@@ -1,0 +1,28 @@
+[11-Jun-2008 21:57:08] PHP Warning:  mysql_num_rows(): supplied argument is not a valid MySQL result resource in /home/nscnet/nsc/websites/snowcms/cms/Sources/Page.php on line 26
+[11-Jun-2008 21:57:08] PHP Notice:  Undefined index:  page_error_title in /home/nscnet/nsc/websites/snowcms/cms/Sources/Page.php on line 35
+[11-Jun-2008 21:57:08] PHP Warning:  require_once(./Themes/default/Page.template.php) [<a href='function.require-once'>function.require-once</a>]: failed to open stream: No such file or directory in /home/nscnet/nsc/websites/snowcms/cms/Sources/Core.php on line 85
+[11-Jun-2008 21:57:08] PHP Fatal error:  require_once() [<a href='function.require'>function.require</a>]: Failed opening required './Themes/default/Page.template.php' (include_path='.:/usr/lib/php:/usr/local/lib/php') in /home/nscnet/nsc/websites/snowcms/cms/Sources/Core.php on line 85
+[11-Jun-2008 21:57:50] PHP Warning:  mysql_num_rows(): supplied argument is not a valid MySQL result resource in /home/nscnet/nsc/websites/snowcms/cms/Sources/Page.php on line 26
+[11-Jun-2008 21:57:50] PHP Warning:  require_once(./Themes/default/Page.template.php) [<a href='function.require-once'>function.require-once</a>]: failed to open stream: No such file or directory in /home/nscnet/nsc/websites/snowcms/cms/Sources/Core.php on line 85
+[11-Jun-2008 21:57:50] PHP Fatal error:  require_once() [<a href='function.require'>function.require</a>]: Failed opening required './Themes/default/Page.template.php' (include_path='.:/usr/lib/php:/usr/local/lib/php') in /home/nscnet/nsc/websites/snowcms/cms/Sources/Core.php on line 85
+[11-Jun-2008 21:58:20] PHP Warning:  mysql_num_rows(): supplied argument is not a valid MySQL result resource in /home/nscnet/nsc/websites/snowcms/cms/Sources/Page.php on line 26
+[11-Jun-2008 21:58:20] PHP Warning:  require_once(./Themes/default/Page.template.php) [<a href='function.require-once'>function.require-once</a>]: failed to open stream: No such file or directory in /home/nscnet/nsc/websites/snowcms/cms/Sources/Core.php on line 85
+[11-Jun-2008 21:58:20] PHP Fatal error:  require_once() [<a href='function.require'>function.require</a>]: Failed opening required './Themes/default/Page.template.php' (include_path='.:/usr/lib/php:/usr/local/lib/php') in /home/nscnet/nsc/websites/snowcms/cms/Sources/Core.php on line 85
+[11-Jun-2008 21:58:53] PHP Warning:  mysql_num_rows(): supplied argument is not a valid MySQL result resource in /home/nscnet/nsc/websites/snowcms/cms/Sources/Page.php on line 26
+[11-Jun-2008 22:19:05] PHP Notice:  Undefined index:  menu_page in /home/nscnet/nsc/websites/snowcms/cms/Sources/Main.php on line 20
+[11-Jun-2008 22:19:05] PHP Fatal error:  Call to undefined function  news() in /home/nscnet/nsc/websites/snowcms/cms/Sources/Main.php on line 26
+[11-Jun-2008 22:19:09] PHP Notice:  Undefined index:  menu_page in /home/nscnet/nsc/websites/snowcms/cms/Sources/Main.php on line 20
+[11-Jun-2008 22:19:09] PHP Fatal error:  Call to undefined function  news() in /home/nscnet/nsc/websites/snowcms/cms/Sources/Main.php on line 26
+[11-Jun-2008 22:19:46] PHP Notice:  Undefined offset:  0 in /home/nscnet/nsc/websites/snowcms/cms/Sources/Core.php on line 152
+[11-Jun-2008 22:20:49] PHP Parse error:  syntax error, unexpected ')', expecting ']' in /home/nscnet/nsc/websites/snowcms/cms/Sources/Core.php on line 152
+[11-Jun-2008 22:21:05] PHP Notice:  Undefined offset:  0 in /home/nscnet/nsc/websites/snowcms/cms/Sources/Core.php on line 152
+[11-Jun-2008 22:23:37] PHP Notice:  Undefined offset:  0 in /home/nscnet/nsc/websites/snowcms/cms/Sources/Core.php on line 152
+[11-Jun-2008 22:23:39] PHP Notice:  Undefined offset:  0 in /home/nscnet/nsc/websites/snowcms/cms/Sources/Core.php on line 152
+[11-Jun-2008 22:23:40] PHP Notice:  Undefined offset:  0 in /home/nscnet/nsc/websites/snowcms/cms/Sources/Core.php on line 152
+[11-Jun-2008 22:25:26] PHP Notice:  Undefined offset:  0 in /home/nscnet/nsc/websites/snowcms/cms/Sources/Core.php on line 152
+[11-Jun-2008 22:26:16] PHP Notice:  Undefined offset:  0 in /home/nscnet/nsc/websites/snowcms/cms/Sources/Core.php on line 152
+[11-Jun-2008 22:26:16] PHP Notice:  Undefined offset:  0 in /home/nscnet/nsc/websites/snowcms/cms/index.php on line 58
+[11-Jun-2008 22:27:11] PHP Notice:  Undefined variable: user in /home/nscnet/nsc/websites/snowcms/cms/Sources/Core.php on line 100
+[11-Jun-2008 22:27:11] PHP Notice:  Undefined offset:  0 in /home/nscnet/nsc/websites/snowcms/cms/Sources/Core.php on line 153
+[11-Jun-2008 22:27:11] PHP Notice:  Undefined offset:  0 in /home/nscnet/nsc/websites/snowcms/cms/index.php on line 58
+[11-Jun-2008 22:27:54] PHP Notice:  Undefined index:  admin in /home/nscnet/nsc/websites/snowcms/cms/Sources/Core.php on line 153
