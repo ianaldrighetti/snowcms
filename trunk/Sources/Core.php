@@ -163,17 +163,25 @@ global $perms, $user;
     return false;
 }
 
-function randStr($length) {
+function randStr($length = 6) {
   $chars = "abcdefghijkmnopqrstuvwxyz023456789";
   srand((double)microtime()*1000000);
   $i = 0;
   $string = '' ;
-  while ($i <= $length) {
+  while ($i <= ($length-1)) {
     $num = rand() % 33;
     $tmp = substr($chars, $num, 1);
     $string = $string . $tmp;
     $i++;
   }
   return $string;
+}
+
+function formattime($timestamp = 0) {
+global $settings;
+  if(!$timestamp)
+    $timestamp = time();
+  return date($settings['timeformat'], $timestamp);
+ 
 }
 ?>
