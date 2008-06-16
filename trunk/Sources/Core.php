@@ -182,6 +182,5 @@ global $settings;
   if(!$timestamp)
     $timestamp = time();
   return date($settings['timeformat'], $timestamp);
- 
 }
 ?>
