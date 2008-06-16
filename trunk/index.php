@@ -48,6 +48,7 @@ WriteOnline();
       'login2' => array('Login.php','Login2'),
       'logout' => array('Login.php','Logout'),
       'news' => array('News.php','News'),
+      'online' => array('Online.php','Online'),
       'register' => array('Register.php','Register'),
       'register2' => array('Register.php','Register2')
     );
