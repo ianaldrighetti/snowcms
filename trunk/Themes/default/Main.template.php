@@ -60,7 +60,7 @@ global $cmsurl, $theme_url, $settings, $user;
 echo '
 	</div>
 	<div id="footer">
-	  <p>Powered by <a href="http://snowcms.northsalemcrew.net/" onclick="window.open(this.href); return false;">SnowCMS</a> '.$settings['version'].' | Theme by <a href="http://www.sourceforge.net/projects/snowcms" onclick="window.open(this.href); return false;">the SnowCMS team</a></p>
+	  <p>Powered by <a href="http://www.snowcms.com/" onClick="window.open(this.href); return false;">SnowCMS</a> '.$settings['version'].' | Theme by <a href="http://www.sourceforge.net/projects/snowcms" onclick="window.open(this.href); return false;">the SnowCMS team</a></p>
 	</div>
 </div>
 </body>
