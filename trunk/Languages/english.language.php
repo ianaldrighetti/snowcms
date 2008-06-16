@@ -40,4 +40,11 @@ $l['page_error_details'] = 'An error has occurred! The Page you have requested d
 
 // Online.template.php
 $l['online_title'] = 'Who\'s Online';
+$l['online_title_unknown'] = 'Unknown';
+$l['online_user_guest'] = 'Guest';
+$l['online_header'] = 'Who\'s Online';
+$l['online_desc'] = 'Here you can view who is online, and what page they are viewing.';
+$l['online_user'] = 'User';
+$l['online_ip'] = 'IP';
+$l['online_currently_viewing'] = 'Currently Viewing';
 ?>
