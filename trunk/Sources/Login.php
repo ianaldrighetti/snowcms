@@ -34,6 +34,11 @@ global $cmsurl, $db_prefix, $l, $settings, $user;
       while($row = mysql_fetch_assoc($result)) {
         $id = $row['id'];
       }
+      if(!empty($_REQUEST['remember_me'])) {
+        setcookie("username", $_REQUEST['username'], time()+($settings['remember_time']*60));
+        setcookie("password", md5($_REQUEST['password']), time()+($settings['remember_time']*60));
+        setcookie("uid", $id, time()+($settings['remember_time']*60));
+      }
       $_SESSION['id'] = $id;
       $_SESSION['pass'] = $password;
       header("Location: {$cmsurl}");
