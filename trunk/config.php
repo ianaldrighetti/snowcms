@@ -25,8 +25,8 @@ $mysql_prefix = 'scms_'; # Prefix for your database
 $source_dir = './Sources'; # Path to your Source directory without trailing /!
 $theme_dir = './Themes'; # Path to your Themes directory without trailing /!
 $language_dir = './Languages'; # Path to your Languages directory without trailing /!
-$cmsurl = 'http://snowcms.northsalemcrew.net/cms/'; # URL to your SnowCMS Installation
-$theme_url = 'http://snowcms.northsalemcrew.net/cms/Themes/'; # URL to your SnowCMS Themes folder
+$cmsurl = 'http://www.snowcms.com/cms/'; # URL to your SnowCMS Installation
+$theme_url = 'http://www.snowcms.com/cms/Themes/'; # URL to your SnowCMS Themes folder
 
 /* Don't touch the stuff below! */
 $db_prefix = '`'.$mysql_db.'`.'.$mysql_prefix;
