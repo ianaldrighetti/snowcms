@@ -42,6 +42,11 @@ global $db_prefix;
   $user['name'] = null;
   $user['email'] = null;
   $user['ip'] = @$_SERVER['HTTP_X_FORWARDED_FOR'] ? $_SERVER['HTTP_X_FORWARDED_FOR'] : $_SERVER['REMOTE_ADDR'];
+  if(empty($_SESSION['id'])) {
+    $_SESSION['id'] = @addslashes(mysql_real_escape_string($_COOKIE['uid']));
+    $_SESSION['user'] = @clean($_COOKIE['username']);
+    $_SESSION['pass'] = @clean($_COOKIE['password']);
+  }
   if(isset($_SESSION['id'])) {
     if(isset($_SESSION['pass'])) {
       $result = mysql_query("SELECT * FROM {$db_prefix}members WHERE `id` = '{$_SESSION['id']}' AND `password` = '{$_SESSION['pass']}'");
