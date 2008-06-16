@@ -37,4 +37,7 @@ $l['register_button'] = 'Register';
 $l['page_error_title'] = $settings['site_name'].' - Error';
 $l['page_error_header'] = 'Error';
 $l['page_error_details'] = 'An error has occurred! The Page you have requested does not exist!';
+
+// Online.template.php
+$l['online_title'] = 'Who\'s Online';
 ?>
