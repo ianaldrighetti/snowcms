@@ -55,7 +55,13 @@ WriteOnline();
       'register' => array('Register.php','Register'),
       'register2' => array('Register.php','Register2')
     );
-    require_once($source_dir.'/'.$actions[$_REQUEST['action']][0]);
-      $actions[$_REQUEST['action']][1]();
+    if(!is_array(@$actions[$_REQUEST['action']])) {
+      require_once($source_dir.'/Main.php');
+        Home();  
+    }
+    else {
+      require_once($source_dir.'/'.$actions[$_REQUEST['action']][0]);
+        $actions[$_REQUEST['action']][1]();
+    }
   }
 ?>
