@@ -47,4 +47,5 @@ $l['online_desc'] = 'Here you can view who is online, and what page they are vie
 $l['online_user'] = 'User';
 $l['online_ip'] = 'IP';
 $l['online_currently_viewing'] = 'Currently Viewing';
+$l['online_time'] = 'Last Active';
 ?>
