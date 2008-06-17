@@ -48,4 +48,8 @@ $l['online_user'] = 'User';
 $l['online_ip'] = 'IP';
 $l['online_currently_viewing'] = 'Currently Viewing';
 $l['online_time'] = 'Last Active';
+
+// Admin.template.php
+$l['admin_title'] = 'Admin CP';
+$l['admin_error_title'] = 'Error';
 ?>
