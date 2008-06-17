@@ -42,4 +42,6 @@ global $cmsurl, $db_prefix, $l, $settings, $source_dir, $user;
 
 function AdminHome() {
 global $cmsurl, $db_prefix, $l, $settings, $source_dir, $user;
+  $settings['page']['title'] = $l['admin_title'];
+  loadTheme('Admin');
 }
