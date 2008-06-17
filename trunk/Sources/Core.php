@@ -149,9 +149,15 @@ global $db_prefix;
 
 function WriteOnline() {
 global $db_prefix, $settings, $user;
+  if(isset($_REQUEST['action']))
+    $action_or_page = 'action:'.clean($_REQUEST['action']);
+  elseif(isset($_REQUEST['page']))
+    $action_or_page = 'page:'.clean($_REQUEST['page']);
+  else 
+    $action_or_page = 0;
   $threshold = time()+($settings['login_threshold']*60);
   mysql_query("DELETE FROM {$db_prefix}online WHERE `last_active` < '$threshold' OR `ip` = '{$user['ip']}'") or die(mysql_error());
-  mysql_query("INSERT INTO {$db_prefix}online (`user_id`,`ip`,`page`,`last_active`) VALUES('{$user['id']}','{$user['ip']}','Nowhere','".time()."')");
+  mysql_query("INSERT INTO {$db_prefix}online (`user_id`,`ip`,`page`,`last_active`) VALUES('{$user['id']}','{$user['ip']}','{$action_or_page}','".time()."')");
 }
 
 function can($what) {
