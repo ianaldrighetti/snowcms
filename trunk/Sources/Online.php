@@ -18,7 +18,7 @@ function Online() {
 global $cmsurl, $db_prefix, $l, $settings, $user;
   if(can('view_online')) {
     $online = array();
-    $result = mysql_query("SELECT * FROM {$db_prefix}online ORDER BY `last_active` ASC");
+    $result = mysql_query("SELECT * FROM {$db_prefix}online ORDER BY `last_active` DESC");
       while($row = mysql_fetch_assoc($result)) {
         $type = explode(":", $row['page']);
         if($type[0]=='action') {
