@@ -56,4 +56,7 @@ $l['admin_cant_get_news_1'] = 'We were unable to get the latest SnowCMS News fro
 $l['admin_cant_get_news_2'] = 'Unable to get the latest news from <a href="http://www.snowcms.com">SnowCMS</a> due to a server timeout. Refresh the page, or check out our site';
 $l['admin_current_version'] = 'Your SnowCMS Version:';
 $l['admin_snowcms_current_version'] = 'Latest SnowCMS Version:';
+
+// Settings.template.php
+$l['basicsettings_title'] = 'Basic Settings';
 ?>
