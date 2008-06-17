@@ -16,6 +16,7 @@ if(!defined("Snow"))
   
 function BasicSettings() {
 global $cmsurl, $db_prefix, $l, $settings, $user;
+  // An array of all the settings that can be set on this page...
   $basic = array(
     'site_name',
     'slogan',
@@ -34,6 +35,7 @@ global $cmsurl, $db_prefix, $l, $settings, $user;
     $settings = loadSettings();
   }
   $settings['page']['title'] = $l['basicsettings_title'];
+  $settings['page']['settings'] = $basic;
   loadTheme('Settings','Basic');
 }
 ?>
