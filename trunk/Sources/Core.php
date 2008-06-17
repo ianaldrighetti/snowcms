@@ -155,8 +155,14 @@ global $db_prefix, $settings, $user;
     $action_or_page = 'page:'.clean($_REQUEST['page']);
   else 
     $action_or_page = 0;
-  $threshold = time()-($settings['login_threshold']*60);
-  mysql_query("DELETE FROM {$db_prefix}online WHERE `last_active` > $threshold OR `ip` = '{$user['ip']}'") or die(mysql_error());
+  $result = mysql_query("SELECT * FROM {$db_prefix}online") or die(mysql_error());
+    while($row = mysql_fetch_assoc($result)) {
+      if($row['ip']==$user['ip'])
+        mysql_query("DELETE FROM {$db_prefix}online WHERE `ip` = '{$row['ip']}'");
+      elseif($row['last_active']+($settings['login_threshold']*60)>time()) {
+        mysql_query("DELETE FROM {$db_prefox}online WHERE `ip` = '{$row['ip']}'");
+      }
+    }
   mysql_query("INSERT INTO {$db_prefix}online (`user_id`,`ip`,`page`,`last_active`) VALUES('{$user['id']}','{$user['ip']}','{$action_or_page}','".time()."')");
 }
 
