@@ -41,7 +41,7 @@ global $cmsurl, $db_prefix, $l, $settings, $user;
           'user' => $row['user_id'] ? $settings['users'][$row['user_id']] : $l['online_user_guest'],
           'ip' => can('view_online_special') ? $row['ip'] : false,
           'page' => $page_title,
-          'time' => formattime($row['last_active'])
+          'time' => date("g:i:sA", $row['last_active'])
         );
       }
     $settings['page']['online'] = $online;
