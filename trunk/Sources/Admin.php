@@ -42,6 +42,22 @@ global $cmsurl, $db_prefix, $l, $settings, $source_dir, $user;
 
 function AdminHome() {
 global $cmsurl, $db_prefix, $l, $settings, $source_dir, $user;
+  // Now we need to get the latest SnowCMS News :)
+  $settings['page']['news'] = null;
+  if(function_exists('curl_init')) {
+    $curl = curl_init('http://www.snowcms.com/news/news.txt');
+      curl_setopt($curl, CURLOPT_HEADER, false);
+	    curl_setopt($curl, CURLOPT_VERBOSE, false);
+	    curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
+	    curl_setopt($curl, CURLOPT_TIMEOUT, 3);
+	  $settings['page']['news'] = curl_exec($curl);
+	  curl_close($curl);
+	  if(empty($settings['page']['news']))
+	    $settings['page']['news'] = $l['admin_cant_get_news_2'];
+	}
+	else {
+	  $settings['page']['news'] = $l['admin_cant_get_news_1'];
+	}
   $settings['page']['title'] = $l['admin_title'];
   loadTheme('Admin');
 }
