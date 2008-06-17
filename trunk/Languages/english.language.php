@@ -54,4 +54,6 @@ $l['admin_title'] = 'Admin CP';
 $l['admin_error_title'] = 'Error';
 $l['admin_cant_get_news_1'] = 'We were unable to get the latest SnowCMS News from the <a href="http://www.snowcms.com">SnowCMS</a> site due to your server configuration does not have <a href="http://php.net/curl">cURL</a> setup. Please check out our site for the latest news &amp; updates.';
 $l['admin_cant_get_news_2'] = 'Unable to get the latest news from <a href="http://www.snowcms.com">SnowCMS</a> due to a server timeout. Refresh the page, or check out our site';
+$l['admin_current_version'] = 'Your SnowCMS Version:';
+$l['admin_snowcms_current_version'] = 'Latest SnowCMS Version:';
 ?>
