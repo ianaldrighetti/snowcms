@@ -155,7 +155,7 @@ global $db_prefix, $settings, $user;
     $action_or_page = 'page:'.clean($_REQUEST['page']);
   else 
     $action_or_page = 0;
-  $threshold = time()+($settings['login_threshold']*60);
+  $threshold = time()-($settings['login_threshold']*60);
   mysql_query("DELETE FROM {$db_prefix}online WHERE `last_active` > $threshold OR `ip` = '{$user['ip']}'") or die(mysql_error());
   mysql_query("INSERT INTO {$db_prefix}online (`user_id`,`ip`,`page`,`last_active`) VALUES('{$user['id']}','{$user['ip']}','{$action_or_page}','".time()."')");
 }
