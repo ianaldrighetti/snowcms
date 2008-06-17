@@ -160,7 +160,7 @@ global $db_prefix, $settings, $user;
       if($row['ip']==$user['ip'])
         mysql_query("DELETE FROM {$db_prefix}online WHERE `ip` = '{$row['ip']}'");
       elseif(($row['last_active']+($settings['login_threshold']*60))<time()) {
-        mysql_query("DELETE FROM {$db_prefox}online WHERE `ip` = '{$row['ip']}'");
+        mysql_query("DELETE FROM {$db_prefix}online WHERE `ip` = '{$row['ip']}'");
       }
     }
   mysql_query("INSERT INTO {$db_prefix}online (`user_id`,`ip`,`page`,`last_active`) VALUES('{$user['id']}','{$user['ip']}','{$action_or_page}','".time()."')");
