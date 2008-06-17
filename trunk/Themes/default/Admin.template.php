@@ -20,3 +20,10 @@ global $cmsurl, $settings, $l, $user;
     </tr>
   </table>';
 }
+
+function Error() {
+global $cmsurl, $settings, $l, $user;
+  echo '
+  <h1>'.$l['admin_error_header'].'</h1>
+  <p>'.$l['admin_error_reason'].'</p>';
+}
