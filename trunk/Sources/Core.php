@@ -159,7 +159,7 @@ global $db_prefix, $settings, $user;
     while($row = mysql_fetch_assoc($result)) {
       if($row['ip']==$user['ip'])
         mysql_query("DELETE FROM {$db_prefix}online WHERE `ip` = '{$row['ip']}'");
-      elseif($row['last_active']+($settings['login_threshold']*60)>time()) {
+      elseif(($row['last_active']+($settings['login_threshold']*60))<time()) {
         mysql_query("DELETE FROM {$db_prefox}online WHERE `ip` = '{$row['ip']}'");
       }
     }
