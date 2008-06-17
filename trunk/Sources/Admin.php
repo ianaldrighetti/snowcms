@@ -23,7 +23,7 @@ global $cmsurl, $db_prefix, $l, $settings, $source_dir, $user;
         'members' => array('Members.php','ManageMembers'),
         'basic-settings' => array('Settings.php','BasicSettings')
       );
-      if(is_array(@$sa[$_REQUEST['members']])) {
+      if(is_array(@$sa[$_REQUEST['sa']])) {
         require_once($source_dir.'/'.$sa[$_REQUEST['sa']][0]);
           $sa[$_REQUEST['sa']][1]();
       }
