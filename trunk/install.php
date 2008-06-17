@@ -32,8 +32,8 @@ $files = array(
 	<div id="sidebar">
 	<ul>
 	  <li><a href="http://www.snowcms.com/" >SnowCMS Support</a></li>
-	  <li><a href="http://www.snowcms.com/cms/index.php?action=login">Login</a></li>
-    <li><a href="http://www.snowcms.com/cms/index.php?action=register">Register</a></li>
+	  <li><a href="http://code.google.com/p/snowcms/">Google Code</a></li>
+    <li><a href="http://www.snowcms.com/forum/index.php?board=3.0">Dev Blogs</a></li>
 	</ul>
 	</div>
 	<div id="content">
