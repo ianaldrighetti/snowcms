@@ -14,7 +14,8 @@ global $cmsurl, $settings, $l, $user;
   <h1>'.$l['basicsettings_header'].'</h1>
   <p>'.$l['basicsettings_desc'].'</p>';
   echo '
-  <table>';
+  <form action="" method="post">
+    <table>';
   foreach($settings['page']['settings'] as $setting) {
     echo '
       <tr>
@@ -22,5 +23,9 @@ global $cmsurl, $settings, $l, $user;
       </tr>';
   }
   echo '
-  </table>';
+      <tr>
+        <td colspan="2"><input name="update" type="submit" value="'.$l['basicsettings_update'].'"/></td>
+      </tr>
+    </table>
+  </form>';
 }
