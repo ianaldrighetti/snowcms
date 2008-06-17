@@ -16,6 +16,8 @@ define("Snow", true);
 
 // Load Some Important Files
 require_once('./config.php');
+if(!$scms_installed)
+  header("Location: install.php");
 require_once($source_dir.'/Core.php');
 
   mysql_connect($mysql_host, $mysql_user, $mysql_passwd) or die(mysql_error());
