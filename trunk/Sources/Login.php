@@ -62,6 +62,10 @@ global $cmsurl, $db_prefix, $settings, $user;
   if($user['is_logged']) {
     session_destroy();
     mysql_query("DELETE FROM {$db_prefix}online WHERE `user_id` = '{$user['id']}'");
+    // Delete the Cookies...  
+      @setcookie("username", '', time()-($settings['remember_time']*60));
+      @setcookie("password", '', time()-($settings['remember_time']*60));
+      @setcookie("uid", '', time()-($settings['remember_time']*60));    
     header("Location: {$cmsurl}");
   }
   else {
