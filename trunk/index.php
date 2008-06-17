@@ -42,6 +42,8 @@ WriteOnline();
   }
   else {
     // Action is not empty!
+    // To add an action, it is Quite Simple, Simply add a row like this:
+    // 'ACTION_NAME' => array('ACTION_SOURCE_FILE','FUNCTION_TO_CALL_ON_IN_FILE'),
     $actions = array(
       'admin' => array('Admin.php','Admin'),
       'login' => array('Login.php','Login'),
@@ -49,6 +51,7 @@ WriteOnline();
       'logout' => array('Login.php','Logout'),
       'news' => array('News.php','News'),
       'online' => array('Online.php','Online'),
+      'profile' => array('Profile.php','Profile'),
       'register' => array('Register.php','Register'),
       'register2' => array('Register.php','Register2')
     );
