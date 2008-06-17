@@ -7,3 +7,7 @@ function Main() {
 global $cmsurl, $settings, $l, $user;
   
 }
+
+function Basic() {
+
+}
