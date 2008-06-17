@@ -16,17 +16,17 @@ if(!defined("Snow"))
   
 // Your MySQL Information
 $mysql_host = 'localhost'; # Your MySQL Host, doubt you will change this
-$mysql_user = 'nscnet_snowcms'; # Your MySQL Username
-$mysql_passwd = '1@snowcms1245&'; # Your MySQL Password
-$mysql_db = 'nscnet_snow'; # Your MySQL DB
+$mysql_user = ''; # Your MySQL Username
+$mysql_passwd = ''; # Your MySQL Password
+$mysql_db = ''; # Your MySQL DB
 $mysql_prefix = 'scms_'; # Prefix for your database
 
 // Some SnowCMS Specific Settings
-$source_dir = './Sources'; # Path to your Source directory without trailing /!
-$theme_dir = './Themes'; # Path to your Themes directory without trailing /!
-$language_dir = './Languages'; # Path to your Languages directory without trailing /!
-$cmsurl = 'http://www.snowcms.com/cms/'; # URL to your SnowCMS Installation
-$theme_url = 'http://www.snowcms.com/cms/Themes/'; # URL to your SnowCMS Themes folder
+$source_dir = ''; # Path to your Source directory without trailing /!
+$theme_dir = ''; # Path to your Themes directory without trailing /!
+$language_dir = ''; # Path to your Languages directory without trailing /!
+$cmsurl = ''; # URL to your SnowCMS Installation
+$theme_url = ''; # URL to your SnowCMS Themes folder
 
 /* Don't touch the stuff below! */
 $db_prefix = '`'.$mysql_db.'`.'.$mysql_prefix;
