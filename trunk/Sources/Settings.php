@@ -34,6 +34,6 @@ global $cmsurl, $db_prefix, $l, $settings, $user;
     $settings = loadSettings();
   }
   $settings['page']['title'] = $l['basicsettings_title'];
-  loadTheme('Settings','BasicSettings');
+  loadTheme('Settings','Basic');
 }
 ?>
