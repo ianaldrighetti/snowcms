@@ -39,3 +39,7 @@ global $cmsurl, $db_prefix, $l, $settings, $source_dir, $user;
     loadTheme('Admin','Error');
   }
 }
+
+function AdminHome() {
+global $cmsurl, $db_prefix, $l, $settings, $source_dir, $user;
+}
