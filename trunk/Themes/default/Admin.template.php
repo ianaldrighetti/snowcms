@@ -12,11 +12,11 @@ global $cmsurl, $settings, $l, $user;
   <table>
     <tr>
       <td>'.$l['admin_current_version'].'</td>
-      <td>'.$settings['version'].'</td>
+      <td>v'.$settings['version'].'</td>
     </tr>
     <tr>
       <td>'.$l['admin_snowcms_current_version'].'</td>
-      <td>v0.2</td>
+      <td>'.$settings['latest_version'].'</td>
     </tr>
   </table>';
 }
