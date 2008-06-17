@@ -36,8 +36,9 @@ global $cmsurl, $db_prefix, $l, $settings, $user;
         else
           $page_title = $l['online_title_unknown'];
         $online[] = array(
-          'user_id' => $row['user_id'] ? $row['user_id'] : $l['online_user_guest'],
-          'user' => $settings['users'][$row['user_id']],
+          'user_id' => $row['user_id'],
+          'is_user' => $row['user_id'] ? true : false,
+          'user' => $row['user_id'] ? $settings['users'][$row['user_id']] : $l['online_user_guest'],
           'ip' => can('view_online_special') ? $row['ip'] : false,
           'page' => $page_title,
           'time' => formattime($row['last_active'])
