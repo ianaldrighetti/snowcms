@@ -86,4 +86,9 @@ $l['managepages_edit_title'] = 'Editing Page %title%';
 $l['managepages_no_page_title'] = 'The Page Doesn\'t Exist!';
 $l['managepages_no_page_header'] = 'Page Doesn\'t Exist';
 $l['managepages_no_page_desc'] = 'The page you have requested to edit does not exist.';
+$l['managepages_edit_header'] = 'Edit Page';
+$l['managepages_edit_desc'] = 'You are currently editing a page, you can edit the content and the title of the page, you use can use HTML in the content of the page.';
+$l['managepages_editpage_title'] = 'Page Title:';
+$l['managepages_editpage_content'] = 'Page Content:';
+$l['managepages_editpage_button'] = 'Update Page';
 ?>
