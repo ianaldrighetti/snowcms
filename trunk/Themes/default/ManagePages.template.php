@@ -36,5 +36,23 @@ global $cmsurl, $settings, $l, $user;
       </table>
     </form>';
   }
+  if($settings['page']['num_pages']>0) {
+    echo '
+    <table>
+      <tr>
+        <td>'.$l['adminpages_title_td'].'</td><td>'.$l['adminpages_pageowner'].'</td><td>'.$l['adminpages_datemade'].'</td>
+      </tr>';
+    foreach($settings['page']['pages'] as $page) {
+      echo '
+      <tr>
+        <td><a href="'.$cmsurl.'index.php?action=admin&sa=editpage&page_id='.$page['page_id'].'">'.$page['title'].'</a></td><td><a href="'.$cmsurl.'index.php?action=profile&u='.$page['page_owner'].'">'.$page['owner'].'</td><td>'.$page['date'].'</td>
+      </tr>';
+    }
+    echo '
+    </table>';
+  }
+  else {
+    echo '<p>'.$l['adminpages_no_pages'].'</p>';
+  }
 }
 ?>
