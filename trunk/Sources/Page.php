@@ -41,6 +41,19 @@ global $cmsurl, $db_prefix, $l, $settings, $user;
 function ManagePages() {
 global $cmsurl, $db_prefix, $l, $settings, $user;
   $settings['page']['make_page']['do'] = false;
+  $settings['page']['update_page'] = 0;
+  if(!empty($_REQUEST['update_page'])) {
+    $page_id = clean($_REQUEST['page_id']);
+    $page_title = clean($_REQUEST['page_title']);
+    $page_content = clean($_REQUEST['page_content']);
+    $result = mysql_query("UPDATE {$db_prefix}pages SET `title` = '{$page_title}', `content` = '{$page_content}' WHERE `page_id` = '{$page_id}'");
+    if($result) {
+      $settings['page']['update_page'] = 1;
+    }
+    else {
+      $settings['page']['update_page'] = 2;
+    }
+  }
   if(!empty($_REQUEST['make_page'])) {
     $settings['page']['make_page']['do'] = true;  
     $page_owner = clean($user['id']);
