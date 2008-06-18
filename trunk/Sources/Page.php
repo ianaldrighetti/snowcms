@@ -59,6 +59,19 @@ global $cmsurl, $db_prefix, $l, $settings, $user;
       $settings['page']['make_page']['info'] = str_replace("%title%", $_REQUEST['page_title'], $l['adminpage_make_fail']);
     }
   }
+  $result = mysql_query("SELECT * FROM {$db_prefix}pages ORDER BY `page_id` DESC");
+    $pages = array();
+    while($row = mysql_fetch_assoc($result)) {
+      $pages[] = array(
+        'page_id' => $row['page_id'],
+        'page_owner' => $row['page_owner'],
+        'owner' => @$settings['users'][$row['page_owner']] ? $settings['users'][$row['page_owner']] : $row['owner_name'],
+        'date' => $row['modify_date'] ? formattime($row['modify_date']) : formattime($row['create_date']),
+        'title' => $row['title']
+      );
+    }
+  $settings['page']['pages'] = $pages;
+  $settings['page']['num_pages'] = count($pages);
   $settings['page']['title'] = $l['adminpage_make_title'];
   loadTheme('ManagePages');
 }
