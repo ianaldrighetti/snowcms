@@ -20,8 +20,9 @@ global $cmsurl, $db_prefix, $l, $settings, $source_dir, $user;
   if(can('admin')) {
     if(!empty($_REQUEST['sa'])) {
       $sa = array(
+        'basic-settings' => array('Settings.php','BasicSettings'),
         'members' => array('Members.php','ManageMembers'),
-        'basic-settings' => array('Settings.php','BasicSettings')
+        'managepages' => array('Page.php','ManagePages')        
       );
       if(is_array(@$sa[$_REQUEST['sa']])) {
         require_once($source_dir.'/'.$sa[$_REQUEST['sa']][0]);
