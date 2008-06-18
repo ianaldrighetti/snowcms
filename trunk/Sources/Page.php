@@ -40,9 +40,9 @@ global $cmsurl, $db_prefix, $l, $settings, $user;
 // An Admin Function to Make/Manage Pages
 function ManagePages() {
 global $cmsurl, $db_prefix, $l, $settings, $user;
-  $settings['page']['make_page'] = false;
+  $settings['page']['make_page']['do'] = false;
   if(!empty($_REQUEST['make_page'])) {
-    $settings['page']['make_page'] = true;  
+    $settings['page']['make_page']['do'] = true;  
     $page_owner = clean($user['id']);
     $owner_name = clean($user['name']);
     $create_date = time();
@@ -51,12 +51,12 @@ global $cmsurl, $db_prefix, $l, $settings, $user;
     if($result) {
       $settings['page']['make_page']['status'] = true;
       $settings['page']['make_page']['title'] = $title;
-      $settings['page']['make_page']['info'] = str_replace("%title%", $_REQUEST['title'], $l['adminpage_make_success']);
+      $settings['page']['make_page']['info'] = str_replace("%title%", $_REQUEST['page_title'], $l['adminpage_make_success']);
     }
     else {
       $settings['page']['make_page']['status'] = false;
       $settings['page']['make_page']['title'] = $title;
-      $settings['page']['make_page']['info'] = str_replace("%title%", $_REQUEST['title'], $l['adminpage_make_fail']);
+      $settings['page']['make_page']['info'] = str_replace("%title%", $_REQUEST['page_title'], $l['adminpage_make_fail']);
     }
   }
   $settings['page']['title'] = $l['adminpage_make_title'];
