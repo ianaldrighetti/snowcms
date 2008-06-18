@@ -9,7 +9,7 @@ global $cmsurl, $settings, $l, $user;
   echo '
   <h1>'.$l['managepages_header'].'</h1>
   <p>'.$l['managepages_desc'].'</p>';
-  if($settings['page']['make_page']) {
+  if($settings['page']['make_page']['do']) {
     if($settings['page']['make_page']['status']) {
       echo '
       <div id="page_success">
