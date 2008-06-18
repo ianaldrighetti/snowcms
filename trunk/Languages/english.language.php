@@ -78,4 +78,8 @@ $l['managepages_header'] = 'Manage Pages';
 $l['managepages_desc'] = 'The main part of SnowCMS is here, being a CMS you can manage, and create pages of your site here.';
 $l['adminpage_make_success'] = 'The page %title% was successfully created!';
 $l['adminpage_make_fail'] = 'Failed to create the page %title%';
+$l['adminpages_title_td'] = 'Page Title';
+$l['adminpages_pageowner'] = 'Page Owner';
+$l['adminpages_datemade'] = 'Created on';
+$l['adminpages_no_pages'] = 'Their are currently no pages in your database';
 ?>
