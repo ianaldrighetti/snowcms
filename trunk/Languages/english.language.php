@@ -69,4 +69,13 @@ $l['basicsettings_login_threshold'] = 'Login Threshold:';
 $l['basicsettings_remember_time'] = 'Default Cookie Time:';
 $l['basicsettings_timeformat'] = 'Time Format:';
 $l['basicsettings_update'] = 'Update Settings';
+
+// ManagePages.template.php
+$l['adminpage_make_title'] = 'Manage Pages';
+$l['managepages_makepage'] = 'Create Page!';
+$l['managepages_pagetitle'] = 'Page Title:';
+$l['managepages_header'] = 'Manage Pages';
+$l['managepages_desc'] = 'The main part of SnowCMS is here, being a CMS you can manage, and create pages of your site here.';
+$l['adminpage_make_success'] = 'The page %title% was successfully created!';
+$l['adminpage_make_fail'] = 'Failed to create the page %title%';
 ?>
