@@ -51,12 +51,12 @@ global $cmsurl, $db_prefix, $l, $settings, $user;
     if($result) {
       $settings['page']['make_page']['status'] = true;
       $settings['page']['make_page']['title'] = $title;
-      $settings['page']['make_page']['info'] = $l['adminpage_make_success'];
+      $settings['page']['make_page']['info'] = str_replace("%title%", $_REQUEST['title'], $l['adminpage_make_success']);
     }
     else {
-      $settings['page']['make_page']['status'] = true;
+      $settings['page']['make_page']['status'] = false;
       $settings['page']['make_page']['title'] = $title;
-      $settings['page']['make_page']['info'] = $l['adminpage_make_fail'];
+      $settings['page']['make_page']['info'] = str_replace("%title%", $_REQUEST['title'], $l['adminpage_make_fail']);
     }
   }
   $settings['page']['title'] = $l['adminpage_make_title'];
