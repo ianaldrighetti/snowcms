@@ -102,6 +102,7 @@ global $cmsurl, $db_prefix, $l, $settings, $user;
           'content' => stripslashes(stripslashes($row['content']))
         );
         $settings['page']['edit_page'] = $page;
+        $settings['page']['edit_page']['content'] = clean($settings['page']['edit_page']['content']);
         $settings['page']['title'] = str_replace("%title%", $page['title'], $l['managepages_edit_title']);
         loadTheme('ManagePages','Editor');
       }
