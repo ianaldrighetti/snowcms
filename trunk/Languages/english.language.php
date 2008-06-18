@@ -82,4 +82,8 @@ $l['adminpages_title_td'] = 'Page Title';
 $l['adminpages_pageowner'] = 'Page Owner';
 $l['adminpages_datemade'] = 'Created on';
 $l['adminpages_no_pages'] = 'Their are currently no pages in your database';
+$l['managepages_edit_title'] = 'Editing Page %title%';
+$l['managepages_no_page_title'] = 'The Page Doesn\'t Exist!';
+$l['managepages_no_page_header'] = 'Page Doesn\'t Exist';
+$l['managepages_no_page_desc'] = 'The page you have requested to edit does not exist.';
 ?>
