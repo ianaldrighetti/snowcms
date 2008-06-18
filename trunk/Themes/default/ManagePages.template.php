@@ -9,6 +9,18 @@ global $cmsurl, $settings, $l, $user;
   echo '
   <h1>'.$l['managepages_header'].'</h1>
   <p>'.$l['managepages_desc'].'</p>';
+  if($settings['page']['update_page']==1) {
+    echo '
+    <div id="page_fail">
+      <p>'.$l['managepages_update_success'].'</p>
+    </div>';  
+  }
+  elseif($settings['page']['update_page']==2) {
+    echo '
+    <div id="page_fail">
+      <p>'.$l['managepages_update_failed'].'</p>
+    </div>';
+  }
   if($settings['page']['make_page']['do']) {
     if($settings['page']['make_page']['status']) {
       echo '
