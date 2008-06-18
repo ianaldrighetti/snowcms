@@ -79,6 +79,7 @@ global $cmsurl, $settings, $l, $user;
       <tr>
         <td colspan="2"><textarea name="page_content" rows="8" cols="40">'.$settings['page']['edit_page']['content'].'</textarea></td>
       </tr>
+      <input name="page_id" type="hidden" value="'.$settings['page']['edit_page']['page_id'].'"/>
       <tr>
         <td>&nbsp;</td><td><input name="update_page" type="submit" value="'.$l['managepages_editpage_button'].'"/></td>
       </tr>
