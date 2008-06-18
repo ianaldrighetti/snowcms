@@ -36,4 +36,30 @@ global $cmsurl, $db_prefix, $l, $settings, $user;
     loadTheme('Page','Error');
   }
 }
+
+// An Admin Function to Make/Manage Pages
+function ManagePages() {
+global $cmsurl, $db_prefix, $l, $settings, $user;
+  $settings['page']['make_page'] = false;
+  if(!empty($_REQUEST['make_page'])) {
+    $settings['page']['make_page'] = true;  
+    $page_owner = clean($user['id']);
+    $owner_name = clean($user['name']);
+    $create_date = time();
+    $title = clean($_REQUEST['page_title']);
+    $result = mysql_query("INSERT INTO {$db_prefix}pages (`page_owner`,`owner_name`,`create_date`,`title`) VALUES('{$page_owner}','{$owner_name}','{$create_date}','{$title}')");
+    if($result) {
+      $settings['page']['make_page']['status'] = true;
+      $settings['page']['make_page']['title'] = $title;
+      $settings['page']['make_page']['info'] = $l['adminpage_make_success'];
+    }
+    else {
+      $settings['page']['make_page']['status'] = true;
+      $settings['page']['make_page']['title'] = $title;
+      $settings['page']['make_page']['info'] = $l['adminpage_make_fail'];
+    }
+  }
+  $settings['page']['title'] = $l['adminpage_make_title'];
+  loadTheme('ManagePages');
+}
 ?>
