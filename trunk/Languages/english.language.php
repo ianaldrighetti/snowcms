@@ -91,4 +91,6 @@ $l['managepages_edit_desc'] = 'You are currently editing a page, you can edit th
 $l['managepages_editpage_title'] = 'Page Title:';
 $l['managepages_editpage_content'] = 'Page Content:';
 $l['managepages_editpage_button'] = 'Update Page';
+$l['managepages_update_failed'] = 'Updating the page Failed!';
+$l['managepages_update_success'] = 'Updated the page Successfully!';
 ?>
