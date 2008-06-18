@@ -55,4 +55,34 @@ global $cmsurl, $settings, $l, $user;
     echo '<p>'.$l['adminpages_no_pages'].'</p>';
   }
 }
+
+function NoPage() {
+global $cmsurl, $settings, $l, $user;
+  echo '
+  <h1>'.$l['managepages_no_page_header'].'</h1>
+  <p>'.$l['managepages_no_page_desc'].'</p>';
+}
+
+function Editor() {
+global $cmsurl, $settings, $l, $user;
+  echo '
+  <h1>'.$l['managepages_edit_header'].'</h1>
+  <p>'.$l['managepages_edit_desc'].'</p>
+  <form action="'.$cmsurl.'index.php?action=admin&sa=managepages" method="post">
+    <table>
+      <tr>
+        <td>'.$l['managepages_editpage_title'].'</td><td><input name="page_title" type="text" value="'.$settings['page']['edit_page']['title'].'"/></td>
+      </tr>
+      <tr>
+        <td colspan="2">'.$l['managepages_editpage_content'].'</td>
+      </tr>
+      <tr>
+        <td colspan="2"><textarea name="page_content" rows="8" cols="40">'.$settings['page']['edit_page']['content'].'</textarea></td>
+      </tr>
+      <tr>
+        <td>&nbsp;</td><td><input name="update_page" type="submit" value="'.$l['managepages_editpage_button'].'"/></td>
+      </tr>
+    </table>
+  </form>'; 
+}
 ?>
