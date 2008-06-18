@@ -89,7 +89,7 @@ global $cmsurl, $db_prefix, $l, $settings, $user;
           'content' => $row['content']
         );
         $settings['page']['edit_page'] = $page;
-        $settings['page']['title'] = $l['managepages_edit_title'];
+        $settings['page']['title'] = str_replace("%title%", $page['title'], $l['managepages_edit_title']);
         loadTheme('ManagePages','Editor');
       }
     }
