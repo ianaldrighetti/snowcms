@@ -45,7 +45,7 @@ global $cmsurl, $db_prefix, $l, $settings, $user;
   if(!empty($_REQUEST['update_page'])) {
     $page_id = clean($_REQUEST['page_id']);
     $page_title = clean($_REQUEST['page_title']);
-    $page_content = clean($_REQUEST['page_content']);
+    $page_content = addslashes(mysql_real_escape_string($_REQUEST['page_content']));
     $result = mysql_query("UPDATE {$db_prefix}pages SET `title` = '{$page_title}', `content` = '{$page_content}' WHERE `page_id` = '{$page_id}'");
     if($result) {
       $settings['page']['update_page'] = 1;
@@ -99,7 +99,7 @@ global $cmsurl, $db_prefix, $l, $settings, $user;
         $page = array(
           'page_id' => $row['page_id'],
           'title' => $row['title'],
-          'content' => $row['content']
+          'content' => stripslashes(stripslashes($row['content']))
         );
         $settings['page']['edit_page'] = $page;
         $settings['page']['title'] = str_replace("%title%", $page['title'], $l['managepages_edit_title']);
