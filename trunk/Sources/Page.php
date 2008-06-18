@@ -75,4 +75,32 @@ global $cmsurl, $db_prefix, $l, $settings, $user;
   $settings['page']['title'] = $l['adminpage_make_title'];
   loadTheme('ManagePages');
 }
+
+function EditPage() {
+global $cmsurl, $db_prefix, $l, $settings, $user;
+  $page_id = clean($_REQUEST['page_id']);
+  if(!empty($page_id)) {
+    $result = mysql_query("SELECT * FROM {$db_prefix}pages WHERE `page_id` = '{$page_id}'");
+    if(mysql_num_rows($result)>0) {
+      while($row = mysql_fetch_assoc($result)) {
+        $page = array(
+          'page_id' => $row['page_id'],
+          'title' => $row['title'],
+          'content' => $row['content']
+        );
+        $settings['page']['edit_page'] = $page;
+        $settings['page']['title'] = $l['managepages_edit_title'];
+        loadTheme('ManagePages','Editor');
+      }
+    }
+    else {
+      $settings['page']['title'] = $l['managepages_no_page_title'];
+      loadTheme('ManagePages','NoPage');
+    }
+  }
+  else {
+    $settings['page']['title'] = $l['managepages_no_page_title'];
+    loadTheme('ManagePages','NoPage');
+  }
+}
 ?>
