@@ -21,6 +21,7 @@ global $cmsurl, $db_prefix, $l, $settings, $source_dir, $user;
     if(!empty($_REQUEST['sa'])) {
       $sa = array(
         'basic-settings' => array('Settings.php','BasicSettings'),
+        'editpage' => array('Page.php','EditPage'),
         'members' => array('Members.php','ManageMembers'),
         'managepages' => array('Page.php','ManagePages')        
       );
