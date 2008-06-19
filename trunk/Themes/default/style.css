@@ -121,11 +121,13 @@ a.headerlink {
   float: left;
   width: 245px;
   border: 1px solid #467aa7;
+  margin-top: 3px;
 }
 .acp_right {
   float: right;
   width: 245px;
   border: 1px solid #467aa7;
+  margin-top: 3px;
 }
 .acp_left .main, .acp_right .main {
   font-weight: bold;
