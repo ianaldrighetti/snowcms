@@ -15,7 +15,7 @@ if(!defined("Snow"))
   die("Hacking Attempt...");
 
 function SendMail($to, $subject, $msg, $is_html = false) {
-global $cmsurl, $l, $settings, $user;
+global $cmsurl, $l, $settings, $source_dir, $user;
   // This function is simple, it is used to send emails, through fsockopen() or mail()
   // First lets see if they want to send email with fsockopen
   if($settings['mail_with_fsockopen']) {
@@ -25,6 +25,7 @@ global $cmsurl, $l, $settings, $user;
     
     // We are sending as SMTP, set the host, SMTP user and password
     $mail->IsSMTP();
+    $mail->PluginDir($source_dir);
     $mail->Host = $settings['smtp_host'];
     $mail->SMTPAuth = true;
     $mail->Username = $settings['smtp_user'];
@@ -57,9 +58,9 @@ global $cmsurl, $l, $settings, $user;
   }
   else {
     // Set the headers, such as where from, and Reply too
-    $headers = "From: {$settings['webmaster_email']}\r\nReply-To: {$settings['webmaster_email']}".
+    $header = "From: ".$settings['webmaster_email']."\r\nReply-To: ".$settings['webmaster_email']."\r\n";
     // Send the email
-    $mail = mail($to, $subject, $msg, $headers);
+    $mail = mail($to, $subject, $msg, $header);
     // Was it successful or not?
     if(!$mail) {
       $info['msg'] = $l['mail_mail_fail'];
