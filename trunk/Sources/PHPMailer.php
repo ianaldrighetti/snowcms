@@ -134,7 +134,7 @@ class PHPMailer {
    * is in a different directory than the PHP include path.
    * @var string
    */
-  public $PluginDir         = $source_dir;
+  public $PluginDir         = '';
 
   /**
    * Holds PHPMailer version.
@@ -285,7 +285,10 @@ class PHPMailer {
   public function IsSMTP() {
     $this->Mailer = 'smtp';
   }
-
+  
+  public function PluginDir($source_dir) {
+    $this->PluginDir = $source_dir;
+  }
   /**
    * Sets Mailer to send message using PHP mail() function.
    * @return void
@@ -511,7 +514,7 @@ class PHPMailer {
    * @return bool
    */
   public function SmtpSend($header, $body) {
-    include_once($this->PluginDir . 'SMTP.php');
+    include_once($this->PluginDir . '/SMTP.php');
     $error = '';
     $bad_rcpt = array();
 
