@@ -10,7 +10,7 @@
 // 
 //            config.php file 
 
-
+// We can't let you access it directly :)
 if(!defined("Snow"))
   die("Hacking Attempt...");
   
