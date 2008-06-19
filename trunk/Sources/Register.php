@@ -23,7 +23,7 @@ global $cmsurl, $l, $settings, $user;
 }
 
 function Register2() {
-global $cmsurl, $db_prefix, $l, $settings, $user;
+global $cmsurl, $db_prefix, $l, $settings, $source_dir, $user;
   // Load the CAPTCHA Image Source
   require_once($source_dir.'/Captcha.php');
   // Get their username, password, verification pass, email, and the captcha
@@ -69,9 +69,10 @@ global $cmsurl, $db_prefix, $l, $settings, $user;
     $activated = 1;
     $acode = base64_encode(md5(time().$email.$password.rand(1,500)));
     // What is account Activation?
-    if($settings['account_activated']>1) {
+    if($settings['account_activation']>0) {
       $activated = 0;
     }
+    $settings['page']['error'] = null;
     // Insert it
     $result = mysql_query("INSERT INTO {$db_prefix}members (`username`,`password`,`email`,`reg_date`,`reg_ip`,`group`,`activated`,`acode`) VALUES('{$username}','{$password}','{$email}','{$time}','{$user['ip']}','2','{$activated}','{$acode}')");
     if($result) {
@@ -87,11 +88,13 @@ global $cmsurl, $db_prefix, $l, $settings, $user;
         $msg = $l['email_register_tpl'];
         $msg = str_replace("%username%", $username, $msg);
         $msg = str_replace("%alink%", $cmsurl.'index.php?action=activate&acode='.$acode.'&u='.$username, $msg);
-        SendMail($_REQUEST['email'], $l['email_register_subject'], $msg);
+        $info = SendMail($_REQUEST['email'], $l['email_register_subject'], $msg);
+        if($info['error'])
+          $settings['page']['error'] = $info['msg'];
         $settings['page']['title'] = $l['register_title'];
         loadTheme('Register', 'SuccessBut1');
       }
-      else {
+      elseif($settings['account_activation']==2) {  
         $settings['page']['title'] = $l['register_title'];
         loadTheme('Register', 'SuccessBut2');
       }
