@@ -99,4 +99,11 @@ $l['managepages_editpage_content'] = 'Page Content:';
 $l['managepages_editpage_button'] = 'Update Page';
 $l['managepages_update_failed'] = 'Updating the page Failed!';
 $l['managepages_update_success'] = 'Updated the page Successfully!';
+
+// Some Email stuff, for Email Activation, etc.
+$l['mail_smtp_fail'] = 'Sending email Failed! Error: %error%';
+$l['mail_smtp_success'] = 'Email Sent Successfully!';
+$l['mail_mail_fail'] = 'Sending email Failed!';
+$l['mail_mail_success'] = 'Email sent Successfully!';
+$l['email_register_tpl'] = "Hello %username%!\r\n Someone has requested an account at {$settings['site_name']} If you didn't request this ignore this email\r\nIf you did request this, click on the link below to activate your account\r\n%alink%\r\n \r\nRegards,\r\nThe {$settings['site_name']} Team";
 ?>
