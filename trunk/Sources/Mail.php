@@ -45,10 +45,14 @@ global $cmsurl, $l, $settings, $user;
     
     // Was it successful or not?
     if(!$mail->Send()) {
-      return str_replace('%error%', $mail->ErrorInfo, $l['mail_smtp_fail']);
+      $info['msg'] = str_replace('%error%', $mail->ErrorInfo, $l['mail_smtp_fail']);
+      $info['error'] = true;
+      return $info;
     }
     else {
-      return $l['mail_smtp_success'];
+      $info['msg'] = $l['mail_smtp_success'];
+      $info['error'] = false;
+      return $info;
     }
   }
   else {
@@ -58,10 +62,14 @@ global $cmsurl, $l, $settings, $user;
     $mail = mail($to, $subject, $msg, $headers);
     // Was it successful or not?
     if(!$mail) {
-      return $l['mail_mail_fail'];
+      $info['msg'] = $l['mail_mail_fail'];
+      $info['error'] = true;
+      return $info;
     }
     else {
-      return $l['mail_mail_success'];
+      $info['msg'] = $l['mail_mail_success'];
+      $info['error'] = false;
+      return $info;
     }
   }
 }
