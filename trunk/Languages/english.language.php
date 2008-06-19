@@ -24,6 +24,7 @@ $l['register_captcha'] = 'Enter the Text you see in the image';
 $l['register_success'] = 'Thank you '.strtolower(@$_REQUEST['username']).'! Your account has been created successfully and you may now <a href="'.$cmsurl.'index.php?action=login">login</a>';
 $l['register_successbut1'] = 'Thanks for registering! The Administrators require you to activate your account via email, please check your email you used on your account, and click the link to activate your account';
 $l['register_successbut2'] = 'Thanks for registering! The Administrators require themselves to activate accounts, you will recieve an email once your account is activated.';
+$l['register_failed'] = 'Registrating Failed!';
 
 // Error Stuff for Register.template.php
 $l['register_error_user_taken'] = 'That Username is already in use';
@@ -107,5 +108,6 @@ $l['mail_smtp_fail'] = 'Sending email Failed! Error: %error%';
 $l['mail_smtp_success'] = 'Email Sent Successfully!';
 $l['mail_mail_fail'] = 'Sending email Failed!';
 $l['mail_mail_success'] = 'Email sent Successfully!';
+$l['email_register_subject'] = 'Activate your Account at '.$settings['site_name'];
 $l['email_register_tpl'] = "Hello %username%!\r\n Someone has requested an account at {$settings['site_name']} If you didn't request this ignore this email\r\nIf you did request this, click on the link below to activate your account\r\n%alink%\r\n \r\nRegards,\r\nThe {$settings['site_name']} Team";
 ?>
