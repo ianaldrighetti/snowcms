@@ -1,8 +1,14 @@
 <?php
 session_start();
-error_reporting(E_ALL);
-define("Snow", true);
-require('config.php');
+  error_reporting(E_ALL);
+  define("Snow", true);
+  require('config.php');
+
+  /* This is the CAPTCHA Image for registering
+     This file may disappear one day D: but of
+     course CAPTCHA will still be in SnowCMS
+     but in a different way :P
+   */
 
 // include captcha class
 require($source_dir.'/Captcha.php');
