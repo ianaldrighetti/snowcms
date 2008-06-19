@@ -13,7 +13,19 @@
 
 if(!defined("Snow"))
   die("Hacking Attempt...");
+/*
+  // Function Admin()
+  ---------------------------------
+  This function is almost like the index.php file, it lets us call un sub admin actions
+  Which allows you to adminisrate your site :P
+  ---------------------------------
   
+  // Function AdminHome()
+  ---------------------------------
+  The AdminHome() function is the what else, the ACP Home,
+  This gets the latest news and version of SnowCMS
+  ---------------------------------  
+*/  
   
 function Admin() {
 global $cmsurl, $db_prefix, $l, $settings, $source_dir, $user;
@@ -71,3 +83,4 @@ global $cmsurl, $db_prefix, $l, $settings, $source_dir, $user;
   $settings['page']['title'] = $l['admin_title'];
   loadTheme('Admin');
 }
+?>
