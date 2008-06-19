@@ -71,12 +71,7 @@ global $cmsurl, $settings, $l, $user;
 function SuccessBut2() {
 global $cmsurl, $settings, $l, $user;
   echo '
-  <h1>'.$l['register_header'].'</h1>';
-  if(empty($settings['page']['error'])) {
-    echo '<p>'.$l['register_successbut1'].'</p>';
-  }
-  else {
-    echo '<p>'.$l['register_failed'].' Error: '.$settings['page']['error'].'</p>';
-  }
+  <h1>'.$l['register_header'].'</h1>
+  <p>'.$l['register_successbut2'].'</p>';
 }
 ?>
