@@ -58,6 +58,12 @@ $l['admin_current_version'] = 'Your SnowCMS Version:';
 $l['admin_snowcms_current_version'] = 'Latest SnowCMS Version:';
 $l['admin_error_header'] = 'Error';
 $l['admin_error_reason'] = 'You don\'t have sufficient permission to access the Admin CP!';
+$l['admin_menu_managepages'] = 'Manage Pages';
+$l['admin_menu_managepages_desc'] = 'You can create, edit and delete pages in your database';
+$l['admin_menu_basic-settings'] = 'Basic Settings';
+$l['admin_menu_basic-settings_desc'] = 'Edit simple settings such as site name, slogan, time format, etc.';
+$l['admin_menu_members'] = 'Manage Members';
+$l['admin_menu_members_desc'] = 'Manage your members, such as changing their member group, anything in their profile';
 
 // Settings.template.php
 $l['basicsettings_title'] = 'Basic Settings';
