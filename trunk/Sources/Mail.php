@@ -14,30 +14,36 @@
 if(!defined("Snow"))
   die("Hacking Attempt...");
 
-function SendMail($to, $subject, $msg) {
+function SendMail($to, $subject, $msg, $is_html = false) {
 global $cmsurl, $l, $settings, $user;
   // This function is simple, it is used to send emails, through fsockopen() or mail()
   // First lets see if they want to send email with fsockopen
   if($settings['mail_with_fsockopen']) {
-    $smtp_server = fsockopen($settings['smtp_server'], $settings['smtp_port'], $errno, $errstr, 30);
-    if(!$server_smtp)
-    {
-	    // Oh noes! It didn't work D:!
+    require($source_dir."/PHPMailer.php");
+
+    $mail = new PHPMailer();
+
+    $mail->IsSMTP();
+    $mail->Host = $settings['smtp_host'];
+    $mail->SMTPAuth = true;
+    $mail->Username = $settings['smtp_user'];
+    $mail->Password = $settings['smtp_pass'];
+
+    $mail->From = $settings['smtp_from'];
+    $mail->FromName = $settings['site_name'];
+    $mail->AddAddress($to);
+
+    $mail->WordWrap = 50;                                 // set word wrap to 50 characters
+    $mail->IsHTML($is_html);                                  // set email format to HTML
+
+    $mail->Subject = $subject;
+    $mail->Body = $msg;
+
+    if(!$mail->Send()) {
+      return str_replace('%error%', $mail->ErrorInfo, $l['mail_smtp_fail']);
     }
     else {
-      fwrite($smtp_server, "AUTH LOGIN");
-      fwrite($smtp_server, base64_encode($settings['smtp_email']));
-      fwrite($smtp_server, base64_encode($settings['smtp_pass']));
-      fwrite($smtp_server, "MAIL FROM:<".$settings['smtp_email'].">\r\n");
-      fwrite($smtp_server, "RCPT TO:<".$to.">\r\n");
-      fwrite($smtp_server, "DATA\r\n");
-      fwrite($smtp_server, "Received: from mydomain.com by hisdomain.com ; ".formattime()."\r\n");
-      fwrite($smtp_server, "Date: ".formattime()."\r\n");
-      fwrite($smtp_server, "From: {$settings['site_name']} <{$settings['smtp_email']}>\r\n");
-      fwrite($smtp_server, "Subject: {$subject}\r\n");
-      fwrite($smtp_server, "To: {$to}\r\n");
-      fwrite($smtp_server, $msg);
-      fwrite($smtp_server, ".\r\nQUIT\r\n");
+      return $l['mail_smtp_success'];
     }
   }
   else {
