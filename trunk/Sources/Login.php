@@ -17,39 +17,46 @@ if(!defined("Snow"))
 // This function prepares to show the login page  
 function Login() {
 global $cmsurl, $db_prefix, $l, $settings, $user;
-  
-  $settings['page']['title'] = $l['login_title'];
-  
+  // Set the Page title, load Login.template.php
+  $settings['page']['title'] = $l['login_title'];  
   loadTheme('Login');
 }
 
 // This processes the login form
 function Login2() {
 global $cmsurl, $db_prefix, $l, $settings, $user;
+  // Get and sanitize the username and encrypt the password
   $username = @clean(strtolower($_REQUEST['username']));
   $password = @md5($_REQUEST['password']);
   if((!empty($username)) && (!empty($password))) {
     $result = mysql_query("SELECT * FROM {$db_prefix}members WHERE `username` = '{$username}' AND `password` = '{$password}'");
     if(mysql_num_rows($result)>0) {
       while($row = mysql_fetch_assoc($result)) {
+        // We need their user ID
         $id = $row['id'];
       }
+      // Did they check Remember Me? If so, set cookies :) Mmmmm, the good kind too, like Chocolate Chip, but not Oatmeal! Ewww!
       if(!empty($_REQUEST['remember_me'])) {
         setcookie("username", $_REQUEST['username'], time()+($settings['remember_time']*60));
         setcookie("password", md5($_REQUEST['password']), time()+($settings['remember_time']*60));
         setcookie("uid", $id, time()+($settings['remember_time']*60));
       }
+      // Set the Session variables, like ID and Pass, enables them to be validated
+      // Its more secure to authenticate them on each page load, or at least we think so :P
       $_SESSION['id'] = $id;
       $_SESSION['pass'] = $password;
+      // Redirect them to the CMSURL URL :P
       header("Location: {$cmsurl}");
     }
     else {
+      // That username doesn't exist, or it is a wrong password! but we won't say which, hehe. Error!
       $settings['page']['error'] = $l['login_error'];
       $settings['page']['title'] = $l['login_title'];
       loadTheme('Login');
     }    
   }
   else {
+    // No Username and password, Error!
     $settings['page']['error'] = $l['login_error'];
     $settings['page']['title'] = $l['login_title'];
     loadTheme('Login');
@@ -59,13 +66,17 @@ global $cmsurl, $db_prefix, $l, $settings, $user;
 // Logout, need I explain? :P
 function Logout() {
 global $cmsurl, $db_prefix, $settings, $user;
+  // Are they even logged in? Lol.
   if($user['is_logged']) {
+    // Destroy! Destroy! Their session :D
     session_destroy();
+    // Delete them from the {db_prefix}online table
     mysql_query("DELETE FROM {$db_prefix}online WHERE `user_id` = '{$user['id']}'");
-    // Delete the Cookies...  
+    // Delete the Cookies... If they have any (the @ means to stfu, I don't want any errors)
       @setcookie("username", '', time()-($settings['remember_time']*60));
       @setcookie("password", '', time()-($settings['remember_time']*60));
       @setcookie("uid", '', time()-($settings['remember_time']*60));    
+    // Redirect to the CMSURL URL
     header("Location: {$cmsurl}");
   }
   else {
