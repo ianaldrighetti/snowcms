@@ -66,12 +66,35 @@ global $cmsurl, $db_prefix, $l, $settings, $user;
     $password = md5($password);
     $email = clean($email);
     $time = time();
+    $activated = 1;
+    $acode = base64_encode(md5(time().$email.$password.rand(1,500)));
+    // What is account Activation?
+    if($settings['account_activated']>1) {
+      $activated = 0;
+    }
     // Insert it
-    $result = mysql_query("INSERT INTO {$db_prefix}members (`username`,`password`,`email`,`reg_date`,`reg_ip`,`group`) VALUES('{$username}','{$password}','{$email}','{$time}','{$user['ip']}','2')");
+    $result = mysql_query("INSERT INTO {$db_prefix}members (`username`,`password`,`email`,`reg_date`,`reg_ip`,`group`,`activated`,`acode`) VALUES('{$username}','{$password}','{$email}','{$time}','{$user['ip']}','2','{$activated}','{$acode}')");
     if($result) {
-      // It was a Success! Weeee!
-      $settings['page']['title'] = $l['register_title'];
-      loadTheme('Register', 'Success');
+      if($settings['account_activation']==0) {    
+        // It was a Success! Weeee!
+        $settings['page']['title'] = $l['register_title'];
+        loadTheme('Register', 'Success');
+      }
+      elseif($settings['account_activation']==1) {
+        // It was a success, but they need to activate their account via email... 
+        // Was Sending the email successful?
+        require_once($source_dir.'/Mail.php');
+        $msg = $l['email_register_tpl'];
+        $msg = str_replace("%username%", $username, $msg);
+        $msg = str_replace("%alink%", $cmsurl.'index.php?action=activate&acode='.$acode.'&u='.$username, $msg);
+        SendMail($_REQUEST['email'], $l['email_register_subject'], $msg);
+        $settings['page']['title'] = $l['register_title'];
+        loadTheme('Register', 'SuccessBut1');
+      }
+      else {
+        $settings['page']['title'] = $l['register_title'];
+        loadTheme('Register', 'SuccessBut2');
+      }
     }
     else {
       // It failed...!
