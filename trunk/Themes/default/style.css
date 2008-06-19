@@ -116,3 +116,28 @@ a.headerlink {
 	width: 670px;
 	clear: both;
 }
+/* Admin CP CSS */
+.acp_left {
+  float: left;
+  width: 245px;
+  border: 1px solid #467aa7;
+}
+.acp_right {
+  float: right;
+  width: 245px;
+  border: 1px solid #467aa7;
+}
+.acp_left .main, .acp_right .main {
+  font-weight: bold;
+  font-size: 15px;
+  padding-top: 2px;
+  padding-left: 2px;
+  margin: 0px;
+  padding-right: 0px;
+  padding-bottom: 0px;
+}
+.acp_left .desc, .acp_right .desc {
+  font-size: 11px;
+  padding: 2px;
+  margin: 0px;
+}
