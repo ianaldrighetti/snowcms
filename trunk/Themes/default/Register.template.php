@@ -55,4 +55,18 @@ global $cmsurl, $settings, $l, $user;
   <h1>'.$l['register_header'].'</h1>
   <p>'.$l['register_success'].'</p>';
 }
+
+function SuccessBut1() {
+global $cmsurl, $settings, $l, $user;
+  echo '
+  <h1>'.$l['register_header'].'</h1>
+  <p>'.$l['register_successbut1'].'</p>';
+}
+
+function SuccessBut2() {
+global $cmsurl, $settings, $l, $user;
+  echo '
+  <h1>'.$l['register_header'].'</h1>
+  <p>'.$l['register_successbut2'].'</p>';
+}
 ?>
