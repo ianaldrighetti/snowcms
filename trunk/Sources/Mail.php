@@ -22,23 +22,28 @@ global $cmsurl, $l, $settings, $user;
     require($source_dir."/PHPMailer.php");
 
     $mail = new PHPMailer();
-
+    
+    // We are sending as SMTP, set the host, SMTP user and password
     $mail->IsSMTP();
     $mail->Host = $settings['smtp_host'];
     $mail->SMTPAuth = true;
     $mail->Username = $settings['smtp_user'];
     $mail->Password = $settings['smtp_pass'];
 
+    // Set from, from name, and to who
     $mail->From = $settings['smtp_from'];
     $mail->FromName = $settings['site_name'];
     $mail->AddAddress($to);
 
-    $mail->WordWrap = 50;                                 // set word wrap to 50 characters
-    $mail->IsHTML($is_html);                                  // set email format to HTML
-
+    // Set the word wrap, and is this HTML or not?
+    $mail->WordWrap = 50;
+    $mail->IsHTML($is_html);
+    
+    // Set Subject and Message
     $mail->Subject = $subject;
     $mail->Body = $msg;
-
+    
+    // Was it successful or not?
     if(!$mail->Send()) {
       return str_replace('%error%', $mail->ErrorInfo, $l['mail_smtp_fail']);
     }
@@ -47,7 +52,17 @@ global $cmsurl, $l, $settings, $user;
     }
   }
   else {
-    // this means we can send with the mail() function! Weeeee!
+    // Set the headers, such as where from, and Reply too
+    $headers = "From: {$settings['webmaster_email']}\r\nReply-To: {$settings['webmaster_email']}".
+    // Send the email
+    $mail = mail($to, $subject, $msg, $headers);
+    // Was it successful or not?
+    if(!$mail) {
+      return $l['mail_mail_fail'];
+    }
+    else {
+      return $l['mail_mail_success'];
+    }
   }
 }
 ?>
