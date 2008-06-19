@@ -37,19 +37,23 @@ global $cmsurl, $db_prefix, $l, $settings, $source_dir, $user;
         'members' => array('Members.php','ManageMembers'),
         'managepages' => array('Page.php','ManagePages')        
       );
+      // Is the sa= in the $sa array? If so do it :D
       if(is_array(@$sa[$_REQUEST['sa']])) {
         require_once($source_dir.'/'.$sa[$_REQUEST['sa']][0]);
           $sa[$_REQUEST['sa']][1]();
       }
       else {
+        // Its not :( We don't want an error, so show the AdminHome();
         AdminHome();
       }
     }
     else {
+      // If sa is just plain not set, load the Admin Home
       AdminHome();
     }
   }
   else {
+    // Go away! We not want you here! >:(
     $settings['page']['title'] = $l['admin_error_title'];
     loadTheme('Admin','Error');
   }
@@ -57,7 +61,7 @@ global $cmsurl, $db_prefix, $l, $settings, $source_dir, $user;
 
 function AdminHome() {
 global $cmsurl, $db_prefix, $l, $settings, $source_dir, $user;
-  // Now we need to get the latest SnowCMS News :)
+  // With cURL (If the curl_init function exists) get the latest version of SnowCMS and Latest News
   $settings['page']['news'] = null;
   if(function_exists('curl_init')) {
     $curl = curl_init('http://news.snowcms.com/latest.txt');
@@ -66,6 +70,7 @@ global $cmsurl, $db_prefix, $l, $settings, $source_dir, $user;
 	    curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
 	    curl_setopt($curl, CURLOPT_TIMEOUT, 3);
 	  $settings['latest_version'] = curl_exec($curl);
+	  // Close the cURL Connection
 	  curl_close($curl);    
     $curl = curl_init('http://news.snowcms.com/v0.x-line/news.txt');
       curl_setopt($curl, CURLOPT_HEADER, false);
@@ -73,13 +78,17 @@ global $cmsurl, $db_prefix, $l, $settings, $source_dir, $user;
 	    curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
 	    curl_setopt($curl, CURLOPT_TIMEOUT, 3);
 	  $settings['page']['news'] = curl_exec($curl);
+	  // Close it again :]
 	  curl_close($curl);
 	  if(empty($settings['page']['news']))
+	    // Oh noes! We tried, but couldn't get it :'(
 	    $settings['page']['news'] = $l['admin_cant_get_news_2'];
 	}
 	else {
+	  // We didn't try because you don't have cURL as far as we can tell :(
 	  $settings['page']['news'] = $l['admin_cant_get_news_1'];
 	}
+	// Set the Title, and then call on the Admin.template.php template
   $settings['page']['title'] = $l['admin_title'];
   loadTheme('Admin');
 }
