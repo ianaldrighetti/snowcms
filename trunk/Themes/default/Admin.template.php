@@ -18,7 +18,24 @@ global $cmsurl, $settings, $l, $user;
       <td>'.$l['admin_snowcms_current_version'].'</td>
       <td>v'.$settings['latest_version'].'</td>
     </tr>
-  </table>';
+  </table>
+  <div class="acp_left">
+    <p class="main"><a href="'.$cmsurl.'index.php?action=admin&sa=managepages" title="'.$l['admin_menu_managepages'].'">'.$l['admin_menu_managepages'].'</a></p>
+    <p class="desc">'.$l['admin_menu_managepages_desc'].'</p>
+  </div>
+  <div class="acp_right">
+    <p class="main"><a href="'.$cmsurl.'index.php?action=admin&sa=basic-settings" title="'.$l['admin_menu_basic-settings'].'">'.$l['admin_menu_basic-settings'].'</a></p>
+    <p class="desc">'.$l['admin_menu_basic-settings_desc'].'</p>  
+  </div>
+    <div class="acp_left">
+    <p class="main"><a href="'.$cmsurl.'index.php?action=admin&sa=members" title="'.$l['admin_menu_members'].'">'.$l['admin_menu_members'].'</a></p>
+    <p class="desc">'.$l['admin_menu_members_desc'].'</p>
+  </div>
+  <div class="acp_right">
+    <p class="main">Main text</p>
+    <p class="desc">Description</p>  
+  </div>
+  ';
 }
 
 function Error() {
