@@ -3,6 +3,7 @@
 if(!defined('Snow'))
   die("Hacking Attempt...");
 
+// When loadTheme('Admin'); is called on, it will display this below function (Main()) and the theme_header(); before this, and theme_footer(); after
 function Main() {
 global $cmsurl, $settings, $l, $user;
   echo '
@@ -38,6 +39,7 @@ global $cmsurl, $settings, $l, $user;
   ';
 }
 
+// Now, you can show this by doing loadTheme('Admin','Error'); which tells them they can't access the ACP :P
 function Error() {
 global $cmsurl, $settings, $l, $user;
   echo '
