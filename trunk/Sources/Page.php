@@ -28,7 +28,7 @@ global $cmsurl, $db_prefix, $l, $settings, $user;
   if(mysql_num_rows($result)>0) {
     while($row = mysql_fetch_assoc($result)) {
       $settings['page']['title'] = $row['title'];
-      $settings['page']['content'] = stripslashes(stripslashes($row['content']));
+      $settings['page']['content'] = stripslashes($row['content']);
     }
     // It does! Set content and page title, then load Page.template.php
     loadTheme('Page');
@@ -50,7 +50,7 @@ global $cmsurl, $db_prefix, $l, $settings, $user;
     // If so, get the info, and clean it :P
     $page_id = clean($_REQUEST['page_id']);
     $page_title = clean($_REQUEST['page_title']);
-    $page_content = addslashes(mysql_real_escape_string($_REQUEST['page_content']));
+    $page_content = addslashes($_REQUEST['page_content']);
     // Update it
     $result = mysql_query("UPDATE {$db_prefix}pages SET `title` = '{$page_title}', `content` = '{$page_content}' WHERE `page_id` = '{$page_id}'");
     if($result) {
@@ -122,7 +122,7 @@ global $cmsurl, $db_prefix, $l, $settings, $user;
         $page = array(
           'page_id' => $row['page_id'],
           'title' => $row['title'],
-          'content' => stripslashes(stripslashes($row['content']))
+          'content' => stripslashes($row['content'])
         );
         // Load $page (the pages info) into $settings, clean() the content with clean() so it won't parse any HTML Entities like &copy; as what you would see (c)
         // Set the title, and load the ManagePages template with the Editor function
