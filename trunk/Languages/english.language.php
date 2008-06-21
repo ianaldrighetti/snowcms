@@ -27,11 +27,11 @@ $l['register_successbut2'] = 'Thanks for registering! The administrators require
 $l['register_failed'] = 'Registration failed!';
 
 // Error Stuff for Register.template.php
-$l['register_error_user_taken'] = 'That username is already in use!';
+$l['register_error_user_taken'] = 'That username is already in use.';
 $l['register_error_username_to_short'] = 'The username must be 3 characters or longer.';
 $l['register_error_passwords'] = 'Those passwords don\'t match!';
 $l['register_error_password_to_short'] = 'Your password is too short!';
-$l['register_error_invalid_email'] = 'That email addressis invalid';
+$l['register_error_invalid_email'] = 'That email address is invalid!';
 $l['register_error_captcha'] = 'You failed the CAPTCHA test! Please try again.';
 $l['register_error_unknown'] = 'An unknown error has disabled us from registering your account. Info: '.mysql_error();
 $l['register_button'] = 'Register';
@@ -84,7 +84,7 @@ $l['adminpage_make_title'] = 'Manage Pages';
 $l['managepages_makepage'] = 'Create Page!';
 $l['managepages_pagetitle'] = 'Page Title:';
 $l['managepages_header'] = 'Manage Pages';
-$l['managepages_desc'] = 'The main part of SnowCMS is here, being a CMS you can manage, and create pages of your site here.';
+$l['managepages_desc'] = 'You can manage and create pages here.';
 $l['adminpage_make_success'] = 'The page %title% was successfully created!';
 $l['adminpage_make_fail'] = 'Failed to create the page %title%';
 $l['adminpages_title_td'] = 'Page Title';
