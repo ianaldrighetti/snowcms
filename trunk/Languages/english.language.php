@@ -22,24 +22,24 @@ $l['register_verify_password'] = 'Verify Password:';
 $l['register_email'] = 'Email:';
 $l['register_captcha'] = 'Enter the Text you see in the image';
 $l['register_success'] = 'Thank you '.strtolower(@$_REQUEST['username']).'! Your account has been created successfully and you may now <a href="'.$cmsurl.'index.php?action=login">login</a>';
-$l['register_successbut1'] = 'Thanks for registering! The Administrators require you to activate your account via email, please check your email you used on your account, and click the link to activate your account';
-$l['register_successbut2'] = 'Thanks for registering! The Administrators require themselves to activate accounts, you will recieve an email once your account is activated.';
-$l['register_failed'] = 'Registrating Failed!';
+$l['register_successbut1'] = 'Thanks for registering! The administrators require you to activate your account via email, please check your email you used on your account, and click the link to activate your account';
+$l['register_successbut2'] = 'Thanks for registering! The administrators require themselves to activate accounts; you will recieve an email once your account is activated.';
+$l['register_failed'] = 'Registration failed!';
 
 // Error Stuff for Register.template.php
-$l['register_error_user_taken'] = 'That Username is already in use';
-$l['register_error_username_to_short'] = 'The Username must be 3 characters or longer';
-$l['register_error_passwords'] = 'Those Passwords don\'t match';
-$l['register_error_password_to_short'] = 'Password is to short';
-$l['register_error_invalid_email'] = 'That Email is invalid';
-$l['register_error_captcha'] = 'The CAPTCHA Test Failed';
-$l['register_error_unknown'] = 'An Unknown Error has disabled us from Registering your Account. Info: '.mysql_error();
+$l['register_error_user_taken'] = 'That username is already in use!';
+$l['register_error_username_to_short'] = 'The username must be 3 characters or longer.';
+$l['register_error_passwords'] = 'Those passwords don\'t match!';
+$l['register_error_password_to_short'] = 'Your password is too short!';
+$l['register_error_invalid_email'] = 'That email addressis invalid';
+$l['register_error_captcha'] = 'You failed the CAPTCHA test! Please try again.';
+$l['register_error_unknown'] = 'An unknown error has disabled us from registering your account. Info: '.mysql_error();
 $l['register_button'] = 'Register';
 
 // Page.template.php
 $l['page_error_title'] = $settings['site_name'].' - Error';
 $l['page_error_header'] = 'Error';
-$l['page_error_details'] = 'An error has occurred! The Page you have requested does not exist!';
+$l['page_error_details'] = 'An error has occurred! The page you have requested does not exist!';
 
 // Online.template.php
 $l['online_title'] = 'Who\'s Online';
@@ -55,8 +55,8 @@ $l['online_time'] = 'Last Active';
 // Admin.template.php
 $l['admin_title'] = 'Admin CP';
 $l['admin_error_title'] = 'Error';
-$l['admin_cant_get_news_1'] = 'We were unable to get the latest SnowCMS News from the <a href="http://www.snowcms.com">SnowCMS</a> site due to your server configuration does not have <a href="http://php.net/curl">cURL</a> setup. Please check out our site for the latest news &amp; updates.';
-$l['admin_cant_get_news_2'] = 'Unable to get the latest news from <a href="http://www.snowcms.com">SnowCMS</a> due to a server timeout. Refresh the page, or check out our site';
+$l['admin_cant_get_news_1'] = 'We were unable to get the latest SnowCMS News from the <a href="http://www.snowcms.com">SnowCMS</a> site because your server configuration does not have <a href="http://php.net/curl">cURL</a> setup. Please check out our site for the latest news &amp; updates.';
+$l['admin_cant_get_news_2'] = 'Unable to get the latest news from <a href="http://www.snowcms.com">SnowCMS</a> due to a server timeout. Refresh the page, or check out our site!';
 $l['admin_current_version'] = 'Your SnowCMS Version:';
 $l['admin_snowcms_current_version'] = 'Latest SnowCMS Version:';
 $l['admin_error_header'] = 'Error';
@@ -92,22 +92,22 @@ $l['adminpages_pageowner'] = 'Page Owner';
 $l['adminpages_datemade'] = 'Created on';
 $l['adminpages_no_pages'] = 'Their are currently no pages in your database';
 $l['managepages_edit_title'] = 'Editing Page %title%';
-$l['managepages_no_page_title'] = 'The Page Doesn\'t Exist!';
-$l['managepages_no_page_header'] = 'Page Doesn\'t Exist';
+$l['managepages_no_page_title'] = 'The page Doesn\'t exist!';
+$l['managepages_no_page_header'] = 'Page doesn\'t exist';
 $l['managepages_no_page_desc'] = 'The page you have requested to edit does not exist.';
 $l['managepages_edit_header'] = 'Edit Page';
-$l['managepages_edit_desc'] = 'You are currently editing a page, you can edit the content and the title of the page, you use can use HTML in the content of the page.';
+$l['managepages_edit_desc'] = 'You are currently editing a page; you can edit the content and the title of the page, and you use can use HTML in the content of the page.';
 $l['managepages_editpage_title'] = 'Page Title:';
 $l['managepages_editpage_content'] = 'Page Content:';
 $l['managepages_editpage_button'] = 'Update Page';
-$l['managepages_update_failed'] = 'Updating the page Failed!';
-$l['managepages_update_success'] = 'Updated the page Successfully!';
+$l['managepages_update_failed'] = 'Updating the page failed!';
+$l['managepages_update_success'] = 'Updated the page successfully!';
 
 // Some Email stuff, for Email Activation, etc.
-$l['mail_smtp_fail'] = 'Sending email Failed! Error: %error%';
-$l['mail_smtp_success'] = 'Email Sent Successfully!';
-$l['mail_mail_fail'] = 'Sending email Failed!';
-$l['mail_mail_success'] = 'Email sent Successfully!';
-$l['email_register_subject'] = 'Activate your Account at '.$settings['site_name'];
-$l['email_register_tpl'] = "Hello %username%!\r\n Someone has requested an account at {$settings['site_name']} If you didn't request this ignore this email\r\nIf you did request this, click on the link below to activate your account\r\n%alink%\r\n \r\nRegards,\r\nThe {$settings['site_name']} Team";
+$l['mail_smtp_fail'] = 'Sending email failed! Error: %error%';
+$l['mail_smtp_success'] = 'Email sent successfully!';
+$l['mail_mail_fail'] = 'Sending email failed!';
+$l['mail_mail_success'] = 'Email sent successfully!';
+$l['email_register_subject'] = 'Activate your account at '.$settings['site_name'].'.';
+$l['email_register_tpl'] = "Hello %username%!\r\n Someone has requested an account at {$settings['site_name']} If you didn't request an account at this site, ignore this email.\r\nIf you did request this, click on the link below to activate your account\r\n%alink%\r\n \r\nRegards,\r\nThe {$settings['site_name']} Team";
 ?>
