@@ -43,10 +43,10 @@ a.headerlink {
 	float: right;
 	background: #fff;
 	color: #252525;
-	margin: 0 0 0 0;
+	margin: 0 10px 0 0;
 	padding-top: 10px;
 	padding-left: 7px;
-	width: 503px;
+	width: 490px;
 	display: inline;
 }
 
@@ -119,13 +119,13 @@ a.headerlink {
 /* Admin CP CSS */
 .acp_left {
   float: left;
-  width: 245px;
+  width: 240px;
   border: 1px solid #467aa7;
   margin-top: 3px;
 }
 .acp_right {
   float: right;
-  width: 245px;
+  width: 240px;
   border: 1px solid #467aa7;
   margin-top: 3px;
 }
