@@ -49,16 +49,18 @@ CREATE TABLE `{$db_prefix}online` (
 
 DROP TABLE IF EXISTS `{$db_prefix}pages`;
 
-CREATE TABLE `{$db_prefix}pages` (
+CREATE TABLE IF NOT EXISTS `{$db_prefix}pages` (
   `page_id` int(11) NOT NULL auto_increment,
   `page_owner` int(11) NOT NULL default '0',
   `owner_name` text NOT NULL,
   `create_date` int(10) NOT NULL default '0',
   `modify_date` int(10) NOT NULL default '0',
+  `show_info` tinyint(1) NOT NULL,
   `title` text NOT NULL,
   `content` text NOT NULL,
   PRIMARY KEY  (`page_id`)
 ) ENGINE=MyISAM DEFAULT CHARSET=latin1;
+
 
 DROP TABLE IF EXISTS `{$db_prefix}permissions`;
 

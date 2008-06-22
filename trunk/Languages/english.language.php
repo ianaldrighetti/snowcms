@@ -102,6 +102,7 @@ $l['managepages_editpage_content'] = 'Page Content:';
 $l['managepages_editpage_button'] = 'Update Page';
 $l['managepages_update_failed'] = 'Updating the page failed!';
 $l['managepages_update_success'] = 'Updated the page successfully!';
+$l['managepages_editpage_show_info'] = "Show page extra info ";
 
 // Some Email stuff, for Email Activation, etc.
 $l['mail_smtp_fail'] = 'Sending email failed! Error: %error%';

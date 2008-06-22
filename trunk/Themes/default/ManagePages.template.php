@@ -85,6 +85,9 @@ global $cmsurl, $settings, $l, $user;
       <tr>
         <td>'.$l['managepages_editpage_title'].'</td><td><input name="page_title" type="text" value="'.$settings['page']['edit_page']['title'].'"/></td>
       </tr>
+	  <tr>
+	    <td>'.$l['managepages_editpage_show_info'].'</td><td><input name="page_show_info" type="checkbox" value="1" '.$settings['page']['edit_page']['checked'].'/></td>
+      </tr>
       <tr>
         <td colspan="2">'.$l['managepages_editpage_content'].'</td>
       </tr>

@@ -28,6 +28,9 @@ global $cmsurl, $db_prefix, $l, $settings, $user;
   if(mysql_num_rows($result)>0) {
     while($row = mysql_fetch_assoc($result)) {
       $settings['page']['title'] = $row['title'];
+	  $settings['page']['date'] = $row['modify_date'] ? formattime($row['modify_date']) : formattime($row['create_date']);
+	  $settings['page']['owner'] = $row['owner_name'];
+	  $settings['page']['show_info'] = $row['show_info'];
       $settings['page']['content'] = stripslashes($row['content']);
     }
     // It does! Set content and page title, then load Page.template.php
@@ -51,8 +54,12 @@ global $cmsurl, $db_prefix, $l, $settings, $user;
     $page_id = clean($_REQUEST['page_id']);
     $page_title = clean($_REQUEST['page_title']);
     $page_content = addslashes($_REQUEST['page_content']);
+	if(isset($_REQUEST['page_show_info']))
+		$page_show_info = $_REQUEST['page_show_info'];
+	else
+		$page_show_info = 0;
     // Update it
-    $result = mysql_query("UPDATE {$db_prefix}pages SET `title` = '{$page_title}', `content` = '{$page_content}' WHERE `page_id` = '{$page_id}'");
+    $result = mysql_query("UPDATE {$db_prefix}pages SET `title` = '{$page_title}', `content` = '{$page_content}', `show_info` = '{$page_show_info}' WHERE `page_id` = '{$page_id}'");
     if($result) {
       // It was successful!
       $settings['page']['update_page'] = 1;
@@ -122,6 +129,7 @@ global $cmsurl, $db_prefix, $l, $settings, $user;
         $page = array(
           'page_id' => $row['page_id'],
           'title' => $row['title'],
+		  'show_info' => $row['show_info'],
           'content' => stripslashes($row['content'])
         );
         // Load $page (the pages info) into $settings, clean() the content with clean() so it won't parse any HTML Entities like &copy; as what you would see (c)
@@ -129,6 +137,10 @@ global $cmsurl, $db_prefix, $l, $settings, $user;
         $settings['page']['edit_page'] = $page;
         $settings['page']['edit_page']['content'] = clean($settings['page']['edit_page']['content']);
         $settings['page']['title'] = str_replace("%title%", $page['title'], $l['managepages_edit_title']);
+		if($settings['page']['edit_page']['show_info'] == 1)
+			$settings['page']['edit_page']['checked'] = "checked";
+		else
+			$settings['page']['edit_page']['checked'] = "";
         loadTheme('ManagePages','Editor');
       }
     }
