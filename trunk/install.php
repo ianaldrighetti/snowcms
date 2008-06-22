@@ -47,7 +47,7 @@ $files = array(
     }
   }
   if(0>0) {
-    echo '<p>The Following Files/Directories do not exist. Please make sure they are uploaded...</p>
+    echo '<p>The Following files/directories do not exist. Please make sure they are uploaded...</p>
     <p>';
     foreach($nofile as $file)
       echo $file.'<br />';
@@ -89,7 +89,7 @@ $files = array(
       if(!$mysql_connect) {
         echo '
         <h1>Step 1</h1>
-        <p>We were unable to connect to MySQL. Here is the error message: '.mysql_error().'<br />
+        <p>We were unable to connect to your MySQL server. Here is the error message: '.mysql_error().'<br />
         <a href="install.php">Go Back</a></p>';
       }
       else {
@@ -98,7 +98,7 @@ $files = array(
         if(!$mysql_select_db) {
         echo '
         <h1>Step 1</h1>
-        <p>We were unable to connect to the MySQL Database. Here is the error message: '.mysql_error().'<br />
+        <p>We were unable to connect to your MySQL Database. Here is the error message: '.mysql_error().'<br />
         <a href="install.php">Go Back</a></p>';        
         }
         else {
@@ -120,7 +120,7 @@ $files = array(
           if(count($mysql_errors)>0) {
             echo '
             <h1>Step 1</h1>
-            <p>The following MySQL Errors Occurred:<br />';
+            <p>The following MySQL errors occurred:<br />';
             foreach($mysql_errors as $error) {
               echo $error.'<br />';
             }
@@ -128,26 +128,30 @@ $files = array(
           }
           else {
             $currentdir = dirname(__FILE__);
-            echo '<h1>Step 1</h1>
-            <p>Your MySQL Database has been populated with the initial data. Now you need to create your Administrator Account and a few other settings...</p>';
+            $iurl = explode('/', $_SERVER['SERVER_NAME'].$_SERVER['REQUEST_URI']);
+			unset($iurl[count($iurl)-1]);
+			$iurl = implode('/', $iurl);
+			$installpath = 'http://'.$iurl.'/';
+            echo '<h1>You\'re almost done!</h1>
+            <p>Your MySQL database has been populated with the initial data. Now you need to create your administrator account and a few other settings.</p>';
             echo '
             <div align="center">
             <form action="install.php?step=2" method="post">
               <table>
                 <tr>
-                  <td>Path to Source Directory</td><td><input name="source_dir" type="text" value="'.$currentdir.'Sources"/></td>
+                  <td>Path to Source Directory</td><td><input name="source_dir" type="text" value="'.$currentdir.'/Sources"/></td>
                 </tr>
                 <tr>
-                  <td>Path to Theme Directory</td><td><input name="theme_dir" type="text" value="'.$currentdir.'Themes"/></td>
+                  <td>Path to Theme Directory</td><td><input name="theme_dir" type="text" value="'.$currentdir.'/Themes"/></td>
                 </tr>
                 <tr>
-                  <td>Path to Language Directory</td><td><input name="language_dir" type="text" value="'.$currentdir.'Languages"/></td>
+                  <td>Path to Language Directory</td><td><input name="language_dir" type="text" value="'.$currentdir.'/Languages"/></td>
                 </tr>
                 <tr>
-                  <td>URL of SnowCMS Installation</td><td><input name="cmsurl" type="text" value=""/></td>
+                  <td>URL of SnowCMS Installation</td><td><input name="cmsurl" type="text" value="'.$installpath.'"/></td>
                 </tr>
                 <tr>
-                  <td>URL of Themes Directory</td><td><input name="theme_url" type="text" value=""/></td>
+                  <td>URL of Themes Directory</td><td><input name="theme_url" type="text" value="'.$installpath.'Themes"/></td>
                 </tr>
                 <tr>
                   <td>Admin Username:</td><td><input name="admin_user" type="text" value=""/></td>
@@ -212,25 +216,25 @@ $scms_installed = true;
     mysql_select_db($_REQUEST['mysql_db']);
     $admin = mysql_query("INSERT INTO {$_REQUEST['mysql_prefix']}members (`username`,`password`,`email`,`reg_date`,`reg_ip`,`group`) VALUES('".addslashes(mysql_real_escape_string($_REQUEST['admin_user']))."','".md5($_REQUEST['admin_pass'])."','".addslashes(mysql_real_escape_string($_REQUEST['admin_email']))."','".time()."','".$_SERVER['REMOTE_ADDR']."','1')");
     echo '
-    <h1>Step 2</h1>';
+    <h1>You\'re done!</h1>';
     if($admin) {
-      echo '<p>Your Administrative account has been created successfully.</p>';
+      echo '<p>Your settings have been sent to the MySQL database.</p>';
     }
     else {
-      echo '<p>Something went wrong while trying to create your admin account! Info: '.mysql_error().'</p>';
+      echo '<p>Something went wrong while trying to create your admin account. Info: '.mysql_error().'</p>';
     }
     if(!is_writeable('./config.php')) {
       echo '
       <p>Your config.php file was not writeable. To make your SnowCMS installation work, please open up your config.php file and put this in it:</p><br />
-      <pre>
+      <textarea cols="60" rows="30" readonly="readonly">
       '.htmlentities($config).'
-      </pre>';
+      </textarea>';
     }
     else {
       $check = file_put_contents('./config.php', $config);
-      echo '<p>Your config.php file has been set! You are ready to go!</p>';
+      echo '<p>Your config.php file has been set! You\'re ready to go!</p>';
     }
-    echo '<p>Once you are done, please delete this file (install.php) and CHMOD config.php to 644</p>';
+    echo '<p>Once you are done, please delete this file (install.php) and CHMOD config.php to 644. Thank you for using SnowCMS!</p>';
 
     }
   }
