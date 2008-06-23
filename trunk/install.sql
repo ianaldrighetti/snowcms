@@ -36,7 +36,7 @@ CREATE TABLE `{$db_prefix}menus` (
   PRIMARY KEY  (`link_id`)
 ) ENGINE=MyISAM AUTO_INCREMENT=2 DEFAULT CHARSET=latin1;
 
-INSERT INTO `{$db_prefix}menus` VALUES ('1','1','Home','http://snowcms.northsalemcrew.net/','0','1');
+INSERT INTO `{$db_prefix}menus` VALUES ('1','1','SnowCMS','http://snowcms.northsalemcrew.net/','0','1');
 
 DROP TABLE IF EXISTS `{$db_prefix}online`;
 

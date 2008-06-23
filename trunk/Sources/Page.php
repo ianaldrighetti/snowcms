@@ -156,4 +156,29 @@ global $cmsurl, $db_prefix, $l, $settings, $user;
     loadTheme('ManagePages','NoPage');
   }
 }
+
+// An function that show page lists
+function PageList() {
+global $cmsurl, $db_prefix, $l, $settings, $user;
+  // Get all the pages in the database so we can list them :)
+  $result = mysql_query("SELECT * FROM {$db_prefix}pages ORDER BY `page_id` DESC");
+    $pages = array();
+    while($row = mysql_fetch_assoc($result)) {
+      $pages[] = array(
+        'page_id' => $row['page_id'],
+        'page_owner' => $row['page_owner'],
+        'owner' => @$settings['users'][$row['page_owner']] ? $settings['users'][$row['page_owner']] : $row['owner_name'],
+        'date' => $row['modify_date'] ? formattime($row['modify_date']) : formattime($row['create_date']),
+        'title' => $row['title']
+      );
+    }
+  // Load the $pages array into $settings so we can pass it on
+  $settings['page']['pages'] = $pages;
+  // Lets make it simple, count how many pages their are
+  $settings['page']['num_pages'] = count($pages);
+  // Set page title, and load ManagePages template
+  $settings['page']['title'] = $l['adminpage_make_title'];
+  loadTheme('Page', 'ListPage');
+}
+
 ?>

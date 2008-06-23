@@ -111,4 +111,8 @@ $l['mail_mail_fail'] = 'Sending email failed!';
 $l['mail_mail_success'] = 'Email sent successfully!';
 $l['email_register_subject'] = 'Activate your account at '.$settings['site_name'].'.';
 $l['email_register_tpl'] = "Hello %username%!\r\n Someone has requested an account at {$settings['site_name']} If you didn't request an account at this site, ignore this email.\r\nIf you did request this, click on the link below to activate your account\r\n%alink%\r\n \r\nRegards,\r\nThe {$settings['site_name']} Team";
+
+// List pages
+$l['listpage_header'] = 'Page List';
+$l['listepage_desc'] = 'This page shows all the pages that was writen in the CMS.';
 ?>
