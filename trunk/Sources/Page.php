@@ -30,7 +30,6 @@ global $cmsurl, $db_prefix, $l, $settings, $user;
       $settings['page']['title'] = $row['title'];
 	  $settings['page']['date'] = $row['modify_date'] ? formattime($row['modify_date']) : formattime($row['create_date']);
 	  $settings['page']['owner'] = $row['owner_name'];
-	  $settings['page']['show_info'] = $row['show_info'];
       $settings['page']['content'] = stripslashes($row['content']);
     }
     // It does! Set content and page title, then load Page.template.php
