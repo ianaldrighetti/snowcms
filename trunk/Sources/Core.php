@@ -82,12 +82,31 @@ global $db_prefix;
 // This loads the Language file, from the language directory, later on (Maybe SnowCMS 0.8 or later)
 // Will allow each theme to have its own language file(s)
 function loadLanguage() {
-global $cmsurl, $language_dir, $settings;
+global $cmsurl, $language_dir, $settings;  
   $l = array();
   require_once($language_dir.'/'.$settings['language'].'.language.php');
+  // Does the current theme have its own language support?
+  if(file_exisits($theme_dir.'/'.$settings['theme'].'/'.$settings['language'].'.language.php')) {
+    $tmp['1'] = $l;
+    unset($l);
+    $l = array();
+    require_once($theme_dir.'/'.$settings['theme'].'/languages/'.$settings['language'].'.language.php');
+    $tmp['2'] = $l;
+    $l = merge_languages($tmp);
+  }
   return $l;
 }
 
+// This will merge the $l arrays which will allow themes to have their own specific language files
+function merge_languages($array) {
+  $tmp = array();
+  foreach($array as $l) {
+    foreach($l as $key => $value) {
+      $tmp[$key] = $value;
+    }
+  }
+  return $tmp;
+}
 // This function loads the Theme file requested in a Source File, More comment inside :P
 function loadTheme($file, $function = 'Main') {
 global $cmsurl, $l, $theme_dir, $settings;
