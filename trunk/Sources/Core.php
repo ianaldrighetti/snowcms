@@ -82,7 +82,7 @@ global $db_prefix;
 // This loads the Language file, from the language directory, later on (Maybe SnowCMS 0.8 or later)
 // Will allow each theme to have its own language file(s)
 function loadLanguage() {
-global $cmsurl, $language_dir, $settings;  
+global $cmsurl, $language_dir, $settings, $theme_dir;  
   $l = array();
   require_once($language_dir.'/'.$settings['language'].'.language.php');
   // Does the current theme have its own language support?
