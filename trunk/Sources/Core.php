@@ -86,7 +86,7 @@ global $cmsurl, $language_dir, $settings;
   $l = array();
   require_once($language_dir.'/'.$settings['language'].'.language.php');
   // Does the current theme have its own language support?
-  if(file_exisits($theme_dir.'/'.$settings['theme'].'/'.$settings['language'].'.language.php')) {
+  if(file_exists($theme_dir.'/'.$settings['theme'].'/'.$settings['language'].'.language.php')) {
     $tmp['1'] = $l;
     unset($l);
     $l = array();
