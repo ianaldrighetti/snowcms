@@ -1,9 +1,13 @@
-This is a Subversion repository; use the 'svnadmin' tool to examine
-it.  Do not add, delete, or modify files here unless you know how
-to avoid corrupting the repository.
+This Subversion repository is updated and maintained by
+the SnowCMS development team. If you would like to
+contribute code or fix a bug, please file a bug in the
+issue tracker. We will review your patch and decide
+whether or not to integrate your patch.
 
-Visit http://subversion.tigris.org/ for more information.
+If you don't understand how to download the latest code
+from Subversion, please see here:
 
+http://code.google.com/p/snowcms/source/checkout
 
-noted by D.R : oh.. i am warned not to change any thing here... hmm... 
-what should i do about this aldo? Stop developing SunSpot?
+Thank you,
+the SnowCMS team
