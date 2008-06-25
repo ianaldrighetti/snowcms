@@ -32,13 +32,15 @@ global $cmsurl, $db_prefix, $l, $settings, $user;
     $result = mysql_query("
       SELECT 
         b.bid, b.name, b.bdesc, b.who_view, b.numtopics, b.numposts,
-        b.cid, log.uid, log.new AS is_new
+        b.cid, log.uid
       FROM {$db_prefix}boards AS b
-        LEFT JOIN {$db_prefix}board_logs AS log ON b.bid = {$user['id']}
+        LEFT JOIN {$db_prefix}board_logs AS log ON log.uid = {$user['id']} AND log.bid = b.bid
       ORDER BY b.border ASC") or die(mysql_error());
-      while($row = mysql_fetch_assoc($result)) {
-        if($row['is_new']==null)
-          $row['is_new'] = 1;
+      while($row = mysql_fetch_assoc($result)) {  
+      if(isset($row['uid']))
+        $new = false;
+      else
+        $new = true;
         $cats[$row['cid']]['boards'][$row['bid']] = array(
           'id' => $row['bid'],
           'name' => $row['name'],
@@ -46,7 +48,7 @@ global $cmsurl, $db_prefix, $l, $settings, $user;
           'who_view' => @explode(",", $row['who_view']),
           'topics' => $row['numtopics'],
           'posts' => $row['numposts'],
-          'is_new' => $row['is_new'] ? true : false
+          'is_new' => $new
         );
       }
     foreach($cats as $cat) {
