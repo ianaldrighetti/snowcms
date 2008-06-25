@@ -1,0 +1,94 @@
+* {
+  padding: 0px;
+  margin: 0px;
+}
+body {
+  font-family: Verdana, San-serif;
+  font-size: 12px; 
+  background: #2D3742;
+}
+#header {
+  width: 816px;
+  height: 100px;
+  background: url('navbg.png');
+  margin-right: auto;
+  margin-left: auto;
+}
+#menu {
+  padding: 8px;
+  background: url('infobg.png');
+  width: 800px;
+  margin-right: auto;
+  margin-left: auto;
+  text-align: center;
+}
+#menu ul {
+  list-style: none;
+}
+#menu ul li {
+  display: inline;
+}
+#menu ul li a {
+  padding: 8px;
+  text-decoration: none;
+  color: #FFF;
+  font-weight: bold;
+}
+#menu ul li a:hover {
+  background: url('infobg2.png');
+}
+#post-container {
+  margin-top: 10px;
+  width: 800px;
+  margin-right: auto;
+  margin-left: auto;
+  background: #FFF url('sidebg.png') repeat-x;
+}
+#post-container #post-left {
+  float: left;
+  width: 100px;
+  padding: 5px;
+  font-weight: bold;
+  color: #CCC;
+  overflow: hidden;
+}
+#post-container #post-right {
+  float: right;
+  width: 680px; 
+  background: #FFFFFF; 
+}
+#post-container #post-right #post-info {
+  padding: 3px;
+  text-align: left;
+  color: #FFF;
+  font-weight: bold;
+  background: #28a1da url('infobg.png');
+}
+#post-container #post-right #post-content {
+  padding: 5px;  
+}
+#post-container #post-right #user-sig {
+  padding: 5px;
+  border-top: 1px solid #000;
+}
+.break {
+  clear: both;
+}
+#foot {
+  margin-top: 10px;
+  color: #FFF;
+  background: url('navbg.png') repeat-x;
+  padding: 8px;
+  font-weight: bold;
+  width: 816px;
+  margin-right: auto;
+  margin-left: auto;
+}
+#pagination {
+  width: 800px;
+  text-align: right;
+  color: #FFF;
+  margin-right: auto;
+  margin-left: auto;
+  margin-top: 5px;
+}
