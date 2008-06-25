@@ -137,3 +137,22 @@ body {
   color: #ffffff;
   padding: 5px;
 }
+/* Message Index */
+#messageindex {
+  background: #fff;
+  width: 800px;
+  margin-right: auto;
+  margin-left: auto;
+}
+#messageindex #title {
+  background: url('infobg.png');
+  color: #fff;
+  padding: 5px;
+}
+#messageindex_panel {
+  background: transparent;
+  color: #fff;
+  width: 800px;
+  margin-right: auto;
+  margin-left: auto;
+}
