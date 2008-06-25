@@ -20,9 +20,6 @@ global $db_prefix;
   $result = mysql_query("SELECT * FROM {$db_prefix}settings");
     while($row = mysql_fetch_assoc($result)) 
       $settings[$row['variable']] = $row['value'];
-  $result = mysql_query("SELECT `id`,`username`,`display_name` FROM {$db_prefix}members");
-    while($row = mysql_fetch_assoc($result)) 
-      $settings['users'][$row['id']] = $row['display_name'] ? $row['display_name'] : $row['username'];
   return $settings;
 } 
 
