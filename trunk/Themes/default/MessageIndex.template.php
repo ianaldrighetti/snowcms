@@ -9,5 +9,44 @@ global $cmsurl, $l, $settings, $user;
 echo '<pre>';
 print_r($settings['topics']);
 echo '</pre>';
+echo '
+<table id="messageindex_panel">
+  <tr>
+    <td style="text-align: left;">Pages: [1]</td>
+    <td style="text-align: right;">'; if(canforum('post_new')) { echo '<a href="'.$cmsurl.'forum.php?action=post&board='.$_REQUEST['board'].'">New Topic</a>'; } echo '</td>
+  </tr>
+</table>
+<div id="messageindex">
+  <table width="800px">
+    <tr id="title">
+      <td width="5%" style="padding: 5px;">&nbsp;</td>
+      <td width="50%" style="padding: 5px;">Subject</td>
+      <td width="15%" style="padding: 5px;">Started By</td>
+      <td width="5%" style="padding: 5px;">Replies</td>
+      <td width="5%" style="padding: 5px;">Views</td>
+      <td width="20%" style="padding: 5px;">Last Post</td>
+    </tr>';
+  if(count($settings['topics'])>0) {
+    foreach($settings['topics'] as $topic) {
+       echo '
+       <tr>
+         <td style="padding: 5px;">XX</td>
+         <td style="padding: 5px;"><a href="'.$cmsurl.'forum.php?topic='.$topic['tid'].'">'.$topic['subject'].'</a></td>
+         <td style="text-align: center; padding: 5px;"><a href="'.$cmsurl.'index.php?action=profile&u='.$topic['starter_id'].'">'.$topic['topic_starter'].'</a></td>
+         <td style="text-align: center; padding: 5px;">'.$topic['num_replies'].'</td>
+         <td style="text-align: center; padding: 5px;">'.$topic['numviews'].'</td>
+         <td style="padding: 5px;">Last Post info :o</td>
+       </tr>';
+    }
+  }
+  else {
+      echo '
+      <tr>
+        <td colspan="6">No Posts</td>
+      </tr>';
+  }
+echo '
+  </table>
+</div>';
 }
 ?>
