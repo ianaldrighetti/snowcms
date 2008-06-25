@@ -74,6 +74,24 @@ body {
 .break {
   clear: both;
 }
+#error {
+  width: 400px;
+  margin-right: auto;
+  margin-left: auto;
+  background: #ffffff;
+  margin-top: 20px;
+  margin-bottom: 20px;
+}
+#error .title {
+  background: url('infobg.png');
+  padding: 5px;
+  color: #FFFFFF;
+  font-weight: bold;
+}
+#error .message {
+  color: #383838;
+  margin: 5px;
+}
 #foot {
   margin-top: 10px;
   color: #FFF;
@@ -83,6 +101,7 @@ body {
   width: 816px;
   margin-right: auto;
   margin-left: auto;
+  text-align: center;
 }
 #pagination {
   width: 800px;
