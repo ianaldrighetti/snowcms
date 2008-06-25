@@ -5,7 +5,7 @@ if(!defined('Snow'))
   die('Hacking Attempt...');
   
 function forum_header() {
-global $cmsurl, $theme_url, $settings, $user;
+global $cmsurl, $theme_url, $l, $settings, $user;
 echo '
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml">
@@ -19,13 +19,22 @@ echo '
   </div>
   <div id="menu">
     <ul>
-      <li><a href="">Home</a></li>
-      <li><a href="">Forum Index</a></li>
-      <li><a href="">Search</a></li>
-      <li><a href="">Admin</a></li>
-      <li><a href="">Profile</a></li>
-      <li><a href="">Members</a></li>
-      <li><a href="">Personal Messages</a></li>
+      <li><a href="'.$cmsurl.'index.php">'.$l['forum_link_home'].'</a></li>
+      <li><a href="'.$cmsurl.'forum.php">'.$l['forum_link_forumindex'].'</a></li>
+      <li><a href="'.$cmsurl.'forum.php?action=search">'.$l['forum_link_search'].'</a></li>';
+    if(can('admin'))
+      echo '<li><a href="'.$cmsurl.'index.php?action=admin">'.$l['forum_link_admin'].'</a></li>';
+    if($user['is_logged']) 
+      echo '<li><a href="'.$cmsurl.'index.php?action=profile">'.$l['forum_link_profile'].'</a></li>';
+    if(can('view_mlist')) 
+      echo '<li><a href="">'.$l['forum_link_members'].'</a></li>';
+    if($user['is_logged'])
+      echo '<li><a href="">'.$l['forum_link_pm'].'</a></li>';
+    if(!$user['is_logged'])
+      echo '
+      <li><a href="'.$cmsurl.'index.php?action=register">'.$l['forum_link_register'].'</a></li>
+      <li><a href="'.$cmsurl.'index.php?action=login">'.$l['forum_link_login'].'</a></li>';
+    echo '
     </ul>
   </div>';
 }
