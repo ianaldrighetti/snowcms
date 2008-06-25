@@ -17,6 +17,16 @@ if(!defined("Snow"))
 function loadBoard() {
 global $cmsurl, $db_prefix, $l, $settings, $user;
   $Board_ID = addslashes(mysql_real_escape_string($_REQUEST['board']));
+  // Mark this board now as read... Only if they are logged in :)
+  if($user['is_logged']) {
+    $result = mysql_query("SELECT * FROM {$db_prefix}board_logs WHERE `bid` = '$Board_ID'");
+    if(mysql_num_rows($result)==0) {
+      mysql_query("
+        INSERT INTO {$db_prefix}board_logs
+				  (`bid`,`uid`)
+	      VALUES ($Board_ID, {$user['id']})") or die(mysql_error());
+	  }
+	}
   $result = mysql_query("SELECT * FROM {$db_prefix}boards WHERE `bid` = '$Board_ID'");
     while($row = mysql_fetch_assoc($result)) {
       $board = array(
