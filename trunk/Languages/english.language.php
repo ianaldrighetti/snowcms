@@ -115,4 +115,10 @@ $l['email_register_tpl'] = "Hello %username%!\r\n Someone has requested an accou
 // List pages
 $l['listpage_header'] = 'Page List';
 $l['listepage_desc'] = 'This page shows all the pages that was writen in the CMS.';
+
+// Forum.template.php
+$l['forum_title'] = $settings['site_name'].' - Index';
+$l['forum_error_title'] = $settings['site_name'].' - Error';
+$l['forum_error_header'] = 'Error';
+$l['forum_error_message'] = 'Sorry, but you aren\'t allowed to view the '.$settings['site_name'].' board, if you have not yet tried, maybe <a href="'.$cmsurl.'index.php?action=register">registering</a> and <a href="'.$cmsurl.'index.php?action=login">logging</a> will allow you to view the forum';
 ?>
