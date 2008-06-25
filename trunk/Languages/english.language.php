@@ -123,4 +123,6 @@ $l['forum_error_header'] = 'Error';
 $l['forum_error_message'] = 'Sorry, but you aren\'t allowed to view the '.$settings['site_name'].' board, if you have not yet tried, maybe <a href="'.$cmsurl.'index.php?action=register">registering</a> and <a href="'.$cmsurl.'index.php?action=login">logging</a> will allow you to view the forum';
 $l['forum_posts_in'] = 'posts in';
 $l['forum_topics'] = 'topics';
+$l['forum_board_new'] = 'New posts';
+$l['forum_board_old'] = 'No news posts';
 ?>
