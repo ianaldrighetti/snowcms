@@ -28,8 +28,7 @@ global $cmsurl, $db_prefix, $l, $settings, $user;
   if(mysql_num_rows($result)>0) {
     while($row = mysql_fetch_assoc($result)) {
       $settings['page']['title'] = $row['title'];
-	  $settings['page']['date'] = $row['modify_date'] ? formattime($row['modify_date']) : formattime($row['create_date']);
-	  $settings['page']['owner'] = $row['owner_name'];
+	    $settings['page']['date'] = $row['modify_date'] ? formattime($row['modify_date']) : formattime($row['create_date']);
       $settings['page']['content'] = stripslashes($row['content']);
     }
     // It does! Set content and page title, then load Page.template.php
@@ -95,16 +94,29 @@ global $cmsurl, $db_prefix, $l, $settings, $user;
     }
   }
   // Get all the pages in the database so we can list them :)
-  $result = mysql_query("SELECT * FROM {$db_prefix}pages ORDER BY `page_id` DESC");
+  $result = mysql_query("
+     SELECT
+       p.page_id, p.page_owner, p.owner_name, p.create_date, 
+       p.modify_date, p.title, m.id, m.username, m.display_name
+     FROM {$db_prefix}pages AS p
+       LEFT JOIN {$db_prefix}members AS m ON m.id = p.page_owner
+     ORDER BY p.page_id DESC") or die(mysql_error());
     $pages = array();
     while($row = mysql_fetch_assoc($result)) {
+      if(!$row['id'])
+        $owner = $row['owner_name'];
+      elseif($row['display_name']!=null)
+        $owner = $row['display_name'];
+      else
+        $owner = $row['username'];
       $pages[] = array(
         'page_id' => $row['page_id'],
+        'title' => $row['title'],
         'page_owner' => $row['page_owner'],
-        'owner' => @$settings['users'][$row['page_owner']] ? $settings['users'][$row['page_owner']] : $row['owner_name'],
-        'date' => $row['modify_date'] ? formattime($row['modify_date']) : formattime($row['create_date']),
-        'title' => $row['title']
+        'owner' => $owner,
+        'date' => $row['modify_date'] ? formattime($row['modify_date']) : formattime($row['create_date'])
       );
+        
     }
   // Load the $pages array into $settings so we can pass it on
   $settings['page']['pages'] = $pages;
@@ -128,7 +140,6 @@ global $cmsurl, $db_prefix, $l, $settings, $user;
         $page = array(
           'page_id' => $row['page_id'],
           'title' => $row['title'],
-		  'show_info' => $row['show_info'],
           'content' => stripslashes($row['content'])
         );
         // Load $page (the pages info) into $settings, clean() the content with clean() so it won't parse any HTML Entities like &copy; as what you would see (c)
@@ -155,29 +166,4 @@ global $cmsurl, $db_prefix, $l, $settings, $user;
     loadTheme('ManagePages','NoPage');
   }
 }
-
-// An function that show page lists
-function PageList() {
-global $cmsurl, $db_prefix, $l, $settings, $user;
-  // Get all the pages in the database so we can list them :)
-  $result = mysql_query("SELECT * FROM {$db_prefix}pages ORDER BY `page_id` DESC");
-    $pages = array();
-    while($row = mysql_fetch_assoc($result)) {
-      $pages[] = array(
-        'page_id' => $row['page_id'],
-        'page_owner' => $row['page_owner'],
-        'owner' => @$settings['users'][$row['page_owner']] ? $settings['users'][$row['page_owner']] : $row['owner_name'],
-        'date' => $row['modify_date'] ? formattime($row['modify_date']) : formattime($row['create_date']),
-        'title' => $row['title']
-      );
-    }
-  // Load the $pages array into $settings so we can pass it on
-  $settings['page']['pages'] = $pages;
-  // Lets make it simple, count how many pages their are
-  $settings['page']['num_pages'] = count($pages);
-  // Set page title, and load ManagePages template
-  $settings['page']['title'] = $l['adminpage_make_title'];
-  loadTheme('Page', 'ListPage');
-}
-
 ?>
