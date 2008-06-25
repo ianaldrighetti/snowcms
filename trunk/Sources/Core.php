@@ -219,8 +219,10 @@ global $perms, $user;
     return false;
 }
 
-// Creates a random string, doesn't have a use... Yet =D
-function randStr($length = 6) {
+// Creates a random session id
+function create_sid() {
+  // Randomly choose how long the session id will be
+  $length = rand(40,50);
   $chars = "abcdefghijkmnopqrstuvwxyz023456789";
   srand((double)microtime()*1000000);
   $i = 0;
