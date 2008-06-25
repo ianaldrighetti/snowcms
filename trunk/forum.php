@@ -30,6 +30,7 @@ require_once($source_dir.'/Core.php');
   $settings = loadSettings();
   $l = loadLanguage();
   $perms = loadPerms();
+  $bperms = loadBPerms();
   $settings['menu'] = loadMenus();
 // Write that this Guest/User is online
   WriteOnline();
@@ -40,12 +41,12 @@ require_once($source_dir.'/Core.php');
     require_once($source_dir.'/BoardIndex.php');
     BoardIndex();
   }
-  elseif(!empty($_REQUEST['topic'])) {
+  elseif((!empty($_REQUEST['topic'])) && (empty($_REQUEST['action']))) {
     // Someone Wants to view a topic, I guess if we have to, we should show it ._.
     require_once($source_dir.'/Topic.php');
     loadTopic();
   }
-  elseif(!empty($_REQUEST['board'])) {
+  elseif((!empty($_REQUEST['board'])) && (empty($_REQUEST['action']))) {
     // Now they want to see a board, do I have to do EVERYTHING? ;D
     require_once($source_dir.'/Board.php');
     loadBoard(); 
@@ -58,7 +59,7 @@ require_once($source_dir.'/Core.php');
       'search' => array('Search.php','FSearch'),
       'search2' => array('Search.php','FSearch2')
     );
-    if(is_array($actions[$_REQUEST['action']])) {
+    if(is_array(@$actions[$_REQUEST['action']])) {
       // It is something defined, hope it works right >.<
       require_once($source_dir.'/'.$actions[$_REQUEST['action']][0]);
         $actions[$_REQUEST['action']][1]();
