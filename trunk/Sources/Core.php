@@ -131,6 +131,34 @@ global $cmsurl, $l, $theme_dir, $settings;
   theme_footer();
 }
 
+// This function is almost EXACTLY (Copied and Pasted tbh) like the loadTheme() function
+// But it is to load up the Forum.template.php as the main parts
+function loadForum($file, $function = 'Main') {
+global $cmsurl, $l, $theme_dir, $settings;
+
+  // Does this theme even have its own Main.template.php file? ._.
+  // Why did they make it if they don't have a Main.template.php file!!! (Which has like the <html><body> stuff :P)
+  if(file_exists($theme_dir.'/'.$settings['theme'].'/Forum.template.php'))
+    require_once($theme_dir.'/'.$settings['theme'].'/Forum.template.php');
+  else
+    require_once($theme_dir.'/default/Forum.template.php');
+  
+  // Do they have the $FILE (Template) in this theme? If not, fall back on the default one :)
+  if(file_exists($theme_dir.'/'.$settings['theme'].'/'.$file.'.template.php'))
+    require_once($theme_dir.'/'.$settings['theme'].'/'.$file.'.template.php');
+  else
+    require_once($theme_dir.'/default/'.$file.'.template.php');
+    
+  // Get the header of the forum...
+  forum_header();
+  
+  // Call on the function that is needed...
+  $function();
+  
+  // Forum Footer
+  forum_footer();
+}
+
 // Loads up the permissions into an array, so we can know what you can and can't do :)
 function loadPerms() {
 global $db_prefix, $user;
