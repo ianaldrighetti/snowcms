@@ -111,3 +111,29 @@ body {
   margin-left: auto;
   margin-top: 5px;
 }
+/* Boards and Categories */
+#category {
+  width: 800px;
+  margin-right: auto;
+  margin-left: auto;
+  margin-top: 5px;
+}
+#category .title {
+  background: url('infobg.png');
+  font-weight: bold;
+  color: #ffffff;
+  padding: 5px;
+}
+#board {
+  background: #fff;
+  margin-top: 5px;
+}
+#board img {
+  padding: 5px;
+}
+#board .title {
+  background: url('infobg.png');
+  font-weight: bold;
+  color: #ffffff;
+  padding: 5px;
+}
