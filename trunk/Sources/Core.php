@@ -171,6 +171,17 @@ global $db_prefix, $user;
   return $perms;
 }
 
+function loadBPerms() {
+global $db_prefix, $user;
+  $bperms = array();
+  $bperms[$user['group']] = array();
+  $result = mysql_query("SELECT * FROM {$db_prefix}board_permissions");
+    while($row = mysql_fetch_assoc($result)) {
+      $bperms[$row['group_id']][$row['what']] = $row['can'] ? true : false;
+    }
+  return $bperms;
+}
+
 // Load all the menus, both the Sidebar menu (if their is one) and the Main one (If their is one :P)
 function loadMenus() {
 global $db_prefix;
@@ -242,6 +253,18 @@ global $perms, $user;
   if(empty($perms[$user['group']][$what]))
     return false;
   elseif($perms[$user['group']][$what]) 
+    return true;
+  else
+    return false;
+}
+
+function canforum($what) {
+global $bperms, $user;
+  // This is a super simple Permission handler, simply, can they do the requested $what or not?
+  // If it isn't set, we say false because we dont know ._.
+  if(empty($bperms[$user['group']][$what]))
+    return false;
+  elseif($bperms[$user['group']][$what]) 
     return true;
   else
     return false;
