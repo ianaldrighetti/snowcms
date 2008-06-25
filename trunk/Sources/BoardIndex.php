@@ -1,7 +1,7 @@
 <?php
 
 
-if(!defined('SnowCMSF'))
+if(!defined('Snow'))
   die("Hacking Attempt...");
 
 // This function loads up the forum index  
@@ -38,7 +38,7 @@ global $cmsurl, $db_prefix, $l, $settings, $user;
           if(is_array($board['who_view'])) {
             if(!in_array($user['group'], $board['who_view'])) {
               // Their user group isn't in the array =S so they can't view it, unset it!
-              unset($cats[$cat['id']][$board['id']])
+              unset($cats[$cat['id']][$board['id']]);
             }
           }
           else {
