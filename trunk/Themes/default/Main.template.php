@@ -39,25 +39,21 @@ echo '
 // Call on by either theme_menu('main'); or theme_menu('side')
 function theme_menu($which) {
 global $cmsurl, $settings, $user;
-  echo 'Navigation';
-    echo '<li><a href="'.$cmsurl.'index.php">Home</a></li>';
-  if(can('admin'))
-    echo '<li><a href="'.$cmsurl.'index.php?action=admin">Admin CP</a></li>';
-  if($which=='side') {
-    if(!$user['is_logged'])
-      echo '<li><a href="'.$cmsurl.'index.php?action=login">Login</a></li>
-            <li><a href="'.$cmsurl.'index.php?action=register">Register</a></li>';
-    else
-      echo '<li><a href="'.$cmsurl.'index.php?action=listpage">Page List</a></li>
-			<li><a href="'.$cmsurl.'index.php?action=profile">Profile</a></li>
-            <li><a href="'.$cmsurl.'index.php?action=logout">Logout</a></li>';      
-  }
-  echo '<br />Links';
   if(count($settings['menu'][$which])>0) {
     foreach($settings['menu'][$which] as $link) {
       echo '<li><a href="'.$link['href'].'" '.$link['target'].'>'.$link['name'].'</a></li>';
     }
   }
+  if($which=='side') {
+    if(!$user['is_logged'])
+      echo '<li><a href="'.$cmsurl.'index.php?action=login">Login</a></li>
+            <li><a href="'.$cmsurl.'index.php?action=register">Register</a></li>';
+    else
+      echo '<li><a href="'.$cmsurl.'index.php?action=profile">Profile</a></li>
+            <li><a href="'.$cmsurl.'index.php?action=logout">Logout</a></li>';      
+    if(can('admin'))
+      echo '<li><a href="'.$cmsurl.'index.php?action=admin">Admin CP</a></li>';
+  }  
 }
 function theme_footer() {
 global $cmsurl, $theme_url, $settings, $user;
