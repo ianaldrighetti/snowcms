@@ -127,4 +127,14 @@ $l['forum_board_new'] = 'New posts';
 $l['forum_board_old'] = 'No news posts';
 $l['forum_error_cantviewb_message'] = 'Sorry, you are not allowed to view or access this board';
 $l['forum_error_noboard_message'] = 'The Board ID you have requested does not exist!';
+// Links for Forum.template.php
+$l['forum_link_home'] = 'Home';
+$l['forum_link_forumindex'] = 'Forum Index';
+$l['forum_link_search'] = 'Search';
+$l['forum_link_admin'] = 'Admin';
+$l['forum_link_profile'] = 'Profile';
+$l['forum_link_members'] = 'Members';
+$l['forum_link_pm'] = 'Personal Messages';
+$l['forum_link_register'] = 'Register';
+$l['forum_link_login'] = 'Login';
 ?>
