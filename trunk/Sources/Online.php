@@ -21,7 +21,13 @@ global $cmsurl, $db_prefix, $l, $settings, $user;
     // Set online as an array, just incase their is nothing in the DB, but if you view ?action=online, 1 should be there by now
     $online = array();
     // Get them, Ordered by `last_active` Descending (Show the newest on top)
-    $result = mysql_query("SELECT * FROM {$db_prefix}online ORDER BY `last_active` DESC");
+    $result = mysql_query("
+       SELECT
+         o.user_id, o.ip, o.page, o.last_active,
+         m.id, m.username, m.display_name
+       FROM {$db_prefix}online AS o
+         LEFT JOIN {$db_prefix}members AS m ON m.id = o.user_id
+       ORDER BY o.last_active DESC");
       while($row = mysql_fetch_assoc($result)) {
         // Are they on a ?page= or ?action=
         $type = @explode(":", $row['page']);
@@ -41,11 +47,23 @@ global $cmsurl, $db_prefix, $l, $settings, $user;
         }
         else
           $page_title = $l['online_title_unknown'];
+        
+        $username = $l['online_user_guest'];
+        if(($row['id']==null) && ($row['user_id'])) {
+          // The member doesn't exist, delete it!
+          mysql_query("DELETE FROM {$db_prefix}online WHERE `user_id` = '{$row['user_id']}'");
+        }
+        elseif(($row['display_name']==null) && ($row['user_id']!=0)) {
+          $username = $row['username'];
+        }
+        elseif(($row['display_name']!=null) && ($row['user_id']!=0)) {
+          $username = $row['display_name'];
+        }
         // Add them to the $online array, give name, ID, page, ip, time last active
         $online[] = array(
           'user_id' => $row['user_id'],
           'is_user' => $row['user_id'] ? true : false,
-          'user' => $row['user_id'] ? $settings['users'][$row['user_id']] : $l['online_user_guest'],
+          'user' => $username,
           'ip' => can('view_online_special') ? $row['ip'] : false,
           'page' => $page_title,
           'time' => date("g:i:sA", $row['last_active'])
