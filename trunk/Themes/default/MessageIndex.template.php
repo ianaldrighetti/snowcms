@@ -6,9 +6,6 @@ if(!defined('Snow'))
   
 function Main() {
 global $cmsurl, $l, $settings, $user;
-echo '<pre>';
-print_r($settings['topics']);
-echo '</pre>';
 echo '
 <table id="messageindex_panel">
   <tr>
