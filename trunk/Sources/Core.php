@@ -27,11 +27,14 @@ global $db_prefix;
 // It makes it so later on, once we have a forum in, you can post PHP and HTML stuff, but it
 // Won't be parsed, but keep the site safe from SQL Injections 
 function clean($str) {
-  $str = str_replace('&', '&amp;', $str);
-  $str = str_replace('"', '&quot;', $str);
-  $str = str_replace("'", '&#39;', $str);
-  $str = str_replace("<", "&lt;", $str);
-  $str = str_replace(">", "&gt;", $str);
+  $replace = array(
+    '&' => '&amp;',
+    '"' => '&quot;',
+    "'" => '&#39;',
+    '<' => '&lt;',
+    '>' => '&gt;'
+  );
+  $str = str_replace(array_keys($replace), array_values($replace), $str);
   return $str;
 }
 
@@ -293,5 +296,10 @@ global $settings;
   if(!$timestamp)
     $timestamp = time();
   return date($settings['timeformat'], $timestamp);
+}
+
+function bbc($str) {
+  $str = strtr($str, array("\n" => "<br />"));
+  return $str;
 }
 ?>
