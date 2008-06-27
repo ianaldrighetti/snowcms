@@ -65,7 +65,8 @@ body {
   background: #28a1da url('infobg.png');
 }
 #post-container #post-right #post-content {
-  padding: 5px;  
+  padding: 5px;
+	overflow: auto;
 }
 #post-container #post-right #user-sig {
   padding: 5px;
@@ -155,4 +156,18 @@ body {
   width: 800px;
   margin-right: auto;
   margin-left: auto;
+}
+#topic_panel {
+  background: transparent;
+  color: #FFFFFF;
+  width: 800px;
+  margin-right: auto;
+  margin-left: auto;
+}
+a {
+  color: #ddd;
+  text-decoration: none;
+}
+a:hover {
+  text-decoration: underline;
 }
