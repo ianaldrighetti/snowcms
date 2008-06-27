@@ -145,4 +145,11 @@ $l['topic_firstpage'] = 'First Page';
 $l['topic_lastpage'] = 'Last Page';
 $l['topic_newtopic'] = 'New Topic';
 $l['topic_reply'] = 'Post Reply';
+
+// Profile.template.php
+$l['profile_title'] = 'Profile';
+$l['profile_error_title'] = 'Error';
+$l['profile_error_header'] = 'Error';
+$l['profile_error_desc'] = 'Sorry, but you are not <a href="'.$cmsurl.'index.php?action=login">logged in</a>, if you have not yet done so, why not <a href="'.$cmsurl.'index.php?action=register">register</a> and or <a href="'.$cmsurl.'index.php?action=login">login</a>';
+$l['profile_profile_of'] = 'Profile of %user%';
 ?>
