@@ -137,4 +137,12 @@ $l['forum_link_members'] = 'Members';
 $l['forum_link_pm'] = 'Personal Messages';
 $l['forum_link_register'] = 'Register';
 $l['forum_link_login'] = 'Login';
+
+// Topic.template.php
+$l['topic_pages'] = 'Pages:';
+$l['topic_on'] = 'on';
+$l['topic_firstpage'] = 'First Page';
+$l['topic_lastpage'] = 'Last Page';
+$l['topic_newtopic'] = 'New Topic';
+$l['topic_reply'] = 'Post Reply';
 ?>
