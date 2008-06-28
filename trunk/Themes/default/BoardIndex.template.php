@@ -32,3 +32,4 @@ global $cmsurl, $theme_url, $l, $settings, $user;
     </div>';
   }
 }
+?>
