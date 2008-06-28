@@ -49,3 +49,4 @@ global $cmsurl, $settings, $l, $user;
   <h1>'.$l['admin_error_header'].'</h1>
   <p>'.$l['admin_error_reason'].'</p>';
 }
+?>
