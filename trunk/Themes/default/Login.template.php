@@ -33,3 +33,4 @@ global $cmsurl, $settings, $l, $user;
     </fieldset>
   </form>';
 }
+?>
