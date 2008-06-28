@@ -14,3 +14,4 @@ echo '
   <h1>'.$l['profile_error_header'].'</h1>
   <p>'.$l['profile_error_desc'].'</p>';
 }
+?>
