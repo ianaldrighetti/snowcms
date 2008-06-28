@@ -67,6 +67,8 @@ $l['admin_menu_basic-settings'] = 'Basic Settings';
 $l['admin_menu_basic-settings_desc'] = 'Edit simple settings such as site name, slogan, time format, etc.';
 $l['admin_menu_members'] = 'Manage Members';
 $l['admin_menu_members_desc'] = 'Manage your members, such as changing their member group, anything in their profile';
+$l['admin_menu_permissions'] = 'Group Permissions';
+$l['admin_menu_permissions_desc'] = 'This is where you can choose what a member group can and cannot do on your site';
 
 // Settings.template.php
 $l['basicsettings_title'] = 'Basic Settings';
@@ -155,4 +157,10 @@ $l['profile_profile_of'] = 'Profile of %user%';
 
 // Permissions.template.php
 $l['permissions_title'] = 'Manage Permissions';
+$l['permissions_header'] = 'Group Permissions';
+$l['permissions_desc'] = 'Here is where you can manage member group specific permissions, in other words, you can choose what people in a member group can and cannot do.</p>';
+$l['permissions_modify'] = 'Modify';
+$l['permissions_membergroup'] = 'Member Group';
+$l['permissions_numusers'] = 'Users';
+$l['permissions_permissions'] = 'Permissions';
 ?>
