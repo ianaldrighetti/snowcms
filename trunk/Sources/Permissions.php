@@ -118,8 +118,31 @@ global $cmsurl, $db_prefix, $l, $settings, $permissions, $user;
   
   }
   else {
-    $settings['page']['title'] = $l['permissions_error_title'];
+    $settings['page']['title'] = $l['admin_error_title'];
     loadTheme('Admin','Error');
+  }
+}
+
+function loadMID() {
+global $cmsurl, $db_prefix, $l, $settings, $permissions, $user;
+  $MID = (int)addslashes(mysql_real_escape_string($_REQUEST['mid']));
+  $result = mysql_query("
+     SELECT
+       grp.group_id, grp.groupname, p.group_id, p.what
+     FROM {$db_prefix}permissions AS p
+       LEFT JOIN {$db_prefix}membergroups AS grp ON grp.group_id = p.group_id
+     WHERE grp.group_id = $MID") or die(mysql_error());
+  $group = mysql_query("SELECT * FROM {$db_prefix}membergroups WHERE `group_id` = '$MID'");
+  if(mysql_num_rows($group)>0) {
+    $settings['perms'] = array();
+    while($row = mysql_fetch_assoc($result))
+      $settings['perms'][] = $row;
+    $settings['page']['title'] = $l['permissions_editperms_title'];
+    loadTheme('Permissions','Edit');
+  }
+  else {
+    $settings['page']['title'] = $l['admin_error_title'];
+    loadTheme('Permissions','NoGroup');
   }
 }
 ?>
