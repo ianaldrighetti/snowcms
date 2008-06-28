@@ -62,7 +62,10 @@ global $cmsurl, $db_prefix, $l, $settings, $permissions, $user;
                 $can = 1;
               else
                 $can = 0;
-              mysql_query("REPLACE INTO {$db_prefix}permissions (`group_id`,`what`,`can`) VALUES('{$membergroup}','{$perm}','{$can}')") or die(mysql_error());
+              if($can)
+                mysql_query("REPLACE INTO {$db_prefix}permissions (`group_id`,`what`,`can`) VALUES('{$membergroup}','{$perm}','{$can}')") or die(mysql_error());
+              else
+                mysql_query("DELETE FROM {$db_prefix}permissions WHERE `group_id` = '{$membergroup}' AND `what` = '{$perm}'");
             }
           // Weeeee! Done!
         }
@@ -70,15 +73,25 @@ global $cmsurl, $db_prefix, $l, $settings, $permissions, $user;
       // Load the list of member groups, etc
       $result = mysql_query("
         SELECT 
-          grp.group_id, grp.groupname AS name, p.what, COUNT(p.what) AS numperms,
-          p.group_id, m.id, m.group, COUNT(m.id) AS numusers
+          grp.group_id AS id, grp.groupname AS name
         FROM {$db_prefix}membergroups AS grp 
-          LEFT JOIN {$db_prefix}members AS m ON m.group = grp.group_id
-          LEFT JOIN {$db_prefix}permissions AS p ON p.group_id = grp.group_id
-        ORDER BY `group_id` DESC");
+        ORDER BY grp.group_id ASC") or die(mysql_error());
       while($row = mysql_fetch_assoc($result)) {
-        $groups[] = $row;
+        $groups[$row['id']] = array(
+                                'id' => $row['id'],
+                                'name' => $row['name'],
+                                'numusers' => 0,
+                                'numperms' => 0
+                              );
       }
+      $result = mysql_query("SELECT `group`, COUNT(*) FROM {$db_prefix}members GROUP BY `group`");
+        while($row = mysql_fetch_assoc($result)) {
+          $groups[$row['group']]['numusers'] = $row['COUNT(*)']; 
+        }
+      $result = mysql_query("SELECT `group_id`, COUNT(*) FROM {$db_prefix}permissions GROUP BY `group_id`");
+        while($row = mysql_fetch_assoc($result)) {
+          $groups[$row['group_id']]['numperms'] = $row['COUNT(*)']; 
+        }        
       $settings['page']['title'] = $l['permissions_title'];
       $settings['groups'] = $groups;
       loadTheme('Permissions');
