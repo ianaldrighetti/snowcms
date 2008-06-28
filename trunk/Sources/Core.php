@@ -171,7 +171,7 @@ function loadPerms() {
 global $db_prefix, $user;
   $perms = array();
   $perms[$user['group']] = array();
-  $result = mysql_query("SELECT * FROM {$db_prefix}permissions");
+  $result = mysql_query("SELECT * FROM {$db_prefix}permissions") or die(mysql_error());
     while($row = mysql_fetch_assoc($result)) {
       $perms[$row['group_id']][$row['what']] = $row['can'] ? true : false;
     }
@@ -182,7 +182,7 @@ function loadBPerms() {
 global $db_prefix, $user;
   $bperms = array();
   $bperms[$user['group']] = array();
-  $result = mysql_query("SELECT * FROM {$db_prefix}board_permissions");
+  $result = mysql_query("SELECT * FROM {$db_prefix}board_permissions") or die(mysql_error());
     while($row = mysql_fetch_assoc($result)) {
       $bperms[$row['group_id']][$row['what']] = $row['can'] ? true : false;
     }
@@ -195,7 +195,7 @@ global $db_prefix;
   $menu =array();
   $menu['main'] = array();
   $menu['side'] = array();
-  $result = mysql_query("SELECT * FROM {$db_prefix}menus ORDER BY `order` ASC");
+  $result = mysql_query("SELECT * FROM {$db_prefix}menus ORDER BY `order` ASC") or die(mysql_error());
   if(mysql_num_rows($result)>0) {  
     while($row = mysql_fetch_assoc($result)) {
       if(($row['menu']==0) || ($row['menu']==2)) {
@@ -243,13 +243,13 @@ global $db_prefix, $settings, $user;
       // Delete this row if it is them
       // Or if this is an expired row, delete it too
       if($row['ip']==$user['ip'])
-        mysql_query("DELETE FROM {$db_prefix}online WHERE `ip` = '{$row['ip']}'");
+        @mysql_query("DELETE FROM {$db_prefix}online WHERE `ip` = '{$row['ip']}'");
       elseif(($row['last_active']+($settings['login_threshold']*60))<time()) {
-        mysql_query("DELETE FROM {$db_prefix}online WHERE `ip` = '{$row['ip']}'");
+        @mysql_query("DELETE FROM {$db_prefix}online WHERE `ip` = '{$row['ip']}'");
       }
     }
   // Insert their information into the database
-  mysql_query("INSERT INTO {$db_prefix}online (`user_id`,`ip`,`page`,`last_active`) VALUES('{$user['id']}','{$user['ip']}','{$action_or_page}','".time()."')");
+  mysql_query("INSERT INTO {$db_prefix}online (`user_id`,`ip`,`page`,`last_active`) VALUES('{$user['id']}','{$user['ip']}','{$action_or_page}','".time()."')") or die(mysql_error());
 }
 
 // This returns true or false (bool) of whether or not they can do said function
