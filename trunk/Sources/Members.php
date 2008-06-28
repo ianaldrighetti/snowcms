@@ -25,7 +25,7 @@ global $cmsurl, $db_prefix, $l, $settings, $user;
     }
     elseif((!empty($_REQUEST['u'])) && (empty($_REQUEST['ssa']))) {
       // :o They are moderating/viewing someones profile
-      loadUser();
+      loadProf();
     }
     else {
       // A Super Sub Action :D!
@@ -37,7 +37,7 @@ global $cmsurl, $db_prefix, $l, $settings, $user;
   }
   else {
     // You can't Manage Members silly!
-    $settings['page']['title'] = $l['managemembers_error_title'];
-    loadTheme('Error','NotAllowed');
+    $settings['page']['title'] = $l['admin_error_title'];
+    loadTheme('Admin','Error');
   }
 }
