@@ -44,5 +44,4 @@ global $cmsurl, $settings, $l, $user;
   }
 	
 }
-
 ?>
