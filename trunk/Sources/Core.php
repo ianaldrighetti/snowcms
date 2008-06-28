@@ -48,6 +48,7 @@ global $db_prefix;
   $user['group'] = 0;
   $user['is_logged'] = false;
   $user['is_guest'] = true;
+  $user['is_admin'] = false;
   $user['name'] = null;
   $user['email'] = null;
   // Make sure we get their real IP :)
@@ -69,9 +70,12 @@ global $db_prefix;
             'group' => $row['group'],
             'is_logged' => true,
             'is_guest' => false,
+            'is_admin' => false,
             'email' => $row['email'],
             'ip' => @$_SERVER['HTTP_X_FORWARDED_FOR'] ? $_SERVER['HTTP_X_FORWARDED_FOR'] : $_SERVER['REMOTE_ADDR']
           );
+          if($user['group']==1)
+            $user['is_admin'] = true;
         }
       }
     }
