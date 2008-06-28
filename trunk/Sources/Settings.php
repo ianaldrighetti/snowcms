@@ -16,29 +16,34 @@ if(!defined("Snow"))
   
 function BasicSettings() {
 global $cmsurl, $db_prefix, $l, $settings, $user;
-  // An array of all the settings that can be set on this page...
-  $basic = array(
-    'site_name',
-    'slogan',
-    'login_threshold',
-    'remember_time',
-    'timeformat'
-  );
-  // Are we updating them?
-  if(!empty($_REQUEST['update'])) {
-    // Set them all!
-    foreach($basic as $setting) {
-      $_REQUEST[$setting] = clean($_REQUEST[$setting]);
-      $query = "UPDATE {$db_prefix}settings SET `value` = '{$_REQUEST[$setting]}' WHERE `variable` = '{$setting}' LIMIT 1";
-      $result = mysql_query($query);
+  if(can('manage_basic-settings')) {  
+    // An array of all the settings that can be set on this page...
+    $basic = array(
+      'site_name',
+      'slogan',
+      'login_threshold',
+      'remember_time',
+      'timeformat'
+    );
+    // Are we updating them?
+    if(!empty($_REQUEST['update'])) {
+      // Set them all!
+      foreach($basic as $setting) {
+        $_REQUEST[$setting] = clean($_REQUEST[$setting]);
+        $query = "UPDATE {$db_prefix}settings SET `value` = '{$_REQUEST[$setting]}' WHERE `variable` = '{$setting}' LIMIT 1";
+        $result = mysql_query($query);
+      }
+      // Reload Settings D: Or they won't be the latest, menu's need to be reset too O.o
+      $settings += loadSettings();
     }
-    // Reload Settings D: Or they won't be the latest, menu's need to be reset too O.o
-    $settings = loadSettings();
-    $settings['menu'] = loadMenus();
+    // Set title, pass on $basic, and load Settings template with the Basic function
+    $settings['page']['title'] = $l['basicsettings_title'];
+    $settings['page']['settings'] = $basic;
+    loadTheme('Settings','Basic');
   }
-  // Set title, pass on $basic, and load Settings template with the Basic function
-  $settings['page']['title'] = $l['basicsettings_title'];
-  $settings['page']['settings'] = $basic;
-  loadTheme('Settings','Basic');
+  else {
+    $settings['page']['title'] = $l['admin_error_title'];
+    loadTheme('Admin','Error');
+  }
 }
 ?>
