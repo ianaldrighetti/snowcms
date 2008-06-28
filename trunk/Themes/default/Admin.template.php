@@ -36,8 +36,8 @@ global $cmsurl, $settings, $l, $user;
     <p class="desc">'.$l['admin_menu_members_desc'].'</p>
   </div>
   <div class="acp_right">
-    <p class="main">Main text</p>
-    <p class="desc">Description</p>  
+    <p class="main"><a href="'.$cmsurl.'index.php?action=admin&sa=permissions" title="'.$l['admin_menu_permissions'].'">'.$l['admin_menu_permissions'].'</a></p>
+    <p class="desc">'.$l['admin_menu_permissions_desc'].'</p>  
   </div>
   ';
 }
