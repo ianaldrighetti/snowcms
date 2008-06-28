@@ -19,13 +19,27 @@ global $cmsurl, $settings, $l, $user;
   foreach($settings['groups'] as $group) {
     echo '
     <tr>
-      <td style="padding: 5px;"><a href="'.$cmsurl.'"index.php?action=admin&sa=groups&mid='.$group['id'].'">'.$group['name'].'</a></td>
+      <td style="padding: 5px;"><a href="'.$cmsurl.'index.php?action=admin&sa=groups&mid='.$group['id'].'">'.$group['name'].'</a></td>
       <td style="text-align: center; padding: 5px;">'.$group['numusers'].'</td>
       <td style="text-align: center; padding: 5px;">'.$group['numperms'].'</td>
-      <td style="text-align: center; padding: 5px;"><a href="'.$cmsurl.'"index.php?action=admin&sa=permissions&mid='.$group['id'].'">'.$l['permissions_modify'].'</a></td>
+      <td style="text-align: center; padding: 5px;"><a href="'.$cmsurl.'index.php?action=admin&sa=permissions&mid='.$group['id'].'">'.$l['permissions_modify'].'</a></td>
     </tr>';
   }
   echo '
   </table>'; 
+}
+
+function NoGroup() {
+global $cmsurl, $settings, $l, $user;
+  echo '
+  <h1>'.$l['admin_error_header'].'</h1>
+  <p>'.$l['permissions_nogroup_desc'].'</p>';
+}
+
+function Edit() {
+global $cmsurl, $settings, $l, $user;
+echo '<pre>';
+print_r($settings['perms']);
+echo '</pre>';
 }
 ?>
