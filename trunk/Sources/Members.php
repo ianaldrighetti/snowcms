@@ -15,5 +15,29 @@ if(!defined("Snow"))
   die("Hacking Attempt...");
   
 function ManageMembers() {
-
+global $cmsurl, $db_prefix, $l, $settings, $user;
+  if(can('manage_members')) {
+    // So they can, yippe for you! :P
+    // Are they just viewing the list, or managing a member, or something else perhaps?
+    if((empty($_REQUEST['u'])) && (empty($_REQUEST['ssa']))) {
+      // K, just load the list of members
+      loadMlist();
+    }
+    elseif((!empty($_REQUEST['u'])) && (empty($_REQUEST['ssa']))) {
+      // :o They are moderating/viewing someones profile
+      loadUser();
+    }
+    else {
+      // A Super Sub Action :D!
+      if($_REQUEST['ssa']=='ua') {
+        // Okay, list all unactivated accounts...
+        loadUA();
+      }
+    }
+  }
+  else {
+    // You can't Manage Members silly!
+    $settings['page']['title'] = $l['managemembers_error_title'];
+    loadTheme('Error','NotAllowed');
+  }
 }
