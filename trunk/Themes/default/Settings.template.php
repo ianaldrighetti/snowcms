@@ -29,3 +29,4 @@ global $cmsurl, $settings, $l, $user;
     </table>
   </form>';
 }
+?>
