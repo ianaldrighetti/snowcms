@@ -33,7 +33,7 @@ require_once($source_dir.'/Core.php');
   $settings['menu'] = loadMenus();
 // Write that this Guest/User is online
   WriteOnline();
-
+  
   // What should we do? ._.
   if((empty($_REQUEST['action'])) && (empty($_REQUEST['page']))) {
     // Neither the ?action= is set, nor the ?page= is set, so load Home()
