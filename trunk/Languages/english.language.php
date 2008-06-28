@@ -163,4 +163,6 @@ $l['permissions_modify'] = 'Modify';
 $l['permissions_membergroup'] = 'Member Group';
 $l['permissions_numusers'] = 'Users';
 $l['permissions_permissions'] = 'Permissions';
+$l['permissions_editperms_title'] = 'Edit Permissions';
+$l['permissions_nogroup_desc'] = 'The member group you have requested does not exist!';
 ?>
