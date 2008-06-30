@@ -324,6 +324,16 @@ function bbc($str) {
 
 function sql_query($query) {
   $result = mysql_query($query);
+  if(!$result) {
+    // Oh noes! An SQL Error maybe? We don't want to die(mysql_error()); but we should save these errors in a file ;)
+    if(!file_exists('error_log')) 
+      @file_put_contents('error_log', mysql_error()."\n");
+    else {
+      $errors = @file_get_contents('error_log');
+      $errors.= mysql_error()."\n";
+      @file_put_contents('error_log', $errors);
+    }
+  }
   return $result;
 }
 ?>
