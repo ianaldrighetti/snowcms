@@ -17,7 +17,7 @@ if(!defined("Snow"))
 // This loads all the settings in the {db_prefix}settings table, also loads usernames into the settings array
 function loadSettings() {
 global $db_prefix;
-  $result = mysql_query("SELECT * FROM {$db_prefix}settings");
+  $result = sql_query("SELECT * FROM {$db_prefix}settings");
     while($row = mysql_fetch_assoc($result)) 
       $settings[$row['variable']] = $row['value'];
   return $settings;
@@ -61,7 +61,7 @@ global $db_prefix;
   }
   if(isset($_SESSION['id'])) {
     if(isset($_SESSION['pass'])) {
-      $result = mysql_query("SELECT * FROM {$db_prefix}members WHERE `id` = '{$_SESSION['id']}' AND `password` = '{$_SESSION['pass']}'");
+      $result = sql_query("SELECT * FROM {$db_prefix}members WHERE `id` = '{$_SESSION['id']}' AND `password` = '{$_SESSION['pass']}'");
       if(mysql_num_rows($result)>0) {
         while($row = mysql_fetch_assoc($result)) {
           $user = array(
@@ -72,7 +72,8 @@ global $db_prefix;
             'is_guest' => false,
             'is_admin' => false,
             'email' => $row['email'],
-            'ip' => @$_SERVER['HTTP_X_FORWARDED_FOR'] ? $_SERVER['HTTP_X_FORWARDED_FOR'] : $_SERVER['REMOTE_ADDR']
+            'ip' => @$_SERVER['HTTP_X_FORWARDED_FOR'] ? $_SERVER['HTTP_X_FORWARDED_FOR'] : $_SERVER['REMOTE_ADDR'],
+            'sc' => create_sid()
           );
           if($user['group']==1)
             $user['is_admin'] = true;
@@ -171,7 +172,7 @@ function loadPerms() {
 global $db_prefix, $user;
   $perms = array();
   $perms[$user['group']] = array();
-  $result = mysql_query("SELECT * FROM {$db_prefix}permissions") or die(mysql_error());
+  $result = sql_query("SELECT * FROM {$db_prefix}permissions") or die(mysql_error());
     while($row = mysql_fetch_assoc($result)) {
       $perms[$row['group_id']][$row['what']] = $row['can'] ? true : false;
     }
@@ -182,7 +183,7 @@ function loadBPerms() {
 global $db_prefix, $user;
   $bperms = array();
   $bperms[$user['group']] = array();
-  $result = mysql_query("SELECT * FROM {$db_prefix}board_permissions") or die(mysql_error());
+  $result = sql_query("SELECT * FROM {$db_prefix}board_permissions") or die(mysql_error());
     while($row = mysql_fetch_assoc($result)) {
       $bperms[$row['group_id']][$row['what']] = $row['can'] ? true : false;
     }
@@ -195,7 +196,7 @@ global $db_prefix;
   $menu =array();
   $menu['main'] = array();
   $menu['side'] = array();
-  $result = mysql_query("SELECT * FROM {$db_prefix}menus ORDER BY `order` ASC") or die(mysql_error());
+  $result = sql_query("SELECT * FROM {$db_prefix}menus ORDER BY `order` ASC") or die(mysql_error());
   if(mysql_num_rows($result)>0) {  
     while($row = mysql_fetch_assoc($result)) {
       if(($row['menu']==0) || ($row['menu']==2)) {
@@ -238,18 +239,18 @@ global $db_prefix, $settings, $user;
   else 
     $action_or_page = 0;
   // Get those peeps online
-  $result = mysql_query("SELECT * FROM {$db_prefix}online") or die(mysql_error());
+  $result = sql_query("SELECT * FROM {$db_prefix}online") or die(mysql_error());
     while($row = mysql_fetch_assoc($result)) {
       // Delete this row if it is them
       // Or if this is an expired row, delete it too
       if($row['ip']==$user['ip'])
-        @mysql_query("DELETE FROM {$db_prefix}online WHERE `ip` = '{$row['ip']}'");
+        sql_query("DELETE FROM {$db_prefix}online WHERE `ip` = '{$row['ip']}'");
       elseif(($row['last_active']+($settings['login_threshold']*60))<time()) {
-        @mysql_query("DELETE FROM {$db_prefix}online WHERE `ip` = '{$row['ip']}'");
+        sql_query("DELETE FROM {$db_prefix}online WHERE `ip` = '{$row['ip']}'");
       }
     }
   // Insert their information into the database
-  mysql_query("INSERT INTO {$db_prefix}online (`user_id`,`ip`,`page`,`last_active`) VALUES('{$user['id']}','{$user['ip']}','{$action_or_page}','".time()."')") or die(mysql_error());
+  sql_query("INSERT INTO {$db_prefix}online (`user_id`,`ip`,`page`,`last_active`) VALUES('{$user['id']}','{$user['ip']}','{$action_or_page}','".time()."')") or die(mysql_error());
 }
 
 // This returns true or false (bool) of whether or not they can do said function
@@ -279,21 +280,35 @@ global $bperms, $user;
 
 // Creates a random session id
 function create_sid() {
+  if(empty($_SESSION['sc'])) {  
+    $string = mkstring();
+    $result = sql_query("SELECT * FROM {$db_prefix}members WHERE `sc` = '{$string}'");
+    while(mysql_num_rows($result)>0) {
+      $string = mkstring();
+      $result = sql_query("SELECT * FROM {$db_prefix}members WHERE `sc` = '{$string}'");
+    }
+    $_SESSION['sc'] = $string;
+    sql_query("UPDATE {$db_prefix}members `sc` = '$string' WHERE `id` = '{$_SESSION['id']}'");
+  }
+  else
+    $string = $_SESSION['sc'];
+  return $string;
+}
+
+function mkstring() {
   // Randomly choose how long the session id will be
   $length = rand(40,50);
   $chars = "abcdefghijkmnopqrstuvwxyz023456789";
   srand((double)microtime()*1000000);
   $i = 0;
-  $string = '' ;
+  $string = '';
   while ($i <= ($length-1)) {
     $num = rand() % 33;
     $tmp = substr($chars, $num, 1);
-    $string = $string . $tmp;
+    $string = $string.$tmp;
     $i++;
   }
-  return $string;
 }
-
 // Formats the time with the time format in settings If timestamp is unset, get the current time
 function formattime($timestamp = 0) {
 global $settings;
@@ -305,5 +320,10 @@ global $settings;
 function bbc($str) {
   $str = strtr($str, array("\n" => "<br />"));
   return $str;
+}
+
+function sql_query($query) {
+  $result = mysql_query($query);
+  return $result;
 }
 ?>
