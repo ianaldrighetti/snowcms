@@ -41,3 +41,4 @@ global $cmsurl, $db_prefix, $l, $settings, $user;
     loadTheme('Admin','Error');
   }
 }
+?>

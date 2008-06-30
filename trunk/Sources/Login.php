@@ -29,7 +29,7 @@ global $cmsurl, $db_prefix, $l, $settings, $user;
   $username = @clean(strtolower($_REQUEST['username']));
   $password = @md5($_REQUEST['password']);
   if((!empty($username)) && (!empty($password))) {
-    $result = mysql_query("SELECT * FROM {$db_prefix}members WHERE `username` = '{$username}' AND `password` = '{$password}'");
+    $result = sql_query("SELECT * FROM {$db_prefix}members WHERE `username` = '{$username}' AND `password` = '{$password}'");
     if(mysql_num_rows($result)>0) {
       while($row = mysql_fetch_assoc($result)) {
         // We need their user ID
@@ -45,6 +45,8 @@ global $cmsurl, $db_prefix, $l, $settings, $user;
       // Its more secure to authenticate them on each page load, or at least we think so :P
       $_SESSION['id'] = $id;
       $_SESSION['pass'] = $password;
+      // Update a few things, lkike last login, last ip, their session ID
+      sql_query("UPDATE {$db_prefix}members SET `last_login` = '".time()."', `last_ip` = '{$user['ip']}' WHERE `id` = '{$_SESSION['id']}'");
       // Redirect them to the CMSURL URL :P
       header("Location: {$cmsurl}");
     }
@@ -71,7 +73,7 @@ global $cmsurl, $db_prefix, $settings, $user;
     // Destroy! Destroy! Their session :D
     session_destroy();
     // Delete them from the {db_prefix}online table
-    mysql_query("DELETE FROM {$db_prefix}online WHERE `user_id` = '{$user['id']}'");
+    sql_query("DELETE FROM {$db_prefix}online WHERE `user_id` = '{$user['id']}'");
     // Delete the Cookies... If they have any (the @ means to stfu, I don't want any errors)
       @setcookie("username", '', time()-($settings['remember_time']*60));
       @setcookie("password", '', time()-($settings['remember_time']*60));

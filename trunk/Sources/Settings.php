@@ -31,7 +31,7 @@ global $cmsurl, $db_prefix, $l, $settings, $user;
       foreach($basic as $setting) {
         $_REQUEST[$setting] = clean($_REQUEST[$setting]);
         $query = "UPDATE {$db_prefix}settings SET `value` = '{$_REQUEST[$setting]}' WHERE `variable` = '{$setting}' LIMIT 1";
-        $result = mysql_query($query);
+        $result = sql_query($query);
       }
       // Reload Settings D: Or they won't be the latest, menu's need to be reset too O.o
       $settings += loadSettings();

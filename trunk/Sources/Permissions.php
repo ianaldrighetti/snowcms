@@ -63,19 +63,19 @@ global $cmsurl, $db_prefix, $l, $settings, $permissions, $user;
               else
                 $can = 0;
               if($can)
-                mysql_query("REPLACE INTO {$db_prefix}permissions (`group_id`,`what`,`can`) VALUES('{$membergroup}','{$perm}','{$can}')") or die(mysql_error());
+                sql_query("REPLACE INTO {$db_prefix}permissions (`group_id`,`what`,`can`) VALUES('{$membergroup}','{$perm}','{$can}')") or die(mysql_error());
               else
-                mysql_query("DELETE FROM {$db_prefix}permissions WHERE `group_id` = '{$membergroup}' AND `what` = '{$perm}'");
+                sql_query("DELETE FROM {$db_prefix}permissions WHERE `group_id` = '{$membergroup}' AND `what` = '{$perm}'");
             }
           // Weeeee! Done!
         }
       }
       // Load the list of member groups, etc
-      $result = mysql_query("
+      $result = sql_query("
         SELECT 
           grp.group_id AS id, grp.groupname AS name
         FROM {$db_prefix}membergroups AS grp 
-        ORDER BY grp.group_id ASC") or die(mysql_error());
+        ORDER BY grp.group_id ASC");
       while($row = mysql_fetch_assoc($result)) {
         $groups[$row['id']] = array(
                                 'id' => $row['id'],
@@ -84,11 +84,11 @@ global $cmsurl, $db_prefix, $l, $settings, $permissions, $user;
                                 'numperms' => 0
                               );
       }
-      $result = mysql_query("SELECT `group`, COUNT(*) FROM {$db_prefix}members GROUP BY `group`");
+      $result = sql_query("SELECT `group`, COUNT(*) FROM {$db_prefix}members GROUP BY `group`");
         while($row = mysql_fetch_assoc($result)) {
           $groups[$row['group']]['numusers'] = $row['COUNT(*)']; 
         }
-      $result = mysql_query("SELECT `group_id`, COUNT(*) FROM {$db_prefix}permissions GROUP BY `group_id`");
+      $result = sql_query("SELECT `group_id`, COUNT(*) FROM {$db_prefix}permissions GROUP BY `group_id`");
         while($row = mysql_fetch_assoc($result)) {
           $groups[$row['group_id']]['numperms'] = $row['COUNT(*)']; 
         }        
@@ -126,17 +126,21 @@ global $cmsurl, $db_prefix, $l, $settings, $permissions, $user;
 function loadMID() {
 global $cmsurl, $db_prefix, $l, $settings, $permissions, $user;
   $MID = (int)addslashes(mysql_real_escape_string($_REQUEST['mid']));
-  $result = mysql_query("
+  $result = sql_query("
      SELECT
        grp.group_id, grp.groupname, p.group_id, p.what
      FROM {$db_prefix}permissions AS p
        LEFT JOIN {$db_prefix}membergroups AS grp ON grp.group_id = p.group_id
-     WHERE grp.group_id = $MID") or die(mysql_error());
-  $group = mysql_query("SELECT * FROM {$db_prefix}membergroups WHERE `group_id` = '$MID'");
+     WHERE grp.group_id = $MID");
+  $group = sql_query("SELECT * FROM {$db_prefix}membergroups WHERE `group_id` = '$MID'");
   if(mysql_num_rows($group)>0) {
     $settings['perms'] = array();
     while($row = mysql_fetch_assoc($result))
-      $settings['perms'][] = $row;
+      $settings['perms'][] = array(
+                               'groupname' => $row['groupname'],
+                               'id' => $row['group_id'],
+                               'what' => $row['what']
+                             );
     $settings['page']['title'] = $l['permissions_editperms_title'];
     loadTheme('Permissions','Edit');
   }

@@ -21,7 +21,7 @@ global $cmsurl, $db_prefix, $l, $settings, $user;
     // Set online as an array, just incase their is nothing in the DB, but if you view ?action=online, 1 should be there by now
     $online = array();
     // Get them, Ordered by `last_active` Descending (Show the newest on top)
-    $result = mysql_query("
+    $result = sql_query("
        SELECT
          o.user_id, o.ip, o.page, o.last_active,
          m.id, m.username, m.display_name
@@ -51,7 +51,7 @@ global $cmsurl, $db_prefix, $l, $settings, $user;
         $username = $l['online_user_guest'];
         if(($row['id']==null) && ($row['user_id'])) {
           // The member doesn't exist, delete it!
-          mysql_query("DELETE FROM {$db_prefix}online WHERE `user_id` = '{$row['user_id']}'");
+          sql_query("DELETE FROM {$db_prefix}online WHERE `user_id` = '{$row['user_id']}'");
         }
         elseif(($row['display_name']==null) && ($row['user_id']!=0)) {
           $username = $row['username'];

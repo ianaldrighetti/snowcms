@@ -35,7 +35,7 @@ global $cmsurl, $db_prefix, $l, $settings, $source_dir, $user;
   // Set error as array, so if no errors, we won't get a PHP error
   $settings['page']['error'] = array();
   // Is the username taken?
-  $result = mysql_query("SELECT * FROM {$db_prefix}members WHERE `username` = '".clean(strtolower($username))."'");
+  $result = sql_query("SELECT * FROM {$db_prefix}members WHERE `username` = '".clean(strtolower($username))."'");
   if(mysql_num_rows($result)>0) {
     $settings['page']['error'][] = $l['register_error_user_taken'];
   }
@@ -74,7 +74,7 @@ global $cmsurl, $db_prefix, $l, $settings, $source_dir, $user;
     }
     $settings['page']['error'] = null;
     // Insert it
-    $result = mysql_query("INSERT INTO {$db_prefix}members (`username`,`password`,`email`,`reg_date`,`reg_ip`,`group`,`activated`,`acode`) VALUES('{$username}','{$password}','{$email}','{$time}','{$user['ip']}','2','{$activated}','{$acode}')");
+    $result = sql_query("INSERT INTO {$db_prefix}members (`username`,`password`,`email`,`reg_date`,`reg_ip`,`group`,`activated`,`acode`) VALUES('{$username}','{$password}','{$email}','{$time}','{$user['ip']}','2','{$activated}','{$acode}')");
     if($result) {
       if($settings['account_activation']==0) {    
         // It was a Success! Weeee!

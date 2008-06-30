@@ -23,7 +23,7 @@ global $cmsurl, $db_prefix, $l, $settings, $user;
   else
     $PageID = clean($_REQUEST['page']);
   // Get it from MySQL
-  $result = mysql_query("SELECT * FROM {$db_prefix}pages WHERE `page_id` = '{$PageID}'");
+  $result = sql_query("SELECT * FROM {$db_prefix}pages WHERE `page_id` = '{$PageID}'");
   // Does it exist or not?
   if(mysql_num_rows($result)>0) {
     while($row = mysql_fetch_assoc($result)) {
@@ -58,7 +58,7 @@ global $cmsurl, $db_prefix, $l, $settings, $user;
 	  else
 		  $page_show_info = 0;
       // Update it
-      $result = mysql_query("UPDATE {$db_prefix}pages SET `title` = '{$page_title}', `content` = '{$page_content}', `show_info` = '{$page_show_info}' WHERE `page_id` = '{$page_id}'");
+      $result = sql_query("UPDATE {$db_prefix}pages SET `title` = '{$page_title}', `content` = '{$page_content}', `show_info` = '{$page_show_info}' WHERE `page_id` = '{$page_id}'");
       if($result) {
         // It was successful!
         $settings['page']['update_page'] = 1;
@@ -80,7 +80,7 @@ global $cmsurl, $db_prefix, $l, $settings, $user;
       // Clean the page's title
       $title = clean($_REQUEST['page_title']);
       // Insert it
-      $result = mysql_query("INSERT INTO {$db_prefix}pages (`page_owner`,`owner_name`,`create_date`,`title`) VALUES('{$page_owner}','{$owner_name}','{$create_date}','{$title}')");
+      $result = sql_query("INSERT INTO {$db_prefix}pages (`page_owner`,`owner_name`,`create_date`,`title`) VALUES('{$page_owner}','{$owner_name}','{$create_date}','{$title}')");
       if($result) {
         // It was a Success! Wooot!
         $settings['page']['make_page']['status'] = true;
@@ -95,13 +95,13 @@ global $cmsurl, $db_prefix, $l, $settings, $user;
       }
     }
     // Get all the pages in the database so we can list them :)
-    $result = mysql_query("
+    $result = sql_query("
        SELECT
          p.page_id, p.page_owner, p.owner_name, p.create_date, 
          p.modify_date, p.title, m.id, m.username, m.display_name
        FROM {$db_prefix}pages AS p
          LEFT JOIN {$db_prefix}members AS m ON m.id = p.page_owner
-       ORDER BY p.page_id DESC") or die(mysql_error());
+       ORDER BY p.page_id DESC");
       $pages = array();
       while($row = mysql_fetch_assoc($result)) {
         if(!$row['id'])
@@ -139,7 +139,7 @@ global $cmsurl, $db_prefix, $l, $settings, $user;
     $page_id = (int)addslashes(mysql_real_escape_string($_REQUEST['page_id']));
     if(!empty($page_id)) {
       // Get it!
-      $result = mysql_query("SELECT * FROM {$db_prefix}pages WHERE `page_id` = '{$page_id}'");
+      $result = sql_query("SELECT * FROM {$db_prefix}pages WHERE `page_id` = '{$page_id}'");
       // Does it exist? o.O
       if(mysql_num_rows($result)>0) {
         while($row = mysql_fetch_assoc($result)) {

@@ -19,7 +19,7 @@ global $cmsurl, $db_prefix, $l, $settings, $source_dir, $user;
   // Maybe they are trying to view someone's profile? o.O
   if((can('view_profile')) && ((!empty($_REQUEST['u'])) && ($_REQUEST['u']!=$user['id']))) {
     $UID = (int)addlashes(mysql_real_escape_string($_REQUEST['u']));
-    $result = mysql_query("
+    $result = sql_query("
        SELECT
          m.id, m.username, m.email, m.display_name, m.reg_date, m.reg_ip, m.last_login,
          m.last_ip, m.group, m.numposts, m.signature, m.activated, grp.group_id, 

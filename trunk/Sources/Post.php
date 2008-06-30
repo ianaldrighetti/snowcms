@@ -23,12 +23,12 @@ global $cmsurl, $db_prefix, $l, $settings, $user;
     if(canforum('post_reply')) {
       // Okay, their permissions say they can reply, but is this even a topic in a board they can see? :O!
       $Topic_ID = (int)addslashes(mysql_real_escape_string($_REQUEST['topic']));
-      $result = mysql_query("
+      $result = sql_query("
          SELECT
            t.tid, t.bid, b.bid, b.who_view
          FROM {$db_prefix}topics AS t
            LEFT JOIN {$db_prefix}boards AS b ON b.bid = t.bid
-         WHERE t.tid = $Topic_ID") or die(mysql_error());
+         WHERE t.tid = $Topic_ID");
       // But does it exist? D:!
       if(mysql_num_rows($result)>0) {
         // The topic DOES exist, now we can check if they are allowed to see it
@@ -63,11 +63,11 @@ global $cmsurl, $db_prefix, $l, $settings, $user;
       // :o What Board?
       $Board_ID = (int)addslashes(mysql_real_escape_string($_REQUEST['board']));
       // Okay, their permissions say yes, but lets see what the forum says! :D!
-      $result = mysql_query("
+      $result = sql_query("
          SELECT 
            b.bid, b.who_view
          FROM {$db_prefix}boards AS b
-         WHERE b.bid = $Board_ID") or die(mysql_error());
+         WHERE b.bid = $Board_ID");
       // Well, does this board exist? ._.
       if(mysql_num_rows($result)>0) {
         while($row = mysql_fetch_assoc($result))
@@ -108,3 +108,4 @@ global $cmsurl, $db_prefix, $l, $settings, $user;
     }
   }
 }
+?>

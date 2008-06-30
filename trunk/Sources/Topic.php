@@ -17,7 +17,7 @@ if(!defined("Snow"))
 function loadTopic() {
 global $cmsurl, $db_prefix, $l, $settings, $user;
   $Topic_ID = addslashes(mysql_real_escape_string($_REQUEST['topic']));
-  $result = mysql_query("
+  $result = sql_query("
     SELECT 
       t.tid, t.bid, b.who_view, b.bid
     FROM {$db_prefix}topics AS t
@@ -31,7 +31,7 @@ global $cmsurl, $db_prefix, $l, $settings, $user;
     $info = paginate($Topic_ID);
     $pagination = $info['pagination'];
     $start = $info['start'];
-    $result = mysql_query("
+    $result = sql_query("
       SELECT
         t.tid, t.first_msg, msg.subject, msg.mid
       FROM {$db_prefix}topics AS t
@@ -39,7 +39,7 @@ global $cmsurl, $db_prefix, $l, $settings, $user;
       WHERE t.tid = $Topic_ID");
     while($row = mysql_fetch_assoc($result))
       $title = $row['subject'];
-    $result = mysql_query("
+    $result = sql_query("
       SELECT
         t.tid, t.sticky, t.locked, t.bid, t.first_msg, grp.group_id, grp.groupname,
         msg.mid, msg.tid, msg.bid, msg.uid, msg.subject, msg.post_time, msg.poster_name, msg.ip, msg.body,
@@ -50,7 +50,7 @@ global $cmsurl, $db_prefix, $l, $settings, $user;
         LEFT JOIN {$db_prefix}members AS mem ON mem.id = msg.uid
         LEFT JOIN {$db_prefix}membergroups AS grp ON grp.group_id = mem.group        
       WHERE t.tid = $Topic_ID
-      ORDER BY msg.mid DESC LIMIT $start,{$settings['topic_posts_per_page']}") or die(mysql_error());
+      ORDER BY msg.mid DESC LIMIT $start,{$settings['topic_posts_per_page']}");
       while($row = mysql_fetch_assoc($result)) {
         if($row['display_name']!=null)
           $row['username'] = $row['display_name'];

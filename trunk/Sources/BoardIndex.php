@@ -19,7 +19,7 @@ function BoardIndex() {
 global $cmsurl, $db_prefix, $l, $settings, $user;
   if(can('view_forum')) {
     // Get All the categories! :D!
-    $result = mysql_query("SELECT * FROM {$db_prefix}categories ORDER BY `corder` ASC") or die(mysql_error());
+    $result = sql_query("SELECT * FROM {$db_prefix}categories ORDER BY `corder` ASC");
     $cats = array();
       while($row = mysql_fetch_assoc($result)) {
         $cats[$row['cid']] = array(
@@ -29,13 +29,13 @@ global $cmsurl, $db_prefix, $l, $settings, $user;
           'boards' => array()
         );
       }
-    $result = mysql_query("
+    $result = sql_query("
       SELECT 
         b.bid, b.name, b.bdesc, b.who_view, b.numtopics, b.numposts,
         b.cid, log.uid
       FROM {$db_prefix}boards AS b
         LEFT JOIN {$db_prefix}board_logs AS log ON log.uid = {$user['id']} AND log.bid = b.bid
-      ORDER BY b.border ASC") or die(mysql_error());
+      ORDER BY b.border ASC");
       while($row = mysql_fetch_assoc($result)) {  
       if(isset($row['uid']))
         $new = false;

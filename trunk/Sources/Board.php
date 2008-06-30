@@ -19,15 +19,15 @@ global $cmsurl, $db_prefix, $l, $settings, $user;
   $Board_ID = addslashes(mysql_real_escape_string($_REQUEST['board']));
   // Mark this board now as read... Only if they are logged in :)
   if($user['is_logged']) {
-    $result = mysql_query("SELECT * FROM {$db_prefix}board_logs WHERE `bid` = '$Board_ID'");
+    $result = sql_query("SELECT * FROM {$db_prefix}board_logs WHERE `bid` = '$Board_ID'");
     if(mysql_num_rows($result)==0) {
-      mysql_query("
+      sql_query("
         INSERT INTO {$db_prefix}board_logs
 				  (`bid`,`uid`)
-	      VALUES ($Board_ID, {$user['id']})") or die(mysql_error());
+	      VALUES ($Board_ID, {$user['id']})");
 	  }
 	}
-  $result = mysql_query("SELECT * FROM {$db_prefix}boards WHERE `bid` = '$Board_ID'");
+  $result = sql_query("SELECT * FROM {$db_prefix}boards WHERE `bid` = '$Board_ID'");
     while($row = mysql_fetch_assoc($result)) {
       $board = array(
         'id' => $row['bid'],
@@ -44,7 +44,7 @@ global $cmsurl, $db_prefix, $l, $settings, $user;
     }
     else {
       $start = 0;
-      $result = mysql_query("
+      $result = sql_query("
         SELECT 
           t.tid, t.sticky, t.locked, t.bid, t.first_msg, t.last_msg, IFNULL(t.last_msg, t.first_msg) AS last_msg, t.topic_starter, t.topic_ender AS topic_ender, IFNULL(t.topic_ender, t.topic_starter) AS topic_ender, t.num_replies,
           t.numviews, t.starter_id, t.ender_id, IFNULL(t.ender_id, t.starter_id) AS ender_id, msg.mid, msg.tid, msg.uid, msg.subject, msg.post_time, msg.poster_name,
@@ -58,7 +58,7 @@ global $cmsurl, $db_prefix, $l, $settings, $user;
           LEFT JOIN {$db_prefix}members AS mem2 ON mem2.id = t.ender_id
         WHERE 
           t.bid = $Board_ID
-        ORDER BY t.sticky DESC, last_post_time ASC") or die(mysql_error());
+        ORDER BY t.sticky DESC, last_post_time ASC");
         $topics = array();
         while($row = mysql_fetch_assoc($result)) {
           $topics[] = $row;
