@@ -136,12 +136,13 @@ global $cmsurl, $db_prefix, $l, $settings, $permissions, $user;
   if(mysql_num_rows($group)>0) {
     $settings['perms'] = array();
     while($row = mysql_fetch_assoc($result))
-      $settings['perms'][] = array(
+      $settings['perms'][$what] = array(
                                'groupname' => $row['groupname'],
                                'id' => $row['group_id'],
                                'what' => $row['what']
                              );
     $settings['page']['title'] = $l['permissions_editperms_title'];
+    $settings['permissions'] = $permissions;
     loadTheme('Permissions','Edit');
   }
   else {
