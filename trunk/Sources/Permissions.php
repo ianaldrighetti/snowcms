@@ -18,7 +18,7 @@ if(!defined("Snow"))
 // You can add permissions by 'WHAT' => Default(true/false),
 // WHAT as in, how will you check if they can or cant do it? accessed by can('WHAT')
 // Default as in, when a new member group is made, and they go to edit permissions, is it checked by default or not?
-$permissions['group'] = array(
+$settings['permissions']['group'] = array(
   'admin' => false,
   'manage_basic-settings' => false,
   'manage_members' => false,
@@ -32,7 +32,7 @@ $permissions['group'] = array(
   'view_profile' => true
 );
 // The above array was a member group specific, these are forum specific permissions for boards
-$permissions['forum'] = array(
+$settings['permissions']['forum'] = array(
   'delete_any' => false,  
   'delete_own' => true,
   'lock_topic' => false,
@@ -45,7 +45,7 @@ $permissions['forum'] = array(
 );
 
 function GroupPermissions() {
-global $cmsurl, $db_prefix, $l, $settings, $permissions, $user;
+global $cmsurl, $db_prefix, $l, $settings, $user;
   if(can('manage_permissions')) {
     // Editing a Member Group already? Maybe just maybe we shoudl load that...
     if((empty($_REQUEST['mid'])) && (empty($_REQUEST['me']))) {  
@@ -57,7 +57,7 @@ global $cmsurl, $db_prefix, $l, $settings, $permissions, $user;
         $result = mysql_query("SELECT * FROM {$db_prefix}membergroups WHERE `group_id` = '{$membergroup}'");
         if(mysql_num_rows($result)>0) {
           // Ok, the member group does exist! dang, :P
-            foreach($permissions['group'] as $perm) {
+            foreach($settings['permissions']['group'] as $perm => $value) {
               if(!empty($_POST[$perm])) 
                 $can = 1;
               else
@@ -122,7 +122,6 @@ global $cmsurl, $db_prefix, $l, $settings, $permissions, $user;
     loadTheme('Admin','Error');
   }
 }
-
 function loadMID() {
 global $cmsurl, $db_prefix, $l, $settings, $permissions, $user;
   $MID = (int)addslashes(mysql_real_escape_string($_REQUEST['mid']));
@@ -136,13 +135,12 @@ global $cmsurl, $db_prefix, $l, $settings, $permissions, $user;
   if(mysql_num_rows($group)>0) {
     $settings['perms'] = array();
     while($row = mysql_fetch_assoc($result))
-      $settings['perms'][$what] = array(
+      $settings['perms'][$row['what']] = array(
                                'groupname' => $row['groupname'],
                                'id' => $row['group_id'],
                                'what' => $row['what']
                              );
     $settings['page']['title'] = $l['permissions_editperms_title'];
-    $settings['permissions'] = $permissions;
     loadTheme('Permissions','Edit');
   }
   else {
