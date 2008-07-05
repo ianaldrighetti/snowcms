@@ -38,23 +38,21 @@ global $cmsurl, $settings, $l, $user;
 
 function Edit() {
 global $cmsurl, $settings, $l, $user;
-echo '<pre>';
-print_r($settings['perms']);
-echo '</pre>';
   echo '
   <h2>'.$l['permissions_edit_header'].'</h2>
   <p>'.$l['permissions_edit_desc'].'</p>';
   echo '
-  <form action="" method="post">
+  <form action="'.$cmsurl.'index.php?action=admin&sa=permissions" method="post">
     <fieldset>
       <table>';
-  foreach($settings['permissions']['group'] as $perm) {
+  foreach($settings['permissions']['group'] as $perm => $value) {
     echo '
         <tr>
-          <td>'.$l['permissions_perm_'.$perm].'</td><td><input name="'.$perm.'" type="checkbox" value="1" ', @$settings['perms'][$what] ? 'checked="checked"', '/></td>
+          <td>'.$l['permissions_perm_'.$perm].'</td><td><input name="'.$perm.'" type="checkbox" value="1" ', @$settings['perms'][$perm] ? 'checked="checked"' : '', '/></td>
         </tr>';
   }
   echo '
+        <input name="membergroup" type="hidden" value="'.$_REQUEST['mid'].'"/>
         <tr>
           <td>&nbsp;</td><td><input name="update_perms" type="submit" value="'.$l['permissions_edit_save'].'"/></td>
         </tr>
