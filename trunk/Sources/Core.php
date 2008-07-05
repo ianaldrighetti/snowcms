@@ -280,6 +280,7 @@ global $bperms, $user;
 
 // Creates a random session id
 function create_sid() {
+global $db_prefix;
   if(empty($_SESSION['sc'])) {  
     $string = mkstring();
     $result = sql_query("SELECT * FROM {$db_prefix}members WHERE `sc` = '{$string}'");
@@ -308,6 +309,7 @@ function mkstring() {
     $string = $string.$tmp;
     $i++;
   }
+  return $string;
 }
 // Formats the time with the time format in settings If timestamp is unset, get the current time
 function formattime($timestamp = 0) {
