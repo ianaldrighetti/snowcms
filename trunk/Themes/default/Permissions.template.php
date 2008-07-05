@@ -45,14 +45,21 @@ echo '</pre>';
   <h2>'.$l['permissions_edit_header'].'</h2>
   <p>'.$l['permissions_edit_desc'].'</p>';
   echo '
-  <table>';
+  <form action="" method="post">
+    <fieldset>
+      <table>';
   foreach($settings['permissions']['group'] as $perm) {
     echo '
-    <tr>
-      <td>'.$l['permissions_perm_'.$perm].'</td><td><input name="'.$perm.'" type="checkbox" value="1" ', @$settings['perms'][$what] ? 'checked="checked"', '/></td>
-    </tr>';
+        <tr>
+          <td>'.$l['permissions_perm_'.$perm].'</td><td><input name="'.$perm.'" type="checkbox" value="1" ', @$settings['perms'][$what] ? 'checked="checked"', '/></td>
+        </tr>';
   }
   echo '
-  </table>';
+        <tr>
+          <td>&nbsp;</td><td><input name="update_perms" type="submit" value="'.$l['permissions_edit_save'].'"/></td>
+        </tr>
+      </table>
+    </fieldset>
+  </form>';
 }
 ?>
