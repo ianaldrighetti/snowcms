@@ -165,4 +165,16 @@ $l['permissions_numusers'] = 'Users';
 $l['permissions_permissions'] = 'Permissions';
 $l['permissions_editperms_title'] = 'Edit Permissions';
 $l['permissions_nogroup_desc'] = 'The member group you have requested does not exist!';
+$l['permissions_edit_save'] = 'Save';
+$l['permissions_perm_admin'] = 'Allow to Administrate the site';
+$l['permissions_perm_manage_basic-settings'] = 'Allow them to edit basic settings';
+$l['permissions_perm_manage_members'] = 'Allow them to manage members';
+$l['permissions_perm_manage_menus'] = 'Allow them to manage menus';
+$l['permissions_perm_manage_news'] = 'Allow them to manage news';
+$l['permissions_perm_manage_pages'] = 'Allow them to manage pages';
+$l['permissions_perm_manage_permissions'] = 'Allow them to manage permissions';
+$l['permissions_perm_manage_forum_perms'] = 'Allow them to manage forum permissions';
+$l['permissions_perm_view_forum'] = 'Let them view the forum';
+$l['permissions_perm_view_online'] = 'Let them view who is online';
+$l['permissions_perm_view_profile'] = 'Let them view others profiles';
 ?>
