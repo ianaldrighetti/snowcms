@@ -8,7 +8,7 @@
 // Which means you are free to edit it and then
 //       redistribute it as your wish!
 // 
-//              Core.php file 
+//             Groups.php file 
 
 
 if(!defined("Snow"))
