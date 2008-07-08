@@ -180,4 +180,5 @@ $l['permissions_perm_view_forum'] = 'Let them view the forum';
 $l['permissions_perm_view_online'] = 'Let them view who is online';
 $l['permissions_perm_view_profile'] = 'Let them view others profiles';
 $l['permissions_perm_manage_mail_settings'] = 'Allow them to edit mail settings';
+$l['permissions_perm_manage_groups'] = 'Allow them to manage member groups';
 ?>
