@@ -90,7 +90,7 @@ global $cmsurl, $db_prefix, $l, $settings, $user;
         while($row = mysql_fetch_assoc($result)) {
           $groups[$row['group']]['numusers'] = $row['COUNT(*)']; 
         }
-      $result = sql_query("SELECT `group_id`, COUNT(*) FROM {$db_prefix}permissions GROUP BY `group_id` WHERE `can` = '1'");
+      $result = sql_query("SELECT `group_id`, COUNT(*) FROM {$db_prefix}permissions WHERE `can` = '1' GROUP BY `group_id`");
         while($row = mysql_fetch_assoc($result)) {
           $groups[$row['group_id']]['numperms'] = $row['COUNT(*)']; 
         }        
