@@ -21,6 +21,7 @@ if(!defined("Snow"))
 $settings['permissions']['group'] = array(
   'admin' => false,
   'manage_basic-settings' => false,
+  'manage_groups' => false,
   'manage_mail_settings' => false,
   'manage_members' => false,
   'manage_menus' => false,
