@@ -34,8 +34,9 @@ global $cmsurl, $db_prefix, $l, $settings, $source_dir, $user;
       $sa = array(
         'basic-settings' => array('Settings.php','BasicSettings'),
         'editpage' => array('Page.php','EditPage'),
-        'members' => array('Members.php','ManageMembers'),
         'managepages' => array('Page.php','ManagePages'),
+        'mail-settings' => array('Settings.php','MailSettings'),        
+        'members' => array('Members.php','ManageMembers'),
         'permissions' => array('Permissions.php','GroupPermissions')        
       );
       // Is the sa= in the $sa array? If so do it :D

@@ -21,6 +21,7 @@ if(!defined("Snow"))
 $settings['permissions']['group'] = array(
   'admin' => false,
   'manage_basic-settings' => false,
+  'manage_mail_settings' => false,
   'manage_members' => false,
   'manage_menus' => false,
   'manage_news' => false,
@@ -88,7 +89,7 @@ global $cmsurl, $db_prefix, $l, $settings, $user;
         while($row = mysql_fetch_assoc($result)) {
           $groups[$row['group']]['numusers'] = $row['COUNT(*)']; 
         }
-      $result = sql_query("SELECT `group_id`, COUNT(*) FROM {$db_prefix}permissions GROUP BY `group_id`");
+      $result = sql_query("SELECT `group_id`, COUNT(*) FROM {$db_prefix}permissions GROUP BY `group_id` WHERE `can` = '1'");
         while($row = mysql_fetch_assoc($result)) {
           $groups[$row['group_id']]['numperms'] = $row['COUNT(*)']; 
         }        

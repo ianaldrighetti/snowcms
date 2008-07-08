@@ -19,11 +19,26 @@ global $cmsurl, $db_prefix, $l, $settings, $user;
   if(can('manage_basic-settings')) {  
     // An array of all the settings that can be set on this page...
     $basic = array(
-      'site_name',
-      'slogan',
-      'login_threshold',
-      'remember_time',
-      'timeformat'
+      'site_name' => 
+        array(
+          'type' => 'text'
+         ),
+      'slogan' =>
+        array(
+          'type' => 'text'
+        ),
+      'login_threshold' =>
+        array(
+          'type' => 'text'
+        ),
+      'remember_time' =>
+        array(
+          'type' => 'text'
+        ),
+      'timeformat' =>
+        array(
+          'type' => 'text'
+        )
     );
     // Are we updating them?
     if(!empty($_REQUEST['update'])) {
@@ -45,5 +60,16 @@ global $cmsurl, $db_prefix, $l, $settings, $user;
     $settings['page']['title'] = $l['admin_error_title'];
     loadTheme('Admin','Error');
   }
+}
+
+function MailSettings() {
+global $cmsurl, $db_prefix, $l, $settings, $user;
+  if(can('manage_mail_settings')) {
+  
+  }
+  else {
+    $settings['page']['title'] = $l['admin_error_title'];
+    loadTheme('Admin','Error');
+  } 
 }
 ?>

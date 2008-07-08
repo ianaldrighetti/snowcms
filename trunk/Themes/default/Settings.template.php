@@ -16,17 +16,24 @@ global $cmsurl, $settings, $l, $user;
   echo '
   <form action="" method="post">
     <table>';
-  foreach($settings['page']['settings'] as $setting) {
+  foreach($settings['page']['settings'] as $setting => $info) {
+    if($info['type']=='text') {
+      $field = '<input name="'.$setting.'" type="text" value="'.$settings[$setting].'"/>';
+    }
     echo '
       <tr>
-        <td>'.$l['basicsettings_'.$setting].'</td><td><input name="'.$setting.'" type="text" value="'.$settings[$setting].'"/></td>
+        <td>'.$l['basicsettings_'.$setting].'</td><td>'.$field.'</td>
       </tr>';
   }
   echo '
       <tr>
-        <td colspan="2"><input name="update" type="submit" value="'.$l['basicsettings_update'].'"/></td>
+        <td>&nbsp;</td><td><input name="update" type="submit" value="'.$l['basicsettings_update'].'"/></td>
       </tr>
     </table>
   </form>';
+}
+
+function Mail() {
+global $cmsurl, $settings, $l, $user;
 }
 ?>

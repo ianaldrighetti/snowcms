@@ -289,7 +289,7 @@ global $db_prefix;
       $result = sql_query("SELECT * FROM {$db_prefix}members WHERE `sc` = '{$string}'");
     }
     $_SESSION['sc'] = $string;
-    sql_query("UPDATE {$db_prefix}members `sc` = '$string' WHERE `id` = '{$_SESSION['id']}'");
+    sql_query("UPDATE {$db_prefix}members SET `sc` = '$string' WHERE `id` = '{$_SESSION['id']}'");
   }
   else
     $string = $_SESSION['sc'];
@@ -299,7 +299,7 @@ global $db_prefix;
 function mkstring() {
   // Randomly choose how long the session id will be
   $length = rand(40,50);
-  $chars = "abcdefghijkmnopqrstuvwxyz023456789";
+  $chars = "GhHiIjJyYzAbvlLmMnTuaBcC78NoOpPqWxVwuXZ023eE1f45kKUvU69QStrRsdDFg";
   srand((double)microtime()*1000000);
   $i = 0;
   $string = '';
