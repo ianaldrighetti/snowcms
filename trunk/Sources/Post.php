@@ -108,4 +108,8 @@ global $cmsurl, $db_prefix, $l, $settings, $user;
     }
   }
 }
+
+function Post2() {
+global $cmsurl, $db_prefix, $l, $settings, $user;
+}
 ?>
