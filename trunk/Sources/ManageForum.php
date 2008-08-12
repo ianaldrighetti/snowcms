@@ -28,8 +28,11 @@ global $cmsurl, $db_prefix, $l, $settings, $user;
         $fa[$_REQUEST['fa']][1]();
     }
     else {
-      // Its not :( We don't want an error, so show the AdminHome();
+      // Its not :( We don't want an error, so show the ForumHome();
       ForumHome();
     }    
+}
+function ForumHome() {
+global $cmsurl, $db_prefix, $l, $settings, $user;
 }
 ?>
