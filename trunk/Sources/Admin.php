@@ -34,6 +34,7 @@ global $cmsurl, $db_prefix, $l, $settings, $source_dir, $user;
       $sa = array(
         'basic-settings' => array('Settings.php','BasicSettings'),
         'editpage' => array('Page.php','EditPage'),
+        'forum' => array('ManageForum.php','ManageForum'),
         'groups' => array('Groups.php','ManageGroups'),
         'managepages' => array('Page.php','ManagePages'),
         'mail-settings' => array('Settings.php','MailSettings'),        
