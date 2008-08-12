@@ -181,4 +181,12 @@ $l['permissions_perm_view_online'] = 'Let them view who is online';
 $l['permissions_perm_view_profile'] = 'Let them view others profiles';
 $l['permissions_perm_manage_mail_settings'] = 'Allow them to edit mail settings';
 $l['permissions_perm_manage_groups'] = 'Allow them to manage member groups';
+
+// ManageForum.template.php
+$l['manageforum_title'] = 'Manage Forum';
+
+// Error.template.php
+$l['themeerror_title'] = 'Theme Error!';
+$l['themeerror_header'] = 'Theme Load Error';
+$l['themeerror_msg'] = 'An error occurred while trying to load the template function %func%(); in the template %file%';
 ?>
