@@ -30,4 +30,11 @@ echo '
     <p class="message">'.$l['forum_error_noboard_message'].'</p>
   </div>';
 }
+
+function ThemeError() {
+global $cmsurl, $l, $settings;
+echo '
+  <h3>', $l['themeerror_header'], '</h3>
+  <p>', $l['themeerror_msg'], '</p>';
+}
 ?>
