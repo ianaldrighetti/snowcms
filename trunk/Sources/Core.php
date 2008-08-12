@@ -115,7 +115,9 @@ function merge_languages($array) {
 // This function loads the Theme file requested in a Source File, More comment inside :P
 function loadTheme($file, $function = 'Main') {
 global $cmsurl, $l, $theme_dir, $settings;
-
+  // We have no Loading Error, yet...
+  $loadError = false;
+  
   // Does this theme even have its own Main.template.php file? ._.
   // Why did they make it if they don't have a Main.template.php file!!! (Which has like the <html><body> stuff :P)
   if(file_exists($theme_dir.'/'.$settings['theme'].'/Main.template.php'))
@@ -126,14 +128,24 @@ global $cmsurl, $l, $theme_dir, $settings;
   // Do they have the $FILE (Template) in this theme? If not, fall back on the default one :)
   if(file_exists($theme_dir.'/'.$settings['theme'].'/'.$file.'.template.php'))
     require_once($theme_dir.'/'.$settings['theme'].'/'.$file.'.template.php');
-  else
+  elseif(file_exists($theme_dir.'/default/'.$file.'.template.php'))
     require_once($theme_dir.'/default/'.$file.'.template.php');
-    
+  else {
+    $loadError = true;
+    $settings['page']['title'] = $l['themeerror_title'];
+    $replace = array(
+      '%func%' => $function,
+      '%file%' => $file
+    );
+    $l['themeerror_msg'] = str_replace(array_keys($replace), array_values($replace), $l['themeerror_msg']);
+    require_once($theme_dir.'/default/Error.template.php');
+    $function = 'ThemeError';
+  } 
   // Get the header of the template...
   theme_header();
   
   // Call on the function that is needed...
-  $function();
+    $function();
   
   // Theme Footer
   theme_footer();
