@@ -34,5 +34,11 @@ global $cmsurl, $db_prefix, $l, $settings, $user;
 }
 function ForumHome() {
 global $cmsurl, $db_prefix, $l, $settings, $user;
+  /*
+    We really don't have a whole lot to do here :-/
+    All we do here is loadTheme D:
+  */
+  $settings['page']['title'] = $l['manageforum_title'];
+  loadTheme('ManageForum');
 }
 ?>
