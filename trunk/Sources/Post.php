@@ -18,10 +18,7 @@ function Post() {
 global $cmsurl, $db_prefix, $l, $settings, $user;
   // Are they posting in a board or a topic? None? o.o
   if(!empty($_REQUEST['topic'])) {
-    // K, they are replying to a topic...
-    // But can they :)
-    if(canforum('post_reply')) {
-      // Okay, their permissions say they can reply, but is this even a topic in a board they can see? :O!
+      // Lets see, we need the Board ID before anything, lets get some stuff :)
       $Topic_ID = (int)addslashes(mysql_real_escape_string($_REQUEST['topic']));
       $result = sql_query("
          SELECT
@@ -29,13 +26,22 @@ global $cmsurl, $db_prefix, $l, $settings, $user;
          FROM {$db_prefix}topics AS t
            LEFT JOIN {$db_prefix}boards AS b ON b.bid = t.bid
          WHERE t.tid = $Topic_ID");
+    // K, they are replying to a topic...
+    // But can they :)    
+    if(canforum('post_reply', $row['bid'])) {         
       // But does it exist? D:!
       if(mysql_num_rows($result)>0) {
+        echo '=D';
         // The topic DOES exist, now we can check if they are allowed to see it
         while($row = mysql_fetch_assoc($result))
           $who_view = @explode(",", $row['who_view']);
         if((in_array($user['group'], $who_view)) || ($user['is_admin'])) {
           $settings['page']['title'] = $l['forum_postreply'];
+          // This is some STUFF to preload, maybe, if you were redirected from ?action=post2 back due to errors :)
+          $settings['locked'] = $_SESSION['locked'] ? (int)$_SESSION['locked'] : (int)$_REQUEST['locked'];
+          $settings['sticky'] = $_SESSION['sticky'] ? (int)$_SESSION['sticky'] : (int)$_REQUEST['sticky'];
+          $settings['subject'] = $_SESSION['subject'] ? clean($_SESSION['subject']) : clean(@$_REQUEST['subject']);
+          $settings['body'] = $_SESSION['body'] ? clean($_SESSION['body']) : clean(@$_REQUEST['body']);
           loadForum('Post','Reply');
         }
         else {
@@ -45,9 +51,9 @@ global $cmsurl, $db_prefix, $l, $settings, $user;
         }
       }
       else {
-      // The topic doesn't exist :o
-      $settings['page']['title'] = $l['forum_error_title'];
-      loadForum('Error','CantPost');        
+        // The topic doesn't exist :o
+        $settings['page']['title'] = $l['forum_error_title'];
+        loadForum('Error','CantPost');        
       }
     }
     else {
@@ -57,11 +63,11 @@ global $cmsurl, $db_prefix, $l, $settings, $user;
     }
   }
   elseif(!empty($_REQUEST['board'])) {
+    // :o What Board?
+    $Board_ID = (int)addslashes(mysql_real_escape_string($_REQUEST['board']));    
     // K, they are making a new topic
     // But can they? :)
-    if(canforum('post_new')) {
-      // :o What Board?
-      $Board_ID = (int)addslashes(mysql_real_escape_string($_REQUEST['board']));
+    if(canforum('post_new', $Board_ID)) {
       // Okay, their permissions say yes, but lets see what the forum says! :D!
       $result = sql_query("
          SELECT 
@@ -72,8 +78,13 @@ global $cmsurl, $db_prefix, $l, $settings, $user;
       if(mysql_num_rows($result)>0) {
         while($row = mysql_fetch_assoc($result))
           $who_view = @explode(",", $row['who_view']);
-        if((in_array($user['group'], $who_view)) || ($user['is_admin'])) {
+        if((in_array($user['group'], $who_view))) {
           $settings['page']['title'] = $l['forum_startnew'];
+          // This is some STUFF to preload, maybe, if you were redirected from ?action=post2 back due to errors :)
+          $settings['locked'] = $_SESSION['locked'] ? (int)$_SESSION['locked'] : (int)$_REQUEST['locked'];
+          $settings['sticky'] = $_SESSION['sticky'] ? (int)$_SESSION['sticky'] : (int)$_REQUEST['sticky'];
+          $settings['subject'] = $_SESSION['subject'] ? clean($_SESSION['subject']) : clean(@$_REQUEST['subject']);
+          $settings['body'] = $_SESSION['body'] ? clean($_SESSION['body']) : clean(@$_REQUEST['body']);          
           loadForum('Post','Topic');
         }
         else {
@@ -95,17 +106,9 @@ global $cmsurl, $db_prefix, $l, $settings, $user;
     }
   }
   else {
-    // D:! No post or BOARD, but could they have posted in the first place? :P
-    if(canforum('post_new')) {
-      // They could have posted, but they can't :P
-      $settings['page']['title'] = $l['forum_error_title'];
-      loadForum('Error','NoSpecified');
-    }
-    else {
       // They couldn't have posted in the first place ._.
       $settings['page']['title'] = $l['forum_error_title'];
-      loadForum('Error','CantPost');
-    }
+      loadForum('Error','NoSpecified');
   }
 }
 
@@ -170,6 +173,7 @@ function postable($id, $which = 0) {
 global $db_prefix, $settings, $user;
   // Make sure it is an int ;]
   $id = (int)$id;
+  $which = (int)$which;
   // Which are we checking? Board ID or Topic ID? 0 = board, 1 = topic
   if($which) {
     $result = sql_query("
