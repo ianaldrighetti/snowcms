@@ -185,6 +185,9 @@ $l['permissions_perm_manage_groups'] = 'Allow them to manage member groups';
 // ManageForum.template.php
 $l['manageforum_title'] = 'Manage Forum';
 
+// Post.template.php
+$l['forum_startnew'] = 'Post New Topic';
+
 // Error.template.php
 $l['themeerror_title'] = 'Theme Error!';
 $l['themeerror_header'] = 'Theme Load Error';
