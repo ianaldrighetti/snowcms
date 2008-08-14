@@ -46,7 +46,7 @@ $files = array(
       $nofile[] = $file;
     }
   }
-  if(0>0) {
+  if(count($nofile)>0) {
     echo '<p>The Following files/directories do not exist. Please make sure they are uploaded...</p>
     <p>';
     foreach($nofile as $file)
