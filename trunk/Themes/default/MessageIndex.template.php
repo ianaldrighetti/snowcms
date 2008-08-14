@@ -5,12 +5,12 @@ if(!defined('Snow'))
   die('Hacking Attempt...');
   
 function Main() {
-global $cmsurl, $l, $settings, $user;
+global $bperms, $cmsurl, $l, $settings, $user;
 echo '
 <table id="messageindex_panel">
   <tr>
     <td style="text-align: left;">Pages: [1]</td>
-    <td style="text-align: right;">'; if(canforum('post_new')) { echo '<a href="'.$cmsurl.'forum.php?action=post&board='.$_REQUEST['board'].'">New Topic</a>'; } echo '</td>
+    <td style="text-align: right;">'; if(canforum('post_new', $_REQUEST['board'])) { echo '<a href="'.$cmsurl.'forum.php?action=post&board='.$_REQUEST['board'].'">New Topic</a>'; } echo '</td>
   </tr>
 </table>
 <div id="messageindex">
