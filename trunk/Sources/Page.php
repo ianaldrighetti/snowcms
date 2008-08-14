@@ -58,7 +58,7 @@ global $cmsurl, $db_prefix, $l, $settings, $user;
 	  else
 		  $page_show_info = 0;
       // Update it
-      $result = sql_query("UPDATE {$db_prefix}pages SET `title` = '{$page_title}', `content` = '{$page_content}', `show_info` = '{$page_show_info}' WHERE `page_id` = '{$page_id}'");
+      $result = sql_query("UPDATE {$db_prefix}pages SET `title` = '{$page_title}', `content` = '{$page_content}' WHERE `page_id` = '{$page_id}'");
       if($result) {
         // It was successful!
         $settings['page']['update_page'] = 1;
