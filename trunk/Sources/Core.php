@@ -52,7 +52,7 @@ global $db_prefix;
   $user['name'] = null;
   $user['email'] = null;
   // Make sure we get their real IP :)
-  $user['ip'] = @$_SERVER['HTTP_X_FORWARDED_FOR'] ? $_SERVER['HTTP_X_FORWARDED_FOR'] : $_SERVER['REMOTE_ADDR'];
+  $user['ip'] = @isset($_SERVER['HTTP_X_FORWARDED_FOR']) ? $_SERVER['HTTP_X_FORWARDED_FOR'] : $_SERVER['REMOTE_ADDR'];
   if(empty($_SESSION['id'])) {
     // We need to sanitize the cookies, last thing we need is to be hacked by cookies, Those are some bad cookies (Like Oatmeal ones, Ewww!)
     $_SESSION['id'] = @addslashes(mysql_real_escape_string($_COOKIE['uid']));
@@ -197,7 +197,7 @@ global $db_prefix, $user;
   $bperms[$user['group']] = array();
   $result = sql_query("SELECT * FROM {$db_prefix}board_permissions") or die(mysql_error());
     while($row = mysql_fetch_assoc($result)) {
-      $bperms[$row['group_id']][$row['what']] = $row['can'] ? true : false;
+      $bperms[$row['group_id']][$row['bid']][$row['what']] = $row['can'] ? true : false;
     }
   return $bperms;
 }
@@ -278,13 +278,14 @@ global $perms, $user;
     return false;
 }
 
-function canforum($what) {
+function canforum($what, $board = 0) {
 global $bperms, $user;
   // This is a super simple Permission handler, simply, can they do the requested $what or not?
   // If it isn't set, we say false because we dont know ._.
-  if(empty($bperms[$user['group']][$what]))
+  // $in, if it is 0, it means a board, 1 means topic...
+  if(empty($bperms[$user['group']][$board][$what]))
     return false;
-  elseif($bperms[$user['group']][$what]) 
+  elseif($bperms[$user['group']][$board][$what]) 
     return true;
   else
     return false;
@@ -332,6 +333,14 @@ global $settings;
 }
 
 function bbc($str) {
+  $text = preg_replace('/\[url\](h?t?t?p?:?\/?\/?)(.*?)\[\/url\]/i', '<a href="http://\\2" target="_blank">\\1\\2</a>', $text); // [url][/url]
+  $text = preg_replace('/\[url=(h?t?t?p?:?\/?\/?)(.*?)\](.*?)\[\/url\]/i', '<a href="http://\\2" target="_blank">\\3</a>', $text); // [url=www.site.com]Linkname[/url]
+  // Creates link by http://www.site.com, www.site.com, http://site.com ftp://site.com
+	$text = preg_replace("/(?<=^|\s)(www\.([-a-zA-Z0-9_]+\.)*[-a-zA-Z0-9_]+\.[-a-zA-Z0-9_]{2,6}(\/[^\s]*)*)(?=\s|$)/", "http://$1", $text);
+  $text2 = "/(?<=^|\s)(http:\/\/|https:\/\/|ftp:\/\/)(([-a-zA-Z0-9_]+\.)*[-a-zA-Z0-9_]+\.[-a-zA-Z0-9_]{2,6}(\/[^\s]*)*)(?=\s|$)/";
+	$text3 = "<a href=\"$1$2\">$2</a>"; 
+	$text = preg_replace($text2, $text3, $text);
+  
   $str = strtr($str, array("\n" => "<br />"));
   return $str;
 }
