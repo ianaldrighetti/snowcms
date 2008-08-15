@@ -41,4 +41,9 @@ global $cmsurl, $db_prefix, $l, $settings, $user;
     loadTheme('Admin','Error');
   }
 }
+
+function loadMlist() {
+global $cmsurl, $db_prefix, $l, $settings, $user;
+ loadTheme("MemberList","f1");
+}
 ?>
