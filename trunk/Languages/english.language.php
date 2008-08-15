@@ -80,6 +80,7 @@ $l['basicsettings_login_threshold'] = 'Login Threshold:';
 $l['basicsettings_remember_time'] = 'Default Cookie Time:';
 $l['basicsettings_timeformat'] = 'Time Format:';
 $l['basicsettings_update'] = 'Update Settings';
+$l['basicsettings_num_news_items'] = 'Number of news items per page';
 
 // ManagePages.template.php
 $l['adminpage_make_title'] = 'Manage Pages';
