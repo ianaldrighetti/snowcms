@@ -1,4 +1,10 @@
 <?php
+// Check if already installed
+define("Snow", true);
+require_once('./config.php');
+if ($scms_installed)
+ die("Hacking Attempt...");
+
 $files = array(
   './Languages',
   './Languages/english.language.php',

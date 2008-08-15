@@ -5,7 +5,18 @@ if(!defined('Snow'))
   die("Hacking Attempt...");
   
 function Main() {
+global $settings;
+  echo '<h1>'.$settings['page']['title'].'</h1>';
+}
 
+function View() {
+global $settings;
+  echo '<h1>'.$settings['page']['title'].'</h1>';
+}
+
+function AdminView() {
+global $settings;
+  echo '<h1>'.$settings['page']['title'].'</h1>';
 }
 
 function NotAllowed() {

@@ -73,7 +73,7 @@ global $cmsurl, $db_prefix, $l, $settings, $source_dir, $user;
 	    curl_setopt($curl, CURLOPT_VERBOSE, false);
 	    curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
 	    curl_setopt($curl, CURLOPT_TIMEOUT, 3);
-	  $settings['latest_version'] = curl_exec($curl);
+	  $settings['latest_version'] = 'v' . curl_exec($curl);
 	  // Close the cURL Connection
 	  curl_close($curl);    
     $curl = curl_init('http://news.snowcms.com/v0.x-line/news.txt');
@@ -89,6 +89,7 @@ global $cmsurl, $db_prefix, $l, $settings, $source_dir, $user;
 	    $settings['page']['news'] = $l['admin_cant_get_news_2'];
 	}
 	else {
+	  $settings['latest_version'] = $l['admin_version_unavailable'];
 	  // We didn't try because you don't have cURL as far as we can tell :(
 	  $settings['page']['news'] = $l['admin_cant_get_news_1'];
 	}

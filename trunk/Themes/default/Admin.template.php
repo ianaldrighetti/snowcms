@@ -15,7 +15,7 @@ global $cmsurl, $settings, $l, $user;
     </tr>
     <tr>
       <td>'.$l['admin_snowcms_current_version'].'</td>
-      <td>v'.$settings['latest_version'].'</td>
+      <td>'.$settings['latest_version'].'</td>
     </tr>
   </table>
   <h3>Latest news on SnowCMS :</h3>

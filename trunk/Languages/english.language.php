@@ -55,10 +55,11 @@ $l['online_time'] = 'Last Active';
 // Admin.template.php
 $l['admin_title'] = 'Admin CP';
 $l['admin_error_title'] = 'Error';
-$l['admin_cant_get_news_1'] = 'We were unable to get the latest SnowCMS News from the <a href="http://www.snowcms.com">SnowCMS</a> site because your server configuration does not have <a href="http://php.net/curl">cURL</a> setup. Please check out our site for the latest news &amp; updates.';
-$l['admin_cant_get_news_2'] = 'Unable to get the latest news from <a href="http://www.snowcms.com">SnowCMS</a> due to a server timeout. Refresh the page, or check out our site!';
+$l['admin_cant_get_news_1'] = 'We were unable to get the latest SnowCMS News from the <a href="http://www.snowcms.com">SnowCMS</a> site because your server configuration does not have <a href="http://php.net/curl">cURL</a> setup. Please check out the SnowCMS site for the latest news &amp; updates.';
+$l['admin_cant_get_news_2'] = 'Unable to get the latest news from the <a href="http://www.snowcms.com">SnowCMS</a> site due to a server timeout. Refresh the page, or check out our site.';
 $l['admin_current_version'] = 'Your SnowCMS Version:';
 $l['admin_snowcms_current_version'] = 'Latest SnowCMS Version:';
+$l['admin_version_unavailable'] = 'N/A';
 $l['admin_error_header'] = 'Error';
 $l['admin_error_reason'] = 'You don\'t have sufficient permission to access the Admin CP!';
 $l['admin_menu_managepages'] = 'Manage Pages';
@@ -80,7 +81,8 @@ $l['basicsettings_login_threshold'] = 'Login Threshold:';
 $l['basicsettings_remember_time'] = 'Default Cookie Time:';
 $l['basicsettings_timeformat'] = 'Time Format:';
 $l['basicsettings_update'] = 'Update Settings';
-$l['basicsettings_num_news_items'] = 'Number of news items per page';
+$l['basicsettings_num_news_items'] = 'News items per page:';
+$l['basicsettings_manage_members_per_page'] = 'Members per page:';
 
 // ManagePages.template.php
 $l['adminpage_make_title'] = 'Manage Pages';
@@ -182,6 +184,18 @@ $l['permissions_perm_view_online'] = 'Let them view who is online';
 $l['permissions_perm_view_profile'] = 'Let them view others profiles';
 $l['permissions_perm_manage_mail_settings'] = 'Allow them to edit mail settings';
 $l['permissions_perm_manage_groups'] = 'Allow them to manage member groups';
+
+// ManageMembers.template.php
+$l['managemembers_title'] = 'Manage Members';
+$l['managemembers_showing'] = 'Showing members %from% to %to%.';
+$l['managemembers_showing_one'] = 'Showing member %number%.';
+$l['managemembers_showing_none'] = 'There are no members on this page.';
+$l['managemembers_next_page'] = 'Next Page';
+$l['managemembers_previous_page'] = 'Previous Page';
+$l['managemembers_id'] = 'ID';
+$l['managemembers_screen_name'] = 'Screen Name';
+$l['managemembers_group'] = 'Group';
+$l['managemembers_join_date'] = 'Join Date';
 
 // ManageForum.template.php
 $l['manageforum_title'] = 'Manage Forum';

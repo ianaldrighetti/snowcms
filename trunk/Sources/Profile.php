@@ -15,10 +15,10 @@ if(!defined("Snow"))
   die("Hacking Attempt...");
 
 function Profile() {
-global $cmsurl, $db_prefix, $l, $settings, $source_dir, $user;
+global $cmsurl, $db_prefix, $l, $settings, $source_dir, $user, $perms;
   // Maybe they are trying to view someone's profile? o.O
   if((can('view_profile')) && ((!empty($_REQUEST['u'])) && ($_REQUEST['u']!=$user['id']))) {
-    $UID = (int)addlashes(mysql_real_escape_string($_REQUEST['u']));
+    $UID = (int)addslashes(mysql_real_escape_string($_REQUEST['u']));
     $result = sql_query("
        SELECT
          m.id, m.username, m.email, m.display_name, m.reg_date, m.reg_ip, m.last_login,
@@ -34,6 +34,7 @@ global $cmsurl, $db_prefix, $l, $settings, $source_dir, $user;
         $mem = array(
           'id' => $row['id'],
           'name' => $row['display_name'] ? $row['display_name'] : $row['username'],
+          'username' => $row['display_name'] ? $row['display_name'] : $row['username'],
           'email' => $row['email'],
           'reg_date' => formattime($row['reg_date']),
           'ip' => $row['last_ip'] ? $row['last_ip'] : $row['reg_ip'],
@@ -46,7 +47,10 @@ global $cmsurl, $db_prefix, $l, $settings, $source_dir, $user;
       }
       $settings['page']['title'] = str_replace("%user%", $mem['name'], $l['profile_profile_of']);
       $settings['profile'] = $mem;
-      loadTheme('Profile','View');
+      if (can('admin'))
+       loadTheme('Profile','AdminView');
+      else
+       loadTheme('Profile','View');
     }
     else {
       // Oh noes! It doesnt! Tell'em :P
