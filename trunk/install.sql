@@ -185,3 +185,20 @@ CREATE TABLE `{$db_prefix}news` (
   `allow_comments` INT(1) NOT NULL default '1',
   PRIMARY KEY(`news_id`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+
+DROP TABLE IF EXISTS `{$db_prefix}news_comments`;
+
+CREATE TABLE `{$db_prefix}news_comments` (
+  `cid` INT(11) NOT NULL AUTO_INCREMENT,
+  `nid` INT(11) NOT NULL,
+  `poster_id` INT(11) NOT NULL default '0',
+  `poster_name` TEXT NOT NULL,
+  `subject` TEXT NOT NULL,
+  `body` TEXT NOT NULL,
+  `post_time` INT(10) NOT NULL,
+  `modify_time` INT(10) NOT NULL default '0',
+  `isApproved` INT(1) NOT NULL default '1',
+  `isSpam` INT(1) NOT NULL default '0',
+  PRIMARY KEY (`cid`),
+  UNIQUE KEY (`cid`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;

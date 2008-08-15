@@ -88,12 +88,38 @@ global $cmsurl, $db_prefix, $l, $settings, $user;
         mysql_free_result($result);
       }
       // We need to do comments too! Awww :[ Only if comments are allowed :D!
+      $comments = array();
       if($news['allow_comments']) {
-      
+        $result = sql_query("
+          SELECT
+            c.cid, c.nid, c.poster_id, c.poster_name, c.subject, c.body, c.modify_time AS post_date,
+            IFNULL(c.modify_time, c.post_time) AS post_date, c.isApproved, c.isSpam, mem.id,
+            mem.display_name AS username, IFNULL(mem.display_name, mem.username) AS username
+          FROM {$db_prefix}news_comments AS n
+            LEFT JOIN {$db_prefix}members AS mem ON mem.id = c.poster_id
+          WHERE 
+            c.nid = $news_id AND isApproved = 1 AND isSpam = 0
+          ORDER BY c.post_time DESC");
+        
+        while($row = mysql_fetch_assoc($result)) {
+          $comments[] = array(
+            'id' => $row['cid'],
+            'news_id' => $row['nid'],
+            'poster_id' => $row['poster_id'],
+            'poster_name' => $row['username'],
+            'subject' => $row['subject'] ? $row['subject'] : NULL,
+            'body' => bbc($row['body']),
+            'post_date' => formattime($row['post_date']),
+            'isApproved' => $row['isApproved'],
+            'isSpam' => $row['isSpam']
+          );
+        }
+        mysql_free_result($result);
       }
       // Load it up :D (the theme thingy)
       $settings['page']['title'] = $news['subject'];
       $settings['news'] = $news;
+      $settings['comments'] = $comments;
       unset($news);
       loadTheme('News','Single');
     }
