@@ -130,4 +130,28 @@ global $cmsurl, $db_prefix, $l, $settings, $user;
     }  
   }
 }
+
+// This is for the Admin CP, to Manage the news
+function ManageNews() {
+global $cmsurl, $db_prefix, $l, $settings, $user;
+  if(can('manage_news')) {
+    // Dang, they can do this, now I have to code it :(
+    // Some actions they can do...
+    $na = array('add');
+    if(empty($_REQUEST['id']) && (!in_array($_REQUEST['na'], $na))) {
+      // No news ID, and no $na action that exists
+    }
+    elseif(empty($_REQUEST['id']) && $_REQUEST['na']=='add') {
+      // Adding news =D
+    }
+    else {
+      // Editing news... =D
+    }
+  }
+  else {
+    // Go away! You cant touch this, nah nah nah nah nah nah, cant touch this =D
+    $settings['page']['title'] = $l['admin_error_title'];
+    loadTheme('Admin','Error');
+  }
+}
 ?>
