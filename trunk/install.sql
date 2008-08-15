@@ -11,7 +11,7 @@ DROP TABLE IF EXISTS `{$db_prefix}board_permissions`;
 CREATE TABLE `{$db_prefix}board_permissions` (
   `bid` int(11) NOT NULL default '0',
   `group_id` int(11) NOT NULL default '0',
-  `what` text NOT NULL,
+  `what` VARCHAR(50) NOT NULL,
   `can` int(1) NOT NULL default '1',
   PRIMARY KEY (`group_id`,`what`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
@@ -145,7 +145,7 @@ INSERT INTO `{$db_prefix}permissions` VALUES ('1','admin','1'),('1','manage_page
 DROP TABLE IF EXISTS `{$db_prefix}settings`;
 
 CREATE TABLE `{$db_prefix}settings` (
-  `variable` text NOT NULL,
+  `variable` VARCHAR(100) NOT NULL,
   `value` text NOT NULL,
   UNIQUE KEY (`variable`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
