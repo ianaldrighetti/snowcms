@@ -33,7 +33,7 @@ global $cmsurl, $settings, $l, $user;
   </form>';
 }
 
-function Mail() {
+function MailSettings() {
 global $cmsurl, $settings, $l, $user;
 }
 ?>
