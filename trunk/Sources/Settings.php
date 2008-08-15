@@ -35,6 +35,10 @@ global $cmsurl, $db_prefix, $l, $settings, $user;
         array(
           'type' => 'text'
         ),
+      'num_news_items' =>
+        array(
+          'type' => 'text'
+        ),
       'timeformat' =>
         array(
           'type' => 'text'
