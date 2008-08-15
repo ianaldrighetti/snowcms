@@ -57,7 +57,8 @@ global $cmsurl, $db_prefix, $l, $settings, $user;
         $result = sql_query($query);
       }
       // Reload Settings D: Or they won't be the latest, menu's need to be reset too O.o
-      $settings += loadSettings(); // Note: this doesn't work
+      $settings = loadSettings();
+      $settings['menu'] = loadMenus();
     }
     // Set title, pass on $basic, and load Settings template with the Basic function
     $settings['page']['title'] = $l['basicsettings_title'];
