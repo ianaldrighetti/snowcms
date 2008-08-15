@@ -333,14 +333,39 @@ global $settings;
 }
 
 function bbc($str) {
-  $text = preg_replace('/\[url\](h?t?t?p?:?\/?\/?)(.*?)\[\/url\]/i', '<a href="http://\\2" target="_blank">\\1\\2</a>', $text); // [url][/url]
-  $text = preg_replace('/\[url=(h?t?t?p?:?\/?\/?)(.*?)\](.*?)\[\/url\]/i', '<a href="http://\\2" target="_blank">\\3</a>', $text); // [url=www.site.com]Linkname[/url]
-  // Creates link by http://www.site.com, www.site.com, http://site.com ftp://site.com
-	$text = preg_replace("/(?<=^|\s)(www\.([-a-zA-Z0-9_]+\.)*[-a-zA-Z0-9_]+\.[-a-zA-Z0-9_]{2,6}(\/[^\s]*)*)(?=\s|$)/", "http://$1", $text);
-  $text2 = "/(?<=^|\s)(http:\/\/|https:\/\/|ftp:\/\/)(([-a-zA-Z0-9_]+\.)*[-a-zA-Z0-9_]+\.[-a-zA-Z0-9_]{2,6}(\/[^\s]*)*)(?=\s|$)/";
-	$text3 = "<a href=\"$1$2\">$2</a>"; 
-	$text = preg_replace($text2, $text3, $text);
-  
+  $simple_search = array(
+    '/\[b\](.*?)\[\/b\]/is',                                
+    '/\[i\](.*?)\[\/i\]/is',                                
+    '/\[u\](.*?)\[\/u\]/is',
+    '/\[s\](.*?)\[\/s\]/is',
+    '/\[url\]((http:\/\/|ftp:\/\/|https:\/\/|ftps:\/\/).*?)\[\/url\]/is',
+    '/\[url="?((http:\/\/|ftp:\/\/|https:\/\/|ftps:\/\/).*?)"?\](.*?)\[\/url\]/is',
+    '/\[code\](.*?)\[\/code\]/is',
+    '/\[quote\](.*?)\[\/quote\]/is',
+    '/\[quote by="?(.*?)"?\](.*?)\[\/quote\]/is',
+    '/\[br\]/is',
+    '/\[hr\]/is',
+    '/\[img\]((http:\/\/|https:\/\/).*?)\[\/img\]/is',
+    '/\[img="?((http:\/\/|https:\/\/).*?)"?\](.*?)\[\/img\]/is'
+  );
+  $simple_replace = array(
+    '<strong>$1</strong>',
+    '<em>$1</em>',
+    '<span style="text-decoration: underline;">$1</span>',
+    '<del>$1</del>',
+    '<a href="$1">$1</a>',
+    '<a href="$1">$3</a>',
+    '<div class="code"><p>$1</p></div>',
+    '<p style="font-weight: bold; padding: 0px; margin: 0px;">Quote:</p><blockquote style="padding: 0px; margin: 0px;">$1</blockquote>',
+    '<p style="font-weight: bold; padding: 0px; margin: 0px;">Quote from $1:</p><blockquote style="padding: 0px; margin: 0px;">$2</blockquote>',
+    '<br />',
+    '<hr />',
+    '<img src="$1" alt=""/>',
+    '<img src="$1" alt="$3"/>'
+  );
+  // Do simple BBCode's
+  $str = preg_replace($simple_search, $simple_replace, $str);
+   
   $str = strtr($str, array("\n" => "<br />"));
   return $str;
 }
