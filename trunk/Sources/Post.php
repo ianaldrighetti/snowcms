@@ -118,8 +118,21 @@ global $cmsurl, $db_prefix, $l, $settings, $user;
   // So, what are we doing? New topic? Posting a Reply?
   $what = strtolower($_REQUEST['what']);
   // Do they want to post a new topic? And can they post it in the board?
-  if($what == 'new_topic' && canforum('post_new') && postable($_REQUEST['board'])) {
+  if($what == 'new_topic' && canforum('post_new', (int)$_REQUEST['board']) && postable($_REQUEST['board'])) {
+    // Just sanitize a variable
     $Board_ID = (int)$_REQUEST['board'];
+    // Make sure they didn't leave it all empty...
+    if(strlen($_REQUEST['subject'])>1 && strlen($_REQUEST['body'])>1) {
+    
+    }
+    else {
+      $_SESSION['subject'] = $_REQUEST['subject'];
+      $_SESSION['body'] = $_REQUEST['body'];
+      $_SESSION['sticky'] = (int)$_REQUEST['sticky'];
+      $_SESSION['locked'] = (int)$_REQUEST['locked'];
+      $_SESSION['board'] = (int)$_REQUEST['board'];
+      redirect("forum.php?action=post&board={$_REQUEST['board']}");
+    }
   }
   elseif($what == 'post_reply' && canforum('post_reply', boardfromTopic($_REQUEST['topic'])) && postable($_REQUEST['topic'])) {
     $Topic_ID = (int)$_REQUEST['topic'];
