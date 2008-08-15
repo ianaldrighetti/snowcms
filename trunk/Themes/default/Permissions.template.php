@@ -48,7 +48,7 @@ global $cmsurl, $settings, $l, $user;
   foreach($settings['permissions']['group'] as $perm => $value) {
     echo '
         <tr>
-          <td>'.$l['permissions_perm_'.$perm].'</td><td><input name="'.$perm.'" type="checkbox" value="1" ', @$settings['perms'][$perm] ? 'checked="checked"' : '', '/></td>
+          <td>'.$l['permissions_perm_'.$perm].'</td><td><input name="'.$perm.'" type="checkbox" value="1" ', @isset($settings['perms'][$perm]) ? 'checked="checked"' : '', '/></td>
         </tr>';
   }
   echo '
