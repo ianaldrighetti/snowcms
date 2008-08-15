@@ -87,6 +87,10 @@ global $cmsurl, $db_prefix, $l, $settings, $user;
         );
         mysql_free_result($result);
       }
+      // We need to do comments too! Awww :[ Only if comments are allowed :D!
+      if($news['allow_comments']) {
+      
+      }
       // Load it up :D (the theme thingy)
       $settings['page']['title'] = $news['subject'];
       $settings['news'] = $news;
