@@ -15,7 +15,7 @@ error_reporting(E_ALL);
 define("Snow", true);
 
 // Load Some Important Files
-require_once('./config.php');
+require_once('./config.php'); 
 // SnowCMS is not installed, so take them to the installer so they can install SnowCMS
 if(!$scms_installed)
   header("Location: install.php");
@@ -23,7 +23,7 @@ if(!$scms_installed)
 require_once($source_dir.'/Core.php');
 
   // Connect to MySQL
-  mysql_connect($mysql_host, $mysql_user, $mysql_passwd) or die(mysql_error());
+  @mysql_connect($mysql_host, $mysql_user, $mysql_passwd) or die(MySQLError(mysql_error()));
 
 // Load up a few things :P Such as $settings, $l[anguage], and $user, the permissions too!
   $user = loadUser();
