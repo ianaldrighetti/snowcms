@@ -359,4 +359,25 @@ function sql_query($query) {
   }
   return $result;
 }
+
+function MySQLError($error) {
+echo '
+<html>
+<head>
+  <title>MySQL Connection Error</title>
+  <style type="text/css">
+  body {
+    font-family: Verdana;
+    font-size: 12px;
+  }
+  p {
+    text-align: center;
+  }
+  </style>
+</head>
+<body>
+  <p>A MySQL Error has occurred! Error: ', $error, '</p>
+</body>
+</html>';
+}
 ?>
