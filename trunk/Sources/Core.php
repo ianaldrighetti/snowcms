@@ -380,4 +380,10 @@ echo '
 </body>
 </html>';
 }
+
+// A simple function to redirect
+function redirect($relative_url) {
+global $cmsurl;
+  header("Location: {$cmsurl}/{$relative_url}");
+}
 ?>
