@@ -130,7 +130,7 @@ global $cmsurl, $db_prefix, $l, $settings, $permissions, $user;
   $MID = (int)addslashes(mysql_real_escape_string($_REQUEST['mid']));
   $result = sql_query("
      SELECT
-       grp.group_id, grp.groupname, p.group_id, p.what
+       grp.group_id, grp.groupname, p.group_id, p.what, p.can
      FROM {$db_prefix}permissions AS p
        LEFT JOIN {$db_prefix}membergroups AS grp ON grp.group_id = p.group_id
      WHERE grp.group_id = $MID");
@@ -141,7 +141,8 @@ global $cmsurl, $db_prefix, $l, $settings, $permissions, $user;
       $settings['perms'][$row['what']] = array(
                                'groupname' => $row['groupname'],
                                'id' => $row['group_id'],
-                               'what' => $row['what']
+                               'what' => $row['what'],
+                               'can' => $row['can']
                              );
     $settings['page']['title'] = $l['permissions_editperms_title'];
     loadTheme('Permissions','Edit');
