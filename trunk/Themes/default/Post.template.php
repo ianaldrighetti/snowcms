@@ -8,7 +8,7 @@ function Topic() {
 global $cmsurl, $settings, $l, $user;
 $l['post_newtopic'] = 'Start new topic';
 echo '
-<form action="', $cmsurl, 'forum.php?action=post&board=', $settings['board'], '" method="post">
+<form action="', $cmsurl, 'forum.php?action=post2&board=', $settings['board'], '" method="post">
 <table id="post" border="0px">
   <tr cellspacing="0px" cellpadding="0px">
     <td class="title" colspan="2">', $l['post_newtopic'], '</td>
