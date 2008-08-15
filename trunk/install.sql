@@ -2,18 +2,19 @@ DROP TABLE IF EXISTS `scms_board_logs`;
 
 CREATE TABLE `scms_board_logs` (
   `bid` int(11) NOT NULL default '0',
-  `uid` int(11) NOT NULL default '0'
+  `uid` int(11) NOT NULL default '0',
+  UNIQUE KEY (`bid`,`uid`)
 ) ENGINE=MyISAM DEFAULT CHARSET=latin1;
 
 DROP TABLE IF EXISTS `scms_board_permissions`;
 
 CREATE TABLE `scms_board_permissions` (
+  `bid` int(11) NOT NULL default '0',
   `group_id` int(11) NOT NULL default '0',
   `what` text NOT NULL,
-  `can` int(1) NOT NULL default '1'
+  `can` int(1) NOT NULL default '1',
+  PRIMARY KEY (`group_id`,`what`)
 ) ENGINE=MyISAM DEFAULT CHARSET=latin1;
-
-INSERT INTO `scms_board_permissions` VALUES ('1','post_new','1');
 
 DROP TABLE IF EXISTS `scms_boards`;
 
@@ -69,6 +70,7 @@ CREATE TABLE `scms_members` (
   `signature` text NOT NULL,
   `activated` int(1) NOT NULL default '0',
   `acode` text NOT NULL,
+  `sc` varchar(50) NOT NULL default '',
   PRIMARY KEY  (`id`)
 ) ENGINE=MyISAM DEFAULT CHARSET=latin1;
 
@@ -82,7 +84,9 @@ CREATE TABLE `scms_menus` (
   `target` int(1) NOT NULL default '0',
   `menu` int(1) NOT NULL default '0',
   PRIMARY KEY  (`link_id`)
-) ENGINE=MyISAM DEFAULT CHARSET=latin1;
+) ENGINE=MyISAM AUTO_INCREMENT=2 DEFAULT CHARSET=latin1;
+
+INSERT INTO `scms_menus` VALUES ('1','1','Home','http://snowcms.northsalemcrew.net/','0','1');
 
 DROP TABLE IF EXISTS `scms_messages`;
 
@@ -102,7 +106,7 @@ CREATE TABLE `scms_messages` (
   `ip` text NOT NULL,
   `body` text NOT NULL,
   PRIMARY KEY  (`mid`)
-) ENGINE=MyISAM AUTO_INCREMENT=2 DEFAULT CHARSET=latin1;
+) ENGINE=MyISAM DEFAULT CHARSET=latin1;
 
 DROP TABLE IF EXISTS `scms_online`;
 
@@ -110,7 +114,8 @@ CREATE TABLE `scms_online` (
   `user_id` int(11) NOT NULL default '0',
   `ip` text NOT NULL,
   `page` text NOT NULL,
-  `last_active` int(10) NOT NULL default '0'
+  `last_active` int(10) NOT NULL default '0',
+  UNIQUE KEY (`user_id`)
 ) ENGINE=MyISAM DEFAULT CHARSET=latin1;
 
 DROP TABLE IF EXISTS `scms_pages`;
@@ -124,24 +129,25 @@ CREATE TABLE `scms_pages` (
   `title` text NOT NULL,
   `content` text NOT NULL,
   PRIMARY KEY  (`page_id`)
-) ENGINE=MyISAMDEFAULT CHARSET=latin1;
+) ENGINE=MyISAM DEFAULT CHARSET=latin1;
 
 DROP TABLE IF EXISTS `scms_permissions`;
 
 CREATE TABLE `scms_permissions` (
   `group_id` int(11) NOT NULL default '0',
-  `what` varchar(50) NOT NULL,
+  `what` varchar(50) NOT NULL default '',
   `can` int(1) NOT NULL default '0',
-  PRIMARY KEY (`group_id`,`what`)
+  PRIMARY KEY  (`group_id`,`what`)
 ) ENGINE=MyISAM DEFAULT CHARSET=latin1;
 
-INSERT INTO `scms_permissions` VALUES ('1','admin','1'),('1','view_online','1'),('0','view_online','1'),('1','view_online_special','1'),('0','view_forum','1'),('1','view_forum','1'),('1','view_forum','1');
+INSERT INTO `scms_permissions` VALUES ('1','admin','1'),('1','manage_pages','1'),('1','manage_basic-settings','1'),('1','manage_members','1'),('1','manage_menus','1'),('1','manage_news','1'),('1','manage_permissions','1'),('1','manage_forum_perms','1'),('1','view_forum','1'),('1','view_online','1'),('1','view_profile','1'),('2','manage_menus','1'),('2','manage_news','1'),('2','manage_pages','1'),('2','manage_permissions','1'),('2','manage_forum_perms','1'),('2','view_forum','1'),('2','view_online','1'),('1','manage_mail_settings','1'),('1','manage_groups','1');
 
 DROP TABLE IF EXISTS `scms_settings`;
 
 CREATE TABLE `scms_settings` (
   `variable` text NOT NULL,
-  `value` text NOT NULL
+  `value` text NOT NULL,
+  UNIQUE KEY (`variable`)
 ) ENGINE=MyISAM DEFAULT CHARSET=latin1;
 
 INSERT INTO `scms_settings` VALUES ('site_name','SnowCMS'),('slogan','Its a CMS alright...'),('language','english'),('theme','default'),('login_threshold','15'),('version','0.7'),('main_page','1'),('main_page_id','1'),('remember_time','120'),('timeformat','jS'),('mail_with_fsockopen','0'),('smtp_host','mail.northsalemcrew.net'),('smtp_user','admin@northsalemcrew.net'),('smtp_pass','4487699'),('smtp_from','admin@northsalemcrew.net'),('smtp_port','25'),('account_activation','1'),('webmaster_email','me@goaway.com'),('board_posts_per_page','20'),('topic_posts_per_page','10');
@@ -162,4 +168,4 @@ CREATE TABLE `scms_topics` (
   `num_replies` int(11) NOT NULL default '0',
   `numviews` int(11) NOT NULL default '0',
   PRIMARY KEY  (`tid`)
-) ENGINE=MyISAM AUTO_INCREMENT=2 DEFAULT CHARSET=latin1;
+) ENGINE=MyISAM DEFAULT CHARSET=latin1;
