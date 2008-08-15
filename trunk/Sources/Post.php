@@ -121,7 +121,7 @@ global $cmsurl, $db_prefix, $l, $settings, $user;
   if($what == 'new_topic' && canforum('post_new') && postable($_REQUEST['board'])) {
     $Board_ID = (int)$_REQUEST['board'];
   }
-  elseif($what == 'post_reply' && canforum('post_reply') && postable($_REQUEST['topic'])) {
+  elseif($what == 'post_reply' && canforum('post_reply', boardfromTopic($_REQUEST['topic'])) && postable($_REQUEST['topic'])) {
     $Topic_ID = (int)$_REQUEST['topic'];
     $subject = clean($_REQUEST['subject']);
     $body = clean($_REQUEST['body']);
@@ -164,6 +164,7 @@ global $cmsurl, $db_prefix, $l, $settings, $user;
         `last_msg` = '{$row['mid']}', `ender_id` = '{$user['id']}', `topic_ender` = '{$user['name']}', `num_replies` = num_replies + 1
       WHERE `tid` = '{$row['tid']}'");
     sql_query("UPDATE {$db_prefix}boards SET `numposts` = numposts + 1 WHERE `bid` = '$Board_ID'");
+    sql_query("UPDATE {$db_prefix}members SET `numposts` = numposts + 1 WHERE `id` = '{$user['id']}'");
     header("Location: {$cmsurl}forum.php?board={$Board_ID}");
   }
 }
@@ -226,5 +227,22 @@ global $db_prefix, $settings, $user;
       return false;
     }
   }
+}
+
+// returns the board ID from a given topic ID
+function boardfromTopic($topic_id) {
+global $db_prefix;
+  $topic_id = (int)$topic_id;
+  $result = sql_query("
+    SELECT
+      t.tid, t.bid
+    FROM {$db_prefix}topics AS t
+    WHERE t.tid = $topic_id");
+  if(mysql_num_rows($result)) {
+    $row = mysql_fetch_assoc($result);
+    return $row['bid'];
+  }
+  else
+    return 0;
 }
 ?>
