@@ -8,9 +8,14 @@ $l['login_header'] = 'Login';
 $l['login_details'] = 'Here you can login to your '.$settings['site_name'].' account. If you do not have an account you can register one <a href="'.$cmsurl.'index.php?action=register">here</a>';
 $l['login_user'] = 'Username:';
 $l['login_pass'] = 'Password:';
-$l['login_remember_me'] = 'Remember Me';
 $l['login_button'] = 'Login!';
 $l['login_error'] = 'Wrong Username or Password';
+$l['login_length'] = 'Session Length:';
+$l['login_hour'] = 'An Hour';
+$l['login_day'] = 'A Day';
+$l['login_week'] = 'A Week';
+$l['login_month'] = 'A Month';
+$l['login_forever'] = 'Forever';
 
 // Register.template.php stuff
 $l['register_title'] = 'Register';

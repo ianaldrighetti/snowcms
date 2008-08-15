@@ -18,13 +18,20 @@ global $cmsurl, $settings, $l, $user;
         </tr>';
       echo '
         <tr>
-          <td>'.$l['login_user'].'</td><td><input name="username" type="text" value="'.@$_REQUEST['username'].'"/></td>
+          <td>'.$l['login_user'].'</td><td><input name="username" type="text" value="', @$_REQUEST['username'], '"/></td>
         </tr>
         <tr>
           <td>'.$l['login_pass'].'</td><td><input name="password" type="password" /></td>
         </tr>
         <tr>
-          <td colspan="2"><input name="remember_me" type="checkbox" checked="checked" value="1"/> '.$l['login_remember_me'].'</td>
+          <td>', $l['login_length'], '</td><td><select name="login_length">
+                                        <option value="3600">', $l['login_hour'], '</option>
+                                        <option value="86400">', $l['login_day'], '</option>
+                                        <option value="604800">', $l['login_week'], '</option>
+                                        <option value="2592000">', $l['login_month'], '</option>
+                                        <option value="31104000" selected="yes">', $l['login_forever'], '</option>
+                                      </select>
+                                  </td>
         </tr>
         <tr>
           <td colspan="2"><input name="login" type="submit" value="'.$l['login_button'].'"/></td>
