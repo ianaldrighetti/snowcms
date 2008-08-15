@@ -9,6 +9,9 @@ global $cmsurl, $settings, $l, $user;
   echo '
   <h1>'.$l['register_header'].'</h1>
   <p>'.$l['register_details'].'</p>
+  <script type="text/javascript" src="includes/jquery.js"></script>
+  <script type="text/javascript" src="includes/jquery-pstrength.js"></script>
+  <script type="text/javascript">$(function() {$('.password').pstrength();});</script>
   <form action="'.$cmsurl.'index.php?action=register2" method="post">
     <fieldset>
       <table>';
@@ -28,7 +31,7 @@ global $cmsurl, $settings, $l, $user;
           <td>'.$l['register_username'].'</td><td><input name="username" type="text" value="'.@$_REQUEST['username'].'"/></td>
         </tr>
         <tr>
-          <td>'.$l['register_password'].'</td><td><input name="password" type="password" /></td>
+          <td>'.$l['register_password'].'</td><td><input class="password" name="password" type="password" /></td>
         </tr>
         <tr>
           <td>'.$l['register_verify_password'].'</td><td><input name="vpassword" type="password" /></td>
