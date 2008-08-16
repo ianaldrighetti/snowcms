@@ -112,4 +112,58 @@ global $cmsurl, $db_prefix, $l, $settings, $source_dir, $user;
     loadTheme('Register');  
   }
 }
+
+// This is how they activate their account, if you can activate it by email...
+function Activate() {
+global $cmsurl, $db_prefix, $l, $settings, $source_dir, $user;
+  $acode = clean(@$_REQUEST['acode']);
+  $u = clean(@$_REQUEST['u']);
+  $settings['acode'] = '';
+  $settings['user'] = '';
+  if(empty($acode) || empty($u)) {
+    // One or both is empty, lets give them a form...
+    $settings['page']['title'] = $l['activate_title'];
+    $settings['acode'] = !empty($acode) ? $acode : '';
+    $settings['user'] = !empty($u) ? $u : '';
+    loadTheme('Register','AForm');
+  }
+  else {
+    // Both are there :D
+    $result = sql_query("
+      SELECT
+        mem.username, mem.acode, mem.activated
+      FROM {$db_prefix}members AS mem
+      WHERE
+        mem.username = '{$u}'");
+    if(mysql_num_rows($result)) {
+      // The user does exist, but thats only part 1
+      $row = mysql_fetch_assoc($result);
+      // Does the activation code match? *AND* is the account not yet activate? ._.
+      if($acode==$row['acode'] && !$row['activated']) {
+        // Success! =D!
+        sql_query("UPDATE {$db_prefix}members SET `activated` = '1' WHERE `username` = '{$u}'");
+        $settings['page']['title'] = $l['activate_title'];
+        $settings['user'] = $row['username'];
+        loadTheme('Register','ASuccess');
+      }
+      elseif($acode!=$row['acode'] && !$row['activated']) {
+        $settings['page']['title'] = $l['activate_title'];
+        $settings['errors'][] = $l['activate_acode_no_match'];
+        loadTheme('Register','AForm');      
+      }
+      else {
+        // That account is already activated! D:
+        $settings['page']['title'] = $l['activate_title'];
+        $settings['errors'][] = $l['activate_account_already_activated'];
+        loadTheme('Register','AForm');        
+      }
+    }
+    else {
+      // The user doesn't exist
+      $settings['page']['title'] = $l['activate_title'];
+      $settings['errors'][] = $l['activate_no_such_user'];
+      loadTheme('Register','AForm');
+    }
+  }
+}
 ?>

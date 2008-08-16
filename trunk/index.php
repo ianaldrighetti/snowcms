@@ -50,6 +50,7 @@ require_once($source_dir.'/Core.php');
     // To add an action, it is Quite Simple, Simply add a row like this:
     // 'ACTION_NAME' => array('ACTION_SOURCE_FILE','FUNCTION_TO_CALL_ON_IN_FILE'),
     $actions = array(
+      'activate' => array('Register.php','Activate'),
       'admin' => array('Admin.php','Admin'),
       'login' => array('Login.php','Login'),
       'login2' => array('Login.php','Login2'),
@@ -58,7 +59,7 @@ require_once($source_dir.'/Core.php');
       'online' => array('Online.php','Online'),
       'profile' => array('Profile.php','Profile'),
       'register' => array('Register.php','Register'),
-      'register2' => array('Register.php','Register2'),
+      'register2' => array('Register.php','Register2')
     );
     // Is this action they are requesting even in the $actions array? If not, we don't want an error message.
     // So, lets load the Home() Function

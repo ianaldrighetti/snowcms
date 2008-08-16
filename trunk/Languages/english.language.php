@@ -30,10 +30,19 @@ $l['register_password'] = 'Password:';
 $l['register_verify_password'] = 'Verify Password:';
 $l['register_email'] = 'Email:';
 $l['register_captcha'] = 'Enter the Text you see in the image';
-$l['register_success'] = 'Thank you '.strtolower(@$_REQUEST['username']).'! Your account has been created successfully and you may now <a href="'.$cmsurl.'index.php?action=login">login</a>';
+$l['register_success'] = 'Thank you '.@clean($_REQUEST['username']).'! Your account has been created successfully and you may now <a href="'.$cmsurl.'index.php?action=login">login</a>';
 $l['register_successbut1'] = 'Thanks for registering! The administrators require you to activate your account via email, please check your email you used on your account, and click the link to activate your account';
 $l['register_successbut2'] = 'Thanks for registering! The administrators require themselves to activate accounts; you will recieve an email once your account is activated.';
 $l['register_failed'] = 'Registration failed!';
+// For Account Activation...
+$l['activate_title'] = 'Activate your Account';
+$l['activate_acode_no_match'] = 'Wrong Activation Code';
+$l['activate_account_already_activated'] = 'That account is already activated';
+$l['activate_no_such_user'] = 'That username doesn\'t exist';
+$l['activate_header'] = 'Account Activation';
+$l['activate_desc'] = 'Here you can activate your account by entering your username and activation code';
+$l['activate_button'] = 'Activate Account';
+$l['activate_account_activated'] = 'Your account has been successfully activated! You may now <a href="', $cmsurl, 'index.php?action=login">login</a>.';
 
 // Error Stuff for Register.template.php
 $l['register_error_user_taken'] = 'That username is already in use.';

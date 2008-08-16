@@ -7,7 +7,7 @@ if(!defined('Snow'))
 function Main() {
 global $cmsurl, $settings, $l, $user;
   echo '
-  <h1>'.$l['register_header'].'</h1>
+  <h2>'.$l['register_header'].'</h2>
   <p>'.$l['register_details'].'</p>
   <script type="text/javascript" src="includes/jquery.js"></script>
   <script type="text/javascript" src="includes/jquery-pstrength.js"></script>'
@@ -59,14 +59,14 @@ global $cmsurl, $settings, $l, $user;
 function Success() {
 global $cmsurl, $settings, $l, $user;
   echo '
-  <h1>'.$l['register_header'].'</h1>
+  <h2>'.$l['register_header'].'</h2>
   <p>'.$l['register_success'].'</p>';
 }
 
 function SuccessBut1() {
 global $cmsurl, $settings, $l, $user;
   echo '
-  <h1>'.$l['register_header'].'</h1>';
+  <h2>'.$l['register_header'].'</h2>';
   if(empty($settings['page']['error'])) {
     echo '<p>'.$l['register_successbut1'].'</p>';
   }
@@ -78,7 +78,47 @@ global $cmsurl, $settings, $l, $user;
 function SuccessBut2() {
 global $cmsurl, $settings, $l, $user;
   echo '
-  <h1>'.$l['register_header'].'</h1>
+  <h2>'.$l['register_header'].'</h2>
   <p>'.$l['register_successbut2'].'</p>';
+}
+
+function AForm() {
+global $cmsurl, $settings, $l, $user;
+  echo '
+  <h2>', $l['activate_header'], '</h2>
+  <p>', $l['activate_desc'], '</p>
+  <form action="', $cmsurl, 'index.php?action=activate" method="post">
+    <fieldset>
+      <table>';
+        if(count($settings['errors'])) {
+        echo '
+        <tr>
+          <td colspan="2"><p class="error">';
+          foreach($settings['errors'] as $error)
+            echo $error . '<br />';
+        echo '
+          </p></td>
+        </tr>';
+        }
+      echo '        
+        <tr>
+          <td>', $l['activate_username'], '</td><td><input name="u" type="text" value="', $settings['user'], '"/></td>
+        </tr>
+        <tr>
+          <td>', $l['activate_acode'], '</td><td><input name="acode" type="text" value="', $settings['acode'], '"/></td>
+        </tr>
+        <tr>
+          <td colspan="2"><input name="activate" type="submit" value="', $l['activate_button'], '"/></td>
+        </tr>
+      </table>
+    </fieldset>
+  </form>';
+}
+
+function ASuccess() {
+global $cmsurl, $settings, $l, $user;
+  echo '
+  <h2>', $l['activate_header'], '</h2>
+  <p>', $l['activate_account_activated'], '</p>';
 }
 ?>
