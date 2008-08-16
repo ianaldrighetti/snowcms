@@ -19,6 +19,7 @@ function ManageForum() {
 global $cmsurl, $db_prefix, $l, $settings, $user;
   // :O We need another sub action kind of thing don't we? .-.
   // Lets call it Forum Action, or fa for short :-]
+  if(can('manage_forum')) {  
     $fa = array(
       'boards' => array('ManageForum.php','ManageBoards'),
       'categories' => array('ManageForum.php','ManageCats'),
@@ -30,7 +31,12 @@ global $cmsurl, $db_prefix, $l, $settings, $user;
     else {
       // Its not :( We don't want an error, so show the ForumHome();
       ForumHome();
-    }    
+    }
+  }
+  else {
+    $settings['page']['title'] = $l['admin_error_title'];
+    loadTheme('Admin','Error');
+  }  
 }
 function ForumHome() {
 global $cmsurl, $db_prefix, $l, $settings, $user;
@@ -40,5 +46,34 @@ global $cmsurl, $db_prefix, $l, $settings, $user;
   */
   $settings['page']['title'] = $l['manageforum_title'];
   loadTheme('ManageForum');
+}
+
+function ManageBoards() {
+global $cmsurl, $db_prefix, $l, $settings, $user;
+  // They want to manage the boards =D
+  if($_REQUEST['do']=="add") {
+    // Show a form to add a new board =D
+  }
+  elseif($_REQUEST['do']=="edit") {
+    // Show a form to edit a board
+  }
+  else {
+    // Show a list of Boards...
+  }
+}
+
+// Awwww, Kitty ^^
+function ManageCats() {
+global $cmsurl, $db_prefix, $l, $settings, $user;
+  // Manage the Categories! :O
+  if($_REQUEST['do']=="add") {
+    // Adding a category
+  }
+  elseif($_REQUEST['do']=="edit") {
+    // Editing an already existing category
+  }
+  else {
+    // Show a list of categories...
+  }
 }
 ?>
