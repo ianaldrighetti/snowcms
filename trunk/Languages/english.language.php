@@ -16,6 +16,10 @@ $l['login_day'] = 'A Day';
 $l['login_week'] = 'A Week';
 $l['login_month'] = 'A Month';
 $l['login_forever'] = 'Forever';
+// Sub stuff for logging out in this template...
+$l['logout_error_title'] = 'Logout Error';
+$l['logout_error_header'] = 'Error';
+$l['logout_error_desc'] = 'Session Verification Failed! Try Clicking on the logout link again.';
 
 // Register.template.php stuff
 $l['register_title'] = 'Register';
@@ -26,7 +30,7 @@ $l['register_password'] = 'Password:';
 $l['register_verify_password'] = 'Verify Password:';
 $l['register_email'] = 'Email:';
 $l['register_captcha'] = 'Enter the Text you see in the image';
-$l['register_success'] = 'Thank you '. @$_REQUEST['username'].'! Your account has been created successfully and you may now <a href="'.$cmsurl.'index.php?action=login">login</a>';
+$l['register_success'] = 'Thank you '.strtolower(@$_REQUEST['username']).'! Your account has been created successfully and you may now <a href="'.$cmsurl.'index.php?action=login">login</a>';
 $l['register_successbut1'] = 'Thanks for registering! The administrators require you to activate your account via email, please check your email you used on your account, and click the link to activate your account';
 $l['register_successbut2'] = 'Thanks for registering! The administrators require themselves to activate accounts; you will recieve an email once your account is activated.';
 $l['register_failed'] = 'Registration failed!';
@@ -137,6 +141,7 @@ $l['forum_board_new'] = 'New posts';
 $l['forum_board_old'] = 'No news posts';
 $l['forum_error_cantviewb_message'] = 'Sorry, you are not allowed to view or access this board';
 $l['forum_error_noboard_message'] = 'The Board ID you have requested does not exist!';
+
 // Links for Forum.template.php
 $l['forum_link_home'] = 'Home';
 $l['forum_link_forumindex'] = 'Forum Index';

@@ -365,7 +365,7 @@ function bbc($str) {
   );
   // Do simple BBCode's
   $str = preg_replace($simple_search, $simple_replace, $str);
-   
+  
   $str = strtr($str, array("\n" => "<br />"));
   return $str;
 }
@@ -410,5 +410,18 @@ echo '
 function redirect($relative_url) {
 global $cmsurl;
   header("Location: {$cmsurl}/{$relative_url}");
+}
+
+// Validates if the Session ID matches that of the users...
+function ValidateSession($sc) {
+global $db_prefix, $user;
+  $result = sql_query("SELECT `sc` FROM {$db_prefix}members WHERE `id` = '{$user['id']}'");
+  $row = mysql_fetch_assoc($result);
+  mysql_free_result($result);
+  // This is simple :D
+  if($sc == $row['sc'])
+    return true;
+  else
+    return false;
 }
 ?>

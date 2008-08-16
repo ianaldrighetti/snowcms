@@ -6,7 +6,7 @@ if(!defined('Snow'))
 function Main() {
 global $cmsurl, $settings, $l, $user;
   echo '
-  <h1>'.$l['login_header'].'</h1>
+  <h3>'.$l['login_header'].'</h3>
   <p>'.$l['login_details'].'</p>
   <form action="'.$cmsurl.'index.php?action=login2" method="post">
     <fieldset>
@@ -39,5 +39,12 @@ global $cmsurl, $settings, $l, $user;
       </table>
     </fieldset>
   </form>';
+}
+
+function LogoutError() {
+global $cmsurl, $settings, $l, $user;
+  echo '
+  <h3>', $l['logout_error_header'], '</h3>
+  <p>', $l['logout_error_desc'], '</p>';
 }
 ?>

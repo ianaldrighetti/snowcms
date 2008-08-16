@@ -69,22 +69,29 @@ global $cmsurl, $db_prefix, $l, $settings, $user;
 
 // Logout, need I explain? :P
 function Logout() {
-global $cmsurl, $db_prefix, $settings, $user;
-  // Are they even logged in? Lol.
-  if($user['is_logged']) {
-    // Destroy! Destroy! Their session :D
-    session_destroy();
-    // Delete them from the {db_prefix}online table
-    sql_query("DELETE FROM {$db_prefix}online WHERE `user_id` = '{$user['id']}'");
-    // Delete the Cookies... If they have any (the @ means to stfu, I don't want any errors)
-      @setcookie("username", '', time()-($settings['remember_time']*60));
-      @setcookie("password", '', time()-($settings['remember_time']*60));
-      @setcookie("uid", '', time()-($settings['remember_time']*60));    
-    // Redirect to the CMSURL URL
-    header("Location: {$cmsurl}");
+global $cmsurl, $db_prefix, $l, $settings, $user;
+  if(ValidateSession(@$_REQUEST['sc'])) {
+    // Are they even logged in? Lol.
+    if($user['is_logged']) {
+      // Destroy! Destroy! Their session :D
+      session_destroy();
+      // Delete them from the {db_prefix}online table
+      sql_query("DELETE FROM {$db_prefix}online WHERE `user_id` = '{$user['id']}'");
+      // Delete the Cookies... If they have any (the @ means to stfu, I don't want any errors)
+        @setcookie("username", '', time()-($settings['remember_time']*60));
+        @setcookie("password", '', time()-($settings['remember_time']*60));
+        @setcookie("uid", '', time()-($settings['remember_time']*60));    
+      // Redirect to the CMSURL URL
+      header("Location: {$cmsurl}");
+    }
+    else {
+      // Your not logged in -.-'
+      header("Location: {$cmsurl}");
+    }
   }
   else {
-    // Your not logged in -.-'
-    header("Location: {$cmsurl}");
+    $settings['page']['title'] = $l['logout_error_title'];
+    loadTheme('Login','LogoutError');
   }
 }
+?>
