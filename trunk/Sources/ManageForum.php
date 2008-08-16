@@ -16,7 +16,7 @@ if(!defined("Snow"))
   
 // Displays the page
 function ManageForum() {
-global $cmsurl, $db_prefix, $l, $settings, $user;
+global $cmsurl, $db_prefix, $l, $settings, $source_dir, $user;
   // :O We need another sub action kind of thing don't we? .-.
   // Lets call it Forum Action, or fa for short :-]
   if(can('manage_forum')) {  
@@ -146,7 +146,7 @@ global $cmsurl, $db_prefix, $l, $settings, $user;
       );
     }
     $settings['page']['title'] = $l['managecats_title'];
-    loadTheme('ManageForum','ManageCats');
+    loadTheme('ManageForum','ShowCats');
   }
 }
 ?>
