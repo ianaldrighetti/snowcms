@@ -86,6 +86,7 @@ $l['basicsettings_header'] = 'Basic Settings';
 $l['basicsettings_desc'] = 'Here are basic settings for your site, such as site name, slogan, time format, etc.';
 $l['basicsettings_site_name'] = 'Site Name:';
 $l['basicsettings_slogan'] = 'Slogan:';
+$l['basicsettings_account_activation'] = 'Account activation:';
 $l['basicsettings_login_threshold'] = 'Login Threshold:';
 $l['basicsettings_remember_time'] = 'Default Cookie Time:';
 $l['basicsettings_timeformat'] = 'Time Format:';
