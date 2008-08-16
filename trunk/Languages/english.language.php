@@ -246,6 +246,13 @@ $l['managemembers_moderate_unban'] = 'Remove Ban';
 
 // ManageForum.template.php
 $l['manageforum_title'] = 'Manage Forum';
+$l['manageforum_header'] = 'Manage Forum';
+$l['manageforum_desc'] = 'Click on one of the links below to manage your <a href="', $cmsurl, 'forum.php">forum</a>';
+// Links
+$l['mf_link_cats'] = 'Manage Categories';
+$l['mf_link_cats_desc'] = 'Create, Edit, and Delete forum categories';
+$l['mf_link_boards'] = 'Manage Boards';
+$l['mf_link_boards_desc'] = 'You can create, edit and delete your boards in your forum here';
 
 // Post.template.php
 $l['forum_startnew'] = 'Post New Topic';
