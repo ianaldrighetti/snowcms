@@ -62,7 +62,7 @@ global $cmsurl, $db_prefix, $l, $settings, $source_dir, $user;
   // Did we get no errors? If no, register them
   if(count($settings['page']['error'])==0) {
     // Clean username, encrypt pass, clean email, set time registered
-    $username = clean(strtolower($username));
+    $username = clean($username);
     $password = md5($password);
     $email = clean($email);
     $time = time();
