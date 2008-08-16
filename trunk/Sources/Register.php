@@ -35,7 +35,7 @@ global $cmsurl, $db_prefix, $l, $settings, $source_dir, $user;
   // Set error as array, so if no errors, we won't get a PHP error
   $settings['page']['error'] = array();
   // Is the username taken?
-  $result = sql_query("SELECT * FROM {$db_prefix}members WHERE `username` = '".clean(strtolower($username))."'");
+  $result = sql_query("SELECT * FROM {$db_prefix}members WHERE `username` = '".clean($username)."'");
   if(mysql_num_rows($result)>0) {
     $settings['page']['error'][] = $l['register_error_user_taken'];
   }
