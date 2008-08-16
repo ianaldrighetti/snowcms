@@ -46,7 +46,46 @@ global $cmsurl, $db_prefix, $l, $settings, $user;
 function loadMlist() {
 global $db_prefix, $settings;
   
-  $member_rows = sql_query("SELECT * FROM {$db_prefix}members LEFT JOIN {$db_prefix}membergroups ON `group` = `group_id`") or die(mysql_error());
+  $settings['manage_members']['id_desc'] = '';
+  $settings['manage_members']['screenname_desc'] = '';
+  $settings['manage_members']['group_desc'] = '';
+  $settings['manage_members']['joindate_desc'] = '';
+  
+  switch (@$_REQUEST['sort']) {
+    case 'id':
+      $sort = 'ORDER BY `id`, `reg_date`';
+      $settings['manage_members']['id_desc'] = '_desc';
+      break;
+    case 'id_desc':
+      $sort = 'ORDER BY `id` DESC, `reg_date`';
+      break;
+    case 'screenname':
+      $sort = 'ORDER BY `username`, `reg_date`';
+      $settings['manage_members']['screenname_desc'] = '_desc';
+      break;
+    case 'screenname_desc':
+      $sort = 'ORDER BY `username` DESC, `reg_date`';
+      break;
+    case 'group':
+      $sort = 'ORDER BY `groupname`, `reg_date`';
+      $settings['manage_members']['group_desc'] = '_desc';
+      break;
+    case 'group_desc':
+      $sort = 'ORDER BY `groupname` DESC, `reg_date`';
+      break;
+    case 'joindate':
+      $sort = 'ORDER BY `reg_date`';
+      $settings['manage_members']['joindate_desc'] = '_desc';
+      break;
+    case 'joindate_desc':
+      $sort = 'ORDER BY `reg_date` DESC';
+      break;
+    default:
+      $sort = 'ORDER BY `reg_date`';
+      break;
+  }
+  
+  $member_rows = sql_query("SELECT * FROM {$db_prefix}members LEFT JOIN {$db_prefix}membergroups ON `group` = `group_id`$sort") or die(mysql_error());
   $settings['manage_members']['member_rows'] = $member_rows;
   
   $settings['manage_members']['total_members'] = mysql_num_rows($member_rows);
@@ -58,6 +97,16 @@ global $db_prefix, $settings;
     $settings['manage_members']['page_end'] = $settings['manage_members_per_page'] * (@$_REQUEST['pg'] + 1);
   $settings['manage_members']['next_page'] = @$_REQUEST['pg'] + 1;
   $settings['manage_members']['prev_page'] = @$_REQUEST['pg'] - 1;
+  
+  // Get GET data
+  if (@$_REQUEST['pg'])
+    $settings['manage_members']['page_get'] = '&pg='.@$_REQUEST['pg'];
+  else
+    $settings['manage_members']['page_get'] = '';
+  if (@$_REQUEST['sort'])
+    $settings['manage_members']['sort_get'] = '&sort='.@$_REQUEST['sort'];
+  else
+    $settings['manage_members']['sort_get'] = '';
   
   // Check if there are any members on the page
   if ($settings['manage_members_per_page'] * @$_REQUEST['pg'] <= mysql_num_rows($member_rows) && @$_REQUEST['pg'] >= 0)

@@ -211,6 +211,7 @@ $l['managemembers_id'] = 'ID';
 $l['managemembers_screen_name'] = 'Screen Name';
 $l['managemembers_group'] = 'Group';
 $l['managemembers_join_date'] = 'Join Date';
+$l['managemembers_moderate'] = 'Moderate';
 
 // ManageForum.template.php
 $l['manageforum_title'] = 'Manage Forum';
