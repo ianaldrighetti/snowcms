@@ -2,7 +2,7 @@
 
 function Main() {
 global $l, $db_prefix, $settings, $cmsurl, $theme_url;
-  echo '<h1>'.$l['managemembers_title'].'</h1>';
+  echo '<h2>'.$l['managemembers_title'].'</h2>';
   
   $page = $settings['manage_members']['page'];
   $member_rows = $settings['manage_members']['member_rows'];
@@ -61,7 +61,7 @@ function NoMembers() {
 global $l;
   
   echo '
-        <h1>'.$l['managemembers_title'].'</h1>
+        <h2>'.$l['managemembers_title'].'</h2>
         
         <p>'.$l['managemembers_showing_none'].'</p>
         ';
@@ -74,7 +74,7 @@ global $l, $settings, $cmsurl;
   $last_login = $settings['managemembers']['member']['last_login'] ? date($settings['timeformat'],$settings['managemembers']['member']['last_login']) : 'Never';
   
   echo '
-        <h1>'.$settings['page']['title'].'</h1>
+        <h2>'.$settings['page']['title'].'</h2>
         
         <form action="'.$cmsurl.'index.php?action=admin&sa=members&u='.$_REQUEST['u'].'" method="post" style="display: inline">
         
