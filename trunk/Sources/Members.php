@@ -29,9 +29,9 @@ global $cmsurl, $db_prefix, $l, $settings, $user;
     }
     else {
       // A Super Sub Action :D!
-      if($_REQUEST['ssa']=='ua') {
-        // Okay, list all unactivated accounts...
-        loadUA();
+      switch ($_REQUEST['ssa']) {
+        case 'ua': loadUA(); break; // Okay, list all unactivated accounts...
+        case 'process-moderate': processModeration(); break; // An admin/mod wants to change someone's member data
       }
     }
   }
@@ -137,5 +137,28 @@ global $l, $settings, $db_prefix;
   
   if ($loadTheme == 2)
     loadTheme('ManageMembers','Profile');
+}
+
+function processModeration() {
+global $db_prefix, $user;
+  
+  // Note: Error handling needs work
+  if (!@$_REQUEST['u'])
+    die("Hacking Attempt...");
+  if (!@$_REQUEST['username'])
+    die("No username");
+  if (!@$_REQUEST['email'])
+    die("No email address");
+  if (!@$_REQUEST['group'])
+    die("Invalid group");
+  if ($_REQUEST['u'] == $user['id'] && $_REQUEST['username'] != $user['name']) // Note: Display names mess this up
+    die("You can't edit your own username"); // Because of a glitch it would cause in sessions
+  
+  // Note: If own group is edited glitches could occur
+  
+  // Update member's data
+  sql_query("UPDATE {$db_prefix}members SET `username` = '{$_REQUEST['username']}', `display_name` = '".$_REQUEST['display_name']."', `email` = '{$_REQUEST['email']}', `group` = '{$_REQUEST['group']}', `signature` = '".$_REQUEST['signature']."' WHERE `id` = '{$_REQUEST['u']}'") or die(mysql_error());
+  
+  loadProf();
 }
 ?>

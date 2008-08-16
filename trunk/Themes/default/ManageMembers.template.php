@@ -78,7 +78,15 @@ global $l, $settings, $cmsurl;
         
         <form action="'.$cmsurl.'index.php" method="post" style="display: inline">
         
+        <p>
+        <input type="hidden" name="action" value="admin" />
+        <input type="hidden" name="sa" value="members" />
+        <input type="hidden" name="ssa" value="process-moderate" />
+        <input type="hidden" name="u" value="'.$settings['managemembers']['member']['id'].'" />
+        </p>
+        
         <table style="width: 100%" class="padding">
+        <tr><th style="text-align: left; width: 30%">'.$l['managemembers_moderate_id'].':</th><td>'.$settings['managemembers']['member']['id'].'</td></tr>
         <tr><th style="text-align: left; width: 30%">'.$l['managemembers_moderate_username'].':</th><td><input name="username" value="'.$settings['managemembers']['member']['username'].'" /></td></tr>
         <tr><th style="text-align: left">'.$l['managemembers_moderate_display_name'].':</th><td><input name="display_name" value="'.$settings['managemembers']['member']['display_name'].'" /></td></tr>
         <tr><th style="text-align: left">'.$l['managemembers_moderate_email'].':</th><td><input name="email" value="'.$settings['managemembers']['member']['email'].'" /></td></tr>

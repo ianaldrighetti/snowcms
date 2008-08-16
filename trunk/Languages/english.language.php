@@ -213,6 +213,7 @@ $l['managemembers_group'] = 'Group';
 $l['managemembers_join_date'] = 'Join Date';
 $l['managemembers_moderate_button'] = 'Moderate';
 $l['managemembers_moderate_title'] = 'Moderate %name%';
+$l['managemembers_moderate_id'] = 'ID';
 $l['managemembers_moderate_username'] = 'Username';
 $l['managemembers_moderate_display_name'] = 'Display Name';
 $l['managemembers_moderate_email'] = 'Email Address';
