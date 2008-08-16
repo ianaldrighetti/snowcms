@@ -68,12 +68,85 @@ global $cmsurl, $db_prefix, $l, $settings, $user;
   // Manage the Categories! :O
   if($_REQUEST['do']=="add") {
     // Adding a category
+    // Load up a list of pre-existing boards, so we can let them say, I want it before {Cat} or After {Cat}
+    $result = sql_query("
+      SELECT
+        c.cid, c.corder, c.cname
+      FROM {$db_prefix}categories AS c
+      ORDER BY c.corder ASC");
+    $cats = array();
+    while($row = mysql_fetch_assoc($result)) {
+      $cats[] = array(
+        'id' => $row['cid'],
+        'order' => $row['corder'],
+        'name' => $row['cname']
+      );
+    }
+    mysql_free_result($result);
+    $settings['cats'] = $cats;
+    unset($cats);
+    // Hmmm, I feel like I need more stuff to code, but what?
+    $settings['page']['title'] = $l['managecats_add_title'];
+    loadTheme('ManageForum','AddCat');
   }
   elseif($_REQUEST['do']=="edit") {
     // Editing an already existing category
+    $cat_id = (int)$_REQUEST['id'];
+    $result = sql_query("
+      SELECT
+        c.cid, c.corder, c.cname
+      FROM {$db_prefix}categories AS c
+      WHERE c.cid = $cat_id");
+    if(mysql_num_rows($result)) {
+      // Dang, it exists... P:
+      $row = mysql_fetch_assoc($result);
+      $settings['cat']['id'] = $row['cid'];
+      $settings['cat']['order'] = $row['corder'];
+      $settings['cat']['name'] = $row['cname'];
+
+      // We need to load a list of categories for this too...
+      $result = sql_query("
+        SELECT
+          c.cid, c.corder, c.cname
+        FROM {$db_prefix}categories AS c
+        WHERE c.cid != $cat_id
+        ORDER BY c.corder ASC");
+      $cats = array();
+      while($row = mysql_fetch_assoc($result)) {
+        $cats[] = array(
+          'id' => $row['cid'],
+          'order' => $row['corder'],
+          'name' => $row['cname']
+        );
+      }
+      $settings['cats'] = $cats;
+      unset($cats);
+      $settings['page']['title'] = $l['managecats_edit_title'];
+      loadTheme('ManageForum','EditCat');
+    }
+    else {
+      // That Category doesn't exist! :O!
+      $settings['page']['title'] = $l['managecats_edit_title'];
+      loadTheme('ManageForum','NoCat');
+    }
   }
   else {
     // Show a list of categories...
+    $result = sql_query("
+      SELECT
+        c.cid, c.corder, c.cname
+      FROM {$db_prefix}categories AS c
+      ORDER BY c.corder ASC");
+    $cats = array();
+    while($row = mysql_fetch_assoc($result)) {
+      $cats[] = array(
+        'id' => $row['cid'],
+        'order' => $row['corder'],
+        'name' => $row['name']
+      );
+    }
+    $settings['page']['title'] = $l['managecats_title'];
+    loadTheme('ManageForum','ManageCats');
   }
 }
 ?>
