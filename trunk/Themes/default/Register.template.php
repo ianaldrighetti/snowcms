@@ -10,9 +10,13 @@ global $cmsurl, $settings, $l, $user;
   <h1>'.$l['register_header'].'</h1>
   <p>'.$l['register_details'].'</p>
   <script type="text/javascript" src="includes/jquery.js"></script>
-  <script type="text/javascript" src="includes/jquery-pstrength.js"></script>
+  <script type="text/javascript" src="includes/jquery-pstrength.js"></script>'
+  /*
   <script type="text/javascript">$(function() {$('.password.').pstrength();});</script>
-  <form action="'.$cmsurl.'index.php?action=register2" method="post">
+  
+  This causes a notice to appear.
+  */ .
+  '<form action="'.$cmsurl.'index.php?action=register2" method="post">
     <fieldset>
       <table>';
       if(count($settings['page']['error'])>0) {
