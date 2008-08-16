@@ -26,7 +26,7 @@ global $cmsurl, $db_prefix, $l, $settings, $user;
 function Login2() {
 global $cmsurl, $db_prefix, $l, $settings, $user;
   // Get and sanitize the username and encrypt the password
-  $username = @clean(strtolower($_REQUEST['username']));
+  $username = @clean($_REQUEST['username']);
   $password = @md5($_REQUEST['password']);
   if((!empty($username)) && (!empty($password))) {
     $result = sql_query("SELECT * FROM {$db_prefix}members WHERE `username` = '{$username}' AND `password` = '{$password}'");
@@ -35,12 +35,14 @@ global $cmsurl, $db_prefix, $l, $settings, $user;
         // We need their user ID
         $id = $row['id'];
       }
-      // Did they check Remember Me? If so, set cookies :) Mmmmm, the good kind too, like Chocolate Chip, but not Oatmeal! Ewww!
-      if(!empty($_REQUEST['remember_me'])) {
-        setcookie("username", $_REQUEST['username'], time()+($settings['remember_time']*60));
-        setcookie("password", md5($_REQUEST['password']), time()+($settings['remember_time']*60));
-        setcookie("uid", $id, time()+($settings['remember_time']*60));
-      }
+      // Set cookies :) Mmmmm, the good kind too, like Chocolate Chip, but not Oatmeal! Ewww!
+      $login_length = (int)$_REQUEST['login_length'];
+      if($login_length==0)
+        $login_length = $settings['remember_time']*60;
+      setcookie("username", $_REQUEST['username'], time()+$login_length);
+      setcookie("password", md5($_REQUEST['password']), time()+$login_length);
+      setcookie("uid", $id, time()+$login_length);
+      
       // Set the Session variables, like ID and Pass, enables them to be validated
       // Its more secure to authenticate them on each page load, or at least we think so :P
       $_SESSION['id'] = $id;
