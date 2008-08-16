@@ -20,6 +20,18 @@ global $cmsurl, $settings, $l, $user;
     if($info['type']=='text') {
       $field = '<input name="'.$setting.'" type="text" value="'.$settings[$setting].'"/>';
     }
+    elseif ($info['type'] == 'select') {
+      $field = "\n".'          <select name="'.$setting.'">'."\n";
+      $i = 0;
+      while ($i < count($info['values'])) {
+       if ($settings[$setting] != $i)
+         $field .= '            <option value="'.$i.'">'.$info['values'][$i].'</option>'."\n";
+       else
+         $field .= '            <option value="'.$i.'" selected="selected">'.$info['values'][$i].'</option>'."\n";
+       $i += 1;
+      }
+      $field .= '          </select>'."\n".'        ';
+    }
     echo '
       <tr>
         <td>'.$l['basicsettings_'.$setting].'</td><td>'.$field.'</td>

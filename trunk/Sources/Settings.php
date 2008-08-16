@@ -27,6 +27,15 @@ global $cmsurl, $db_prefix, $l, $settings, $user;
         array(
           'type' => 'text'
         ),
+      'account_activation' =>
+        array(
+          'type' => 'select',
+          'values' => array(
+                        $l['basicsettings_value_no_activation'],
+                        $l['basicsettings_value_email_activation'],
+                        $l['basicsettings_value_admin_activation']
+                      )
+        ),
       'login_threshold' =>
         array(
           'type' => 'text'
