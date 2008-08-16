@@ -109,7 +109,7 @@ global $db_prefix, $settings;
     $settings['manage_members']['sort_get'] = '';
   
   // Check if there are any members on the page
-  if ($settings['manage_members_per_page'] * @$_REQUEST['pg'] <= mysql_num_rows($member_rows) && @$_REQUEST['pg'] >= 0)
+  if ($settings['manage_members_per_page'] * @$_REQUEST['pg'] < mysql_num_rows($member_rows) && @$_REQUEST['pg'] >= 0)
     loadTheme('ManageMembers');
   else
     loadTheme('ManageMembers','NoMembers');
