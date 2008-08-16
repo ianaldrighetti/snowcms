@@ -42,7 +42,7 @@ $l['activate_no_such_user'] = 'That username doesn\'t exist';
 $l['activate_header'] = 'Account Activation';
 $l['activate_desc'] = 'Here you can activate your account by entering your username and activation code';
 $l['activate_button'] = 'Activate Account';
-$l['activate_account_activated'] = 'Your account has been successfully activated! You may now <a href="', $cmsurl, 'index.php?action=login">login</a>.';
+$l['activate_account_activated'] = 'Your account has been successfully activated! You may now <a href="'. $cmsurl. 'index.php?action=login">login</a>.';
 
 // Error Stuff for Register.template.php
 $l['register_error_user_taken'] = 'That username is already in use.';
