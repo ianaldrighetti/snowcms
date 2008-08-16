@@ -32,6 +32,10 @@ global $cmsurl, $db_prefix, $l, $settings, $user;
       switch ($_REQUEST['ssa']) {
         case 'ua': loadUA(); break; // Okay, list all unactivated accounts...
         case 'process-moderate': processModeration(); break; // An admin/mod wants to change someone's member data
+        case 'unsuspend': suspend(); break; // An admin/mod wants to unsuspend a member
+        case 'suspend': suspend(); break; // An admin/mod wants to suspend a member
+        case 'ban': ban(); break; // An admin/mod wants to ban a member
+        case 'unban': unban(); break; // An admin/mod wants to unban a member
       }
     }
   }
@@ -124,7 +128,7 @@ global $l, $settings, $db_prefix;
   $result = sql_query("SELECT * FROM {$db_prefix}members LEFT JOIN {$db_prefix}membergroups ON `group` = `group_id` WHERE id = ".@$_REQUEST['u']) or die(mysql_error());
   if (mysql_num_rows($result))
     if ($row = mysql_fetch_assoc($result)) {
-      $settings['page']['title'] = str_replace("%name%",$row['username'],$l['managemembers_moderate_title']);
+      $settings['page']['title'] = str_replace("%name%",$row['display_name'] ? $row['display_name'] : $row['username'],$l['managemembers_moderate_title']);
       $settings['managemembers']['member'] = $row;
       $loadTheme += 1;
     }
@@ -145,19 +149,74 @@ global $db_prefix, $user;
   // Note: Error handling needs work
   if (!@$_REQUEST['u'])
     die("Hacking Attempt...");
-  if (!@$_REQUEST['username'])
+  if (!@$_REQUEST['user_name'])
     die("No username");
   if (!@$_REQUEST['email'])
     die("No email address");
   if (!@$_REQUEST['group'])
     die("Invalid group");
-  if ($_REQUEST['u'] == $user['id'] && $_REQUEST['username'] != $user['name']) // Note: Display names mess this up
-    die("You can't edit your own username"); // Because of a glitch it would cause in sessions
   
   // Note: If own group is edited glitches could occur
   
+  // Check if someone else is using that username or display name
+  $result = sql_query("SELECT * FROM {$db_prefix}members") or die(mysql_error());
+  if (mysql_num_rows($result))
+    while ($row = mysql_fetch_assoc($result)) {
+      if ($_REQUEST['u'] != $_REQUEST['uid'] && ($_REQUEST['user_name'] == $row['username'] || $_REQUEST['user_name'] == $row['display_name']))
+        die("That username is already in use");
+      if ($_REQUEST['u'] != $_REQUEST['uid'] && $_REQUEST['display_name'] != '' && ($_REQUEST['display_name'] == $row['username'] || $_REQUEST['display_name'] == $row['display_name']))
+        die("That display name is already in use");
+    }
+  
   // Update member's data
-  sql_query("UPDATE {$db_prefix}members SET `username` = '{$_REQUEST['username']}', `display_name` = '".$_REQUEST['display_name']."', `email` = '{$_REQUEST['email']}', `group` = '{$_REQUEST['group']}', `signature` = '".$_REQUEST['signature']."' WHERE `id` = '{$_REQUEST['u']}'") or die(mysql_error());
+  sql_query("UPDATE {$db_prefix}members SET `username` = '{$_REQUEST['user_name']}', `display_name` = '".$_REQUEST['display_name']."', `email` = '{$_REQUEST['email']}', `group` = '{$_REQUEST['group']}', `signature` = '".$_REQUEST['signature']."' WHERE `id` = '{$_REQUEST['u']}'") or die(mysql_error());
+  
+  if ($_REQUEST['u'] == $_REQUEST['uid'])
+    setcookie('username',$_REQUEST['user_name']);
+  
+  loadProf();
+}
+
+function suspend() {
+global $db_prefix;
+  
+  if (!@$_REQUEST['u'])
+    die("Hacking Attempt...");
+  
+  sql_query("UPDATE {$db_prefix}members SET `suspension` = '" . (time()+@$_REQUEST['suspension']*60) . "' WHERE `id` = '{$_REQUEST['u']}'") or die(mysql_error());
+  
+  loadProf();
+}
+
+function unsuspend() {
+global $db_prefix;
+  
+  if (!@$_REQUEST['u'])
+    die("Hacking Attempt...");
+  
+  sql_query("UPDATE {$db_prefix}members SET `suspension` = '0' WHERE `id` = '{$_REQUEST['u']}'") or die(mysql_error());
+  
+  loadProf();
+}
+
+function ban() {
+global $db_prefix;
+  
+  if (!@$_REQUEST['u'])
+    die("Hacking Attempt...");
+  
+  sql_query("UPDATE {$db_prefix}members SET `banned` = '1' WHERE `id` = '{$_REQUEST['u']}'") or die(mysql_error());
+  
+  loadProf();
+}
+
+function unban() {
+global $db_prefix;
+  
+  if (!@$_REQUEST['u'])
+    die("Hacking Attempt...");
+  
+  sql_query("UPDATE {$db_prefix}members SET `banned` = '0' WHERE `id` = '{$_REQUEST['u']}'") or die(mysql_error());
   
   loadProf();
 }

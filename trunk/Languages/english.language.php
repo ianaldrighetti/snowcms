@@ -229,6 +229,9 @@ $l['managemembers_moderate_change'] = 'Change Details';
 $l['managemembers_moderate_profile'] = 'View Profile';
 $l['managemembers_moderate_suspend'] = '%button% for %input% hour(s)';
 $l['managemembers_moderate_suspend_button'] = 'Suspend';
+$l['managemembers_moderate_unsuspend_button'] = 'Remove Suspension';
+$l['managemembers_moderate_renew_suspension'] = '%renew% for %input% hour(s) or %remove%';
+$l['managemembers_moderate_renew_suspension_button'] = 'Renew Suspension';
 $l['managemembers_moderate_ban'] = 'Ban Permanently';
 $l['managemembers_moderate_unban'] = 'Remove Ban';
 
