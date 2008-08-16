@@ -17,7 +17,6 @@ if(!defined("Snow"))
 function ManageMembers() {
 global $cmsurl, $db_prefix, $l, $settings, $user;
   if(can('manage_members')) {
-    $settings['page']['title'] = $l['managemembers_title'];
     // So they can, yippe for you! :P
     // Are they just viewing the list, or managing a member, or something else perhaps?
     if((empty($_REQUEST['u'])) && (empty($_REQUEST['ssa']))) {
@@ -44,10 +43,12 @@ global $cmsurl, $db_prefix, $l, $settings, $user;
 }
 
 function loadMlist() {
-global $db_prefix, $settings;
+global $l, $settings, $db_prefix;
+  
+  $settings['page']['title'] = $l['managemembers_title'];
   
   $settings['manage_members']['id_desc'] = '';
-  $settings['manage_members']['screenname_desc'] = '';
+  $settings['manage_members']['username_desc'] = '';
   $settings['manage_members']['group_desc'] = '';
   $settings['manage_members']['joindate_desc'] = '';
   
@@ -59,11 +60,11 @@ global $db_prefix, $settings;
     case 'id_desc':
       $sort = 'ORDER BY `id` DESC, `reg_date`';
       break;
-    case 'screenname':
+    case 'username':
       $sort = 'ORDER BY `username`, `reg_date`';
-      $settings['manage_members']['screenname_desc'] = '_desc';
+      $settings['manage_members']['username_desc'] = '_desc';
       break;
-    case 'screenname_desc':
+    case 'username_desc':
       $sort = 'ORDER BY `username` DESC, `reg_date`';
       break;
     case 'group':
@@ -113,5 +114,28 @@ global $db_prefix, $settings;
     loadTheme('ManageMembers');
   else
     loadTheme('ManageMembers','NoMembers');
+}
+
+function loadProf() {
+global $l, $settings, $db_prefix;
+  
+  $loadTheme = 0;
+  
+  $result = sql_query("SELECT * FROM {$db_prefix}members LEFT JOIN {$db_prefix}membergroups ON `group` = `group_id` WHERE id = ".@$_REQUEST['u']) or die(mysql_error());
+  if (mysql_num_rows($result))
+    if ($row = mysql_fetch_assoc($result)) {
+      $settings['page']['title'] = str_replace("%name%",$row['username'],$l['managemembers_moderate_title']);
+      $settings['managemembers']['member'] = $row;
+      $loadTheme += 1;
+    }
+  
+  $result = sql_query("SELECT * FROM {$db_prefix}membergroups") or die(mysql_error());
+  if (mysql_num_rows($result)) {
+    $settings['managemembers']['groups'] = $result;
+    $loadTheme += 1;
+  }
+  
+  if ($loadTheme == 2)
+    loadTheme('ManageMembers','Profile');
 }
 ?>

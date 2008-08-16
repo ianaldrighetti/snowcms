@@ -143,3 +143,6 @@ a.headerlink {
   padding: 2px;
   margin: 0px;
 }
+.padding th, .padding td {
+  padding-bottom: 5px;
+}
