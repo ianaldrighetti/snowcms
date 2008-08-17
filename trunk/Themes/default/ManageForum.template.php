@@ -19,55 +19,26 @@ global $cmsurl, $db_prefix, $l, $settings, $user;
   </div>';
 }
 
-function AddCat() {
-global $cmsurl, $db_prefix, $l, $settings, $user;
-  echo ' 
-  <h2>', $l['managecats_add_header'], '</h2>
-  <br />
-  <form action="', $cmsurl, 'index.php?action=admin&sa=forum&fa=categories" method="post">
-    <fieldset>
-      <table>
-        <tr>
-          <td>Category Name:</td><td><input name="cat_name" type="text" value="', $settings['cat_name'], '"/></td>
-        </tr>
-        <tr>
-          <td>Category Position:</td><td><select name="placement">
-                                           <option value="0">Before...</option>
-                                           <option value="1">After...</option>
-                                         </select>
-                                         <select name="category">';
-                                         if(count($settings['cats'])) {
-                                           foreach($settings['cats'] as $cat) {
-                                             echo '<option value="', $cat['id'], '">', $cat['name'], '</option>';
-                                           }
-                                         }
-                                         echo '
-                                         </select>
-                                     </td>
-        </tr>
-        <tr>
-          <td></td><td><input name="add_cat" type="submit" value="Add Category"/></td>
-        </tr>
-      </table>
-    </fieldset>
-  </form>';
-}
-
 function ShowCats() {
 global $cmsurl, $db_prefix, $l, $settings, $user;
-  echo '<h2>Manage Categories</h2>
-        <p>Here you can edit, delete and create categories</p>
-        <table id="mc">
+  echo '<h2>', $l['managecats_header'], '</h2>
+        <p>', $l['managecats_desc'], '</p>
+        <form action="" method="post">
+        <table width="100%" id="mc">
           <tr>
-            <td>Category Name</td><td>Order</td><td>Delete</td>
+            <td width="80%">', $l['mc_tr_cn'], '</td><td width="10%">', $l['mc_tr_order'], '</td><td width="9%">', $l['mc_tr_del'], '</td>
           </tr>';
         foreach($settings['cats'] as $cat) {
           echo '
           <tr>
-            <td><input name="cat_name[', $cat['id'], ']" type="text" class="name" value="', $cat['name'], '"/></td><td><input name="cat_order[', $cat['id'], ']" type="text" class="order" value="', $cat['order'], '"/></td><td></td>
+            <td><input name="cat_name[', $cat['id'], ']" type="text" class="name" value="', $cat['name'], '"/></td><td><input name="cat_order[', $cat['id'], ']" type="text" class="order" value="', $cat['order'], '"/></td><td class="delete"><a href="', $cmsurl, 'index.php?action=admin&sa=forum&fa=categories&delete=', $cat['id'], '" onClick="return confirm(\'', $l['managecats_are_you_sure'], '\');">X</td>
           </tr>';
         }
         echo '
-        </table>';
+          <tr>
+            <td></td><td><input name="update_cats" type="submit" value="', $l['managecats_update'], '"/></td><td></td>
+          </tr>
+        </table>
+        </form>';
 }
 ?>
