@@ -133,7 +133,17 @@ global $cmsurl, $db_prefix, $l, $settings, $user;
   }
   else {
     // Process stuff, like updating or adding categories! =o
-echo '<pre>'; print_r($_POST); echo '</pre>';
+    if(!empty($_REQUEST['update_cats'])) {  
+      $rows = array();
+      foreach($_POST['cat_name'] as $cat_id => $name) {
+        $cat_id = (int)$cat_id;
+        $name = clean($name);
+        $corder = (int)$_POST['cat_order'][$cat_id];
+        $rows[] = "('$cat_id','$corder','$name')";
+      }
+      $updated = implode(",", $rows);
+      sql_query("REPLACE INTO {$db_prefix}categories (`cid`,`corder`,`cname`) VALUES{$updated}");
+    }
     // Show a list of categories...
     $result = sql_query("
       SELECT
