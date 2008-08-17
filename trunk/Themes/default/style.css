@@ -161,11 +161,11 @@ a.headerlink {
 /* Manage Categories */
 #mc .order {
   border: 1px solid #dddddd;
-  width: 8%;
+  width: 90%;
 }
 #mc .name {
   border: 1px solid #dddddd;
-  width: 80%;
+  width: 98%;
 }
 #mc .delete {
   text-align: center;
