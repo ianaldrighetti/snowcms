@@ -260,10 +260,11 @@ $l['mf_link_cats'] = 'Manage Categories';
 $l['mf_link_cats_desc'] = 'Create, Edit, and Delete forum categories';
 $l['mf_link_boards'] = 'Manage Boards';
 $l['mf_link_boards_desc'] = 'You can create, edit and delete your boards in your forum here';
-// AddCat();
-$l['managecats_add_title'] = 'Add Category';
+$l['managecats_title'] = 'Manage Categories';
+
 $l['mf_new_category'] = 'New Category';
 $l['managecats_add_header'] = 'Add Category';
+$l['managecats_addbutton'] = 'Add Category';
 $l['managecats_header'] = 'Manage Categories';
 $l['managecats_desc'] = 'Here you can edit, delete and create categories';
 $l['mc_tr_cn'] = 'Category Name';
@@ -271,10 +272,8 @@ $l['mc_tr_order'] = 'Order';
 $l['mc_tr_del'] = 'Delete';
 $l['managecats_update'] = 'Update';
 $l['managecats_are_you_sure'] = 'Are you sure you want to delete this Category?';
-
-// ShowCats();
-$l['managecats_title'] = 'Manage Categories';
-
+$l['managecats_catname'] = 'Category Name:';
+$l['managecats_order'] = 'Order:';
 
 // Post.template.php
 $l['forum_startnew'] = 'Post New Topic';

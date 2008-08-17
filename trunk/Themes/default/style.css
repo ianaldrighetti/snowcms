@@ -173,3 +173,15 @@ a.headerlink {
 #mc .delete a {
   color: #CC0000;
 }
+#add_cat {
+  width: 100%;
+}
+#add_cat .add_header {
+  font-size: 14px;
+}
+#add_cat .cat_name {
+  border: 1px solid #dddddd;
+}
+#add_cat .order {
+  border: 1px solid #dddddd;
+}
