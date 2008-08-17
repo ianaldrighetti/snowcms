@@ -34,20 +34,26 @@ global $l, $db_prefix, $settings, $cmsurl, $theme_url;
         ';
     
     // Show next and previous page links
-    if ($total_members > $page_end)
-      echo '<br />
-        <br />
-        <p style="float: right"><a href="'.$cmsurl.'index.php?action=admin&sa=members&pg='.$next_page.$settings['manage_members']['filter_get'].$settings['manage_members']['sort_get'].'">'.$l['managemembers_next_page'].'</a></p>
+    if ($prev_page > 0)
+      echo '<table width="100%">
+        <tr><td><a href="'.$cmsurl.'index.php?action=admin&sa=members&pg='.$prev_page.$settings['manage_members']['filter_get'].$settings['manage_members']['sort_get'].'">'.$l['managemembers_previous_page'].'</a></td>
+        ';
+    elseif ($prev_page == 0)
+      echo '<table width="100%">
+        <tr><td><a href="'.$cmsurl.'index.php?action=admin&sa=members'.$settings['manage_members']['filter_get'].$settings['manage_members']['sort_get'].'">'.$l['managemembers_previous_page'].'</a></td>
         ';
     else
-      echo '<p style="float: right">&nbsp;</p>
-      <br />
-      <br />
-      ';
-    if ($prev_page > 0)
-      echo '<p><a href="'.$cmsurl.'index.php?action=admin&sa=members&pg='.$prev_page.$settings['manage_members']['filter_get'].$settings['manage_members']['sort_get'].'">'.$l['managemembers_previous_page'].'</a></p>';
-    elseif ($prev_page == 0)
-      echo '<p><a href="'.$cmsurl.'index.php?action=admin&sa=members'.$settings['manage_members']['filter_get'].$settings['manage_members']['sort_get'].'">'.$l['managemembers_previous_page'].'</a></p>';
+      echo '<table width="100%">
+        <tr><td></td>
+        ';
+    if ($total_members > $page_end)
+      echo '<td style="text-align: right"><a href="'.$cmsurl.'index.php?action=admin&sa=members&pg='.$next_page.$settings['manage_members']['filter_get'].$settings['manage_members']['sort_get'].'">'.$l['managemembers_next_page'].'</a></td></tr>
+        </table>
+        ';
+    else
+      echo '<td style="text-align: right"></td></tr>
+        </table>
+        ';
     
     // Show members
     echo '<table style="width: 100%; text-align: center">
@@ -60,22 +66,25 @@ global $l, $db_prefix, $settings, $cmsurl, $theme_url;
     echo '</table>';
     
     // Show next and previous page links
-    if ($total_members > $page_end)
-      echo '<p style="float: right"><a href="'.$cmsurl.'index.php?action=admin&sa=members&pg='.$next_page.$settings['manage_members']['filter_get'].$settings['manage_members']['sort_get'].'">'.$l['managemembers_next_page'].'</a></p>
+    if ($prev_page > 0)
+      echo '<table width="100%">
+        <tr><td><a href="'.$cmsurl.'index.php?action=admin&sa=members&pg='.$prev_page.$settings['manage_members']['filter_get'].$settings['manage_members']['sort_get'].'">'.$l['managemembers_previous_page'].'</a></td>
+        ';
+    elseif ($prev_page == 0)
+      echo '<table width="100%">
+        <tr><td><a href="'.$cmsurl.'index.php?action=admin&sa=members'.$settings['manage_members']['filter_get'].$settings['manage_members']['sort_get'].'">'.$l['managemembers_previous_page'].'</a></td>
         ';
     else
-      echo '<p style="float: right">&nbsp;</p>';
-    if ($prev_page > 0)
-      echo '<p><a href="'.$cmsurl.'index.php?action=admin&sa=members&pg='.$prev_page.$settings['manage_members']['filter_get'].$settings['manage_members']['sort_get'].'">'.$l['managemembers_previous_page'].'</a></p>
-        <br />';
-    elseif ($prev_page == 0)
-      echo '<p><a href="'.$cmsurl.'index.php?action=admin&sa=members'.$settings['manage_members']['filter_get'].$settings['manage_members']['sort_get'].'">'.$l['managemembers_previous_page'].'</a></p>
-        <br />';
-    elseif ($total_members > $page_end)
-      echo '<p>&nbsp;</p>
-        <br />';
+      echo '<table width="100%">
+        <tr><td></td>
+        ';
+    if ($total_members > $page_end)
+      echo '<td style="text-align: right"><a href="'.$cmsurl.'index.php?action=admin&sa=members&pg='.$next_page.$settings['manage_members']['filter_get'].$settings['manage_members']['sort_get'].'">'.$l['managemembers_next_page'].'</a></td></tr>
+        </table>
+        ';
     else
-      echo '<br />
+      echo '<td style="text-align: right"></td></tr>
+        </table>
         ';
     
     // Show filter
