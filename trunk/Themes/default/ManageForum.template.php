@@ -31,7 +31,7 @@ global $cmsurl, $db_prefix, $l, $settings, $user;
         foreach($settings['cats'] as $cat) {
           echo '
           <tr>
-            <td><input name="cat_name[', $cat['id'], ']" type="text" class="name" value="', $cat['name'], '"/></td><td><input name="cat_order[', $cat['id'], ']" type="text" class="order" value="', $cat['order'], '"/></td><td class="delete"><a href="', $cmsurl, 'index.php?action=admin&sa=forum&fa=categories&delete=', $cat['id'], '" onClick="return confirm(\'', $l['managecats_are_you_sure'], '\');">X</td>
+            <td><input name="cat_name[', $cat['id'], ']" type="text" class="name" value="', $cat['name'], '"/></td><td><input name="cat_order[', $cat['id'], ']" type="text" class="order" value="', $cat['order'], '"/></td><td class="delete"><a href="', $cmsurl, 'index.php?action=admin&sa=forum&fa=categories&delete=', $cat['id'], '&sc=', $user['sc'], '" onClick="return confirm(\'', $l['managecats_are_you_sure'], '\');">X</td>
           </tr>';
         }
         echo '

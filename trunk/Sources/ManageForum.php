@@ -66,101 +66,38 @@ global $cmsurl, $db_prefix, $l, $settings, $user;
 function ManageCats() {
 global $cmsurl, $db_prefix, $l, $settings, $user;
   // Manage the Categories! :O
-  if(@$_REQUEST['do']=="add") {
-    // Adding a category
-    // Load up a list of pre-existing boards, so we can let them say, I want it before {Cat} or After {Cat}
-    $result = sql_query("
-      SELECT
-        c.cid, c.corder, c.cname
-      FROM {$db_prefix}categories AS c
-      ORDER BY c.corder ASC");
-    $cats = array();
-    while($row = mysql_fetch_assoc($result)) {
-      $cats[] = array(
-        'id' => $row['cid'],
-        'order' => $row['corder'],
-        'name' => $row['cname']
-      );
+  // Process stuff, like updating or adding categories! =o
+  if(!empty($_REQUEST['update_cats'])) {  
+    $rows = array();
+    foreach($_POST['cat_name'] as $cat_id => $name) {
+      $cat_id = (int)$cat_id;
+      $name = clean($name);
+      $corder = (int)$_POST['cat_order'][$cat_id];
+      $rows[] = "('$cat_id','$corder','$name')";
     }
-    mysql_free_result($result);
-    $settings['cats'] = $cats;
-    $settings['cat_name'] = @$_REQUEST['cat_name'] ? clean($_REQUEST['cat_name']) : $l['mf_new_category'];
-    unset($cats);
-    // Hmmm, I feel like I need more stuff to code, but what?
-    $settings['page']['title'] = $l['managecats_add_title'];
-    loadTheme('ManageForum','AddCat');
+    $updated = implode(",", $rows);
+    sql_query("REPLACE INTO {$db_prefix}categories (`cid`,`corder`,`cname`) VALUES{$updated}");
   }
-  elseif(@$_REQUEST['do']=="edit") {
-    // Editing an already existing category
-    $cat_id = (int)$_REQUEST['id'];
-    $result = sql_query("
-      SELECT
-        c.cid, c.corder, c.cname
-      FROM {$db_prefix}categories AS c
-      WHERE c.cid = $cat_id");
-    if(mysql_num_rows($result)) {
-      // Dang, it exists... P:
-      $row = mysql_fetch_assoc($result);
-      $settings['cat']['id'] = $row['cid'];
-      $settings['cat']['order'] = $row['corder'];
-      $settings['cat']['name'] = $row['cname'];
-
-      // We need to load a list of categories for this too...
-      $result = sql_query("
-        SELECT
-          c.cid, c.corder, c.cname
-        FROM {$db_prefix}categories AS c
-        WHERE c.cid != $cat_id
-        ORDER BY c.corder ASC");
-      $cats = array();
-      while($row = mysql_fetch_assoc($result)) {
-        $cats[] = array(
-          'id' => $row['cid'],
-          'order' => $row['corder'],
-          'name' => $row['cname']
-        );
-      }
-      $settings['cats'] = $cats;
-      unset($cats);
-      $settings['page']['title'] = $l['managecats_edit_title'];
-      loadTheme('ManageForum','EditCat');
-    }
-    else {
-      // That Category doesn't exist! :O!
-      $settings['page']['title'] = $l['managecats_edit_title'];
-      loadTheme('ManageForum','NoCat');
-    }
+  if(!empty($_REQUEST['delete']) && validateSession($_REQUEST['sc'])) {
+    $cat_id = (int)$_REQUEST['delete'];
+    sql_query("DELETE FROM {$db_prefix}categories WHERE `cid` = '$cat_id'");
   }
-  else {
-    // Process stuff, like updating or adding categories! =o
-    if(!empty($_REQUEST['update_cats'])) {  
-      $rows = array();
-      foreach($_POST['cat_name'] as $cat_id => $name) {
-        $cat_id = (int)$cat_id;
-        $name = clean($name);
-        $corder = (int)$_POST['cat_order'][$cat_id];
-        $rows[] = "('$cat_id','$corder','$name')";
-      }
-      $updated = implode(",", $rows);
-      sql_query("REPLACE INTO {$db_prefix}categories (`cid`,`corder`,`cname`) VALUES{$updated}");
-    }
-    // Show a list of categories...
-    $result = sql_query("
-      SELECT
-        c.cid, c.corder, c.cname
-      FROM {$db_prefix}categories AS c
-      ORDER BY c.corder ASC");
-    $cats = array();
-    while($row = mysql_fetch_assoc($result)) {
-      $cats[] = array(
-        'id' => $row['cid'],
-        'order' => $row['corder'],
-        'name' => $row['cname']
-      );
-    }
-    $settings['cats'] = $cats;
-    $settings['page']['title'] = $l['managecats_title'];
-    loadTheme('ManageForum','ShowCats');
+  // Show a list of categories...
+  $result = sql_query("
+    SELECT
+      c.cid, c.corder, c.cname
+    FROM {$db_prefix}categories AS c
+    ORDER BY c.corder ASC");
+  $cats = array();
+  while($row = mysql_fetch_assoc($result)) {
+    $cats[] = array(
+      'id' => $row['cid'],
+      'order' => $row['corder'],
+      'name' => $row['cname']
+    );
   }
+  $settings['cats'] = $cats;
+  $settings['page']['title'] = $l['managecats_title'];
+  loadTheme('ManageForum','ShowCats');
 }
 ?>
