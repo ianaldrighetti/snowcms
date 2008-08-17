@@ -50,8 +50,8 @@ $settings['permissions']['forum'] = array(
 function GroupPermissions() {
 global $cmsurl, $db_prefix, $l, $settings, $user;
   if(can('manage_permissions')) {
-    // Editing a Member Group already? Maybe just maybe we shoudl load that...
-    if((empty($_REQUEST['mid'])) && (empty($_REQUEST['me']))) {  
+    // Editing a Member Group already? Maybe just maybe we should load that...
+    if((empty($_REQUEST['mid'])) && (empty($_REQUEST['me']))) {
       // Hmmm, updating being done? :O
       if(!empty($_REQUEST['update_perms'])) {
         // What member group are they setting these for?
@@ -72,6 +72,11 @@ global $cmsurl, $db_prefix, $l, $settings, $user;
             }
           // Weeeee! Done!
         }
+      }
+      // Create a new group
+      if (@$_REQUEST['new_group']) {
+        $new_group = clean($_REQUEST['new_group']);
+        sql_query("INSERT INTO {$db_prefix}membergroups (`groupname`) VALUES ('$new_group')") or die(mysql_error());
       }
       // Load the list of member groups, etc
       $result = sql_query("

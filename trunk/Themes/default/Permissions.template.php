@@ -26,7 +26,14 @@ global $cmsurl, $settings, $l, $user;
     </tr>';
   }
   echo '
-  </table>'; 
+  </table>
+  
+  <form action="'.$cmsurl.'index.php?action=admin&sa=permissions" method="post">
+  <p>
+  <input name="new_group" />
+  <input type="submit" value="Create Group" />
+  </p>
+  </form>';
 }
 
 function NoGroup() {
