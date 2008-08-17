@@ -264,6 +264,7 @@ $l['mf_link_boards_desc'] = 'You can create, edit and delete your boards in your
 $l['managecats_add_title'] = 'Add Category';
 $l['mf_new_category'] = 'New Category';
 $l['managecats_add_header'] = 'Add Category';
+$l['managecats_header'] = 'Manage Categories';
 $l['managecats_desc'] = 'Here you can edit, delete and create categories';
 $l['mc_tr_cn'] = 'Category Name';
 $l['mc_tr_order'] = 'Order';

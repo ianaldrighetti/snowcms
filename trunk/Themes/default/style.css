@@ -161,8 +161,15 @@ a.headerlink {
 /* Manage Categories */
 #mc .order {
   border: 1px solid #dddddd;
-  width: 20px;
+  width: 8%;
 }
 #mc .name {
   border: 1px solid #dddddd;
+  width: 80%;
+}
+#mc .delete {
+  text-align: center;
+}
+#mc .delete a {
+  color: #CC0000;
 }
