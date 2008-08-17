@@ -325,11 +325,15 @@ function mkstring() {
   return $string;
 }
 // Formats the time with the time format in settings If timestamp is unset, get the current time
-function formattime($timestamp = 0) {
+function formattime($timestamp = 0, $timedate = 0) {
 global $settings;
   if(!$timestamp)
     $timestamp = time();
-  return date($settings['timeformat'], $timestamp);
+  switch ($timedate) {
+    case 0: return date($settings['dateformat'], $timestamp); break;
+    case 1: return date($settings['timeformat'], $timestamp); break;
+    case 2: return date($settings['timeformat'].', '.$settings['dateformat'], $timestamp); break;
+  }
 }
 
 function bbc($str) {

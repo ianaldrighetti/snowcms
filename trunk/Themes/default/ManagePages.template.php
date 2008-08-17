@@ -35,29 +35,30 @@ global $cmsurl, $settings, $l, $user;
       </div>';    
     }
   }
-  else {
-    echo '
-    <form action="" method="post">
-      <table>
-        <tr>
-          <td>'.$l['managepages_pagetitle'].'</td><td><input name="page_title" type="text" value=""/></td>
-        </tr>
-        <tr>
-          <td>&nbsp;</td><td><input name="make_page" type="submit" value="'.$l['managepages_makepage'].'"/></td>
-        </tr>
-      </table>
-    </form>';
-  }
-  if($settings['page']['num_pages']>0) {
-    echo '
+  echo '
+  <form action="" method="post">
     <table>
       <tr>
-        <td>'.$l['adminpages_title_td'].'</td><td>'.$l['adminpages_pageowner'].'</td><td>'.$l['adminpages_datemade'].'</td>
+        <td>'.$l['managepages_pagetitle'].'</td><td><input name="page_title" type="text" value=""/></td>
+      </tr>
+      <tr>
+        <td>&nbsp;</td><td><input name="make_page" type="submit" value="'.$l['managepages_makepage'].'"/></td>
+      </tr>
+    </table>
+  </form>';
+  if($settings['page']['num_pages']>0) {
+    echo '
+    <table width="100%" style="text-align: center">
+      <tr>
+        <th style="border-style: solid; border-width: 1px">'.$l['adminpages_title_td'].'</th>
+        <th style="border-style: solid; border-width: 1px">'.$l['adminpages_pageowner'].'</th>
+        <th style="border-style: solid; border-width: 1px">'.$l['adminpages_datemade'].'</th>
+        <th></th>
       </tr>';
     foreach($settings['page']['pages'] as $page) {
       echo '
       <tr>
-        <td><a href="'.$cmsurl.'index.php?action=admin&sa=editpage&page_id='.$page['page_id'].'">'.$page['title'].'</a></td><td><a href="'.$cmsurl.'index.php?action=profile&u='.$page['page_owner'].'">'.$page['owner'].'</td><td>'.$page['date'].'</td>
+        <td><a href="'.$cmsurl.'index.php?action=admin&sa=editpage&page_id='.$page['page_id'].'">'.$page['title'].'</a></td><td><a href="'.$cmsurl.'index.php?action=profile&u='.$page['page_owner'].'">'.$page['owner'].'</td><td>'.$page['date'].'</td><td><a href="'.$cmsurl.'index.php?action=admin&sa=managepages&did='.$page['page_id'].'">'.$l['managepages_delete'].'</a></td>
       </tr>';
     }
     echo '

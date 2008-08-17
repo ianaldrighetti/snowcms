@@ -55,6 +55,10 @@ global $cmsurl, $db_prefix, $l, $settings, $user;
       'timeformat' =>
         array(
           'type' => 'text'
+        ),
+      'dateformat' =>
+        array(
+          'type' => 'text'
         )
     );
     // Are we updating them?

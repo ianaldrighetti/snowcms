@@ -68,12 +68,16 @@ global $cmsurl, $db_prefix, $l, $settings, $user;
         $settings['page']['update_page'] = 2;
       }
     }
+    if (@$_REQUEST['did']) {
+      $did = clean($_REQUEST['did']);
+      sql_query("DELETE FROM {$db_prefix}pages WHERE `page_id` = '$did'") or die(mysql_error());
+    }
     // Or are we supposed to create a page?
     if(!empty($_REQUEST['make_page'])) {
       $settings['page']['make_page']['do'] = true;  
-      // Who is the Page Owner? (Ther User ID)
+      // Who is the Page Owner? (Their User ID)
       $page_owner = clean($user['id']);
-      // We save their name, just incase if their account is deleted
+      // We save their name, just incase their account is deleted
       $owner_name = clean($user['name']);
       // The Time stamp of when it was made
       $create_date = time();

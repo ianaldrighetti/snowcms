@@ -60,7 +60,7 @@ global $l, $db_prefix, $settings, $cmsurl, $theme_url;
           <tr><th style="border-style: solid; border-width: 1px; width: 11%"><a href="'.$cmsurl.'index.php?action=admin&sa=members'.$settings['manage_members']['page_get'].$settings['manage_members']['filter_get'].'&s=id'.$settings['manage_members']['id_desc'].'">'.$l['managemembers_id'].'</a></th><th style="border-style: solid; border-width: 1px; width: 29%"><a href="'.$cmsurl.'index.php?action=admin&sa=members'.$settings['manage_members']['page_get'].$settings['manage_members']['filter_get'].'&s=username'.$settings['manage_members']['username_desc'].'">'.$l['managemembers_username'].'</a></th><th style="border-style: solid; border-width: 1px; width: 28%"><a href="'.$cmsurl.'index.php?action=admin&sa=members'.$settings['manage_members']['page_get'].$settings['manage_members']['filter_get'].'&s=group'.$settings['manage_members']['group_desc'].'">'.$l['managemembers_group'].'</a></th><th style="border-style: solid; border-width: 1px; width: 29%"><a href="'.$cmsurl.'index.php?action=admin&sa=members'.$settings['manage_members']['page_get'].$settings['manage_members']['filter_get'].'&s=joindate'.$settings['manage_members']['joindate_desc'].'">'.$l['managemembers_join_date'].'</a></th><th width="6%"></th></tr>';
     $i = 0;
     while (($row = mysql_fetch_assoc($member_rows)) && $i < $page_end - ($page_start - 1)) {
-      echo '<tr><td>'.$row['id'].'</td><td><a href="'.$cmsurl.'index.php?action=profile&u='.$row['id'].'">'.($row['display_name'] ? $row['display_name'] : $row['username']).'</a></td><td>'.$row['groupname'].'</td><td>'.date($settings['timeformat'],$row['reg_date']).'</td><td><a href="'.$cmsurl.'index.php?action=admin&sa=members&u='.$row['id'].'"><img src="'.$theme_url.'/'.$settings['theme'].'/moderate.png" alt="'.$l['managemembers_moderate_button'].'" width="12" height="12" style="border: 0" /></a></td></tr>';
+      echo '<tr><td>'.$row['id'].'</td><td><a href="'.$cmsurl.'index.php?action=profile&u='.$row['id'].'">'.($row['display_name'] ? $row['display_name'] : $row['username']).'</a></td><td>'.$row['groupname'].'</td><td>'.date($settings['dateformat'],$row['reg_date']).'</td><td><a href="'.$cmsurl.'index.php?action=admin&sa=members&u='.$row['id'].'"><img src="'.$theme_url.'/'.$settings['theme'].'/moderate.png" alt="'.$l['managemembers_moderate_button'].'" width="12" height="12" style="border: 0" /></a></td></tr>';
       $i += 1;
     }
     echo '</table>';
@@ -173,7 +173,7 @@ function Profile() {
 global $l, $settings, $cmsurl;
   
   $last_ip = $settings['managemembers']['member']['last_ip'] ? $settings['managemembers']['member']['last_ip'] : $settings['managemembers']['member']['reg_ip'];
-  $last_login = $settings['managemembers']['member']['last_login'] ? date($settings['timeformat'],$settings['managemembers']['member']['last_login']) : 'Never';
+  $last_login = $settings['managemembers']['member']['last_login'] ? date($settings['timeformat'].', '.$settings['dateformat'],$settings['managemembers']['member']['last_login']) : $l['managemembers_moderate_never'];
   
   echo '
         <h1>'.$settings['page']['title'].'</h1>
@@ -206,12 +206,12 @@ global $l, $settings, $cmsurl;
   echo '</select>
         </td></tr>
         <tr><th style="text-align: left">'.$l['managemembers_moderate_posts'].':</th><td>'.$settings['managemembers']['member']['numposts'].'</td></tr>
-        <tr><th style="text-align: left">'.$l['managemembers_moderate_registration_date'].':</th><td>'.date($settings['timeformat'],$settings['managemembers']['member']['reg_date']).'</td></tr>
+        <tr><th style="text-align: left">'.$l['managemembers_moderate_registration_date'].':</th><td>'.date($settings['timeformat'].', '.$settings['dateformat'],$settings['managemembers']['member']['reg_date']).'</td></tr>
         <tr><th style="text-align: left">'.$l['managemembers_moderate_last_login'].':</th><td>'.$last_login.'</td></tr>
         ';
   
   if ($settings['managemembers']['member']['suspension'] > time())
-    echo '<tr><th style="text-align: left">'.$l['managemembers_moderate_suspended_until'].':</th><td>'.date($settings['timeformat'],$settings['managemembers']['member']['suspension']).'</td></tr>';
+    echo '<tr><th style="text-align: left">'.$l['managemembers_moderate_suspended_until'].':</th><td>'.date($settings['timeformat'].', '.$settings['dateformat'],$settings['managemembers']['member']['suspension']).'</td></tr>';
   
   echo '<tr><th style="text-align: left">'.$l['managemembers_moderate_registration_ip'].':</th><td>'.$settings['managemembers']['member']['reg_ip'].'</td></tr>
         <tr><th style="text-align: left">'.$l['managemembers_moderate_last_ip'].':</th><td>'.$last_ip.'</td></tr>
