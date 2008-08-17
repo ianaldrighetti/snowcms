@@ -7,7 +7,7 @@ if(!defined('Snow'))
 function Main() {
 global $cmsurl, $settings, $l, $user;
   echo '
-  <h2>Admin Panel</h2>
+  <h1>Admin Panel</h1>
   <table>
     <tr>
       <td>'.$l['admin_current_version'].'</td>
@@ -18,11 +18,11 @@ global $cmsurl, $settings, $l, $user;
       <td>'.$settings['latest_version'].'</td>
     </tr>
   </table>
-  <h3>Latest news on SnowCMS :</h3>
+  <h2>Latest news on SnowCMS :</h2>
   <div style="overflow: auto; width: 475px; height: 100px;">
     '.$settings['page']['news'].'
 	</div>
-  <h3>Admin Options</h3>
+  <h2>Admin Options</h2>
   <div class="acp_left">
     <p class="main"><a href="'.$cmsurl.'index.php?action=admin&sa=managepages" title="'.$l['admin_menu_managepages'].'">'.$l['admin_menu_managepages'].'</a></p>
     <p class="desc">'.$l['admin_menu_managepages_desc'].'</p>
