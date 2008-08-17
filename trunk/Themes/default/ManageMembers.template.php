@@ -2,7 +2,9 @@
 
 function Main() {
 global $l, $db_prefix, $settings, $cmsurl, $theme_url;
-  echo '<h2>'.$l['managemembers_title'].'</h2>';
+  
+  echo '<h1>'.$l['managemembers_title'].'</h1>
+        ';
   
   $page = $settings['manage_members']['page'];
   $member_rows = $settings['manage_members']['member_rows'];
@@ -25,19 +27,31 @@ global $l, $db_prefix, $settings, $cmsurl, $theme_url;
       $i += 1;
     }
     
+    // Show filter
+    echo '<form action="'.$cmsurl.'index.php" method="get" style="float: right; margin-bottom: 0"><p style="display: inline">
+       '.$settings['managemembers']['filter'].'
+        </p></form>
+        ';
+    
     // Show next and previous page links
     if ($total_members > $page_end)
-      echo '<p style="float: right"><a href="'.$cmsurl.'index.php?action=admin&sa=members&pg='.$next_page.$settings['manage_members']['sort_get'].'">'.$l['managemembers_next_page'].'</a></p>';
+      echo '<br />
+        <br />
+        <p style="float: right"><a href="'.$cmsurl.'index.php?action=admin&sa=members&pg='.$next_page.$settings['manage_members']['filter_get'].$settings['manage_members']['sort_get'].'">'.$l['managemembers_next_page'].'</a></p>
+        ';
     else
-      echo '<p style="float: right">&nbsp;</p>';
+      echo '<p style="float: right">&nbsp;</p>
+      <br />
+      <br />
+      ';
     if ($prev_page > 0)
-      echo '<p><a href="'.$cmsurl.'index.php?action=admin&sa=members&pg='.$prev_page.$settings['manage_members']['sort_get'].'">'.$l['managemembers_previous_page'].'</a></p>';
+      echo '<p><a href="'.$cmsurl.'index.php?action=admin&sa=members&pg='.$prev_page.$settings['manage_members']['filter_get'].$settings['manage_members']['sort_get'].'">'.$l['managemembers_previous_page'].'</a></p>';
     elseif ($prev_page == 0)
-      echo '<p><a href="'.$cmsurl.'index.php?action=admin&sa=members'.$settings['manage_members']['sort_get'].'">'.$l['managemembers_previous_page'].'</a></p>';
+      echo '<p><a href="'.$cmsurl.'index.php?action=admin&sa=members'.$settings['manage_members']['filter_get'].$settings['manage_members']['sort_get'].'">'.$l['managemembers_previous_page'].'</a></p>';
     
     // Show members
     echo '<table style="width: 100%; text-align: center">
-          <tr><th style="border-style: solid; border-width: 1px; width: 11%"><a href="'.$cmsurl.'index.php?action=admin&sa=members'.$settings['manage_members']['page_get'].'&sort=id'.$settings['manage_members']['id_desc'].'">'.$l['managemembers_id'].'</a></th><th style="border-style: solid; border-width: 1px; width: 29%"><a href="'.$cmsurl.'index.php?action=admin&sa=members'.$settings['manage_members']['page_get'].'&sort=username'.$settings['manage_members']['username_desc'].'">'.$l['managemembers_username'].'</a></th><th style="border-style: solid; border-width: 1px; width: 28%"><a href="'.$cmsurl.'index.php?action=admin&sa=members'.$settings['manage_members']['page_get'].'&sort=group'.$settings['manage_members']['group_desc'].'">'.$l['managemembers_group'].'</a></th><th style="border-style: solid; border-width: 1px; width: 29%"><a href="'.$cmsurl.'index.php?action=admin&sa=members'.$settings['manage_members']['page_get'].'&sort=joindate'.$settings['manage_members']['joindate_desc'].'">'.$l['managemembers_join_date'].'</a></th><th width="6%"></th></tr>';
+          <tr><th style="border-style: solid; border-width: 1px; width: 11%"><a href="'.$cmsurl.'index.php?action=admin&sa=members'.$settings['manage_members']['page_get'].$settings['manage_members']['filter_get'].'&s=id'.$settings['manage_members']['id_desc'].'">'.$l['managemembers_id'].'</a></th><th style="border-style: solid; border-width: 1px; width: 29%"><a href="'.$cmsurl.'index.php?action=admin&sa=members'.$settings['manage_members']['page_get'].$settings['manage_members']['filter_get'].'&s=username'.$settings['manage_members']['username_desc'].'">'.$l['managemembers_username'].'</a></th><th style="border-style: solid; border-width: 1px; width: 28%"><a href="'.$cmsurl.'index.php?action=admin&sa=members'.$settings['manage_members']['page_get'].$settings['manage_members']['filter_get'].'&s=group'.$settings['manage_members']['group_desc'].'">'.$l['managemembers_group'].'</a></th><th style="border-style: solid; border-width: 1px; width: 29%"><a href="'.$cmsurl.'index.php?action=admin&sa=members'.$settings['manage_members']['page_get'].$settings['manage_members']['filter_get'].'&s=joindate'.$settings['manage_members']['joindate_desc'].'">'.$l['managemembers_join_date'].'</a></th><th width="6%"></th></tr>';
     $i = 0;
     while (($row = mysql_fetch_assoc($member_rows)) && $i < $page_end - ($page_start - 1)) {
       echo '<tr><td>'.$row['id'].'</td><td><a href="'.$cmsurl.'index.php?action=profile&u='.$row['id'].'">'.($row['display_name'] ? $row['display_name'] : $row['username']).'</a></td><td>'.$row['groupname'].'</td><td>'.date($settings['timeformat'],$row['reg_date']).'</td><td><a href="'.$cmsurl.'index.php?action=admin&sa=members&u='.$row['id'].'"><img src="'.$theme_url.'/'.$settings['theme'].'/moderate.png" alt="'.$l['managemembers_moderate_button'].'" width="12" height="12" style="border: 0" /></a></td></tr>';
@@ -47,24 +61,79 @@ global $l, $db_prefix, $settings, $cmsurl, $theme_url;
     
     // Show next and previous page links
     if ($total_members > $page_end)
-      echo '<p style="float: right"><a href="'.$cmsurl.'index.php?action=admin&sa=members&pg='.$next_page.$settings['manage_members']['sort_get'].'">'.$l['managemembers_next_page'].'</a></p>';
+      echo '<p style="float: right"><a href="'.$cmsurl.'index.php?action=admin&sa=members&pg='.$next_page.$settings['manage_members']['filter_get'].$settings['manage_members']['sort_get'].'">'.$l['managemembers_next_page'].'</a></p>
+        ';
     else
       echo '<p style="float: right">&nbsp;</p>';
     if ($prev_page > 0)
-      echo '<p><a href="'.$cmsurl.'index.php?action=admin&sa=members&pg='.$prev_page.$settings['manage_members']['sort_get'].'">'.$l['managemembers_previous_page'].'</a></p>';
+      echo '<p><a href="'.$cmsurl.'index.php?action=admin&sa=members&pg='.$prev_page.$settings['manage_members']['filter_get'].$settings['manage_members']['sort_get'].'">'.$l['managemembers_previous_page'].'</a></p>
+        <br />';
     elseif ($prev_page == 0)
-      echo '<p><a href="'.$cmsurl.'index.php?action=admin&sa=members'.$settings['manage_members']['sort_get'].'">'.$l['managemembers_previous_page'].'</a></p>';
+      echo '<p><a href="'.$cmsurl.'index.php?action=admin&sa=members'.$settings['manage_members']['filter_get'].$settings['manage_members']['sort_get'].'">'.$l['managemembers_previous_page'].'</a></p>
+        <br />';
+    elseif ($total_members > $page_end)
+      echo '<p>&nbsp;</p>
+        <br />';
+    else
+      echo '<br />
+        ';
+    
+    // Show filter
+    echo '<form action="'.$cmsurl.'index.php" method="get" style="float: right; margin-bottom: 0"><p style="display: inline">
+       '.$settings['managemembers']['filter'].'
+       </p></form>';
   }
 }
 
 function NoMembers() {
-global $l;
+global $l, $settings, $cmsurl;
   
-  echo '
-        <h2>'.$l['managemembers_title'].'</h2>
-        
-        <p>'.$l['managemembers_showing_none'].'</p>
+  echo '<h1>'.$l['managemembers_title'].'</h1>
         ';
+  
+  $page = $settings['manage_members']['page'];
+  $member_rows = $settings['manage_members']['member_rows'];
+  $total_members = $settings['manage_members']['total_members'];
+  $page_start = $settings['manage_members']['page_start'];
+  $page_end = $settings['manage_members']['page_end'];
+  $next_page = $settings['manage_members']['next_page'];
+  $prev_page = $settings['manage_members']['prev_page'];
+  
+  // Show filter
+    echo '<form action="'.$cmsurl.'index.php" method="get" style="float: right; margin-bottom: 0"><p style="display: inline">
+       '.$settings['managemembers']['filter'].'
+        </p></form>
+        <br />
+        <br />
+        ';
+  
+  // Show next and previous page links
+    if ($total_members > $page_end)
+      echo '<p style="float: right"><a href="'.$cmsurl.'index.php?action=admin&sa=members&pg='.$next_page.$settings['manage_members']['filter_get'].$settings['manage_members']['sort_get'].'">'.$l['managemembers_next_page'].'</a></p>';
+    else
+      echo '<p style="float: right">&nbsp;</p>';
+    if ($prev_page > 0)
+      echo '<p><a href="'.$cmsurl.'index.php?action=admin&sa=members&pg='.$prev_page.$settings['manage_members']['filter_get'].$settings['manage_members']['sort_get'].'">'.$l['managemembers_previous_page'].'</a></p>';
+    elseif ($prev_page == 0)
+      echo '<p><a href="'.$cmsurl.'index.php?action=admin&sa=members'.$settings['manage_members']['filter_get'].$settings['manage_members']['sort_get'].'">'.$l['managemembers_previous_page'].'</a></p>';
+  
+  echo '<p>'.$l['managemembers_showing_none'].'</p>
+        ';
+  
+  // Show next and previous page links
+    if ($total_members > $page_end)
+      echo '<p style="float: right"><a href="'.$cmsurl.'index.php?action=admin&sa=members&pg='.$next_page.$settings['manage_members']['filter_get'].$settings['manage_members']['sort_get'].'">'.$l['managemembers_next_page'].'</a></p>';
+    else
+      echo '<p style="float: right">&nbsp;</p>';
+    if ($prev_page > 0)
+      echo '<p><a href="'.$cmsurl.'index.php?action=admin&sa=members&pg='.$prev_page.$settings['manage_members']['filter_get'].$settings['manage_members']['sort_get'].'">'.$l['managemembers_previous_page'].'</a></p>';
+    elseif ($prev_page == 0)
+      echo '<p><a href="'.$cmsurl.'index.php?action=admin&sa=members'.$settings['manage_members']['filter_get'].$settings['manage_members']['sort_get'].'">'.$l['managemembers_previous_page'].'</a></p>';
+  
+  // Show filter
+    echo '<form action="'.$cmsurl.'index.php" method="get" style="float: right; margin-bottom: 0"><p style="display: inline">
+       '.$settings['managemembers']['filter'].'
+       </p></form>';
 }
 
 function Profile() {
@@ -74,7 +143,7 @@ global $l, $settings, $cmsurl;
   $last_login = $settings['managemembers']['member']['last_login'] ? date($settings['timeformat'],$settings['managemembers']['member']['last_login']) : 'Never';
   
   echo '
-        <h2>'.$settings['page']['title'].'</h2>
+        <h1>'.$settings['page']['title'].'</h1>
         
         <form action="'.$cmsurl.'index.php?action=admin&sa=members&u='.$_REQUEST['u'].'" method="post" style="display: inline">
         
@@ -95,7 +164,7 @@ global $l, $settings, $cmsurl;
         ';
   
   while ($row = mysql_fetch_assoc($settings['managemembers']['groups'])) {
-    if ($settings['managemembers']['member']['groupname'] == $row["groupname"])
+    if ($settings['managemembers']['member']['group'] == $row["group_id"])
       echo '<option value="'.$row['group_id'].'" selected="selected">'.$row['groupname'].'</option>'."\n";
     else
       echo '<option value="'.$row['group_id'].'">'.$row['groupname'].'</option>'."\n";
@@ -131,16 +200,28 @@ global $l, $settings, $cmsurl;
        <br />
        <br />
        ';
-  if ($settings['managemembers']['member']['suspension'] <= time())
-    echo '<form action="'.$cmsurl.'index.php?action=admin&sa=members&u='.$_REQUEST['u'].'" method="post" style="display: inline"><p style="display: inline">
+  if (!$settings['managemembers']['member']['activated'])
+    echo '<form action="'.$cmsurl.'index.php" method="get" style="display: inline">
+        <p style="display: inline">
+        <input type="hidden" name="action" value="admin" />
+        <input type="hidden" name="sa" value="members" />
+        <input type="hidden" name="ssa" value="activate" />
+        <input type="hidden" name="u" value="'.$settings['managemembers']['member']['id'].'" />
+        <input type="submit" value="'.$l['managemembers_moderate_activate'].'" />
+        </p>
+        </form>
+        ';
+  else {
+    if ($settings['managemembers']['member']['suspension'] <= time())
+      echo '<form action="'.$cmsurl.'index.php?action=admin&sa=members&u='.$_REQUEST['u'].'" method="post" style="display: inline"><p style="display: inline">
         <input type="hidden" name="action" value="admin" />
         <input type="hidden" name="sa" value="members" />
         <input type="hidden" name="ssa" value="suspend" />
         '.str_replace('%button%','<input type="submit" value="'.$l['managemembers_moderate_suspend_button'].'" />',str_replace('%input%','<input name="suspension" value="3" style="text-align: center; width: 30px" maxlength="4" />',$l['managemembers_moderate_suspend'])).
         '</p></form>
         ';
-  else
-    echo str_replace('%renew%','<form action="'.$cmsurl.'index.php?action=admin&sa=members&u='.$_REQUEST['u'].'" method="post" style="display: inline"><p style="display: inline">
+    else
+      echo str_replace('%renew%','<form action="'.$cmsurl.'index.php?action=admin&sa=members&u='.$_REQUEST['u'].'" method="post" style="display: inline"><p style="display: inline">
         <input type="hidden" name="action" value="admin" />
         <input type="hidden" name="sa" value="members" />
         <input type="hidden" name="ssa" value="suspend" />
@@ -153,26 +234,27 @@ global $l, $settings, $cmsurl;
         <input type="hidden" name="ssa" value="unsuspend" />
         </p></form>
         ',$l['managemembers_moderate_renew_suspension'])));
-  echo '<br />
+    echo '<br />
         <br />
         <form action="'.$cmsurl.'index.php?action=admin&sa=members&u='.$_REQUEST['u'].'" method="post" style="display: inline">
         <p style="display: inline">
         <input type="hidden" name="action" value="admin" />
         <input type="hidden" name="sa" value="members" />
         ';
-  if (!@$settings['managemembers']['member']['banned'])
-    echo '<input type="hidden" name="ssa" value="ban" />
+    if (!@$settings['managemembers']['member']['banned'])
+      echo '<input type="hidden" name="ssa" value="ban" />
         <input type="hidden" name="u" value="'.$settings['managemembers']['member']['id'].'" />
         <input type="submit" value="'.$l['managemembers_moderate_ban'].'" />
         ';
-  else
-    echo '<input type="hidden" name="ssa" value="unban" />
+    else
+      echo '<input type="hidden" name="ssa" value="unban" />
         <input type="hidden" name="u" value="'.$settings['managemembers']['member']['id'].'" />
         <input type="submit" value="'.$l['managemembers_moderate_unban'].'" />
         ';
-  echo '</p>
+    echo '</p>
        </form>
        ';
+  }
 }
 
 ?>
