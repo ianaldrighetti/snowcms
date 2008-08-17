@@ -117,27 +117,51 @@ global $l, $settings, $cmsurl;
         ';
   
   // Show next and previous page links
-    if ($total_members > $page_end)
-      echo '<p style="float: right"><a href="'.$cmsurl.'index.php?action=admin&sa=members&pg='.$next_page.$settings['manage_members']['filter_get'].$settings['manage_members']['sort_get'].'">'.$l['managemembers_next_page'].'</a></p>';
-    else
-      echo '<p style="float: right">&nbsp;</p>';
     if ($prev_page > 0)
-      echo '<p><a href="'.$cmsurl.'index.php?action=admin&sa=members&pg='.$prev_page.$settings['manage_members']['filter_get'].$settings['manage_members']['sort_get'].'">'.$l['managemembers_previous_page'].'</a></p>';
+      echo '<table width="100%">
+        <tr><td><a href="'.$cmsurl.'index.php?action=admin&sa=members&pg='.$prev_page.$settings['manage_members']['filter_get'].$settings['manage_members']['sort_get'].'">'.$l['managemembers_previous_page'].'</a></td>
+        ';
     elseif ($prev_page == 0)
-      echo '<p><a href="'.$cmsurl.'index.php?action=admin&sa=members'.$settings['manage_members']['filter_get'].$settings['manage_members']['sort_get'].'">'.$l['managemembers_previous_page'].'</a></p>';
+      echo '<table width="100%">
+        <tr><td><a href="'.$cmsurl.'index.php?action=admin&sa=members'.$settings['manage_members']['filter_get'].$settings['manage_members']['sort_get'].'">'.$l['managemembers_previous_page'].'</a></td>
+        ';
+    else
+      echo '<table width="100%">
+        <tr><td></td>
+        ';
+    if ($total_members > $page_end)
+      echo '<td style="text-align: right"><a href="'.$cmsurl.'index.php?action=admin&sa=members&pg='.$next_page.$settings['manage_members']['filter_get'].$settings['manage_members']['sort_get'].'">'.$l['managemembers_next_page'].'</a></td></tr>
+        </table>
+        ';
+    else
+      echo '<td style="text-align: right"></td></tr>
+        </table>
+        ';
   
   echo '<p>'.$l['managemembers_showing_none'].'</p>
         ';
   
   // Show next and previous page links
-    if ($total_members > $page_end)
-      echo '<p style="float: right"><a href="'.$cmsurl.'index.php?action=admin&sa=members&pg='.$next_page.$settings['manage_members']['filter_get'].$settings['manage_members']['sort_get'].'">'.$l['managemembers_next_page'].'</a></p>';
-    else
-      echo '<p style="float: right">&nbsp;</p>';
     if ($prev_page > 0)
-      echo '<p><a href="'.$cmsurl.'index.php?action=admin&sa=members&pg='.$prev_page.$settings['manage_members']['filter_get'].$settings['manage_members']['sort_get'].'">'.$l['managemembers_previous_page'].'</a></p>';
+      echo '<table width="100%">
+        <tr><td><a href="'.$cmsurl.'index.php?action=admin&sa=members&pg='.$prev_page.$settings['manage_members']['filter_get'].$settings['manage_members']['sort_get'].'">'.$l['managemembers_previous_page'].'</a></td>
+        ';
     elseif ($prev_page == 0)
-      echo '<p><a href="'.$cmsurl.'index.php?action=admin&sa=members'.$settings['manage_members']['filter_get'].$settings['manage_members']['sort_get'].'">'.$l['managemembers_previous_page'].'</a></p>';
+      echo '<table width="100%">
+        <tr><td><a href="'.$cmsurl.'index.php?action=admin&sa=members'.$settings['manage_members']['filter_get'].$settings['manage_members']['sort_get'].'">'.$l['managemembers_previous_page'].'</a></td>
+        ';
+    else
+      echo '<table width="100%">
+        <tr><td></td>
+        ';
+    if ($total_members > $page_end)
+      echo '<td style="text-align: right"><a href="'.$cmsurl.'index.php?action=admin&sa=members&pg='.$next_page.$settings['manage_members']['filter_get'].$settings['manage_members']['sort_get'].'">'.$l['managemembers_next_page'].'</a></td></tr>
+        </table>
+        ';
+    else
+      echo '<td style="text-align: right"></td></tr>
+        </table>
+        ';
   
   // Show filter
     echo '<form action="'.$cmsurl.'index.php" method="get" style="float: right; margin-bottom: 0"><p style="display: inline">
