@@ -9,29 +9,41 @@ global $cmsurl, $settings, $l, $user;
   echo '
     <h2>'.$l['permissions_header'].'</h2>
     <p>'.$l['permissions_desc'].'</p>
+  
   <table width="100%">
     <tr>
-      <td width="60%">'.$l['permissions_membergroup'].'</td>
-      <td width="10%">'.$l['permissions_numusers'].'</td>
-      <td width="10%">'.$l['permissions_permissions'].'</td>
-      <td width="20%">&nbsp;</td>
+      <th width="60%">'.$l['permissions_membergroup'].'</th>
+      <th width="10%">'.$l['permissions_numusers'].'</th>
+      <th width="10%">'.$l['permissions_permissions'].'</th>
+      <th width="20%" colspan="2">&nbsp;</td>
     </tr>';
   foreach($settings['groups'] as $group) {
     echo '
     <tr>
-      <td style="padding: 5px;"><a href="'.$cmsurl.'index.php?action=admin&sa=groups&mid='.$group['id'].'">'.$group['name'].'</a></td>
+      <td style="padding: 5px;">
+      <form action="'.$cmsurl.'index.php?action=admin&sa=permissions" method="post" style="display: inline">
+      <p style="display: inline">
+      <input type="hidden" name="change_group" value="'.$group['id'].'" />
+      <input name="group_name" value="'.$group['name'].'" />
+      <input type="submit" value="'.$l['permissions_change_name'].'" />
+      </p>
+      </form>
+      </td>
       <td style="text-align: center; padding: 5px;">'.$group['numusers'].'</td>
       <td style="text-align: center; padding: 5px;">'.$group['numperms'].'</td>
       <td style="text-align: center; padding: 5px;"><a href="'.$cmsurl.'index.php?action=admin&sa=permissions&mid='.$group['id'].'">'.$l['permissions_modify'].'</a></td>
+      <td style="text-align: center; padding: 5px;"><a href="'.$cmsurl.'index.php?action=admin&sa=permissions&did='.$group['id'].'">'.$l['permissions_delete'].'</a></td>
     </tr>';
   }
   echo '
   </table>
   
+  <br />
+  
   <form action="'.$cmsurl.'index.php?action=admin&sa=permissions" method="post">
   <p>
   <input name="new_group" />
-  <input type="submit" value="Create Group" />
+  <input type="submit" value="'.$l['permissions_new_group'].'" />
   </p>
   </form>';
 }

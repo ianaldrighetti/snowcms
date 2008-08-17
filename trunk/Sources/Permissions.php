@@ -73,10 +73,21 @@ global $cmsurl, $db_prefix, $l, $settings, $user;
           // Weeeee! Done!
         }
       }
+      // Change a group's name
+      if (@$_REQUEST['change_group']) {
+        $group_id = clean($_REQUEST['change_group']);
+        $group_name = clean($_REQUEST['group_name']);
+        sql_query("UPDATE {$db_prefix}membergroups SET `groupname` = '$group_name' WHERE `group_id` = '$group_id'") or die(mysql_error());
+      }
       // Create a new group
       if (@$_REQUEST['new_group']) {
         $new_group = clean($_REQUEST['new_group']);
         sql_query("INSERT INTO {$db_prefix}membergroups (`groupname`) VALUES ('$new_group')") or die(mysql_error());
+      }
+      // Create a new group
+      if (@$_REQUEST['did']) {
+        $group = clean($_REQUEST['did']);
+        sql_query("DELETE FROM {$db_prefix}membergroups WHERE `group_id` = '$group'") or die(mysql_error());
       }
       // Load the list of member groups, etc
       $result = sql_query("
