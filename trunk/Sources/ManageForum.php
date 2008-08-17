@@ -66,7 +66,7 @@ global $cmsurl, $db_prefix, $l, $settings, $user;
 function ManageCats() {
 global $cmsurl, $db_prefix, $l, $settings, $user;
   // Manage the Categories! :O
-  if($_REQUEST['do']=="add") {
+  if(@$_REQUEST['do']=="add") {
     // Adding a category
     // Load up a list of pre-existing boards, so we can let them say, I want it before {Cat} or After {Cat}
     $result = sql_query("
@@ -84,12 +84,13 @@ global $cmsurl, $db_prefix, $l, $settings, $user;
     }
     mysql_free_result($result);
     $settings['cats'] = $cats;
+    $settings['cat_name'] = @$_REQUEST['cat_name'] ? clean($_REQUEST['cat_name']) : $l['mf_new_category'];
     unset($cats);
     // Hmmm, I feel like I need more stuff to code, but what?
     $settings['page']['title'] = $l['managecats_add_title'];
     loadTheme('ManageForum','AddCat');
   }
-  elseif($_REQUEST['do']=="edit") {
+  elseif(@$_REQUEST['do']=="edit") {
     // Editing an already existing category
     $cat_id = (int)$_REQUEST['id'];
     $result = sql_query("
@@ -131,6 +132,8 @@ global $cmsurl, $db_prefix, $l, $settings, $user;
     }
   }
   else {
+    // Process stuff, like updating or adding categories! =o
+echo '<pre>'; print_r($_POST); echo '</pre>';
     // Show a list of categories...
     $result = sql_query("
       SELECT
@@ -142,9 +145,10 @@ global $cmsurl, $db_prefix, $l, $settings, $user;
       $cats[] = array(
         'id' => $row['cid'],
         'order' => $row['corder'],
-        'name' => $row['name']
+        'name' => $row['cname']
       );
     }
+    $settings['cats'] = $cats;
     $settings['page']['title'] = $l['managecats_title'];
     loadTheme('ManageForum','ShowCats');
   }

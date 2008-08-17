@@ -146,3 +146,11 @@ a.headerlink {
 .padding th, .padding td {
   padding-bottom: 5px;
 }
+/* Manage Categories */
+#mc .order {
+  border: 1px solid #dddddd;
+  width: 20px;
+}
+#mc .name {
+  border: 1px solid #dddddd;
+}

@@ -32,7 +32,7 @@ global $cmsurl, $db_prefix, $l, $settings, $user;
         </tr>
         <tr>
           <td>Category Position:</td><td><select name="placement">
-                                           <option value="-1">Before...</option>
+                                           <option value="0">Before...</option>
                                            <option value="1">After...</option>
                                          </select>
                                          <select name="category">';
@@ -45,6 +45,9 @@ global $cmsurl, $db_prefix, $l, $settings, $user;
                                          </select>
                                      </td>
         </tr>
+        <tr>
+          <td></td><td><input name="add_cat" type="submit" value="Add Category"/></td>
+        </tr>
       </table>
     </fieldset>
   </form>';
@@ -52,6 +55,19 @@ global $cmsurl, $db_prefix, $l, $settings, $user;
 
 function ShowCats() {
 global $cmsurl, $db_prefix, $l, $settings, $user;
-
+  echo '<h2>Manage Categories</h2>
+        <p>Here you can edit, delete and create categories</p>
+        <table id="mc">
+          <tr>
+            <td>Category Name</td><td>Order</td><td>Delete</td>
+          </tr>';
+        foreach($settings['cats'] as $cat) {
+          echo '
+          <tr>
+            <td><input name="cat_name[', $cat['id'], ']" type="text" class="name" value="', $cat['name'], '"/></td><td><input name="cat_order[', $cat['id'], ']" type="text" class="order" value="', $cat['order'], '"/></td><td></td>
+          </tr>';
+        }
+        echo '
+        </table>';
 }
 ?>
