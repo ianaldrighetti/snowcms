@@ -110,10 +110,63 @@ function ManageBoards() {
 global $cmsurl, $db_prefix, $l, $settings, $user;
   $do = @$_REQUEST['do'] ? $_REQUEST['do'] : null;
   if($do == "add") {
-  
+    // Adding a Board, Load up category list, Member groups and such
+    $result = sql_query("
+      SELECT
+        c.cid, c.cname, c.corder
+      FROM {$db_prefix}categories AS c
+      ORDER BY c.corder ASC");
+    $settings['cats'] = array();
+    // Any categories? They can't add boards if there are no categories! D:
+    if(mysql_num_rows($result)) {
+      while($row = mysql_fetch_assoc($result)) {
+        $settings['cats'][] = array(
+          'id' => $row['cid'],
+          'name' => $row['cname']
+        );
+      }
+      // Load the member groups ;) Except #1 :D cause Admins can do ANYTHING Respect my authoritay!
+      $result = sql_query("
+        SELECT
+          m.group_id, m.groupname
+        FROM {$db_prefix}membergroups AS m
+        WHERE m.group_id != 1
+        ORDER BY m.group_id ASC");
+      $settings['groups'] = array();
+      while($row = mysql_fetch_assoc($result)) {
+        $settings['groups'][] = array(
+          'id' => $row['group_id'],
+          'name' => $row['groupname']
+        );
+      }
+    }
+    $settings['page']['title'] = $l['manageboards_add_title'];
+    loadTheme('ManageForum','AddBoard');
   }
   elseif($do == "edit") {
-  
+    // Load up the board we need to edit and such...
+    $board_id = (int)$_REQUEST['id'];
+    $result = sql_query("
+      SELECT
+        b.bid, b.cid, b.border, b.who_view, b.name, b.bdesc
+      FROM {$db_prefix}boards AS b
+      WHERE b.bid = $board_id");
+    $settings['board'] = array();
+    if(mysql_num_rows($result)) {
+      // The board exists... Dang!
+      $row = mysql_fetch_assoc($result);
+      $settings['board']['name'] = $row['name'];
+      $settings['board']['bid'] = $row['bid'];
+      $settings['board']['cid'] = $row['cid'];
+      $settings['board']['order'] = $row['border'];
+      $settings['board']['who_view'] = @explode(",", $row['who_view']);
+      $settings['board']['desc'] = $row['bdesc'];
+    }
+    else {
+      // That board doesn't exist! D:!
+      $settings['page']['title'] = $l['manageboards_no_board_title'];
+      loadTheme('ManageForum','NoBoard');
+    }
   }
   else {
     // Load up all the boards and such...
