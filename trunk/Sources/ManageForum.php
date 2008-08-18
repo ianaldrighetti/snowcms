@@ -82,6 +82,11 @@ global $cmsurl, $db_prefix, $l, $settings, $user;
     $cat_id = (int)$_REQUEST['delete'];
     sql_query("DELETE FROM {$db_prefix}categories WHERE `cid` = '$cat_id'");
   }
+  if(!empty($_REQUEST['add_cat'])) {
+    $cat_name = clean($_REQUEST['cat_name']);
+    $corder = (int)$_REQUEST['order'];
+    sql_query("INSERT INTO {$db_prefix}categories (`corder`,`cname`) VALUES('$corder','$cat_name')");
+  }
   // Show a list of categories...
   $result = sql_query("
     SELECT
