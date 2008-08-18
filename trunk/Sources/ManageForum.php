@@ -161,6 +161,23 @@ global $cmsurl, $db_prefix, $l, $settings, $user;
       $settings['board']['order'] = $row['border'];
       $settings['board']['who_view'] = @explode(",", $row['who_view']);
       $settings['board']['desc'] = $row['bdesc'];
+      // Now load up the member groups (Except #1) and see which are checked :P
+      $result = sql_query("
+        SELECT
+          m.group_id, m.groupname
+        FROM {$db_prefix}membergroups AS m
+        WHERE m.group_id != 1
+        ORDER BY m.group_id ASC");
+      $settings['groups'] = array();
+      while($row = mysql_fetch_assoc($result)) {
+        $settings['groups'][] = array(
+          'id' => $row['group_id'],
+          'name' => $row['groupname'],
+          'checked' => @in_array($row['group_id'], $settings['board']['who_view']) ? true : false
+        );
+      }
+      $settings['page']['title'] = $l['manageboards_edit_title'];
+      loadTheme('ManageForum','EditBoard');
     }
     else {
       // That board doesn't exist! D:!
