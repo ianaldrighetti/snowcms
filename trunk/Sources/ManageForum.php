@@ -105,4 +105,41 @@ global $cmsurl, $db_prefix, $l, $settings, $user;
   $settings['page']['title'] = $l['managecats_title'];
   loadTheme('ManageForum','ShowCats');
 }
+
+function ManageBoards() {
+global $cmsurl, $db_prefix, $l, $settings, $user;
+
+  // Load up all the boards and such...
+  $result = sql_query("
+    SELECT
+      c.cid, c.corder, c.cname
+    FROM {$db_prefix}categories AS c
+    ORDER BY c.corder ASC");
+  $settings['cats'] = array();
+  if(mysql_num_rows($result)) {
+    while($row = mysql_fetch_assoc($result)) {
+      $settings['cats'][$row['cid']] = array(
+        'id' => $row['cid'],
+        'order' => $row['corder'],
+        'name' => $row['cname'],
+        'boards' => array()
+      );
+    }
+    $result = sql_query("
+      SELECT
+        b.bid, b.cid, b.border, b.name
+      FROM {$db_prefix}boards AS b
+      ORDER BY b.border ASC");
+    while($row = mysql_fetch_assoc($result)) {
+      $settings['cats'][$row['cid']]['boards'][] = array(
+        'id' => $row['bid'],
+        'cid' => $row['cid'],
+        'order' => $row['border'],
+        'name' => $row['name']
+      );
+    }
+  }
+  $settings['page']['title'] = $l['manageboards_title'];
+  loadTheme('ManageForum','ShowBoards');
+}
 ?>
