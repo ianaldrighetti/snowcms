@@ -227,6 +227,7 @@ $l['managemembers_group'] = 'Group';
 $l['managemembers_join_date'] = 'Join Date';
 $l['managemembers_filter_button'] = 'Filter';
 $l['managemembers_filter_everyone'] = 'Everyone';
+$l['managemembers_filter_active'] = 'Active';
 $l['managemembers_filter_activated'] = 'Activated';
 $l['managemembers_filter_unactivated'] = 'Unactivated';
 $l['managemembers_filter_suspended'] = 'Suspended';

@@ -92,7 +92,8 @@ global $l, $settings, $db_prefix, $cmsurl;
   
   // Get filter SQL
   switch (@$_REQUEST['f']) {
-    case 'activated':   $filter = "WHERE `activated` = '1' AND `suspension` < '".time()."' AND `banned` = '0'"; break;
+    case 'active':   $filter = "WHERE `activated` = '1' AND `suspension` < '".time()."' AND `banned` = '0'"; break;
+    case 'activated':   $filter = "WHERE `activated` = '1'"; break;
     case 'unactivated': $filter = "WHERE `activated` = '0'"; break;
     case 'suspended':   $filter = "WHERE `suspension` > '".time()."'"; break;
     case 'banned':      $filter = "WHERE `banned` = '1'"; break;
@@ -149,6 +150,15 @@ global $l, $settings, $db_prefix, $cmsurl;
     switch (@$_REQUEST['f']) {
       case '':
         $filter .= '<option value="" selected="selected">'.$l['managemembers_filter_everyone'].'</option>
+          <option value="active">'.$l['managemembers_filter_active'].'</option>
+          <option value="activated">'.$l['managemembers_filter_activated'].'</option>
+          <option value="unactivated">'.$l['managemembers_filter_unactivated'].'</option>
+          <option value="suspended">'.$l['managemembers_filter_suspended'].'</option>
+          <option value="banned">'.$l['managemembers_filter_banned'].'</option>
+          '; break;
+      case 'active':
+        $filter .= '<option value="" selected="selected">'.$l['managemembers_filter_everyone'].'</option>
+          <option value="active" selected="selected">'.$l['managemembers_filter_active'].'</option>
           <option value="activated">'.$l['managemembers_filter_activated'].'</option>
           <option value="unactivated">'.$l['managemembers_filter_unactivated'].'</option>
           <option value="suspended">'.$l['managemembers_filter_suspended'].'</option>
@@ -156,6 +166,7 @@ global $l, $settings, $db_prefix, $cmsurl;
           '; break;
       case 'activated':
         $filter .= '<option value="">'.$l['managemembers_filter_everyone'].'</option>
+          <option value="active">'.$l['managemembers_filter_active'].'</option>
           <option value="activated" selected="selected">'.$l['managemembers_filter_activated'].'</option>
           <option value="unactivated">'.$l['managemembers_filter_unactivated'].'</option>
           <option value="suspended">'.$l['managemembers_filter_suspended'].'</option>
@@ -163,6 +174,7 @@ global $l, $settings, $db_prefix, $cmsurl;
           '; break;
       case 'unactivated':
         $filter .= '<option value="">'.$l['managemembers_filter_everyone'].'</option>
+          <option value="active">'.$l['managemembers_filter_active'].'</option>
           <option value="activated">'.$l['managemembers_filter_activated'].'</option>
           <option value="unactivated" selected="selected">'.$l['managemembers_filter_unactivated'].'</option>
           <option value="suspended">'.$l['managemembers_filter_suspended'].'</option>
@@ -170,6 +182,7 @@ global $l, $settings, $db_prefix, $cmsurl;
           '; break;
       case 'suspended':
         $filter .= '<option value="">'.$l['managemembers_filter_everyone'].'</option>
+          <option value="active">'.$l['managemembers_filter_active'].'</option>
           <option value="activated">'.$l['managemembers_filter_activated'].'</option>
           <option value="unactivated">'.$l['managemembers_filter_unactivated'].'</option>
           <option value="suspended" selected="selected">'.$l['managemembers_filter_suspended'].'</option>
@@ -177,6 +190,7 @@ global $l, $settings, $db_prefix, $cmsurl;
           '; break;
       case 'banned':
         $filter .= '<option value="">'.$l['managemembers_filter_everyone'].'</option>
+          <option value="active">'.$l['managemembers_filter_active'].'</option>
           <option value="activated">'.$l['managemembers_filter_activated'].'</option>
           <option value="unactivated">'.$l['managemembers_filter_unactivated'].'</option>
           <option value="suspended">'.$l['managemembers_filter_suspended'].'</option>
@@ -184,6 +198,7 @@ global $l, $settings, $db_prefix, $cmsurl;
           '; break;
       default:
         $filter .= '<option value="">'.$l['managemembers_filter_everyone'].'</option>
+          <option value="active">'.$l['managemembers_filter_active'].'</option>
           <option value="activated">'.$l['managemembers_filter_activated'].'</option>
           <option value="unactivated">'.$l['managemembers_filter_unactivated'].'</option>
           <option value="suspended">'.$l['managemembers_filter_suspended'].'</option>
