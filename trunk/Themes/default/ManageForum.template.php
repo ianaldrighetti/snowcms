@@ -50,9 +50,9 @@ global $cmsurl, $db_prefix, $l, $settings, $user;
               <td>', $l['managecats_catname'], ' <input class="cat_name" name="cat_name" type="text" value="', $l['mf_new_category'], '"/></td><td>', $l['managecats_order'], ' <input class="order" name="order" type="text" value=""/></td>
             </tr>
             <tr>
-              <td></td><td><input name="add_cat" type="submit" value="add"/></td>
+              <td></td><td><input name="add_cat" type="submit" value="', $l['managecats_addbutton'], '"/></td>
             </tr>
           </table>
-        </form>;
+        </form>';
 }
 ?>
