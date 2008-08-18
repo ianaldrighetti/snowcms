@@ -31,7 +31,9 @@ CREATE TABLE `{$db_prefix}boards` (
   `last_uid` int(11) NOT NULL default '0',
   `last_name` text NOT NULL,
   PRIMARY KEY  (`bid`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+) ENGINE=MyISAM AUTO_INCREMENT=2 DEFAULT CHARSET=utf8;
+
+INSERT INTO `{$db_prefix}boards` (`bid`,`cid`,`border`,`who_view`,`name`,`bdesc`,`numtopic`,`numposts`,`last_msg`,`last_uid`,`last_name`) VALUES('1','1','1','1,2','General Chat','Chat about anything!','0','0','0','0','0');
 
 DROP TABLE IF EXISTS `{$db_prefix}categories`;
 
@@ -39,9 +41,10 @@ CREATE TABLE `{$db_prefix}categories` (
   `cid` int(11) NOT NULL auto_increment,
   `corder` int(11) NOT NULL default '0',
   `cname` tinytext NOT NULL,
-  `cdesc` text NOT NULL,
   PRIMARY KEY  (`cid`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+) ENGINE=MyISAM AUTO_INCREMENT=2 DEFAULT CHARSET=utf8;
+
+INSERT INTO `{$db_prefix}categories` (`cid`,`corder`,`cname`) VALUES('1','1','General Category');
 
 DROP TABLE IF EXISTS `{$db_prefix}membergroups`;
 
@@ -89,7 +92,7 @@ CREATE TABLE `{$db_prefix}menus` (
   PRIMARY KEY  (`link_id`)
 ) ENGINE=MyISAM AUTO_INCREMENT=2 DEFAULT CHARSET=utf8;
 
-INSERT INTO `{$db_prefix}menus` VALUES ('1','1','Home','http://snowcms.northsalemcrew.net/','0','1');
+INSERT INTO `{$db_prefix}menus` VALUES ('1','1','SnowCMS','http://www.snowcms.com/','0','1');
 
 DROP TABLE IF EXISTS `{$db_prefix}messages`;
 
