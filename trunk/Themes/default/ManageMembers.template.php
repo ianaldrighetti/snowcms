@@ -170,7 +170,7 @@ global $l, $settings, $cmsurl;
 }
 
 function Profile() {
-global $l, $settings, $cmsurl;
+global $l, $settings, $user, $cmsurl;
   
   $last_ip = $settings['managemembers']['member']['last_ip'] ? $settings['managemembers']['member']['last_ip'] : $settings['managemembers']['member']['reg_ip'];
   $last_login = $settings['managemembers']['member']['last_login'] ? date($settings['timeformat'].', '.$settings['dateformat'],$settings['managemembers']['member']['last_login']) : $l['managemembers_moderate_never'];
@@ -181,6 +181,7 @@ global $l, $settings, $cmsurl;
         <form action="'.$cmsurl.'index.php?action=admin&sa=members&u='.$_REQUEST['u'].'" method="post" style="display: inline">
         
         <p>
+        <input type="hidden" name="sc" value="'.$user['sc'].'" />
         <input type="hidden" name="action" value="admin" />
         <input type="hidden" name="sa" value="members" />
         <input type="hidden" name="ssa" value="process-moderate" />
@@ -240,6 +241,7 @@ global $l, $settings, $cmsurl;
         <input type="hidden" name="action" value="admin" />
         <input type="hidden" name="sa" value="members" />
         <input type="hidden" name="ssa" value="activate" />
+        <input type="hidden" name="sc" value="'.$user['sc'].'" />
         <input type="hidden" name="u" value="'.$settings['managemembers']['member']['id'].'" />
         <input type="submit" value="'.$l['managemembers_moderate_activate'].'" />
         </p>
@@ -251,6 +253,7 @@ global $l, $settings, $cmsurl;
         <input type="hidden" name="action" value="admin" />
         <input type="hidden" name="sa" value="members" />
         <input type="hidden" name="ssa" value="suspend" />
+        <input type="hidden" name="sc" value="'.$user['sc'].'" />
         '.str_replace('%button%','<input type="submit" value="'.$l['managemembers_moderate_suspend_button'].'" />',str_replace('%input%','<input name="suspension" value="3" style="text-align: center; width: 30px" maxlength="4" />',$l['managemembers_moderate_suspend'])).
         '</p></form>
         ';
@@ -259,6 +262,7 @@ global $l, $settings, $cmsurl;
         <input type="hidden" name="action" value="admin" />
         <input type="hidden" name="sa" value="members" />
         <input type="hidden" name="ssa" value="suspend" />
+        <input type="hidden" name="sc" value="'.$user['sc'].'" />
         <input type="submit" value="'.$l['managemembers_moderate_renew_suspension_button'].'" />
         ',str_replace('%input%','<input name="suspension" value="3" style="text-align: center; width: 30px" maxlength="4" />
         </p></form>',str_replace('%remove%','<form action="'.$cmsurl.'index.php?action=admin&sa=members&u='.$_REQUEST['u'].'" method="post" style="display: inline"><p style="display: inline">
@@ -266,6 +270,7 @@ global $l, $settings, $cmsurl;
         <input type="hidden" name="action" value="admin" />
         <input type="hidden" name="sa" value="members" />
         <input type="hidden" name="ssa" value="unsuspend" />
+        <input type="hidden" name="sc" value="'.$user['sc'].'" />
         </p></form>
         ',$l['managemembers_moderate_renew_suspension'])));
     echo '<br />
@@ -277,11 +282,13 @@ global $l, $settings, $cmsurl;
         ';
     if (!@$settings['managemembers']['member']['banned'])
       echo '<input type="hidden" name="ssa" value="ban" />
+      <input type="hidden" name="sc" value="'.$user['sc'].'" />
         <input type="hidden" name="u" value="'.$settings['managemembers']['member']['id'].'" />
         <input type="submit" value="'.$l['managemembers_moderate_ban'].'" />
         ';
     else
       echo '<input type="hidden" name="ssa" value="unban" />
+      <input type="hidden" name="sc" value="'.$user['sc'].'" />
         <input type="hidden" name="u" value="'.$settings['managemembers']['member']['id'].'" />
         <input type="submit" value="'.$l['managemembers_moderate_unban'].'" />
         ';

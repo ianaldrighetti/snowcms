@@ -254,7 +254,7 @@ function processModeration() {
 global $db_prefix, $user;
   
   // Note: Error handling needs work
-  if (!@$_REQUEST['u'])
+  if (!ValidateSession(@$_REQUEST['sc']) || !@$_REQUEST['u'])
     die("Hacking Attempt...");
   if (!@$_REQUEST['user_name'])
     die("No username");
@@ -294,7 +294,7 @@ global $db_prefix, $user;
 function activate() {
 global $db_prefix;
   
-  if (!@$_REQUEST['u'])
+  if (!ValidateSession(@$_REQUEST['sc']) || !@$_REQUEST['u'])
     die("Hacking Attempt...");
   
   sql_query("UPDATE {$db_prefix}members SET `activated` = '1' WHERE `id` = '{$_REQUEST['u']}'") or die(mysql_error());
@@ -305,7 +305,7 @@ global $db_prefix;
 function suspend() {
 global $db_prefix;
   
-  if (!@$_REQUEST['u'])
+  if (!ValidateSession(@$_REQUEST['sc']) || !@$_REQUEST['u'])
     die("Hacking Attempt...");
   
   sql_query("UPDATE {$db_prefix}members SET `suspension` = '" . (time()+@$_REQUEST['suspension']*60) . "' WHERE `id` = '{$_REQUEST['u']}'") or die(mysql_error());
@@ -316,7 +316,7 @@ global $db_prefix;
 function unsuspend() {
 global $db_prefix;
   
-  if (!@$_REQUEST['u'])
+  if (!ValidateSession(@$_REQUEST['sc']) || !@$_REQUEST['u'])
     die("Hacking Attempt...");
   
   sql_query("UPDATE {$db_prefix}members SET `suspension` = '".time()."' WHERE `id` = '{$_REQUEST['u']}'") or die(mysql_error());
@@ -327,7 +327,7 @@ global $db_prefix;
 function ban() {
 global $db_prefix;
   
-  if (!@$_REQUEST['u'])
+  if (!ValidateSession(@$_REQUEST['sc']) || !@$_REQUEST['u'])
     die("Hacking Attempt...");
   
   sql_query("UPDATE {$db_prefix}members SET `banned` = '1' WHERE `id` = '{$_REQUEST['u']}'") or die(mysql_error());
@@ -338,7 +338,7 @@ global $db_prefix;
 function unban() {
 global $db_prefix;
   
-  if (!@$_REQUEST['u'])
+  if (!ValidateSession(@$_REQUEST['sc']) || !@$_REQUEST['u'])
     die("Hacking Attempt...");
   
   sql_query("UPDATE {$db_prefix}members SET `banned` = '0' WHERE `id` = '{$_REQUEST['u']}'") or die(mysql_error());
