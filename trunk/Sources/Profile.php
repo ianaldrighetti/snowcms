@@ -22,11 +22,12 @@ global $cmsurl, $db_prefix, $l, $settings, $source_dir, $user, $perms;
     $result = sql_query("
        SELECT
          m.id, m.username, m.email, m.display_name, m.reg_date, m.reg_ip, m.last_login,
-         m.last_ip, m.group, m.numposts, m.signature, m.activated, grp.group_id, 
-         grp.groupname
+         m.last_ip, m.group, m.numposts, m.signature, m.profile, grp.group_id, 
+         grp.groupname, o.last_active
        FROM {$db_prefix}members AS m
          LEFT JOIN {$db_prefix}membergroups AS grp ON grp.group_id = m.group
-       WHERE m.id = $UID");
+         LEFT JOIN {$db_prefix}online AS o ON o.user_id = m.id
+       WHERE m.id = $UID") or die(mysql_error());
     // Hmmm, is this account in this DB? D:
     if(mysql_num_rows($result)) {
       // It exists! :D
@@ -37,20 +38,18 @@ global $cmsurl, $db_prefix, $l, $settings, $source_dir, $user, $perms;
           'username' => $row['display_name'] ? $row['display_name'] : $row['username'],
           'email' => $row['email'],
           'reg_date' => formattime($row['reg_date']),
+          'online' => $row['last_active'],
           'ip' => $row['last_ip'] ? $row['last_ip'] : $row['reg_ip'],
-          'membergroup' => $row['groupname'],
+          'group_name' => $row['groupname'],
           'group_id' => $row['group'],
-          'numposts' => $row['numposts'],
+          'posts' => $row['numposts'],
           'signature' => $row['signature'],
-          'activated' => $row['activated']
+          'text' => $row['profile'],
         );
       }
       $settings['page']['title'] = str_replace("%user%", $mem['name'], $l['profile_profile_of']);
       $settings['profile'] = $mem;
-      if (can('admin'))
-       loadTheme('Profile','AdminView');
-      else
-       loadTheme('Profile','View');
+      loadTheme('Profile','View');
     }
     else {
       // Oh noes! It doesnt! Tell'em :P

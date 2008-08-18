@@ -182,6 +182,8 @@ $l['profile_error_title'] = 'Error';
 $l['profile_error_header'] = 'Error';
 $l['profile_error_desc'] = 'Sorry, but you are not <a href="'.$cmsurl.'index.php?action=login">logged in</a>, if you have not yet done so, why not <a href="'.$cmsurl.'index.php?action=register">register</a> and or <a href="'.$cmsurl.'index.php?action=login">login</a>';
 $l['profile_profile_of'] = 'Profile of %user%';
+$l['profile_online'] = 'Online';
+$l['profile_offline'] = 'Offline';
 
 // Permissions.template.php
 $l['permissions_title'] = 'Manage Permissions';
@@ -247,6 +249,7 @@ $l['managemembers_moderate_suspended_until'] = 'Suspended Until';
 $l['managemembers_moderate_registration_ip'] = 'Registration IP';
 $l['managemembers_moderate_last_ip'] = 'Last Used IP';
 $l['managemembers_moderate_signature'] = 'Signature';
+$l['managemembers_moderate_profile_text'] = 'Profile Text';
 $l['managemembers_moderate_change'] = 'Change Details';
 $l['managemembers_moderate_profile'] = 'View Profile';
 $l['managemembers_moderate_activate'] = 'Activate Account';

@@ -269,14 +269,21 @@ global $db_prefix, $user;
   $result = sql_query("SELECT * FROM {$db_prefix}members") or die(mysql_error());
   if (mysql_num_rows($result))
     while ($row = mysql_fetch_assoc($result)) {
-      if ($_REQUEST['u'] != $_REQUEST['uid'] && ($_REQUEST['user_name'] == $row['username'] || $_REQUEST['user_name'] == $row['display_name']))
+      if ($_REQUEST['u'] != $row['id'] && ($_REQUEST['user_name'] == $row['username'] || $_REQUEST['user_name'] == $row['display_name']))
         die("That username is already in use");
-      if ($_REQUEST['u'] != $_REQUEST['uid'] && $_REQUEST['display_name'] != '' && ($_REQUEST['display_name'] == $row['username'] || $_REQUEST['display_name'] == $row['display_name']))
+      if ($_REQUEST['u'] != $row['id'] && $_REQUEST['display_name'] != '' && ($_REQUEST['display_name'] == $row['username'] || $_REQUEST['display_name'] == $row['display_name']))
         die("That display name is already in use");
     }
   
+  $username = clean($_REQUEST['user_name']);
+  $display_name = clean($_REQUEST['display_name']);
+  $email = clean($_REQUEST['email']);
+  $group = clean($_REQUEST['group']);
+  $signature = clean($_REQUEST['signature']);
+  $profile = clean($_REQUEST['profile']);
+  
   // Update member's data
-  sql_query("UPDATE {$db_prefix}members SET `username` = '{$_REQUEST['user_name']}', `display_name` = '".$_REQUEST['display_name']."', `email` = '{$_REQUEST['email']}', `group` = '{$_REQUEST['group']}', `signature` = '".$_REQUEST['signature']."' WHERE `id` = '{$_REQUEST['u']}'") or die(mysql_error());
+  sql_query("UPDATE {$db_prefix}members SET `username` = '$username', `display_name` = '$display_name', `email` = '$email', `group` = '$group', `signature` = '$signature', `profile` = '$profile' WHERE `id` = '{$_REQUEST['u']}'") or die(mysql_error());
   
   if ($_REQUEST['u'] == $_REQUEST['uid'])
     setcookie('username',$_REQUEST['user_name']);

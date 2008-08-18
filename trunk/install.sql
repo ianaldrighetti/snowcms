@@ -68,6 +68,7 @@ CREATE TABLE `{$db_prefix}members` (
   `group` int(11) NOT NULL default '0',
   `numposts` int(11) NOT NULL default '0',
   `signature` text NOT NULL,
+  `profile` text NOT NULL,
   `activated` int(1) NOT NULL default '0',
   `suspension` int(10) NOT NULL default '0',
   `banned` int(1) NOT NULL default '0',
