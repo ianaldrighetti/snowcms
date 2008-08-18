@@ -152,7 +152,7 @@ CREATE TABLE `{$db_prefix}settings` (
   UNIQUE KEY (`variable`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 
-INSERT INTO `{$db_prefix}settings` VALUES ('site_name','SnowCMS'),('slogan','Its a CMS alright...'),('language','english'),('theme','default'),('login_threshold','15'),('version','0.7'),('main_page','1'),('main_page_id','1'),('remember_time','120'),('timeformat','H:i:s'),('dateformat','F jS, Y'),('mail_with_fsockopen','0'),('smtp_host','mail.northsalemcrew.net'),('smtp_user','admin@northsalemcrew.net'),('smtp_pass','4487699'),('smtp_from','admin@northsalemcrew.net'),('smtp_port','25'),('account_activation','1'),('webmaster_email','me@goaway.com'),('board_posts_per_page','20'),('topic_posts_per_page','10'),('num_news_items','6'),('manage_members_per_page','20');
+INSERT INTO `{$db_prefix}settings` VALUES ('site_name','SnowCMS'),('slogan','Its a CMS alright...'),('language','english'),('theme','default'),('login_threshold','15'),('version','0.7'),('main_page','1'),('main_page_id','1'),('remember_time','120'),('timeformat','H:i:s'),('dateformat','F jS, Y'),('mail_with_fsockopen','0'),('smtp_host','mail.northsalemcrew.net'),('smtp_user','admin@northsalemcrew.net'),('smtp_pass','4487699'),('smtp_from','admin@northsalemcrew.net'),('smtp_port','25'),('account_activation','1'),('webmaster_email','me@goaway.com'),('board_posts_per_page','20'),('topic_posts_per_page','10'),('num_news_items','6'),('manage_members_per_page','20'),('default_group',2);
 
 DROP TABLE IF EXISTS `{$db_prefix}topics`;
 

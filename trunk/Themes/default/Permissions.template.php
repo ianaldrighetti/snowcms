@@ -10,25 +10,29 @@ global $cmsurl, $settings, $l, $user;
     <h2>'.$l['permissions_header'].'</h2>
     <p>'.$l['permissions_desc'].'</p>
   
+  <form action="'.$cmsurl.'index.php?action=admin&sa=permissions" method="post" style="display: inline">
+  
+  <p><input type="hidden" name="change_groups" value="true" /></p>
+  
   <table width="100%">
     <tr>
-      <th width="60%">'.$l['permissions_membergroup'].'</th>
-      <th width="10%">'.$l['permissions_numusers'].'</th>
-      <th width="10%">'.$l['permissions_permissions'].'</th>
+      <th width="4%"></th>
+      <th width="40%" style="border-style: solid; border-width: 1px">'.$l['permissions_membergroup'].'</th>
+      <th width="15%" style="border-style: solid; border-width: 1px">'.$l['permissions_numusers'].'</th>
+      <th width="21%" style="border-style: solid; border-width: 1px">'.$l['permissions_permissions'].'</th>
       <th width="20%" colspan="2">&nbsp;</td>
     </tr>';
   foreach($settings['groups'] as $group) {
     echo '
     <tr>
-      <td style="padding: 5px;">
-      <form action="'.$cmsurl.'index.php?action=admin&sa=permissions" method="post" style="display: inline">
-      <p style="display: inline">
-      <input type="hidden" name="change_group" value="'.$group['id'].'" />
-      <input name="group_name" value="'.$group['name'].'" />
-      <input type="submit" value="'.$l['permissions_change_name'].'" />
-      </p>
-      </form>
-      </td>
+      ';
+    if ($settings['default_group'] == $group['id'])
+      echo '<td><input type="radio" name="default_group" value="'.$group['id'].'" checked="checked"></td>
+      ';
+    else
+      echo '<td><input type="radio" name="default_group" value="'.$group['id'].'"></td>
+      ';
+    echo '<td style="padding: 5px;"><input name="group_'.$group['id'].'" value="'.$group['name'].'" /></td>
       <td style="text-align: center; padding: 5px;">'.$group['numusers'].'</td>
       <td style="text-align: center; padding: 5px;">'.$group['numperms'].'</td>
       <td style="text-align: center; padding: 5px;"><a href="'.$cmsurl.'index.php?action=admin&sa=permissions&mid='.$group['id'].'">'.$l['permissions_modify'].'</a></td>
@@ -37,6 +41,10 @@ global $cmsurl, $settings, $l, $user;
   }
   echo '
   </table>
+  
+  <p><input type="submit" value="'.$l['permissions_change_groups'].'" /></p>
+  
+  </form>
   
   <br />
   

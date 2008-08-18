@@ -73,11 +73,17 @@ global $cmsurl, $db_prefix, $l, $settings, $user;
           // Weeeee! Done!
         }
       }
-      // Change a group's name
-      if (@$_REQUEST['change_group']) {
-        $group_id = clean($_REQUEST['change_group']);
-        $group_name = clean($_REQUEST['group_name']);
-        sql_query("UPDATE {$db_prefix}membergroups SET `groupname` = '$group_name' WHERE `group_id` = '$group_id'") or die(mysql_error());
+      // Change groups' names and which one is default
+      if (@$_REQUEST['change_groups']) {
+        $default_group = clean($_REQUEST['default_group']);
+        sql_query("UPDATE {$db_prefix}settings SET `value` = '$default_group' WHERE `variable` = 'default_group'") or die(mysql_error());
+        foreach ($_REQUEST as $key => $value) {
+         if (substr($key,0,6) == 'group_') {
+           $group_id = clean(substr($key,6,strlen($key)));
+           $group_name = clean($value);
+           sql_query("UPDATE {$db_prefix}membergroups SET `groupname` = '$group_name' WHERE `group_id` = '$group_id'") or die(mysql_error());
+         }
+        }
       }
       // Create a new group
       if (@$_REQUEST['new_group']) {
