@@ -33,7 +33,7 @@ CREATE TABLE `{$db_prefix}boards` (
   PRIMARY KEY  (`bid`)
 ) ENGINE=MyISAM AUTO_INCREMENT=2 DEFAULT CHARSET=utf8;
 
-INSERT INTO `{$db_prefix}boards` (`bid`,`cid`,`border`,`who_view`,`name`,`bdesc`,`numtopic`,`numposts`,`last_msg`,`last_uid`,`last_name`) VALUES('1','1','1','1,2','General Chat','Chat about anything!','0','0','0','0','0');
+INSERT INTO `{$db_prefix}boards` (`bid`,`cid`,`border`,`who_view`,`name`,`bdesc`,`numtopics`,`numposts`,`last_msg`,`last_uid`,`last_name`) VALUES('1','1','1','1,2','General Chat','Chat about anything!','0','0','0','0','0');
 
 DROP TABLE IF EXISTS `{$db_prefix}categories`;
 
