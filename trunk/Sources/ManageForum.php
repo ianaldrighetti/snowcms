@@ -155,10 +155,10 @@ global $cmsurl, $db_prefix, $forumperms, $l, $settings, $user;
         WHERE m.group_id != 1
         ORDER BY m.group_id ASC");
       $settings['groups'] = array();
-      if(in_array(0, $settings['board']['who_view'], true))
-        $settings['groups']['0']['checked'] = true;
+      if(in_array(-1, $settings['board']['who_view']))
+        $settings['groups']['-1']['checked'] = true;
       else
-        $settings['groups']['0']['checked'] = false;
+        $settings['groups']['-1']['checked'] = false;
       while($row = mysql_fetch_assoc($result)) {
         $settings['groups'][$row['group_id']] = array(
           'id' => $row['group_id'],
@@ -211,7 +211,7 @@ global $cmsurl, $db_prefix, $forumperms, $l, $settings, $user;
       sql_query("INSERT INTO {$db_prefix}boards (`cid`,`who_view`,`name`,`bdesc`) VALUES('$in_category','$who_view','$board_name','$board_desc')");
       $result = sql_query("SELECT * FROM {$db_prefix}boards ORDER BY `bid` DESC LIMIT 1");
       $row = mysql_fetch_assoc($result);
-      setPermissions($row['bid']);
+      setPermissions($row['bid'], $_REQUEST['groups']);
     }
     if(!empty($_REQUEST['update_boards'])) {
       $result = sql_query("SELECT * FROM {$db_prefix}boards");
@@ -251,6 +251,7 @@ global $cmsurl, $db_prefix, $forumperms, $l, $settings, $user;
       }
       $who_view = implode(",", $tmp_array);
       sql_query("UPDATE {$db_prefix}boards SET `cid` = $in_category, `name` = '$board_name', `bdesc` = '$board_desc', `who_view` = '$who_view' WHERE `bid` = '$board_id'");
+      setPermissions($board_id, $_REQUEST['groups'], true);
     }
     if(!empty($_REQUEST['delete']) && validateSession(@$_REQUEST['sc'])) {
       $board_id = (int)$_REQUEST['delete'];
@@ -301,21 +302,28 @@ global $settings;
 }
 
 // This is called upon when a new board is made, that sets permissions ;)
-function setPermissions($board_id, $type = false) {
+function setPermissions($board_id, $groups_allowed, $type = false) {
 global $db_prefix;
-/* This is an array of permissions that can be done on the forum ;) */
-// 'PERM' => 'Defaultly (Is that a word?) Set'
-$forumperms = array(
-  'delete_any' => false,  
-  'delete_own' => true,
-  'lock_topic' => false,
-  'move_any' => false,
-  'edit_any' => false,
-  'edit_own' => true,
-  'post_new' => true,
-  'post_reply' => true,
-  'sticky_topic' => false
-); 
+  $board_id = (int)$board_id;
+  $tmp = array();
+  foreach($groups_allowed as $group) {
+    $tmp[] = (int)$group;
+  }
+  $groups_allowed = $tmp;
+  unset($tmp);
+  /* This is an array of permissions that can be done on the forum ;) */
+  // 'PERM' => 'Defaultly (Is that a word?) Set'
+  $forumperms = array(
+    'delete_any' => false,  
+    'delete_own' => true,
+    'lock_topic' => false,
+    'move_any' => false,
+    'edit_any' => false,
+    'edit_own' => true,
+    'post_new' => true,
+    'post_reply' => true,
+    'sticky_topic' => false
+  ); 
   /*
     $type:
     1 = updating current ones
@@ -335,20 +343,47 @@ $forumperms = array(
     // Delete any possible ones? D:!
     sql_query("DELETE FROM {$db_prefix}board_permissions WHERE `bid` = $board_id");
     foreach($groups as $group_id) {
-      $perms = array();
-      foreach($forumperms as $perm => $default) {
-        if($default)
-          $can = 1;
-        else
-          $can = 0;
-        $perms[] = "('$board_id','$group_id','$perm','$can')";        
+      // Have they been given access? O.o
+      if(in_array($group_id, $groups_allowed)) {
+        $perms = array();
+        foreach($forumperms as $perm => $default) {
+          if($default)
+            $can = 1;
+          else
+            $can = 0;
+          $perms[] = "('$board_id','$group_id','$perm','$can')";        
+        }
+        $query = implode(",", $perms);
+        sql_query("INSERT INTO {$db_prefix}board_permissions (`bid`,`group_id`,`what`,`can`) VALUES{$query}");
       }
-      $query = implode(",", $perms);
-      sql_query("INSERT INTO {$db_prefix}board_permissions (`bid`,`group_id`,`what`,`can`) VALUES{$query}");
     }
   }
   else {
-  
+    foreach($groups as $group_id) {
+      // Check and see if any permissions for this group have been set D:!
+      // If none, then it is a new group...
+      $result = sql_query("
+        SELECT
+          p.bid, p.group_id, p.what, p.can
+        FROM {$db_prefix}board_permissions AS p
+        WHERE p.group_id = $group_id");
+      // If more then 1, don't mess with it, else, add :D!
+      if(!mysql_num_rows($result) && in_array($group_id, $groups_allowed)) {
+        // None! D:!
+        foreach($forumsperms as $perm => $default) {
+          if($default)
+            $can = 1;
+          else
+            $can = 0;
+          $perms[] = "('$board_id','$group_id','$perm','$can')";          
+        }
+        $query = implode(",", $perms);
+        sql_query("INSERT INTO {$db_prefix}board_permissions (`bid`,`group_id`,`what`,`can`) VALUES{$query}");
+      }      
+    }
+    // Okay, now delete ALL that have not been kept :P
+    $not_in = implode(",", $groups);
+    sql_query("DELETE FROM {$db_prefix}board_permissions WHERE `group_id` NOT IN($not_in)");
   }
 }
 ?>
