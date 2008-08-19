@@ -6,7 +6,7 @@ if(!defined('Snow'))
   
 function Main() {
 global $settings;
-  
+  View();
 }
 
 function View() {
