@@ -64,7 +64,7 @@ global $cmsurl, $db_prefix, $l, $settings, $user;
     $updated = implode(",", $rows);
     sql_query("REPLACE INTO {$db_prefix}categories (`cid`,`corder`,`cname`) VALUES{$updated}");
   }
-  if(!empty($_REQUEST['delete']) && validateSession($_REQUEST['sc'])) {
+  if(!empty($_REQUEST['delete']) && validateSession(@$_REQUEST['sc'])) {
     $cat_id = (int)$_REQUEST['delete'];
     sql_query("DELETE FROM {$db_prefix}categories WHERE `cid` = '$cat_id'");
   }
@@ -246,7 +246,7 @@ global $cmsurl, $db_prefix, $l, $settings, $user;
       $who_view = implode(",", $tmp_array);
       sql_query("UPDATE {$db_prefix}boards SET `cid` = $in_category, `name` = '$board_name', `bdesc` = '$board_desc', `who_view` = '$who_view' WHERE `bid` = '$board_id'");
     }
-    if(!empty($_REQUEST['delete']) && validateSession($_REQUEST['sc'])) {
+    if(!empty($_REQUEST['delete']) && validateSession(@$_REQUEST['sc'])) {
       $board_id = (int)$_REQUEST['delete'];
       sql_query("DELETE FROM {$db_prefix}boards WHERE `bid` = $board_id");
     }
