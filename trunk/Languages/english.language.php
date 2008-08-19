@@ -271,7 +271,7 @@ $l['mf_link_cats_desc'] = 'Create, Edit, and Delete forum categories';
 $l['mf_link_boards'] = 'Manage Boards';
 $l['mf_link_boards_desc'] = 'You can create, edit and delete your boards in your forum here';
 $l['managecats_title'] = 'Manage Categories';
-
+// Manage Categories
 $l['mf_new_category'] = 'New Category';
 $l['managecats_add_header'] = 'Add Category';
 $l['managecats_addbutton'] = 'Add Category';
@@ -284,6 +284,23 @@ $l['managecats_update'] = 'Update';
 $l['managecats_are_you_sure'] = 'Are you sure you want to delete this Category?';
 $l['managecats_catname'] = 'Category Name:';
 $l['managecats_order'] = 'Order:';
+// Manage Boards
+$l['manageboards_title'] = 'Manage Boards';
+$l['manageboards_header'] = 'Manage Boards';
+$l['manageboards_desc'] = 'You can edit, add, and delete boards in your forum, be sure that you have <a href="'. $cmsurl. 'index.php?action=admin&sa=forum&fa=categories">categories</a> created already';
+$l['manageboards_no_cats'] = 'No categories have been found! You <em>must</em> have categories to add boards, you can make them <a href="'. $cmsurl. 'index.php?action=admin&sa=forum&fa=categories">here</a>';
+$l['manageboards_are_you_sure_del'] = 'Are you SURE you want to delete this board? \nIt can\\\'t be undone!';
+$l['manageboards_edit_link'] = 'EDIT';
+// Add Boards
+$l['manageboards_add_title'] = 'Add Board';
+$l['manageboards_add_header'] = 'Add Board';
+$l['manageboards_add_category'] = 'Category';
+$l['manageboards_add_boardname'] = 'Board Name';
+$l['manageboards_add_boarddesc'] = 'Board Description';
+$l['manageboards_add_whoview'] = 'Allowed Groups';
+$l['manageboards_add_button'] = 'Add Board';
+$l['manageboards_add_guests'] = 'Guests';
+$l['manageboards_add_update'] = 'Update Boards';
 
 // Post.template.php
 $l['forum_startnew'] = 'Post New Topic';

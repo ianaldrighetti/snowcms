@@ -48,20 +48,6 @@ global $cmsurl, $db_prefix, $l, $settings, $user;
   loadTheme('ManageForum');
 }
 
-function ManageBoards() {
-global $cmsurl, $db_prefix, $l, $settings, $user;
-  // They want to manage the boards =D
-  if($_REQUEST['do']=="add") {
-    // Show a form to add a new board =D
-  }
-  elseif($_REQUEST['do']=="edit") {
-    // Show a form to edit a board
-  }
-  else {
-    // Show a list of Boards...
-  }
-}
-
 // Awwww, Kitty ^^
 function ManageCats() {
 global $cmsurl, $db_prefix, $l, $settings, $user;
@@ -186,6 +172,25 @@ global $cmsurl, $db_prefix, $l, $settings, $user;
     }
   }
   else {
+    // Add boards or edit them as requested...
+    if(!empty($_REQUEST['add_board'])) {
+      $in_category = (int)$_REQUEST['in_category'];
+      $board_name = clean($_REQUEST['board_name']);
+      $board_desc = clean($_REQUEST['board_desc']);      
+      if(is_array($_REQUEST['groups'])) {
+        $who_view = array();
+        foreach($_REQUEST['groups'] as $group) {
+          $who_view[] = (int)$group;
+        }
+        $who_view = implode(",", $who_view);
+      }
+      else {
+        $who_view = (int)$_REQUEST['groups'];
+      }
+      sql_query("INSERT INTO {$db_prefix}boards (`cid`,`who_view`,`name`,`bdesc`) VALUES('$in_category','$who_view','$board_name','$board_desc')");
+      echo '=D<br />';
+      echo mysql_error().'<br />';
+    }
     // Load up all the boards and such...
     $result = sql_query("
       SELECT

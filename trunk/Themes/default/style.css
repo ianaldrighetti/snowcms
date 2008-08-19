@@ -1,11 +1,16 @@
 /* 
 		Snowy
 		Stylesheet - June 11, 2008
-		Copyright 2008 soren121.
+		Copyright 2008 of SnowCMS.
 */
 
 body {
 	background: #ededed;
+	font-family: Verdana,Arial,Sans;
+	font-size: 12px;
+}
+
+textarea {
 	font-family: Verdana,Arial,Sans;
 	font-size: 12px;
 }
@@ -184,4 +189,40 @@ a.headerlink {
 }
 #add_cat .order {
   border: 1px solid #dddddd;
+}
+/* Manage Boards */
+#board_list {
+  width: 100%;
+}
+#board_list .category td {
+  font-weight: bold;
+  border: 1px solid #DDDDDD;
+}
+#board_list .board input {
+  border: 1px solid #DDDDDD;
+}
+#board_list .board .name {
+  width: 70%;
+}
+#board_list .board  .order {
+  width: 10%;
+}
+#board_list .board .edit {
+  width: 8%;
+}
+#board_list .board .del {
+  width: 8%;
+}
+#board_list .board .del a {
+  color: #CC0000;
+}
+#board_list input {
+  width: 95%;
+}
+/* Add Boards */
+#add_board {
+  width: 100%;
+}
+#add_board input[type="text"], #add_board input[type="submit"] {
+  border: 1px solid #DDDDDD;
 }
