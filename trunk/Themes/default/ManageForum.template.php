@@ -66,23 +66,21 @@ global $cmsurl, $db_prefix, $l, $settings, $user;
   <form action="', $cmsurl, 'index.php?action=admin&sa=forum&fa=boards" method="post">
     <div id="board_list">';
     foreach($settings['cats'] as $cat) {
-      // Show the Category name...
       echo '
       <div class="category">
-        <p><a name="c', $cat['id'], '"></a>', $cat['name'], '</p>
+        <p>', $cat['name'], '</p>
       </div>';
-      // Now for the boards!
       if(count($cat['boards'])) {
         foreach($cat['boards'] as $board) {
           echo '
-          <tr class="board">
-            <td class="name"><input name="board_name[', $board['id'], ']" type="text" value="', $board['name'], '"/></td><td class="order"><input name="board_order[', $board['id'], ']" type="text" value="', $board['order'], '"/></td><td class="edit">[<a href="', $cmsurl, 'index.php?action=admin&sa=forum&fa=boards&do=edit&id=', $board['id'], '">', $l['manageboards_edit_link'], '</a>]</td><td class="del"><a href="', $cmsurl, 'index.php?action=admin&sa=forum&fa=boards&delete=', $board['id'], '" onClick="return confirm(\'', $l['manageboards_are_you_sure_del'], '\');">X</td>
-          </tr>';
+          <div class="board">
+            <p><input class="board_name" name="board_name[', $board['id'], ']" type="text" value="', $board['name'], '"/> <input class="board_order" name="border_order[', $board['id'], ']" type="text" value="', $board['order'], '"/> [<a href="', $cmsurl, 'index.php?action=admin&sa=forum&fa=boards&do=edit&id=', $board['id'], '">', $l['manageboards_edit_link'], '</a>] <a class="del" href="', $cmsurl, 'index.php?action=admin&sa=forum&fa=boards&delete=', $board['id'], '" onClick="return confirm(\'', $l['manageboards_are_you_sure_del'], '\');">X</a></p>
+          </div>';
         }
       }
     }
     echo '
-    </table>
+    </div>
     <table width="100%">
       <tr align="right">
         <td><a href="', $cmsurl, 'index.php?action=admin&sa=forum&fa=boards&do=add">', $l['manageboards_add_button'], '</a>  <input name="update_boards" type="submit" value="', $l['manageboards_add_update'], '"/></td>
