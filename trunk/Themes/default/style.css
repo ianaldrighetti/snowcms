@@ -191,33 +191,37 @@ a.headerlink {
   border: 1px solid #dddddd;
 }
 /* Manage Boards */
+#board_list input {
+  border: 1px solid #DDDDDD;
+  margin-top: 2px;
+}
 #board_list {
   width: 100%;
+  padding: 0px;
+  margin: 0px;
 }
-#board_list .category td {
-  font-weight: bold;
+#board_list .category {
   border: 1px solid #DDDDDD;
+  height: 14px;
+  padding-left: 5px;
+  margin: 2px;
 }
-#board_list .board input {
+#board_list .board {
   border: 1px solid #DDDDDD;
+  height: 26px;
+  margin-top: 4px;
+  padding-left: 5px;
+  margin-left: 3%;
 }
-#board_list .board .name {
-  width: 70%;
+#board_list .board_order {
+  width: 5%;
+  text-align: center;
 }
-#board_list .board  .order {
-  width: 10%;
+#board_list .board_name {
+  width: 80%;
 }
-#board_list .board .edit {
-  width: 8%;
-}
-#board_list .board .del {
-  width: 8%;
-}
-#board_list .board .del a {
+#board_list .del {
   color: #CC0000;
-}
-#board_list input {
-  width: 95%;
 }
 /* Add Boards */
 #add_board {

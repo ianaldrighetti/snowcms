@@ -74,7 +74,7 @@ global $cmsurl, $db_prefix, $l, $settings, $user;
         foreach($cat['boards'] as $board) {
           echo '
           <div class="board">
-            <p><input class="board_name" name="board_name[', $board['id'], ']" type="text" value="', $board['name'], '"/> <input class="board_order" name="border_order[', $board['id'], ']" type="text" value="', $board['order'], '"/> [<a href="', $cmsurl, 'index.php?action=admin&sa=forum&fa=boards&do=edit&id=', $board['id'], '">', $l['manageboards_edit_link'], '</a>] <a class="del" href="', $cmsurl, 'index.php?action=admin&sa=forum&fa=boards&delete=', $board['id'], '" onClick="return confirm(\'', $l['manageboards_are_you_sure_del'], '\');">X</a></p>
+            <p><input class="board_name" name="board_name[', $board['id'], ']" type="text" value="', $board['name'], '"/> <input class="board_order" name="board_order[', $board['id'], ']" type="text" value="', $board['order'], '"/> [<a href="', $cmsurl, 'index.php?action=admin&sa=forum&fa=boards&do=edit&id=', $board['id'], '">', $l['manageboards_edit_link'], '</a>] <a class="del" href="', $cmsurl, 'index.php?action=admin&sa=forum&fa=boards&delete=', $board['id'], '" onClick="return confirm(\'', $l['manageboards_are_you_sure_del'], '\');">X</a></p>
           </div>';
         }
       }
