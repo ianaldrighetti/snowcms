@@ -13,7 +13,7 @@
 
 if(!defined("Snow"))
   die("Hacking Attempt...");
-  
+ 
 // Displays the page
 function ManageForum() {
 global $cmsurl, $db_prefix, $l, $settings, $source_dir, $user;
@@ -64,7 +64,7 @@ global $cmsurl, $db_prefix, $l, $settings, $user;
     $updated = implode(",", $rows);
     sql_query("REPLACE INTO {$db_prefix}categories (`cid`,`corder`,`cname`) VALUES{$updated}");
   }
-  if(!empty($_REQUEST['delete']) && validateSession(@$_REQUEST['sc'])) {
+  if(!empty($_REQUEST['delete']) && validateSession($_REQUEST['sc'])) {
     $cat_id = (int)$_REQUEST['delete'];
     sql_query("DELETE FROM {$db_prefix}categories WHERE `cid` = '$cat_id'");
   }
@@ -93,7 +93,7 @@ global $cmsurl, $db_prefix, $l, $settings, $user;
 }
 
 function ManageBoards() {
-global $cmsurl, $db_prefix, $l, $settings, $user;
+global $cmsurl, $db_prefix, $forumperms, $l, $settings, $user;
   $do = @$_REQUEST['do'] ? $_REQUEST['do'] : null;
   if($do == "add") {
     // Adding a Board, Load up category list, Member groups and such
@@ -189,6 +189,9 @@ global $cmsurl, $db_prefix, $l, $settings, $user;
       loadTheme('ManageForum','NoBoard');
     }
   }
+  elseif($do == "permissions") {
+    // We set board permissions by group here...
+  }
   else {
     // Add boards or edit them as requested...
     if(!empty($_REQUEST['add_board'])) {
@@ -206,6 +209,9 @@ global $cmsurl, $db_prefix, $l, $settings, $user;
         $who_view = (int)$_REQUEST['groups'];
       }
       sql_query("INSERT INTO {$db_prefix}boards (`cid`,`who_view`,`name`,`bdesc`) VALUES('$in_category','$who_view','$board_name','$board_desc')");
+      $result = sql_query("SELECT * FROM {$db_prefix}boards ORDER BY `bid` DESC LIMIT 1");
+      $row = mysql_fetch_assoc($result);
+      setPermissions($row['bid']);
     }
     if(!empty($_REQUEST['update_boards'])) {
       $result = sql_query("SELECT * FROM {$db_prefix}boards");
@@ -249,7 +255,7 @@ global $cmsurl, $db_prefix, $l, $settings, $user;
     if(!empty($_REQUEST['delete']) && validateSession(@$_REQUEST['sc'])) {
       $board_id = (int)$_REQUEST['delete'];
       sql_query("DELETE FROM {$db_prefix}boards WHERE `bid` = $board_id");
-    }
+    }    
     // Load up all the boards and such...
     $result = sql_query("
       SELECT
@@ -292,5 +298,57 @@ global $settings;
     return true;
   else
     return false;
+}
+
+// This is called upon when a new board is made, that sets permissions ;)
+function setPermissions($board_id, $type = false) {
+global $db_prefix;
+/* This is an array of permissions that can be done on the forum ;) */
+// 'PERM' => 'Defaultly (Is that a word?) Set'
+$forumperms = array(
+  'delete_any' => false,  
+  'delete_own' => true,
+  'lock_topic' => false,
+  'move_any' => false,
+  'edit_any' => false,
+  'edit_own' => true,
+  'post_new' => true,
+  'post_reply' => true,
+  'sticky_topic' => false
+); 
+  /*
+    $type:
+    1 = updating current ones
+    0 = adding the default ones
+  */
+  // Get the membergroups :)
+  $result = sql_query("
+    SELECT
+      g.group_id, g.groupname
+    FROM {$db_prefix}membergroups AS g
+    WHERE g.group_id != 1");
+  $groups = array();
+  while($row = mysql_fetch_assoc($result)) {
+    $groups[] = $row['group_id'];
+  }
+  if(!$type) {
+    // Delete any possible ones? D:!
+    sql_query("DELETE FROM {$db_prefix}board_permissions WHERE `bid` = $board_id");
+    foreach($groups as $group_id) {
+      $perms = array();
+      foreach($forumperms as $perm => $default) {
+        if($default)
+          $can = 1;
+        else
+          $can = 0;
+        $perms[] = "('$board_id','$group_id','$perm','$can')";        
+      }
+      $query = implode(",", $perms);
+      sql_query("INSERT INTO {$db_prefix}board_permissions (`bid`,`group_id`,`what`,`can`) VALUES{$query}");
+    }
+  }
+  else {
+  
+  }
 }
 ?>
