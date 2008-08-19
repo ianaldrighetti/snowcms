@@ -188,8 +188,30 @@ global $cmsurl, $db_prefix, $l, $settings, $user;
         $who_view = (int)$_REQUEST['groups'];
       }
       sql_query("INSERT INTO {$db_prefix}boards (`cid`,`who_view`,`name`,`bdesc`) VALUES('$in_category','$who_view','$board_name','$board_desc')");
-      echo '=D<br />';
-      echo mysql_error().'<br />';
+    }
+    if(!empty($_REQUEST['update_boards'])) {
+      $result = sql_query("SELECT * FROM {$db_prefix}boards");
+      while($row = mysql_fetch_assoc($result)) {
+        $settings['boards'][$row['bid']] = array(
+          'bid' => $row['bid'],
+          'cid' => $row['cid'],
+          'who_view' => $row['who_view'],
+          'bdesc' => $row['bdesc'],
+          'numtopics' => $row['numtopics'],
+          'numposts' => $row['numposts'],
+          'last_msg' => $row['last_msg'],
+          'last_uid' => $row['last_uid'],
+          'last_name' => $row['last_name']
+        );
+      }
+      foreach($_POST['board_name'] as $board_id => $board_name) {
+        $board_id = (int)$board_id;
+        $board_name = clean($board_name);
+        $board_order = (int)$_POST['board_order'][$board_id];
+        $boards[] = "('$board_id','{$settings['boards'][$board_id]['cid']}','$board_order','{$settings['boards'][$board_id]['who_view']}','$board_name','{$settings['boards'][$board_id]['bdesc']}','{$settings['boards'][$board_id]['numtopics']}','{$settings['boards'][$board_id]['numposts']}','{$settings['boards'][$board_id]['last_msg']}','{$settings['boards'][$board_id]['last_uid']}','{$settings['boards'][$board_id]['last_name']}')";
+      }
+      $query = implode(",", $boards);      
+      sql_query("REPLACE INTO {$db_prefix}boards (`bid`,`cid`,`border`,`who_view`,`name`,`bdesc`,`numtopics`,`numposts`,`last_msg`,`last_uid`,`last_name`) VALUES{$query}");
     }
     // Load up all the boards and such...
     $result = sql_query("

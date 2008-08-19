@@ -63,13 +63,14 @@ global $cmsurl, $db_prefix, $l, $settings, $user;
   <p>', $l['manageboards_desc'], '</p>';
   if(count($settings['cats'])) {
     echo '
-    <table id="board_list">';
+  <form action="', $cmsurl, 'index.php?action=admin&sa=forum&fa=boards" method="post">
+    <div id="board_list">';
     foreach($settings['cats'] as $cat) {
       // Show the Category name...
       echo '
-      <tr class="category">
-        <td colspan="4"><a name="c', $cat['id'], '">', $cat['name'], '</a></td>
-      </tr>';
+      <div class="category">
+        <p><a name="c', $cat['id'], '"></a>', $cat['name'], '</p>
+      </div>';
       // Now for the boards!
       if(count($cat['boards'])) {
         foreach($cat['boards'] as $board) {
@@ -82,11 +83,12 @@ global $cmsurl, $db_prefix, $l, $settings, $user;
     }
     echo '
     </table>
-  <table width="100%">
-    <tr align="right">
-      <td><a href="', $cmsurl, 'index.php?action=admin&sa=forum&fa=boards&do=add">', $l['manageboards_add_button'], '</a></td>
-    </tr>
-  </table>';  
+    <table width="100%">
+      <tr align="right">
+        <td><a href="', $cmsurl, 'index.php?action=admin&sa=forum&fa=boards&do=add">', $l['manageboards_add_button'], '</a>  <input name="update_boards" type="submit" value="', $l['manageboards_add_update'], '"/></td>
+      </tr>
+    </table>
+  </form>';  
   }
   else {
     echo '<p style="error">', $l['manageboards_no_cats'], '</p>';
