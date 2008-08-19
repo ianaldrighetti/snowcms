@@ -5,10 +5,10 @@ if(!defined('Snow'))
   die("Hacking Attempt...");
   
 function Main() {
-global $settings, $cmsurl;
+global $l, $settings, $cmsurl;
   
   echo '<h1 style="margin-bottom: 0">'.$settings['page']['title'].'</h1>
-        ';
+        <p style="margin-top: 0"><a href="'.$cmsurl.'index.php?action=profile&sa=edit">'.$l['profile_edit'].'</a></p>';
   
   Info();
 }
@@ -51,6 +51,12 @@ global $l, $settings;
         '.bbc($profile['text']).'
         </p>
         ';
+}
+
+function Settings() {
+global $l, $settings;
+  
+  echo '<h1>'.$settings['page']['title'].'</h1>';
 }
 
 function NotAllowed() {
