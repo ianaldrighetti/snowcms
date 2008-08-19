@@ -5,8 +5,12 @@ if(!defined('Snow'))
   die("Hacking Attempt...");
   
 function Main() {
-global $settings;
-  View();
+global $settings, $cmsurl;
+  
+  echo '<h1 style="margin-bottom: 0">'.$settings['page']['title'].'</h1>
+        ';
+  
+  Info();
 }
 
 function View() {
@@ -24,9 +28,17 @@ global $l, $settings, $theme_url;
               alt="'.$l['profile_offline'].'" width="16" height="16" /></td><td><b>
             '.$l['profile_offline'])
           .'</b></td></tr>
-        </table>
+        </table>';
+  
+  Info();
+}
+
+function Info() {
+global $l, $settings;
+  
+  $profile = $settings['profile'];
         
-        <br />
+  echo '<br />
         
         <table width="100%">
         <tr><th style="text-align: left">Member Group:</th><td>'.$profile['group_name'].'</td></tr>
