@@ -155,13 +155,31 @@ global $cmsurl, $db_prefix, $l, $settings, $user;
         WHERE m.group_id != 1
         ORDER BY m.group_id ASC");
       $settings['groups'] = array();
+      if(in_array(0, $settings['board']['who_view'], true))
+        $settings['groups']['0']['checked'] = true;
+      else
+        $settings['groups']['0']['checked'] = false;
       while($row = mysql_fetch_assoc($result)) {
-        $settings['groups'][] = array(
+        $settings['groups'][$row['group_id']] = array(
           'id' => $row['group_id'],
           'name' => $row['groupname'],
           'checked' => @in_array($row['group_id'], $settings['board']['who_view']) ? true : false
         );
       }
+      $result = sql_query("
+        SELECT
+          c.cid, c.cname
+        FROM {$db_prefix}categories AS c
+        ORDER BY c.cid ASC");
+      $settings['cats'] = array();
+      while($row = mysql_fetch_assoc($result)) {
+        $settings['cats'][] = array(
+          'id' => $row['cid'],
+          'name' => $row['cname'],
+          'selected' => isSelected($row['cid']) ? true : false
+        );
+      }  
+        
       $settings['page']['title'] = $l['manageboards_edit_title'];
       loadTheme('ManageForum','EditBoard');
     }
@@ -213,6 +231,25 @@ global $cmsurl, $db_prefix, $l, $settings, $user;
       $query = implode(",", $boards);      
       sql_query("REPLACE INTO {$db_prefix}boards (`bid`,`cid`,`border`,`who_view`,`name`,`bdesc`,`numtopics`,`numposts`,`last_msg`,`last_uid`,`last_name`) VALUES{$query}");
     }
+    if(!empty($_REQUEST['update_board'])) {
+      $board_id = (int)$_REQUEST['board_id'];
+      $in_category = (int)$_REQUEST['in_category'];
+      $board_name = clean($_REQUEST['board_name']);
+      $board_desc = clean($_REQUEST['board_desc']);
+      $who_view = @$_REQUEST['groups'] ? $_REQUEST['groups'] : null;
+      $tmp_array = array();
+      if(count($who_view)) {       
+        foreach($who_view as $group_id) {
+          $tmp_array[] = (int)$group_id;
+        }
+      }
+      $who_view = implode(",", $tmp_array);
+      sql_query("UPDATE {$db_prefix}boards SET `cid` = $in_category, `name` = '$board_name', `bdesc` = '$board_desc', `who_view` = '$who_view' WHERE `bid` = '$board_id'");
+    }
+    if(!empty($_REQUEST['delete']) && validateSession($_REQUEST['sc'])) {
+      $board_id = (int)$_REQUEST['delete'];
+      sql_query("DELETE FROM {$db_prefix}boards WHERE `bid` = $board_id");
+    }
     // Load up all the boards and such...
     $result = sql_query("
       SELECT
@@ -246,5 +283,14 @@ global $cmsurl, $db_prefix, $l, $settings, $user;
     $settings['page']['title'] = $l['manageboards_title'];
     loadTheme('ManageForum','ShowBoards');
   }
+}
+
+// A quick function to help out :P
+function isSelected($cid) {
+global $settings;
+  if($cid==$settings['board']['cid'])
+    return true;
+  else
+    return false;
 }
 ?>

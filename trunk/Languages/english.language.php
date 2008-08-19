@@ -301,6 +301,10 @@ $l['manageboards_add_whoview'] = 'Allowed Groups';
 $l['manageboards_add_button'] = 'Add Board';
 $l['manageboards_add_guests'] = 'Guests';
 $l['manageboards_add_update'] = 'Update Boards';
+// Edit Boards
+$l['manageboards_edit_title'] = 'Edit Board';
+$l['manageboards_edit_header'] = 'Edit Board';
+$l['manageboards_edit_button'] = 'Update Board';
 
 // Post.template.php
 $l['forum_startnew'] = 'Post New Topic';

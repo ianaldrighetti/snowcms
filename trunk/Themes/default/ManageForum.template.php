@@ -74,7 +74,7 @@ global $cmsurl, $db_prefix, $l, $settings, $user;
         foreach($cat['boards'] as $board) {
           echo '
           <div class="board">
-            <p><input class="board_name" name="board_name[', $board['id'], ']" type="text" value="', $board['name'], '"/> <input class="board_order" name="board_order[', $board['id'], ']" type="text" value="', $board['order'], '"/> [<a href="', $cmsurl, 'index.php?action=admin&sa=forum&fa=boards&do=edit&id=', $board['id'], '">', $l['manageboards_edit_link'], '</a>] <a class="del" href="', $cmsurl, 'index.php?action=admin&sa=forum&fa=boards&delete=', $board['id'], '" onClick="return confirm(\'', $l['manageboards_are_you_sure_del'], '\');">X</a></p>
+            <p><input class="board_name" name="board_name[', $board['id'], ']" type="text" value="', $board['name'], '"/> <input class="board_order" name="board_order[', $board['id'], ']" type="text" value="', $board['order'], '"/> [<a href="', $cmsurl, 'index.php?action=admin&sa=forum&fa=boards&do=edit&id=', $board['id'], '">', $l['manageboards_edit_link'], '</a>] <a class="del" href="', $cmsurl, 'index.php?action=admin&sa=forum&fa=boards&delete=', $board['id'], '&sc=', $user['sc'], '" onClick="return confirm(\'', $l['manageboards_are_you_sure_del'], '\');">X</a></p>
           </div>';
         }
       }
@@ -96,7 +96,7 @@ global $cmsurl, $db_prefix, $l, $settings, $user;
 function AddBoard() {
 global $cmsurl, $db_prefix, $l, $settings, $user;
   echo '
-  <h1>', $l['manageboards_add_header'], '</h2>
+  <h2>', $l['manageboards_add_header'], '</h2>
   <form action="', $cmsurl, 'index.php?action=admin&sa=forum&fa=boards" method="post">  
     <table id="add_board">
       <tr class="category">
@@ -126,6 +126,44 @@ global $cmsurl, $db_prefix, $l, $settings, $user;
         <td colspan="2" align="right"><input name="add_board" type="submit" value="', $l['manageboards_add_button'], '"/></td>
       </tr>
     </table>
+  </form>';
+}
+
+function EditBoard() {
+global $cmsurl, $db_prefix, $l, $settings, $user;
+  echo '
+  <h2>', $l['manageboards_edit_header'], '</h2>
+  <form action="', $cmsurl, 'index.php?action=admin&sa=forum&fa=boards" method="post">  
+    <table id="add_board">
+      <tr class="category">
+        <td>', $l['manageboards_add_category'], '</td>
+        <td align="right"><select name="in_category">';
+            foreach($settings['cats'] as $cat) 
+              echo '<option value="', $cat['id'], '"', $cat['selected'] ? ' selected="yes"' : '', '>', $cat['name'], '</option>';
+        echo '
+        </select></td>
+      </tr>
+      <tr class="board_name">
+        <td>', $l['manageboards_add_boardname'], '</td><td align="right"><input name="board_name" type="text" value="', $settings['board']['name'], '"/></td>
+      </tr>
+      <tr class="board_desc">
+        <td>', $l['manageboards_add_boarddesc'], '</td><td align="right"><textarea name="board_desc" cols="22" rows="2">', $settings['board']['desc'], '</textarea></td>
+      </tr>
+      <tr class="who_view">
+        <td valign="top">', $l['manageboards_add_whoview'], '</td>
+        <td align="right">
+          <label for="g0">', $l['manageboards_add_guests'], '</label> <input id="g0" name="groups[]" type="checkbox" value="0" ', $settings['groups'][0]['checked'] ? 'checked="checked"' : '', '/><br />';
+        foreach($settings['groups'] as $group_id => $group)
+          if($group_id!=0)
+            echo '<label for="g', $group['id'], '">', $group['name'], '</label> <input id="g', $group['id'], '" name="groups[]" type="checkbox" value="', $group['id'], '"', $group['checked'] ? ' checked="checked"' : '', '/><br />';
+        echo '
+        </td>
+      </tr>
+      <tr>
+        <td colspan="2" align="right"><input name="update_board" type="submit" value="', $l['manageboards_edit_button'], '"/></td>
+      </tr>
+    </table>
+    <input name="board_id" type="hidden" value="', $settings['board']['bid'], '"/>
   </form>';
 }
 ?>
