@@ -1,5 +1,5 @@
 <?php
-// SnowCMS Main.language.php File for English
+// SnowCMS Main.language.php file for English
 // Version 0.2
 
 // Login.template.php stuff
@@ -182,9 +182,16 @@ $l['profile_error_title'] = 'Error';
 $l['profile_error_header'] = 'Error';
 $l['profile_error_desc'] = 'Sorry, but you are not <a href="'.$cmsurl.'index.php?action=login">logged in</a>, if you have not yet done so, why not <a href="'.$cmsurl.'index.php?action=register">register</a> and or <a href="'.$cmsurl.'index.php?action=login">login</a>';
 $l['profile_profile_of'] = 'Profile of %user%';
-$l['profile_edit'] = 'Change Settings';
 $l['profile_online'] = 'Online';
 $l['profile_offline'] = 'Offline';
+$l['profile_edit_link'] = 'Change Settings';
+$l['profile_edit_title'] = 'Change Settings';
+$l['profile_edit_display_name'] = 'Display Name';
+$l['profile_edit_email'] = 'Email Address';
+$l['profile_edit_signature'] = 'Signature';
+$l['profile_edit_profile_text'] = 'Profile Text';
+$l['profile_edit_change'] = 'Change Details';
+$l['profile_edit_cancel'] = 'Cancel';
 
 // Permissions.template.php
 $l['permissions_title'] = 'Manage Permissions';

@@ -8,7 +8,7 @@ function Main() {
 global $l, $settings, $cmsurl;
   
   echo '<h1 style="margin-bottom: 0">'.$settings['page']['title'].'</h1>
-        <p style="margin-top: 0"><a href="'.$cmsurl.'index.php?action=profile&sa=edit">'.$l['profile_edit'].'</a></p>';
+        <p style="margin-top: 0"><a href="'.$cmsurl.'index.php?action=profile&sa=edit">'.$l['profile_edit_link'].'</a></p>';
   
   Info();
 }
@@ -54,9 +54,39 @@ global $l, $settings;
 }
 
 function Settings() {
-global $l, $settings;
+global $l, $settings, $cmsurl, $user;
   
-  echo '<h1>'.$settings['page']['title'].'</h1>';
+  $profile = $settings['profile'];
+  
+  echo '
+        <h1>'.$settings['page']['title'].'</h1>
+        
+        <form action="'.$cmsurl.'index.php?action=profile&sa=edit" method="post" style="display: inline">
+        
+        <p><input type="hidden" name="ssa" value="process-edit" /></p>
+        
+        <table style="width: 100%" class="padding">
+        <tr><th style="text-align: left">'.$l['profile_edit_display_name'].':</th><td><input name="display_name" value="'.$profile['display_name'].'" /></td></tr>
+        <tr><th style="text-align: left">'.$l['profile_edit_email'].':</th><td><input name="email" value="'.$profile['email'].'" /></td></tr>
+        <tr><th style="text-align: left">'.$l['profile_edit_signature'].':</th><td><textarea name="signature" cols="45" rows="4">'.$profile['signature'].'</textarea></td></tr>
+        <tr><th style="text-align: left">'.$l['profile_edit_profile_text'].':</th><td><textarea name="profile" cols="45" rows="4">'.$profile['text'].'</textarea></td></tr>
+        </table>
+        
+        <br />
+        
+        <p style="display: inline"><input type="submit" value="'.$l['profile_edit_change'].'" /></p>
+        </form>
+        
+        <form action="'.$cmsurl.'index.php" method="get" style="display: inline">
+        <p style="display: inline">
+        <input type="hidden" name="action" value="profile" />
+        <input type="hidden" name="u" value="'.$profile['id'].'" />
+        <input type="submit" value="'.$l['profile_edit_cancel'].'" />
+        </p>
+        </form>
+       <br />
+       <br />
+       ';
 }
 
 function NotAllowed() {

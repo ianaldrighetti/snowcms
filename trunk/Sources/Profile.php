@@ -22,7 +22,7 @@ global $cmsurl, $db_prefix, $l, $settings, $source_dir, $user, $perms;
   $result = sql_query("
      SELECT
        m.id, m.username, m.email, m.display_name, m.reg_date, m.reg_ip, m.last_login,
-       m.last_ip, m.group, m.numposts, m.signature, m.profile, grp.group_id, 
+       m.last_ip, m.group, m.numposts, m.signature, m.profile, m.activated, grp.group_id, 
        grp.groupname, o.last_active
      FROM {$db_prefix}members AS m
        LEFT JOIN {$db_prefix}membergroups AS grp ON grp.group_id = m.group
@@ -38,6 +38,7 @@ global $cmsurl, $db_prefix, $l, $settings, $source_dir, $user, $perms;
             'name' => $row['display_name'] ? $row['display_name'] : $row['username'],
             'username' => $row['display_name'] ? $row['display_name'] : $row['username'],
             'email' => $row['email'],
+            'display_name' => $row['display_name'],
             'reg_date' => formattime($row['reg_date']),
             'online' => $row['last_active'] < time() - $settings['login_detection_time'] * 60,
             'ip' => $row['last_ip'] ? $row['last_ip'] : $row['reg_ip'],
@@ -46,6 +47,7 @@ global $cmsurl, $db_prefix, $l, $settings, $source_dir, $user, $perms;
             'posts' => $row['numposts'],
             'signature' => $row['signature'],
             'text' => $row['profile'],
+            'activated' => $row['activated'],
           );
           $settings['page']['title'] = str_replace("%user%", $mem['name'], $l['profile_profile_of']);
           $settings['profile'] = $mem;
@@ -58,8 +60,12 @@ global $cmsurl, $db_prefix, $l, $settings, $source_dir, $user, $perms;
   
   // Are they changing settings?
   if ($UID == $user['id'] && @$_REQUEST['sa'] == 'edit') {
-    $settings['page']['title'] = 'Change Settings';
-    loadTheme('Profile','Settings');
+    $settings['page']['title'] = $l['profile_edit_title'];
+    
+    if (@$_REQUEST['ssa'] == 'process-edit')
+      processEdit();
+    else
+      loadTheme('Profile','Settings');
   }
   // Maybe they are trying to view someone's profile? o.O
   elseif ((can('view_profile')) && ($UID!=$user['id']))
@@ -72,5 +78,23 @@ global $cmsurl, $db_prefix, $l, $settings, $source_dir, $user, $perms;
     $settings['page']['title'] = $l['profile_error_title'];
     loadTheme('Profile','NotAllowed');
   }
+}
+
+function processEdit() {
+global $settings, $db_prefix, $user, $cmsurl;
+  
+  // Note: Error handling needs work
+  if (!@$_REQUEST['email'])
+    die("No email address");
+  
+  $display_name = clean($_REQUEST['display_name']);
+  $email = clean($_REQUEST['email']);
+  $signature = clean($_REQUEST['signature']);
+  $profile = clean($_REQUEST['profile']);
+  
+  // Update member's data
+  sql_query("UPDATE {$db_prefix}members SET `display_name` = '$display_name', `email` = '$email', `signature` = '$signature', `profile` = '$profile' WHERE `id` = '{$user['id']}'") or die(mysql_error());
+  
+  header('location: '.$cmsurl.'index.php?action=profile&u='.$user['id']);
 }
 ?>

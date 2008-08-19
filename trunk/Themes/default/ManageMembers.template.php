@@ -182,10 +182,7 @@ global $l, $settings, $user, $cmsurl;
         
         <p>
         <input type="hidden" name="sc" value="'.$user['sc'].'" />
-        <input type="hidden" name="action" value="admin" />
-        <input type="hidden" name="sa" value="members" />
         <input type="hidden" name="ssa" value="process-moderate" />
-        <input type="hidden" name="u" value="'.$settings['managemembers']['member']['id'].'" />
         </p>
         
         <table style="width: 100%" class="padding">
@@ -198,7 +195,7 @@ global $l, $settings, $user, $cmsurl;
         ';
   
   while ($row = mysql_fetch_assoc($settings['managemembers']['groups'])) {
-    if ($settings['managemembers']['member']['group'] == $row["group_id"])
+    if ($settings['managemembers']['member']['group'] == $row['group_id'])
       echo '<option value="'.$row['group_id'].'" selected="selected">'.$row['groupname'].'</option>'."\n";
     else
       echo '<option value="'.$row['group_id'].'">'.$row['groupname'].'</option>'."\n";
@@ -216,8 +213,8 @@ global $l, $settings, $user, $cmsurl;
   
   echo '<tr><th style="text-align: left">'.$l['managemembers_moderate_registration_ip'].':</th><td>'.$settings['managemembers']['member']['reg_ip'].'</td></tr>
         <tr><th style="text-align: left">'.$l['managemembers_moderate_last_ip'].':</th><td>'.$last_ip.'</td></tr>
-        <tr><th style="text-align: left">'.$l['managemembers_moderate_signature'].':</th><td><textarea name="signature" cols="30" rows="4">'.$settings['managemembers']['member']['signature'].'</textarea></td></tr>
-        <tr><th style="text-align: left">'.$l['managemembers_moderate_profile_text'].':</th><td><textarea name="profile" cols="30" rows="4">'.$settings['managemembers']['member']['profile'].'</textarea></td></tr>
+        <tr><th style="text-align: left">'.$l['managemembers_moderate_signature'].':</th><td><textarea name="signature" cols="45" rows="4">'.$settings['managemembers']['member']['signature'].'</textarea></td></tr>
+        <tr><th style="text-align: left">'.$l['managemembers_moderate_profile_text'].':</th><td><textarea name="profile" cols="45" rows="4">'.$settings['managemembers']['member']['profile'].'</textarea></td></tr>
         </table>
         
         <br />
