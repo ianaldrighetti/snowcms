@@ -13,7 +13,7 @@ CREATE TABLE `{$db_prefix}board_permissions` (
   `group_id` int(11) NOT NULL default '0',
   `what` VARCHAR(50) NOT NULL,
   `can` int(1) NOT NULL default '1',
-  PRIMARY KEY (`group_id`,`what`)
+  PRIMARY KEY (`bid`,`group_id`,`what`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 
 DROP TABLE IF EXISTS `{$db_prefix}boards`;
@@ -146,7 +146,7 @@ CREATE TABLE `{$db_prefix}permissions` (
   PRIMARY KEY  (`group_id`,`what`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 
-INSERT INTO `{$db_prefix}permissions` VALUES ('1','admin','1'),('1','manage_pages','1'),('1','manage_basic-settings','1'),('1','manage_members','1'),('1','manage_menus','1'),('1','manage_news','1'),('1','manage_permissions','1'),('1','manage_forum_perms','1'),('1','view_forum','1'),('1','view_online','1'),('1','view_profile','1'),('2','manage_menus','1'),('2','manage_news','1'),('2','manage_pages','1'),('2','manage_permissions','1'),('2','manage_forum_perms','1'),('2','view_forum','1'),('2','view_online','1'),('1','manage_mail_settings','1'),('1','manage_groups','1');
+INSERT INTO `{$db_prefix}permissions` VALUES ('1','admin','1'),('1','manage_forum','1'),('1','manage_pages','1'),('1','manage_basic-settings','1'),('1','manage_members','1'),('1','manage_menus','1'),('1','manage_news','1'),('1','manage_permissions','1'),('1','manage_forum_perms','1'),('1','view_forum','1'),('1','view_online','1'),('1','view_profile','1'),('2','manage_menus','1'),('2','manage_news','1'),('2','manage_pages','1'),('2','manage_permissions','1'),('2','manage_forum_perms','1'),('2','view_forum','1'),('2','view_online','1'),('1','manage_mail_settings','1'),('1','manage_groups','1');
 
 DROP TABLE IF EXISTS `{$db_prefix}settings`;
 
