@@ -34,23 +34,37 @@ global $cmsurl, $db_prefix, $l, $settings, $user;
       while($row = mysql_fetch_assoc($result)) {
         // We need their user ID
         $id = $row['id'];
+        $is_activated = $row['activated'];
+        $is_banned = $row['banned'];
       }
-      // Set cookies :) Mmmmm, the good kind too, like Chocolate Chip, but not Oatmeal! Ewww!
-      $login_length = (int)$_REQUEST['login_length'];
-      if($login_length==0)
-        $login_length = $settings['remember_time']*60;
-      setcookie("username", $_REQUEST['username'], time()+$login_length);
-      setcookie("password", md5($_REQUEST['password']), time()+$login_length);
-      setcookie("uid", $id, time()+$login_length);
-      
-      // Set the Session variables, like ID and Pass, enables them to be validated
-      // Its more secure to authenticate them on each page load, or at least we think so :P
-      $_SESSION['id'] = $id;
-      $_SESSION['pass'] = $password;
-      // Update a few things, lkike last login, last ip, their session ID
-      sql_query("UPDATE {$db_prefix}members SET `last_login` = '".time()."', `last_ip` = '{$user['ip']}' WHERE `id` = '{$_SESSION['id']}'");
-      // Redirect them to the CMSURL URL :P
-      header("Location: {$cmsurl}");
+      // Just cause their password and username is right, doesn't mean they can login :P
+      if($is_activated || !$is_banned) {
+        // Set cookies :) Mmmmm, the good kind too, like Chocolate Chip, but not Oatmeal! Ewww!
+        $login_length = (int)$_REQUEST['login_length'];
+        if($login_length==0)
+          $login_length = $settings['remember_time']*60;
+        setcookie("username", $_REQUEST['username'], time()+$login_length);
+        setcookie("password", md5($_REQUEST['password']), time()+$login_length);
+        setcookie("uid", $id, time()+$login_length);
+        
+        // Set the Session variables, like ID and Pass, enables them to be validated
+        // Its more secure to authenticate them on each page load, or at least we think so :P
+        $_SESSION['id'] = $id;
+        $_SESSION['pass'] = $password;
+        // Update a few things, lkike last login, last ip, their session ID
+        sql_query("UPDATE {$db_prefix}members SET `last_login` = '".time()."', `last_ip` = '{$user['ip']}' WHERE `id` = '{$_SESSION['id']}'");
+        // Redirect them to the CMSURL URL :P
+        header("Location: {$cmsurl}");
+      }
+      elseif(!$is_activated) {
+        // Not activated... Give them a message and a link to a resend form
+        $settings['page']['title'] = $l['login_title'];
+        loadTheme('Login','NotActivated');
+      }
+      elseif(!$is_banned) {
+        $settings['page']['title'] = $l['login_title'];
+        loadTheme('Login','Banned');
+      }
     }
     else {
       // That username doesn't exist, or it is a wrong password! but we won't say which, hehe. Error!

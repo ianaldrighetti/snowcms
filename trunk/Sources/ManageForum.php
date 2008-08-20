@@ -251,7 +251,7 @@ global $cmsurl, $db_prefix, $forumperms, $l, $settings, $user;
       }
       $who_view = implode(",", $tmp_array);
       sql_query("UPDATE {$db_prefix}boards SET `cid` = $in_category, `name` = '$board_name', `bdesc` = '$board_desc', `who_view` = '$who_view' WHERE `bid` = '$board_id'");
-      setPermissions($board_id, $_REQUEST['groups'], true);
+      setPermissions($board_id, @$_REQUEST['groups'], true);
     }
     if(!empty($_REQUEST['delete']) && validateSession(@$_REQUEST['sc'])) {
       $board_id = (int)$_REQUEST['delete'];
@@ -306,8 +306,10 @@ function setPermissions($board_id, $groups_allowed, $type = false) {
 global $db_prefix;
   $board_id = (int)$board_id;
   $tmp = array();
-  foreach($groups_allowed as $group) {
-    $tmp[] = (int)$group;
+  if(count($groups_allowed)) {
+    foreach($groups_allowed as $group) {
+      $tmp[] = (int)$group;
+    }
   }
   $groups_allowed = $tmp;
   unset($tmp);
@@ -370,7 +372,7 @@ global $db_prefix;
       // If more then 1, don't mess with it, else, add :D!
       if(!mysql_num_rows($result) && in_array($group_id, $groups_allowed)) {
         // None! D:!
-        foreach($forumsperms as $perm => $default) {
+        foreach($forumperms as $perm => $default) {
           if($default)
             $can = 1;
           else
@@ -383,7 +385,10 @@ global $db_prefix;
     }
     // Okay, now delete ALL that have not been kept :P
     $not_in = implode(",", $groups);
-    sql_query("DELETE FROM {$db_prefix}board_permissions WHERE `group_id` NOT IN($not_in)");
+    if(count($not_in)) 
+      sql_query("DELETE FROM {$db_prefix}board_permissions WHERE `group_id` NOT IN($not_in)");
+    else
+      sql_query("DELETE FROM {$db_prefix}board_permissions WHERE `bid` = $board_id");
   }
 }
 ?>
