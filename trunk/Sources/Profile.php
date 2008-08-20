@@ -86,14 +86,36 @@ global $settings, $db_prefix, $user, $cmsurl;
   // Note: Error handling needs work
   if (!@$_REQUEST['email'])
     die("No email address");
+  if(!preg_match("/^([a-z0-9._-](\+[a-z0-9])*)+@[a-z0-9.-]+\.[a-z]{2,6}$/i", @$_REQUEST['email']))
+    die("Invalid email address");
+  
+  if ($_REQUEST['password-new']) {
+    $result = sql_query("SELECT password FROM {$db_prefix}members WHERE `id` = '{$user['id']}'");
+    $row = mysql_fetch_assoc($result) or die("Internal error");
+  
+    if (md5(@$_REQUEST['password-old']) != @$row['password'])
+      die("Your current password is incorrect");
+    if (@$_REQUEST['password-new'] != @$_REQUEST['password-verify'])
+      die("Your verification password is incorrect");
+    if (strlen($_REQUEST['password-new']) < 5)
+      die("Your password is under five characters long");
+  }
   
   $display_name = clean($_REQUEST['display_name']);
-  $email = clean($_REQUEST['email']);
+  $email = clean($_REQUEST[ 'email']);
   $signature = clean($_REQUEST['signature']);
   $profile = clean($_REQUEST['profile']);
   
   // Update member's data
-  sql_query("UPDATE {$db_prefix}members SET `display_name` = '$display_name', `email` = '$email', `signature` = '$signature', `profile` = '$profile' WHERE `id` = '{$user['id']}'") or die(mysql_error());
+  if (@$_REQUEST['password-new']) {
+    $password_new = md5(@$_REQUEST['password-new']);
+    sql_query("UPDATE {$db_prefix}members SET `display_name` = '$display_name', `email` = '$email', `signature` = '$signature', `profile` = '$profile', `password` = '$password_new' WHERE `id` = '{$user['id']}'");
+    
+    setcookie("password", $password_new);
+    $_SESSION['pass'] = $password_new;
+  }
+  else
+    sql_query("UPDATE {$db_prefix}members SET `display_name` = '$display_name', `email` = '$email', `signature` = '$signature', `profile` = '$profile' WHERE `id` = '{$user['id']}'");
   
   header('location: '.$cmsurl.'index.php?action=profile&u='.$user['id']);
 }

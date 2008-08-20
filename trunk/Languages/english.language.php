@@ -190,6 +190,9 @@ $l['profile_edit_display_name'] = 'Display Name';
 $l['profile_edit_email'] = 'Email Address';
 $l['profile_edit_signature'] = 'Signature';
 $l['profile_edit_profile_text'] = 'Profile Text';
+$l['profile_edit_password_old'] = 'Old Password';
+$l['profile_edit_password_new'] = 'New Password';
+$l['profile_edit_password_verify'] = 'Verify Password';
 $l['profile_edit_change'] = 'Change Details';
 $l['profile_edit_cancel'] = 'Cancel';
 

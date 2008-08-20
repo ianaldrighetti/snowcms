@@ -70,6 +70,10 @@ global $l, $settings, $cmsurl, $user;
         <tr><th style="text-align: left">'.$l['profile_edit_email'].':</th><td><input name="email" value="'.$profile['email'].'" /></td></tr>
         <tr><th style="text-align: left">'.$l['profile_edit_signature'].':</th><td><textarea name="signature" cols="45" rows="4">'.$profile['signature'].'</textarea></td></tr>
         <tr><th style="text-align: left">'.$l['profile_edit_profile_text'].':</th><td><textarea name="profile" cols="45" rows="4">'.$profile['text'].'</textarea></td></tr>
+        <tr><td colspan="2"><br /></td></tr>
+        <tr><th style="text-align: left">'.$l['profile_edit_password_old'].':</th><td><input type="password" name="password-old" /></td></tr>
+        <tr><th style="text-align: left">'.$l['profile_edit_password_new'].':</th><td><input type="password" name="password-new" /></td></tr>
+        <tr><th style="text-align: left">'.$l['profile_edit_password_verify'].':</th><td><input type="password" name="password-verify" /></td></tr>
         </table>
         
         <br />

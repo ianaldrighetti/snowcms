@@ -62,7 +62,8 @@ global $db_prefix;
   if(isset($_SESSION['id'])) {
     if(isset($_SESSION['pass'])) {
       $result = sql_query("SELECT * FROM {$db_prefix}members WHERE `id` = '{$_SESSION['id']}' AND `password` = '{$_SESSION['pass']}'");
-      if(mysql_num_rows($result)>0) {
+      // If user ID and password are in the database
+      if (mysql_num_rows($result)) {
         while($row = mysql_fetch_assoc($result)) {
           $user = array(
             'id' => $row['id'],
@@ -78,6 +79,11 @@ global $db_prefix;
           if($user['group']==1)
             $user['is_admin'] = true;
         }
+      }
+      else {
+        setcookie("uid","",time()-60*60*24);
+        setcookie("username","",time()-60*60*24);
+        setcookie("password","",time()-60*60*24);
       }
     }
   }
