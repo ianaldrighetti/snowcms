@@ -386,7 +386,7 @@ global $db_prefix;
     // Okay, now delete ALL that have not been kept :P
     $not_in = implode(",", $groups);
     if(count($not_in)) 
-      sql_query("DELETE FROM {$db_prefix}board_permissions WHERE `group_id` NOT IN($not_in)");
+      sql_query("DELETE FROM {$db_prefix}board_permissions WHERE `group_id` NOT IN($not_in) AND `bid` = $board_id");
     else
       sql_query("DELETE FROM {$db_prefix}board_permissions WHERE `bid` = $board_id");
   }

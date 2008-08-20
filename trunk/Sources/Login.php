@@ -36,9 +36,10 @@ global $cmsurl, $db_prefix, $l, $settings, $user;
         $id = $row['id'];
         $is_activated = $row['activated'];
         $is_banned = $row['banned'];
+        $is_suspended = $row['suspended'];
       }
       // Just cause their password and username is right, doesn't mean they can login :P
-      if($is_activated || !$is_banned) {
+      if($is_activated || !$is_banned || $is_suspended>time()) {
         // Set cookies :) Mmmmm, the good kind too, like Chocolate Chip, but not Oatmeal! Ewww!
         $login_length = (int)$_REQUEST['login_length'];
         if($login_length==0)
@@ -64,6 +65,11 @@ global $cmsurl, $db_prefix, $l, $settings, $user;
       elseif(!$is_banned) {
         $settings['page']['title'] = $l['login_title'];
         loadTheme('Login','Banned');
+      }
+      elseif($is_suspended>time()) {
+        $settings['page']['title'] = $l['login_title'];
+        $settings['time'] = formattime($is_suspended);
+        loadTheme('Login','Suspended');
       }
     }
     else {
