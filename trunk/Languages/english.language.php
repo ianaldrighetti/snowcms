@@ -31,7 +31,10 @@ $l['register_verify_password'] = 'Verify Password:';
 $l['register_email'] = 'Email:';
 $l['register_captcha'] = 'Enter the Text you see in the image';
 $l['register_success'] = 'Thank you '.@clean($_REQUEST['username']).'! Your account has been created successfully and you may now <a href="'.$cmsurl.'index.php?action=login">login</a>';
-$l['register_successbut1'] = 'Thanks for registering! The administrators require you to activate your account via email, please check your email you used on your account, and click the link to activate your account';
+$l['register_successbut1'] = 'Thanks for registering! The administrators require you to activate your account via email, please check your email you used on your account, and click the link to activate your account.</p>
+
+<p>If didn\'t receive your activation email, check your spam/bulk folder. Some email clients wrongly think our emails are spam. If you still can\'t find it, use the following form to resend your activation email.';
+$l['register_resend'] = 'Resend';
 $l['register_successbut2'] = 'Thanks for registering! The administrators require themselves to activate accounts; you will recieve an email once your account is activated.';
 $l['register_failed'] = 'Registration failed!';
 // For Account Activation...

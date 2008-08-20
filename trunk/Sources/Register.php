@@ -89,9 +89,10 @@ global $cmsurl, $db_prefix, $l, $settings, $source_dir, $user;
         $msg = str_replace("%username%", $username, $msg);
         $msg = str_replace("%alink%", $cmsurl.'index.php?action=activate&acode='.$acode.'&u='.$username, $msg);
         $info = SendMail($_REQUEST['email'], $l['email_register_subject'], $msg);
-        if($info['error'])
+        if(@$info['error'])
           $settings['page']['error'] = $info['msg'];
         $settings['page']['title'] = $l['register_title'];
+        $settings['register']['email'] = $_REQUEST['email'];
         loadTheme('Register', 'SuccessBut1');
       }
       elseif($settings['account_activation']==2) {  
@@ -164,6 +165,21 @@ global $cmsurl, $db_prefix, $l, $settings, $source_dir, $user;
       $settings['errors'][] = $l['activate_no_such_user'];
       loadTheme('Register','AForm');
     }
+  }
+}
+
+function Register3() {
+  // Resend activation email
+  require_once($source_dir.'/Mail.php');
+  $msg = $l['email_register_tpl'];
+  $msg = str_replace("%username%", $username, $msg);
+  $msg = str_replace("%alink%", $cmsurl.'index.php?action=activate&acode='.$acode.'&u='.$username, $msg);
+  $info = SendMail($_REQUEST['email'], $l['email_register_subject'], $msg);
+  if(@$info['error'])
+    $settings['page']['error'] = $info['msg'];
+    $settings['page']['title'] = $l['register_title'];
+    $settings['register']['email'] = $_REQUEST['email'];
+    loadTheme('Register', 'SuccessBut1');
   }
 }
 ?>
