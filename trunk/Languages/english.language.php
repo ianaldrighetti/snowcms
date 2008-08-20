@@ -184,6 +184,7 @@ $l['profile_error_desc'] = 'Sorry, but you are not <a href="'.$cmsurl.'index.php
 $l['profile_profile_of'] = 'Profile of %user%';
 $l['profile_online'] = 'Online';
 $l['profile_offline'] = 'Offline';
+$l['profile_moderate'] = 'Moderate';
 $l['profile_edit_link'] = 'Change Settings';
 $l['profile_edit_title'] = 'Change Settings';
 $l['profile_edit_display_name'] = 'Display Name';

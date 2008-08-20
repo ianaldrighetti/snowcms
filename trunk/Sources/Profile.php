@@ -40,7 +40,7 @@ global $cmsurl, $db_prefix, $l, $settings, $source_dir, $user, $perms;
             'email' => $row['email'],
             'display_name' => $row['display_name'],
             'reg_date' => formattime($row['reg_date']),
-            'online' => $row['last_active'] < time() - $settings['login_detection_time'] * 60,
+            'online' => $row['last_active'] > time() - $settings['login_detection_time'] * 60,
             'ip' => $row['last_ip'] ? $row['last_ip'] : $row['reg_ip'],
             'group_name' => $row['groupname'],
             'group_id' => $row['group'],
@@ -67,6 +67,9 @@ global $cmsurl, $db_prefix, $l, $settings, $source_dir, $user, $perms;
     else
       loadTheme('Profile','Settings');
   }
+  // Is an admin trying to view someone's profile?
+  elseif (can('view_profile') && $UID != $user['id'] && can('manage_members'))
+    loadTheme('Profile','AdminView');
   // Maybe they are trying to view someone's profile? o.O
   elseif ((can('view_profile')) && ($UID!=$user['id']))
     loadTheme('Profile','View');

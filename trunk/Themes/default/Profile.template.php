@@ -33,6 +33,26 @@ global $l, $settings, $theme_url;
   Info();
 }
 
+function AdminView() {
+global $l, $settings, $theme_url, $cmsurl;
+  
+  $profile = $settings['profile'];
+  
+  echo '<h1 style="margin-bottom: 0">'.$settings['page']['title'].'</h1>
+        <table>
+         '.($profile['online']
+          ? '<tr><td><img src="'.$theme_url.'/'.$settings['theme'].'/online.gif"
+              alt="'.$l['profile_online'].'" width="16" height="16" /></td><td><b>
+            '.$l['profile_online']
+          : '<tr><td><img src="'.$theme_url.'/'.$settings['theme'].'/offline.gif"
+              alt="'.$l['profile_offline'].'" width="16" height="16" /></td><td><b>
+            '.$l['profile_offline'])
+          .'</b> - <a href="'.$cmsurl.'index.php?action=admin&sa=members&u='.$profile['id'].'">'.$l['profile_moderate'].'</a></td></tr>
+        </table>';
+  
+  Info();
+}
+
 function Info() {
 global $l, $settings;
   
