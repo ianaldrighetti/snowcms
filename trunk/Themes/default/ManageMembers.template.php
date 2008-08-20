@@ -190,6 +190,10 @@ global $l, $settings, $user, $cmsurl;
         <tr><th style="text-align: left">'.$l['managemembers_moderate_username'].':</th><td><input name="user_name" value="'.$settings['managemembers']['member']['username'].'" /></td></tr>
         <tr><th style="text-align: left">'.$l['managemembers_moderate_display_name'].':</th><td><input name="display_name" value="'.$settings['managemembers']['member']['display_name'].'" /></td></tr>
         <tr><th style="text-align: left">'.$l['managemembers_moderate_email'].':</th><td><input name="email" value="'.$settings['managemembers']['member']['email'].'" /></td></tr>
+        <tr><td colspan="2"><br /></td></tr>
+        <tr><th style="text-align: left">'.$l['profile_edit_password_new'].':</th><td><input type="password" name="password-new" /></td></tr>
+        <tr><th style="text-align: left">'.$l['profile_edit_password_verify'].':</th><td><input type="password" name="password-verify" /></td></tr>
+        <tr><td colspan="2"><br /></td></tr>
         <tr><th style="text-align: left">'.$l['managemembers_moderate_group'].':</th><td>
         <select name="group">
         ';

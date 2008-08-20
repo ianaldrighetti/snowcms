@@ -281,12 +281,30 @@ global $db_prefix, $user;
   $group = clean($_REQUEST['group']);
   $signature = clean($_REQUEST['signature']);
   $profile = clean($_REQUEST['profile']);
+  $password_new = clean($_REQUEST['password-new']);
+  $password_verify = clean($_REQUEST['password-verify']);
+  
+  if (!$username)
+    die("No username");
+  if (!$email)
+    die("No email address");
+  if(!preg_match("/^([a-z0-9._-](\+[a-z0-9])*)+@[a-z0-9.-]+\.[a-z]{2,6}$/i", @$_REQUEST['email']))
+    die("Invalid email address");
+  if ($password_new != $password_verify)
+    die("Verification password is incorrect");
+  if (strlen($password_new) < 5)
+    die("Password is under five characters long");
+  
+  $password_new = md5($password_new);
   
   // Update member's data
-  sql_query("UPDATE {$db_prefix}members SET `username` = '$username', `display_name` = '$display_name', `email` = '$email', `group` = '$group', `signature` = '$signature', `profile` = '$profile' WHERE `id` = '{$_REQUEST['u']}'") or die(mysql_error());
+  sql_query("UPDATE {$db_prefix}members SET `username` = '$username', `display_name` = '$display_name', `email` = '$email', `password` = '$password_new', `group` = '$group', `signature` = '$signature', `profile` = '$profile' WHERE `id` = '{$_REQUEST['u']}'") or die(mysql_error());
   
-  if ($_REQUEST['u'] == $_REQUEST['uid'])
+  if ($_REQUEST['u'] == $_REQUEST['uid']) {
     setcookie('username',$_REQUEST['user_name']);
+    setcookie("password", $password_new);
+    $_SESSION['pass'] = $password_new;
+  }
   
   loadProf();
 }
