@@ -60,7 +60,7 @@ global $cmsurl, $l, $settings, $source_dir, $user;
     // Set the headers, such as where from, and Reply too
     $header = "From: ".$settings['webmaster_email']."\r\nReply-To: ".$settings['webmaster_email']."\r\n";
     // Send the email
-    $mail = mail($to, $subject, $msg, $header);
+    @$mail = mail($to, $subject, $msg, $header);
     // Was it successful or not?
     if(!$mail) {
       $info['msg'] = $l['mail_mail_fail'];
