@@ -45,7 +45,7 @@ global $db_prefix;
   $user = array();
   // Set some default info, incase they are guests
   $user['id'] = 0;
-  $user['group'] = 0;
+  $user['group'] = -1;
   $user['is_logged'] = false;
   $user['is_guest'] = true;
   $user['is_admin'] = false;

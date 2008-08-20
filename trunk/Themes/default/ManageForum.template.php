@@ -116,7 +116,7 @@ global $cmsurl, $db_prefix, $l, $settings, $user;
       <tr class="who_view">
         <td valign="top">', $l['manageboards_add_whoview'], '</td>
         <td align="right">
-          <label for="g0">', $l['manageboards_add_guests'], '</label> <input id="g0" name="groups[]" type="checkbox" value="0"/><br />';
+          <label for="g0">', $l['manageboards_add_guests'], '</label> <input id="g0" name="groups[]" type="checkbox" value="-1"/><br />';
         foreach($settings['groups'] as $group)
           echo '<label for="g', $group['id'], '">', $group['name'], '</label> <input id="g', $group['id'], '" name="groups[]" type="checkbox" value="', $group['id'], '"/><br />';
         echo '
@@ -152,7 +152,7 @@ global $cmsurl, $db_prefix, $l, $settings, $user;
       <tr class="who_view">
         <td valign="top">', $l['manageboards_add_whoview'], '</td>
         <td align="right">
-          <label for="g0">', $l['manageboards_add_guests'], '</label> <input id="g0" name="groups[]" type="checkbox" value="0" ', $settings['groups'][0]['checked'] ? 'checked="checked"' : '', '/><br />';
+          <label for="g0">', $l['manageboards_add_guests'], '</label> <input id="g0" name="groups[]" type="checkbox" value="-1" ', $settings['groups']['-1']['checked'] ? 'checked="checked"' : '', '/><br />';
         foreach($settings['groups'] as $group_id => $group)
           if($group_id!=0)
             echo '<label for="g', $group['id'], '">', $group['name'], '</label> <input id="g', $group['id'], '" name="groups[]" type="checkbox" value="', $group['id'], '"', $group['checked'] ? ' checked="checked"' : '', '/><br />';
