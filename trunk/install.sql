@@ -192,6 +192,14 @@ CREATE TABLE `{$db_prefix}news` (
   PRIMARY KEY(`news_id`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 
+DROP TABLE IF EXISTS `{$db_prefix}news_categories`;
+
+CREATE TABLE `{$db_prefix}news_categories` (
+  `cat_id` INT(11) NOT NULL AUTO_INCREMENT,
+  `cat_name` VARCHAR(200) NOT NULL,
+  PRIMARY KEY (`cat_id`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+
 DROP TABLE IF EXISTS `{$db_prefix}news_comments`;
 
 CREATE TABLE `{$db_prefix}news_comments` (
