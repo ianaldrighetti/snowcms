@@ -36,7 +36,7 @@ global $cmsurl, $db_prefix, $l, $settings, $user;
         $id = $row['id'];
         $is_activated = $row['activated'];
         $is_banned = $row['banned'];
-        $is_suspended = $row['suspended'];
+        $is_suspended = $row['suspension'];
       }
       // Just cause their password and username is right, doesn't mean they can login :P
       if($is_activated || !$is_banned || $is_suspended>time()) {
