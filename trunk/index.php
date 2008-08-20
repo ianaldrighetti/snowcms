@@ -26,11 +26,11 @@ require_once($source_dir.'/Core.php');
   @mysql_connect($mysql_host, $mysql_user, $mysql_passwd) or die(MySQLError(mysql_error()));
 
 // Load up a few things :P Such as $settings, $l[anguage], and $user, the permissions too!
-  $user = loadUser();
-  $settings = loadSettings();
-  $l = loadLanguage();
-  $perms = loadPerms();
-  $settings['menu'] = loadMenus();
+  loadUser();
+  loadSettings();
+  loadLanguage();
+  loadPerms();
+  loadMenus();
 // Write that this Guest/User is online
   WriteOnline();
   

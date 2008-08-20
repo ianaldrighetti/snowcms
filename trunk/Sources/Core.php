@@ -16,7 +16,7 @@ if(!defined("Snow"))
 
 // This loads all the settings in the {db_prefix}settings table, also loads usernames into the settings array
 function loadSettings() {
-global $db_prefix;
+global $db_prefix, $settings;
   $result = sql_query("SELECT * FROM {$db_prefix}settings");
     while($row = mysql_fetch_assoc($result)) 
       $settings[$row['variable']] = $row['value'];
@@ -41,7 +41,7 @@ function clean($str) {
 // Loads up the $user array, such as their member group, IP, email, if they are logged in or not
 // It will also revive their session if they left, but had remember me on
 function loadUser() {
-global $db_prefix;
+global $db_prefix, $user;
   $user = array();
   // Set some default info, incase they are guests
   $user['id'] = 0;
@@ -93,7 +93,7 @@ global $db_prefix;
 // This loads the Language file, from the language directory, later on (Maybe SnowCMS 0.8 or later)
 // Will allow each theme to have its own language file(s)
 function loadLanguage() {
-global $cmsurl, $language_dir, $settings, $theme_dir;  
+global $cmsurl, $l, $language_dir, $settings, $theme_dir;  
   $l = array();
   require_once($language_dir.'/'.$settings['language'].'.language.php');
   // Does the current theme have its own language support?
@@ -187,7 +187,7 @@ global $cmsurl, $l, $theme_dir, $settings;
 
 // Loads up the permissions into an array, so we can know what you can and can't do :)
 function loadPerms() {
-global $db_prefix, $user;
+global $db_prefix, $perms, $user;
   $perms = array();
   $perms[$user['group']] = array();
   $result = sql_query("SELECT * FROM {$db_prefix}permissions") or die(mysql_error());
@@ -198,7 +198,7 @@ global $db_prefix, $user;
 }
 
 function loadBPerms() {
-global $db_prefix, $user;
+global $bperms, $db_prefix, $user;
   $bperms = array();
   $bperms[$user['group']] = array();
   $result = sql_query("SELECT * FROM {$db_prefix}board_permissions") or die(mysql_error());
@@ -210,8 +210,8 @@ global $db_prefix, $user;
 
 // Load all the menus, both the Sidebar menu (if their is one) and the Main one (If their is one :P)
 function loadMenus() {
-global $db_prefix;
-  $menu =array();
+global $db_prefix, $settings;
+  $menu = array();
   $menu['main'] = array();
   $menu['side'] = array();
   $result = sql_query("SELECT * FROM {$db_prefix}menus ORDER BY `order` ASC") or die(mysql_error());
@@ -241,7 +241,7 @@ global $db_prefix;
       }
     }
   }
-  return $menu;
+  $settings['menu'] = $menu;
 }
 
 // Writes the user or guest online, also deletes old ones expired guests/users

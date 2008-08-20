@@ -70,9 +70,8 @@ global $cmsurl, $db_prefix, $l, $settings, $user;
         $result = sql_query($query);
       }
       // Reload Settings D: Or they won't be the latest, menu's need to be reset too O.o
-      $menus = $settings['menu'];
-      $settings = loadSettings();
-      $settings['menu'] = $menus;
+      loadSettings();
+      loadMenus();
       unset($menus);
       
     }
