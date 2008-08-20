@@ -154,7 +154,7 @@ global $cmsurl, $db_prefix, $l, $settings, $user;
         <td align="right">
           <label for="g0">', $l['manageboards_add_guests'], '</label> <input id="g0" name="groups[]" type="checkbox" value="-1" ', $settings['groups']['-1']['checked'] ? 'checked="checked"' : '', '/><br />';
         foreach($settings['groups'] as $group_id => $group)
-          if($group_id!=0)
+          if($group_id != -1)
             echo '<label for="g', $group['id'], '">', $group['name'], '</label> <input id="g', $group['id'], '" name="groups[]" type="checkbox" value="', $group['id'], '"', $group['checked'] ? ' checked="checked"' : '', '/><br />';
         echo '
         </td>
