@@ -275,6 +275,7 @@ global $db_prefix, $user;
         die("That display name is already in use");
     }
   
+  // Clean the data of possible injections (Hacking)
   $username = clean($_REQUEST['user_name']);
   $display_name = clean($_REQUEST['display_name']);
   $email = clean($_REQUEST['email']);
@@ -284,26 +285,34 @@ global $db_prefix, $user;
   $password_new = clean($_REQUEST['password-new']);
   $password_verify = clean($_REQUEST['password-verify']);
   
+  // Check for errors in data
   if (!$username)
     die("No username");
   if (!$email)
     die("No email address");
   if(!preg_match("/^([a-z0-9._-](\+[a-z0-9])*)+@[a-z0-9.-]+\.[a-z]{2,6}$/i", @$_REQUEST['email']))
     die("Invalid email address");
-  if ($password_new != $password_verify)
+  if ($password_new != $password_verify && $password_new)
     die("Verification password is incorrect");
-  if (strlen($password_new) < 5)
+  if (strlen($password_new) < 5 && $password_new)
     die("Password is under five characters long");
   
   $password_new = md5($password_new);
   
   // Update member's data
-  sql_query("UPDATE {$db_prefix}members SET `username` = '$username', `display_name` = '$display_name', `email` = '$email', `password` = '$password_new', `group` = '$group', `signature` = '$signature', `profile` = '$profile' WHERE `id` = '{$_REQUEST['u']}'") or die(mysql_error());
+  if ($_REQUEST['password-new']) // And change password
+    sql_query("UPDATE {$db_prefix}members SET `username` = '$username', `display_name` = '$display_name', `email` = '$email', `password` = '$password_new', `group` = '$group', `signature` = '$signature', `profile` = '$profile' WHERE `id` = '{$_REQUEST['u']}'") or die('Internal error');
+  else // And don't change password
+    sql_query("UPDATE {$db_prefix}members SET `username` = '$username', `display_name` = '$display_name', `email` = '$email', `group` = '$group', `signature` = '$signature', `profile` = '$profile' WHERE `id` = '{$_REQUEST['u']}'") or die('Internal error');
   
+  // If they moderated themselves change settings to keep 'em logged in
   if ($_REQUEST['u'] == $_REQUEST['uid']) {
     setcookie('username',$_REQUEST['user_name']);
-    setcookie("password", $password_new);
-    $_SESSION['pass'] = $password_new;
+    // More settings if they changed their p[assword
+    if ($_REQUEST['password-new']) {
+      setcookie("password", $password_new);
+      $_SESSION['pass'] = $password_new;
+    }
   }
   
   loadProf();
