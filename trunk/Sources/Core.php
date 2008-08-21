@@ -187,7 +187,7 @@ global $cmsurl, $l, $theme_dir, $settings;
 
 // Loads up the permissions into an array, so we can know what you can and can't do :)
 function loadPerms() {
-global $db_prefix, $perms, $user;
+global $db_prefix, $perms, $user, $forumperms;
   $perms = array();
   $perms[$user['group']] = array();
   $result = sql_query("SELECT * FROM {$db_prefix}permissions") or die(mysql_error());
@@ -206,19 +206,6 @@ global $bperms, $db_prefix, $user, $forumperms;
       $bperms[$row['group_id']][$row['bid']][$row['what']] = $row['can'] ? true : false;
     }
   return $bperms;
-  /* This is an array of permissions that can be done on the forum ;) */
-  // 'PERM' => 'Defaultly (Is that a word?) Set'
-  $forumperms = array(
-    'delete_any' => false,  
-    'delete_own' => true,
-    'lock_topic' => false,
-    'move_any' => false,
-    'edit_any' => false,
-    'edit_own' => true,
-    'post_new' => true,
-    'post_reply' => true,
-    'sticky_topic' => false
-  ); 
 }
 
 // Load all the menus, both the Sidebar menu (if their is one) and the Main one (If their is one :P)
@@ -447,4 +434,17 @@ global $db_prefix, $user;
   else
     return false;
 }
+  /* This is an array of permissions that can be done on the forum ;) */
+  // 'PERM' => 'Defaultly (Is that a word?) Set'
+  $forumperms = array(
+    'delete_any' => false,  
+    'delete_own' => true,
+    'lock_topic' => false,
+    'move_any' => false,
+    'edit_any' => false,
+    'edit_own' => true,
+    'post_new' => true,
+    'post_reply' => true,
+    'sticky_topic' => false
+  ); 
 ?>
