@@ -30,13 +30,15 @@ global $cmsurl, $db_prefix, $l, $settings, $user;
       }
     $result = sql_query("
       SELECT 
-        b.bid, b.name, b.bdesc, b.who_view, b.numtopics, b.numposts,
-        b.cid, log.uid
+        b.bid, b.name, b.bdesc, b.who_view, b.numtopics, b.numposts, b.last_msg, b.last_uid, b.last_name, b.cid, log.uid AS is_new, log.bid,
+        msg.tid, msg.mid, msg.uid, msg.subject, msg.post_time, msg.poster_name, mem.id, mem.display_name AS username, IFNULL(mem.display_name, mem.username) AS username
       FROM {$db_prefix}boards AS b
         LEFT JOIN {$db_prefix}board_logs AS log ON log.uid = {$user['id']} AND log.bid = b.bid
+        LEFT JOIN {$db_prefix}messages AS msg ON msg.mid = b.last_msg
+        LEFT JOIN {$db_prefix}members AS mem ON mem.id = msg.uid
       ORDER BY b.border ASC");
       while($row = mysql_fetch_assoc($result)) {  
-      if(isset($row['uid']))
+      if(isset($row['is_new']))
         $new = false;
       else
         $new = true;
@@ -47,7 +49,16 @@ global $cmsurl, $db_prefix, $l, $settings, $user;
           'who_view' => @explode(",", $row['who_view']),
           'topics' => $row['numtopics'],
           'posts' => $row['numposts'],
-          'is_new' => $new
+          'is_new' => $new,
+          'last_post' => array(
+                           'tid' => $row['tid'],
+                           'mid' => $row['mid'],
+                           'subject' => $row['subject'],
+                           'username' => $row['username'],
+                           'time' => formattime($row['post_time']),
+                           'uid' => $row['uid'],
+                           'is_post' => $row['mid'] ? true : false
+                         )
         );
       }
     foreach($cats as $cat) {
