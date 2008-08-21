@@ -19,10 +19,10 @@ global $cmsurl, $db_prefix, $l, $settings, $user;
   $Board_ID = addslashes(mysql_real_escape_string($_REQUEST['board']));
   // Mark this board now as read... Only if they are logged in :)
   if($user['is_logged']) {
-    $result = sql_query("SELECT * FROM {$db_prefix}board_logs WHERE `bid` = '$Board_ID'");
+    $result = sql_query("SELECT * FROM {$db_prefix}board_logs WHERE `bid` = '$Board_ID' AND `uid` = '{$user['id']}'");
     if(mysql_num_rows($result)==0) {
       sql_query("
-        INSERT INTO {$db_prefix}board_logs
+        REPLACE INTO {$db_prefix}board_logs
 				  (`bid`,`uid`)
 	      VALUES ($Board_ID, {$user['id']})");
 	  }
@@ -58,7 +58,7 @@ global $cmsurl, $db_prefix, $l, $settings, $user;
           LEFT JOIN {$db_prefix}members AS mem2 ON mem2.id = t.ender_id
         WHERE 
           t.bid = $Board_ID
-        ORDER BY t.sticky DESC, last_post_time ASC");
+        ORDER BY t.sticky DESC, last_post_time DESC");
         $topics = array();
         while($row = mysql_fetch_assoc($result)) {
           $topics[] = $row;

@@ -126,7 +126,7 @@ global $cmsurl, $db_prefix, $l, $settings, $user;
     if(strlen($_REQUEST['subject'])>2 && strlen($_REQUEST['body'])>2) {
       // Okie Dokie then...
       $isSticky = canforum('sticky_topic') ? (int)@$_REQUEST['sticky'] : 0;
-      $isLocked = canform('lock_topic') ? (int)@$_REQUEST['locked'] : 0;
+      $isLocked = canforum('lock_topic') ? (int)@$_REQUEST['locked'] : 0;
       $result = sql_query("
         INSERT INTO {$db_prefix}topics
         (`sticky`,`locked`,`bid`,`starter_id`,`topic_starter`,`ender_id`,`topic_ender`)
@@ -142,6 +142,11 @@ global $cmsurl, $db_prefix, $l, $settings, $user;
         VALUES('$topic_id','$Board_ID','{$user['id']}','$subject','$post_time','{$user['name']}','{$user['email']}','{$user['ip']}','{$body}')");
       $msg_id = mysql_insert_id();
       sql_query("UPDATE {$db_prefix}topics SET `first_msg` = '$msg_id', `last_msg` = '$msg_id' WHERE `tid` = '$topic_id'");
+      // Update a few things :o Like Post Count and Number of posts and topics inside the board...
+      sql_query("UPDATE {$db_prefix}members SET `numposts` = numposts + 1 WHERE `id` = '{$user['id']}'");
+      sql_query("UPDATE {$db_prefix}boards SET `numtopics` = numtopics + 1, `numposts` = numposts + 1, `last_msg` = '$msg_id', `last_uid` = '{$user['id']}', `last_name` = '{$user['name']}' WHERE `bid` = '$Board_ID'");
+      // Delete anything from board logs with the Board ID of $Board_ID, there is a new post in town!
+      sql_query("DELETE FROM {$db_prefix}board_logs WHERE `bid` = '$Board_ID'");
       redirect("forum.php");
     }
     else {
