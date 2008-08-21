@@ -25,7 +25,6 @@ global $cmsurl, $db_prefix, $l, $settings, $user;
         $cats[$row['cid']] = array(
           'id' => $row['cid'],
           'name' => $row['cname'],
-          'desc' => $row['cdesc'],
           'boards' => array()
         );
       }
