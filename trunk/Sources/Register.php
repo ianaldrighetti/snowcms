@@ -175,7 +175,7 @@ function Register3() {
   $msg = str_replace("%username%", $username, $msg);
   $msg = str_replace("%alink%", $cmsurl.'index.php?action=activate&acode='.$acode.'&u='.$username, $msg);
   $info = SendMail($_REQUEST['email'], $l['email_register_subject'], $msg);
-  if(@$info['error'])
+  if(@$info['error']) {
     $settings['page']['error'] = $info['msg'];
     $settings['page']['title'] = $l['register_title'];
     $settings['register']['email'] = $_REQUEST['email'];
