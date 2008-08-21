@@ -22,7 +22,7 @@ echo '
   if(canforum('post_sticky', $_REQUEST['board']) || canforum('lock_topic', $_REQUEST['board'])) {
     echo '
     <tr align="center">
-      <td>', canforum('post_sticky', $_REQUEST['board']) ? 'Make topic Sticky <input name="sticky" type="checkbox" value="1"', $settings['sticky'] ? ' checked="checked"' : '', '/>' : '', '</td><td>', canforum('lock_topic', $_REQUEST['board']) ? 'Lock topic <input name="lock" type="checkbox" type="checkbox" value="1"', $settings['locked'] ? ' checked="checked"' : '', '/>' : '', '</td>
+      <td>', canforum('post_sticky', $_REQUEST['board']) ? 'Make topic Sticky <input name="sticky" type="checkbox" value="1"'. $settings['sticky'] ? ' checked="checked"' : ''. '/>' : '', '</td><td>', canforum('lock_topic', $_REQUEST['board']) ? 'Lock topic <input name="lock" type="checkbox" type="checkbox" value="1"'. $settings['locked'] ? ' checked="checked"' : ''. '/>' : '', '</td>
     </tr>';
   }
 echo '
