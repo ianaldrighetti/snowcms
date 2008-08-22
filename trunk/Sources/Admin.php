@@ -39,7 +39,8 @@ global $cmsurl, $db_prefix, $l, $settings, $source_dir, $user;
         'managepages' => array('Page.php','ManagePages'),
         'mail-settings' => array('Settings.php','MailSettings'),        
         'members' => array('Members.php','ManageMembers'),
-        'permissions' => array('Permissions.php','GroupPermissions')        
+        'permissions' => array('Permissions.php','GroupPermissions'),
+        'managemenus' => array('Menus.php','ManageMenus')
       );
       // Is the sa= in the $sa array? If so do it :D
       if(is_array(@$sa[$_REQUEST['sa']])) {
