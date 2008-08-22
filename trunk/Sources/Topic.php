@@ -50,7 +50,7 @@ global $cmsurl, $db_prefix, $l, $settings, $user;
         LEFT JOIN {$db_prefix}members AS mem ON mem.id = msg.uid
         LEFT JOIN {$db_prefix}membergroups AS grp ON grp.group_id = mem.group        
       WHERE t.tid = $Topic_ID
-      ORDER BY msg.mid DESC LIMIT $start,{$settings['topic_posts_per_page']}");
+      ORDER BY msg.mid ASC LIMIT $start,{$settings['topic_posts_per_page']}");
       while($row = mysql_fetch_assoc($result)) {
         if($row['display_name']!=null)
           $row['username'] = $row['display_name'];
@@ -63,7 +63,7 @@ global $cmsurl, $db_prefix, $l, $settings, $user;
           'post_time' => formattime($row['post_time']),
           'body' => bbc($row['body']),
           'username' => $row['username'] ? $row['username'] : $row['poster_name'],
-          'signature' => $row['signature'],
+          'signature' => bbc($row['signature']),
           'membergroup' => $row['groupname'],
           'numposts' => $row['numposts']
         );
