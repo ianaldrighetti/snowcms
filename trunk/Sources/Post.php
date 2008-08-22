@@ -80,7 +80,7 @@ global $cmsurl, $db_prefix, $l, $settings, $user;
       if(mysql_num_rows($result)>0) {
         while($row = mysql_fetch_assoc($result))
           $who_view = @explode(",", $row['who_view']);
-        if((in_array($user['group'], $who_view))) {
+        if((in_array($user['group'], $who_view)) || $user['group']==1) {
           $settings['page']['title'] = $l['forum_startnew'];
           // This is some STUFF to preload, maybe, if you were redirected from ?action=post2 back due to errors :)
           $settings['locked'] = @$_SESSION['locked'] ? (int)$_SESSION['locked'] : (int)@$_REQUEST['locked'];
