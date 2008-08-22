@@ -30,7 +30,7 @@ global $cmsurl, $db_prefix, $l, $settings, $user;
       }
     $result = sql_query("
       SELECT 
-        b.bid, b.name, b.bdesc, b.who_view, b.numtopics, b.numposts, b.last_msg, b.last_uid, b.last_name, b.cid, log.uid AS is_new, log.bid,
+        b.bid AS board_id, b.name, b.bdesc, b.who_view, b.numtopics, b.numposts, b.last_msg, b.last_uid, b.last_name, b.cid, log.uid AS is_new, log.bid,
         msg.tid, msg.mid, msg.uid, msg.subject, msg.post_time, msg.poster_name, mem.id, mem.display_name AS username, IFNULL(mem.display_name, mem.username) AS username
       FROM {$db_prefix}boards AS b
         LEFT JOIN {$db_prefix}board_logs AS log ON log.uid = {$user['id']} AND log.bid = b.bid
@@ -42,8 +42,8 @@ global $cmsurl, $db_prefix, $l, $settings, $user;
         $new = false;
       else
         $new = true;
-        $cats[$row['cid']]['boards'][$row['bid']] = array(
-          'id' => $row['bid'],
+        $cats[$row['cid']]['boards'][$row['board_id']] = array(
+          'id' => $row['board_id'],
           'name' => $row['name'],
           'desc' => $row['bdesc'],
           'who_view' => @explode(",", $row['who_view']),
