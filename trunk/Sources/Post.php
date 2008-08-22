@@ -43,6 +43,7 @@ global $cmsurl, $db_prefix, $l, $settings, $user;
           $settings['subject'] = @$_SESSION['subject'] ? clean($_SESSION['subject']) : clean(@$_REQUEST['subject']);
           $settings['body'] = @$_SESSION['body'] ? clean($_SESSION['body']) : clean(@$_REQUEST['body']);
           $settings['board'] = $row['bid'];
+          $settings['topic'] = $row['tid'];
           loadForum('Post','Reply');
         }
         else {
@@ -148,6 +149,7 @@ global $cmsurl, $db_prefix, $l, $settings, $user;
       sql_query("UPDATE {$db_prefix}boards SET `numtopics` = numtopics + 1, `numposts` = numposts + 1, `last_msg` = '$msg_id', `last_uid` = '{$user['id']}', `last_name` = '{$user['name']}' WHERE `bid` = '$Board_ID'");
       // Delete anything from board logs with the Board ID of $Board_ID, there is a new post in town!
       sql_query("DELETE FROM {$db_prefix}board_logs WHERE `bid` = '$Board_ID'");
+      unset($_SESSION['subject'], $_SESSION['body'], $_SESSION['sticky'], $_SESSION['locked'], $_SESSION['board']);
       redirect("forum.php");
     }
     else {
@@ -160,54 +162,53 @@ global $cmsurl, $db_prefix, $l, $settings, $user;
     }
   }
   elseif($what == 'post_reply' && canforum('post_reply', boardfromTopic($_REQUEST['topic'])) && postable($_REQUEST['topic'])) {
-    echo '=(';
     $Topic_ID = (int)$_REQUEST['topic'];
-    $subject = clean($_REQUEST['subject']);
-    $body = clean($_REQUEST['body']);
-    // Get a couple options, like locked topic, sticky topic, etc.
-    $options = array();
-    $options['sticky'] = canforum('sticky_topic') ? (int)@$_REQUEST['sticky'] : 0;
-    $options['locked'] = canforum('lock_topic') ? (int)@$_REQUEST['locked'] : 0;
-    // If they stickied the topic or locked it, we need to update the original topic :)
-    if($options['sticky'] || $options['locked']) {
-      sql_query("UPDATE {$db_prefix}topics SET `sticky` = '{$options['sticky']}', `locked` = '{$options['locked']}'  WHERE tid = '$Topic_ID'");
+    // Hmm, make sure it is at least filled out, ya know? :P
+    if(strlen($_REQUEST['body'])>2) {
+      $subject = @clean($_REQUEST['subject']);
+      $body = clean($_REQUEST['body']);
+      $board_id = boardfromTopic($Topic_ID);
+      // Get a couple options, like locked topic, sticky topic, etc.
+      $options = array();
+      $options['sticky'] = canforum('sticky_topic', $board_id) ? (int)@$_REQUEST['sticky'] : 0;
+      $options['locked'] = canforum('lock_topic', $board_id) ? (int)@$_REQUEST['locked'] : 0;
+      // If they stickied the topic or locked it, we need to update the original topic :)
+      if(canforum('sticky_topic', $board_id) || canforum('lock_topic', $board_id)) {
+        sql_query("UPDATE {$db_prefix}topics SET `sticky` = '{$options['sticky']}', `locked` = '{$options['locked']}'  WHERE tid = '$Topic_ID'");
+      }
+      // No Subject? No Problem!
+      if(empty($subject)) {
+        $result = sql_query("
+          SELECT
+            t.tid, t.first_msg, msg.mid, msg.subject
+          FROM {$db_prefix}topics AS t
+            LEFT JOIN {$db_prefix}messages AS msg ON msg.mid = t.first_msg
+          WHERE t.tid = $Topic_ID");
+        $row = mysql_fetch_assoc($result);
+        $subject = "Re: ". $row['subject'];
+      }
+      $post_time = time();
+      sql_query("INSERT INTO {$db_prefix}messages
+                 (`tid`,`bid`,`uid`,`subject`,`post_time`,`poster_name`,`poster_email`,`ip`,`body`)
+           VALUES('$Topic_ID','$board_id','{$user['id']}','$subject','$post_time','{$user['name']}','{$user['email']}','{$user['ip']}','{$body}')");
+      $msg_id = mysql_insert_id();
+      sql_query("UPDATE {$db_prefix}topics SET `last_msg` = '$msg_id', `ender_id` = '{$user['id']}', `topic_ender` = '{$user['name']}', `num_replies` = num_replies + 1 WHERE `tid` = '$Topic_ID'");
+      sql_query("UPDATE {$db_prefix}members SET `numposts` = numposts + 1 WHERE `id` = '{$user['id']}'");
+      sql_query("UPDATE {$db_prefix}boards SET `numposts` = numposts + 1, `last_msg` = '$msg_id', `last_uid` = '{$user['id']}', `last_name` = '{$user['name']}' WHERE `bid` = '$board_id'");
+      unset($_SESSION['subject'], $_SESSION['body'], $_SESSION['sticky'], $_SESSION['locked'], $_SESSION['board']);
+      redirect("forum.php?board={$board_id}");
     }
-    $result = sql_query("
-      SELECT
-        b.bid, t.tid, t.bid
-      FROM {$db_prefix}topics AS t
-        LEFT JOIN {$db_prefix}boards AS b ON b.bid = t.bid
-      WHERE 
-        t.tid = $Topic_ID");
-    $row = mysql_fetch_row($result);
-    $Board_ID = $row['bid'];
-    $post_time = time();
-    mysql_free_result($result);
-    sql_query("
-      INSERT INTO {$db_prefix}messages
-        (`tid`,`bid`,`uid`,`subject`,`post_time`,`poster_name`,`poster_email`,`ip`,`body`)
-        VALUES('$Topic_ID','$Board_ID','{$user['id']}','{$subject}','{$post_time}','{$user['name']}','{$user['email']}','{$user['ip']}','{$body}')");
-    // D: You think we are done? Hahaha, You are so funny... ._.
-    $result = sql_query("
-      SELECT 
-        m.mid, m.tid, m.bid, m.uid, m.poster_name, m.post_time
-      FROM {$db_prefix}messages AS m
-      WHERE
-        m.tid = '$Topic_ID' AND m.bid = '$Board_ID' AND m.uid = '{$user['id']}' AND m.post_time = '{$post_time}'
-      LIMIT 1");
-    $row = mysql_fetch_row($result);
-    mysql_free_result($result);
-    sql_query("
-      UPDATE {$db_prefix}topics
-      SET
-        `last_msg` = '{$row['mid']}', `ender_id` = '{$user['id']}', `topic_ender` = '{$user['name']}', `num_replies` = num_replies + 1
-      WHERE `tid` = '{$row['tid']}'");
-    sql_query("UPDATE {$db_prefix}boards SET `numposts` = numposts + 1 WHERE `bid` = '$Board_ID'");
-    sql_query("UPDATE {$db_prefix}members SET `numposts` = numposts + 1 WHERE `id` = '{$user['id']}'");
-    header("Location: {$cmsurl}forum.php?board={$Board_ID}");
+    else {
+      $_SESSION['subject'] = @$_REQUEST['subject'];
+      $_SESSION['body'] = @$_REQUEST['body'];
+      $_SESSION['sticky'] = (int)@$_REQUEST['sticky'];
+      $_SESSION['locked'] = (int)@$_REQUEST['locked'];
+      $_SESSION['board'] = (int)@$_REQUEST['board'];
+      redirect("forum.php?action=post&topic={$Topic_ID}");
+    }    
   }
   else {
-    echo 'D:!';
+    // Uhh, yeah, this is for if they cant post or reply to the requested thingy...
   }
 }
 
