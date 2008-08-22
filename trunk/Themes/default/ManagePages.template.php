@@ -36,7 +36,7 @@ global $cmsurl, $settings, $l, $user;
     }
   }
   echo '
-  <form action="" method="post">
+  <form action="'.$cmsurl.'index.php?action=admin&sa=managepages" method="post">
     <table>
       <tr>
         <td>'.$l['managepages_pagetitle'].'</td><td><input name="page_title" type="text" value=""/></td>
