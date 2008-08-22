@@ -219,56 +219,61 @@ global $db_prefix, $settings, $user;
   $id = (int)$id;
   $which = (int)$which;
   // Which are we checking? Board ID or Topic ID? 0 = board, 1 = topic
-  if(!$which) {
-    $result = sql_query("
-      SELECT
-        b.bid, b.who_view
-      FROM {$db_prefix}boards AS b
-      WHERE b.bid = $id
-      LIMIT 1");
-    // Does the board even exist?
-    if(mysql_num_rows($result)) {
-      $row = mysql_fetch_assoc($result);
-      $who_view = explode(",", $row['who_view']);
-      // Is their user group in the array?
-      if(in_array($user['group'], $who_view)) {
-        // It is!
-        return true;
+  if($user['group']!=1) {
+    if(!$which) {
+      $result = sql_query("
+        SELECT
+          b.bid, b.who_view
+        FROM {$db_prefix}boards AS b
+        WHERE b.bid = $id
+        LIMIT 1");
+      // Does the board even exist?
+      if(mysql_num_rows($result)) {
+        $row = mysql_fetch_assoc($result);
+        $who_view = explode(",", $row['who_view']);
+        // Is their user group in the array?
+        if(in_array($user['group'], $who_view)) {
+          // It is!
+          return true;
+        }
+        else {
+          // Oh noes!
+          return false;
+        }
       }
       else {
-        // Oh noes!
+        // This board doesn't even exist!
         return false;
       }
     }
     else {
-      // This board doesn't even exist!
-      return false;
+      // Checking a topic, a little bit more to do then the board check
+      $result = sql_query("
+        SELECT
+          b.bid, b.who_view, t.bid, t.tid, t.locked
+        FROM {$db_prefix}topics AS t
+          LEFT JOIN {$db_prefix}boards AS b ON b.bid = t.bid
+        WHERE t.tid = $id");
+      // Does this topic exist? :P
+      if(mysql_num_rows($result)) {
+        // It exists...
+        $row = mysql_fetch_row($result);
+        $who_view = explode(",", $row['who_view']);
+        // Now, is there group in the array AND is this topic NOT locked?
+        if(in_array($user['group'], $who_view) && !$row['locked']) {
+          return true;
+        }
+        else {
+          return false;
+        }
+      }
+      else {
+        return false;
+      }
     }
   }
   else {
-    // Checking a topic, a little bit more to do then the board check
-    $result = sql_query("
-      SELECT
-        b.bid, b.who_view, t.bid, t.tid, t.locked
-      FROM {$db_prefix}topics AS t
-        LEFT JOIN {$db_prefix}boards AS b ON b.bid = t.bid
-      WHERE t.tid = $id");
-    // Does this topic exist? :P
-    if(mysql_num_rows($result)) {
-      // It exists...
-      $row = mysql_fetch_row($result);
-      $who_view = explode(",", $row['who_view']);
-      // Now, is there group in the array AND is this topic NOT locked?
-      if(in_array($user['group'], $who_view) && !$row['locked']) {
-        return true;
-      }
-      else {
-        return false;
-      }
-    }
-    else {
-      return false;
-    }
+    return true;
   }
 }
 

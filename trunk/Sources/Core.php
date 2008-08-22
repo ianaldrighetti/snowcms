@@ -276,12 +276,16 @@ function can($what) {
 global $perms, $user;
   // This is a super simple Permission handler, simply, can they do the requested $what or not?
   // If it isn't set, we say false because we dont know ._.
-  if(empty($perms[$user['group']][$what]))
-    return false;
-  elseif($perms[$user['group']][$what]) 
+  if($user['group']!=1) {
+    if(empty($perms[$user['group']][$what]) && $user['group']!=1)
+      return false;
+    elseif($perms[$user['group']][$what] || $user['group']==1) 
+      return true;
+    else
+      return false;
+  }
+  else 
     return true;
-  else
-    return false;
 }
 
 function canforum($what, $board = 0) {
@@ -289,12 +293,16 @@ global $bperms, $user;
   // This is a super simple Permission handler, simply, can they do the requested $what or not?
   // If it isn't set, we say false because we dont know ._.
   // $in, if it is 0, it means a board, 1 means topic...
-  if(empty($bperms[$user['group']][$board][$what]))
-    return false;
-  elseif($bperms[$user['group']][$board][$what]) 
-    return true;
+  if($user['group']!=1) {
+    if(empty($bperms[$user['group']][$board][$what]))
+      return false;
+    elseif($bperms[$user['group']][$board][$what]) 
+      return true;
+    else
+      return false;
+  }
   else
-    return false;
+    return true;
 }
 
 // Creates a random session id
