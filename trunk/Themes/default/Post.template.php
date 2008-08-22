@@ -35,7 +35,7 @@ echo '
 function Reply() {
 global $cmsurl, $settings, $l, $user;
 echo '
-<form action="', $cmsurl, 'forum.php?action=post2&board=', $settings['board'], '" method="post">
+<form action="', $cmsurl, 'forum.php?action=post2&topic=', $settings['topic'], '" method="post">
 <table id="post" border="0px">
   <tr cellspacing="0px" cellpadding="0px">
     <td class="title" colspan="2">', $l['post_postreply'], '</td>
@@ -54,7 +54,7 @@ echo '
   }
 echo '
   <tr align="center">
-    <td colspan="2"><input name="make_topic" type="submit" value="', $l['topic_post_button'] ,'"/></td>
+    <td colspan="2"><input name="post_reply" type="submit" value="', $l['topic_post_button'] ,'"/></td>
   </tr>
 </table>
 </form>';
