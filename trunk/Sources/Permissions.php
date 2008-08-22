@@ -90,7 +90,7 @@ global $cmsurl, $db_prefix, $l, $settings, $user;
         $new_group = clean($_REQUEST['new_group']);
         sql_query("INSERT INTO {$db_prefix}membergroups (`groupname`) VALUES ('$new_group')") or die(mysql_error());
       }
-      // Create a new group
+      // Delete a group
       if (@$_REQUEST['did']) {
         $group = clean($_REQUEST['did']);
         sql_query("DELETE FROM {$db_prefix}membergroups WHERE `group_id` = '$group'") or die(mysql_error());
