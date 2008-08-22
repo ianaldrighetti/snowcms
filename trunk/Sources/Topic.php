@@ -166,4 +166,65 @@ global $db_prefix, $settings;
  $info['start'] = $start;
  return $info;
 }
+
+function Sticky() {
+global $cmsurl, $db_prefix, $l, $settings, $user;
+  // We need to get the board, and check the permissions :P
+  $topic_id = (int)$_REQUEST['topic'];
+  $result = sql_query("
+    SELECT
+      t.tid, t.bid, t.sticky
+    FROM {$db_prefix}topics AS t
+    WHERE t.tid = $topic_id");
+  if(!mysql_num_rows($result))
+    $board_id = 0;
+  else {
+    $row = mysql_fetch_assoc($result);
+    $board_id = $row['bid'];
+  }
+  // So. Can they?
+  if(canforum('sticky_topic', $board_id) && validateSession($_REQUEST['sc'])) {
+    // This seems simple :P just an update... Then Redirect back to the topic :D
+    if($row['sticky'])
+      $sticky = 0;
+    else
+      $sticky = 1;
+    sql_query("UPDATE {$db_prefix}topics SET `sticky` = '$sticky' WHERE `tid` = '$topic_id'");
+    redirect("forum.php?topic={$topic_id}");
+  }
+  else {
+    $settings['page']['title'] = $l['topic_sticky_error'];
+    loadTheme('Topic','ErrorSticky');
+  }
+}
+
+function Lock() {
+global $cmsurl, $db_prefix, $l, $settings, $user;
+  // Same as Sticky(), can they? :P
+  $topic_id = (int)$_REQUEST['topic'];
+  $result = sql_query("
+    SELECT
+      t.tid, t.bid, t.locked
+    FROM {$db_prefix}topics
+    WHERE t.tid = $topic_id");
+  if(!mysql_num_rows($result)) 
+    $board_id = 0;
+  else {
+    $row = mysql_fetch_assoc($result);
+    $board_id = $row['bid'];
+  }
+  // Check if they can...
+  if(canforum('sticky_topic', $board_id) && validateSession($_REQUEST['sc'])) {
+    if($row['locked'])
+      $lock = 0;
+    else
+      $lock = 1;
+    sql_query("UPDATE {$db_prefix}topics SET `locked` = '$lock' WHERE `tid` = '$topic_id'");
+    redirect("forum.php?topic={$topic_id}");
+  }
+  else {
+    $settings['page']['title'] = $l['topic_lock_error'];
+    loadTheme('Topic','ErrorLock');
+  }
+}
 ?>
