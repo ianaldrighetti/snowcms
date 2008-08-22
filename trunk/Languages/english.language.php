@@ -92,7 +92,7 @@ $l['admin_menu_members_desc'] = 'Manage your members, such as changing their mem
 $l['admin_menu_permissions'] = 'Group Permissions';
 $l['admin_menu_permissions_desc'] = 'This is where you can choose what a member group can and cannot do on your site';
 $l['admin_menu_menus'] = 'Manage Menus';
-$l['admin_menu_menus_desc'] = 'With this option you can edit the links on the sidebar.';
+$l['admin_menu_menus_desc'] = 'You can edit the links on the sidebar and main menu here.';
 $l['admin_menu_forum'] = 'Manage Forum';
 $l['admin_menu_forum_desc'] = 'You can manage your forum setup here, such as categories and board management.';
 
@@ -287,6 +287,16 @@ $l['managemembers_moderate_renew_suspension'] = '%renew% for %input% hour(s) or 
 $l['managemembers_moderate_renew_suspension_button'] = 'Renew Suspension';
 $l['managemembers_moderate_ban'] = 'Ban Permanently';
 $l['managemembers_moderate_unban'] = 'Remove Ban';
+
+// ManageMenus.template.php
+$l['managemenus_title'] = 'Manage Menus';
+$l['managemenus_name'] = 'Name';
+$l['managemenus_url'] = 'URL';
+$l['managemenus_new_window'] = 'New Window';
+$l['managemenus_sidebar'] = 'Sidebar';
+$l['managemenus_order'] = 'Order';
+$l['managemenus_delete'] = 'Delete';
+$l['managemenus_save_changes'] = 'Save Changes';
 
 // ManageForum.template.php
 $l['manageforum_title'] = 'Manage Forum';
