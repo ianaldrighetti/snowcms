@@ -28,20 +28,21 @@ global $cmsurl, $db_prefix, $l, $settings, $user;
          WHERE t.tid = $Topic_ID");
     // K, they are replying to a topic...
     // But can they :)    
+    $row = mysql_fetch_assoc($result);
     if(canforum('post_reply', $row['bid'])) {         
       // But does it exist? D:!
       if(mysql_num_rows($result)>0) {
-        echo '=D';
         // The topic DOES exist, now we can check if they are allowed to see it
-        while($row = mysql_fetch_assoc($result))
+        //while($row = mysql_fetch_assoc($result))
           $who_view = @explode(",", $row['who_view']);
         if((in_array($user['group'], $who_view)) || ($user['is_admin'])) {
           $settings['page']['title'] = $l['forum_postreply'];
           // This is some STUFF to preload, maybe, if you were redirected from ?action=post2 back due to errors :)
-          $settings['locked'] = $_SESSION['locked'] ? (int)$_SESSION['locked'] : (int)$_REQUEST['locked'];
-          $settings['sticky'] = $_SESSION['sticky'] ? (int)$_SESSION['sticky'] : (int)$_REQUEST['sticky'];
-          $settings['subject'] = $_SESSION['subject'] ? clean($_SESSION['subject']) : clean(@$_REQUEST['subject']);
-          $settings['body'] = $_SESSION['body'] ? clean($_SESSION['body']) : clean(@$_REQUEST['body']);
+          $settings['locked'] = @$_SESSION['locked'] ? (int)$_SESSION['locked'] : (int)@$_REQUEST['locked'];
+          $settings['sticky'] = @$_SESSION['sticky'] ? (int)$_SESSION['sticky'] : (int)@$_REQUEST['sticky'];
+          $settings['subject'] = @$_SESSION['subject'] ? clean($_SESSION['subject']) : clean(@$_REQUEST['subject']);
+          $settings['body'] = @$_SESSION['body'] ? clean($_SESSION['body']) : clean(@$_REQUEST['body']);
+          $settings['board'] = $row['bid'];
           loadForum('Post','Reply');
         }
         else {

@@ -178,6 +178,14 @@ $l['topic_firstpage'] = 'First Page';
 $l['topic_lastpage'] = 'Last Page';
 $l['topic_newtopic'] = 'New Topic';
 $l['topic_reply'] = 'Post Reply';
+$l['forum_postreply'] = 'Post Reply';
+$l['post_newtopic'] = 'Start new topic';
+$l['topic_topic_button'] = 'Post Topic';
+$l['topic_post_button'] = 'Post Reply';
+$l['topic_sticky'] = 'Make topic Sticky';
+$l['topic_lock'] = 'Lock topic';
+$l['topic_subject'] = 'Subject:';
+$l['post_postreply'] = 'Post Reply';
 
 // Profile.template.php
 $l['profile_title'] = 'Profile';
