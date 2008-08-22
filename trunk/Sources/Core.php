@@ -447,4 +447,19 @@ global $db_prefix, $user;
     'post_reply' => true,
     'sticky_topic' => false
   ); 
+// !!! This function changes (forcefully) the separator from & to ;
+// !!! This function needs improvement!!!!
+function cleanQuery() {
+global $_REQUEST, $_GET;
+  if(!empty($_SERVER['QUERY_STRING'])) {
+  $matches = explode(";", $_SERVER['QUERY_STRING']);
+    if(count($matches)) {
+      foreach($matches as $arg) {
+        $new = explode("=", $arg);
+        $_GET[$new[0]] = $new[1];
+        $_REQUEST[$new[0]] = $new[1];
+      }
+    }
+  }
+}
 ?>

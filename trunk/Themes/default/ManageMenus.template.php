@@ -11,7 +11,7 @@ global $cmsurl, $settings, $l, $user, $cmsurl;
   
   echo '
   <h1>'.$settings['page']['title'].'</h1>
-    <form action="'.$cmsurl.'index.php?action=admin&sa=menus" method="post" style="display: inline">
+    <form action="'.$cmsurl.'index.php?action=admin;sa=menus" method="post" style="display: inline">
     
     <p><input type="hidden" name="change_menus" value="true" /></p>
     
@@ -41,7 +41,7 @@ global $cmsurl, $settings, $l, $user, $cmsurl;
         <td><input type="checkbox" name="link_new_window_'.$menu['id'].'"'.$new_window.' /></td>
         <td><input type="checkbox" name="link_sidebar_'.$menu['id'].'"'.$sidebar.' /></td>
         <td><input name="link_order_'.$menu['id'].'" value="'.$menu['order'].'" size="1" style="text-align: center" /></td>
-        <td><a href="'.$cmsurl.'index.php?action=admin&sa=menus&did='.$menu['id'].'">'.$l['managemenus_delete'].'</a></td>
+        <td><a href="'.$cmsurl.'index.php?action=admin;sa=menus;did='.$menu['id'].'">'.$l['managemenus_delete'].'</a></td>
       </tr>';
       
       // Get the highest order ready for the new row
@@ -70,7 +70,7 @@ global $l, $settings, $cmsurl;
   
   echo '
   <h1>'.$settings['page']['title'].'</h1>
-    <form action="'.$cmsurl.'index.php?action=admin&sa=menus" method="post" style="display: inline">
+    <form action="'.$cmsurl.'index.php?action=admin;sa=menus" method="post" style="display: inline">
     
     <p><input type="hidden" name="change_menus" value="true" /></p>
     

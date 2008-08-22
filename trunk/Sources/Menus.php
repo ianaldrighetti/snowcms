@@ -179,7 +179,7 @@ global $l, $settings, $db_prefix;
             'menu' => $row['menu']
           );
     }
-    
+    loadMenus();
     $settings['menus']['menus'] = $menus;
     loadTheme('ManageMenus');
   }

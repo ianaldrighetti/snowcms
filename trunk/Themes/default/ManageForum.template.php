@@ -10,11 +10,11 @@ global $cmsurl, $db_prefix, $l, $settings, $user;
   <p>', $l['manageforum_desc'], '</p>
   <br />
   <div class="acp_left">
-    <p class="main"><a href="', $cmsurl, 'index.php?action=admin&sa=forum&fa=categories" title="', $l['mf_link_cats'], '">', $l['mf_link_cats'], '</a></p>
+    <p class="main"><a href="', $cmsurl, 'index.php?action=admin;sa=forum;fa=categories" title="', $l['mf_link_cats'], '">', $l['mf_link_cats'], '</a></p>
     <p class="desc">', $l['mf_link_cats_desc'], '</p>
   </div>
   <div class="acp_right">
-    <p class="main"><a href="', $cmsurl, 'index.php?action=admin&sa=forum&fa=boards" title="', $l['mf_link_boards'], '">', $l['mf_link_boards'], '</a></p>
+    <p class="main"><a href="', $cmsurl, 'index.php?action=admin;sa=forum;fa=boards" title="', $l['mf_link_boards'], '">', $l['mf_link_boards'], '</a></p>
     <p class="desc">', $l['mf_link_boards_desc'], '</p>  
   </div>';
 }
@@ -23,7 +23,7 @@ function ShowCats() {
 global $cmsurl, $db_prefix, $l, $settings, $user;
   echo '<h2>', $l['managecats_header'], '</h2>
         <p>', $l['managecats_desc'], '</p>
-        <form action="', $cmsurl, 'index.php?action=admin&sa=forum&fa=categories" method="post">
+        <form action="', $cmsurl, 'index.php?action=admin;sa=forum;fa=categories" method="post">
           <table width="100%" id="mc">
             <tr>
               <td width="80%">', $l['mc_tr_cn'], '</td><td width="10%">', $l['mc_tr_order'], '</td><td width="9%">', $l['mc_tr_del'], '</td>
@@ -31,7 +31,7 @@ global $cmsurl, $db_prefix, $l, $settings, $user;
           foreach($settings['cats'] as $cat) {
             echo '
             <tr>
-              <td><input name="cat_name[', $cat['id'], ']" type="text" class="name" value="', $cat['name'], '"/></td><td><input name="cat_order[', $cat['id'], ']" type="text" class="order" value="', $cat['order'], '"/></td><td class="delete"><a href="', $cmsurl, 'index.php?action=admin&sa=forum&fa=categories&delete=', $cat['id'], '&sc=', $user['sc'], '" onClick="return confirm(\'', $l['managecats_are_you_sure'], '\');">X</td>
+              <td><input name="cat_name[', $cat['id'], ']" type="text" class="name" value="', $cat['name'], '"/></td><td><input name="cat_order[', $cat['id'], ']" type="text" class="order" value="', $cat['order'], '"/></td><td class="delete"><a href="', $cmsurl, 'index.php?action=admin;sa=forum;fa=categories;delete=', $cat['id'], ';sc=', $user['sc'], '" onClick="return confirm(\'', $l['managecats_are_you_sure'], '\');">X</td>
             </tr>';
           }
           echo '
@@ -41,7 +41,7 @@ global $cmsurl, $db_prefix, $l, $settings, $user;
           </table>
         </form>
         <br />
-        <form action="', $cmsurl, 'index.php?action=admin&sa=forum&fa=categories" method="post">
+        <form action="', $cmsurl, 'index.php?action=admin;sa=forum;fa=categories" method="post">
           <table id="add_cat">
             <tr>
               <td colspan="2"><p class="add_header">', $l['managecats_add_header'], '</p></td>
@@ -63,7 +63,7 @@ global $cmsurl, $db_prefix, $l, $settings, $user;
   <p>', $l['manageboards_desc'], '</p>';
   if(count($settings['cats'])) {
     echo '
-  <form action="', $cmsurl, 'index.php?action=admin&sa=forum&fa=boards" method="post">
+  <form action="', $cmsurl, 'index.php?action=admin;sa=forum;fa=boards" method="post">
     <div id="board_list">';
     foreach($settings['cats'] as $cat) {
       echo '
@@ -74,7 +74,7 @@ global $cmsurl, $db_prefix, $l, $settings, $user;
         foreach($cat['boards'] as $board) {
           echo '
           <div class="board">
-            <p><input class="board_name" name="board_name[', $board['id'], ']" type="text" value="', $board['name'], '"/> <input class="board_order" name="board_order[', $board['id'], ']" type="text" value="', $board['order'], '"/> [<a href="', $cmsurl, 'index.php?action=admin&sa=forum&fa=boards&do=edit&id=', $board['id'], '">', $l['manageboards_edit_link'], '</a>] <a class="del" href="', $cmsurl, 'index.php?action=admin&sa=forum&fa=boards&delete=', $board['id'], '&sc=', $user['sc'], '" onClick="return confirm(\'', $l['manageboards_are_you_sure_del'], '\');">X</a></p>
+            <p><input class="board_name" name="board_name[', $board['id'], ']" type="text" value="', $board['name'], '"/> <input class="board_order" name="board_order[', $board['id'], ']" type="text" value="', $board['order'], '"/> [<a href="', $cmsurl, 'index.php?action=admin;sa=forum;fa=boards;do=edit;id=', $board['id'], '">', $l['manageboards_edit_link'], '</a>] <a class="del" href="', $cmsurl, 'index.php?action=admin;sa=forum;fa=boards;delete=', $board['id'], ';sc=', $user['sc'], '" onClick="return confirm(\'', $l['manageboards_are_you_sure_del'], '\');">X</a></p>
           </div>';
         }
       }
@@ -83,7 +83,7 @@ global $cmsurl, $db_prefix, $l, $settings, $user;
     </div>
     <table width="100%">
       <tr align="right">
-        <td><a href="', $cmsurl, 'index.php?action=admin&sa=forum&fa=boards&do=add">', $l['manageboards_add_button'], '</a>  <input name="update_boards" type="submit" value="', $l['manageboards_add_update'], '"/></td>
+        <td><a href="', $cmsurl, 'index.php?action=admin;sa=forum;fa=boards;do=add">', $l['manageboards_add_button'], '</a>  <input name="update_boards" type="submit" value="', $l['manageboards_add_update'], '"/></td>
       </tr>
     </table>
   </form>';  
@@ -97,7 +97,7 @@ function AddBoard() {
 global $cmsurl, $db_prefix, $l, $settings, $user;
   echo '
   <h2>', $l['manageboards_add_header'], '</h2>
-  <form action="', $cmsurl, 'index.php?action=admin&sa=forum&fa=boards" method="post">  
+  <form action="', $cmsurl, 'index.php?action=admin;sa=forum;fa=boards" method="post">  
     <table id="add_board">
       <tr class="category">
         <td>', $l['manageboards_add_category'], '</td>
@@ -133,7 +133,7 @@ function EditBoard() {
 global $cmsurl, $db_prefix, $l, $settings, $user;
   echo '
   <h2>', $l['manageboards_edit_header'], '</h2>
-  <form action="', $cmsurl, 'index.php?action=admin&sa=forum&fa=boards" method="post">  
+  <form action="', $cmsurl, 'index.php?action=admin;sa=forum;fa=boards" method="post">  
     <table id="add_board">
       <tr class="category">
         <td>', $l['manageboards_add_category'], '</td>

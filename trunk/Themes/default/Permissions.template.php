@@ -10,7 +10,7 @@ global $cmsurl, $settings, $l, $user;
     <h2>'.$l['permissions_header'].'</h2>
     <p>'.$l['permissions_desc'].'</p>
   
-  <form action="'.$cmsurl.'index.php?action=admin&sa=permissions" method="post" style="display: inline">
+  <form action="'.$cmsurl.'index.php?action=admin;sa=permissions" method="post" style="display: inline">
   
   <p><input type="hidden" name="change_groups" value="true" /></p>
   
@@ -35,8 +35,8 @@ global $cmsurl, $settings, $l, $user;
     echo '<td style="padding: 5px;"><input name="group_'.$group['id'].'" value="'.$group['name'].'" /></td>
       <td style="text-align: center; padding: 5px;">'.$group['numusers'].'</td>
       <td style="text-align: center; padding: 5px;">'.$group['numperms'].'</td>
-      <td style="text-align: center; padding: 5px;"><a href="'.$cmsurl.'index.php?action=admin&sa=permissions&mid='.$group['id'].'">'.$l['permissions_modify'].'</a></td>
-      <td style="text-align: center; padding: 5px;"><a href="'.$cmsurl.'index.php?action=admin&sa=permissions&did='.$group['id'].'">'.$l['permissions_delete'].'</a></td>
+      <td style="text-align: center; padding: 5px;"><a href="'.$cmsurl.'index.php?action=admin;sa=permissions;mid='.$group['id'].'">'.$l['permissions_modify'].'</a></td>
+      <td style="text-align: center; padding: 5px;"><a href="'.$cmsurl.'index.php?action=admin;sa=permissions;did='.$group['id'].'">'.$l['permissions_delete'].'</a></td>
     </tr>';
   }
   echo '
@@ -48,7 +48,7 @@ global $cmsurl, $settings, $l, $user;
   
   <br />
   
-  <form action="'.$cmsurl.'index.php?action=admin&sa=permissions" method="post">
+  <form action="'.$cmsurl.'index.php?action=admin;sa=permissions" method="post">
   <p>
   <input name="new_group" />
   <input type="submit" value="'.$l['permissions_new_group'].'" />
@@ -69,7 +69,7 @@ global $cmsurl, $settings, $l, $user;
   <h2>'.$l['permissions_edit_header'].'</h2>
   <p>'.$l['permissions_edit_desc'].'</p>';
   echo '
-  <form action="'.$cmsurl.'index.php?action=admin&sa=permissions" method="post">
+  <form action="'.$cmsurl.'index.php?action=admin;sa=permissions" method="post">
     <fieldset>
       <table>';
   foreach($settings['permissions']['group'] as $perm => $value) {

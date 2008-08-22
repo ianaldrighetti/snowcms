@@ -23,27 +23,27 @@ global $cmsurl, $settings, $l, $user;
 	</div>
   <h2>Admin Options</h2>
   <div class="acp_left">
-    <p class="main"><a href="'. $cmsurl. 'index.php?action=admin&sa=managepages" title="'. $l['admin_menu_managepages']. '">'. $l['admin_menu_managepages']. '</a></p>
+    <p class="main"><a href="'. $cmsurl. 'index.php?action=admin;sa=managepages" title="'. $l['admin_menu_managepages']. '">'. $l['admin_menu_managepages']. '</a></p>
     <p class="desc">'. $l['admin_menu_managepages_desc']. '</p>
   </div>
   <div class="acp_right">
-    <p class="main"><a href="'. $cmsurl. 'index.php?action=admin&sa=basic-settings" title="'. $l['admin_menu_basic-settings']. '">'. $l['admin_menu_basic-settings']. '</a></p>
+    <p class="main"><a href="'. $cmsurl. 'index.php?action=admin;sa=basic-settings" title="'. $l['admin_menu_basic-settings']. '">'. $l['admin_menu_basic-settings']. '</a></p>
     <p class="desc">'. $l['admin_menu_basic-settings_desc']. '</p>  
   </div>
     <div class="acp_left">
-    <p class="main"><a href="'. $cmsurl. 'index.php?action=admin&sa=members" title="'. $l['admin_menu_members']. '">'. $l['admin_menu_members']. '</a></p>
+    <p class="main"><a href="'. $cmsurl. 'index.php?action=admin;sa=members" title="'. $l['admin_menu_members']. '">'. $l['admin_menu_members']. '</a></p>
     <p class="desc">'. $l['admin_menu_members_desc']. '</p>
   </div>
   <div class="acp_right">
-    <p class="main"><a href="'. $cmsurl. 'index.php?action=admin&sa=permissions" title="'. $l['admin_menu_permissions']. '">'. $l['admin_menu_permissions']. '</a></p>
+    <p class="main"><a href="'. $cmsurl. 'index.php?action=admin;sa=permissions" title="'. $l['admin_menu_permissions']. '">'. $l['admin_menu_permissions']. '</a></p>
     <p class="desc">'. $l['admin_menu_permissions_desc']. '</p>  
   </div>
   <div class="acp_left">
-    <p class="main"><a href="'. $cmsurl. 'index.php?action=admin&sa=menus" title="'. $l['admin_menu_menus']. '">'. $l['admin_menu_menus']. '</a></p>
+    <p class="main"><a href="'. $cmsurl. 'index.php?action=admin;sa=menus" title="'. $l['admin_menu_menus']. '">'. $l['admin_menu_menus']. '</a></p>
     <p class="desc">'. $l['admin_menu_menus_desc']. '</p>  
   </div>
   <div class="acp_right">
-    <p class="main"><a href="'. $cmsurl. 'index.php?action=admin&sa=forum" title="'. $l['admin_menu_forum']. '">'. $l['admin_menu_forum']. '</a></p>
+    <p class="main"><a href="'. $cmsurl. 'index.php?action=admin;sa=forum" title="'. $l['admin_menu_forum']. '">'. $l['admin_menu_forum']. '</a></p>
     <p class="desc">'. $l['admin_menu_forum_desc']. '</p>  
   </div>  
   ';

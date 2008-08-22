@@ -16,7 +16,7 @@ echo '
   foreach($settings['page']['online'] as $online) {
     echo '
     <tr>
-      <td>'; if($online['is_user']) { echo '<a href="'.$cmsurl.'index.php?action=profile&u='.$online['user_id'].'">'; } echo $online['user']; if($online['is_user']) { echo '</a>'; } echo '</td>'; if(can('view_online_special')) { echo '<td>'.$online['ip'].'</td>'; } echo '<td>'.$online['time'].'</td><td>'.$online['page'].'</td>
+      <td>'; if($online['is_user']) { echo '<a href="'.$cmsurl.'index.php?action=profile;u='.$online['user_id'].'">'; } echo $online['user']; if($online['is_user']) { echo '</a>'; } echo '</td>'; if(can('view_online_special')) { echo '<td>'.$online['ip'].'</td>'; } echo '<td>'.$online['time'].'</td><td>'.$online['page'].'</td>
     </tr>';
   }
   echo '

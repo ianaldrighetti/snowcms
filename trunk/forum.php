@@ -24,7 +24,8 @@ require_once($source_dir.'/Core.php');
 
   // Connect to MySQL
   @mysql_connect($mysql_host, $mysql_user, $mysql_passwd) or die(MySQLError(mysql_error()));
-
+  
+  cleanQuery();
 // Load up a few things :P Such as $settings, $l[anguage], and $user, the permissions too!
   loadUser();
   loadSettings();

@@ -8,7 +8,7 @@ function Main() {
 global $l, $settings, $cmsurl;
   
   echo '<h1 style="margin-bottom: 0">'.$settings['page']['title'].'</h1>
-        <p style="margin-top: 0"><a href="'.$cmsurl.'index.php?action=profile&sa=edit">'.$l['profile_edit_link'].'</a></p>';
+        <p style="margin-top: 0"><a href="'.$cmsurl.'index.php?action=profile;sa=edit">'.$l['profile_edit_link'].'</a></p>';
   
   Info();
 }
@@ -47,7 +47,7 @@ global $l, $settings, $theme_url, $cmsurl;
           : '<tr><td><img src="'.$theme_url.'/'.$settings['theme'].'/offline.gif"
               alt="'.$l['profile_offline'].'" width="16" height="16" /></td><td><b>
             '.$l['profile_offline'])
-          .'</b> - <a href="'.$cmsurl.'index.php?action=admin&sa=members&u='.$profile['id'].'">'.$l['profile_moderate'].'</a></td></tr>
+          .'</b> - <a href="'.$cmsurl.'index.php?action=admin;sa=members;u='.$profile['id'].'">'.$l['profile_moderate'].'</a></td></tr>
         </table>';
   
   Info();
@@ -81,7 +81,7 @@ global $l, $settings, $cmsurl, $user;
   echo '
         <h1>'.$settings['page']['title'].'</h1>
         
-        <form action="'.$cmsurl.'index.php?action=profile&sa=edit" method="post" style="display: inline">
+        <form action="'.$cmsurl.'index.php?action=profile;sa=edit" method="post" style="display: inline">
         
         <p><input type="hidden" name="ssa" value="process-edit" /></p>
         

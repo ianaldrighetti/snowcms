@@ -324,8 +324,8 @@ $l['managecats_order'] = 'Order:';
 // Manage Boards
 $l['manageboards_title'] = 'Manage Boards';
 $l['manageboards_header'] = 'Manage Boards';
-$l['manageboards_desc'] = 'You can edit, add, and delete boards in your forum, be sure that you have <a href="'. $cmsurl. 'index.php?action=admin&sa=forum&fa=categories">categories</a> created already';
-$l['manageboards_no_cats'] = 'No categories have been found! You <em>must</em> have categories to add boards, you can make them <a href="'. $cmsurl. 'index.php?action=admin&sa=forum&fa=categories">here</a>';
+$l['manageboards_desc'] = 'You can edit, add, and delete boards in your forum, be sure that you have <a href="'. $cmsurl. 'index.php?action=admin;sa=forum;fa=categories">categories</a> created already';
+$l['manageboards_no_cats'] = 'No categories have been found! You <em>must</em> have categories to add boards, you can make them <a href="'. $cmsurl. 'index.php?action=admin;sa=forum;fa=categories">here</a>';
 $l['manageboards_are_you_sure_del'] = 'Are you SURE you want to delete this board? \nIt can\\\'t be undone!';
 $l['manageboards_edit_link'] = 'EDIT';
 // Add Boards

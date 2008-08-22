@@ -36,7 +36,7 @@ global $cmsurl, $settings, $l, $user;
     }
   }
   echo '
-  <form action="'.$cmsurl.'index.php?action=admin&sa=managepages" method="post">
+  <form action="'.$cmsurl.'index.php?action=admin;sa=managepages" method="post">
     <table>
       <tr>
         <td>'.$l['managepages_pagetitle'].'</td><td><input name="page_title" type="text" value=""/></td>
@@ -58,7 +58,7 @@ global $cmsurl, $settings, $l, $user;
     foreach($settings['page']['pages'] as $page) {
       echo '
       <tr>
-        <td><a href="'.$cmsurl.'index.php?action=admin&sa=editpage&page_id='.$page['page_id'].'">'.$page['title'].'</a></td><td><a href="'.$cmsurl.'index.php?action=profile&u='.$page['page_owner'].'">'.$page['owner'].'</td><td>'.$page['date'].'</td><td><a href="'.$cmsurl.'index.php?action=admin&sa=managepages&did='.$page['page_id'].'">'.$l['managepages_delete'].'</a></td>
+        <td><a href="'.$cmsurl.'index.php?action=admin;sa=editpage;page_id='.$page['page_id'].'">'.$page['title'].'</a></td><td><a href="'.$cmsurl.'index.php?action=profile;u='.$page['page_owner'].'">'.$page['owner'].'</td><td>'.$page['date'].'</td><td><a href="'.$cmsurl.'index.php?action=admin;sa=managepages;did='.$page['page_id'].'">'.$l['managepages_delete'].'</a></td>
       </tr>';
     }
     echo '
@@ -81,7 +81,7 @@ global $cmsurl, $settings, $l, $user;
   echo '
   <h1>'.$l['managepages_edit_header'].'</h1>
   <p>'.$l['managepages_edit_desc'].'</p>
-  <form action="'.$cmsurl.'index.php?action=admin&sa=managepages" method="post">
+  <form action="'.$cmsurl.'index.php?action=admin;sa=managepages" method="post">
     <table>
       <tr>
         <td>'.$l['managepages_editpage_title'].'</td><td><input name="page_title" type="text" value="'.$settings['page']['edit_page']['title'].'"/></td>

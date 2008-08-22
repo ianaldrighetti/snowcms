@@ -10,7 +10,7 @@ echo '
 <table id="messageindex_panel">
   <tr>
     <td style="text-align: left;">Pages: [1]</td>
-    <td style="text-align: right;">'; if(canforum('post_new', $_REQUEST['board'])) { echo '<a href="'. $cmsurl. 'forum.php?action=post&board='. $_REQUEST['board']. '">New Topic</a>'; } echo '</td>
+    <td style="text-align: right;">'; if(canforum('post_new', $_REQUEST['board'])) { echo '<a href="'. $cmsurl. 'forum.php?action=post;board='. $_REQUEST['board']. '">New Topic</a>'; } echo '</td>
   </tr>
 </table>
 <div id="messageindex">
@@ -29,7 +29,7 @@ echo '
        <tr>
          <td style="padding: 5px;">XX</td>
          <td style="padding: 5px;"><a href="'. $cmsurl. 'forum.php?topic='. $topic['tid']. '">'. $topic['subject']. '</a></td>
-         <td style="text-align: center; padding: 5px;"><a href="'. $cmsurl. 'index.php?action=profile&u='. $topic['starter_id']. '">'.$topic['username']. '</a></td>
+         <td style="text-align: center; padding: 5px;"><a href="'. $cmsurl. 'index.php?action=profile;u='. $topic['starter_id']. '">'.$topic['username']. '</a></td>
          <td style="text-align: center; padding: 5px;">'. $topic['numReplies']. '</td>
          <td style="text-align: center; padding: 5px;">'. $topic['numViews']. '</td>
          <td style="padding: 5px;">Last Post info :o</td>

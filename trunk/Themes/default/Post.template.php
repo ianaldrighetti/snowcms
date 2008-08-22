@@ -7,7 +7,7 @@ if(!defined('Snow'))
 function Topic() {
 global $cmsurl, $settings, $l, $user;
 echo '
-<form action="', $cmsurl, 'forum.php?action=post2&board=', $settings['board'], '" method="post">
+<form action="', $cmsurl, 'forum.php?action=post2;board=', $settings['board'], '" method="post">
 <table id="post" border="0px">
   <tr cellspacing="0px" cellpadding="0px">
     <td class="title" colspan="2">', $l['post_newtopic'], '</td>
@@ -35,7 +35,7 @@ echo '
 function Reply() {
 global $cmsurl, $settings, $l, $user;
 echo '
-<form action="', $cmsurl, 'forum.php?action=post2&topic=', $settings['topic'], '" method="post">
+<form action="', $cmsurl, 'forum.php?action=post2;topic=', $settings['topic'], '" method="post">
 <table id="post" border="0px">
   <tr cellspacing="0px" cellpadding="0px">
     <td class="title" colspan="2">', $l['post_postreply'], '</td>

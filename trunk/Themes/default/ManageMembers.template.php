@@ -28,7 +28,7 @@ global $l, $db_prefix, $settings, $cmsurl, $theme_url;
     }
     
     // Show filter
-    echo '<form action="'.$cmsurl.'index.php" method="get" style="float: right; margin-bottom: 0"><p style="display: inline">
+    echo '<form action="'.$cmsurl.'index.php" method="post" style="float: right; margin-bottom: 0"><p style="display: inline">
        '.$settings['managemembers']['filter'].'
         </p></form>
         ';
@@ -36,18 +36,18 @@ global $l, $db_prefix, $settings, $cmsurl, $theme_url;
     // Show next and previous page links
     if ($prev_page > 0)
       echo '<table width="100%">
-        <tr><td><a href="'.$cmsurl.'index.php?action=admin&sa=members&pg='.$prev_page.$settings['manage_members']['filter_get'].$settings['manage_members']['sort_get'].'">'.$l['managemembers_previous_page'].'</a></td>
+        <tr><td><a href="'.$cmsurl.'index.php?action=admin;sa=members;pg='.$prev_page.$settings['manage_members']['filter_get'].$settings['manage_members']['sort_get'].'">'.$l['managemembers_previous_page'].'</a></td>
         ';
     elseif ($prev_page == 0)
       echo '<table width="100%">
-        <tr><td><a href="'.$cmsurl.'index.php?action=admin&sa=members'.$settings['manage_members']['filter_get'].$settings['manage_members']['sort_get'].'">'.$l['managemembers_previous_page'].'</a></td>
+        <tr><td><a href="'.$cmsurl.'index.php?action=admin;sa=members'.$settings['manage_members']['filter_get'].$settings['manage_members']['sort_get'].'">'.$l['managemembers_previous_page'].'</a></td>
         ';
     else
       echo '<table width="100%">
         <tr><td></td>
         ';
     if ($total_members > $page_end)
-      echo '<td style="text-align: right"><a href="'.$cmsurl.'index.php?action=admin&sa=members&pg='.$next_page.$settings['manage_members']['filter_get'].$settings['manage_members']['sort_get'].'">'.$l['managemembers_next_page'].'</a></td></tr>
+      echo '<td style="text-align: right"><a href="'.$cmsurl.'index.php?action=admin;sa=members;pg='.$next_page.$settings['manage_members']['filter_get'].$settings['manage_members']['sort_get'].'">'.$l['managemembers_next_page'].'</a></td></tr>
         </table>
         ';
     else
@@ -57,10 +57,10 @@ global $l, $db_prefix, $settings, $cmsurl, $theme_url;
     
     // Show members
     echo '<table style="width: 100%; text-align: center">
-          <tr><th style="border-style: solid; border-width: 1px; width: 11%"><a href="'.$cmsurl.'index.php?action=admin&sa=members'.$settings['manage_members']['page_get'].$settings['manage_members']['filter_get'].'&s=id'.$settings['manage_members']['id_desc'].'">'.$l['managemembers_id'].'</a></th><th style="border-style: solid; border-width: 1px; width: 29%"><a href="'.$cmsurl.'index.php?action=admin&sa=members'.$settings['manage_members']['page_get'].$settings['manage_members']['filter_get'].'&s=username'.$settings['manage_members']['username_desc'].'">'.$l['managemembers_username'].'</a></th><th style="border-style: solid; border-width: 1px; width: 28%"><a href="'.$cmsurl.'index.php?action=admin&sa=members'.$settings['manage_members']['page_get'].$settings['manage_members']['filter_get'].'&s=group'.$settings['manage_members']['group_desc'].'">'.$l['managemembers_group'].'</a></th><th style="border-style: solid; border-width: 1px; width: 29%"><a href="'.$cmsurl.'index.php?action=admin&sa=members'.$settings['manage_members']['page_get'].$settings['manage_members']['filter_get'].'&s=joindate'.$settings['manage_members']['joindate_desc'].'">'.$l['managemembers_join_date'].'</a></th><th width="6%"></th></tr>';
+          <tr><th style="border-style: solid; border-width: 1px; width: 11%"><a href="'.$cmsurl.'index.php?action=admin;sa=members'.$settings['manage_members']['page_get'].$settings['manage_members']['filter_get'].';s=id'.$settings['manage_members']['id_desc'].'">'.$l['managemembers_id'].'</a></th><th style="border-style: solid; border-width: 1px; width: 29%"><a href="'.$cmsurl.'index.php?action=admin;sa=members'.$settings['manage_members']['page_get'].$settings['manage_members']['filter_get'].';s=username'.$settings['manage_members']['username_desc'].'">'.$l['managemembers_username'].'</a></th><th style="border-style: solid; border-width: 1px; width: 28%"><a href="'.$cmsurl.'index.php?action=admin;sa=members'.$settings['manage_members']['page_get'].$settings['manage_members']['filter_get'].';s=group'.$settings['manage_members']['group_desc'].'">'.$l['managemembers_group'].'</a></th><th style="border-style: solid; border-width: 1px; width: 29%"><a href="'.$cmsurl.'index.php?action=admin;sa=members'.$settings['manage_members']['page_get'].$settings['manage_members']['filter_get'].';s=joindate'.$settings['manage_members']['joindate_desc'].'">'.$l['managemembers_join_date'].'</a></th><th width="6%"></th></tr>';
     $i = 0;
     while (($row = mysql_fetch_assoc($member_rows)) && $i < $page_end - ($page_start - 1)) {
-      echo '<tr><td>'.$row['id'].'</td><td><a href="'.$cmsurl.'index.php?action=profile&u='.$row['id'].'">'.($row['display_name'] ? $row['display_name'] : $row['username']).'</a></td><td>'.$row['groupname'].'</td><td>'.date($settings['dateformat'],$row['reg_date']).'</td><td><a href="'.$cmsurl.'index.php?action=admin&sa=members&u='.$row['id'].'"><img src="'.$theme_url.'/'.$settings['theme'].'/moderate.png" alt="'.$l['managemembers_moderate_button'].'" width="12" height="12" style="border: 0" /></a></td></tr>';
+      echo '<tr><td>'.$row['id'].'</td><td><a href="'.$cmsurl.'index.php?action=profile;u='.$row['id'].'">'.($row['display_name'] ? $row['display_name'] : $row['username']).'</a></td><td>'.$row['groupname'].'</td><td>'.date($settings['dateformat'],$row['reg_date']).'</td><td><a href="'.$cmsurl.'index.php?action=admin;sa=members;u='.$row['id'].'"><img src="'.$theme_url.'/'.$settings['theme'].'/moderate.png" alt="'.$l['managemembers_moderate_button'].'" width="12" height="12" style="border: 0" /></a></td></tr>';
       $i += 1;
     }
     echo '</table>';
@@ -68,18 +68,18 @@ global $l, $db_prefix, $settings, $cmsurl, $theme_url;
     // Show next and previous page links
     if ($prev_page > 0)
       echo '<table width="100%">
-        <tr><td><a href="'.$cmsurl.'index.php?action=admin&sa=members&pg='.$prev_page.$settings['manage_members']['filter_get'].$settings['manage_members']['sort_get'].'">'.$l['managemembers_previous_page'].'</a></td>
+        <tr><td><a href="'.$cmsurl.'index.php?action=admin;sa=members;pg='.$prev_page.$settings['manage_members']['filter_get'].$settings['manage_members']['sort_get'].'">'.$l['managemembers_previous_page'].'</a></td>
         ';
     elseif ($prev_page == 0)
       echo '<table width="100%">
-        <tr><td><a href="'.$cmsurl.'index.php?action=admin&sa=members'.$settings['manage_members']['filter_get'].$settings['manage_members']['sort_get'].'">'.$l['managemembers_previous_page'].'</a></td>
+        <tr><td><a href="'.$cmsurl.'index.php?action=admin;sa=members'.$settings['manage_members']['filter_get'].$settings['manage_members']['sort_get'].'">'.$l['managemembers_previous_page'].'</a></td>
         ';
     else
       echo '<table width="100%">
         <tr><td></td>
         ';
     if ($total_members > $page_end)
-      echo '<td style="text-align: right"><a href="'.$cmsurl.'index.php?action=admin&sa=members&pg='.$next_page.$settings['manage_members']['filter_get'].$settings['manage_members']['sort_get'].'">'.$l['managemembers_next_page'].'</a></td></tr>
+      echo '<td style="text-align: right"><a href="'.$cmsurl.'index.php?action=admin;sa=members;pg='.$next_page.$settings['manage_members']['filter_get'].$settings['manage_members']['sort_get'].'">'.$l['managemembers_next_page'].'</a></td></tr>
         </table>
         ';
     else
@@ -119,18 +119,18 @@ global $l, $settings, $cmsurl;
   // Show next and previous page links
     if ($prev_page > 0)
       echo '<table width="100%">
-        <tr><td><a href="'.$cmsurl.'index.php?action=admin&sa=members&pg='.$prev_page.$settings['manage_members']['filter_get'].$settings['manage_members']['sort_get'].'">'.$l['managemembers_previous_page'].'</a></td>
+        <tr><td><a href="'.$cmsurl.'index.php?action=admin;sa=members;pg='.$prev_page.$settings['manage_members']['filter_get'].$settings['manage_members']['sort_get'].'">'.$l['managemembers_previous_page'].'</a></td>
         ';
     elseif ($prev_page == 0)
       echo '<table width="100%">
-        <tr><td><a href="'.$cmsurl.'index.php?action=admin&sa=members'.$settings['manage_members']['filter_get'].$settings['manage_members']['sort_get'].'">'.$l['managemembers_previous_page'].'</a></td>
+        <tr><td><a href="'.$cmsurl.'index.php?action=admin;sa=members'.$settings['manage_members']['filter_get'].$settings['manage_members']['sort_get'].'">'.$l['managemembers_previous_page'].'</a></td>
         ';
     else
       echo '<table width="100%">
         <tr><td></td>
         ';
     if ($total_members > $page_end)
-      echo '<td style="text-align: right"><a href="'.$cmsurl.'index.php?action=admin&sa=members&pg='.$next_page.$settings['manage_members']['filter_get'].$settings['manage_members']['sort_get'].'">'.$l['managemembers_next_page'].'</a></td></tr>
+      echo '<td style="text-align: right"><a href="'.$cmsurl.'index.php?action=admin;sa=members;pg='.$next_page.$settings['manage_members']['filter_get'].$settings['manage_members']['sort_get'].'">'.$l['managemembers_next_page'].'</a></td></tr>
         </table>
         ';
     else
@@ -144,18 +144,18 @@ global $l, $settings, $cmsurl;
   // Show next and previous page links
     if ($prev_page > 0)
       echo '<table width="100%">
-        <tr><td><a href="'.$cmsurl.'index.php?action=admin&sa=members&pg='.$prev_page.$settings['manage_members']['filter_get'].$settings['manage_members']['sort_get'].'">'.$l['managemembers_previous_page'].'</a></td>
+        <tr><td><a href="'.$cmsurl.'index.php?action=admin;sa=members;pg='.$prev_page.$settings['manage_members']['filter_get'].$settings['manage_members']['sort_get'].'">'.$l['managemembers_previous_page'].'</a></td>
         ';
     elseif ($prev_page == 0)
       echo '<table width="100%">
-        <tr><td><a href="'.$cmsurl.'index.php?action=admin&sa=members'.$settings['manage_members']['filter_get'].$settings['manage_members']['sort_get'].'">'.$l['managemembers_previous_page'].'</a></td>
+        <tr><td><a href="'.$cmsurl.'index.php?action=admin;sa=members'.$settings['manage_members']['filter_get'].$settings['manage_members']['sort_get'].'">'.$l['managemembers_previous_page'].'</a></td>
         ';
     else
       echo '<table width="100%">
         <tr><td></td>
         ';
     if ($total_members > $page_end)
-      echo '<td style="text-align: right"><a href="'.$cmsurl.'index.php?action=admin&sa=members&pg='.$next_page.$settings['manage_members']['filter_get'].$settings['manage_members']['sort_get'].'">'.$l['managemembers_next_page'].'</a></td></tr>
+      echo '<td style="text-align: right"><a href="'.$cmsurl.'index.php?action=admin;sa=members;pg='.$next_page.$settings['manage_members']['filter_get'].$settings['manage_members']['sort_get'].'">'.$l['managemembers_next_page'].'</a></td></tr>
         </table>
         ';
     else
@@ -178,7 +178,7 @@ global $l, $settings, $user, $cmsurl;
   echo '
         <h1>'.$settings['page']['title'].'</h1>
         
-        <form action="'.$cmsurl.'index.php?action=admin&sa=members&u='.$_REQUEST['u'].'" method="post" style="display: inline">
+        <form action="'.$cmsurl.'index.php?action=admin;sa=members;u='.$_REQUEST['u'].'" method="post" style="display: inline">
         
         <p>
         <input type="hidden" name="sc" value="'.$user['sc'].'" />
@@ -250,7 +250,7 @@ global $l, $settings, $user, $cmsurl;
         ';
   else {
     if ($settings['managemembers']['member']['suspension'] <= time())
-      echo '<form action="'.$cmsurl.'index.php?action=admin&sa=members&u='.$_REQUEST['u'].'" method="post" style="display: inline"><p style="display: inline">
+      echo '<form action="'.$cmsurl.'index.php?action=admin;sa=members;u='.$_REQUEST['u'].'" method="post" style="display: inline"><p style="display: inline">
         <input type="hidden" name="action" value="admin" />
         <input type="hidden" name="sa" value="members" />
         <input type="hidden" name="ssa" value="suspend" />
@@ -259,14 +259,14 @@ global $l, $settings, $user, $cmsurl;
         '</p></form>
         ';
     else
-      echo str_replace('%renew%','<form action="'.$cmsurl.'index.php?action=admin&sa=members&u='.$_REQUEST['u'].'" method="post" style="display: inline"><p style="display: inline">
+      echo str_replace('%renew%','<form action="'.$cmsurl.'index.php?action=admin;sa=members;u='.$_REQUEST['u'].'" method="post" style="display: inline"><p style="display: inline">
         <input type="hidden" name="action" value="admin" />
         <input type="hidden" name="sa" value="members" />
         <input type="hidden" name="ssa" value="suspend" />
         <input type="hidden" name="sc" value="'.$user['sc'].'" />
         <input type="submit" value="'.$l['managemembers_moderate_renew_suspension_button'].'" />
         ',str_replace('%input%','<input name="suspension" value="3" style="text-align: center; width: 30px" maxlength="4" />
-        </p></form>',str_replace('%remove%','<form action="'.$cmsurl.'index.php?action=admin&sa=members&u='.$_REQUEST['u'].'" method="post" style="display: inline"><p style="display: inline">
+        </p></form>',str_replace('%remove%','<form action="'.$cmsurl.'index.php?action=admin;sa=members;u='.$_REQUEST['u'].'" method="post" style="display: inline"><p style="display: inline">
         <input type="submit" value="'.$l['managemembers_moderate_unsuspend_button'].'" />
         <input type="hidden" name="action" value="admin" />
         <input type="hidden" name="sa" value="members" />
@@ -276,7 +276,7 @@ global $l, $settings, $user, $cmsurl;
         ',$l['managemembers_moderate_renew_suspension'])));
     echo '<br />
         <br />
-        <form action="'.$cmsurl.'index.php?action=admin&sa=members&u='.$_REQUEST['u'].'" method="post" style="display: inline">
+        <form action="'.$cmsurl.'index.php?action=admin;sa=members;u='.$_REQUEST['u'].'" method="post" style="display: inline">
         <p style="display: inline">
         <input type="hidden" name="action" value="admin" />
         <input type="hidden" name="sa" value="members" />

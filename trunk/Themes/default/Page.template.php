@@ -33,7 +33,7 @@ global $cmsurl, $settings, $l, $user;
     foreach($settings['page']['pages'] as $page) {
       echo '
       <tr>
-        <td><a href="'.$cmsurl.'index.php?action=page&page_id='.$page['page_id'].'">'.$page['title'].'</a></td><td><a href="'.$cmsurl.'index.php?action=profile&u='.$page['page_owner'].'">'.$page['owner'].'</td><td>'.$page['date'].'</td>
+        <td><a href="'.$cmsurl.'index.php?action=page;page_id='.$page['page_id'].'">'.$page['title'].'</a></td><td><a href="'.$cmsurl.'index.php?action=profile;u='.$page['page_owner'].'">'.$page['owner'].'</td><td>'.$page['date'].'</td>
       </tr>';
     }
     echo '
