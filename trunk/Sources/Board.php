@@ -50,7 +50,9 @@ global $cmsurl, $db_prefix, $l, $settings, $user;
           t.numviews, t.starter_id, t.ender_id, IFNULL(t.ender_id, t.starter_id) AS ender_id, msg.mid, msg.tid, msg.uid, msg.subject, msg.post_time, msg.poster_name,
           msg2.mid AS mid2, IFNULL(msg2.mid, msg.mid) AS mid2, msg2.uid AS uid2, IFNULL(msg2.uid, msg.uid) AS uid2, 
           msg2.subject AS subject2, IFNULL(msg2.subject, msg.subject) AS subject2, msg2.post_time AS last_post_time, IFNULL(msg2.post_time, msg.post_time) AS last_post_time,
-          msg2.poster_name AS poster_name2, IFNULL(msg2.poster_name, msg.poster_name) AS poster_name2
+          msg2.poster_name AS poster_name2, IFNULL(msg2.poster_name, msg.poster_name) AS poster_name2,
+          mem.display_name AS username, IFNULL(mem.display_name, mem.username) AS username,
+          mem2.display_name AS username2, IFNULL(mem2.display_name, mem2.username) AS username2
         FROM {$db_prefix}topics AS t
           LEFT JOIN {$db_prefix}messages AS msg ON msg.mid = t.first_msg
           LEFT JOIN {$db_prefix}messages AS msg2 ON msg2.mid = t.last_msg
@@ -61,7 +63,17 @@ global $cmsurl, $db_prefix, $l, $settings, $user;
         ORDER BY t.sticky DESC, last_post_time DESC");
         $topics = array();
         while($row = mysql_fetch_assoc($result)) {
-          $topics[] = $row;
+          $topics[] = array(
+            'tid' => $row['tid'],
+            'subject' => $row['subject'],
+            'sticky' => $row['sticky'],
+            'locked' => $row['locked'],
+            'bid' => $row['bid'],
+            'username' => $row['username'],
+            'numReplies' => $row['num_replies'],
+            'numViews' => $row['numviews'],
+            'starter_id' => $row['starter_id']
+          );
         }
       $settings['topics'] = $topics;
       $settings['page']['title'] = $settings['site_name'].' - '.$board['name'];
