@@ -38,6 +38,10 @@ global $cmsurl, $settings, $l, $user;
     <p class="main"><a href="'.$cmsurl.'index.php?action=admin&sa=permissions" title="'.$l['admin_menu_permissions'].'">'.$l['admin_menu_permissions'].'</a></p>
     <p class="desc">'.$l['admin_menu_permissions_desc'].'</p>  
   </div>
+  <div class="acp_left">
+    <p class="main"><a href="'.$cmsurl.'index.php?action=admin&sa=menus" title="'.$l['admin_menu_menus'].'">'.$l['admin_menu_menus'].'</a></p>
+    <p class="desc">'.$l['admin_menu_menus_desc'].'</p>  
+  </div>
   ';
 }
 

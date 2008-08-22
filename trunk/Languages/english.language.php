@@ -91,6 +91,8 @@ $l['admin_menu_members'] = 'Manage Members';
 $l['admin_menu_members_desc'] = 'Manage your members, such as changing their member group, anything in their profile';
 $l['admin_menu_permissions'] = 'Group Permissions';
 $l['admin_menu_permissions_desc'] = 'This is where you can choose what a member group can and cannot do on your site';
+$l['admin_menu_menus'] = 'Manage Menus';
+$l['admin_menu_menus_desc'] = 'With this option you can edit the links on the sidebar.';
 
 // Settings.template.php
 $l['basicsettings_title'] = 'Basic Settings';
