@@ -93,6 +93,8 @@ $l['admin_menu_permissions'] = 'Group Permissions';
 $l['admin_menu_permissions_desc'] = 'This is where you can choose what a member group can and cannot do on your site';
 $l['admin_menu_menus'] = 'Manage Menus';
 $l['admin_menu_menus_desc'] = 'With this option you can edit the links on the sidebar.';
+$l['admin_menu_forum'] = 'Manage Forum';
+$l['admin_menu_forum_desc'] = 'You can manage your forum setup here, such as categories and board management.';
 
 // Settings.template.php
 $l['basicsettings_title'] = 'Basic Settings';
