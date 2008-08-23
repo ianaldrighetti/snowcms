@@ -158,7 +158,7 @@ global $cmsurl, $db_prefix, $l, $settings, $user;
       $_SESSION['sticky'] = (int)@$_REQUEST['sticky'];
       $_SESSION['locked'] = (int)@$_REQUEST['locked'];
       $_SESSION['board'] = (int)@$_REQUEST['board'];
-      redirect("forum.php?action=post&board={$Board_ID}");
+      redirect("forum.php?action=post;board={$Board_ID}");
     }
   }
   elseif($what == 'post_reply' && canforum('post_reply', boardfromTopic($_REQUEST['topic'])) && postable($_REQUEST['topic'])) {
@@ -204,7 +204,7 @@ global $cmsurl, $db_prefix, $l, $settings, $user;
       $_SESSION['sticky'] = (int)@$_REQUEST['sticky'];
       $_SESSION['locked'] = (int)@$_REQUEST['locked'];
       $_SESSION['board'] = (int)@$_REQUEST['board'];
-      redirect("forum.php?action=post&topic={$Topic_ID}");
+      redirect("forum.php?action=post;topic={$Topic_ID}");
     }    
   }
   else {

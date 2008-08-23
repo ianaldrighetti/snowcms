@@ -18,10 +18,18 @@ echo '
   <tr align="center">
     <td colspan="2"><textarea name="body" rows="12" cols="60">', $settings['body'], '</textarea></td>
   </tr>';
-  if(canforum('post_sticky', $_REQUEST['board']) || canforum('lock_topic', $settings['board'])) {
+  if(canforum('post_sticky', $settings['board']) || canforum('lock_topic', $settings['board'])) {
+    if($settings['sticky'])
+      $settings['sticky'] = 'checked="checked"';
+    else
+      $settings['sticky'] = '';
+    if($settings['locked'])
+      $settings['locked'] = 'checked="checked"';
+    else
+      $settings['locked'] = '';
     echo '
     <tr align="center">
-      <td>', canforum('post_sticky', $settings['board']) ? $l['topic_sticky'].' <input name="sticky" type="checkbox" value="1"'. $settings['sticky'] ? ' checked="checked"' : ''. '/>' : '', '</td><td>', canforum('lock_topic', $_REQUEST['board']) ? $l['topic_lock']. ' <input name="lock" type="checkbox" type="checkbox" value="1"'. $settings['locked'] ? ' checked="checked"' : ''. '/>' : '', '</td>
+      <td>', canforum('post_sticky', $settings['board']) ? $l['topic_sticky'].' <input name="sticky" '. $settings['sticky']. ' type="checkbox" value="1"/>' : '', '</td><td>', canforum('lock_topic', $settings['board']) ? $l['topic_lock'].' <input name="locked" '. $settings['locked']. ' type="checkbox" value="1"/>' : '', '</td>
     </tr>';
   }
 echo '
@@ -47,9 +55,17 @@ echo '
     <td colspan="2"><textarea name="body" rows="12" cols="60">', $settings['body'], '</textarea></td>
   </tr>';
   if(canforum('post_sticky', $settings['board']) || canforum('lock_topic', $settings['board'])) {
+    if($settings['sticky'])
+      $settings['sticky'] = 'checked="checked"';
+    else
+      $settings['sticky'] = '';
+    if($settings['locked'])
+      $settings['locked'] = 'checked="checked"';
+    else
+      $settings['locked'] = '';
     echo '
     <tr align="center">
-      <td>', canforum('post_sticky', $settings['board']) ? $l['topic_sticky'].' <input name="sticky" type="checkbox" value="1"'. $settings['sticky'] ? ' checked="checked"' : ''. '/>' : '', '</td><td>', canforum('lock_topic', $settings['board']) ? $l['topic_lock']. ' <input name="lock" type="checkbox" type="checkbox" value="1"'. $settings['locked'] ? ' checked="checked"' : ''. '/>' : '', '</td>
+      <td>', canforum('post_sticky', $settings['board']) ? $l['topic_sticky'].' <input name="sticky" '. $settings['sticky']. ' type="checkbox" value="1"/>' : '', '</td><td>', canforum('lock_topic', $settings['board']) ? $l['topic_lock'].' <input name="locked" '. $settings['locked']. ' type="checkbox" value="1"/>' : '', '</td>
     </tr>';
   }
 echo '

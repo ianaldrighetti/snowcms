@@ -427,7 +427,7 @@ echo '
 // A simple function to redirect
 function redirect($relative_url) {
 global $cmsurl;
-  header("Location: {$cmsurl}/{$relative_url}");
+  header("Location: {$cmsurl}{$relative_url}");
 }
 
 // Validates if the Session ID matches that of the users...
