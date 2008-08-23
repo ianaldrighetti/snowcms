@@ -118,7 +118,7 @@ global $cmsurl, $db_prefix, $l, $settings, $user;
           'can' => array(
                        'edit' => canforum('edit_any', $row['bid']) ? true : edit($row['uid'], canforum('edit_own', $row['bid'])),
                        'del' => canforum('delete_any', $row['bid']) ? true : del($row['uid'], canforum('delete_own')),
-                       'split' => canforum('split_topic', $row['bid'])
+                       'split' => Splitable($row['first_msg'], $row['mid'], canforum('split_topic', $row['bid']))
                      )
         );
         $bid = $row['bid'];
@@ -297,6 +297,15 @@ global $db_prefix, $user;
   if(!$can)
     return false;
   elseif($uid==$user['id'] && $can)
+    return true;
+  else
+    return false;
+}
+function Splitable($first_msg, $mid, $can) {
+global $user;
+  if($first_msg==$mid)
+    return false;
+  elseif($can)
     return true;
   else
     return false;

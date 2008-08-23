@@ -198,6 +198,10 @@ $l['topic_sticky'] = 'Make topic Sticky';
 $l['topic_lock'] = 'Lock topic';
 $l['topic_subject'] = 'Subject:';
 $l['post_postreply'] = 'Post Reply';
+$l['topic_editpost'] = 'Edit Post';
+$l['topic_quote'] = 'Reply with Quote';
+$l['topic_deletemsg'] = 'Delete Message';
+$l['topic_split'] = 'Split this Message';
 
 // Profile.template.php
 $l['profile_title'] = 'Profile';

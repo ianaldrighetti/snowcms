@@ -7,6 +7,9 @@ body {
   font-size: 12px; 
   background: #2D3742;
 }
+img {
+  border: 0px;
+}
 #header {
   width: 816px;
   height: 100px;
@@ -184,4 +187,11 @@ a:hover {
   color: #FFFFFF;
   font-weight: bold;
   background: url('images/navbg.png') repeat-x;
+}
+.link_tree {
+  width: 800px;
+  margin-right: auto;
+  margin-left: auto;
+  margin-top: 3px;
+  color: #ffffff;
 }

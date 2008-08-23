@@ -5,7 +5,7 @@ if(!defined('Snow'))
   die('Hacking Attempt...');
   
 function Main() {
-global $cmsurl, $l, $settings, $user;
+global $cmsurl, $theme_url, $l, $settings, $user;
 echo '
 <table id="topic_panel">
   <tr>
@@ -26,7 +26,9 @@ echo '
   </div>
   <div id="post-right">
     <div id="post-info">
-      <p><a href="'.$cmsurl.'forum.php?topic='.$post['tid'].';msg='.$post['mid'].'">'.$post['subject'].'</a> '.$l['topic_on'].' '.$post['post_time'].'</p>
+      <p style="float: left;"><a href="'.$cmsurl.'forum.php?topic='.$post['tid'].';msg='.$post['mid'].'">'.$post['subject'].'</a> '.$l['topic_on'].' '.$post['post_time'].'</p><p style="float: right;">', $user['is_logged'] ? '<a href="'. $cmsurl. 'forum.php?action=post;topic='. $post['tid']. ';quote='. $post['mid']. '" title="'. $l['topic_quote']. '"><img src="'. $theme_url.'/'.$settings['theme'].'/images/quote.png" alt="'. $l['topic_quote']. '"/></a>' : '', ' ', $post['can']['edit'] ? '<a href="'. $cmsurl. 'forum.php?action=post;msg='. $post['mid']. '" title="'. $l['topic_editpost']. '"><img src="'. $theme_url.'/'.$settings['theme'].'/images/edit_post.png" alt="'. $l['topic_editpost'] .'"/></a>' : '', ' ', $post['can']['del'] ? '<a href="'. $cmsurl. 'forum.php?action=delete;msg='. $post['mid']. ';sc='.$user['sc'].'" title="'. $l['topic_deletemsg']. '"><img src="'. $theme_url. '/'. $settings['theme']. '/images/delete.png" alt="'. $l['topic_deletemsg']. '"/></a>' : '', ' ', $post['can']['split'] ? '<a href="'. $cmsurl. 'forum.php?action=split;msg='. $post['mid']. ';sc='. $user['sc']. '" title="'. $l['topic_split']. '"><img src="'. $theme_url. '/'.$settings['theme'].'/images/split.png" alt="'. $l['topic_split']. '"/></a>' : '', '</p>
+      <div class="break">
+      </div>
     </div>
     <div id="post-content">
       <p>'.$post['body'].'</p>

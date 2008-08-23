@@ -36,12 +36,21 @@ echo '
       <li><a href="'.$cmsurl.'index.php?action=login">'.$l['forum_link_login'].'</a></li>';
     echo '
     </ul>
-  </div>';
+  </div>'. link_tree();
+}
+
+function link_tree() {
+global $settings;
+  $tree = array();
+  foreach($settings['linktree'] as $link) {
+    $tree[] = '<a href="'. $link['href']. '">'. $link['name']. '</a>';
+  }
+  return '<p class="link_tree">'. implode(" > ", $tree). '</p>';
 }
 
 function forum_footer() {
 global $cmsurl, $theme_url, $settings, $user;
-echo '
+echo link_tree(). '
   <div id="foot">
     <p>Powered by <a href="http://www.snowcms.com/">SnowCMS</a> | Copyright &copy; 2008 Your Site</p>
   </div>
