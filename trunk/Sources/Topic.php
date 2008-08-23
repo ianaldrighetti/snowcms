@@ -16,18 +16,60 @@ if(!defined("Snow"))
   
 function loadTopic() {
 global $cmsurl, $db_prefix, $l, $settings, $user;
-  $Topic_ID = addslashes(mysql_real_escape_string($_REQUEST['topic']));
+  $Topic_ID = (int)$_REQUEST['topic'];
   $result = sql_query("
     SELECT 
       t.tid, t.bid, b.who_view, b.bid
     FROM {$db_prefix}topics AS t
       LEFT JOIN {$db_prefix}boards AS b ON b.bid = t.bid
-    WHERE t.tid = '$Topic_ID'");
-  // Can they even view this topic? As in, is this in a board they aren'tallowed to view?
-  while($row = mysql_fetch_assoc($result))  
-    $who_view = @explode(",", $row['who_view']);
-  $who_view[] = 1;
-  if(in_array($user['group'], $who_view)) {
+    WHERE t.tid = '$Topic_ID' AND {$user['board_query']}");
+  // Can they even view this topic? As in, is this in a board they aren't allowed to view?
+  if(mysql_num_rows($result)) {
+    if(!empty($_REQUEST['msg'])) {
+      // The fun part! WEEEEEEEEEE!
+      // We need to redirect ?topic=topic_id;msg=msg_id to the right paginated page...
+      $msg_id = (int)$_REQUEST['msg'];
+      $topic_id = $Topic_ID;
+      // Select all messages with the tid of $topic_id
+      $result = sql_query("
+        SELECT
+          msg.mid, msg.tid
+        FROM {$db_prefix}messages AS msg
+        WHERE msg.tid = $topic_id");
+      // How many messages are there? :o
+      $num_msg = mysql_num_rows($result)-1;
+      // If the number of messages is less then $settings['topic_posts_per_page'], no need to do anything fancy :]
+      if($num_msg<$settings['topic_posts_per_page']) {
+        redirect("forum.php?topic={$topic_id}#mid{$msg_id}");
+      }
+      else {
+        $num_pages = ceil($num_msg/$settings['topic_posts_per_page']);
+        $mids = array();
+        while($row = mysql_fetch_assoc($result))
+          $mids[] = $row['mid'];
+        // If $mid_page is not 0, then we found the page =D!
+        if(in_array($msg_id, $mids)) {
+          $msgs = 0;
+          $page = 1;
+          $mid_page = 0;
+          foreach($mids as $i => $mid_val) {
+            $msgs++;
+            if($mids[$i]==$msg_id) {
+             $mid_page = $page;
+            }
+            if($msgs==$settings['topic_posts_per_page']) {
+              $msgs = 1;
+              $page++;
+            }
+          }
+          redirect("forum.php?topic={$topic_id};page={$mid_page}#mid{$msg_id}");
+        }
+        else {
+          // Sorry bub, we didn't find that Message ID...
+          redirect("forum.php?topic={$topic_id}");
+        }
+      }
+    }
     $info = paginate($Topic_ID);
     $pagination = $info['pagination'];
     $start = $info['start'];
@@ -82,7 +124,7 @@ global $cmsurl, $db_prefix, $l, $settings, $user;
   }     
 }
 function paginate($topic) {
-global $db_prefix, $settings;
+global $cmsurl, $db_prefix, $settings;
 
  $query = mysql_query("SELECT * FROM {$db_prefix}messages WHERE `tid` = $topic");
  $num_posts = mysql_num_rows($query);
