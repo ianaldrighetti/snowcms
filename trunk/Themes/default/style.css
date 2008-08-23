@@ -133,6 +133,11 @@ a.headerlink {
 	width: 670px;
 	clear: both;
 }
+
+img.emoticon {
+  vertical-align: middle;
+}
+
 /* Admin CP CSS */
 .acp_left {
   float: left;

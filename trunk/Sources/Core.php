@@ -356,9 +356,13 @@ global $settings;
 function bbc($str) {
 global $theme_dir, $theme_url;
   
+  // Process newline characters
+  $str = strtr($str, array("\r\n" => "\n", "\r" => "\n"));
+  
+  // Process BBCode
   $simple_search = array(
-    '/\[b\](.*?)\[\/b\]/is',                                
-    '/\[i\](.*?)\[\/i\]/is',                                
+    '/\[b\](.*?)\[\/b\]/is',
+    '/\[i\](.*?)\[\/i\]/is',
     '/\[u\](.*?)\[\/u\]/is',
     '/\[s\](.*?)\[\/s\]/is',
     '/\[url\]((http:\/\/|ftp:\/\/|https:\/\/|ftps:\/\/).*?)\[\/url\]/is',
@@ -386,22 +390,42 @@ global $theme_dir, $theme_url;
     '<img src="$1" alt=""/>',
     '<img src="$1" alt="$3"/>'
   );
-  // Do simple BBCode's
   $str = preg_replace($simple_search, $simple_replace, $str);
   
-  // Insert emoticons
+  // Process emoticons
+  $str = '<bbcode-process>'.$str.'</bbcode-process>';
+  
   global $smileys;
   require_once($theme_dir.'/default/emoticons/emoticons.php');
   
   $sm_search = array();
   $sm_replace = array();
   foreach($smileys as $smiley => $file) {
-    $sm_search[] = $smiley;
-    $sm_replace[] = '<img src="'.$theme_url.'/default/emoticons/'.$file.'" alt="'.$smiley.'" style="vertical-align: middle" />';
+    $sm_search[] = ' '.$smiley.' ';
+    $sm_replace[] = ' <img src="'.$theme_url.'/default/emoticons/'.$file.'" alt="'.$smiley.'" class="emoticon" /> ';
+    $sm_search[] = "\n".$smiley."\n";
+    $sm_replace[] = "\n".'<img src="'.$theme_url.'/default/emoticons/'.$file.'" alt="'.$smiley.'" class="emoticon" />'."\n";
+    $sm_search[] = ' '.$smiley."\n";
+    $sm_replace[] = ' <img src="'.$theme_url.'/default/emoticons/'.$file.'" alt="'.$smiley.'" class="emoticon" />'."\n";
+    $sm_search[] = "\n".$smiley.' ';
+    $sm_replace[] = "\n".'<img src="'.$theme_url.'/default/emoticons/'.$file.'" alt="'.$smiley.'" class="emoticon" /> ';
+    $sm_search[] = '<bbcode-process>'.$smiley.' ';
+    $sm_replace[] = '<bbcode-process><img src="'.$theme_url.'/default/emoticons/'.$file.'" alt="'.$smiley.'" class="emoticon" /> ';
+    $sm_search[] = '<bbcode-process>'.$smiley."\n";
+    $sm_replace[] = '<bbcode-process><img src="'.$theme_url.'/default/emoticons/'.$file.'" alt="'.$smiley.'" class="emoticon" />'."\n";
+    $sm_search[] = ' '.$smiley.'</bbcode-process>';
+    $sm_replace[] = ' <img src="'.$theme_url.'/default/emoticons/'.$file.'" alt="'.$smiley.'" class="emoticon" /></bbcode-process>';
+    $sm_search[] = "\n".$smiley.'</bbcode-process>';
+    $sm_replace[] = "\n".'<img src="'.$theme_url.'/default/emoticons/'.$file.'" alt="'.$smiley.'" class="emoticon" /></bbcode-process>';
   }
   $str = str_replace($sm_search, $sm_replace, $str);
   
+  $str = substr($str,16,strlen($str)-33);
+  
+  // Process newlines
   $str = strtr($str, array("\n" => "<br />"));
+  
+  // Return finished product
   return $str;
 }
 
