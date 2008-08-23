@@ -74,7 +74,7 @@ global $cmsurl, $db_prefix, $l, $settings, $source_dir, $user;
     }
     $settings['page']['error'] = null;
     // Insert it
-    $result = sql_query("INSERT INTO {$db_prefix}members (`username`,`password`,`email`,`reg_date`,`reg_ip`,`group`,`activated`,`acode`) VALUES('{$username}','{$password}','{$email}','{$time}','{$user['ip']}','{$settings['default_group']}','{$activated}','{$acode}')");
+    $result = sql_query("INSERT INTO {$db_prefix}members (`username`,`display_name`,`password`,`email`,`reg_date`,`reg_ip`,`group`,`activated`,`acode`) VALUES('{$username}','{$username}','{$password}','{$email}','{$time}','{$user['ip']}','{$settings['default_group']}','{$activated}','{$acode}')");
     if($result) {
       if($settings['account_activation']==0) {    
         // It was a Success! Weeee!

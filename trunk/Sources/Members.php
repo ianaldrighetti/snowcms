@@ -277,7 +277,7 @@ global $db_prefix, $user;
   
   // Clean the data of possible injections (Hacking)
   $username = clean($_REQUEST['user_name']);
-  $display_name = clean($_REQUEST['display_name']);
+  $display_name = clean($_REQUEST['display_name']) ? clean($_REQUEST['display_name']) : $username;
   $email = clean($_REQUEST['email']);
   $group = clean($_REQUEST['group']);
   $signature = clean($_REQUEST['signature']);

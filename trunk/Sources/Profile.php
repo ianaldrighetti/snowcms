@@ -104,7 +104,14 @@ global $settings, $db_prefix, $user, $cmsurl;
       die("Your password is under five characters long");
   }
   
-  $display_name = clean($_REQUEST['display_name']);
+  if (clean($_REQUEST['display_name']))
+    $display_name = clean($_REQUEST['display_name']);
+  else {
+    $result = sql_query("SELECT * FROM {$db_prefix}members WHERE `id` = '{$user['id']}'");
+    $row = mysql_fetch_assoc($result) or die("Internal error");
+    
+    $display_name = $row['username'];
+  }
   $email = clean($_REQUEST[ 'email']);
   $signature = clean($_REQUEST['signature']);
   $profile = clean($_REQUEST['profile']);
