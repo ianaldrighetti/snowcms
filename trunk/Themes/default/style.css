@@ -138,6 +138,11 @@ img.emoticon {
   vertical-align: middle;
 }
 
+th.border {
+  border-style: solid;
+  border-width: 1px;
+}
+
 /* Admin CP CSS */
 .acp_left {
   float: left;

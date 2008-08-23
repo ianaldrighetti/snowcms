@@ -327,7 +327,6 @@ $l['managecats_header'] = 'Manage Categories';
 $l['managecats_desc'] = 'Here you can edit, delete and create categories';
 $l['mc_tr_cn'] = 'Category Name';
 $l['mc_tr_order'] = 'Order';
-$l['mc_tr_del'] = 'Delete';
 $l['managecats_update'] = 'Update';
 $l['managecats_are_you_sure'] = 'Are you sure you want to delete this Category?';
 $l['managecats_catname'] = 'Category Name:';

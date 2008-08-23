@@ -20,18 +20,20 @@ global $cmsurl, $db_prefix, $l, $settings, $user;
 }
 
 function ShowCats() {
-global $cmsurl, $db_prefix, $l, $settings, $user;
-  echo '<h2>', $l['managecats_header'], '</h2>
+global $cmsurl, $db_prefix, $l, $settings, $user, $theme_url;
+  echo '<h1>', $l['managecats_header'], '</h1>
         <p>', $l['managecats_desc'], '</p>
         <form action="', $cmsurl, 'index.php?action=admin;sa=forum;fa=categories" method="post">
           <table width="100%" id="mc">
             <tr>
-              <td width="80%">', $l['mc_tr_cn'], '</td><td width="10%">', $l['mc_tr_order'], '</td><td width="9%">', $l['mc_tr_del'], '</td>
+              <th class="border" width="80%">', $l['mc_tr_cn'], '</th><th class="border" width="10%">', $l['mc_tr_order'], '</th><th></th>
             </tr>';
           foreach($settings['cats'] as $cat) {
             echo '
             <tr>
-              <td><input name="cat_name[', $cat['id'], ']" type="text" class="name" value="', $cat['name'], '"/></td><td><input name="cat_order[', $cat['id'], ']" type="text" class="order" value="', $cat['order'], '"/></td><td class="delete"><a href="', $cmsurl, 'index.php?action=admin;sa=forum;fa=categories;delete=', $cat['id'], ';sc=', $user['sc'], '" onClick="return confirm(\'', $l['managecats_are_you_sure'], '\');">X</td>
+              <td><input name="cat_name[', $cat['id'], ']" type="text" class="name" value="', $cat['name'], '"/></td>
+              <td><input name="cat_order[', $cat['id'], ']" type="text" class="order" value="', $cat['order'], '"/></td>
+              <td class="delete"><a href="', $cmsurl, 'index.php?action=admin;sa=forum;fa=categories;delete=', $cat['id'], ';sc=', $user['sc'], '" onClick="return confirm(\'', $l['managecats_are_you_sure'], '\');"><img src="'.$theme_url.'/'.$settings['theme'].'/images/delete.png" alt="'.$l['managemembers_moderate_button'].'" width="15" height="15" style="border: 0" /></td>
             </tr>';
           }
           echo '
