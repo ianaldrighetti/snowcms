@@ -116,8 +116,8 @@ global $cmsurl, $db_prefix, $l, $settings, $user;
           'membergroup' => $row['groupname'],
           'numposts' => $row['numposts'],
           'can' => array(
-                       'edit' => canforum('edit_any', $row['bid']) ? true : canforum('edit_own', $row['bid']),
-                       'del' => canforum('delete_any', $row['bid']) ? true : canforum('delete_own', $row['bid']),
+                       'edit' => canforum('edit_any', $row['bid']) ? true : edit($row['uid'], canforum('edit_own', $row['bid'])),
+                       'del' => canforum('delete_any', $row['bid']) ? true : del($row['uid'], canforum('delete_own')),
                        'split' => canforum('split_topic', $row['bid'])
                      )
         );
@@ -280,5 +280,25 @@ global $cmsurl, $db_prefix, $l, $settings, $user;
     $settings['page']['title'] = $l['topic_lock_error'];
     loadTheme('Topic','ErrorLock');
   }
+}
+
+// More simple functions to aid in moderation...
+function del($uid, $can) {
+global $db_prefix, $user;
+  if(!$can)
+    return false;
+  elseif($uid==$user['id'] && $can)
+    return true;
+  else
+    return false;
+}
+function edit($uid, $can) {
+global $db_prefix, $user;
+  if(!$can)
+    return false;
+  elseif($uid==$user['id'] && $can)
+    return true;
+  else
+    return false;
 }
 ?>
