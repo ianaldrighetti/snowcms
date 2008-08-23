@@ -70,6 +70,9 @@ global $cmsurl, $db_prefix, $l, $settings, $user;
         }
       }
     }
+    // We don't want ;page=1 :P
+    if(!empty($_REQUEST['page']) && $_REQUEST['page']==1)
+      redirect("forum.php?topic={$_REQUEST['topic']}");
     $info = paginate($Topic_ID);
     $pagination = $info['pagination'];
     $start = $info['start'];
@@ -156,51 +159,51 @@ global $cmsurl, $db_prefix, $settings;
      if($page==1) {
        for($i = 1; $i <= 3; $i++) {
          if($page==$i) {
-           $pagination .= '[ <a href="'.$cmsurl.'?topic='.$topic.'&page='.$i.'">'.$i.'</a> ] ';
+           $pagination .= '[ <a href="'.$cmsurl.'forum.php?topic='.$topic.';page='.$i.'">'.$i.'</a> ] ';
          }
          else {
-           $pagination .= '<a href="'.$cmsurl.'?topic='.$topic.'&page='.$i.'">'.$i.'</a> ';
+           $pagination .= '<a href="'.$cmsurl.'forum.php?topic='.$topic.';page='.$i.'">'.$i.'</a> ';
          }
        }
-       $pagination .= ' <a href="'.$cmsurl.'?topic='.$topic.'&page='.$lastpage.'">'.$l['topic_lastpage'].'</a>';
+       $pagination .= ' <a href="'.$cmsurl.'forum.php?topic='.$topic.';page='.$lastpage.'">'.$l['topic_lastpage'].'</a>';
      }
      else {
        if(($page-1)!=1)
-         $pagination .= ' <a href="'.$cmsurl.'?topic='.$topic.'&page=1">'.$l['topic_firstpage'].'</a> ';
+         $pagination .= ' <a href="'.$cmsurl.'forum.php?topic='.$topic.';page=1">'.$l['topic_firstpage'].'</a> ';
        for($i = ($page-1); $i <= ($page+1); $i++) {
          if($page==$i) {
-           $pagination .= '[ <a href="'.$cmsurl.'?topic='.$topic.'&page='.$i.'">'.$i.'</a> ] ';
+           $pagination .= '[ <a href="'.$cmsurl.'forum.php?topic='.$topic.';page='.$i.'">'.$i.'</a> ] ';
          }
          else {
-           $pagination .= '<a href="'.$cmsurl.'?topic='.$topic.'&page='.$i.'">'.$i.'</a> ';
+           $pagination .= '<a href="'.$cmsurl.'forum.php?topic='.$topic.';page='.$i.'">'.$i.'</a> ';
          }       
        }
        if(($page+1)!=$lastpage)
-         $pagination .= ' <a href="'.$cmsurl.'?topic='.$topic.'&page='.$lastpage.'">'.$l['topic_lastpage'].'</a>';
+         $pagination .= ' <a href="'.$cmsurl.'forum.php?topic='.$topic.';page='.$lastpage.'">'.$l['topic_lastpage'].'</a>';
      }
    }
    else {
-     $pagination .= ' <a href="'.$cmsurl.'?topic='.$topic.'&page=1">'.$l['topic_firstpage'].'</a> ';
+     $pagination .= ' <a href="'.$cmsurl.'forum.php?topic='.$topic.';page=1">'.$l['topic_firstpage'].'</a> ';
      for($i = ($lastpage-2); $i <= $lastpage; $i++) {
        if($page==$i) {
-         $pagination .= '[ <a href="'.$cmsurl.'?topic='.$topic.'&page='.$i.'">'.$i.'</a> ] ';
+         $pagination .= '[ <a href="'.$cmsurl.'forum.php?topic='.$topic.';page='.$i.'">'.$i.'</a> ] ';
        }
        else {
-         $pagination .= '<a href="'.$cmsurl.'?topic='.$topic.'&page='.$i.'">'.$i.'</a> ';
+         $pagination .= '<a href="'.$cmsurl.'forum.php?topic='.$topic.';page='.$i.'">'.$i.'</a> ';
        }
      }     
    }     
  }
  elseif($lastpage==1) {
-   $pagination = '[1]';
+   $pagination = '[ 1 ]';
  }
  else {
-   for($i = 1; $i <= 3; $i++) {
+   for($i = 1; $i <= $lastpage; $i++) {
      if($page==$i) {
-       $pagination .= '[ <a href="'.$cmsurl.'?topic='.$topic.'&page='.$i.'">'.$i.'</a> ] ';
+       $pagination .= '[ <a href="'.$cmsurl.'forum.php?topic='.$topic.';page='.$i.'">'.$i.'</a> ] ';
      }
      else {
-       $pagination .= '<a href="'.$cmsurl.'?topic='.$topic.'&page='.$i.'">'.$i.'</a> ';
+       $pagination .= '<a href="'.$cmsurl.'forum.php?topic='.$topic.';page='.$i.'">'.$i.'</a> ';
      }
    }
  }
