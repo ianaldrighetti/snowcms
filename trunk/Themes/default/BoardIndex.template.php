@@ -21,7 +21,7 @@ global $cmsurl, $theme_url, $l, $settings, $user;
                   '.$board['desc'].'</p>
               </td>
               <td width="16%">'.$board['posts'].' '.$l['forum_posts_in'].' '.$board['topics']. ' '.$l['forum_topics'].'</td>
-              <td width="20%">Last Posts</td>
+              <td valign="middle" width="20%">', $board['last_post']['is_post'] ? $l['topic_lastby'].' <a href="'. $cmsurl. 'index.php?action=profile;u='. $board['last_post']['uid']. '">'. $board['last_post']['username']. '</a> '.$l['topic_in'].'<br /><a href="'. $cmsurl. 'forum.php?topic='. $board['last_post']['tid']. ';msg='. $board['last_post']['mid']. '">'. $board['last_post']['subject']. '</a>' : '<span class="last_post">'. $l['forum_no_posts']. '</span>', '</td>
             </tr>
           </table>
         </div>';

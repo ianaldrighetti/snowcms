@@ -160,9 +160,12 @@ $l['forum_error_message'] = 'Sorry, but you aren\'t allowed to view the '.$setti
 $l['forum_posts_in'] = 'posts in';
 $l['forum_topics'] = 'topics';
 $l['forum_board_new'] = 'New posts';
+$l['forum_no_posts'] = 'No Posts';
 $l['forum_board_old'] = 'No news posts';
 $l['forum_error_cantviewb_message'] = 'Sorry, you are not allowed to view or access this board';
 $l['forum_error_noboard_message'] = 'The Board ID you have requested does not exist!';
+$l['topic_lastby'] = 'Last Post by';
+$l['topic_in'] = 'in';
 
 // Links for Forum.template.php
 $l['forum_link_home'] = 'Home';
