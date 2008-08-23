@@ -36,6 +36,7 @@ global $cmsurl, $db_prefix, $l, $settings, $user;
         LEFT JOIN {$db_prefix}board_logs AS log ON log.uid = {$user['id']} AND log.bid = b.bid
         LEFT JOIN {$db_prefix}messages AS msg ON msg.mid = b.last_msg
         LEFT JOIN {$db_prefix}members AS mem ON mem.id = msg.uid
+      WHERE {$user['board_query']}
       ORDER BY b.border ASC");
       while($row = mysql_fetch_assoc($result)) {  
       if(isset($row['is_new']))

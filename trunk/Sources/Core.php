@@ -51,6 +51,7 @@ global $db_prefix, $user;
   $user['is_admin'] = false;
   $user['name'] = null;
   $user['email'] = null;
+  $user['board_query'] = 'FIND_IN_SET('. $user['group']. ', b.who_view)';
   // Make sure we get their real IP :)
   $user['ip'] = @isset($_SERVER['HTTP_X_FORWARDED_FOR']) ? $_SERVER['HTTP_X_FORWARDED_FOR'] : $_SERVER['REMOTE_ADDR'];
   if(empty($_SESSION['id'])) {
@@ -76,8 +77,10 @@ global $db_prefix, $user;
             'ip' => @$_SERVER['HTTP_X_FORWARDED_FOR'] ? $_SERVER['HTTP_X_FORWARDED_FOR'] : $_SERVER['REMOTE_ADDR'],
             'sc' => create_sid()
           );
-          if($user['group']==1)
+          if($user['group']==1) {
             $user['is_admin'] = true;
+            $user['board_query'] = '1=1';
+          }
         }
       }
       else {
