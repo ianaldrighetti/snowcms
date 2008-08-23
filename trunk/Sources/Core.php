@@ -76,6 +76,7 @@ global $db_prefix, $user;
             'is_admin' => false,
             'email' => $row['email'],
             'language' => $row['language'],
+            'board_query' => 'FIND_IN_SET('. $user['group']. ', b.who_view)',
             'ip' => @$_SERVER['HTTP_X_FORWARDED_FOR'] ? $_SERVER['HTTP_X_FORWARDED_FOR'] : $_SERVER['REMOTE_ADDR'],
             'sc' => create_sid()
           );
