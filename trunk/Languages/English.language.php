@@ -202,6 +202,9 @@ $l['topic_editpost'] = 'Edit Post';
 $l['topic_quote'] = 'Reply with Quote';
 $l['topic_deletemsg'] = 'Delete Message';
 $l['topic_split'] = 'Split this Message';
+$l['topic_delconfirm'] = 'Are you sure you want to delete this message? \\n This cannot be undone!';
+$l['topic_posts'] = 'Posts:';
+$l['topic_status'] = 'Status:';
 
 // Profile.template.php
 $l['profile_title'] = 'Profile';

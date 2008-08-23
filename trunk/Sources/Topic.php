@@ -93,11 +93,12 @@ global $cmsurl, $db_prefix, $l, $settings, $user;
         t.tid, t.sticky, t.locked, t.bid, t.first_msg, grp.group_id, grp.groupname,
         msg.mid, msg.tid, msg.bid, msg.uid, msg.subject, msg.post_time, msg.poster_name, msg.ip, msg.body,
         mem.id AS uid, mem.username, IFNULL(mem.username, msg.poster_name) AS username, mem.display_name, 
-        mem.signature, mem.group, mem.email, mem.numposts
+        mem.signature, mem.group, mem.email, mem.numposts, ol.user_id, ol.last_active
       FROM {$db_prefix}topics AS t
         LEFT JOIN {$db_prefix}messages AS msg ON msg.tid = t.tid
         LEFT JOIN {$db_prefix}members AS mem ON mem.id = msg.uid
-        LEFT JOIN {$db_prefix}membergroups AS grp ON grp.group_id = mem.group        
+        LEFT JOIN {$db_prefix}membergroups AS grp ON grp.group_id = mem.group
+        LEFT JOIN {$db_prefix}online AS ol ON ol.user_id = mem.id
       WHERE t.tid = $Topic_ID
       ORDER BY msg.mid ASC LIMIT $start,{$settings['topic_posts_per_page']}");
       while($row = mysql_fetch_assoc($result)) {
@@ -115,6 +116,7 @@ global $cmsurl, $db_prefix, $l, $settings, $user;
           'signature' => bbc($row['signature']),
           'membergroup' => $row['groupname'],
           'numposts' => $row['numposts'],
+          'status' => $row['last_active'] ? true : false,
           'can' => array(
                        'edit' => canforum('edit_any', $row['bid']) ? true : edit($row['uid'], canforum('edit_own', $row['bid'])),
                        'del' => canforum('delete_any', $row['bid']) ? true : del($row['uid'], canforum('delete_own')),
