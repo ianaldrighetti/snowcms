@@ -5,7 +5,7 @@ if(!defined('Snow'))
   die("Hacking Attempt...");
 
 function Main() {
-global $cmsurl, $settings, $l, $user, $cmsurl;
+global $cmsurl, $settings, $l, $user, $cmsurl, $theme_url;
   
   $menus = $settings['menus'];
   
@@ -22,7 +22,7 @@ global $cmsurl, $settings, $l, $user, $cmsurl;
         <th style="border-style: solid; border-width: 1px">'.$l['managemenus_new_window'].'</th>
         <th style="border-style: solid; border-width: 1px">'.$l['managemenus_menu'].'</th>
         <th style="border-style: solid; border-width: 1px">'.$l['managemenus_order'].'</th>
-        <th></th>
+        <th width="15"></th>
       </tr>';
     foreach($menus['menus'] as $menu) {
       if ($menu['target'])
@@ -40,12 +40,12 @@ global $cmsurl, $settings, $l, $user, $cmsurl;
       
       echo '
       <tr>
-        <td><input name="link_name_'.$menu['id'].'" value="'.$menu['name'].'" size="13" /></td>
+        <td><input name="link_name_'.$menu['id'].'" value="'.$menu['name'].'" /></td>
         <td><input name="link_url_'.$menu['id'].'" value="'.$menu['url'].'" /></td>
         <td><input type="checkbox" name="link_new_window_'.$menu['id'].'"'.$new_window.' /></td>
         <td><input type="checkbox" name="link_main_'.$menu['id'].'"'.$mainmenu.' /><input type="checkbox" name="link_sidebar_'.$menu['id'].'"'.$sidebar.' /></td>
         <td><input name="link_order_'.$menu['id'].'" value="'.$menu['order'].'" size="1" style="text-align: center" /></td>
-        <td><a href="'.$cmsurl.'index.php?action=admin;sa=menus;did='.$menu['id'].'">'.$l['managemenus_delete'].'</a></td>
+        <td><a href="'.$cmsurl.'index.php?action=admin;sa=menus;did='.$menu['id'].'"><img src="'.$theme_url.'/'.$settings['theme'].'/images/delete.png" alt="'.$l['managemenus_delete'].'" width="15" height="15" style="border: 0" /></a></td>
       </tr>';
       
       // Get the highest order ready for the new row
@@ -55,7 +55,7 @@ global $cmsurl, $settings, $l, $user, $cmsurl;
     }
     echo '
       <tr>
-        <td><input name="new_link_name" value="" size="13" /></td>
+        <td><input name="new_link_name" value="" /></td>
         <td><input name="new_link_url" value="" /></td>
         <td><input type="checkbox" name="new_link_new_window" /></td>
         <td><input type="checkbox" name="new_link_main" /><input type="checkbox" name="new_link_sidebar" /></td>
@@ -85,10 +85,10 @@ global $l, $settings, $cmsurl;
         <th style="border-style: solid; border-width: 1px">'.$l['managemenus_new_window'].'</th>
         <th style="border-style: solid; border-width: 1px">'.$l['managemenus_menu'].'</th>
         <th style="border-style: solid; border-width: 1px">'.$l['managemenus_order'].'</th>
-        <th></th>
+        <th width="15"></th>
       </tr>
       <tr>
-        <td><input name="new_link_name" value="" size="13" /></td>
+        <td><input name="new_link_name" value="" /></td>
         <td><input name="new_link_url" value="" /></td>
         <td><input type="checkbox" name="new_link_new_window" /></td>
         <td><input type="checkbox" name="new_link_main" /><input type="checkbox" name="new_link_sidebar" /></td>

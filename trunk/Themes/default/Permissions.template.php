@@ -5,7 +5,7 @@ if(!defined('Snow'))
   die("Hacking Attempt...");
   
 function Main() {
-global $cmsurl, $settings, $l, $user;
+global $cmsurl, $settings, $l, $user, $theme_url;
   echo '
     <h2>'.$l['permissions_header'].'</h2>
     <p>'.$l['permissions_desc'].'</p>
@@ -35,8 +35,8 @@ global $cmsurl, $settings, $l, $user;
     echo '<td style="padding: 5px;"><input name="group_'.$group['id'].'" value="'.$group['name'].'" /></td>
       <td style="text-align: center; padding: 5px;">'.$group['numusers'].'</td>
       <td style="text-align: center; padding: 5px;">'.$group['numperms'].'</td>
-      <td style="text-align: center; padding: 5px;"><a href="'.$cmsurl.'index.php?action=admin;sa=permissions;mid='.$group['id'].'">'.$l['permissions_modify'].'</a></td>
-      <td style="text-align: center; padding: 5px;"><a href="'.$cmsurl.'index.php?action=admin;sa=permissions;did='.$group['id'].'">'.$l['permissions_delete'].'</a></td>
+      <td style="text-align: center; padding: 5px;"><a href="'.$cmsurl.'index.php?action=admin;sa=permissions;mid='.$group['id'].'"><img src="'.$theme_url.'/'.$settings['theme'].'/images/modify.png" alt="'.$l['permissions_modify'].'" width="15" height="15" style="border: 0" /></a></td>
+      <td style="text-align: center; padding: 5px;"><a href="'.$cmsurl.'index.php?action=admin;sa=permissions;did='.$group['id'].'"><img src="'.$theme_url.'/'.$settings['theme'].'/images/delete.png" alt="'.$l['permissions_delete'].'" width="15" height="15" style="border: 0" /></a></td>
     </tr>';
   }
   echo '

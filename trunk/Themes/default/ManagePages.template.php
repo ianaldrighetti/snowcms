@@ -5,7 +5,7 @@ if(!defined('Snow'))
   die("Hacking Attempt...");
 
 function Main() {
-global $cmsurl, $settings, $l, $user;
+global $cmsurl, $settings, $l, $user, $theme_url;
   echo '
   <h1>'.$l['managepages_header'].'</h1>
   <p>'.$l['managepages_desc'].'</p>';
@@ -58,7 +58,7 @@ global $cmsurl, $settings, $l, $user;
     foreach($settings['page']['pages'] as $page) {
       echo '
       <tr>
-        <td><a href="'.$cmsurl.'index.php?action=admin;sa=editpage;page_id='.$page['page_id'].'">'.$page['title'].'</a></td><td><a href="'.$cmsurl.'index.php?action=profile;u='.$page['page_owner'].'">'.$page['owner'].'</td><td>'.$page['date'].'</td><td><a href="'.$cmsurl.'index.php?action=admin;sa=managepages;did='.$page['page_id'].'">'.$l['managepages_delete'].'</a></td>
+        <td><a href="'.$cmsurl.'index.php?action=admin;sa=editpage;page_id='.$page['page_id'].'">'.$page['title'].'</a></td><td><a href="'.$cmsurl.'index.php?action=profile;u='.$page['page_owner'].'">'.$page['owner'].'</td><td>'.$page['date'].'</td><td><a href="'.$cmsurl.'index.php?action=admin;sa=managepages;did='.$page['page_id'].'"><img src="'.$theme_url.'/'.$settings['theme'].'/images/delete.png" alt="'.$l['managepages_delete'].'" width="15" height="15" style="border: 0" /></a></td>
       </tr>';
     }
     echo '
