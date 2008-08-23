@@ -127,6 +127,6 @@ global $settings, $db_prefix, $user, $cmsurl;
   else
     sql_query("UPDATE {$db_prefix}members SET `display_name` = '$display_name', `email` = '$email', `signature` = '$signature', `profile` = '$profile' WHERE `id` = '{$user['id']}'");
   
-  header('location: '.$cmsurl.'index.php?action=profile&u='.$user['id']);
+  redirect('index.php?action=profile;u='.$user['id']);
 }
 ?>
