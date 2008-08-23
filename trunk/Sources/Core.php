@@ -354,6 +354,8 @@ global $settings;
 }
 
 function bbc($str) {
+global $theme_dir, $theme_url;
+  
   $simple_search = array(
     '/\[b\](.*?)\[\/b\]/is',                                
     '/\[i\](.*?)\[\/i\]/is',                                
@@ -386,6 +388,11 @@ function bbc($str) {
   );
   // Do simple BBCode's
   $str = preg_replace($simple_search, $simple_replace, $str);
+  
+  require_once($theme_dir.'/default/emoticons/emoticons.php');
+  foreach ($emoticon as $key => $value) {
+    $str = str_replace($key,'<img src="'.$theme_url.'/default/emoticons/'.$value.'" src="'.$key.'" />',$str);
+  }
   
   $str = strtr($str, array("\n" => "<br />"));
   return $str;
