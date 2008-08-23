@@ -177,8 +177,13 @@ global $l, $settings, $user, $cmsurl;
   
   echo '
         <h1>'.$settings['page']['title'].'</h1>
+        ';
+  if (@$settings['error'])
+    echo '
+          <p>'.$settings['error'].'</p>
+          ';
         
-        <form action="'.$cmsurl.'index.php?action=admin;sa=members;u='.$_REQUEST['u'].'" method="post" style="display: inline">
+  echo '<form action="'.$cmsurl.'index.php?action=admin;sa=members;u='.$_REQUEST['u'].'" method="post" style="display: inline">
         
         <p>
         <input type="hidden" name="sc" value="'.$user['sc'].'" />

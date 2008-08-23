@@ -251,17 +251,11 @@ global $l, $settings, $db_prefix;
 }
 
 function processModeration() {
-global $db_prefix, $user;
+global $l, $db_prefix, $user, $settings;
   
   // Note: Error handling needs work
   if (!ValidateSession(@$_REQUEST['sc']) || !@$_REQUEST['u'])
     die("Hacking Attempt...");
-  if (!@$_REQUEST['user_name'])
-    die("No username");
-  if (!@$_REQUEST['email'])
-    die("No email address");
-  if (!@$_REQUEST['group'])
-    die("Invalid group");
   
   // Note: If own group is edited glitches could occur
   
@@ -270,9 +264,9 @@ global $db_prefix, $user;
   if (mysql_num_rows($result))
     while ($row = mysql_fetch_assoc($result)) {
       if ($_REQUEST['u'] != $row['id'] && ($_REQUEST['user_name'] == $row['username'] || $_REQUEST['user_name'] == $row['display_name']))
-        die("That username is already in use");
+        $settings['error'] = $l['managemembers_error_username_already_used'];
       if ($_REQUEST['u'] != $row['id'] && $_REQUEST['display_name'] != '' && ($_REQUEST['display_name'] == $row['username'] || $_REQUEST['display_name'] == $row['display_name']))
-        die("That display name is already in use");
+        $settings['error'] = $l['managemembers_error_display_name_already_used'];
     }
   
   // Clean the data of possible injections (Hacking)
@@ -287,15 +281,20 @@ global $db_prefix, $user;
   
   // Check for errors in data
   if (!$username)
-    die("No username");
+    $settings['error'] = $l['managemembers_error_username_none'];
   if (!$email)
-    die("No email address");
+    $settings['error'] = $l['managemembers_error_email_none'];
   if(!preg_match("/^([a-z0-9._-](\+[a-z0-9])*)+@[a-z0-9.-]+\.[a-z]{2,6}$/i", @$_REQUEST['email']))
-    die("Invalid email address");
-  if ($password_new != $password_verify && $password_new)
-    die("Verification password is incorrect");
+    $settings['error'] = $l['managemembers_error_email_invalid'];
   if (strlen($password_new) < 5 && $password_new)
-    die("Password is under five characters long");
+    $settings['error'] = $l['managemembers_error_password_too_short'];
+  if ($password_new != $password_verify && $password_new)
+    $settings['error'] = $l['managemembers_error_password_failed_verification'];
+  if (!@$_REQUEST['group'])
+    $settings['error'] = $l['managemembers_error_group_invalid'];
+  
+  
+  if (!@$settings['error']) {
   
   $password_new = md5($password_new);
   
@@ -313,6 +312,9 @@ global $db_prefix, $user;
       setcookie("password", $password_new);
       $_SESSION['pass'] = $password_new;
     }
+  }
+  
+  redirect('index.php?action=admin;sa=members;u='.$_REQUEST['u']);
   }
   
   loadProf();
