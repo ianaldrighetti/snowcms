@@ -389,10 +389,23 @@ global $theme_dir, $theme_url;
   // Do simple BBCode's
   $str = preg_replace($simple_search, $simple_replace, $str);
   
-  require_once($theme_dir.'/default/emoticons/emoticons.php');
-  foreach ($emoticon as $key => $value) {
-    $str = str_replace($key,'<img src="'.$theme_url.'/default/emoticons/'.$value.'" src="'.$key.'" />',$str);
+  $smileys = array(
+    ':)' => 'smile.png',
+    ':(' => 'sad.png',
+    ':[' => 'angry.png',
+    ':D' => 'grin.png',
+    '^_^' => 'happy.png',
+    ':O' => 'shock.png',
+    ';)' => 'wink.png',
+    ':P' => 'tongue.png'
+  );
+  $sm_search = array();
+  $sm_replace = array();
+  foreach($smileys as $smiley => $file) {
+    $sm_search[] = ' '.$smiley.' ';
+    $sm_replace[] = ' <img src="'.$theme_url.'/default/emoticons/'.$file.'" alt="'.$smiley.'" /> ';
   }
+  $str = str_replace($sm_search, $sm_replace, $str);
   
   $str = strtr($str, array("\n" => "<br />"));
   return $str;
