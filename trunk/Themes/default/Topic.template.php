@@ -26,7 +26,7 @@ echo '
   </div>
   <div id="post-right">
     <div id="post-info">
-      <p><a href="'.$cmsurl.'forum.php?topic='.$post['tid'].'">'.$post['subject'].'</a> '.$l['topic_on'].' '.$post['post_time'].'</p>
+      <p><a href="'.$cmsurl.'forum.php?topic='.$post['tid'].';msg='.$post['mid'].'">'.$post['subject'].'</a> '.$l['topic_on'].' '.$post['post_time'].'</p>
     </div>
     <div id="post-content">
       <p>'.$post['body'].'</p>

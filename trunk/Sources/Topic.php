@@ -62,7 +62,11 @@ global $cmsurl, $db_prefix, $l, $settings, $user;
               $page++;
             }
           }
-          redirect("forum.php?topic={$topic_id};page={$mid_page}#mid{$msg_id}");
+          // !!! $page_id != 1 BAD!
+          if($mid_page!=1)
+            redirect("forum.php?topic={$topic_id};page={$mid_page}#mid{$msg_id}");
+          else
+            redirect("forum.php?topic={$topic_id}#mid{$msg_id}");
         }
         else {
           // Sorry bub, we didn't find that Message ID...
