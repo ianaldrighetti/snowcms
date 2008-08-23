@@ -63,19 +63,7 @@ global $cmsurl, $db_prefix, $l, $settings, $user;
         );
       }
     foreach($cats as $cat) {
-      if(count($cats[$cat['id']]['boards'])>0) {
-        foreach($cat['boards'] as $board) {
-          // Can they view this board? :o But of course, the admin can view anything :D!
-          if((!in_array($user['group'], $board['who_view'])) && ($user['group']!=1)){
-            // They can't! UNSET it so the can't see hehe :)
-            unset($cats[$cat['id']]['boards'][$board['id']]);
-          }
-        }
-        // Check if this cat has any boards again...
-        if(count($cats[$cat['id']]['boards'])==0)
-          unset($cats[$cat['id']]);
-      }
-      else {
+      if(!count($cats[$cat['id']]['boards'])) {
         // Dont show a category if it has no boards...
         unset($cats[$cat['id']]);
       }
