@@ -119,6 +119,7 @@ DROP TABLE IF EXISTS `{$db_prefix}online`;
 
 CREATE TABLE `{$db_prefix}online` (
   `user_id` int(11) NOT NULL default '0',
+  `sc` VARCHAR(50) NOT NULL default '',
   `ip` text NOT NULL,
   `page` text NOT NULL,
   `last_active` int(10) NOT NULL default '0',

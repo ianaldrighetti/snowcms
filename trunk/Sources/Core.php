@@ -52,6 +52,7 @@ global $db_prefix, $user;
   $user['name'] = null;
   $user['email'] = null;
   $user['language'] = false;
+  $user['sc'] = 'guest';
   $user['board_query'] = 'FIND_IN_SET('. $user['group']. ', b.who_view)';
   // Make sure we get their real IP :)
   $user['ip'] = @isset($_SERVER['HTTP_X_FORWARDED_FOR']) ? $_SERVER['HTTP_X_FORWARDED_FOR'] : $_SERVER['REMOTE_ADDR'];
@@ -282,13 +283,13 @@ global $db_prefix, $settings, $user;
       // Delete this row if it is them
       // Or if this is an expired row, delete it too
       if($row['ip']==$user['ip'])
-        sql_query("DELETE FROM {$db_prefix}online WHERE `ip` = '{$row['ip']}'");
+        sql_query("DELETE FROM {$db_prefix}online WHERE `ip` = '{$row['ip']}' AND `sc` = '{$user['sc']}'");
       elseif(($row['last_active']+($settings['login_threshold']*60))<time()) {
-        sql_query("DELETE FROM {$db_prefix}online WHERE `ip` = '{$row['ip']}'");
+        sql_query("DELETE FROM {$db_prefix}online WHERE `ip` = '{$row['ip']}' AND `sc` = '{$user['sc']}'");
       }
     }
   // Insert their information into the database
-  sql_query("INSERT INTO {$db_prefix}online (`user_id`,`ip`,`page`,`last_active`) VALUES('{$user['id']}','{$user['ip']}','{$action_or_page}','".time()."')") or die(mysql_error());
+  sql_query("INSERT INTO {$db_prefix}online (`user_id`,`sc`,`ip`,`page`,`last_active`) VALUES('{$user['id']}','{$user['sc']}','{$user['ip']}','{$action_or_page}','".time()."')") or die(mysql_error());
 }
 
 // This returns true or false (bool) of whether or not they can do said function
