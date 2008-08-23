@@ -1,10 +1,12 @@
 <?php
-$emoticon[':)'] = 'smile.png';
-$emoticon[':('] = 'sad.png';
-$emoticon[':['] = 'angry.png';
-$emoticon[':D'] = 'grin.png';
-$emoticon['^_^'] = 'happy.png';
-$emoticon[':O'] = 'shock.png';
-$emoticon[';)'] = 'wink.png';
-$emoticon[':P'] = 'tongue.png';
+$smileys = array(
+  ':)' => 'smile.png',
+  ':(' => 'sad.png',
+  ':[' => 'angry.png',
+  ':D' => 'grin.php',
+  '^_^' => 'happy.png',
+  ':O' => 'shock.png',
+  ';)' => 'wink.png',
+  ':P' => 'tongue.png'
+)
 ?>
