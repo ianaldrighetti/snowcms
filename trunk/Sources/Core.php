@@ -282,10 +282,10 @@ global $db_prefix, $settings, $user;
     while($row = mysql_fetch_assoc($result)) {
       // Delete this row if it is them
       // Or if this is an expired row, delete it too
-      if($row['ip']==$user['ip'])
-        sql_query("DELETE FROM {$db_prefix}online WHERE `ip` = '{$row['ip']}' AND `sc` = '{$user['sc']}'");
+      if($row['user_id']==$user['id'] || ($row['ip']==$user['ip'] && $user['sc']==$row['sc']))
+        sql_query("DELETE FROM {$db_prefix}online WHERE `id` = '{$row['user_id']}' OR `ip` = '{$row['ip']}' AND `sc` = '{$row['sc']}'");
       elseif(($row['last_active']+($settings['login_threshold']*60))<time()) {
-        sql_query("DELETE FROM {$db_prefix}online WHERE `ip` = '{$row['ip']}' AND `sc` = '{$user['sc']}'");
+        sql_query("DELETE FROM {$db_prefix}online WHERE `ip` = '{$row['ip']}' AND `sc` = '{$row['sc']}'");
       }
     }
   // Insert their information into the database

@@ -44,6 +44,7 @@ global $cmsurl, $db_prefix, $l, $settings, $user;
           $settings['body'] = @$_SESSION['body'] ? clean($_SESSION['body']) : clean(@$_REQUEST['body']);
           $settings['board'] = $row['bid'];
           $settings['topic'] = $row['tid'];
+          unset($_SESSION['subject'], $_SESSION['body'], $_SESSION['sticky'], $_SESSION['locked'], $_SESSION['board']);
           loadForum('Post','Reply');
         }
         else {
@@ -88,6 +89,7 @@ global $cmsurl, $db_prefix, $l, $settings, $user;
           $settings['subject'] = @$_SESSION['subject'] ? clean($_SESSION['subject']) : clean(@$_REQUEST['subject']);
           $settings['body'] = @$_SESSION['body'] ? clean($_SESSION['body']) : clean(@$_REQUEST['body']);          
           $settings['board'] = (int)$_REQUEST['board'];
+          unset($_SESSION['subject'], $_SESSION['body'], $_SESSION['sticky'], $_SESSION['locked'], $_SESSION['board']);
           loadForum('Post','Topic');
         }
         else {

@@ -15,8 +15,11 @@ echo '
   <tr align="center">
     <td>', $l['topic_subject'], '</td><td><input name="subject" type="text" size="80" value="', $settings['subject'], '"/>
   </tr>
+  <tr align="center" valign="middle">
+    <td colspan="2"><a href="javascript:void(0);" onClick="add_bbcode(\'body\',\'[b]\',\'[/b]\');">Bold</a></td>
+  </tr>
   <tr align="center">
-    <td colspan="2"><textarea name="body" rows="12" cols="60">', $settings['body'], '</textarea></td>
+    <td colspan="2"><textarea id="body" name="body" rows="12" cols="60">', $settings['body'], '</textarea></td>
   </tr>';
   if(canforum('post_sticky', $settings['board']) || canforum('lock_topic', $settings['board'])) {
     if($settings['sticky'])
