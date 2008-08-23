@@ -32,7 +32,7 @@ $files = array(
 <div id="container">
 	<div id="header">
 		<div id="headerimg">
-			<a class="headerlink" href="http://www.snowcms.com/" title="SnowCMS"><img class="headerimg" src="Themes/default/title.png" alt="SnowCMS" /></a>
+			<a class="headerlink" href="http://www.snowcms.com/" title="SnowCMS"><img class="headerimg" src="Themes/default/images/title.png" alt="SnowCMS" /></a>
 		</div>
 	</div>
 	<div id="sidebar">

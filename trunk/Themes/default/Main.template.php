@@ -24,7 +24,7 @@ echo '
 <div id="container">
 	<div id="header">
 		<div id="headerimg">
-			<a class="headerlink" href="'.$cmsurl.'" title="'.$settings['site_name'].'"><img class="headerimg" src="'.$theme_url.'/'.$settings['theme'].'/title.png" alt="'.$settings['site_name'].'" /></a>
+			<a class="headerlink" href="'.$cmsurl.'" title="'.$settings['site_name'].'"><img class="headerimg" src="'.$theme_url.'/'.$settings['theme'].'/images/title.png" alt="'.$settings['site_name'].'" /></a>
 		</div>
 	</div>
 	<div id="sidebar">

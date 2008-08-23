@@ -64,7 +64,9 @@ global $l, $settings, $db_prefix;
         $link_name = clean($value);
         $link_url = clean(@$_REQUEST['link_url_'.$link_id]);
         $link_new_window = @$_REQUEST['link_new_window_'.$link_id] == true;
-        $link_sidebar = @$_REQUEST['link_sidebar_'.$link_id] == true;
+        $link_main = @$_REQUEST['link_main_'.$link_id] == true;
+        $link_sidebar = (@$_REQUEST['link_sidebar_'.$link_id] == true) * 2;
+        $link_menu = $link_main + $link_sidebar;
         $link_order = $order[$link_id];
         sql_query("
         UPDATE {$db_prefix}menus
@@ -72,7 +74,7 @@ global $l, $settings, $db_prefix;
           `link_name` = '$link_name',
           `href` = '$link_url',
           `target` = '$link_new_window',
-          `menu` = '$link_sidebar',
+          `menu` = '$link_menu',
           `order` = '$link_order'
         WHERE
           `link_id` = '$link_id'
@@ -83,7 +85,9 @@ global $l, $settings, $db_prefix;
       $link_name = clean($_REQUEST['new_link_name']);
       $link_url = clean($_REQUEST['new_link_url']);
       $link_new_window = @$_REQUEST['new_link_new_window'] == true;
-      $link_sidebar = @$_REQUEST['new_link_sidebar'] == true;
+      $link_main = @$_REQUEST['new_link_main'] == true;
+      $link_sidebar = (@$_REQUEST['new_link_sidebar'] == true) * 2;
+      $link_menu = $link_main + $link_sidebar;
       $link_order = $order[$new_id];
       sql_query("
       INSERT INTO {$db_prefix}menus
@@ -98,7 +102,7 @@ global $l, $settings, $db_prefix;
         '$link_name',
         '$link_url',
         '$link_new_window',
-        '$link_sidebar',
+        '$link_menu',
         '$link_order'
       )
       ");
@@ -163,7 +167,6 @@ global $l, $settings, $db_prefix;
         ");
       }
     }
-    //////////
   }
   
   $settings['page']['title'] = $l['managemenus_title'];

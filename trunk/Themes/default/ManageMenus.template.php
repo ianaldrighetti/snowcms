@@ -29,18 +29,21 @@ global $cmsurl, $settings, $l, $user, $cmsurl;
         $new_window = ' checked="checked"';
       else
         $new_window = "";
-      if ($menu['menu'])
+      if ($menu['menu'] == 2 || $menu['menu'] == 3)
         $sidebar = ' checked="checked"';
       else
         $sidebar = "";
+      if ($menu['menu'] == 1 || $menu['menu'] == 3)
+        $mainmenu = ' checked="checked"';
+      else
+        $mainmenu = "";
       
       echo '
       <tr>
         <td><input name="link_name_'.$menu['id'].'" value="'.$menu['name'].'" size="13" /></td>
         <td><input name="link_url_'.$menu['id'].'" value="'.$menu['url'].'" /></td>
         <td><input type="checkbox" name="link_new_window_'.$menu['id'].'"'.$new_window.' /></td>
-        <td><input type="checkbox" name="link_main'.$menu['id'].'"'.$sidebar.' />
-            <input type="checkbox" name="link_sidebar_'.$menu['id'].'"'.$sidebar.' /></td>
+        <td><input type="checkbox" name="link_main_'.$menu['id'].'"'.$mainmenu.' /><input type="checkbox" name="link_sidebar_'.$menu['id'].'"'.$sidebar.' /></td>
         <td><input name="link_order_'.$menu['id'].'" value="'.$menu['order'].'" size="1" style="text-align: center" /></td>
         <td><a href="'.$cmsurl.'index.php?action=admin;sa=menus;did='.$menu['id'].'">'.$l['managemenus_delete'].'</a></td>
       </tr>';
@@ -55,8 +58,7 @@ global $cmsurl, $settings, $l, $user, $cmsurl;
         <td><input name="new_link_name" value="" size="13" /></td>
         <td><input name="new_link_url" value="" /></td>
         <td><input type="checkbox" name="new_link_new_window" /></td>
-        <td><input type="checkbox" name="new_link_main" />
-            <input type="checkbox" name="new_link_sidebar" /></td>
+        <td><input type="checkbox" name="new_link_main" /><input type="checkbox" name="new_link_sidebar" /></td>
         <td><input name="new_link_order" value="'.$new_order.'" size="1" style="text-align: center" /></td>
         <td></td>
       </tr>
@@ -89,8 +91,7 @@ global $l, $settings, $cmsurl;
         <td><input name="new_link_name" value="" size="13" /></td>
         <td><input name="new_link_url" value="" /></td>
         <td><input type="checkbox" name="new_link_new_window" /></td>
-        <td><input type="checkbox" name="new_link_main" />
-            <input type="checkbox" name="new_link_sidebar" /></td>
+        <td><input type="checkbox" name="new_link_main" /><input type="checkbox" name="new_link_sidebar" /></td>
         <td><input name="new_link_order" value="1" size="1" style="text-align: center" /></td>
         <td></td>
       </tr>
