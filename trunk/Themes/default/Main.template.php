@@ -50,7 +50,7 @@ global $cmsurl, $settings, $user;
             <li><a href="'.$cmsurl.'index.php?action=register">Register</a></li>';
     else
       echo '<li><a href="'.$cmsurl.'index.php?action=profile">Profile</a></li>
-            <li><a href="'.$cmsurl.'index.php?action=logout&sc=', $user['sc'], '">Logout</a></li>';      
+            <li><a href="'.$cmsurl.'index.php?action=logout;sc=', $user['sc'], '">Logout</a></li>';      
     if(can('admin'))
       echo '<li><a href="'.$cmsurl.'index.php?action=admin">Admin CP</a></li>';
   }  
