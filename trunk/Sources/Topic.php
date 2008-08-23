@@ -114,7 +114,12 @@ global $cmsurl, $db_prefix, $l, $settings, $user;
           'username' => $row['username'] ? $row['username'] : $row['poster_name'],
           'signature' => bbc($row['signature']),
           'membergroup' => $row['groupname'],
-          'numposts' => $row['numposts']
+          'numposts' => $row['numposts'],
+          'can' => array(
+                       'edit' => canforum('edit_any', $row['bid']) ? true : canforum('edit_own', $row['bid']),
+                       'del' => canforum('delete_any', $row['bid']) ? true : canforum('delete_own', $row['bid']),
+                       'split' => canforum('split_topic', $row['bid'])
+                     )
         );
         $bid = $row['bid'];
       }

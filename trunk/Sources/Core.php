@@ -510,7 +510,8 @@ global $db_prefix, $user;
     'edit_own' => true,
     'post_new' => true,
     'post_reply' => true,
-    'sticky_topic' => false
+    'sticky_topic' => false,
+    'split_topic' => false
   ); 
 // !!! This function changes (forcefully) the separator from & to ;
 // !!! This function needs improvement!!!!
