@@ -27,8 +27,9 @@ require_once($source_dir.'/Core.php');
   
   cleanQuery();
 // Load up a few things :P Such as $settings, $l[anguage], and $user, the permissions too!
-  loadUser();
   loadSettings();
+  loadUser();
+  changeLanguage();
   loadLanguage();
   loadPerms();
   loadMenus();

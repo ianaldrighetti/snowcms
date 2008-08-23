@@ -5,9 +5,8 @@ if(!defined('Snow'))
   die("Hacking Attempt...");
   
 function theme_header() {
-global $cmsurl, $theme_url, $settings, $user;
-echo '
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+global $l, $cmsurl, $theme_url, $settings, $user;
+echo '<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
   "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
 
@@ -32,8 +31,11 @@ echo '
 	  theme_menu('side');
 	echo '
 	</ul>
-	</div>
-	<div id="content">';
+	';
+	languageOption();
+	echo '</div>
+	<div id="content">
+	';
 }
 
 // Call on by either theme_menu('main'); or theme_menu('side')
@@ -65,5 +67,36 @@ echo '
 </div>
 </body>
 </html>';
+}
+
+function languageOption() {
+global $user, $settings, $l, $db_prefix;
+  
+  $current_language = clean($user['language'] ? $user['language'] : (@$_COOKIE['language'] ? @$_COOKIE['language'] : $settings['language']));
+  $result = sql_query("SELECT * FROM {$db_prefix}languages");
+  if (mysql_num_rows($result) > 1) {
+    while ($row = mysql_fetch_assoc($result))
+      $languages[$row['lang_id']] = $row['lang_name'];
+    
+    
+	  echo '<form action="'.$_SERVER['REQUEST_URI'].'" method="post" style="text-align: center"><p>
+	  <select name="change-language">
+	  ';
+	  
+    foreach ($languages as $id => $name) {
+      if ($current_language == $id)
+	      echo ' <option value="'.$id.'" selected="selected">'.$name.'</option>
+	  ';
+	    else
+	      echo ' <option value="'.$id.'">'.$name.'</option>
+	  ';
+	  }
+  	echo ' <option value="5">Spanish</option>
+	  ';
+  	echo '</select>
+	  <input type="submit" value="'.$l['main_language_go'].'" />
+	  </p></form>
+	';
+	}
 }
 ?>

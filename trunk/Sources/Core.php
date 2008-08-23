@@ -51,6 +51,7 @@ global $db_prefix, $user;
   $user['is_admin'] = false;
   $user['name'] = null;
   $user['email'] = null;
+  $user['language'] = false;
   $user['board_query'] = 'FIND_IN_SET('. $user['group']. ', b.who_view)';
   // Make sure we get their real IP :)
   $user['ip'] = @isset($_SERVER['HTTP_X_FORWARDED_FOR']) ? $_SERVER['HTTP_X_FORWARDED_FOR'] : $_SERVER['REMOTE_ADDR'];
@@ -74,6 +75,7 @@ global $db_prefix, $user;
             'is_guest' => false,
             'is_admin' => false,
             'email' => $row['email'],
+            'language' => $row['language'],
             'ip' => @$_SERVER['HTTP_X_FORWARDED_FOR'] ? $_SERVER['HTTP_X_FORWARDED_FOR'] : $_SERVER['REMOTE_ADDR'],
             'sc' => create_sid()
           );
@@ -96,15 +98,29 @@ global $db_prefix, $user;
 // This loads the Language file, from the language directory, later on (Maybe SnowCMS 0.8 or later)
 // Will allow each theme to have its own language file(s)
 function loadLanguage() {
-global $cmsurl, $l, $language_dir, $settings, $theme_dir;  
+global $cmsurl, $l, $language_dir, $settings, $theme_dir, $user, $db_prefix;
+  
+  // Get the language record from either the user's profile, the cookies or the site's default
+  $language = clean($user['language'] ? $user['language'] : (@$_COOKIE['language'] ? @$_COOKIE['language'] : $settings['language']));
+  $result = sql_query("SELECT * FROM {$db_prefix}languages WHERE `lang_id` = '$language'");
+  if (mysql_num_rows($result) && ($row = mysql_fetch_assoc($result)))
+    $language = $row['lang_name'];
+  else {
+    $result = sql_query("SELECT * FROM {$db_prefix}languages WHERE `lang_id` = '{$settings['language']}'");
+    if (mysql_num_rows($result) && ($row = mysql_fetch_assoc($result)))
+      $language = $row['lang_name'];
+    else
+      die('Internal error');
+  }
+  
   $l = array();
-  require_once($language_dir.'/'.$settings['language'].'.language.php');
+  require_once($language_dir.'/'.$language.'.language.php');
   // Does the current theme have its own language support?
-  if(file_exists($theme_dir.'/'.$settings['theme'].'/'.$settings['language'].'.language.php')) {
+  if(file_exists($theme_dir.'/'.$settings['theme'].'/'.$language.'.language.php')) {
     $tmp['1'] = $l;
     unset($l);
     $l = array();
-    require_once($theme_dir.'/'.$settings['theme'].'/languages/'.$settings['language'].'.language.php');
+    require_once($theme_dir.'/'.$settings['theme'].'/languages/'.$language.'.language.php');
     $tmp['2'] = $l;
     $l = merge_languages($tmp);
   }
@@ -567,12 +583,32 @@ global $cmsurl, $db_prefix, $settings, $user;
       $settings['linktree'][] = array(
                                   'name' => $topic['name'],
                                   'href' => $cmsurl.'forum.php?board='.$topic['bid']
-                                );      
+                                );
       $settings['linktree'][] = array(
                                   'name' => $topic['subject'],
                                   'href' => $cmsurl.'forum.php?topic='.$topic['tid']
-                                );      
+                                );
     }
+  }
+}
+
+// Just because this function is getting called doesn't mean the language is going to change
+function changeLanguage() {
+global $db_prefix, $user;
+  
+  if (@$_POST['change-language']) {
+    // Oh wait, it is
+    $language = clean(@$_POST['change-language']);
+    
+    if (!mysql_num_rows(mysql_query("SELECT * FROM {$db_prefix}languages WHERE `lang_name` = '$language'")))
+      die('Internal error');
+    
+    if ($user['is_logged'] == true)
+      sql_query("UPDATE {$db_prefix}members SET `language` = '$language' WHERE `id` = '{$user['id']}'");
+    else
+      setcookie('language',$language,time()+60*60*24*365);
+    
+    $user['language'] = $language;
   }
 }
 ?>
