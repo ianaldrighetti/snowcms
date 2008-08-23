@@ -33,6 +33,7 @@ require_once($source_dir.'/Core.php');
   loadPerms();
   loadBPerms();
   loadMenus();
+  loadTree();
 // Write that this Guest/User is online
   WriteOnline();
 

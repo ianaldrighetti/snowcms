@@ -511,4 +511,68 @@ global $_REQUEST, $_GET;
     }
   }
 }
+
+// This function is for the forum! It loads a link tree of the current position...
+function loadTree() {
+global $cmsurl, $db_prefix, $settings, $user;
+  $settings['linktree'] = array();
+  // Where are? Topic? Board?
+  if(empty($_REQUEST['topic']) && empty($_REQUEST['board'])) {
+    // Hmmm, we must be at Home Sweet Home...
+    $settings['linktree'][] = array(
+                                'name' => $settings['site_name'],
+                                'href' => $cmsurl.'forum.php'
+                              );
+  }
+  elseif(!empty($_REQUEST['board'])) {
+    // A board :o
+    $board_id = (int)$_REQUEST['board'];
+    // We still need the home link :)
+    $settings['linktree'][] = array(
+                                'name' => $settings['site_name'],
+                                'href' => $cmsurl.'forum.php'
+                              );    
+    $result = sql_query("
+      SELECT
+        b.bid, b.name
+      FROM {$db_prefix}boards AS b
+      WHERE {$user['board_query']} AND b.bid = $board_id");
+    // If no boards, well, they can't see it OR, it really doesn't exist...
+    if(mysql_num_rows($result)) {
+      $board = mysql_fetch_assoc($result);
+      $settings['linktree'][] = array(
+                                  'name' => $board['name'],
+                                  'href' => $cmsurl.'forum.php?board='.$board['bid']
+                                );
+    }
+  }
+  else {
+    // Its got to be a topic
+    $topic_id = (int)$_REQUEST['topic'];
+    // We still need the home link :)
+    $settings['linktree'][] = array(
+                                'name' => $settings['site_name'],
+                                'href' => $cmsurl.'forum.php'
+                              );     
+    $result = sql_query("
+      SELECT
+        t.tid, t.bid, t.first_msg, msg.subject, msg.mid, b.bid, b.name, b.who_view
+      FROM {$db_prefix}topics AS t
+        LEFT JOIN {$db_prefix}messages AS msg ON msg.mid = t.first_msg
+        LEFT JOIN {$db_prefix}boards AS b ON b.bid = t.bid
+      WHERE {$user['board_query']} AND t.tid = $topic_id");
+    // If no rows, they can't see it, nanananana! Or it doesn't exist, Lol. We will never know.
+    if(mysql_num_rows($result)) {
+      $topic = mysql_fetch_assoc($result);
+      $settings['linktree'][] = array(
+                                  'name' => $topic['name'],
+                                  'href' => $cmsurl.'forum.php?board='.$topic['bid']
+                                );      
+      $settings['linktree'][] = array(
+                                  'name' => $topic['subject'],
+                                  'href' => $cmsurl.'forum.php?topic='.$topic['tid']
+                                );      
+    }
+  }
+}
 ?>
