@@ -138,7 +138,7 @@ CREATE TABLE `{$db_prefix}pages` (
   PRIMARY KEY  (`page_id`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 
-INSERT INTO `{$db_prefix}pages` (`page_owner`, `owner_name`, `create_date`, `title`, `content`) VALUES ('-1','The SnowCMS Team','%current_time%','Welcome to SnowCMS','Start modifing the default settings and creating pages now. Thank you for choosing SnowCMS.<br /><br />The SnowCMS Team');
+INSERT INTO `{$db_prefix}pages` (`page_owner`, `owner_name`, `create_date`, `title`, `content`) VALUES ('-1','The SnowCMS Team','%current_time%','Welcome to SnowCMS','<p>Start modifing the default settings and creating pages now. Thank you for choosing SnowCMS.</p>\n\n<p>The SnowCMS Team</p>');
 
 DROP TABLE IF EXISTS `{$db_prefix}permissions`;
 
