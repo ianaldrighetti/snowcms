@@ -58,7 +58,12 @@ global $cmsurl, $settings, $l, $user, $theme_url;
     foreach($settings['page']['pages'] as $page) {
       echo '
       <tr>
-        <td><a href="'.$cmsurl.'index.php?action=admin;sa=editpage;page_id='.$page['page_id'].'">'.$page['title'].'</a></td><td><a href="'.$cmsurl.'index.php?action=profile;u='.$page['page_owner'].'">'.$page['owner'].'</td><td>'.$page['date'].'</td><td><a href="'.$cmsurl.'index.php?action=admin;sa=managepages;did='.$page['page_id'].'"><img src="'.$theme_url.'/'.$settings['theme'].'/images/delete.png" alt="'.$l['managepages_delete'].'" width="15" height="15" style="border: 0" /></a></td>
+        <td><a href="'.$cmsurl.'index.php?action=admin;sa=editpage;page_id='.$page['page_id'].'">'.$page['title'].'</a></td><td>';
+      if ($page['page_owner'] != -1)
+        echo '<a href="'.$cmsurl.'index.php?action=profile;u='.$page['page_owner'].'">'.$page['owner'].'</a>';
+      else
+        echo $page['owner'];
+      echo '</td><td>'.$page['date'].'</td><td><a href="'.$cmsurl.'index.php?action=admin;sa=managepages;did='.$page['page_id'].'"><img src="'.$theme_url.'/'.$settings['theme'].'/images/delete.png" alt="'.$l['managepages_delete'].'" width="15" height="15" style="border: 0" /></a></td>
       </tr>';
     }
     echo '

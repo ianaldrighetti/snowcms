@@ -108,16 +108,20 @@ global $cmsurl, $db_prefix, $l, $settings, $user;
        ORDER BY p.page_id DESC");
       $pages = array();
       while($row = mysql_fetch_assoc($result)) {
-        if(!$row['id'])
+        if(!$row['id']) {
+          $page_owner = -1;
           $owner = $row['owner_name'];
-        elseif($row['display_name']!=null)
+        }
+        elseif($row['display_name']!=null) {
+          $page_owner = $row['page_owner'];
           $owner = $row['display_name'];
+        }
         else
           $owner = $row['username'];
         $pages[] = array(
           'page_id' => $row['page_id'],
           'title' => $row['title'],
-          'page_owner' => $row['page_owner'],
+          'page_owner' => $page_owner,
           'owner' => $owner,
           'date' => $row['modify_date'] ? formattime($row['modify_date']) : formattime($row['create_date'])
         );          

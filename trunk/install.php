@@ -111,7 +111,7 @@ $files = array(
           // Get the MySQL Queries from the SQL file :D
           $db_prefix = $_REQUEST['mysql_prefix'];
           $sqls = file_get_contents('./install.sql');
-          $sqls = str_replace('{$db_prefix}', $db_prefix, $sqls);
+          $sqls = str_replace('%current_time%',time(),str_replace('{$db_prefix}', $db_prefix, $sqls));
           $mysql_queries = explode(";", $sqls);
           $mysql_errors = array();
           $num_queries = count($mysql_queries);
@@ -240,7 +240,7 @@ $scms_installed = true;
       $check = file_put_contents('./config.php', $config);
       echo '<p>Your config.php file has been set! You\'re ready to go!</p>';
     }
-    echo '<p>Once you are done, please delete this file (install.php) and CHMOD config.php to 644. Thank you for using SnowCMS!</p>';
+    echo '<p>Once you are done, please delete this file (install.php) and CHMOD config.php to 644. Thank you for using SnowCMS! <a href="'.$_REQUEST['cmsurl'].'">Click here</a> to contine your home page.</p>';
 
     }
   }
