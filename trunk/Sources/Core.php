@@ -103,7 +103,7 @@ function loadLanguage() {
 global $cmsurl, $l, $language_dir, $settings, $theme_dir, $user, $db_prefix;
   
   // Get the language record from either the user's profile, the cookies or the site's default
-  $language = clean($user['language'] ? $user['language'] : (@$_COOKIE['language'] ? @$_COOKIE['language'] : $settings['language']));
+  $language = clean($user['language'] ? $user['language'] : (@$_COOKIE['change-language'] ? @$_COOKIE['change-language'] : $settings['language']));
   
   $l = array();
   require_once($language_dir.'/'.$language.'.language.php');
@@ -598,13 +598,10 @@ global $db_prefix, $user;
     // Oh wait, it is
     $language = clean(@$_POST['change-language']);
     
-    if (!mysql_num_rows(mysql_query("SELECT * FROM {$db_prefix}languages WHERE `lang_name` = '$language'")))
-      die('Internal error');
-    
     if ($user['is_logged'] == true)
       sql_query("UPDATE {$db_prefix}members SET `language` = '$language' WHERE `id` = '{$user['id']}'");
     else
-      setcookie('language',$language,time()+60*60*24*365);
+      setcookie('change-language',$language,time()+60*60*24*365);
     
     $user['language'] = $language;
   }

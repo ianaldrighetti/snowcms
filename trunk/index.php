@@ -74,4 +74,5 @@ require_once($source_dir.'/Core.php');
         $actions[$_REQUEST['action']][1]();
     }
   }
+
 ?>

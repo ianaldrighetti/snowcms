@@ -70,29 +70,36 @@ echo '
 }
 
 function languageOption() {
-global $user, $settings, $l, $db_prefix;
+global $user, $settings, $l, $db_prefix, $language_dir, $cmsurl;
   
-  $current_language = clean($user['language'] ? $user['language'] : (@$_COOKIE['language'] ? @$_COOKIE['language'] : $settings['language']));
-  $result = sql_query("SELECT * FROM {$db_prefix}languages");
-  if (mysql_num_rows($result) > 1) {
-    while ($row = mysql_fetch_assoc($result))
-      $languages[$row['lang_id']] = $row['lang_name'];
+  // Check how many language there are
+  $total_languages = 0;
+  foreach (scandir($language_dir) as $language)
+    if (substr($language,0,1) != '.')
+      $total_languages += 1;
+  
+  // Only show the change language form if there are at least two
+  if ($total_languages > 1) {
     
+    $current_language = clean($user['language'] ? $user['language'] : (@$_COOKIE['change-language'] ? @$_COOKIE['change-language'] : $settings['language']));
     
 	  echo '<form action="'.$_SERVER['REQUEST_URI'].'" method="post" style="text-align: center"><p>
 	  <select name="change-language">
 	  ';
 	  
-    foreach ($languages as $id => $name) {
-      if ($current_language == $id)
-	      echo ' <option value="'.$id.'" selected="selected">'.$name.'</option>
-	  ';
-	    else
-	      echo ' <option value="'.$id.'">'.$name.'</option>
-	  ';
-	  }
-  	echo ' <option value="5">Spanish</option>
-	  ';
+    foreach (scandir($language_dir) as $language)
+      if (substr($language,0,1) != '.') {
+        $l_temp = $l;
+        include $language_dir.'/'.$language;
+        if ($current_language == $language)
+          echo '<option value="'.strrev(substr(strrev($language),strlen(strstr($language,'.language.php')),strlen($language))).'" selected="selected">'.$l['language_name'].'</option>
+      ';
+        else
+          echo '<option value="'.strrev(substr(strrev($language),strlen(strstr($language,'.language.php')),strlen($language))).'">'.$l['language_name'].'</option>
+      ';
+        $l = $l_temp;
+      }
+	  
   	echo '</select>
 	  <input type="submit" value="'.$l['main_language_go'].'" />
 	  </p></form>
