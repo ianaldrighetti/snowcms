@@ -102,6 +102,7 @@ global $cmsurl, $db_prefix, $l, $settings, $user, $language_dir, $theme_dir, $th
       loadSettings();
       loadMenus();
       unset($menus);
+      redirect('index.php?action=admin');
       
     }
     // Set title, pass on $basic, and load Settings template with the Basic function
