@@ -122,8 +122,7 @@ CREATE TABLE `{$db_prefix}online` (
   `sc` VARCHAR(50) NOT NULL default '',
   `ip` text NOT NULL,
   `page` text NOT NULL,
-  `last_active` int(10) NOT NULL default '0',
-  UNIQUE KEY (`user_id`)
+  `last_active` int(10) NOT NULL default '0'
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 
 DROP TABLE IF EXISTS `{$db_prefix}pages`;

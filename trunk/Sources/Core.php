@@ -268,27 +268,32 @@ global $db_prefix, $settings;
 // Writes the user or guest online, also deletes old ones expired guests/users
 function WriteOnline() {
 global $db_prefix, $settings, $user;
-  // Are they at a ?action= page? If so, thats where we need to save them as
-  // Or are they  on a Page? save its Page ID
-  // Nothing? D:!
-  if(isset($_REQUEST['action']))
-    $action_or_page = 'action:'.clean($_REQUEST['action']);
-  elseif(isset($_REQUEST['page']))
-    $action_or_page = 'page:'.clean($_REQUEST['page']);
-  else 
+  if(!empty($_REQUEST['action']))
+    $action_or_page = 'action:'. clean($_REQUEST['action']);
+  elseif(!empty($_REQUEST['page']))
+    $action_or_page = 'page:'. clean($_REQUEST['page']);
+  else
     $action_or_page = 0;
-  // Get those peeps online
-  $result = sql_query("SELECT * FROM {$db_prefix}online") or die(mysql_error());
-    while($row = mysql_fetch_assoc($result)) {
-      // Delete this row if it is them
-      // Or if this is an expired row, delete it too
-      if($row['user_id']==$user['id'] || ($row['ip']==$user['ip'] && $user['sc']==$row['sc']))
-        sql_query("DELETE FROM {$db_prefix}online WHERE `id` = '{$row['user_id']}' OR `ip` = '{$row['ip']}' AND `sc` = '{$row['sc']}'");
-      elseif(($row['last_active']+($settings['login_threshold']*60))<time()) {
-        sql_query("DELETE FROM {$db_prefix}online WHERE `ip` = '{$row['ip']}' AND `sc` = '{$row['sc']}'");
-      }
-    }
-  // Insert their information into the database
+  $result = sql_query("
+    SELECT
+      *
+    FROM {$db_prefix}online");
+  $id_del = array();
+  $ip_del = array();
+  while($row = mysql_fetch_assoc($result)) {
+    if($user['is_logged'] && $row['user_id'] = $user['id'])
+      $id_del[] = $user['id'];
+    elseif($row['user_id'] != 0 && ($row['last_active']+($settings['login_threshold']*60))<time())
+      $id_del[] = $row['id'];
+    elseif($row['user_id'] == 0 && ($row['last_active']+($settings['login_threshold']*60))<time())
+      $ip_del[] = $row['ip'];
+    elseif($user['id'] == 0 && $row['ip'] = $user['ip'])
+      $ip_del[] = $row['ip'];
+  }
+  if(count($id_del))
+    sql_query("DELETE FROM {$db_prefix}online WHERE `user_id` IN(". implode(",", $id_del). ")");
+  if(count($ip_del))
+    sql_query("DELETE FROM {$db_prefix}online WHERE `ip` IN('". implode("','", $ip_del). "') AND `sc` = 'guest'");
   sql_query("INSERT INTO {$db_prefix}online (`user_id`,`sc`,`ip`,`page`,`last_active`) VALUES('{$user['id']}','{$user['sc']}','{$user['ip']}','{$action_or_page}','".time()."')") or die(mysql_error());
 }
 
