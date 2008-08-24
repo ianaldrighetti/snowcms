@@ -24,11 +24,11 @@ global $cmsurl, $settings, $l, $user;
       $field = "\n".'          <select name="'.$setting.'">'."\n";
       $i = 0;
       while ($i < count($info['values'])) {
-       if ($settings[$setting] != $i)
-         $field .= '            <option value="'.$i.'">'.$info['values'][$i].'</option>'."\n";
+       if ($settings[$setting] != $info['values'][$i+1])
+         $field .= '            <option value="'.$info['values'][$i+1].'">'.$info['values'][$i].'</option>'."\n";
        else
-         $field .= '            <option value="'.$i.'" selected="selected">'.$info['values'][$i].'</option>'."\n";
-       $i += 1;
+         $field .= '            <option value="'.$info['values'][$i+1].'" selected="selected">'.$info['values'][$i].'</option>'."\n";
+       $i += 2;
       }
       $field .= '          </select>'."\n".'        ';
     }

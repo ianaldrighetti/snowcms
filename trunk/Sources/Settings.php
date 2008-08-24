@@ -15,7 +15,7 @@ if(!defined("Snow"))
   die("Hacking Attempt...");
   
 function BasicSettings() {
-global $cmsurl, $db_prefix, $l, $settings, $user;
+global $cmsurl, $db_prefix, $l, $settings, $user, $language_dir, $theme_dir, $theme_name;
   if(can('manage_basic-settings')) {
     // An array of all the settings that can be set on this page...
     $basic = array(
@@ -27,13 +27,23 @@ global $cmsurl, $db_prefix, $l, $settings, $user;
         array(
           'type' => 'text'
         ),
+      'language' =>
+        array(
+          'type' => 'select',
+          'values' => array()
+        ),
+      'theme' =>
+        array(
+          'type' => 'select',
+          'values' => array()
+        ),
       'account_activation' =>
         array(
           'type' => 'select',
           'values' => array(
-                        $l['basicsettings_value_no_activation'],
-                        $l['basicsettings_value_email_activation'],
-                        $l['basicsettings_value_admin_activation']
+                        $l['basicsettings_value_no_activation'], 0,
+                        $l['basicsettings_value_email_activation'], 1,
+                        $l['basicsettings_value_admin_activation'], 2
                       )
         ),
       'login_threshold' =>
@@ -61,6 +71,25 @@ global $cmsurl, $db_prefix, $l, $settings, $user;
           'type' => 'text'
         )
     );
+    
+    // Get the language values
+    foreach (scandir($language_dir) as $language)
+      if (substr($language,0,1) != '.') {
+        $l_temp = $l;
+        include $language_dir.'/'.$language;
+        $basic['language']['values'][] = $l['language_name'];
+        $l = $l_temp;
+        $basic['language']['values'][] = strrev(substr(strrev($language),strlen(strstr($language,'.language.php')),strlen($language)));
+      }
+    
+    // Get the theme values
+    foreach (scandir($theme_dir) as $theme)
+      if (substr($theme,0,1) != '.') {
+        include $theme_dir.'/'.$theme.'/info.php';
+        $basic['theme']['values'][] = $theme_name;
+        $basic['theme']['values'][] = $theme;
+      }
+    
     // Are we updating them?
     if(!empty($_REQUEST['update'])) {
       // Set them all!

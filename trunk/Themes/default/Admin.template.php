@@ -46,10 +46,6 @@ global $cmsurl, $settings, $l, $user;
     <p class="main"><a href="'. $cmsurl. 'index.php?action=admin;sa=forum" title="'. $l['admin_menu_forum']. '">'. $l['admin_menu_forum']. '</a></p>
     <p class="desc">'. $l['admin_menu_forum_desc']. '</p>  
   </div>
-  <div class="acp_left">
-    <p class="main"><a href="'. $cmsurl. 'index.php?action=admin;sa=theme" title="'. $l['admin_menu_theme']. '">'. $l['admin_menu_theme']. '</a></p>
-    <p class="desc">'. $l['admin_menu_theme_desc']. '</p>  
-  </div>
   ';
 }
 

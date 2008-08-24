@@ -34,7 +34,7 @@ require_once($source_dir.'/Core.php');
   loadPerms();
   loadMenus();
 // Write that this Guest/User is online
-  WriteOnline();
+  //WriteOnline();
   
   // What should we do? ._.
   if((empty($_REQUEST['action'])) && (empty($_REQUEST['page']))) {

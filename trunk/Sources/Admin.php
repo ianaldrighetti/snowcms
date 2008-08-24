@@ -41,7 +41,6 @@ global $cmsurl, $db_prefix, $l, $settings, $source_dir, $user;
         'members' => array('Members.php','ManageMembers'),
         'permissions' => array('Permissions.php','GroupPermissions'),
         'menus' => array('Menus.php','ManageMenus'),
-        'theme' => array('Themes.php','ManageThemes'),
         'news' => array('News.php','ManageNews')
       );
       // Is the sa= in the $sa array? If so do it :D

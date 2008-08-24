@@ -2,6 +2,9 @@
 // SnowCMS Main.language.php file for English
 // Version 0.2
 
+// Language's name
+$l['language_name'] = 'English';
+
 // Main.template.php
 $l['main_language_go'] = 'Go';
 
@@ -98,8 +101,6 @@ $l['admin_menu_menus'] = 'Manage Menus';
 $l['admin_menu_menus_desc'] = 'You can edit the links on the sidebar and main menu here.';
 $l['admin_menu_forum'] = 'Manage Forum';
 $l['admin_menu_forum_desc'] = 'You can manage your forum setup here, such as categories and board management.';
-$l['admin_menu_theme'] = 'Themes & Languages';
-$l['admin_menu_theme_desc'] = 'You can change the default theme and language here, as well as install new themes and languages.';
 
 // Settings.template.php
 $l['basicsettings_title'] = 'Basic Settings';
@@ -107,6 +108,8 @@ $l['basicsettings_header'] = 'Basic Settings';
 $l['basicsettings_desc'] = 'Here are basic settings for your site, such as site name, slogan, time format, etc.';
 $l['basicsettings_site_name'] = 'Site Name:';
 $l['basicsettings_slogan'] = 'Slogan:';
+$l['basicsettings_language'] = 'Default Language:';
+$l['basicsettings_theme'] = 'Default Theme:';
 $l['basicsettings_account_activation'] = 'Account activation:';
 $l['basicsettings_value_no_activation'] = 'No activation';
 $l['basicsettings_value_email_activation'] = 'Email activation';
@@ -321,18 +324,6 @@ $l['managemenus_order'] = 'Order';
 $l['managemenus_delete'] = 'Delete';
 $l['managemenus_save_changes'] = 'Save Changes';
 
-// ManageThemes.template.php
-$l['managethemes_title'] = 'Manage Themes & Languages';
-$l['managethemes_language_title'] = 'Languages';
-$l['managethemes_language_install'] = 'Install';
-$l['managethemes_language_delete'] = 'Delete';
-$l['managethemes_language_default'] = 'Make Default';
-$l['managethemes_language_already_installed'] = '<b>Error:</b> The language %language% is already installed.';
-$l['managethemes_language_file_missing'] = '<b>Error:</b> The language file %language%.language.php doesn\'t exist in the languages directory.';
-$l['managethemes_language_delete_last'] = '<b>Error:</b> You cannot delete all languages. Create a new language before deleting this one.';
-$l['managethemes_language_delete_your'] = '<b>Error:</b> You cannot delete your current language. Change your language before deleting this one.';
-$l['managethemes_language_delete_default'] = '<b>Error:</b> You cannot delete the default language. Change the default language before deleting this one.';
-
 // ManageForum.template.php
 $l['manageforum_title'] = 'Manage Forum';
 $l['manageforum_header'] = 'Manage Forum';
@@ -384,4 +375,5 @@ $l['forum_startnew'] = 'Post New Topic';
 $l['themeerror_title'] = 'Theme Error!';
 $l['themeerror_header'] = 'Theme Load Error';
 $l['themeerror_msg'] = 'An error occurred while trying to load the template function %func%(); in the template %file%';
+
 ?>

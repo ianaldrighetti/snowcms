@@ -104,16 +104,6 @@ global $cmsurl, $l, $language_dir, $settings, $theme_dir, $user, $db_prefix;
   
   // Get the language record from either the user's profile, the cookies or the site's default
   $language = clean($user['language'] ? $user['language'] : (@$_COOKIE['language'] ? @$_COOKIE['language'] : $settings['language']));
-  $result = sql_query("SELECT * FROM {$db_prefix}languages WHERE `lang_id` = '$language'");
-  if (mysql_num_rows($result) && ($row = mysql_fetch_assoc($result)))
-    $language = $row['lang_name'];
-  else {
-    $result = sql_query("SELECT * FROM {$db_prefix}languages WHERE `lang_id` = '{$settings['language']}'");
-    if (mysql_num_rows($result) && ($row = mysql_fetch_assoc($result)))
-      $language = $row['lang_name'];
-    else
-      die('Internal error');
-  }
   
   $l = array();
   require_once($language_dir.'/'.$language.'.language.php');
