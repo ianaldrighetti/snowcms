@@ -7,6 +7,11 @@ $l['language_name'] = 'English';
 
 // Main.template.php
 $l['main_language_go'] = 'Go';
+$l['main_sidebar_login'] = 'Login';
+$l['main_sidebar_logout'] = 'Logout';
+$l['main_sidebar_register'] = 'Register';
+$l['main_sidebar_profile'] = 'Profile';
+$l['main_sidebar_control_panel'] = 'Control Panel';
 
 // Login.template.php stuff
 $l['login_title'] = 'Login';
@@ -80,7 +85,9 @@ $l['online_currently_viewing'] = 'Currently Viewing';
 $l['online_time'] = 'Last Active';
 
 // Admin.template.php
-$l['admin_title'] = 'Admin CP';
+$l['admin_title'] = 'Control Panel';
+$l['admin_snowcms_news'] = 'Latest news on SnowCMS';
+$l['admin_options'] = 'Admin Options';
 $l['admin_error_title'] = 'Error';
 $l['admin_cant_get_news_1'] = 'We were unable to get the latest SnowCMS News from the <a href="http://www.snowcms.com">SnowCMS</a> site because your server configuration does not have <a href="http://php.net/curl">cURL</a> setup. Please check out the SnowCMS site for the latest news &amp; updates.';
 $l['admin_cant_get_news_2'] = 'Unable to get the latest news from the <a href="http://www.snowcms.com">SnowCMS</a> site due to a server timeout. Refresh the page, or check out our site.';
@@ -352,7 +359,8 @@ $l['manageboards_header'] = 'Manage Boards';
 $l['manageboards_desc'] = 'You can edit, add, and delete boards in your forum, be sure that you have <a href="'. $cmsurl. 'index.php?action=admin;sa=forum;fa=categories">categories</a> created already';
 $l['manageboards_no_cats'] = 'No categories have been found! You <em>must</em> have categories to add boards, you can make them <a href="'. $cmsurl. 'index.php?action=admin;sa=forum;fa=categories">here</a>';
 $l['manageboards_are_you_sure_del'] = 'Are you SURE you want to delete this board? \nIt can\\\'t be undone!';
-$l['manageboards_edit_link'] = 'EDIT';
+$l['manageboards_edit'] = 'Edit';
+$l['manageboards_delete'] = 'Delete';
 // Add Boards
 $l['manageboards_add_title'] = 'Add Board';
 $l['manageboards_add_header'] = 'Add Board';

@@ -17,11 +17,13 @@ global $cmsurl, $settings, $l, $user;
       <td>'. $settings['latest_version']. '</td>
     </tr>
   </table>
-  <h2>Latest news on SnowCMS :</h2>
+  
+  <h2>'.$l['admin_snowcms_news'].'</h2>
   <div style="overflow: auto; width: 475px; height: 100px;">
     '. $settings['page']['news']. '
 	</div>
-  <h2>Admin Options</h2>
+	
+  <h2>'.$l['admin_options'].'</h2>
   <div class="acp_left">
     <p class="main"><a href="'. $cmsurl. 'index.php?action=admin;sa=managepages" title="'. $l['admin_menu_managepages']. '">'. $l['admin_menu_managepages']. '</a></p>
     <p class="desc">'. $l['admin_menu_managepages_desc']. '</p>

@@ -40,7 +40,8 @@ echo '<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
 
 // Call on by either theme_menu('main'); or theme_menu('side')
 function theme_menu($which) {
-global $cmsurl, $settings, $user;
+global $l, $cmsurl, $settings, $user;
+  
   if(count($settings['menu'][$which])>0) {
     foreach($settings['menu'][$which] as $link) {
       echo '<li><a href="'.$link['href'].'" '.$link['target'].'>'.$link['name'].'</a></li>';
@@ -48,13 +49,13 @@ global $cmsurl, $settings, $user;
   }
   if($which=='side') {
     if(!$user['is_logged'])
-      echo '<li><a href="'.$cmsurl.'index.php?action=login">Login</a></li>
-            <li><a href="'.$cmsurl.'index.php?action=register">Register</a></li>';
+      echo '<li><a href="'.$cmsurl.'index.php?action=login">'.$l['main_sidebar_login'].'</a></li>
+            <li><a href="'.$cmsurl.'index.php?action=register">'.$l['main_sidebar_register'].'</a></li>';
     else
-      echo '<li><a href="'.$cmsurl.'index.php?action=profile">Profile</a></li>
-            <li><a href="'.$cmsurl.'index.php?action=logout;sc=', $user['sc'], '">Logout</a></li>';      
+      echo '<li><a href="'.$cmsurl.'index.php?action=profile">'.$l['main_sidebar_profile'].'</a></li>
+            <li><a href="'.$cmsurl.'index.php?action=logout;sc=', $user['sc'], '">'.$l['main_sidebar_logout'].'</a></li>';      
     if(can('admin'))
-      echo '<li><a href="'.$cmsurl.'index.php?action=admin">Admin CP</a></li>';
+      echo '<li><a href="'.$cmsurl.'index.php?action=admin">'.$l['main_sidebar_control_panel'].'</a></li>';
   }  
 }
 function theme_footer() {

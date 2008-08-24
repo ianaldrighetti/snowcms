@@ -43,6 +43,10 @@ h3 {
 	float: left;
 }
 
+img {
+ border: 0;
+}
+
 img.headerimg {
 	margin-left: 46px;
 	margin-top: 1px;
@@ -237,6 +241,6 @@ th.border {
 #add_board {
   width: 100%;
 }
-#add_board input[type="text"], #add_board input[type="submit"] {
+input {
   border: 1px solid #DDDDDD;
 }
