@@ -314,14 +314,19 @@ $l['managemembers_moderate_renew_suspension'] = '%renew% for %input% hour(s) or 
 $l['managemembers_moderate_renew_suspension_button'] = 'Renew Suspension';
 $l['managemembers_moderate_ban'] = 'Ban Permanently';
 $l['managemembers_moderate_unban'] = 'Remove Ban';
-$l['managemembers_error_username_none'] = '<b>Error:</b> You didn\'t enter a username.';
-$l['managemembers_error_username_already_used'] = '<b>Error:</b> That username is already in use.';
-$l['managemembers_error_display_name_already_used'] = '<b>Error:</b> That display name is already in use.';
-$l['managemembers_error_email_none'] = '<b>Error:</b> You didn\'t enter an email address.';
-$l['managemembers_error_email_invalid'] = '<b>Error:</b> That email address is invalid.';
-$l['managemembers_error_password_too_short'] = '<b>Error:</b> That password is too short.';
-$l['managemembers_error_password_failed_verification'] = '<b>Error:</b> The verification password didn\'t match.';
-$l['managemembers_error_group_invalid'] = '<b>Error:</b> That group is invalid.';
+$l['managemembers_error_username_none'] = 'You didn\'t enter a username.';
+$l['managemembers_error_username_already_used'] = 'That username is already in use.';
+$l['managemembers_error_display_name_already_used'] = 'That display name is already in use.';
+$l['managemembers_error_email_none'] = 'You didn\'t enter an email address.';
+$l['managemembers_error_email_invalid'] = 'That email address is invalid.';
+$l['managemembers_error_password_too_short'] = 'That password is too short.';
+$l['managemembers_error_password_failed_verification'] = 'The verification password didn\'t match.';
+$l['managemembers_error_group_invalid'] = 'That group is invalid.';
+$l['managemembers_error_activate'] = 'Failed to activate member\'s account.';
+$l['managemembers_error_suspension'] = 'Failed to suspend member.';
+$l['managemembers_error_unsuspend'] = 'Failed to unsuspend member.';
+$l['managemembers_error_ban'] = 'Failed to ban member.';
+$l['managemembers_error_unban'] = 'Failed to unban member.';
 
 // ManageMenus.template.php
 $l['managemenus_title'] = 'Manage Menus';

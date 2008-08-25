@@ -3,9 +3,6 @@
 function Main() {
 global $l, $db_prefix, $settings, $cmsurl, $theme_url;
   
-  echo '<h1>'.$l['managemembers_title'].'</h1>
-        ';
-  
   $page = $settings['manage_members']['page'];
   $member_rows = $settings['manage_members']['member_rows'];
   $total_members = $settings['manage_members']['total_members'];
@@ -169,20 +166,12 @@ global $l, $settings, $cmsurl;
        </p></form>';
 }
 
-function Profile() {
+function Moderate() {
 global $l, $settings, $user, $cmsurl;
   
   $last_ip = $settings['managemembers']['member']['last_ip'] ? $settings['managemembers']['member']['last_ip'] : $settings['managemembers']['member']['reg_ip'];
   $last_login = $settings['managemembers']['member']['last_login'] ? date($settings['timeformat'].', '.$settings['dateformat'],$settings['managemembers']['member']['last_login']) : $l['managemembers_moderate_never'];
   
-  echo '
-        <h1>'.$settings['page']['title'].'</h1>
-        ';
-  if (@$settings['error'])
-    echo '
-          <p>'.$settings['error'].'</p>
-          ';
-        
   echo '<form action="'.$cmsurl.'index.php?action=admin;sa=members;u='.$_REQUEST['u'].'" method="post" style="display: inline">
         
         <p>
@@ -231,10 +220,9 @@ global $l, $settings, $user, $cmsurl;
         <p style="display: inline"><input type="submit" value="'.$l['managemembers_moderate_change'].'" /></p>
         </form>
         
-        <form action="'.$cmsurl.'index.php" method="get" style="display: inline">
+        <form action="'.$cmsurl.'index.php?action=profile;u='.$settings['managemembers']['member']['id'].'" method="post" style="display: inline">
         <p style="display: inline">
-        <input type="hidden" name="action" value="profile" />
-        <input type="hidden" name="u" value="'.$settings['managemembers']['member']['id'].'" />
+        <input type="hidden" name="view-profile" value="true" />
         <input type="submit" value="'.$l['managemembers_moderate_profile'].'" />
         </p>
         </form>

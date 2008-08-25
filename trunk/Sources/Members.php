@@ -247,7 +247,7 @@ global $l, $settings, $db_prefix;
   }
   
   if ($loadTheme == 2)
-    loadTheme('ManageMembers','Profile');
+    loadTheme('ManageMembers','Moderate');
 }
 
 function processModeration() {
@@ -281,20 +281,20 @@ global $l, $db_prefix, $user, $settings;
   
   // Check for errors in data
   if (!$username)
-    $settings['error'] = $l['managemembers_error_username_none'];
+    $_SESSION['error'] = $l['managemembers_error_username_none'];
   if (!$email)
-    $settings['error'] = $l['managemembers_error_email_none'];
+    $_SESSION['error'] = $l['managemembers_error_email_none'];
   if(!preg_match("/^([a-z0-9._-](\+[a-z0-9])*)+@[a-z0-9.-]+\.[a-z]{2,6}$/i", @$_REQUEST['email']))
-    $settings['error'] = $l['managemembers_error_email_invalid'];
+    $_SESSION['error'] = $l['managemembers_error_email_invalid'];
   if (strlen($password_new) < 5 && $password_new)
-    $settings['error'] = $l['managemembers_error_password_too_short'];
+    $_SESSION['error'] = $l['managemembers_error_password_too_short'];
   if ($password_new != $password_verify && $password_new)
-    $settings['error'] = $l['managemembers_error_password_failed_verification'];
+    $_SESSION['error'] = $l['managemembers_error_password_failed_verification'];
   if (!@$_REQUEST['group'])
-    $settings['error'] = $l['managemembers_error_group_invalid'];
+    $_SESSION['error'] = $l['managemembers_error_group_invalid'];
   
   
-  if (!@$settings['error']) {
+  if (!@$$_SESSION['error']) {
   
   $password_new = md5($password_new);
   
@@ -304,74 +304,72 @@ global $l, $db_prefix, $user, $settings;
   else // And don't change password
     sql_query("UPDATE {$db_prefix}members SET `username` = '$username', `display_name` = '$display_name', `email` = '$email', `group` = '$group', `signature` = '$signature', `profile` = '$profile' WHERE `id` = '{$_REQUEST['u']}'") or die('Internal error');
   
-  // If they moderated themselves change settings to keep 'em logged in
-  if ($_REQUEST['u'] == $_REQUEST['uid']) {
-    setcookie('username',$_REQUEST['user_name']);
-    // More settings if they changed their p[assword
-    if ($_REQUEST['password-new']) {
-      setcookie("password", $password_new);
-      $_SESSION['pass'] = $password_new;
+    // If they changed their own username change settings to keep 'em logged in
+    if ($_REQUEST['u'] == $_REQUEST['uid']) {
+      setcookie('username',$_REQUEST['user_name']);
+      // More settings if they changed their p[assword
+      if ($_REQUEST['password-new']) {
+        setcookie("password", $password_new);
+        $_SESSION['pass'] = $password_new;
+      }
     }
   }
   
-  redirect('index.php?action=admin;sa=members;u='.$_REQUEST['u']);
-  }
-  
-  loadProf();
+  redirect('index.php?action=admin;sa=members;u='.clean_header($_REQUEST['u']));
 }
 
 function activate() {
-global $db_prefix;
+global $db_prefix, $l;
   
   if (!ValidateSession(@$_REQUEST['sc']) || !@$_REQUEST['u'])
     die("Hacking Attempt...");
   
-  sql_query("UPDATE {$db_prefix}members SET `activated` = '1' WHERE `id` = '{$_REQUEST['u']}'") or die(mysql_error());
+  sql_query("UPDATE {$db_prefix}members SET `activated` = '1' WHERE `id` = '{$_REQUEST['u']}'") or ($_SESSION['error'] = $l['managemembers_error_activate']);
   
-  loadProf();
+  redirect('index.php?action=admin;sa=members;u='.clean_header($_REQUEST['u']));
 }
 
 function suspend() {
-global $db_prefix;
+global $db_prefix, $l;
   
   if (!ValidateSession(@$_REQUEST['sc']) || !@$_REQUEST['u'])
     die("Hacking Attempt...");
   
-  sql_query("UPDATE {$db_prefix}members SET `suspension` = '" . (time()+@$_REQUEST['suspension']*60) . "' WHERE `id` = '{$_REQUEST['u']}'") or die(mysql_error());
+  sql_query("UPDATE {$db_prefix}members SET `suspension` = '" . (time()+@$_REQUEST['suspension']*60*60) . "' WHERE `id` = '{$_REQUEST['u']}'") or ($_SESSION['error'] = $l['managemembers_error_suspension']);
   
-  loadProf();
+  redirect('index.php?action=admin;sa=members;u='.clean_header($_REQUEST['u']));
 }
 
 function unsuspend() {
-global $db_prefix;
+global $db_prefix, $l;
   
   if (!ValidateSession(@$_REQUEST['sc']) || !@$_REQUEST['u'])
     die("Hacking Attempt...");
   
-  sql_query("UPDATE {$db_prefix}members SET `suspension` = '".time()."' WHERE `id` = '{$_REQUEST['u']}'") or die(mysql_error());
+  sql_query("UPDATE {$db_prefix}members SET `suspension` = '".time()."' WHERE `id` = '{$_REQUEST['u']}'") or ($_SESSION['error'] = $l['managemembers_error_unsuspend']);
   
-  loadProf();
+  redirect('index.php?action=admin;sa=members;u='.clean_header($_REQUEST['u']));
 }
 
 function ban() {
-global $db_prefix;
+global $db_prefix, $l;
   
   if (!ValidateSession(@$_REQUEST['sc']) || !@$_REQUEST['u'])
     die("Hacking Attempt...");
   
-  sql_query("UPDATE {$db_prefix}members SET `banned` = '1' WHERE `id` = '{$_REQUEST['u']}'") or die(mysql_error());
+  sql_query("UPDATE {$db_prefix}members SET `banned` = '1' WHERE `id` = '{$_REQUEST['u']}'") or ($_SESSION['error'] = $l['managemembers_error_ban']);
   
-  loadProf();
+  redirect('index.php?action=admin;sa=members;u='.clean_header($_REQUEST['u']));
 }
 
 function unban() {
-global $db_prefix;
+global $db_prefix, $l;
   
   if (!ValidateSession(@$_REQUEST['sc']) || !@$_REQUEST['u'])
     die("Hacking Attempt...");
   
-  sql_query("UPDATE {$db_prefix}members SET `banned` = '0' WHERE `id` = '{$_REQUEST['u']}'") or die(mysql_error());
+  sql_query("UPDATE {$db_prefix}members SET `banned` = '0' WHERE `id` = '{$_REQUEST['u']}'") or ($_SESSION['error'] = $l['managemembers_error_unban']);
   
-  loadProf();
+  redirect('index.php?action=admin;sa=members;u='.clean_header($_REQUEST['u']));
 }
 ?>
