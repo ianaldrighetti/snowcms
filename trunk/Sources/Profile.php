@@ -87,11 +87,16 @@ function processEdit() {
 global $settings, $db_prefix, $user, $cmsurl;
   
   // Note: Error handling needs work
-  if (!@$_REQUEST['email'])
-    die("No email address");
-  if(!preg_match("/^([a-z0-9._-](\+[a-z0-9])*)+@[a-z0-9.-]+\.[a-z]{2,6}$/i", @$_REQUEST['email']))
-    die("Invalid email address");
   
+  // Check if someone else is using that display name
+  $result = sql_query("SELECT * FROM {$db_prefix}members") or die(mysql_error());
+  if (mysql_num_rows($result))
+    while ($row = mysql_fetch_assoc($result)) {
+      if ($row['id'] != $user['id'] && $_REQUEST['display_name'] != '' && ($_REQUEST['display_name'] == $row['username'] || $_REQUEST['display_name'] == $row['display_name']))
+        die("Display name already in use");
+    }
+  
+  // Check if the password is valid
   if ($_REQUEST['password-new']) {
     $result = sql_query("SELECT password FROM {$db_prefix}members WHERE `id` = '{$user['id']}'");
     $row = mysql_fetch_assoc($result) or die("Internal error");
@@ -103,6 +108,12 @@ global $settings, $db_prefix, $user, $cmsurl;
     if (strlen($_REQUEST['password-new']) < 5)
       die("Your password is under five characters long");
   }
+  
+  // Check if the email address is valid
+  if (!@$_REQUEST['email'])
+    die("No email address");
+  if(!preg_match("/^([a-z0-9._-](\+[a-z0-9])*)+@[a-z0-9.-]+\.[a-z]{2,6}$/i", @$_REQUEST['email']))
+    die("Invalid email address");
   
   if (clean($_REQUEST['display_name']))
     $display_name = clean($_REQUEST['display_name']);
