@@ -241,7 +241,7 @@ th.border {
 #add_board {
   width: 100%;
 }
-input {
+input, textarea {
   border: 1px solid #DDDDDD;
 }
 select {
