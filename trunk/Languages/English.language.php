@@ -131,17 +131,18 @@ $l['basicsettings_num_news_items'] = 'News items per page:';
 $l['basicsettings_manage_members_per_page'] = 'Members per page:';
 
 // ManagePages.template.php
-$l['adminpage_make_title'] = 'Manage Pages';
-$l['managepages_makepage'] = 'Create Page';
+$l['managepages_title'] = 'Manage Pages';
+$l['managepages_createpage'] = 'Create Page';
 $l['managepages_pagetitle'] = 'Page Title:';
 $l['managepages_header'] = 'Manage Pages';
 $l['managepages_desc'] = 'You can manage and create pages here.';
-$l['adminpage_make_success'] = 'The page %title% was successfully created!';
-$l['adminpage_make_fail'] = 'Failed to create the page %title%.';
-$l['adminpages_title_td'] = 'Page Title';
-$l['adminpages_pageowner'] = 'Page Owner';
-$l['adminpages_datemade'] = 'Created on';
-$l['adminpages_no_pages'] = 'Their are currently no pages in your database';
+$l['managepages_no_title'] = 'You didn\'t enter a title for the page.';
+$l['managepages_make_success'] = 'The page %title% was successfully created!';
+$l['managepages_make_fail'] = 'Failed to create the page %title%.';
+$l['managepages_pagetitle'] = 'Page Title';
+$l['managepages_pageowner'] = 'Page Owner';
+$l['managepages_datemade'] = 'Created on';
+$l['managepages_no_pages'] = 'Their are currently no pages in your database';
 $l['managepages_delete'] = 'Delete';
 $l['managepages_edit_title'] = 'Editing page %title%';
 $l['managepages_no_page_title'] = 'That page doesn\'t exist!';

@@ -51,12 +51,16 @@ global $cmsurl, $db_prefix, $l, $settings, $user;
     if(!empty($_REQUEST['update_page'])) {
       // If so, get the info, and clean it :P
       $page_id = clean($_REQUEST['page_id']);
-      $page_title = clean($_REQUEST['page_title']);
+      if (!($page_title = clean($_REQUEST['page_title']))) {
+        // If they remove the page title, they'll regret it later
+        $_SESSION['error'] = $l['managepages_no_title'];
+        redirect('index.php?action=admin;sa=editpage;page_id='.clean_header($page_id));
+      }
       $page_content = addslashes($_REQUEST['page_content']);
-	  if(isset($_REQUEST['page_show_info']))
-	  	$page_show_info = $_REQUEST['page_show_info'];
-	  else
-		  $page_show_info = 0;
+  	  if(isset($_REQUEST['page_show_info']))
+	    	$page_show_info = $_REQUEST['page_show_info'];
+	    else
+		    $page_show_info = 0;
       // Update it
       $result = sql_query("UPDATE {$db_prefix}pages SET `title` = '{$page_title}', `content` = '{$page_content}' WHERE `page_id` = '{$page_id}'");
       if($result) {
@@ -71,9 +75,10 @@ global $cmsurl, $db_prefix, $l, $settings, $user;
     if (@$_REQUEST['did']) {
       $did = clean($_REQUEST['did']);
       sql_query("DELETE FROM {$db_prefix}pages WHERE `page_id` = '$did'") or die(mysql_error());
+      redirect('index.php?action=admin;sa=managepages');
     }
     // Or are we supposed to create a page?
-    if(!empty($_REQUEST['make_page'])) {
+    if(!empty($_REQUEST['create_page'])) {
       $settings['page']['make_page']['do'] = true;  
       // Who is the Page Owner? (Their User ID)
       $page_owner = clean($user['id']);
@@ -82,12 +87,16 @@ global $cmsurl, $db_prefix, $l, $settings, $user;
       // The Time stamp of when it was made
       $create_date = time();
       // Clean the page's title
-      $title = clean($_REQUEST['page_title']);
+		  if (!($title = clean($_REQUEST['page_title']))) {
+		    // They didn't even enter a page title
+		    $_SESSION['error'] = $l['managepages_no_title'];
+		    redirect('index.php?action=admin;sa=managepages');
+		  }
       // Insert it
-      $result = sql_query("INSERT INTO1 {$db_prefix}pages (`page_owner`,`owner_name`,`create_date`,`title`) VALUES('{$page_owner}','{$owner_name}','{$create_date}','{$title}')");
+      $result = sql_query("INSERT INTO {$db_prefix}pages (`page_owner`,`owner_name`,`create_date`,`title`) VALUES('{$page_owner}','{$owner_name}','{$create_date}','{$title}')");
       if(!$result) {
         // Oh NOES! It failed!
-        $_SESSION['error'] = str_replace('%title%',$title,$l['adminpage_make_fail']);
+        $_SESSION['error'] = str_replace('%title%',$title,$l['managepages_make_fail']);
       }
       redirect('index.php?action=admin;sa=managepages');
     }
@@ -124,7 +133,7 @@ global $cmsurl, $db_prefix, $l, $settings, $user;
     // Lets make it simple, count how many pages their are
     $settings['page']['num_pages'] = count($pages);
     // Set page title, and load ManagePages template
-    $settings['page']['title'] = $l['adminpage_make_title'];
+    $settings['page']['title'] = $l['managepages_title'];
     loadTheme('ManagePages');
   }
   else {

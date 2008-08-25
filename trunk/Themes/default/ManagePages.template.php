@@ -36,22 +36,16 @@ global $cmsurl, $settings, $l, $user, $theme_url;
   }
   echo '
   <form action="'.$cmsurl.'index.php?action=admin;sa=managepages" method="post">
-    <table>
-      <tr>
-        <td>'.$l['managepages_pagetitle'].'</td><td><input name="page_title" type="text" value=""/></td>
-      </tr>
-      <tr>
-        <td>&nbsp;</td><td><input name="make_page" type="submit" value="'.$l['managepages_makepage'].'"/></td>
-      </tr>
-    </table>
+    <p><input type="hidden" name="create_page" value="true"></p>
+    <p>'.$l['managepages_pagetitle'].' <input name="page_title" type="text" /> <input type="submit" value="'.$l['managepages_createpage'].'" /></p>
   </form>';
   if($settings['page']['num_pages']>0) {
     echo '
     <table width="100%" style="text-align: center">
       <tr>
-        <th style="border-style: solid; border-width: 1px">'.$l['adminpages_title_td'].'</th>
-        <th style="border-style: solid; border-width: 1px">'.$l['adminpages_pageowner'].'</th>
-        <th style="border-style: solid; border-width: 1px">'.$l['adminpages_datemade'].'</th>
+        <th style="border-style: solid; border-width: 1px">'.$l['managepages_pagetitle'].'</th>
+        <th style="border-style: solid; border-width: 1px">'.$l['managepages_pageowner'].'</th>
+        <th style="border-style: solid; border-width: 1px">'.$l['managepages_datemade'].'</th>
         <th></th>
       </tr>';
     foreach($settings['page']['pages'] as $page) {
@@ -84,6 +78,7 @@ global $cmsurl, $settings, $l, $user;
   echo '
   <p>'.$l['managepages_edit_desc'].'</p>
   <form action="'.$cmsurl.'index.php?action=admin;sa=managepages" method="post">
+    <p><input type="hidden" name="update_page" value="true" /></p>
     <table>
       <tr>
         <td>'.$l['managepages_editpage_title'].'</td><td><input name="page_title" type="text" value="'.$settings['page']['edit_page']['title'].'"/></td>
@@ -96,7 +91,7 @@ global $cmsurl, $settings, $l, $user;
       </tr>
       <input name="page_id" type="hidden" value="'.$settings['page']['edit_page']['page_id'].'"/>
       <tr>
-        <td>&nbsp;</td><td><input name="update_page" type="submit" value="'.$l['managepages_editpage_button'].'"/></td>
+        <td>&nbsp;</td><td><input type="submit" value="'.$l['managepages_editpage_button'].'"/></td>
       </tr>
     </table>
   </form>'; 

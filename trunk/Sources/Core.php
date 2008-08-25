@@ -38,6 +38,16 @@ function clean($str) {
   return $str;
 }
 
+// And a version for use instead HTTP headers
+function clean_header($str) {
+  $replace = array(
+    ':' => '&#58;',
+    '\n' => ' ',
+    '\r' => ' '
+  );
+  return str_replace(array_keys($replace), array_values($replace), $str);
+}
+
 // Loads up the $user array, such as their member group, IP, email, if they are logged in or not
 // It will also revive their session if they left, but had remember me on
 function loadUser() {
