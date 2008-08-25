@@ -76,14 +76,18 @@ global $cmsurl, $db_prefix, $l, $settings, $user;
       // Change groups' names and which one is default
       if (@$_REQUEST['change_groups']) {
         $default_group = clean($_REQUEST['default_group']);
-        sql_query("UPDATE {$db_prefix}settings SET `value` = '$default_group' WHERE `variable` = 'default_group'") or ($_SESSION['error'] = $l['permissions_error_change']);
-        foreach ($_REQUEST as $key => $value) {
-         if (substr($key,0,6) == 'group_') {
-           $group_id = clean(substr($key,6,strlen($key)));
-           $group_name = clean($value);
-           sql_query("UPDATE {$db_prefix}membergroups SET `groupname` = '$group_name' WHERE `group_id` = '$group_id'") or ($_SESSION['error'] = $l['permissions_error_change']);
-         }
+        if ($default_group != -1) {
+          sql_query("UPDATE {$db_prefix}settings SET `value` = '$default_group' WHERE `variable` = 'default_group'") or ($_SESSION['error'] = $l['permissions_error_change']);
+          foreach ($_REQUEST as $key => $value) {
+            if (substr($key,0,6) == 'group_') {
+              $group_id = clean(substr($key,6,strlen($key)));
+              $group_name = clean($value);
+              sql_query("UPDATE {$db_prefix}membergroups SET `groupname` = '$group_name' WHERE `group_id` = '$group_id'") or ($_SESSION['error'] = $l['permissions_error_change']);
+            }
+          }
         }
+        else
+          $_SESSION['error'] = $l['permissions_error_default_guest'];
         redirect('index.php?action=admin;sa=permissions');
       }
       // Create a new group

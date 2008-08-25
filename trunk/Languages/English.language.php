@@ -271,6 +271,7 @@ $l['permissions_perm_manage_groups'] = 'Allow them to manage member groups';
 $l['permissions_perm_manage_forum'] = 'Allow them to Manage the Forum';
 $l['permissions_error_change'] = 'Changing member groups failed.';
 $l['permissions_error_new'] = 'Adding member group failed.';
+$l['permissions_error_default_guest'] = 'Cannot make guest group default.';
 $l['permissions_error_delete'] = 'Deleting member group failed.';
 $l['permissions_error_delete_admin'] = 'Cannot delete administrative group.';
 $l['permissions_error_delete_guest'] = 'Cannot delete guest group.';
