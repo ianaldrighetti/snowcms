@@ -369,6 +369,8 @@ $l['mf_link_cats_desc'] = 'Create, Edit, and Delete forum categories';
 $l['mf_link_boards'] = 'Manage Boards';
 $l['mf_link_boards_desc'] = 'You can create, edit and delete your boards in your forum here';
 $l['managecats_title'] = 'Manage Categories';
+$l['mf_link_perms'] = 'Forum Permissions';
+$l['mf_link_perms_desc'] = 'Here is where you can edit permissions for each board and each member group';
 // Manage Categories
 $l['mf_new_category'] = 'New Category';
 $l['managecats_add_header'] = 'Add Category';

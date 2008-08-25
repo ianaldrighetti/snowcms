@@ -23,6 +23,7 @@ global $cmsurl, $db_prefix, $l, $settings, $source_dir, $user;
     $fa = array(
       'boards' => array('ManageForum.php','ManageBoards'),
       'categories' => array('ManageForum.php','ManageCats'),
+      'permissions' => array('Permissions.php','ForumPerms')
     );
     if(is_array(@$fa[$_REQUEST['fa']])) {
       require_once($source_dir.'/'.$fa[$_REQUEST['fa']][0]);

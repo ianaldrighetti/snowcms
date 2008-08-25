@@ -209,4 +209,8 @@ global $cmsurl, $db_prefix, $l, $settings, $permissions, $user;
     loadTheme('Permissions','NoGroup');
   }
 }
+
+function ForumPerms() {
+global $cmsurl, $db_prefix, $l, $settings, $user;
+}
 ?>

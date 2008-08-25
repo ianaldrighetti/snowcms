@@ -15,6 +15,10 @@ global $cmsurl, $db_prefix, $l, $settings, $user;
   <div class="acp_right">
     <p class="main"><a href="', $cmsurl, 'index.php?action=admin;sa=forum;fa=boards" title="', $l['mf_link_boards'], '">', $l['mf_link_boards'], '</a></p>
     <p class="desc">', $l['mf_link_boards_desc'], '</p>  
+  </div>
+  <div class="acp_left">
+    <p class="main"><a href="', $cmsurl, 'index.php?action=admin;sa=forum;fa=permissions" title="', $l['mf_link_perms'], '">', $l['mf_link_perms'], '</a></p>
+    <p class="desc">', $l['mf_link_perms_desc'], '</p>
   </div>';
 }
 
