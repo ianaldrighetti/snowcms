@@ -7,7 +7,6 @@ if(!defined('Snow'))
 function Main() {
 global $cmsurl, $settings, $l, $user, $theme_url;
   echo '
-    <h2>'.$l['permissions_header'].'</h2>
     <p>'.$l['permissions_desc'].'</p>
   
   <form action="'.$cmsurl.'index.php?action=admin;sa=permissions" method="post" style="display: inline">

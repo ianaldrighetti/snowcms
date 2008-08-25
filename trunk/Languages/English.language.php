@@ -269,6 +269,11 @@ $l['permissions_perm_view_profile'] = 'Let them view others profiles';
 $l['permissions_perm_manage_mail_settings'] = 'Allow them to edit mail settings';
 $l['permissions_perm_manage_groups'] = 'Allow them to manage member groups';
 $l['permissions_perm_manage_forum'] = 'Allow them to Manage the Forum';
+$l['permissions_error_change'] = 'Changing member groups failed.';
+$l['permissions_error_new'] = 'Adding member group failed.';
+$l['permissions_error_delete'] = 'Deleting member group failed.';
+$l['permissions_error_delete_admin'] = 'Cannot delete administrative group.';
+$l['permissions_error_delete_default'] = 'Cannot delete default group.';
 
 // ManageMembers.template.php
 $l['managemembers_title'] = 'Manage Members';

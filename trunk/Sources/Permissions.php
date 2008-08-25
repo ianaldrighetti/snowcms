@@ -76,24 +76,36 @@ global $cmsurl, $db_prefix, $l, $settings, $user;
       // Change groups' names and which one is default
       if (@$_REQUEST['change_groups']) {
         $default_group = clean($_REQUEST['default_group']);
-        sql_query("UPDATE {$db_prefix}settings SET `value` = '$default_group' WHERE `variable` = 'default_group'") or die(mysql_error());
+        sql_query("UPDATE {$db_prefix}settings SET `value` = '$default_group' WHERE `variable` = 'default_group'") or ($_SESSION['error'] = $l['permissions_error_change']);
         foreach ($_REQUEST as $key => $value) {
          if (substr($key,0,6) == 'group_') {
            $group_id = clean(substr($key,6,strlen($key)));
            $group_name = clean($value);
-           sql_query("UPDATE {$db_prefix}membergroups SET `groupname` = '$group_name' WHERE `group_id` = '$group_id'") or die(mysql_error());
+           sql_query("UPDATE {$db_prefix}membergroups SET `groupname` = '$group_name' WHERE `group_id` = '$group_id'") or ($_SESSION['error'] = $l['permissions_error_change']);
          }
         }
+        redirect('index.php?action=admin;sa=permissions');
       }
       // Create a new group
       if (@$_REQUEST['new_group']) {
         $new_group = clean($_REQUEST['new_group']);
-        sql_query("INSERT INTO {$db_prefix}membergroups (`groupname`) VALUES ('$new_group')") or die(mysql_error());
+        sql_query("INSERT INTO {$db_prefix}membergroups (`groupname`) VALUES ('$new_group')") or ($_SESSION['error'] = $l['permissions_error_new']);
+        redirect('index.php?action=admin;sa=permissions');
       }
       // Delete a group
       if (@$_REQUEST['did']) {
         $group = clean($_REQUEST['did']);
-        sql_query("DELETE FROM {$db_prefix}membergroups WHERE `group_id` = '$group'") or die(mysql_error());
+        if ($group != 1)
+          if ($group != $settings['default_group']) {
+            $continue = sql_query("UPDATE {$db_prefix}members SET `group` = '{$settings['default_group']}' WHERE `group` = '$group'") or ($_SESSION['error'] = $l['permissions_error_delete']);
+            if ($continue)
+              sql_query("DELETE FROM {$db_prefix}membergroups WHERE `group_id` = '$group'") or ($_SESSION['error'] = $l['permissions_error_delete']);
+          }
+          else
+            $_SESSION['error'] = $l['permissions_error_delete_default'];
+        else
+          $_SESSION['error'] = $l['permissions_error_delete_admin'];
+        redirect('index.php?action=admin;sa=permissions');
       }
       // Load the list of member groups, etc
       $result = sql_query("
