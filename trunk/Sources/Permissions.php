@@ -233,11 +233,28 @@ global $cmsurl, $db_prefix, $forumperms, $l, $settings, $user;
         loadTheme('Permissions','NoCats');
       }
       else {
+        $cats = array();
+        while($row = mysql_fetch_assoc($result)) {
+          $cats[$row['cid']] = array(
+            'id' => $row['cid'],
+            'name' => $row['cname'],
+            'boards' => array()
+          );
+        }
         $result = sql_query("
           SELECT
             b.bid, b.name, b.cid, b.border
           FROM {$db_prefix}boards AS b
           ORDER BY b.border ASC");
+        while($row = mysql_fetch_assoc($result)) {
+          $cats[$row['cid']]['boards'][] = array(
+            'id' => $row['bid'],
+            'name' => $row['name']
+          );
+        }
+        $settings['page']['cats'] = $cats;
+        $settings['page']['title'] = $l['mf_perms_title'];
+        loadTheme('Permissions','ListBoards');
       }
     }
   }

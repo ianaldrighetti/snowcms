@@ -289,6 +289,10 @@ $l['permissions_error_delete'] = 'Deleting member group failed.';
 $l['permissions_error_delete_admin'] = 'Cannot delete administrative group.';
 $l['permissions_error_delete_guest'] = 'Cannot delete guest group.';
 $l['permissions_error_delete_default'] = 'Cannot delete default group.';
+// Sub part for Board Permissions
+$l['mf_perms_title'] = 'Manage Board Permissions';
+$l['mf_perms_header'] = 'Board Permissions';
+$l['mf_perms_desc'] = 'Choose a board below, and from there, you can choose a member group to edit permissions for that are allowed access to that board.';
 
 // ManageMembers.template.php
 $l['managemembers_title'] = 'Manage Members';

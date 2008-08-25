@@ -85,4 +85,10 @@ global $cmsurl, $settings, $l, $user;
     </fieldset>
   </form>';
 }
+
+function ListBoards() {
+global $cmsurl, $settings, $l, $user;
+  echo '<h3>', $l['mf_perms_header'], '</h3>
+        <p>', $l['mf_perms_desc'], '</p>';
+}
 ?>
