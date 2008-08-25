@@ -88,7 +88,34 @@ global $cmsurl, $settings, $l, $user;
 
 function BoardPerms() {
 global $cmsurl, $settings, $l, $user;
-  echo '<h3>', $l['mf_perms_header'], '</h3>
-        <p>', $l['mf_perms_desc'], '</p>';
+  echo '
+  <h3>', $l['mf_perms_header'], '</h3>
+  <p>', $l['mf_perms_desc'], '</p>
+  <table width="100%">';    
+    foreach($settings['cats'] as $cat) {
+      echo '
+      <tr>
+        <td colspan="2">', $cat['name'], '</td>
+      </tr>';
+      if(count($cat['boards'])) {
+        foreach($cat['boards'] as $board) {
+          echo '
+          <tr style="margin-left: 10px;">
+            <td width="90%">', $board['name'], '</td><td width="5%"><a href="', $cmsurl, 'index.php?action=admin;sa=forum;fa=permissions;bid=', $board['id'], '">', $l['mf_perms_manage'], '</a></td>
+          </tr>';
+        }
+      }
+    }
+  echo '
+  </table>';
+}
+
+function NoCats() {
+global $cmsurl, $settings, $l, $user;
+  echo '
+  <h3>', $l['mf_perms_header'], '</h3>
+  <p>', $l['mf_perms_desc'], '</p>
+  <br />
+  <p style="text-align: center; color: red;">', $l['mf_perms_nocats'], '</p>';
 }
 ?>

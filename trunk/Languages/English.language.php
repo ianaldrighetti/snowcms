@@ -293,6 +293,8 @@ $l['permissions_error_delete_default'] = 'Cannot delete default group.';
 $l['mf_perms_title'] = 'Manage Board Permissions';
 $l['mf_perms_header'] = 'Board Permissions';
 $l['mf_perms_desc'] = 'Choose a board below, and from there, you can choose a member group to edit permissions for that are allowed access to that board.';
+$l['mf_perms_manage'] = 'Manage';
+$l['mf_perms_nocats'] = 'Error! It appears you don\'t have any <a href="'. $cmsurl. 'index.php?action=admin;sa=forum;fa=categories">categories</a> made, please make some if you want to access this</p>';
 
 // ManageMembers.template.php
 $l['managemembers_title'] = 'Manage Members';
