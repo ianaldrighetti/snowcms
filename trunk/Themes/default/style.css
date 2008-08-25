@@ -244,3 +244,6 @@ th.border {
 input {
   border: 1px solid #DDDDDD;
 }
+select {
+  width: 153px;
+}
