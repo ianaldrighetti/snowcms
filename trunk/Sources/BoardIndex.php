@@ -14,7 +14,9 @@
 if(!defined("Snow"))
   die("Hacking Attempt...");
 
-// This function loads up the forum index  
+// This function loads up the forum index
+// It shows the categories and then the boards within the categories with board information
+// Like last post, how many posts and topics, etc...
 function BoardIndex() {
 global $cmsurl, $db_prefix, $l, $settings, $user;
   if(can('view_forum')) {
@@ -28,6 +30,8 @@ global $cmsurl, $db_prefix, $l, $settings, $user;
           'boards' => array()
         );
       }
+    // Query for the boards! LEFT JOINs galore!
+    // !!! Needs Improvement :)
     $result = sql_query("
       SELECT 
         b.bid AS board_id, b.name, b.bdesc, b.who_view, b.numtopics, b.numposts, b.last_msg, b.last_uid, b.last_name, b.cid, log.uid AS is_new, log.bid,
@@ -62,17 +66,20 @@ global $cmsurl, $db_prefix, $l, $settings, $user;
                          )
         );
       }
+    // Just some stuff and checks :)
     foreach($cats as $cat) {
       if(!count($cats[$cat['id']]['boards'])) {
         // Dont show a category if it has no boards...
         unset($cats[$cat['id']]);
       }
     }
+    // Load it up
     $settings['forum']['cats'] = $cats;
     $settings['page']['title'] = $l['forum_title'];
     loadForum('BoardIndex');
   }
   else {
+    // Go away! :P You should not be here
     $settings['page']['title'] = $l['forum_error_title'];
     loadForum('Error','BNotAllowed');
   }

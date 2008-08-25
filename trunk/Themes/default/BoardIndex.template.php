@@ -3,7 +3,10 @@
 
 if(!defined('Snow'))
   die('Hacking Attempt...');
-  
+
+// This constructs the Board Index of the forum, which shows categories, boards
+// and information about the boards, like the description, number of posts and topics
+// and the last post information, if any
 function Main() {
 global $cmsurl, $theme_url, $l, $settings, $user;
   foreach($settings['forum']['cats'] as $cat) {

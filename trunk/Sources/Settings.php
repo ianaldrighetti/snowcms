@@ -71,6 +71,8 @@ global $cmsurl, $db_prefix, $l, $settings, $user, $language_dir, $theme_dir, $th
           'type' => 'text'
         )
     );
+    // You can add options into the above array, with the name of the setting in the settings table...
+    // Make sure you made a $l var for it and inserted a row for it in the table
     
     // Get the language values
     foreach (scandir($language_dir) as $language)

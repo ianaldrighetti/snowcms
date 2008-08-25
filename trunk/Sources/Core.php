@@ -218,6 +218,8 @@ global $db_prefix, $perms, $user, $forumperms;
   return $perms;
 }
 
+// Loads up the permissions, except this is for the forum permissions,
+// So we can make sure you are allowed to edit/delete/move/etc
 function loadBPerms() {
 global $bperms, $db_prefix, $user, $forumperms;
   $bperms = array();
@@ -274,12 +276,14 @@ global $db_prefix, $settings, $user;
     $action_or_page = 'page:'. clean($_REQUEST['page']);
   else
     $action_or_page = 0;
+  // Select all rows
   $result = sql_query("
     SELECT
       *
     FROM {$db_prefix}online");
   $id_del = array();
   $ip_del = array();
+  // While Loop =D Load all expired IP's and user_id's, and the current users as well
   while($row = mysql_fetch_assoc($result)) {
     if($user['is_logged'] && $row['user_id'] = $user['id'])
       $id_del[] = $user['id'];
@@ -290,10 +294,12 @@ global $db_prefix, $settings, $user;
     elseif($user['id'] == 0 && $row['ip'] = $user['ip'])
       $ip_del[] = $row['ip'];
   }
+  // Delete them all that aren't needed :)
   if(count($id_del))
     sql_query("DELETE FROM {$db_prefix}online WHERE `user_id` IN(". implode(",", $id_del). ")");
   if(count($ip_del))
     sql_query("DELETE FROM {$db_prefix}online WHERE `ip` IN('". implode("','", $ip_del). "') AND `sc` = 'guest'");
+  // We deleted theirs, make a new one...
   sql_query("INSERT INTO {$db_prefix}online (`user_id`,`sc`,`ip`,`page`,`last_active`) VALUES('{$user['id']}','{$user['sc']}','{$user['ip']}','{$action_or_page}','".time()."')") or die(mysql_error());
 }
 
@@ -334,6 +340,8 @@ global $bperms, $user;
 // Creates a random session id
 function create_sid() {
 global $db_prefix;
+  // This creates a random session ID, and it saves it into their users row...
+  // !!! This function will probably be removed later on... Maybe
   if(empty($_SESSION['sc'])) {  
     $string = mkstring();
     $result = sql_query("SELECT * FROM {$db_prefix}members WHERE `sc` = '{$string}'");
@@ -362,6 +370,7 @@ function mkstring() {
     $string = $string.$tmp;
     $i++;
   }
+  // Returns it to the place it was called upon
   return $string;
 }
 // Formats the time with the time format in settings If timestamp is unset, get the current time
@@ -452,6 +461,7 @@ global $theme_dir, $theme_url, $settings;
   return $str;
 }
 
+// Our Version of mysql_query(), this function looks sad right now, but will be improved sooner or later...
 function sql_query($query) {
   $result = mysql_query($query);
   if(!$result) {
@@ -467,6 +477,10 @@ function sql_query($query) {
   return $result;
 }
 
+/* 
+  This is called upon when a MySQL Connection Error Occurs, and hopefully won't look so devastating
+  when it occurs, hopefully...
+*/
 function MySQLError($error) {
 echo '
 <html>
@@ -521,14 +535,19 @@ global $db_prefix, $user;
     'sticky_topic' => false,
     'split_topic' => false
   ); 
+  // ^^^ Should be moved somewhere else, such as inside the loadPerms(); function (No, not the loadBPerms(); function!) ^^^
+  
 // !!! This function changes (forcefully) the separator from & to ;
 // !!! This function needs improvement!!!!
 function cleanQuery() {
 global $_REQUEST, $_GET;
+  // Make sure there is even somehting that needs handling, we don't want errors
   if(!empty($_SERVER['QUERY_STRING'])) {
+  // EXPLOSION! Quick and Dirty
   $matches = explode(";", $_SERVER['QUERY_STRING']);
     if(count($matches)) {
       foreach($matches as $arg) {
+        // EXPLODED! Again, make the new $_GET and $_REQUEST variables
         $new = explode("=", $arg);
         $_GET[$new[0]] = $new[1];
         $_REQUEST[$new[0]] = $new[1];
@@ -608,7 +627,7 @@ global $db_prefix, $user;
   if (@$_POST['change-language']) {
     // Oh wait, it is
     $language = clean(@$_POST['change-language']);
-    
+    // If they are a user, it can be saved, however, if it is a guest, it can only be done via a cookie
     if ($user['is_logged'] == true)
       sql_query("UPDATE {$db_prefix}members SET `language` = '$language' WHERE `id` = '{$user['id']}'");
     else

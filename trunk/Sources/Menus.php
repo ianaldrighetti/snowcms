@@ -40,8 +40,9 @@ global $l, $settings, $db_prefix;
       $link_new_window = @$_REQUEST['new_link_new_window'] == true;
       $link_main = @$_REQUEST['new_link_main'] == true;
       $link_sidebar = (@$_REQUEST['new_link_sidebar'] == true) * 2;
-      $link_menu = $link_main + $link_sidebar;
+      $link_menu = (int)$link_main + $link_sidebar;
       $link_order = clean(@$_REQUEST['new_link_order']);
+      // Now the Query for the new link :-D
       sql_query("
       INSERT INTO {$db_prefix}menus
       (
@@ -60,10 +61,12 @@ global $l, $settings, $db_prefix;
       )
       ");
     }
+    // Redirect back home
     redirect('index.php?action=admin;sa=menus');
   }
   // Delete a link
-  if (@$_REQUEST['did']) {
+  if (!empty($_REQUEST['did'])) {
+    // Get the link ID they want to delete
     $did = clean($_REQUEST['did']);
     sql_query("DELETE FROM {$db_prefix}menus WHERE `link_id` = '$did'");
     redirect('index.php?action=admin;sa=menus');
@@ -82,14 +85,12 @@ global $l, $settings, $db_prefix;
             'menu' => $row['menu']
           );
     }
+    // We need to reload the menus, so they are up to date
     loadMenus();
     $settings['menus']['menus'] = $menus;
     loadTheme('ManageMenus');
   }
   else
-    loadTheme('ManageMenus','NoMenus');
-  
-  
+    loadTheme('ManageMenus','NoMenus'); 
 }
-
 ?>

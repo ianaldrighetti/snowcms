@@ -1,13 +1,18 @@
 <?php
+/*
+   This is the installer file for SnowCMS (http://www.snowcms.com/)
+   Access this file in your browser to install your SnowCMS Setup
+   Once you are done, make sure you delete this file IMMEDIATELY!
+*/
 // Check if already installed
 define("Snow", true);
 require_once('./config.php');
 if ($scms_installed)
  die("Hacking Attempt...");
-
+// Define some files that we should check if they exist, as they are pretty important ;)
 $files = array(
   './Languages',
-  './Languages/english.language.php',
+  './Languages/English.language.php',
   './Sources',
   './Themes',
   './Themes/default',
@@ -101,6 +106,7 @@ $files = array(
       else {
         // Sure we don't actually use mysql_select_db, but lets just check if they are allowed to access it ;)
         $mysql_select_db = @mysql_select_db($_REQUEST['mysql_db']);
+        // We couldn't select that database, usually means that the MySQL Username is not assign to that database :S
         if(!$mysql_select_db) {
         echo '
         <h1>Step 1</h1>
@@ -111,8 +117,11 @@ $files = array(
           // Get the MySQL Queries from the SQL file :D
           $db_prefix = $_REQUEST['mysql_prefix'];
           $sqls = file_get_contents('./install.sql');
+          // Replace a couple things so it is done right
           $sqls = str_replace('%current_time%',time(),str_replace('{$db_prefix}', $db_prefix, $sqls));
+          // Separate the Queries the easy way xD
           $mysql_queries = explode(";", $sqls);
+          // MySQL Errors? No thanks!
           $mysql_errors = array();
           $num_queries = count($mysql_queries);
           foreach($mysql_queries as $query) {
@@ -133,11 +142,13 @@ $files = array(
             echo '</p>';
           }
           else {
+            // Get the current directory for settings
             $currentdir = dirname(__FILE__);
             $iurl = explode('/', $_SERVER['SERVER_NAME'].$_SERVER['REQUEST_URI']);
 			unset($iurl[count($iurl)-1]);
 			$iurl = implode('/', $iurl);
 			$installpath = 'http://'.$iurl.'/';
+            // Now get details, such as directory paths, and administrative details
             echo '<h1>You\'re almost done!</h1>
             <p>Your MySQL database has been populated with the initial data. Now you need to create your administrator account and a few other settings.</p>';
             echo '
@@ -184,6 +195,7 @@ $files = array(
       }
     }
     elseif($step==2) {
+    // Create the config.php file which holds details about MySQL and paths we will need all the time
 $config = '<?php
 //                 SnowCMS
 //           By aldo and soren121
@@ -218,6 +230,7 @@ $theme_url = \''.$_REQUEST['theme_url'].'\'; # URL to your SnowCMS Themes folder
 $db_prefix = \'`\'.$mysql_db.\'`.\'.$mysql_prefix;
 $scms_installed = true;
 ?>';
+    // Now make the admin account
     mysql_connect($_REQUEST['mysql_host'], $_REQUEST['mysql_user'], $_REQUEST['mysql_pass']);
     mysql_select_db($_REQUEST['mysql_db']);
     $admin = mysql_query("INSERT INTO {$_REQUEST['mysql_prefix']}members (`username`,`display_name`,`password`,`email`,`reg_date`,`reg_ip`,`group`,`activated`) VALUES('".addslashes(mysql_real_escape_string($_REQUEST['admin_user']))."','".addslashes(mysql_real_escape_string($_REQUEST['admin_user']))."','".md5($_REQUEST['admin_pass'])."','".addslashes(mysql_real_escape_string($_REQUEST['admin_email']))."','".time()."','".$_SERVER['REMOTE_ADDR']."','1','1')");
@@ -229,6 +242,7 @@ $scms_installed = true;
     else {
       echo '<p>Something went wrong while trying to create your admin account. Info: '.mysql_error().'</p>';
     }
+    // Oh noes! the config.php file was NOT writeable, so we will let them copy it and paste it without having to start all over again :)
     if(!is_writeable('./config.php')) {
       echo '
       <p>Your config.php file was not writeable. To make your SnowCMS installation work, please open up your config.php file and put this in it:</p><br />
@@ -237,6 +251,7 @@ $scms_installed = true;
       </textarea>';
     }
     else {
+      // Yay! Write it to the config.php file, and your good to go!
       $check = file_put_contents('./config.php', $config);
       echo '<p>Your config.php file has been set! You\'re ready to go!</p>';
     }

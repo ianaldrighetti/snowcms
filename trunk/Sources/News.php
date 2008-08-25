@@ -100,7 +100,7 @@ global $cmsurl, $db_prefix, $l, $settings, $user;
           WHERE 
             c.nid = $news_id AND isApproved = 1 AND isSpam = 0
           ORDER BY c.post_time DESC");
-        
+        // Load up the comments into an array
         while($row = mysql_fetch_assoc($result)) {
           $comments[] = array(
             'id' => $row['cid'],
@@ -114,6 +114,7 @@ global $cmsurl, $db_prefix, $l, $settings, $user;
             'isSpam' => $row['isSpam']
           );
         }
+        // Free! ITS FREE!
         mysql_free_result($result);
       }
       // Load it up :D (the theme thingy)

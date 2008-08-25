@@ -3,6 +3,7 @@
 if(!defined('Snow'))
   die("Hacking Attempt...");
 
+// Shows the login form, enter your username, password, and choose your desired session length =D
 function Main() {
 global $cmsurl, $settings, $l, $user;
   echo '
@@ -40,6 +41,7 @@ global $cmsurl, $settings, $l, $user;
   </form>';
 }
 
+// Logout error Occurred, usually if not always because your Session ID was not right/valid
 function LogoutError() {
 global $cmsurl, $settings, $l, $user;
   echo '

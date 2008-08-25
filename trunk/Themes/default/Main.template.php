@@ -3,7 +3,9 @@
 
 if(!defined('Snow'))
   die("Hacking Attempt...");
-  
+
+// If you want to change the layout of the site, you can edit this file, and it will change the layout of your site
+// However, if you want to change your forums layout, look at Forum.template.php 
 function theme_header() {
 global $l, $cmsurl, $theme_url, $settings, $user;
 echo '<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
@@ -28,6 +30,7 @@ echo '<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
 	</div>
 	<div id="sidebar">
 	<ul>';
+	  // Show the Side Menu
 	  theme_menu('side');
 	echo '
 	</ul>
@@ -44,7 +47,7 @@ echo '<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
 // Call on by either theme_menu('main'); or theme_menu('side')
 function theme_menu($which) {
 global $l, $cmsurl, $settings, $user;
-  
+  // Is there even any links? Lol.
   if(count($settings['menu'][$which])>0) {
     foreach($settings['menu'][$which] as $link) {
       echo '<li><a href="'.$link['href'].'" '.$link['target'].'>'.$link['name'].'</a></li>';
@@ -61,6 +64,11 @@ global $l, $cmsurl, $settings, $user;
       echo '<li><a href="'.$cmsurl.'index.php?action=admin">'.$l['main_sidebar_control_panel'].'</a></li>';
   }  
 }
+
+// The footer of your site!
+// Please do NOT remove the Powered By link, it helps support SnowCMS
+// By getting more users, if you do remove it, we can and will deny
+// you of support for your SnowCMS installation. Thanks!
 function theme_footer() {
 global $cmsurl, $theme_url, $settings, $user;
 echo '

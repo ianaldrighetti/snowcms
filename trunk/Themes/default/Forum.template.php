@@ -3,7 +3,8 @@
 
 if(!defined('Snow')) 
   die('Hacking Attempt...');
-  
+
+// The main part, the forum header which has the main menu, the meta data, and more
 function forum_header() {
 global $cmsurl, $theme_url, $l, $settings, $user;
 echo '
@@ -40,6 +41,7 @@ echo '
   </div>'. link_tree();
 }
 
+// This constructs the link tree that is gotten from the linktree array in $settings
 function link_tree() {
 global $settings;
   $tree = array();
@@ -49,6 +51,7 @@ global $settings;
   return '<p class="link_tree">'. implode(" > ", $tree). '</p>';
 }
 
+// The forum footer function, you can change the copyright here, though we will have a setting to do that soon
 function forum_footer() {
 global $cmsurl, $theme_url, $settings, $user;
 echo link_tree(). '

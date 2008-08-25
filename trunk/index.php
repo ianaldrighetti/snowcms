@@ -12,9 +12,10 @@ error_reporting(E_ALL);
 // 
 //            index.php file 
 
+// Stops people from trying to access files in other directories
 define("Snow", true);
 
-// Load Some Important Files
+// Load the config.php file, this has our MySQL connection info, and other stuff needed
 require_once('./config.php'); 
 // SnowCMS is not installed, so take them to the installer so they can install SnowCMS
 if(!$scms_installed)
@@ -22,7 +23,7 @@ if(!$scms_installed)
 // Load Core.php, this file has many things we need, such as the functions we will call on soon :)
 require_once($source_dir.'/Core.php');
 
-  // Connect to MySQL
+  // Connect to MySQL, or if it fails, make the error pretty :]
   @mysql_connect($mysql_host, $mysql_user, $mysql_passwd) or die(MySQLError(mysql_error()));
   
   cleanQuery();
@@ -34,7 +35,7 @@ require_once($source_dir.'/Core.php');
   loadPerms();
   loadMenus();
 // Write that this Guest/User is online
-  //WriteOnline();
+  WriteOnline();
   
   // What should we do? ._.
   if((empty($_REQUEST['action'])) && (empty($_REQUEST['page']))) {
@@ -73,9 +74,7 @@ require_once($source_dir.'/Core.php');
       require_once($source_dir.'/'.$actions[$_REQUEST['action']][0]);
         $actions[$_REQUEST['action']][1]();
     }
-  }
-  
+  }  
   // Remove any error messages so they aren't displayed again
   unset($_SESSION['error']);
-
 ?>

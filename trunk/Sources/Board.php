@@ -13,7 +13,15 @@
 
 if(!defined("Snow"))
   die("Hacking Attempt...");
-  
+
+
+/*
+   loadBoard() loads the board for your forum, it loads the specified board through forum.php?board=BOARD_ID
+   It also handles if this board is new or not, however it will only log that if you are a registered and 
+   logged in user on this site.
+   
+   Of course, this also makes sure you can view the board via the super useful SQL Function FIND_IN_SET
+*/
 function loadBoard() {
 global $cmsurl, $db_prefix, $l, $settings, $user;
   if(can('view_forum')) {
@@ -28,7 +36,13 @@ global $cmsurl, $db_prefix, $l, $settings, $user;
 	        VALUES ($Board_ID, {$user['id']})");
 	    }
 	  }
-    $result = sql_query("SELECT * FROM {$db_prefix}boards WHERE `bid` = '$Board_ID'");
+	  // Get the board requested
+	  // !!! This function needs MAJOR IMPROVEMENT!
+    $result = sql_query("
+      SELECT 
+        * 
+      FROM {$db_prefix}boards 
+      WHERE `bid` = '$Board_ID' AND {$user['board_query']}");
       while($row = mysql_fetch_assoc($result)) {
         $board = array(
           'id' => $row['bid'],
@@ -37,6 +51,7 @@ global $cmsurl, $db_prefix, $l, $settings, $user;
           'who_view' => @explode(",", $row['who_view'])
         );
       }
+    // Any board found? :P
     if(count($board)>0) {  
       // Before we do anything else, are they allowed to see this board? :o!
       if((!in_array($user['group'], $board['who_view'])) && ($user['group']!=1)) {
@@ -44,6 +59,7 @@ global $cmsurl, $db_prefix, $l, $settings, $user;
         loadForum('Error','CantViewB');    
       }
       else {
+        // Yup, lets go
         $start = 0;
         $result = sql_query("
           SELECT 
@@ -82,11 +98,13 @@ global $cmsurl, $db_prefix, $l, $settings, $user;
       }
     }
     else {
+      // No board has been found
       $settings['page']['title'] = $l['forum_error_title'];
       loadForum('Error','NoBoard');
     }
   }
   else {
+    // You aren't allowed to view this
     $settings['page']['title'] = $l['forum_error_title'];
     loadForum('Error','BNotAllowed');
   }

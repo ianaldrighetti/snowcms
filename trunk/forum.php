@@ -12,6 +12,7 @@ error_reporting(E_ALL);
 // 
 //            index.php file 
 
+// This is to stop access to files in other directories, Security I suppose
 define("Snow", true);
 
 // Load Some Important Files
@@ -22,7 +23,7 @@ if(!$scms_installed)
 // Load Core.php, this file has many things we need, such as the functions we will call on soon :)
 require_once($source_dir.'/Core.php');
 
-  // Connect to MySQL
+  // Connect to MySQL, if an Error Occurs, lets not make it look ugly =|
   @mysql_connect($mysql_host, $mysql_user, $mysql_passwd) or die(MySQLError(mysql_error()));
   
   cleanQuery();

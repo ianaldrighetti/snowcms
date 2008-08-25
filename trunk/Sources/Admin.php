@@ -17,13 +17,15 @@ if(!defined("Snow"))
   // Function Admin()
   ---------------------------------
   This function is almost like the index.php file, it lets us call un sub admin actions
-  Which allows you to adminisrate your site :P
+  Which allows you to adminisrate your site :P 
+  So this is kinda like index.php, just a sub one :)
   ---------------------------------
   
   // Function AdminHome()
   ---------------------------------
   The AdminHome() function is the what else, the ACP Home,
-  This gets the latest news and version of SnowCMS
+  This gets the latest news and version of SnowCMS, or gives
+  possible errors for why you couldn't get the news and such
   ---------------------------------  
 */  
   

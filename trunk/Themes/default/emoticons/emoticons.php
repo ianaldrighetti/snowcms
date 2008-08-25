@@ -1,4 +1,6 @@
 <?php
+// You can add smileys here
+// !!! This really should be somewhere else =\
 $smileys = array(
   ':)' => 'smile.png',
   ':(' => 'sad.png',
