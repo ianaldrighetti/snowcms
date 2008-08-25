@@ -61,7 +61,7 @@ require_once($source_dir.'/Core.php');
       'online' => array('Online.php','Online'),
       'profile' => array('Profile.php','Profile'),
       'register' => array('Register.php','Register'),
-      'register2' => array('Register.php','Register2')
+      'register3' => array('Register.php','Register3')
     );
     // Is this action they are requesting even in the $actions array? If not, we don't want an error message.
     // So, lets load the Home() Function

@@ -42,7 +42,7 @@ $l['register_password'] = 'Password:';
 $l['register_verify_password'] = 'Verify Password:';
 $l['register_email'] = 'Email:';
 $l['register_captcha'] = 'Enter the Text you see in the image';
-$l['register_success'] = 'Thank you '.@clean($_REQUEST['username']).'! Your account has been created successfully and you may now <a href="'.$cmsurl.'index.php?action=login">login</a>';
+$l['register_success'] = 'Thank you %username%! Your account has been created successfully and you may now <a href="'.$cmsurl.'index.php?action=login">login</a>';
 $l['register_successbut1'] = 'Thanks for registering! The administrators require you to activate your account via email, please check your email you used on your account, and click the link to activate your account.</p>
 
 <p>If you didn\'t receive your activation email, check your spam/bulk folder. Some email clients wrongly think our emails are spam. If you still can\'t find it, use the following form to resend your activation email.';
@@ -66,7 +66,8 @@ $l['register_error_passwords'] = 'Those passwords don\'t match!';
 $l['register_error_password_to_short'] = 'Your password is too short!';
 $l['register_error_invalid_email'] = 'That email address is invalid!';
 $l['register_error_captcha'] = 'You failed the CAPTCHA test! Please try again.';
-$l['register_error_unknown'] = 'An unknown error has disabled us from registering your account. Info: '.mysql_error();
+$l['register_error_activation_email'] = 'There was an error sending your activation email. Please wait for an administrator to manually register your account.';
+$l['register_error_unknown'] = 'An unknown error has disabled us from registering your account. Please try again later.';
 $l['register_button'] = 'Register';
 
 // Page.template.php

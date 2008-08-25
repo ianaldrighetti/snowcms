@@ -15,7 +15,8 @@ global $cmsurl, $settings, $l, $user;
   
   This causes a notice to appear.
   */ .
-  '<form action="'.$cmsurl.'index.php?action=register2" method="post">
+  '<form action="'.$cmsurl.'index.php?action=register" method="post">
+    <p><input type="hidden" name="register" value="true" /></p>
     <fieldset>
       <table>';
       if(count($settings['page']['error'])>0) {
@@ -49,7 +50,7 @@ global $cmsurl, $settings, $l, $user;
           <td>'.$l['register_captcha'].'</td><td><input name="captcha" type="text"/></td>
         </tr>
         <tr>
-          <td colspan="2"><input name="register" type="submit" value="'.$l['register_button'].'"/></td>
+          <td colspan="2"><input type="submit" value="'.$l['register_button'].'"/></td>
         </tr>
       </table>
     </fieldset>
@@ -58,7 +59,7 @@ global $cmsurl, $settings, $l, $user;
 function Success() {
 global $cmsurl, $settings, $l, $user;
   echo '
-  <p>'.$l['register_success'].'</p>';
+  <p>'.str_replace('%username%',$settings['page']['username'],$l['register_success']).'</p>';
 }
 
 function SuccessBut1() {
@@ -117,5 +118,12 @@ function ASuccess() {
 global $cmsurl, $settings, $l, $user;
   echo '
   <p>', $l['activate_account_activated'], '</p>';
+}
+
+function Failure() {
+global $l;
+  
+  echo '
+  <p>'.$l['register_error_activation_email'].'</p>';
 }
 ?>
