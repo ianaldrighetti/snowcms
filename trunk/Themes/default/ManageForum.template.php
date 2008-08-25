@@ -6,7 +6,6 @@ if(!defined('Snow'))
 function Main() {
 global $cmsurl, $db_prefix, $l, $settings, $user;
   echo '
-  <h2>', $l['manageforum_header'], '</h2>
   <p>', $l['manageforum_desc'], '</p>
   <br />
   <div class="acp_left">
@@ -61,7 +60,6 @@ global $cmsurl, $db_prefix, $l, $settings, $user, $theme_url;
 function ShowBoards() {
 global $cmsurl, $db_prefix, $l, $settings, $user, $theme_url;
   echo '
-  <h2>', $l['manageboards_header'], '</h2>
   <p>', $l['manageboards_desc'], '</p>';
   if(count($settings['cats'])) {
     echo '
@@ -98,7 +96,6 @@ global $cmsurl, $db_prefix, $l, $settings, $user, $theme_url;
 function AddBoard() {
 global $cmsurl, $db_prefix, $l, $settings, $user;
   echo '
-  <h2>', $l['manageboards_add_header'], '</h2>
   <form action="', $cmsurl, 'index.php?action=admin;sa=forum;fa=boards" method="post">  
     <table id="add_board">
       <tr class="category">
@@ -134,7 +131,6 @@ global $cmsurl, $db_prefix, $l, $settings, $user;
 function EditBoard() {
 global $cmsurl, $db_prefix, $l, $settings, $user;
   echo '
-  <h2>', $l['manageboards_edit_header'], '</h2>
   <form action="', $cmsurl, 'index.php?action=admin;sa=forum;fa=boards" method="post">  
     <table id="add_board">
       <tr class="category">

@@ -7,7 +7,6 @@ if(!defined('Snow'))
 function Main() {
 global $cmsurl, $settings, $l, $user;
   echo '
-  <h1>'.$l['register_header'].'</h1>
   <p>'.$l['register_details'].'</p>
   <script type="text/javascript" src="includes/jquery.js"></script>
   <script type="text/javascript" src="includes/jquery-pstrength.js"></script>'
@@ -59,14 +58,11 @@ global $cmsurl, $settings, $l, $user;
 function Success() {
 global $cmsurl, $settings, $l, $user;
   echo '
-  <h1>'.$l['register_header'].'</h1>
   <p>'.$l['register_success'].'</p>';
 }
 
 function SuccessBut1() {
 global $cmsurl, $settings, $l, $user;
-  echo '
-  <h1>'.$l['register_header'].'</h1>';
   if(empty($settings['page']['error'])) {
     echo '<p>'.$l['register_successbut1'].'</p>
     
@@ -82,14 +78,12 @@ global $cmsurl, $settings, $l, $user;
 function SuccessBut2() {
 global $cmsurl, $settings, $l, $user;
   echo '
-  <h1>'.$l['register_header'].'</h1>
   <p>'.$l['register_successbut2'].'</p>';
 }
 
 function AForm() {
 global $cmsurl, $settings, $l, $user;
   echo '
-  <h1>', $l['activate_header'], '</h1>
   <p>', $l['activate_desc'], '</p>
   <form action="', $cmsurl, 'index.php?action=activate" method="post">
     <fieldset>
@@ -122,7 +116,6 @@ global $cmsurl, $settings, $l, $user;
 function ASuccess() {
 global $cmsurl, $settings, $l, $user;
   echo '
-  <h1>', $l['activate_header'], '</h1>
   <p>', $l['activate_account_activated'], '</p>';
 }
 ?>

@@ -6,7 +6,6 @@ if(!defined('Snow'))
 function Main() {
 global $cmsurl, $settings, $l, $user;
   echo '
-  <h3>'.$l['login_header'].'</h3>
   <p>'.$l['login_details'].'</p>
   <form action="'.$cmsurl.'index.php?action=login2" method="post">
     <fieldset>
