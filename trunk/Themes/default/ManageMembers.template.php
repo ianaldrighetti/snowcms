@@ -222,7 +222,7 @@ global $l, $settings, $user, $cmsurl;
         
         <form action="'.$cmsurl.'index.php?action=profile;u='.$settings['managemembers']['member']['id'].'" method="post" style="display: inline">
         <p style="display: inline">
-        <input type="hidden" name="view-profile" value="true" />
+        <input type="hidden" name="action" value="profile" />
         <input type="submit" value="'.$l['managemembers_moderate_profile'].'" />
         </p>
         </form>

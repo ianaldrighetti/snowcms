@@ -7,7 +7,7 @@ if(!defined('Snow'))
 function Main() {
 global $l, $settings, $cmsurl;
   
-  echo '<h1 style="margin-bottom: 0">'.$settings['page']['title'].'</h1>
+  echo '
         <p style="margin-top: 0"><a href="'.$cmsurl.'index.php?action=profile;sa=edit">'.$l['profile_edit_link'].'</a></p>';
   
   Info();
@@ -18,7 +18,7 @@ global $l, $settings, $theme_url;
   
   $profile = $settings['profile'];
   
-  echo '<h1 style="margin-bottom: 0">'.$settings['page']['title'].'</h1>
+  echo '
         <table>
          '.($profile['online']
           ? '<tr><td><img src="'.$theme_url.'/'.$settings['theme'].'/images/online.gif"
@@ -38,7 +38,7 @@ global $l, $settings, $theme_url, $cmsurl;
   
   $profile = $settings['profile'];
   
-  echo '<h1 style="margin-bottom: 0">'.$settings['page']['title'].'</h1>
+  echo '
         <table>
          '.($profile['online']
           ? '<tr><td><img src="'.$theme_url.'/'.$settings['theme'].'/images/online.gif"
@@ -79,7 +79,6 @@ global $l, $settings, $cmsurl, $user;
   $profile = $settings['profile'];
   
   echo '
-        <h1>'.$settings['page']['title'].'</h1>
         
         <form action="'.$cmsurl.'index.php?action=profile;sa=edit" method="post" style="display: inline">
         
@@ -101,10 +100,9 @@ global $l, $settings, $cmsurl, $user;
         <p style="display: inline"><input type="submit" value="'.$l['profile_edit_change'].'" /></p>
         </form>
         
-        <form action="'.$cmsurl.'index.php" method="get" style="display: inline">
+        <form action="'.$cmsurl.'index.php?action=profile;u='.$profile['id'].'" method="post" style="display: inline">
         <p style="display: inline">
         <input type="hidden" name="action" value="profile" />
-        <input type="hidden" name="u" value="'.$profile['id'].'" />
         <input type="submit" value="'.$l['profile_edit_cancel'].'" />
         </p>
         </form>
@@ -116,7 +114,6 @@ global $l, $settings, $cmsurl, $user;
 function NotAllowed() {
 global $cmsurl, $l, $settings;
 echo '
-  <h1>'.$l['profile_error_header'].'</h1>
   <p>'.$l['profile_error_desc'].'</p>';
 }
 ?>
