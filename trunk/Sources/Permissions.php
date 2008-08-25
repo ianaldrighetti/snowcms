@@ -100,7 +100,11 @@ global $cmsurl, $db_prefix, $l, $settings, $user;
             if ($group != $settings['default_group']) {
               $continue = sql_query("UPDATE {$db_prefix}members SET `group` = '{$settings['default_group']}' WHERE `group` = '$group'") or ($_SESSION['error'] = $l['permissions_error_delete']);
               if ($continue)
-                sql_query("DELETE FROM {$db_prefix}membergroups WHERE `group_id` = '$group'") or ($_SESSION['error'] = $l['permissions_error_delete']);
+                $continue = sql_query("DELETE FROM {$db_prefix}permissions WHERE `group_id` = $group");
+              if ($continue)
+                sql_query("DELETE FROM {$db_prefix}board_permissions WHERE `group_id` = $group");
+              if ($continue)
+                $continue = sql_query("DELETE FROM {$db_prefix}membergroups WHERE `group_id` = '$group'") or ($_SESSION['error'] = $l['permissions_error_delete']);
             }
           else
             $_SESSION['error'] = $l['permissions_error_delete_default'];
