@@ -7,7 +7,6 @@ if(!defined('Snow'))
 function Main() {
 global $cmsurl, $settings, $l, $user, $theme_url;
   echo '
-  <h1>'.$l['managepages_header'].'</h1>
   <p>'.$l['managepages_desc'].'</p>';
   if($settings['page']['update_page']==1) {
     echo '
@@ -77,14 +76,12 @@ global $cmsurl, $settings, $l, $user, $theme_url;
 function NoPage() {
 global $cmsurl, $settings, $l, $user;
   echo '
-  <h1>'.$l['managepages_no_page_header'].'</h1>
   <p>'.$l['managepages_no_page_desc'].'</p>';
 }
 
 function Editor() {
 global $cmsurl, $settings, $l, $user;
   echo '
-  <h1>'.$l['managepages_edit_header'].'</h1>
   <p>'.$l['managepages_edit_desc'].'</p>
   <form action="'.$cmsurl.'index.php?action=admin;sa=managepages" method="post">
     <table>

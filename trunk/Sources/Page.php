@@ -84,19 +84,12 @@ global $cmsurl, $db_prefix, $l, $settings, $user;
       // Clean the page's title
       $title = clean($_REQUEST['page_title']);
       // Insert it
-      $result = sql_query("INSERT INTO {$db_prefix}pages (`page_owner`,`owner_name`,`create_date`,`title`) VALUES('{$page_owner}','{$owner_name}','{$create_date}','{$title}')");
-      if($result) {
-        // It was a Success! Wooot!
-        $settings['page']['make_page']['status'] = true;
-        $settings['page']['make_page']['title'] = $title;
-        $settings['page']['make_page']['info'] = str_replace("%title%", $_REQUEST['page_title'], $l['adminpage_make_success']);
-      }
-      else {
+      $result = sql_query("INSERT INTO1 {$db_prefix}pages (`page_owner`,`owner_name`,`create_date`,`title`) VALUES('{$page_owner}','{$owner_name}','{$create_date}','{$title}')");
+      if(!$result) {
         // Oh NOES! It failed!
-        $settings['page']['make_page']['status'] = false;
-        $settings['page']['make_page']['title'] = $title;
-        $settings['page']['make_page']['info'] = str_replace("%title%", $_REQUEST['page_title'], $l['adminpage_make_fail']);
+        $_SESSION['error'] = str_replace('%title%',$title,$l['adminpage_make_fail']);
       }
+      redirect('index.php?action=admin;sa=managepages');
     }
     // Get all the pages in the database so we can list them :)
     $result = sql_query("

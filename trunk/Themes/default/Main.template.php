@@ -11,7 +11,7 @@ echo '<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
 
 <head>
-	<title>'.$settings['site_name'].' - '.$settings['page']['title'].'</title>
+	<title>'.@$settings['page']['title'].' - '.$settings['site_name'].'</title>
 	<meta http-equiv="content-type" content="text/html;charset=utf-8" />
 	<meta name="generator" content="Geany 0.13/soren121" />
 	<link rel="stylesheet" href="'.$theme_url.'/'.$settings['theme'].'/style.css" type="text/css" media="screen" />
@@ -35,7 +35,12 @@ echo '<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
 	languageOption();
 	echo '</div>
 	<div id="content">
+	
+	<h1>'.@$settings['page']['title'].'</h1>
 	';
+	
+	if (@$_SESSION['error'])
+	 echo '<p><b>'.$l['main_error'].':</b> '.$_SESSION['error'].'</p>';
 }
 
 // Call on by either theme_menu('main'); or theme_menu('side')

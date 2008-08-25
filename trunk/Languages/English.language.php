@@ -12,6 +12,7 @@ $l['main_sidebar_logout'] = 'Logout';
 $l['main_sidebar_register'] = 'Register';
 $l['main_sidebar_profile'] = 'Profile';
 $l['main_sidebar_control_panel'] = 'Control Panel';
+$l['main_error'] = 'Error';
 
 // Login.template.php stuff
 $l['login_title'] = 'Login';
@@ -135,8 +136,8 @@ $l['managepages_makepage'] = 'Create Page';
 $l['managepages_pagetitle'] = 'Page Title:';
 $l['managepages_header'] = 'Manage Pages';
 $l['managepages_desc'] = 'You can manage and create pages here.';
-$l['adminpage_make_success'] = 'The page <b>%title%</b> was successfully created!';
-$l['adminpage_make_fail'] = 'Failed to create the page %title%';
+$l['adminpage_make_success'] = 'The page %title% was successfully created!';
+$l['adminpage_make_fail'] = 'Failed to create the page %title%.';
 $l['adminpages_title_td'] = 'Page Title';
 $l['adminpages_pageowner'] = 'Page Owner';
 $l['adminpages_datemade'] = 'Created on';

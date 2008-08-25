@@ -6,7 +6,7 @@ if(!defined('Snow'))
 // When loadTheme('Admin'); is called on, it will display this below function (Main()) and the theme_header(); before this, and theme_footer(); after
 function Main() {
 global $cmsurl, $settings, $l, $user;
-  echo '<h1>'. $settings['page']['title']. '</h1>
+  echo '
   <table>
     <tr>
       <td>'.$l['admin_current_version'].'</td>

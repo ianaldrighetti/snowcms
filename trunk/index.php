@@ -74,5 +74,8 @@ require_once($source_dir.'/Core.php');
         $actions[$_REQUEST['action']][1]();
     }
   }
+  
+  // Remove any error messages so they aren't displayed again
+  unset($_SESSION['error']);
 
 ?>

@@ -7,7 +7,6 @@ if(!defined('Snow'))
 function Main() {
 global $cmsurl, $l, $settings, $user;
   echo '
-		<h2>'.$settings['page']['title'].'</h2>
 		<p>'.$settings['page']['content'].'</p> 
 		<br />';
 }
@@ -22,7 +21,6 @@ global $cmsurl, $l, $settings, $user;
 function ListPage() {
 global $cmsurl, $settings, $l, $user;
   echo '
-  <h2>'.$l['listpage_header'].'</h2>
   <p>'.$l['listepage_desc'].'</p><hr>';
   if($settings['page']['num_pages']>0) {
     echo '
