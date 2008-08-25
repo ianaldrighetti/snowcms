@@ -211,6 +211,39 @@ global $cmsurl, $db_prefix, $l, $settings, $permissions, $user;
 }
 
 function ForumPerms() {
-global $cmsurl, $db_prefix, $l, $settings, $user;
+global $cmsurl, $db_prefix, $forumperms, $l, $settings, $user;
+  if(can('manage_forum_perms')) {
+    // Are they editing a groups board permission right now?
+    if(!empty($_REQUEST['bid']) && !empty($_REQUEST['gid'])) {
+    
+    }
+    elseif(!empty($_REQUEST['bid'])) {
+      // Choosing a group they want to edit :o
+    }
+    else {
+      // Show a list of boards O_O
+      $result = sql_query("
+        SELECT
+          c.cname, c.cid, c.corder
+        FROM {$db_prefix}categories AS c
+        ORDER BY c.corder ASC");
+      if(!mysql_num_rows($result)) {
+        // Oh noes! No categories?!?#!
+        $settings['page']['title'] = $l['mf_perms_title'];
+        loadTheme('Permissions','NoCats');
+      }
+      else {
+        $result = sql_query("
+          SELECT
+            b.bid, b.name, b.cid, b.border
+          FROM {$db_prefix}boards AS b
+          ORDER BY b.border ASC");
+      }
+    }
+  }
+  else {
+    $settings['page']['title'] = $l['permissions_error_title'];
+    loadTheme('Admin','Error');
+  }
 }
 ?>
