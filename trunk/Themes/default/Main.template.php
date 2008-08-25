@@ -35,8 +35,6 @@ echo '<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
 	languageOption();
 	echo '</div>
 	<div id="content">
-	
-	<h1>'.@$settings['page']['title'].'</h1>
 	';
 	
 	if (@$_SESSION['error'])

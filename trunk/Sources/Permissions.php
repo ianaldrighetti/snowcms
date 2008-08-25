@@ -254,7 +254,7 @@ global $cmsurl, $db_prefix, $forumperms, $l, $settings, $user;
         }
         $settings['page']['cats'] = $cats;
         $settings['page']['title'] = $l['mf_perms_title'];
-        loadTheme('Permissions','ListBoards');
+        loadTheme('Permissions','BoardPerms');
       }
     }
   }
