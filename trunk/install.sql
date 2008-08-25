@@ -54,7 +54,7 @@ CREATE TABLE `{$db_prefix}membergroups` (
   PRIMARY KEY  (`group_id`)
 ) ENGINE=MyISAM AUTO_INCREMENT=3 DEFAULT CHARSET=utf8;
 
-INSERT INTO `{$db_prefix}membergroups` VALUES ('1','Administrator'),('2','Regular Member');
+INSERT INTO `{$db_prefix}membergroups` VALUES ('-1','Guest'),('1','Administrator'),('2','Regular Member');
 
 DROP TABLE IF EXISTS `{$db_prefix}members`;
 

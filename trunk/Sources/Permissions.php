@@ -96,13 +96,16 @@ global $cmsurl, $db_prefix, $l, $settings, $user;
       if (@$_REQUEST['did']) {
         $group = clean($_REQUEST['did']);
         if ($group != 1)
-          if ($group != $settings['default_group']) {
-            $continue = sql_query("UPDATE {$db_prefix}members SET `group` = '{$settings['default_group']}' WHERE `group` = '$group'") or ($_SESSION['error'] = $l['permissions_error_delete']);
-            if ($continue)
-              sql_query("DELETE FROM {$db_prefix}membergroups WHERE `group_id` = '$group'") or ($_SESSION['error'] = $l['permissions_error_delete']);
-          }
+          if ($group != -1)
+            if ($group != $settings['default_group']) {
+              $continue = sql_query("UPDATE {$db_prefix}members SET `group` = '{$settings['default_group']}' WHERE `group` = '$group'") or ($_SESSION['error'] = $l['permissions_error_delete']);
+              if ($continue)
+                sql_query("DELETE FROM {$db_prefix}membergroups WHERE `group_id` = '$group'") or ($_SESSION['error'] = $l['permissions_error_delete']);
+            }
           else
             $_SESSION['error'] = $l['permissions_error_delete_default'];
+          else
+            $_SESSION['error'] = $l['permissions_error_delete_guest'];
         else
           $_SESSION['error'] = $l['permissions_error_delete_admin'];
         redirect('index.php?action=admin;sa=permissions');

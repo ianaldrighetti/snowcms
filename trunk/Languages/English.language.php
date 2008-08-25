@@ -273,6 +273,7 @@ $l['permissions_error_change'] = 'Changing member groups failed.';
 $l['permissions_error_new'] = 'Adding member group failed.';
 $l['permissions_error_delete'] = 'Deleting member group failed.';
 $l['permissions_error_delete_admin'] = 'Cannot delete administrative group.';
+$l['permissions_error_delete_guest'] = 'Cannot delete guest group.';
 $l['permissions_error_delete_default'] = 'Cannot delete default group.';
 
 // ManageMembers.template.php
