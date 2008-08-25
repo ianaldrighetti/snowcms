@@ -65,7 +65,6 @@ global $cmsurl, $settings, $l, $user;
 function Edit() {
 global $cmsurl, $settings, $l, $user;
   echo '
-  <h2>'.$l['permissions_edit_header'].'</h2>
   <p>'.$l['permissions_edit_desc'].'</p>';
   echo '
   <form action="'.$cmsurl.'index.php?action=admin;sa=permissions" method="post">

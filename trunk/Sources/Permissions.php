@@ -32,7 +32,19 @@ $settings['permissions']['group'] = array(
   'manage_forum_perms' => false,
   'view_forum' => true,
   'view_online' => true,
-  'view_profile' => true
+  'view_profile' => true,
+  'moderate_username' => false,
+  'moderate_display_name' => false,
+  'moderate_email' => false,
+  'moderate_password' => false,
+  'moderate_group' => false,
+  'moderate_signature' => false,
+  'moderate_profile' => false,
+  'moderate_activate' => false,
+  'moderate_suspend' => false,
+  'moderate_unsuspend' => false,
+  'moderate_ban' => false,
+  'moderate_unban' => false
 );
 // The above array was a member group specific, these are forum specific permissions for boards
 $settings['permissions']['forum'] = array(

@@ -270,6 +270,7 @@ global $l, $db_prefix, $user, $settings;
     }
   
   // Clean the data of possible injections (Hacking)
+  $u = clean($_REQUEST['u']);
   $username = clean($_REQUEST['user_name']);
   $display_name = clean($_REQUEST['display_name']) ? clean($_REQUEST['display_name']) : $username;
   $email = clean($_REQUEST['email']);
@@ -293,16 +294,35 @@ global $l, $db_prefix, $user, $settings;
   if (!@$_REQUEST['group'])
     $_SESSION['error'] = $l['managemembers_error_group_invalid'];
   
-  
-  if (!@$$_SESSION['error']) {
-  
   $password_new = md5($password_new);
   
+  // Get current member information, so that it can replace any data this member isn't allowed to modify
+  $result = sql_query("SELECT * FROM {$db_prefix}members WHERE `id` = '$u'");
+  if (!mysql_num_rows($result))
+    die('Internal error');
+  $row = mysql_fetch_assoc($result);
+  
+  if (!can('moderate_username'))
+    $username = $row['username'];
+  if (!can('moderate_display_name'))
+    $display_name = $row['display_name'];
+  if (!can('moderate_email'))
+    $email = $row['email'];
+  if (!can('moderate_password'))
+    $password = $row['password'];
+  if (!can('moderate_group'))
+    $group = $row['group'];
+  if (!can('moderate_signature'))
+    $signature = $row['signature'];
+  if (!can('moderate_profile'))
+    $profile = $row['profile'];
+  
+  if (!@$$_SESSION['error']) {
   // Update member's data
   if ($_REQUEST['password-new']) // And change password
     sql_query("UPDATE {$db_prefix}members SET `username` = '$username', `display_name` = '$display_name', `email` = '$email', `password` = '$password_new', `group` = '$group', `signature` = '$signature', `profile` = '$profile' WHERE `id` = '{$_REQUEST['u']}'") or die('Internal error');
   else // And don't change password
-    sql_query("UPDATE {$db_prefix}members SET `username` = '$username', `display_name` = '$display_name', `email` = '$email', `group` = '$group', `signature` = '$signature', `profile` = '$profile' WHERE `id` = '{$_REQUEST['u']}'") or die('Internal error');
+    sql_query("UPDATE {$db_prefix}members SET `username` = '$username', `display_name` = '$display_name', `email` = '$email', `group` = '$group', `signature` = '$signature', `profile` = '$profile' WHERE `id` = '$u'") or die('Internal error');
   
     // If they changed their own username change settings to keep 'em logged in
     if ($_REQUEST['u'] == $_REQUEST['uid']) {
@@ -321,7 +341,7 @@ global $l, $db_prefix, $user, $settings;
 function activate() {
 global $db_prefix, $l;
   
-  if (!ValidateSession(@$_REQUEST['sc']) || !@$_REQUEST['u'])
+  if (!ValidateSession(@$_REQUEST['sc']) || !@$_REQUEST['u'] || !can('moderate_activate'))
     die("Hacking Attempt...");
   
   sql_query("UPDATE {$db_prefix}members SET `activated` = '1' WHERE `id` = '{$_REQUEST['u']}'") or ($_SESSION['error'] = $l['managemembers_error_activate']);
@@ -332,7 +352,7 @@ global $db_prefix, $l;
 function suspend() {
 global $db_prefix, $l;
   
-  if (!ValidateSession(@$_REQUEST['sc']) || !@$_REQUEST['u'])
+  if (!ValidateSession(@$_REQUEST['sc']) || !@$_REQUEST['u'] || !can('moderate_unsuspend'))
     die("Hacking Attempt...");
   
   sql_query("UPDATE {$db_prefix}members SET `suspension` = '" . (time()+@$_REQUEST['suspension']*60*60) . "' WHERE `id` = '{$_REQUEST['u']}'") or ($_SESSION['error'] = $l['managemembers_error_suspension']);
@@ -343,7 +363,7 @@ global $db_prefix, $l;
 function unsuspend() {
 global $db_prefix, $l;
   
-  if (!ValidateSession(@$_REQUEST['sc']) || !@$_REQUEST['u'])
+  if (!ValidateSession(@$_REQUEST['sc']) || !@$_REQUEST['u'] || !can('moderate_unsuspend'))
     die("Hacking Attempt...");
   
   sql_query("UPDATE {$db_prefix}members SET `suspension` = '".time()."' WHERE `id` = '{$_REQUEST['u']}'") or ($_SESSION['error'] = $l['managemembers_error_unsuspend']);
@@ -354,7 +374,7 @@ global $db_prefix, $l;
 function ban() {
 global $db_prefix, $l;
   
-  if (!ValidateSession(@$_REQUEST['sc']) || !@$_REQUEST['u'])
+  if (!ValidateSession(@$_REQUEST['sc']) || !@$_REQUEST['u'] || !can('moderate_ban'))
     die("Hacking Attempt...");
   
   sql_query("UPDATE {$db_prefix}members SET `banned` = '1' WHERE `id` = '{$_REQUEST['u']}'") or ($_SESSION['error'] = $l['managemembers_error_ban']);
@@ -365,7 +385,7 @@ global $db_prefix, $l;
 function unban() {
 global $db_prefix, $l;
   
-  if (!ValidateSession(@$_REQUEST['sc']) || !@$_REQUEST['u'])
+  if (!ValidateSession(@$_REQUEST['sc']) || !@$_REQUEST['u'] || !can('moderate_unban'))
     die("Hacking Attempt...");
   
   sql_query("UPDATE {$db_prefix}members SET `banned` = '0' WHERE `id` = '{$_REQUEST['u']}'") or ($_SESSION['error'] = $l['managemembers_error_unban']);
