@@ -26,7 +26,7 @@ $files = array(
   "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
 <head>
-	<title>SnowCMS - SnowCMS - Error</title>
+	<title>SnowCMS - SnowCMS - Title</title>
 	<meta http-equiv="content-type" content="text/html;charset=utf-8" />
 	<meta name="generator" content="SnowCMS 0.7" />
 	<link rel="stylesheet" href="Themes/default/style.css" type="text/css" media="screen" />
@@ -177,6 +177,9 @@ $files = array(
                   <td>Admin Password:</td><td><input name="admin_pass" type="password" value=""/></td>
                 </tr>
                 <tr>
+                  <td>Admin Password (Again):</td><td><input name="admin_pass2" type="password" value=""/></td>
+                </tr>
+                <tr>
                   <td>Admin Email:</td><td><input name="admin_email" type="text" value=""/></td>
                 </tr>
                 <tr>
@@ -190,6 +193,8 @@ $files = array(
               <input name="mysql_prefix" type="hidden" value="'.$_REQUEST['mysql_prefix'].'"/>
             </form>
             </div>';
+            
+            //shouldn't store mysql user/pass in the form? security risk almost? encryption?
           }
         }
       }
@@ -230,17 +235,25 @@ $theme_url = \''.$_REQUEST['theme_url'].'\'; # URL to your SnowCMS Themes folder
 $db_prefix = \'`\'.$mysql_db.\'`.\'.$mysql_prefix;
 $scms_installed = true;
 ?>';
-    // Now make the admin account
-    mysql_connect($_REQUEST['mysql_host'], $_REQUEST['mysql_user'], $_REQUEST['mysql_pass']);
-    mysql_select_db($_REQUEST['mysql_db']);
-    $admin = mysql_query("INSERT INTO {$_REQUEST['mysql_prefix']}members (`username`,`display_name`,`password`,`email`,`reg_date`,`reg_ip`,`group`,`activated`) VALUES('".addslashes(mysql_real_escape_string($_REQUEST['admin_user']))."','".addslashes(mysql_real_escape_string($_REQUEST['admin_user']))."','".md5($_REQUEST['admin_pass'])."','".addslashes(mysql_real_escape_string($_REQUEST['admin_email']))."','".time()."','".$_SERVER['REMOTE_ADDR']."','1','1')");
-    echo '
-    <h1>You\'re done!</h1>';
-    if($admin) {
-      echo '<p>Your settings have been sent to the MySQL database.</p>';
-    }
-    else {
-      echo '<p>Something went wrong while trying to create your admin account. Info: '.mysql_error().'</p>';
+    if(strlen($_REQUEST["admin_user"]) > 0 && strlen($_REQUEST["admin_pass"]) > 0){
+      if($_REQUEST["admin_pass"] == $_REQUEST["admin_pass2"]){
+        // Now make the admin account
+        mysql_connect($_REQUEST['mysql_host'], $_REQUEST['mysql_user'], $_REQUEST['mysql_pass']);
+        mysql_select_db($_REQUEST['mysql_db']);
+        $admin = mysql_query("INSERT INTO {$_REQUEST['mysql_prefix']}members (`username`,`display_name`,`password`,`email`,`reg_date`,`reg_ip`,`group`,`activated`) VALUES('".addslashes(mysql_real_escape_string($_REQUEST['admin_user']))."','".addslashes(mysql_real_escape_string($_REQUEST['admin_user']))."','".md5($_REQUEST['admin_pass'])."','".addslashes(mysql_real_escape_string($_REQUEST['admin_email']))."','".time()."','".$_SERVER['REMOTE_ADDR']."','1','1')");
+        echo '
+        <h1>You\'re done!</h1>';
+        if($admin) {
+          echo '<p>Your settings have been sent to the MySQL database.</p>';
+        }
+        else {
+          echo '<p>Something went wrong while trying to create your admin account. Info: '.mysql_error().'</p>';
+        }
+      }else{
+        die("<p>Error! Passwords did not match!</p>");
+      }
+    }else{
+        die("<p>Error! You'r password and/or username can not be blank!</p>");
     }
     // Oh noes! the config.php file was NOT writeable, so we will let them copy it and paste it without having to start all over again :)
     if(!is_writeable('./config.php')) {
@@ -257,6 +270,14 @@ $scms_installed = true;
     }
     echo '<p>Once you are done, please delete this file (install.php) and CHMOD config.php to 644. Thank you for using SnowCMS! <a href="'.$_REQUEST['cmsurl'].'">Click here</a> to contine your home page.</p>';
 
+    }elseif($step == 3){
+      if(file_exists("install.php")){
+        echo "Attempting to auto-delete install.php...<br>";
+        unlink("install.php");
+        echo "Hopefully done...";
+      }else{
+        echo "this must be some strange world.... how do you not have install.php but you're running this now?";
+      }
     }
   }
   ?>
