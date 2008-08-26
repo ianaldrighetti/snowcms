@@ -58,8 +58,12 @@ global $cmsurl, $settings, $l, $user, $theme_url;
         echo '<td><input type="radio" name="default_group" value="'.$group['id'].'"></td>
       ';
       echo '<td style="padding: 5px;"><input name="group_'.$group['id'].'" value="'.$group['name'].'" /></td>
-      <td style="text-align: center; padding: 5px;">'.$group['numusers'].'</td>
-      <td style="text-align: center; padding: 5px;">'.$group['numperms'].'/'.$settings['page']['total_permissions'].'</td>
+      ';
+      if ($group['id'] != -1)
+        echo '<td style="text-align: center; padding: 5px;">'.$group['numusers'].'</td>';
+      else
+        echo '<td style="text-align: center; padding: 5px;">-</td>';
+      echo '<td style="text-align: center; padding: 5px;">'.$group['numperms'].'/'.$settings['page']['total_permissions'].'</td>
       <td style="text-align: center; padding: 5px;"><a href="'.$cmsurl.'index.php?action=admin;sa=permissions;mid='.$group['id'].'"><img src="'.$theme_url.'/'.$settings['theme'].'/images/modify.png" alt="'.$l['permissions_modify'].'" width="15" height="15" style="border: 0" /></a></td>
       ';
       if ($group['id'] != -1)
