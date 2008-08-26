@@ -430,4 +430,8 @@ $l['themeerror_title'] = 'Theme Error!';
 $l['themeerror_header'] = 'Theme Load Error';
 $l['themeerror_msg'] = 'An error occurred while trying to load the template function %func%(); in the template %file%';
 
+// News.template.php
+$l['news_title'] = 'News';
+$l['news_nonews_header'] = 'No News';
+$l['news_nonews_desc'] = 'Sorry, but there is currently no news, why not check back later?';
 ?>
