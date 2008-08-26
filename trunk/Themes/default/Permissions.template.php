@@ -22,22 +22,50 @@ global $cmsurl, $settings, $l, $user, $theme_url;
       <th width="21%" style="border-style: solid; border-width: 1px">'.$l['permissions_permissions'].'</th>
       <th width="20%" colspan="2">&nbsp;</td>
     </tr>';
+  
+  $group = $settings['groups'][1];
+  echo '
+      <tr>
+      ';
+  if ($settings['default_group'] == $group['id'])
+    echo '<td><input type="radio" name="default_group" value="'.$group['id'].'" checked="checked"></td>
+      ';
+  else
+    echo '<td><input type="radio" name="default_group" value="'.$group['id'].'"></td>
+      ';
+  echo '<td style="padding: 5px;"><input name="group_'.$group['id'].'" value="'.$group['name'].'" /></td>
+      <td style="text-align: center; padding: 5px;">'.$group['numusers'].'</td>';
+  if ($group['id'] == 1)
+    echo '<td style="text-align: center; padding: 5px;">'.$l['permissions_all'].'</td>
+          <td></td>';
+  else
+    echo '<td style="text-align: center; padding: 5px;">'.$group['numperms'].'</td>
+          <td style="text-align: center; padding: 5px;"><a href="'.$cmsurl.'index.php?action=admin;sa=permissions;mid='.$group['id'].'"><img src="'.$theme_url.'/'.$settings['theme'].'/images/modify.png" alt="'.$l['permissions_modify'].'" width="15" height="15" style="border: 0" /></a></td>
+      ';
+  if ($group['id'] != 1 && $group['id'] != -1)
+    echo '<td style="text-align: center; padding: 5px;"><a href="'.$cmsurl.'index.php?action=admin;sa=permissions;did='.$group['id'].'"><img src="'.$theme_url.'/'.$settings['theme'].'/images/delete.png" alt="'.$l['permissions_delete'].'" width="15" height="15" style="border: 0" /></a></td>
+    </tr>';
+  
   foreach($settings['groups'] as $group) {
-    echo '
+    if ($group['id'] != 1) {
+      echo '
     <tr>
       ';
-    if ($settings['default_group'] == $group['id'])
-      echo '<td><input type="radio" name="default_group" value="'.$group['id'].'" checked="checked"></td>
+      if ($settings['default_group'] == $group['id'])
+        echo '<td><input type="radio" name="default_group" value="'.$group['id'].'" checked="checked"></td>
       ';
-    else
-      echo '<td><input type="radio" name="default_group" value="'.$group['id'].'"></td>
+      else
+        echo '<td><input type="radio" name="default_group" value="'.$group['id'].'"></td>
       ';
-    echo '<td style="padding: 5px;"><input name="group_'.$group['id'].'" value="'.$group['name'].'" /></td>
+      echo '<td style="padding: 5px;"><input name="group_'.$group['id'].'" value="'.$group['name'].'" /></td>
       <td style="text-align: center; padding: 5px;">'.$group['numusers'].'</td>
-      <td style="text-align: center; padding: 5px;">'.$group['numperms'].'</td>
+      <td style="text-align: center; padding: 5px;">'.$group['numperms'].'/'.$settings['page']['total_permissions'].'</td>
       <td style="text-align: center; padding: 5px;"><a href="'.$cmsurl.'index.php?action=admin;sa=permissions;mid='.$group['id'].'"><img src="'.$theme_url.'/'.$settings['theme'].'/images/modify.png" alt="'.$l['permissions_modify'].'" width="15" height="15" style="border: 0" /></a></td>
-      <td style="text-align: center; padding: 5px;"><a href="'.$cmsurl.'index.php?action=admin;sa=permissions;did='.$group['id'].'"><img src="'.$theme_url.'/'.$settings['theme'].'/images/delete.png" alt="'.$l['permissions_delete'].'" width="15" height="15" style="border: 0" /></a></td>
+      ';
+      if ($group['id'] != -1)
+        echo '<td style="text-align: center; padding: 5px;"><a href="'.$cmsurl.'index.php?action=admin;sa=permissions;did='.$group['id'].'"><img src="'.$theme_url.'/'.$settings['theme'].'/images/delete.png" alt="'.$l['permissions_delete'].'" width="15" height="15" style="border: 0" /></a></td>
     </tr>';
+    }
   }
   echo '
   </table>

@@ -151,7 +151,11 @@ global $cmsurl, $db_prefix, $l, $settings, $user;
       $result = sql_query("SELECT `group_id`, COUNT(*) FROM {$db_prefix}permissions WHERE `can` = '1' GROUP BY `group_id`");
         while($row = mysql_fetch_assoc($result)) {
           $groups[$row['group_id']]['numperms'] = $row['COUNT(*)']; 
-        }        
+        }
+      $result = sql_query("SELECT `group_id`, COUNT(*) FROM {$db_prefix}permissions GROUP BY `group_id`");
+        while($row = mysql_fetch_assoc($result)) {
+          $settings['page']['total_permissions'] = $row['COUNT(*)']; 
+        }
       $settings['page']['title'] = $l['permissions_title'];
       $settings['groups'] = $groups;
       loadTheme('Permissions');

@@ -253,6 +253,7 @@ $l['permissions_change_groups'] = 'Save Changes';
 $l['permissions_new_group'] = 'New Group';
 $l['permissions_modify'] = 'Modify';
 $l['permissions_delete'] = 'Delete';
+$l['permissions_all'] = 'All';
 $l['permissions_membergroup'] = 'Member Group';
 $l['permissions_numusers'] = 'Users';
 $l['permissions_permissions'] = 'Permissions';
