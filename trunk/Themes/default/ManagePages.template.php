@@ -77,10 +77,13 @@ global $cmsurl, $settings, $l, $user;
 }
 
 function Editor() {
-global $cmsurl, $settings, $l, $user;
+global $cmsurl, $settings, $l, $user, $theme_url;
   echo '
   <h1>'.str_replace('%title%',$settings['page']['edit_page']['title'],$l['managepages_edit_header']).'</h1>
   <p>'.$l['managepages_edit_desc'].'</p>
+  
+  <script type="text/javascript" src="'.$theme_url.'/'.$settings['theme'].'/scripts/bbcode.js"></script>
+  
   <form action="'.$cmsurl.'index.php?action=admin;sa=managepages" method="post">
     <p><input type="hidden" name="update_page" value="true" /></p>
     <table>
@@ -88,16 +91,32 @@ global $cmsurl, $settings, $l, $user;
         <td>'.$l['managepages_editpage_title'].'</td><td><input name="page_title" type="text" value="'.$settings['page']['edit_page']['title'].'"/></td>
       </tr>
       <tr>
+        <td colspan="2">
+        <select name="links" id="links">
+         ';
+   
+   while ($row = mysql_fetch_assoc($settings['page']['all-pages']))
+     echo '<option value="'.$row['page_id'].'">'.$row['title'].'</option>
+         ';
+   
+   echo '</select>
+        <input type="button" value="'.$l['managepages_editpage_insert_link'].'" onclick="add_bbcode(\'page_content\',\'<a href=\\\'index.php?page=\'+document.getElementById(\'links\').options[document.getElementById(\'links\').selectedIndex].value+\'\\\'>\',\'</a>\')" /></td>
+      </tr>
+      <tr>
         <td colspan="2">'.$l['managepages_editpage_content'].'</td>
       </tr>
       <tr>
-        <td colspan="2"><textarea name="page_content" rows="8" cols="40">'.$settings['page']['edit_page']['content'].'</textarea></td>
+        <td colspan="2"><textarea name="page_content" rows="16" cols="70" onclick="this.selection = document.selection.createRange()" onkeyup="this.selection = document.selection.createRange()" onchange="this.selection = document.selection.createRange().duplicate()" onfocus="this.selection = document.selection.createRange().duplicate()">'.$settings['page']['edit_page']['content'].'</textarea></td>
       </tr>
       <input name="page_id" type="hidden" value="'.$settings['page']['edit_page']['page_id'].'"/>
       <tr>
         <td>&nbsp;</td><td><input type="submit" value="'.$l['managepages_editpage_button'].'"/></td>
       </tr>
     </table>
-  </form>'; 
+  </form>
+  
+  <script type="text/javascript">
+  document.getElementById(\'page_content\').focus();
+  </script>';
 }
 ?>

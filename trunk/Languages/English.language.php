@@ -155,6 +155,7 @@ $l['managepages_edit_desc'] = 'You are currently editing a page; you can edit th
 $l['managepages_editpage_title'] = 'Page Title:';
 $l['managepages_editpage_content'] = 'Page Content:';
 $l['managepages_editpage_button'] = 'Update Page';
+$l['managepages_editpage_insert_link'] = 'Insert Link';
 $l['managepages_update_failed'] = 'Page update failed!';
 $l['managepages_update_success'] = 'Page updated successfully!';
 $l['managepages_editpage_show_info'] = "Show extra page info";

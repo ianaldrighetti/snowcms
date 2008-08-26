@@ -163,6 +163,7 @@ global $cmsurl, $db_prefix, $l, $settings, $user;
           $settings['page']['edit_page'] = $page;
           $settings['page']['edit_page']['content'] = clean($settings['page']['edit_page']['content']);
           $settings['page']['title'] = str_replace("%title%", $page['title'], $l['managepages_edit_title']);
+          $settings['page']['all-pages'] = sql_query("SELECT * FROM {$db_prefix}pages") or die('Internal error');
           loadTheme('ManagePages','Editor');
         }
       }
