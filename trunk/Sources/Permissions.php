@@ -19,6 +19,9 @@ if(!defined("Snow"))
 // WHAT as in, how will you check if they can or cant do it? accessed by can('WHAT')
 // Default as in, when a new member group is made, and they go to edit permissions, is it checked by default or not?
 $settings['permissions']['group'] = array(
+  'view_forum' => true,
+  'view_online' => true,
+  'view_profile' => true,
   'admin' => false,
   'manage_basic-settings' => false,
   'manage_forum' => false,
@@ -30,9 +33,6 @@ $settings['permissions']['group'] = array(
   'manage_pages' => false,
   'manage_permissions' => false,
   'manage_forum_perms' => false,
-  'view_forum' => true,
-  'view_online' => true,
-  'view_profile' => true,
   'moderate_username' => false,
   'moderate_display_name' => false,
   'moderate_email' => false,
@@ -73,7 +73,7 @@ global $cmsurl, $db_prefix, $l, $settings, $user;
         if(mysql_num_rows($result)>0) {
           // Ok, the member group does exist! dang, :P
             foreach($settings['permissions']['group'] as $perm => $value) {
-              if(!empty($_POST[$perm])) 
+              if(!empty($_POST[$perm]) || !empty($_POST['all'])) 
                 $can = 1;
               else
                 $can = 0;
@@ -83,6 +83,7 @@ global $cmsurl, $db_prefix, $l, $settings, $user;
                 sql_query("DELETE FROM {$db_prefix}permissions WHERE `group_id` = '{$membergroup}' AND `what` = '{$perm}'");
             }
           // Weeeee! Done!
+          redirect('index.php?action=admin;sa=permissions');
         }
       }
       // Change groups' names and which one is default
@@ -206,6 +207,10 @@ global $cmsurl, $db_prefix, $l, $settings, $permissions, $user;
                                'can' => $row['can']
                              );
     $settings['page']['title'] = $l['permissions_editperms_title'];
+    $result = sql_query("SELECT `group_id`, COUNT(*) FROM {$db_prefix}permissions GROUP BY `group_id`");
+      while($row = mysql_fetch_assoc($result)) {
+        $settings['page']['total_permissions'] = $row['COUNT(*)']; 
+      }
     loadTheme('Permissions','Edit');
   }
   else {

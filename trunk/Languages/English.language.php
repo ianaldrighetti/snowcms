@@ -262,6 +262,7 @@ $l['permissions_nogroup_desc'] = 'The member group you have requested does not e
 $l['permissions_edit_header'] = 'Edit Permissions';
 $l['permissions_edit_desc'] = 'Here you can edit the permissions for this specific group, which allows you to choose what they can and cannot do.';
 $l['permissions_edit_save'] = 'Save';
+$l['permissions_perm_all'] = 'Allow them to do everything';
 $l['permissions_perm_admin'] = 'Allow them to administrate the site';
 $l['permissions_perm_manage_basic-settings'] = 'Allow them to edit basic settings';
 $l['permissions_perm_manage_members'] = 'Allow them to manage members';

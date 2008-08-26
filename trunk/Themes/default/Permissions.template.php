@@ -95,16 +95,45 @@ function Edit() {
 global $cmsurl, $settings, $l, $user;
   echo '
   <h1>'.$l['permissions_edit_header'].'</h1>
-  <p>'.$l['permissions_edit_desc'].'</p>';
+  <p>'.$l['permissions_edit_desc'].'</p>
+  
+  <script type="text/javascript">
+  function all_change() {
+    if (document.getElementById("all").checked == true) {';
+  $i = 1;
+  while ($i < $settings['page']['total_permissions'] + 1) {
+    echo 'document.getElementById("perm'.$i.'").disabled = true;
+    ';
+    $i += 1;
+  }
   echo '
+    }
+    else {
+      ';
+  $i = 1;
+  while ($i < $settings['page']['total_permissions'] + 1) {
+    echo 'document.getElementById("perm'.$i.'").disabled = false;
+    ';
+    $i += 1;
+  }
+  echo '
+    }
+  }
+  </script>
+  
   <form action="'.$cmsurl.'index.php?action=admin;sa=permissions" method="post">
     <fieldset>
-      <table>';
+      <table>
+        <tr>
+          <td><b>'.$l['permissions_perm_all'].'</b></td><td><input name="all" id="all" type="checkbox" onclick="all_change()" /></td>
+        </tr>';
+  $i = 1;
   foreach($settings['permissions']['group'] as $perm => $value) {
     echo '
         <tr>
-          <td>'.$l['permissions_perm_'.$perm].'</td><td><input name="'.$perm.'" type="checkbox" value="1" ', @$settings['perms'][$perm]['can'] ? 'checked="checked"' : '', '/></td>
+          <td>'.$l['permissions_perm_'.$perm].'</td><td><input name="'.$perm.'" id="perm'.$i.'" type="checkbox" value="1" ', @$settings['perms'][$perm]['can'] ? 'checked="checked"' : '', ' /></td>
         </tr>';
+    $i += 1;
   }
   echo '
         <input name="membergroup" type="hidden" value="'.$_REQUEST['mid'].'"/>
