@@ -7,6 +7,7 @@ if(!defined('Snow'))
 function Main() {
 global $cmsurl, $settings, $l, $user, $theme_url;
   echo '
+    <h1>'.$l['permissions_header'].'</h1>
     <p>'.$l['permissions_desc'].'</p>
   
   <form action="'.$cmsurl.'index.php?action=admin;sa=permissions" method="post" style="display: inline">
@@ -65,6 +66,7 @@ global $cmsurl, $settings, $l, $user;
 function Edit() {
 global $cmsurl, $settings, $l, $user;
   echo '
+  <h1>'.$l['permissions_edit_header'].'</h1>
   <p>'.$l['permissions_edit_desc'].'</p>';
   echo '
   <form action="'.$cmsurl.'index.php?action=admin;sa=permissions" method="post">
@@ -89,7 +91,7 @@ global $cmsurl, $settings, $l, $user;
 function BoardPerms() {
 global $cmsurl, $settings, $l, $user;
   echo '
-  <h3>', $l['mf_perms_header'], '</h3>
+  <h1>', $l['mf_perms_header'], '</h1>
   <p>', $l['mf_perms_desc'], '</p>
   <table width="100%">';    
     foreach($settings['cats'] as $cat) {
@@ -113,7 +115,7 @@ global $cmsurl, $settings, $l, $user;
 function NoCats() {
 global $cmsurl, $settings, $l, $user;
   echo '
-  <h3>', $l['mf_perms_header'], '</h3>
+  <h1>', $l['mf_perms_header'], '</h1>
   <p>', $l['mf_perms_desc'], '</p>
   <br />
   <p style="text-align: center; color: red;">', $l['mf_perms_nocats'], '</p>';

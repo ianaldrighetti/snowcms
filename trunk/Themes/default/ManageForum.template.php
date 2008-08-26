@@ -6,6 +6,7 @@ if(!defined('Snow'))
 function Main() {
 global $cmsurl, $db_prefix, $l, $settings, $user;
   echo '
+  <h1>',$l['manageforum_title'],'</h1>
   <p>', $l['manageforum_desc'], '</p>
   <br />
   <div class="acp_left">
@@ -24,7 +25,7 @@ global $cmsurl, $db_prefix, $l, $settings, $user;
 
 function ShowCats() {
 global $cmsurl, $db_prefix, $l, $settings, $user, $theme_url;
-  echo '<h1>', $l['managecats_header'], '</h1>
+  echo '<h1>', $l['manageforum_title'], '</h1>
         <p>', $l['managecats_desc'], '</p>
         <form action="', $cmsurl, 'index.php?action=admin;sa=forum;fa=categories" method="post">
           <table width="100%" id="mc">
@@ -64,6 +65,7 @@ global $cmsurl, $db_prefix, $l, $settings, $user, $theme_url;
 function ShowBoards() {
 global $cmsurl, $db_prefix, $l, $settings, $user, $theme_url;
   echo '
+  <h1>', $l['manageboards_title'], '</h1>
   <p>', $l['manageboards_desc'], '</p>';
   if(count($settings['cats'])) {
     echo '

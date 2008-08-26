@@ -7,6 +7,8 @@ if(!defined('Snow'))
 function Main() {
 global $cmsurl, $settings, $l, $user;
   echo '
+  <h1>'.$l['register_header'].'</h1>
+  
   <p>'.$l['register_details'].'</p>
   <script type="text/javascript" src="includes/jquery.js"></script>
   <script type="text/javascript" src="includes/jquery-pstrength.js"></script>'
@@ -60,12 +62,17 @@ function Success() {
 global $cmsurl, $settings, $l, $user;
   // Woo! You registered, you can now login!
   echo '
+  <h1>'.$l['register_header'].'</h1>
+  
   <p>'.str_replace('%username%',$settings['page']['username'],$l['register_success']).'</p>';
 }
 
 function SuccessBut1() {
 global $cmsurl, $settings, $l, $user;
   // Dang, you got to get it email activated =|
+  echo '<h1>'.$l['register_header'].'</h1>
+    ';
+  
   if(empty($settings['page']['error'])) {
     echo '<p>'.$l['register_successbut1'].'</p>
     
@@ -81,7 +88,8 @@ global $cmsurl, $settings, $l, $user;
 function SuccessBut2() {
 global $cmsurl, $settings, $l, $user;
   // Admins must activate your account before you can login
-  echo '
+  echo '<h1>'.$l['register_header'].'</h1>
+  
   <p>'.$l['register_successbut2'].'</p>';
 }
 
@@ -89,6 +97,8 @@ function AForm() {
 global $cmsurl, $settings, $l, $user;
   // This is the activation form, so of course, you can activate your account via email
   echo '
+  <h1>'.$l['register_header'].'</h1>
+  
   <p>', $l['activate_desc'], '</p>
   <form action="', $cmsurl, 'index.php?action=activate" method="post">
     <fieldset>
@@ -122,6 +132,8 @@ function ASuccess() {
 global $cmsurl, $settings, $l, $user;
   // Email Activation was a Success!
   echo '
+  <h1>'.$l['register_header'].'</h1>
+  
   <p>', $l['activate_account_activated'], '</p>';
 }
 
@@ -129,6 +141,8 @@ function Failure() {
 global $l;
   // Dang, it failed =[
   echo '
+  <h1>'.$l['register_header'].'</h1>
+  
   <p>'.$l['register_error_activation_email'].'</p>';
 }
 ?>

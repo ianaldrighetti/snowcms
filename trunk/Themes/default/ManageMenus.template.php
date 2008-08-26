@@ -10,6 +10,8 @@ global $cmsurl, $settings, $l, $user, $cmsurl, $theme_url;
   $menus = $settings['menus'];
   
   echo '
+    <h1>'.$l['managemenus_header'].'</h1>
+    
     <form action="'.$cmsurl.'index.php?action=admin;sa=menus" method="post" style="display: inline">
     
     <p><input type="hidden" name="change_menus" value="true" /></p>
@@ -72,6 +74,8 @@ function NoMenus() {
 global $l, $settings, $cmsurl;
   
   echo '
+    <h1>'.$l['managemenus_header'].'</h1>
+    
     <form action="'.$cmsurl.'index.php?action=admin;sa=menus" method="post" style="display: inline">
     
     <p><input type="hidden" name="change_menus" value="true" /></p>

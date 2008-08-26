@@ -34,7 +34,7 @@ echo '
 function ThemeError() {
 global $cmsurl, $l, $settings;
 echo '
-  <h3>', $l['themeerror_header'], '</h3>
+  <h1>', $l['themeerror_header'], '</h1>
   <p>', $l['themeerror_msg'], '</p>';
 }
 ?>

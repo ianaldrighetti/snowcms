@@ -7,6 +7,7 @@ if(!defined('Snow'))
 function Main() {
 global $cmsurl, $settings, $l, $user;
   echo '
+  <h1>'.$l['admin_title'].'</h1>
   <table>
     <tr>
       <td>'.$l['admin_current_version'].'</td>

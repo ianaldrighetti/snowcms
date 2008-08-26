@@ -133,6 +133,7 @@ $l['basicsettings_manage_members_per_page'] = 'Members per page:';
 
 // ManagePages.template.php
 $l['managepages_title'] = 'Manage Pages';
+$l['managepages_header'] = 'Manage Pages';
 $l['managepages_createpage'] = 'Create Page';
 $l['managepages_pagetitle'] = 'Page Title:';
 $l['managepages_header'] = 'Manage Pages';
@@ -145,11 +146,11 @@ $l['managepages_pageowner'] = 'Page Owner';
 $l['managepages_datemade'] = 'Created on';
 $l['managepages_no_pages'] = 'Their are currently no pages in your database';
 $l['managepages_delete'] = 'Delete';
-$l['managepages_edit_title'] = 'Editing page %title%';
+$l['managepages_edit_title'] = 'Editing %title%';
+$l['managepages_edit_header'] = 'Editing %title%';
 $l['managepages_no_page_title'] = 'That page doesn\'t exist!';
 $l['managepages_no_page_header'] = 'That page doesn\'t exist!';
 $l['managepages_no_page_desc'] = 'The page you have requested to edit does not exist.';
-$l['managepages_edit_header'] = 'Edit Page';
 $l['managepages_edit_desc'] = 'You are currently editing a page; you can edit the content and the title of the page, and you use can use HTML in the content of the page.';
 $l['managepages_editpage_title'] = 'Page Title:';
 $l['managepages_editpage_content'] = 'Page Content:';
@@ -221,6 +222,8 @@ $l['topic_status'] = 'Status:';
 
 // Profile.template.php
 $l['profile_title'] = 'Profile';
+$l['profile_header'] = 'Profile of %user%';
+$l['profile_own_header'] = 'Profile';
 $l['profile_error_title'] = 'Error';
 $l['profile_error_header'] = 'Error';
 $l['profile_error_desc'] = 'Sorry, but you are not <a href="'.$cmsurl.'index.php?action=login">logged in</a>, if you have not yet done so, why not <a href="'.$cmsurl.'index.php?action=register">register</a> and or <a href="'.$cmsurl.'index.php?action=login">login</a>';
@@ -230,6 +233,7 @@ $l['profile_offline'] = 'Offline';
 $l['profile_moderate'] = 'Moderate';
 $l['profile_edit_link'] = 'Change Settings';
 $l['profile_edit_title'] = 'Change Settings';
+$l['profile_edit_header'] = 'Change Settings';
 $l['profile_edit_display_name'] = 'Display Name';
 $l['profile_edit_email'] = 'Email Address';
 $l['profile_edit_signature'] = 'Signature';
@@ -298,6 +302,7 @@ $l['mf_perms_nocats'] = 'Error! It appears you don\'t have any <a href="'. $cmsu
 
 // ManageMembers.template.php
 $l['managemembers_title'] = 'Manage Members';
+$l['managemembers_header'] = 'Member List';
 $l['managemembers_showing'] = 'Showing members %from% to %to%.';
 $l['managemembers_showing_one'] = 'Showing member %number%.';
 $l['managemembers_showing_none'] = 'No members match this filter.';
@@ -316,6 +321,7 @@ $l['managemembers_filter_suspended'] = 'Suspended';
 $l['managemembers_filter_banned'] = 'Banned';
 $l['managemembers_moderate_button'] = 'Moderate';
 $l['managemembers_moderate_title'] = 'Moderate %name%';
+$l['managemembers_moderate_header'] = 'Moderate %name%';
 $l['managemembers_moderate_id'] = 'ID';
 $l['managemembers_moderate_username'] = 'Username';
 $l['managemembers_moderate_display_name'] = 'Display Name';
@@ -357,6 +363,7 @@ $l['managemembers_error_unban'] = 'Failed to unban member.';
 
 // ManageMenus.template.php
 $l['managemenus_title'] = 'Manage Menus';
+$l['managemenus_header'] = 'Manage Menus';
 $l['managemenus_name'] = 'Name';
 $l['managemenus_url'] = 'URL';
 $l['managemenus_new_window'] = 'New Window';

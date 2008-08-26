@@ -3,6 +3,10 @@
 function Main() {
 global $l, $db_prefix, $settings, $cmsurl, $theme_url;
   
+  echo '
+    <h1>'.$l['managemembers_header'].'</h1>
+    ';
+  
   $page = $settings['manage_members']['page'];
   $member_rows = $settings['manage_members']['member_rows'];
   $total_members = $settings['manage_members']['total_members'];
@@ -101,7 +105,7 @@ global $l, $db_prefix, $settings, $cmsurl, $theme_url;
 function NoMembers() {
 global $l, $settings, $cmsurl;
   
-  echo '<h1>'.$l['managemembers_title'].'</h1>
+  echo '<h1>'.$l['managemembers_header'].'</h1>
         ';
   
   $page = $settings['manage_members']['page'];
@@ -179,7 +183,9 @@ global $l, $settings, $user, $cmsurl;
   $last_ip = $settings['managemembers']['member']['last_ip'] ? $settings['managemembers']['member']['last_ip'] : $settings['managemembers']['member']['reg_ip'];
   $last_login = $settings['managemembers']['member']['last_login'] ? date($settings['timeformat'].', '.$settings['dateformat'],$settings['managemembers']['member']['last_login']) : $l['managemembers_moderate_never'];
   
-  echo '<form action="'.$cmsurl.'index.php?action=admin;sa=members;u='.$_REQUEST['u'].'" method="post" style="display: inline">
+  echo '
+      <h1>'.str_replace('%name%',$settings['managemembers']['member']['display_name'],$l['managemembers_moderate_header']).'</h1>
+        <form action="'.$cmsurl.'index.php?action=admin;sa=members;u='.$_REQUEST['u'].'" method="post" style="display: inline">
         
         <p>
         <input type="hidden" name="sc" value="'.$user['sc'].'" />

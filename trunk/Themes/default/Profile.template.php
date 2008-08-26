@@ -7,7 +7,9 @@ if(!defined('Snow'))
 function Main() {
 global $l, $settings, $cmsurl;
   
-  echo '
+  $profile = $settings['profile'];
+  
+  echo '<h1>'.str_replace('%user%',$profile['display_name'],$l['profile_own_header']).'</h1>
         <p style="margin-top: 0"><a href="'.$cmsurl.'index.php?action=profile;sa=edit">'.$l['profile_edit_link'].'</a></p>';
   
   Info();
@@ -18,7 +20,7 @@ global $l, $settings, $theme_url;
   
   $profile = $settings['profile'];
   
-  echo '
+  echo '<h1>'.str_replace('%user%',$profile['display_name'],$l['profile_header']).'</h1>
         <table>
          '.($profile['online']
           ? '<tr><td><img src="'.$theme_url.'/'.$settings['theme'].'/images/online.gif"
@@ -38,7 +40,7 @@ global $l, $settings, $theme_url, $cmsurl;
   
   $profile = $settings['profile'];
   
-  echo '
+  echo '<h1>'.str_replace('%user%',$profile['display_name'],$l['profile_header']).'</h1>
         <table>
          '.($profile['online']
           ? '<tr><td><img src="'.$theme_url.'/'.$settings['theme'].'/images/online.gif"
@@ -78,7 +80,7 @@ global $l, $settings, $cmsurl, $user;
   
   $profile = $settings['profile'];
   
-  echo '
+  echo '<h1>'.$l['profile_edit_header'].'</h1>
         
         <form action="'.$cmsurl.'index.php?action=profile;sa=edit" method="post" style="display: inline">
         
@@ -114,6 +116,7 @@ global $l, $settings, $cmsurl, $user;
 function NotAllowed() {
 global $cmsurl, $l, $settings;
 echo '
+  <h1>'.$l['profile_header'].'</h1>
   <p>'.$l['profile_error_desc'].'</p>';
 }
 ?>

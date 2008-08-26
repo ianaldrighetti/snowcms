@@ -7,6 +7,7 @@ if(!defined('Snow'))
 function Main() {
 global $cmsurl, $l, $settings, $user;
   echo '
+    <h1>'.$settings['page']['title'].'</h1>
 		<p>'.$settings['page']['content'].'</p> 
 		<br />';
 }

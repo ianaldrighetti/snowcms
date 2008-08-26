@@ -7,6 +7,7 @@ if(!defined('Snow'))
 function Main() {
 global $cmsurl, $settings, $l, $user, $theme_url;
   echo '
+  <h1>'.$l['managepages_header'].'</h1>
   <p>'.$l['managepages_desc'].'</p>';
   if($settings['page']['update_page']==1) {
     echo '
@@ -63,19 +64,22 @@ global $cmsurl, $settings, $l, $user, $theme_url;
     </table>';
   }
   else {
-    echo '<p>'.$l['adminpages_no_pages'].'</p>';
+    echo '<p>'.$l['managepages_no_pages'].'</p>';
   }
 }
 
 function NoPage() {
 global $cmsurl, $settings, $l, $user;
   echo '
+  <h1>'.$l['managepages_no_page_header'].'</h1>
+  
   <p>'.$l['managepages_no_page_desc'].'</p>';
 }
 
 function Editor() {
 global $cmsurl, $settings, $l, $user;
   echo '
+  <h1>'.str_replace('%title%',$settings['page']['edit_page']['title'],$l['managepages_edit_header']).'</h1>
   <p>'.$l['managepages_edit_desc'].'</p>
   <form action="'.$cmsurl.'index.php?action=admin;sa=managepages" method="post">
     <p><input type="hidden" name="update_page" value="true" /></p>
