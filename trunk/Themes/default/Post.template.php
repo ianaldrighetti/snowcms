@@ -5,7 +5,7 @@ if(!defined('Snow'))
   die('Hacking Attempt...');
   
 function Topic() {
-global $cmsurl, $settings, $l, $user;
+global $cmsurl, $settings, $l, $user, $theme_url;
 echo '
 <form action="', $cmsurl, 'forum.php?action=post2;board=', $settings['board'], '" method="post"  class="write">
 <table id="post" border="0px">
@@ -17,24 +17,40 @@ echo '
   </tr>
   <tr align="center" valign="middle">
     <td colspan="2">
-	    <a href="javascript:void(0);" onClick="add_bbcode(\'body\',\'[b]\',\'[/b]\');">Bold</a>
-	    <a href="javascript:void(0);" onClick="add_bbcode(\'body\',\'[i]\',\'[/i]\');">Italics</a>
-	    <a href="javascript:void(0);" onClick="add_bbcode(\'body\',\'[u]\',\'[/u]\');">Underline</a>
-	    <a href="javascript:void(0);" onClick="add_bbcode(\'body\',\'[s]\',\'[/s]\');">Strikethrough</a>
+	    <a href="javascript:void(0);" onClick="add_bbcode(\'body\',\'[b]\',\'[/b]\');"><b>Bold</b></a>
+	    <a href="javascript:void(0);" onClick="add_bbcode(\'body\',\'[i]\',\'[/i]\');"><i>Italics</i></a>
+	    <a href="javascript:void(0);" onClick="add_bbcode(\'body\',\'[u]\',\'[/u]\');"><u>Underline</u></a>
+	    <a href="javascript:void(0);" onClick="add_bbcode(\'body\',\'[s]\',\'[/s]\');"><del>Strikethrough</del></a>
 	    <a href="javascript:void(0);" onClick="add_bbcode(\'body\',\'[img]\',\'[/img]\');">Image</a>
-	    <a href="javascript:void(0);" onClick="add_bbcode(\'body\',\'[url]\',\'[/url]\');">Link</a>
-	    <a href="javascript:void(0);" onClick="add_bbcode(\'body\',\'[tt]\',\'[/tt]\');">Teletype</a>
+	    <a href="javascript:void(0);" onClick="add_bbcode(\'body\',\'[url]\',\'[/url]\');">http://Link</a>
+	    <a href="javascript:void(0);" onClick="add_bbcode(\'body\',\'[tt]\',\'[/tt]\');"><tt>Teletype</tt></a>
 	  </td>	
   </tr>
   <tr align="center" valign="middle">
   	<td colspan="2">  
-	    <a href="javascript:void(0);" onClick="add_bbcode(\'body\',\' :) \',\'\');">smile</a>
-	    <a href="javascript:void(0);" onClick="add_bbcode(\'body\',\' :( \',\'\');">sad</a>
-	    <a href="javascript:void(0);" onClick="add_bbcode(\'body\',\' :[ \',\'\');">angry</a>
-	    <a href="javascript:void(0);" onClick="add_bbcode(\'body\',\' :D \',\'\');">grin</a>
-	    <a href="javascript:void(0);" onClick="add_bbcode(\'body\',\' :O \',\'\');">shock</a>
-	    <a href="javascript:void(0);" onClick="add_bbcode(\'body\',\' ;) \',\'\');">wink</a>
-	    <a href="javascript:void(0);" onClick="add_bbcode(\'body\',\' :P \',\'\');">tongue</a>
+	    
+	    <a href="javascript:void(0);" onClick="add_bbcode(\'body\',\' :) \',\'\');">
+	    <img src="'.$theme_url.'/'.$settings['theme'].'/emoticons/smile.png" alt="smile" title="Smile">
+	    </a>
+	    <a href="javascript:void(0);" onClick="add_bbcode(\'body\',\' :( \',\'\');">
+	    <img src="'.$theme_url.'/'.$settings['theme'].'/emoticons/sad.png" alt="sad" title="Sad">
+	    </a>
+	    <a href="javascript:void(0);" onClick="add_bbcode(\'body\',\' :[ \',\'\');">
+	    <img src="'.$theme_url.'/'.$settings['theme'].'/emoticons/angry.png" alt="angry" title="Angry">
+	    </a>
+	    <a href="javascript:void(0);" onClick="add_bbcode(\'body\',\' :D \',\'\');">
+	    <img src="'.$theme_url.'/'.$settings['theme'].'/emoticons/grin.png" alt="grin" title="Grin">
+	    </a>
+	    <a href="javascript:void(0);" onClick="add_bbcode(\'body\',\' :O \',\'\');">
+	    <img src="'.$theme_url.'/'.$settings['theme'].'/emoticons/shock.png" alt="shock" title="Shock">
+	    </a>
+	    <a href="javascript:void(0);" onClick="add_bbcode(\'body\',\' ;) \',\'\');">
+	    <img src="'.$theme_url.'/'.$settings['theme'].'/emoticons/wink.png" alt="wink" title="Wink">
+	    </a>
+	    <a href="javascript:void(0);" onClick="add_bbcode(\'body\',\' :P \',\'\');">
+	    <img src="'.$theme_url.'/'.$settings['theme'].'/emoticons/tongue.png" alt="tongue" title="Mr. Yucky-Poo">
+	    </a>
+	    
 	  </td>
   </tr>
   <tr align="center">
@@ -66,7 +82,7 @@ echo '
 }
 
 function Reply() {
-global $cmsurl, $settings, $l, $user;
+global $cmsurl, $settings, $l, $user, $theme_url;
 echo '
 <form action="', $cmsurl, 'forum.php?action=post2;topic=', $settings['topic'], '" method="post" class="write">
 <table id="post" border="0px">
@@ -78,24 +94,38 @@ echo '
   </tr>
   <tr align="center" valign="middle">
     <td colspan="2">
-	    <a href="javascript:void(0);" onClick="add_bbcode(\'body\',\'[b]\',\'[/b]\');">Bold</a>
-	    <a href="javascript:void(0);" onClick="add_bbcode(\'body\',\'[i]\',\'[/i]\');">Italics</a>
-	    <a href="javascript:void(0);" onClick="add_bbcode(\'body\',\'[u]\',\'[/u]\');">Underline</a>
-	    <a href="javascript:void(0);" onClick="add_bbcode(\'body\',\'[s]\',\'[/s]\');">Strikethrough</a>
+	    <a href="javascript:void(0);" onClick="add_bbcode(\'body\',\'[b]\',\'[/b]\');"><b>Bold</b></a>
+	    <a href="javascript:void(0);" onClick="add_bbcode(\'body\',\'[i]\',\'[/i]\');"><i>Italics</i></a>
+	    <a href="javascript:void(0);" onClick="add_bbcode(\'body\',\'[u]\',\'[/u]\');"><u>Underline</u></a>
+	    <a href="javascript:void(0);" onClick="add_bbcode(\'body\',\'[s]\',\'[/s]\');"><del>Strikethrough</del></a>
 	    <a href="javascript:void(0);" onClick="add_bbcode(\'body\',\'[img]\',\'[/img]\');">Image</a>
 	    <a href="javascript:void(0);" onClick="add_bbcode(\'body\',\'[url]\',\'[/url]\');">Link</a>
-	    <a href="javascript:void(0);" onClick="add_bbcode(\'body\',\'[tt]\',\'[/tt]\');">Teletype</a>
+	    <a href="javascript:void(0);" onClick="add_bbcode(\'body\',\'[tt]\',\'[/tt]\');"><tt>Teletype</tt></a>
 	  </td>	
   </tr>
   <tr align="center" valign="middle">
   	<td colspan="2">  
-	    <a href="javascript:void(0);" onClick="add_bbcode(\'body\',\' :) \',\'\');">smile</a>
-	    <a href="javascript:void(0);" onClick="add_bbcode(\'body\',\' :( \',\'\');">sad</a>
-	    <a href="javascript:void(0);" onClick="add_bbcode(\'body\',\' :[ \',\'\');">angry</a>
-	    <a href="javascript:void(0);" onClick="add_bbcode(\'body\',\' :D \',\'\');">grin</a>
-	    <a href="javascript:void(0);" onClick="add_bbcode(\'body\',\' :O \',\'\');">shock</a>
-	    <a href="javascript:void(0);" onClick="add_bbcode(\'body\',\' ;) \',\'\');">wink</a>
-	    <a href="javascript:void(0);" onClick="add_bbcode(\'body\',\' :P \',\'\');">tongue</a>
+	    <a href="javascript:void(0);" onClick="add_bbcode(\'body\',\' :) \',\'\');">
+	    <img src="'.$theme_url.'/'.$settings['theme'].'/emoticons/smile.png" alt="smile" title="Smile">
+	    </a>
+	    <a href="javascript:void(0);" onClick="add_bbcode(\'body\',\' :( \',\'\');">
+	    <img src="'.$theme_url.'/'.$settings['theme'].'/emoticons/sad.png" alt="sad" title="Sad">
+	    </a>
+	    <a href="javascript:void(0);" onClick="add_bbcode(\'body\',\' :[ \',\'\');">
+	    <img src="'.$theme_url.'/'.$settings['theme'].'/emoticons/angry.png" alt="angry" title="Angry">
+	    </a>
+	    <a href="javascript:void(0);" onClick="add_bbcode(\'body\',\' :D \',\'\');">
+	    <img src="'.$theme_url.'/'.$settings['theme'].'/emoticons/grin.png" alt="grin" title="Grin">
+	    </a>
+	    <a href="javascript:void(0);" onClick="add_bbcode(\'body\',\' :O \',\'\');">
+	    <img src="'.$theme_url.'/'.$settings['theme'].'/emoticons/shock.png" alt="shock" title="Shock">
+	    </a>
+	    <a href="javascript:void(0);" onClick="add_bbcode(\'body\',\' ;) \',\'\');">
+	    <img src="'.$theme_url.'/'.$settings['theme'].'/emoticons/wink.png" alt="wink" title="Wink">
+	    </a>
+	    <a href="javascript:void(0);" onClick="add_bbcode(\'body\',\' :P \',\'\');">
+	    <img src="'.$theme_url.'/'.$settings['theme'].'/emoticons/tongue.png" alt="tongue" title="Mr. Yucky-Poo">
+	    </a>
 	  </td>
   </tr>
   <tr align="center">

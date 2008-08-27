@@ -26,7 +26,7 @@ echo '
   if(count($settings['topics'])>0) {
     foreach($settings['topics'] as $topic) {
        echo '
-       <tr>
+       <tr class="indexcontent">
          <td style="padding: 5px;">XX</td>
          <td style="padding: 5px;"><a href="'. $cmsurl. 'forum.php?topic='. $topic['tid']. '">'. $topic['subject']. '</a></td>
          <td style="text-align: center; padding: 5px;"><a href="'. $cmsurl. 'index.php?action=profile;u='. $topic['starter_id']. '">'.$topic['username']. '</a></td>
