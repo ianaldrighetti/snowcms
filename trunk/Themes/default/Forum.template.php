@@ -14,7 +14,7 @@ echo '
 	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 	<title>'.$settings['page']['title'].'</title>
   <link rel="stylesheet" href="'.$theme_url.'/'.$settings['theme'].'/forum.css" type="text/css" media="screen" />
-  <script type="text/javascript" src="'. $theme_url. '/default/scripts/bbcode.js"></script>
+  <script type="text/javascript" src="'. $theme_url. '/default/scripts/bbcode_mini.js"></script>
 </head>
 <body>
   <div id="header">
