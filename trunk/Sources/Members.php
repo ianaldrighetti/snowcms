@@ -221,7 +221,7 @@ global $l, $settings, $db_prefix;
 }
 
 function processModeration() {
-global $l, $db_prefix, $user, $settings;
+global $l, $db_prefix, $user, $settings, $cookie_prefix;
   
   // Note: Error handling needs work
   if (!ValidateSession(@$_REQUEST['sc']) || !@$_REQUEST['u'])
@@ -296,10 +296,10 @@ global $l, $db_prefix, $user, $settings;
   
     // If they changed their own username change settings to keep 'em logged in
     if ($_REQUEST['u'] == $_REQUEST['uid']) {
-      setcookie('username',$_REQUEST['user_name']);
+      setcookie($cookie_prefix.'username',$_REQUEST['user_name']);
       // More settings if they changed their p[assword
       if ($_REQUEST['password-new']) {
-        setcookie("password", $password_new);
+        setcookie($cookie_prefix."password", $password_new);
         $_SESSION['pass'] = $password_new;
       }
     }

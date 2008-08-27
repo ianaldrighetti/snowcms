@@ -79,7 +79,7 @@ echo '
 }
 
 function languageOption() {
-global $user, $settings, $l, $db_prefix, $language_dir, $cmsurl;
+global $user, $settings, $l, $db_prefix, $language_dir, $cmsurl, $cookie_prefix;
   
   // Check how many language there are
   $total_languages = 0;
@@ -90,7 +90,7 @@ global $user, $settings, $l, $db_prefix, $language_dir, $cmsurl;
   // Only show the change language form if there are at least two
   if ($total_languages > 1) {
     
-    $current_language = clean($user['language'] ? $user['language'] : (@$_COOKIE['change-language'] ? @$_COOKIE['change-language'] : $settings['language']));
+    $current_language = clean($user['language'] ? $user['language'] : (@$_COOKIE[$cookie_prefix.'change-language'] ? @$_COOKIE[$cookie_prefix.'change-language'] : $settings['language']));
     
 	  echo '<form action="'.$_SERVER['REQUEST_URI'].'" method="post" style="text-align: center"><p>
 	  <select name="change-language">

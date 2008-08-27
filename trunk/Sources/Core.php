@@ -51,7 +51,7 @@ function clean_header($str) {
 // Loads up the $user array, such as their member group, IP, email, if they are logged in or not
 // It will also revive their session if they left, but had remember me on
 function loadUser() {
-global $db_prefix, $user;
+global $db_prefix, $user, $cookie_prefix;
   $user = array();
   // Set some default info, incase they are guests
   $user['id'] = 0;
@@ -68,9 +68,9 @@ global $db_prefix, $user;
   $user['ip'] = @isset($_SERVER['HTTP_X_FORWARDED_FOR']) ? $_SERVER['HTTP_X_FORWARDED_FOR'] : $_SERVER['REMOTE_ADDR'];
   if(empty($_SESSION['id'])) {
     // We need to sanitize the cookies, last thing we need is to be hacked by cookies, Those are some bad cookies (Like Oatmeal ones, Ewww!)
-    $_SESSION['id'] = @addslashes(mysql_real_escape_string($_COOKIE['uid']));
-    $_SESSION['user'] = @clean($_COOKIE['username']);
-    $_SESSION['pass'] = @clean($_COOKIE['password']);
+    $_SESSION['id'] = @addslashes(mysql_real_escape_string($_COOKIE[$cookie_prefix.'uid']));
+    $_SESSION['user'] = @clean($_COOKIE[$cookie_prefix.'username']);
+    $_SESSION['pass'] = @clean($_COOKIE[$cookie_prefix.'password']);
   }
   if(isset($_SESSION['id'])) {
     if(isset($_SESSION['pass'])) {
@@ -98,9 +98,9 @@ global $db_prefix, $user;
         }
       }
       else {
-        setcookie("uid","",time()-60*60*24);
-        setcookie("username","",time()-60*60*24);
-        setcookie("password","",time()-60*60*24);
+        setcookie($cookie_prefix."uid","",time()-60*60*24);
+        setcookie($cookie_prefix."username","",time()-60*60*24);
+        setcookie($cookie_prefix."password","",time()-60*60*24);
       }
     }
   }
@@ -110,10 +110,10 @@ global $db_prefix, $user;
 // This loads the Language file, from the language directory, later on (Maybe SnowCMS 0.8 or later)
 // Will allow each theme to have its own language file(s)
 function loadLanguage() {
-global $cmsurl, $l, $language_dir, $settings, $theme_dir, $user, $db_prefix;
+global $cmsurl, $l, $language_dir, $settings, $theme_dir, $user, $db_prefix, $cookie_prefix;
   
   // Get the language record from either the user's profile, the cookies or the site's default
-  $language = clean($user['language'] ? $user['language'] : (@$_COOKIE['change-language'] ? @$_COOKIE['change-language'] : $settings['language']));
+  $language = clean($user['language'] ? $user['language'] : (@$_COOKIE[$cookie_prefix.'change-language'] ? @$_COOKIE[$cookie_prefix.'change-language'] : $settings['language']));
   
   $l = array();
   require_once($language_dir.'/'.$language.'.language.php');
@@ -627,7 +627,7 @@ global $cmsurl, $db_prefix, $settings, $user;
 
 // Just because this function is getting called doesn't mean the language is going to change
 function changeLanguage() {
-global $db_prefix, $user;
+global $db_prefix, $user, $cookie_prefix;
   
   if (@$_POST['change-language']) {
     // Oh wait, it is
@@ -636,7 +636,7 @@ global $db_prefix, $user;
     if ($user['is_logged'] == true)
       sql_query("UPDATE {$db_prefix}members SET `language` = '$language' WHERE `id` = '{$user['id']}'");
     else
-      setcookie('change-language',$language,time()+60*60*24*365);
+      setcookie($cookie_prefix.'change-language',$language,time()+60*60*24*365);
     
     $user['language'] = $language;
   }

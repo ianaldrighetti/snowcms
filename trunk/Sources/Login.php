@@ -24,7 +24,7 @@ global $cmsurl, $db_prefix, $l, $settings, $user;
 
 // This processes the login form
 function Login2() {
-global $cmsurl, $db_prefix, $l, $settings, $user;
+global $cmsurl, $db_prefix, $l, $settings, $user, $cookie_prefix;
   // Get and sanitize the username and encrypt the password
   $username = @clean($_REQUEST['username']);
   $password = @md5($_REQUEST['password']);
@@ -44,9 +44,9 @@ global $cmsurl, $db_prefix, $l, $settings, $user;
         $login_length = (int)$_REQUEST['login_length'];
         if($login_length==0)
           $login_length = $settings['remember_time']*60;
-        setcookie("username", $_REQUEST['username'], time()+$login_length);
-        setcookie("password", md5($_REQUEST['password']), time()+$login_length);
-        setcookie("uid", $id, time()+$login_length);
+        setcookie($cookie_prefix."username", $_REQUEST['username'], time()+$login_length);
+        setcookie($cookie_prefix."password", md5($_REQUEST['password']), time()+$login_length);
+        setcookie($cookie_prefix."uid", $id, time()+$login_length);
         
         // Set the Session variables, like ID and Pass, enables them to be validated
         // Its more secure to authenticate them on each page load, or at least we think so :P
@@ -89,7 +89,7 @@ global $cmsurl, $db_prefix, $l, $settings, $user;
 
 // Logout, need I explain? :P
 function Logout() {
-global $cmsurl, $db_prefix, $l, $settings, $user;
+global $cmsurl, $db_prefix, $l, $settings, $user, $cookie_prefix;
   if(ValidateSession(@$_REQUEST['sc'])) {
     // Are they even logged in? Lol.
     if($user['is_logged']) {
@@ -98,9 +98,9 @@ global $cmsurl, $db_prefix, $l, $settings, $user;
       // Delete them from the {db_prefix}online table
       sql_query("DELETE FROM {$db_prefix}online WHERE `user_id` = '{$user['id']}'");
       // Delete the Cookies... If they have any (the @ means to stfu, I don't want any errors)
-        @setcookie("username", '', time()-($settings['remember_time']*60));
-        @setcookie("password", '', time()-($settings['remember_time']*60));
-        @setcookie("uid", '', time()-($settings['remember_time']*60));    
+        @setcookie($cookie_prefix."username", '', time()-($settings['remember_time']*60));
+        @setcookie($cookie_prefix."password", '', time()-($settings['remember_time']*60));
+        @setcookie($cookie_prefix."uid", '', time()-($settings['remember_time']*60));    
       // Redirect to the CMSURL URL
       header("Location: {$cmsurl}");
     }

@@ -84,7 +84,7 @@ global $cmsurl, $db_prefix, $l, $settings, $source_dir, $user, $perms;
 }
 
 function processEdit() {
-global $settings, $db_prefix, $user, $cmsurl;
+global $settings, $db_prefix, $user, $cmsurl,$cookie_prefix;
   
   // Note: Error handling needs work
   
@@ -132,7 +132,7 @@ global $settings, $db_prefix, $user, $cmsurl;
     $password_new = md5(@$_REQUEST['password-new']);
     sql_query("UPDATE {$db_prefix}members SET `display_name` = '$display_name', `email` = '$email', `signature` = '$signature', `profile` = '$profile', `password` = '$password_new' WHERE `id` = '{$user['id']}'");
     
-    setcookie("password", $password_new);
+    setcookie($cookie_prefix."password", $password_new);
     $_SESSION['pass'] = $password_new;
   }
   else

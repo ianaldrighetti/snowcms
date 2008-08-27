@@ -224,6 +224,9 @@ $mysql_passwd = \''.$_REQUEST['mysql_pass'].'\'; # Your MySQL Password
 $mysql_db = \''.$_REQUEST['mysql_db'].'\'; # Your MySQL DB
 $mysql_prefix = \''.$_REQUEST['mysql_prefix'].'\'; # Prefix for your database
 
+// Misc
+$cookie_prefix = \''.$_REQUEST['mysql_prefix'].'\'; # Previx for cookies
+
 // Some SnowCMS Specific Settings
 $source_dir = \''.$_REQUEST['source_dir'].'\'; # Path to your Source directory without trailing /!
 $theme_dir = \''.$_REQUEST['theme_dir'].'\'; # Path to your Themes directory without trailing /!
