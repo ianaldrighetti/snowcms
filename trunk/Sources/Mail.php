@@ -32,7 +32,7 @@ global $cmsurl, $l, $settings, $source_dir, $user;
     $mail->Password = $settings['smtp_pass'];
 
     // Set from, from name, and to who
-    $mail->From = $settings['smtp_from'];
+    $mail->From = $settings['from_email'];
     $mail->FromName = $settings['site_name'];
     $mail->AddAddress($to);
 
@@ -58,7 +58,7 @@ global $cmsurl, $l, $settings, $source_dir, $user;
   }
   else {
     // Set the headers, such as where from, and Reply too
-    $header = "From: ".$settings['webmaster_email']."\r\nReply-To: ".$settings['webmaster_email']."\r\n";
+    $header = "From: ".$settings['from_email']."\r\nReply-To: ".$settings['from_email']."\r\n";
     // Send the email
     @$mail = mail($to, $subject, $msg, $header);
     // Was it successful or not?

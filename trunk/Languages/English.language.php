@@ -110,6 +110,8 @@ $l['admin_menu_menus'] = 'Manage Menus';
 $l['admin_menu_menus_desc'] = 'You can edit the links on the sidebar and main menu here.';
 $l['admin_menu_forum'] = 'Manage Forum';
 $l['admin_menu_forum_desc'] = 'You can manage your forum setup here, such as categories and board management.';
+$l['admin_menu_email'] = 'Mail Settings';
+$l['admin_menu_email_desc'] = 'You can change mail settings here, like whether SMTP or Sendmail are used.';
 
 // Settings.template.php
 $l['basicsettings_title'] = 'Basic Settings';
@@ -130,6 +132,22 @@ $l['basicsettings_dateformat'] = 'Date Format:';
 $l['basicsettings_update'] = 'Update Settings';
 $l['basicsettings_num_news_items'] = 'News items per page:';
 $l['basicsettings_manage_members_per_page'] = 'Members per page:';
+
+// Mail.template.php
+$l['mailsettings_title'] = 'Email Settings';
+$l['mailsettings_header'] = 'Email Settings';
+$l['mailsettings_desc'] = 'You can change mail settings here, like whether SMTP or Sendmail are used.';
+$l['mailsettings_smtp'] = 'SMTP';
+$l['mailsettings_sendmail'] = 'Sendmail';
+$l['mailsettings_smtp_host'] = 'SMTP Host:';
+$l['mailsettings_smtp_port'] = 'SMTP Port:';
+$l['mailsettings_smtp_user'] = 'SMTP User:';
+$l['mailsettings_smtp_pass'] = 'SMTP Password:';
+$l['mailsettings_smtp_pass_2'] = 'Verify Password:';
+$l['mailsettings_from_email'] = 'From Email Address:';
+$l['mailsettings_update'] = 'Update Settings';
+$l['mailsettings_error'] = '<b>Error:</b> Failed to update mail settings.';
+$l['mailsettings_error_verification'] = '<b>Error:</b> The verification password was wrong.';
 
 // ManagePages.template.php
 $l['managepages_title'] = 'Manage Pages';

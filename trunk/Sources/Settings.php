@@ -119,13 +119,54 @@ global $cmsurl, $db_prefix, $l, $settings, $user, $language_dir, $theme_dir, $th
 }
 
 function MailSettings() {
-global $cmsurl, $db_prefix, $l, $settings, $user;
+global $cmsurl, $db_prefix, $l, $settings;
+  // Do they have permission?
   if(can('manage_mail_settings')) {
-  
+    // Are they changing settings?
+    if (@$_REQUEST['change_settings']) {
+      
+      $mail_with_fsockopen = clean(@$_REQUEST['mail_with_fsockopen']);
+      $smtp_host = clean(@$_REQUEST['smtp_host']);
+      $smtp_port = clean(@$_REQUEST['smtp_port']);
+      $smtp_user = clean(@$_REQUEST['smtp_user']);
+      $smtp_pass = clean(@$_REQUEST['smtp_pass']);
+      $smtp_pass_2 = clean(@$_REQUEST['smtp_pass_2']);
+      $from_email = clean(@$_REQUEST['from_email']);
+      
+      // Are they changing the password?
+      if ($smtp_pass) {
+        // Is the verification password correct?
+        if ($smtp_pass == $smtp_pass_2)
+          // It is
+          sql_query("UPDATE {$db_prefix}settings SET `value` = '$smtp_pass' WHERE `variable` = 'smtp_pass'") or $_SESSION['error'] = $l['mailsettings_error'];
+        else
+          // It isn't
+          $_SESSION['error'] = $l['mailsettings_error_verification'];
+      }
+      
+      // Do this only if there hasn't been an error yet
+      if (!@$_SESSION['error']) {
+        if ($mail_with_fsockopen) {
+          // Change all the settings
+          sql_query("UPDATE {$db_prefix}settings SET `value` = '$mail_with_fsockopen' WHERE `variable` = 'mail_with_fsockopen'") or $_SESSION['error'] = $l['mailsettings_error'];
+          sql_query("UPDATE {$db_prefix}settings SET `value` = '$smtp_host' WHERE `variable` = 'smtp_host'") or $_SESSION['error'] = $l['mailsettings_error'];
+          sql_query("UPDATE {$db_prefix}settings SET `value` = '$smtp_port' WHERE `variable` = 'smtp_port'") or $_SESSION['error'] = $l['mailsettings_error'];
+          sql_query("UPDATE {$db_prefix}settings SET `value` = '$smtp_user' WHERE `variable` = 'smtp_user'") or $_SESSION['error'] = $l['mailsettings_error'];
+          sql_query("UPDATE {$db_prefix}settings SET `value` = '$from_email' WHERE `variable` = 'from_email'") or $_SESSION['error'] = $l['mailsettings_error'];
+        }
+        else {
+          // Change only the non-fsockopen related settings
+          sql_query("UPDATE {$db_prefix}settings SET `value` = '$mail_with_fsockopen' WHERE `variable` = 'mail_with_fsockopen'") or $_SESSION['error'] = $l['mailsettings_error'];
+          sql_query("UPDATE {$db_prefix}settings SET `value` = '$from_email' WHERE `variable` = 'from_email'") or $_SESSION['error'] = $l['mailsettings_error'];
+        }
+      }
+      
+      // Redirect the page to make it so if they refresh the settings aren't updated again
+      redirect('index.php?action=admin;sa=mail-settings');
+    }
+    // Set the page title and load the theme
+    $settings['page']['title'] = $l['mailsettings_title'];
+    loadTheme('Settings','ManageMailSettings');
   }
-  else {
-    $settings['page']['title'] = $l['admin_error_title'];
-    loadTheme('Admin','Error');
-  } 
 }
 ?>

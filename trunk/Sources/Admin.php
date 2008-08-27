@@ -39,11 +39,11 @@ global $cmsurl, $db_prefix, $l, $settings, $source_dir, $user;
         'forum' => array('ManageForum.php','ManageForum'),
         'groups' => array('Groups.php','ManageGroups'),
         'managepages' => array('Page.php','ManagePages'),
-        'mail-settings' => array('Settings.php','MailSettings'),        
         'members' => array('Members.php','ManageMembers'),
         'permissions' => array('Permissions.php','GroupPermissions'),
         'menus' => array('Menus.php','ManageMenus'),
-        'news' => array('News.php','ManageNews')
+        'news' => array('News.php','ManageNews'),
+        'mail-settings' => array('Settings.php','MailSettings')
       );
       // Is the sa= in the $sa array? If so do it :D
       if(is_array(@$sa[$_REQUEST['sa']])) {
