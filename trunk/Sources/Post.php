@@ -44,8 +44,12 @@ global $cmsurl, $db_prefix, $l, $settings, $user;
           $settings['body'] = @$_SESSION['body'] ? clean($_SESSION['body']) : clean(@$_REQUEST['body']);
           $settings['board'] = $row['bid'];
           $settings['topic'] = $row['tid'];
-          unset($_SESSION['subject'], $_SESSION['body'], $_SESSION['sticky'], $_SESSION['locked'], $_SESSION['board']);
+          // Load the preview of the topic, and if necessary the quote ;)
+          loadPreview();
+          loadQuote();
           loadForum('Post','Reply');
+          // Undelete a few things ;)
+          unset($_SESSION['subject'], $_SESSION['body'], $_SESSION['sticky'], $_SESSION['locked'], $_SESSION['board']);
         }
         else {
           // They can't access the board that the topic is in, why should they be able to post, make them think this topic doesnt exist.
@@ -300,5 +304,22 @@ global $db_prefix;
   }
   else
     return 0;
+}
+
+// This will load the preview of the current topic...
+function loadPreview() {
+global $db_prefix, $settings, $Topic_ID, $user;
+  $result = sql_query("
+    SELECT
+     msg.tid, msg.mid, msg.uid, msg.poster_name, msg.body,
+     mem.id, mem.display_name AS username, IFNULL(mem.display_name, msg.poster_name) AS username
+    FROM {$db_prefix}messages AS msg
+      LEFT JOIN {$db_prefix}members AS mem ON mem.id = msg.uid
+    WHERE msg.tid = $Topic_ID AND {$user['board_query']}
+    ORDER BY msg.mid DESC LIMIT 6");
+  $settings['preview'] = array();
+  while($row = mysql_fetch_assoc($result)) {
+  
+  }
 }
 ?>
