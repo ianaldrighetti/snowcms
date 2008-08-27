@@ -26,7 +26,7 @@ $files = array(
   "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
 <head>
-	<title>SnowCMS - SnowCMS - Title</title>
+	<title>SnowCMS - SnowCMS Install</title>
 	<meta http-equiv="content-type" content="text/html;charset=utf-8" />
 	<meta name="generator" content="SnowCMS 0.7" />
 	<link rel="stylesheet" href="Themes/default/style.css" type="text/css" media="screen" />
