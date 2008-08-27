@@ -41,7 +41,7 @@ echo '
 	</td>
   </tr>
   <tr align="center">
-    <td colspan="2"><textarea id="body" name="body" rows="12" cols="60">', $settings['body'], '</textarea></td>
+    <td colspan="2"><textarea id="body" name="body" rows="12" cols="60" onclick="this.selection = document.selection.createRange()" onkeyup="this.selection = document.selection.createRange()" onchange="this.selection = document.selection.createRange().duplicate()" onfocus="this.selection = document.selection.createRange().duplicate()">', $settings['body'], '</textarea></td>
   </tr>';
   if(canforum('post_sticky', $settings['board']) || canforum('lock_topic', $settings['board'])) {
     if($settings['sticky'])
@@ -62,10 +62,11 @@ echo '
     <td colspan="2"><input name="make_topic" type="submit" value="', $l['topic_topic_button'], '"/></td>
   </tr>
 </table>
+</form>
+
 <script type="text/javascript">
   document.getElementById(\'body\').focus();
-</script>
-</form>';
+</script>';
 }
 
 function Reply() {
@@ -105,7 +106,7 @@ echo '
 	</td>
   </tr>
   <tr align="center">
-    <td colspan="2"><textarea name="body" id="body" rows="12" cols="60">', $settings['body'], '</textarea></td>
+    <td colspan="2"><textarea name="body" rows="12" cols="60" onclick="this.selection = document.selection.createRange()" onkeyup="this.selection = document.selection.createRange()" onchange="this.selection = document.selection.createRange().duplicate()" onfocus="this.selection = document.selection.createRange().duplicate()">', $settings['body'], '</textarea></td>
   </tr>';
   if(canforum('post_sticky', $settings['board']) || canforum('lock_topic', $settings['board'])) {
     if($settings['sticky'])
@@ -126,10 +127,10 @@ echo '
     <td colspan="2"><input name="post_reply" type="submit" value="', $l['topic_post_button'] ,'"/></td>
   </tr>
 </table>
+</form>
+
 <script type="text/javascript">
   document.getElementById(\'body\').focus();
-</script>
-</form>
-PREVIEW!';
+</script>';
 }
 ?>
