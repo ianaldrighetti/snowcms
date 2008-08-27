@@ -405,7 +405,9 @@ global $theme_dir, $theme_url, $settings;
     '/\[br\]/is',
     '/\[hr\]/is',
     '/\[img\]((http:\/\/|https:\/\/).*?)\[\/img\]/is',
-    '/\[img="?((http:\/\/|https:\/\/).*?)"?\](.*?)\[\/img\]/is'
+    '/\[img="?((http:\/\/|https:\/\/).*?)"?\](.*?)\[\/img\]/is',
+	'/\[tt\](.*?)\[\/tt\]/is',
+	'/\[s\](.*?)\[\/s\]/is'
   );
   $simple_replace = array(
     '<strong>$1</strong>',
@@ -420,7 +422,10 @@ global $theme_dir, $theme_url, $settings;
     '<br />',
     '<hr />',
     '<img src="$1" alt=""/>',
-    '<img src="$1" alt="$3"/>'
+    '<img src="$1" alt="$3"/>',
+	'<tt>$1</tt>',
+	'<del>$1</del>'
+	
   );
   $str = preg_replace($simple_search, $simple_replace, $str);
   
