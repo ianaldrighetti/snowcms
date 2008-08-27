@@ -46,10 +46,10 @@ global $cmsurl, $settings, $l, $user;
           <td>'.$l['register_email'].'</td><td><input name="email" type="text" value="'.@$_REQUEST['email'].'" /></td>
         </tr>
         <tr>
-          <td>&nbsp;</td><td colspan="2"><img src="'.$cmsurl.'image.php" alt="CAPTCHA" style="border: 1px solid #000;" /></td>
+          <td>'.$l['register_captcha'].'</td><td><input name="captcha" type="text"/></td>
         </tr>
         <tr>
-          <td>'.$l['register_captcha'].'</td><td><input name="captcha" type="text"/></td>
+          <td>&nbsp;</td><td colspan="2"><img src="'.$cmsurl.'image.php" alt="CAPTCHA" /></td>
         </tr>
         <tr>
           <td colspan="2"><input type="submit" value="'.$l['register_button'].'"/></td>
