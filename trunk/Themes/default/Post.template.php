@@ -62,6 +62,9 @@ echo '
     <td colspan="2"><input name="make_topic" type="submit" value="', $l['topic_topic_button'], '"/></td>
   </tr>
 </table>
+<script type="text/javascript">
+  document.getElementById(\'body\').focus();
+</script>
 </form>';
 }
 
@@ -123,6 +126,10 @@ echo '
     <td colspan="2"><input name="post_reply" type="submit" value="', $l['topic_post_button'] ,'"/></td>
   </tr>
 </table>
-</form>';
+<script type="text/javascript">
+  document.getElementById(\'body\').focus();
+</script>
+</form>
+PREVIEW!';
 }
 ?>
