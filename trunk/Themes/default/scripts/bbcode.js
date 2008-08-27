@@ -3,6 +3,7 @@
  * http://compressorrater.thruhere.net/
  */
 function add_bbcode(div_id, before, after) {
+ if(!after){after=""}
  textarea = document.getElementById(div_id);
  if (textarea.selection != "undefined" && textarea.createTextRange) {
   was_empty = textarea.selection.text.length;
