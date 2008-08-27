@@ -171,6 +171,9 @@ $files = array(
                   <td>URL of Themes Directory</td><td><input name="theme_url" type="text" value="'.$installpath.'Themes"/></td>
                 </tr>
                 <tr>
+                  <td>Cookie Prefix:</td><td><input name="cookie_prefix" type="text" value="scms_"/></td>
+                </tr>
+                <tr>
                   <td>Admin Username:</td><td><input name="admin_user" type="text" value=""/></td>
                 </tr>
                 <tr>
@@ -225,7 +228,7 @@ $mysql_db = \''.$_REQUEST['mysql_db'].'\'; # Your MySQL DB
 $mysql_prefix = \''.$_REQUEST['mysql_prefix'].'\'; # Prefix for your database
 
 // Misc
-$cookie_prefix = \''.$_REQUEST['mysql_prefix'].'\'; # Previx for cookies
+$cookie_prefix = \''.$_REQUEST['cookie_prefix'].'\'; # Prefix for cookies
 
 // Some SnowCMS Specific Settings
 $source_dir = \''.$_REQUEST['source_dir'].'\'; # Path to your Source directory without trailing /!
