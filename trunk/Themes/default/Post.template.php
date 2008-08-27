@@ -92,19 +92,20 @@ echo '
   <tr align="center">
     <td>', $l['topic_subject'], '</td><td><input name="subject" type="text" size="80" value="', $settings['subject'], '"/>
   </tr>
-  <tr align="center" valign="middle">
+ <tr align="center" valign="middle">
     <td colspan="2">
 	    <a href="javascript:void(0);" onClick="add_bbcode(\'body\',\'[b]\',\'[/b]\');"><b>Bold</b></a>
 	    <a href="javascript:void(0);" onClick="add_bbcode(\'body\',\'[i]\',\'[/i]\');"><i>Italics</i></a>
 	    <a href="javascript:void(0);" onClick="add_bbcode(\'body\',\'[u]\',\'[/u]\');"><u>Underline</u></a>
 	    <a href="javascript:void(0);" onClick="add_bbcode(\'body\',\'[s]\',\'[/s]\');"><del>Strikethrough</del></a>
 	    <a href="javascript:void(0);" onClick="add_bbcode(\'body\',\'[img]\',\'[/img]\');">Image</a>
-	    <a href="javascript:void(0);" onClick="add_bbcode(\'body\',\'[url]\',\'[/url]\');">Link</a>
+	    <a href="javascript:void(0);" onClick="add_bbcode(\'body\',\'[url]\',\'[/url]\');">http://Link</a>
 	    <a href="javascript:void(0);" onClick="add_bbcode(\'body\',\'[tt]\',\'[/tt]\');"><tt>Teletype</tt></a>
 	  </td>	
   </tr>
   <tr align="center" valign="middle">
   	<td colspan="2">  
+	    
 	    <a href="javascript:void(0);" onClick="add_bbcode(\'body\',\' :) \',\'\');">
 	    <img src="'.$theme_url.'/'.$settings['theme'].'/emoticons/smile.png" alt="smile" title="Smile">
 	    </a>
@@ -126,6 +127,7 @@ echo '
 	    <a href="javascript:void(0);" onClick="add_bbcode(\'body\',\' :P \',\'\');">
 	    <img src="'.$theme_url.'/'.$settings['theme'].'/emoticons/tongue.png" alt="tongue" title="Mr. Yucky-Poo">
 	    </a>
+	    
 	  </td>
   </tr>
   <tr align="center">
