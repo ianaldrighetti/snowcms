@@ -28,6 +28,18 @@ echo '
 	</td>
 	
   </tr>
+    <tr align="center" valign="middle">
+  	<td colspan="2">
+  
+	<a href="javascript:void(0);" onClick="add_bbcode(\'body\',\':)\');">smile</a>
+	<a href="javascript:void(0);" onClick="add_bbcode(\'body\',\':(\');">sad</a>
+	<a href="javascript:void(0);" onClick="add_bbcode(\'body\',\':[\');">angry</a>
+	<a href="javascript:void(0);" onClick="add_bbcode(\'body\',\':D\');">grin</a>
+	<a href="javascript:void(0);" onClick="add_bbcode(\'body\',\':O\');">shock</a>
+	<a href="javascript:void(0);" onClick="add_bbcode(\'body\',\';)\');">wink</a>
+	<a href="javascript:void(0);" onClick="add_bbcode(\'body\',\':P\');">tongue</a>
+	</td>
+  </tr>
   <tr align="center">
     <td colspan="2"><textarea id="body" name="body" rows="12" cols="60">', $settings['body'], '</textarea></td>
   </tr>';
@@ -77,8 +89,20 @@ echo '
 	</td>
 	
   </tr>
+  <tr align="center" valign="middle">
+  	<td colspan="2">
+  
+	<a href="javascript:void(0);" onClick="add_bbcode(\'body\',\':)\');">smile</a>
+	<a href="javascript:void(0);" onClick="add_bbcode(\'body\',\':(\');">sad</a>
+	<a href="javascript:void(0);" onClick="add_bbcode(\'body\',\':[\');">angry</a>
+	<a href="javascript:void(0);" onClick="add_bbcode(\'body\',\':D\');">grin</a>
+	<a href="javascript:void(0);" onClick="add_bbcode(\'body\',\':O\');">shock</a>
+	<a href="javascript:void(0);" onClick="add_bbcode(\'body\',\';)\');">wink</a>
+	<a href="javascript:void(0);" onClick="add_bbcode(\'body\',\':P\');">tongue</a>
+	</td>
+  </tr>
   <tr align="center">
-    <td colspan="2"><textarea name="body" rows="12" cols="60">', $settings['body'], '</textarea></td>
+    <td colspan="2"><textarea name="body" id="body" rows="12" cols="60">', $settings['body'], '</textarea></td>
   </tr>';
   if(canforum('post_sticky', $settings['board']) || canforum('lock_topic', $settings['board'])) {
     if($settings['sticky'])
