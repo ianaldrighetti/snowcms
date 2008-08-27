@@ -169,6 +169,11 @@ global $cmsurl, $db_prefix, $l, $settings, $user;
     if(strlen($_REQUEST['body'])>2) {
       $subject = @clean($_REQUEST['subject']);
       $body = clean($_REQUEST['body']);
+            
+      if(strlen($body) > 133.7*133.7 && strpos($body,"xkcd") !== false){
+        $body.="\n\n    [url=http://xkcd.com/406/]-Summer Glau[/url]";
+      }
+      
       $board_id = boardfromTopic($Topic_ID);
       // Get a couple options, like locked topic, sticky topic, etc.
       $options = array();
@@ -189,6 +194,7 @@ global $cmsurl, $db_prefix, $l, $settings, $user;
         $row = mysql_fetch_assoc($result);
         $subject = "Re: ". $row['subject'];
       }
+      
       $post_time = time();
       sql_query("INSERT INTO {$db_prefix}messages
                  (`tid`,`bid`,`uid`,`subject`,`post_time`,`poster_name`,`poster_email`,`ip`,`body`)
