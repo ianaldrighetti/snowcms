@@ -2,6 +2,8 @@
  * The contents of bbcode_mini.js is this file ran through the YUI compressor option of
  * http://compressorrater.thruhere.net/
  */
+ 
+
 function add_bbcode(div_id, before, after) {
  if(!after){after=""}
  textarea = document.getElementById(div_id);
@@ -29,3 +31,4 @@ function add_bbcode(div_id, before, after) {
   textarea.focus(textarea.value.length - 1);
  }
 }
+
