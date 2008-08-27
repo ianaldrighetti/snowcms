@@ -195,3 +195,8 @@ a:hover {
   margin-top: 3px;
   color: #ffffff;
 }
+
+#post-content a, .indexcontent a, #board a, .write a {
+	color: #1D5A9F;
+}
+
