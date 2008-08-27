@@ -11,6 +11,8 @@ global $cmsurl, $settings, $l, $user;
 function Basic() {
 global $cmsurl, $settings, $l, $user;
   echo '
+  <h1>'.$l['basicsettings_header'].'</h1>
+  
   <p>'.$l['basicsettings_desc'].'</p>';
   echo '
   <form action="" method="post">

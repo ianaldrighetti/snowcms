@@ -49,88 +49,136 @@ global $cmsurl, $db_prefix, $l, $settings, $user;
 function loadMlist() {
 global $l, $settings, $db_prefix, $cmsurl;
   
+  // Redirect post data into get data if filter and sort are set
+  if (@$_POST['f'] && @$_POST['s'])
+    redirect('index.php?action=admin;sa=members;f='.$_POST['f'].';s='.$_POST['s']);
+  // Redirect post data into get data if only filter is set
+  else if (@$_POST['f'])
+    redirect('index.php?action=admin;sa=members;f='.$_POST['f']);
+  // And redirect post data into get data if only sort is set
+  else if (@$_POST['s'])
+    redirect('index.php?action=admin;sa=members;s='.$_POST['s']);
+  
+  // The page's title
   $settings['page']['title'] = $l['managemembers_title'];
   
+  // Set some variables' defaults incase they don't get set in the following switch statement
   $settings['manage_members']['id_desc'] = '';
   $settings['manage_members']['username_desc'] = '';
   $settings['manage_members']['group_desc'] = '';
   $settings['manage_members']['joindate_desc'] = '';
   
-  // Get sort SQL
+  // Get the sort SQL ready for use in following SQL query
   switch (@$_REQUEST['s']) {
+    // Sort by ID number
     case 'id':
       $sort = 'ORDER BY `id`, `reg_date`';
       $settings['manage_members']['id_desc'] = '_desc';
       break;
+    // Sort by ID number, descending
     case 'id_desc':
       $sort = 'ORDER BY `id` DESC, `reg_date`';
       break;
+    // Sort by display name
     case 'username':
-      $sort = 'ORDER BY `username`, `reg_date`';
+      $sort = 'ORDER BY `display_name`, `reg_date`';
       $settings['manage_members']['username_desc'] = '_desc';
       break;
+    // Sort by display name, descending
     case 'username_desc':
-      $sort = 'ORDER BY `username` DESC, `reg_date`';
+      $sort = 'ORDER BY `display_name` DESC, `reg_date`';
       break;
+    // Sort by group name
     case 'group':
       $sort = 'ORDER BY `groupname`, `reg_date`';
       $settings['manage_members']['group_desc'] = '_desc';
       break;
+    // Sort by group name descending
     case 'group_desc':
       $sort = 'ORDER BY `groupname` DESC, `reg_date`';
       break;
+    // Sort by date joined
     case 'joindate':
       $sort = 'ORDER BY `reg_date`';
       $settings['manage_members']['joindate_desc'] = '_desc';
       break;
+    // Sort by date joined, descending
     case 'joindate_desc':
       $sort = 'ORDER BY `reg_date` DESC';
       break;
+    // No sort specified, so sort by date joined
     default:
       $sort = 'ORDER BY `reg_date`';
   }
   
-  // Get filter SQL
+  // Get the filter SQL ready for use in a following SQL query
   switch (@$_REQUEST['f']) {
+    // Member is activated and not suspended or banned
     case 'active':   $filter = "WHERE `activated` = '1' AND `suspension` < '".time()."' AND `banned` = '0'"; break;
+    // Member is activated
     case 'activated':   $filter = "WHERE `activated` = '1'"; break;
+    // Member is unactivated
     case 'unactivated': $filter = "WHERE `activated` = '0'"; break;
+    // Member is suspended
     case 'suspended':   $filter = "WHERE `suspension` > '".time()."'"; break;
+    // Member is unsuspended
     case 'banned':      $filter = "WHERE `banned` = '1'"; break;
-    default: $filter = '';
+    // All members
+    case '':      $filter = ""; break;
+    // Members of a particular group
+    default: $filter = "WHERE `group_id` = '".clean($_REQUEST['f'])."'";
   }
   
-  $member_rows = sql_query("SELECT * FROM {$db_prefix}members LEFT JOIN {$db_prefix}membergroups ON `group` = `group_id` $filter $sort") or die(mysql_error());
-  $settings['manage_members']['member_rows'] = $member_rows;
+  // Get the member records of all members out of the database
+  $all_members = sql_query("SELECT * FROM {$db_prefix}members LEFT JOIN {$db_prefix}membergroups ON `group` = `group_id` $filter $sort");
+  // The total amount of members
+  $settings['page']['total_members'] = @mysql_num_rows($all_members);
   
-  // Check if there are members on the page
+  // The current page number
   $page = @$_REQUEST['pg'];
+  // If the page number is lower then zero then make it zero
   if ($page < 0)
     $page = 0;
-  while ($settings['manage_members_per_page'] * $page >= mysql_num_rows($member_rows) && @$page > 0)
+  // If page number is higher then maximum, lower it until it isn't
+  while ($settings['manage_members_per_page'] * $page >= $settings['page']['total_members'] && $page > 0)
     $page -= 1;
   
-  $settings['manage_members']['total_members'] = mysql_num_rows($member_rows);
-  $settings['manage_members']['page'] = $page;
-  $settings['manage_members']['page_start'] = $settings['manage_members_per_page'] * $page + 1;
-  if ($settings['manage_members_per_page'] * ($page + 1) > mysql_num_rows($member_rows))
-    $settings['manage_members']['page_end'] = mysql_num_rows($member_rows);
-  else
-    $settings['manage_members']['page_end'] = $settings['manage_members_per_page'] * ($page + 1);
-  $settings['manage_members']['next_page'] = $page + 1;
-  $settings['manage_members']['prev_page'] = $page - 1;
+  // The first member number of this page
+  $settings['page']['first_member'] = 1 + $start = $page * $settings['manage_members_per_page'];
+  // The last member number of this page
+  $settings['page']['last_member'] = $settings['page']['total_members'] < $start + $settings['manage_members_per_page']
+                                   ? $settings['page']['total_members']
+                                   : $start + $settings['manage_members_per_page'];
   
-  // Get GET data
+  // Get the member records of this page out of the database
+  $members = sql_query("SELECT * FROM {$db_prefix}members LEFT JOIN {$db_prefix}membergroups ON `group` = `group_id` $filter $sort LIMIT $start, ".$settings['manage_members_per_page']);
+  // The members as an SQL result resource
+  $settings['page']['members'] = $members;
+  
+  // The first page number
+  $settings['page']['first_page'] = $page + 1;
+  // The previous page number
+  $settings['page']['previous_page'] = $page - 1;
+  // The current page number
+  $settings['page']['current_page'] = $page;
+  // The next page number
+  $settings['page']['next_page'] = $page + 1;
+  // The last page number
+  $settings['page']['last_page'] = $page - 1;
+  
+  // Get the page number from the query string
   if (@$_REQUEST['pg'])
-    $settings['manage_members']['page_get'] = '&pg='.@$_REQUEST['pg'];
+    $settings['manage_members']['page_get'] = ';pg='.@$_REQUEST['pg'];
   else
     $settings['manage_members']['page_get'] = '';
+   // Get the filter from the query string
   if (@$_REQUEST['f'])
-    $settings['manage_members']['filter_get'] = '&f='.@$_REQUEST['f'];
+    $settings['manage_members']['filter_get'] = ';f='.@$_REQUEST['f'];
   else
     $settings['manage_members']['filter_get'] = '';
+  // Get the sort from the query string
   if (@$_REQUEST['s'])
-    $settings['manage_members']['sort_get'] = '&s='.@$_REQUEST['s'];
+    $settings['manage_members']['sort_get'] = ';s='.@$_REQUEST['s'];
   else
     $settings['manage_members']['sort_get'] = '';
   
@@ -140,86 +188,8 @@ global $l, $settings, $db_prefix, $cmsurl;
     $settings['managemembers']['groups'] = $result;
   }
   
-  // Get filter HTML
-    $filter = '
-          <input type="submit" value="'.$l['managemembers_filter_button'].'" />
-          <input type="hidden" name="action" value="admin" />
-          <input type="hidden" name="sa" value="members" />
-          ';
-    $filter .= '<select name="f">';
-    switch (@$_REQUEST['f']) {
-      case '':
-        $filter .= '<option value="" selected="selected">'.$l['managemembers_filter_everyone'].'</option>
-          <option value="active">'.$l['managemembers_filter_active'].'</option>
-          <option value="activated">'.$l['managemembers_filter_activated'].'</option>
-          <option value="unactivated">'.$l['managemembers_filter_unactivated'].'</option>
-          <option value="suspended">'.$l['managemembers_filter_suspended'].'</option>
-          <option value="banned">'.$l['managemembers_filter_banned'].'</option>
-          '; break;
-      case 'active':
-        $filter .= '<option value="" selected="selected">'.$l['managemembers_filter_everyone'].'</option>
-          <option value="active" selected="selected">'.$l['managemembers_filter_active'].'</option>
-          <option value="activated">'.$l['managemembers_filter_activated'].'</option>
-          <option value="unactivated">'.$l['managemembers_filter_unactivated'].'</option>
-          <option value="suspended">'.$l['managemembers_filter_suspended'].'</option>
-          <option value="banned">'.$l['managemembers_filter_banned'].'</option>
-          '; break;
-      case 'activated':
-        $filter .= '<option value="">'.$l['managemembers_filter_everyone'].'</option>
-          <option value="active">'.$l['managemembers_filter_active'].'</option>
-          <option value="activated" selected="selected">'.$l['managemembers_filter_activated'].'</option>
-          <option value="unactivated">'.$l['managemembers_filter_unactivated'].'</option>
-          <option value="suspended">'.$l['managemembers_filter_suspended'].'</option>
-          <option value="banned">'.$l['managemembers_filter_banned'].'</option>
-          '; break;
-      case 'unactivated':
-        $filter .= '<option value="">'.$l['managemembers_filter_everyone'].'</option>
-          <option value="active">'.$l['managemembers_filter_active'].'</option>
-          <option value="activated">'.$l['managemembers_filter_activated'].'</option>
-          <option value="unactivated" selected="selected">'.$l['managemembers_filter_unactivated'].'</option>
-          <option value="suspended">'.$l['managemembers_filter_suspended'].'</option>
-          <option value="banned">'.$l['managemembers_filter_banned'].'</option>
-          '; break;
-      case 'suspended':
-        $filter .= '<option value="">'.$l['managemembers_filter_everyone'].'</option>
-          <option value="active">'.$l['managemembers_filter_active'].'</option>
-          <option value="activated">'.$l['managemembers_filter_activated'].'</option>
-          <option value="unactivated">'.$l['managemembers_filter_unactivated'].'</option>
-          <option value="suspended" selected="selected">'.$l['managemembers_filter_suspended'].'</option>
-          <option value="banned">'.$l['managemembers_filter_banned'].'</option>
-          '; break;
-      case 'banned':
-        $filter .= '<option value="">'.$l['managemembers_filter_everyone'].'</option>
-          <option value="active">'.$l['managemembers_filter_active'].'</option>
-          <option value="activated">'.$l['managemembers_filter_activated'].'</option>
-          <option value="unactivated">'.$l['managemembers_filter_unactivated'].'</option>
-          <option value="suspended">'.$l['managemembers_filter_suspended'].'</option>
-          <option value="banned" selected="selected">Banned</option>
-          '; break;
-      default:
-        $filter .= '<option value="">'.$l['managemembers_filter_everyone'].'</option>
-          <option value="active">'.$l['managemembers_filter_active'].'</option>
-          <option value="activated">'.$l['managemembers_filter_activated'].'</option>
-          <option value="unactivated">'.$l['managemembers_filter_unactivated'].'</option>
-          <option value="suspended">'.$l['managemembers_filter_suspended'].'</option>
-          <option value="banned">'.$l['managemembers_filter_banned'].'</option>
-          ';
-    }
-    $filter .= '<option value="">-----------------</option>
-          ';
-    while ($row = mysql_fetch_assoc($settings['managemembers']['groups'])) {
-      if (@$_REQUEST['f'] == $row['group_id'])
-        $filter .= '<option value="'.$row['group_id'].'" selected="selected">'.$row['groupname'].'</option>'."\n";
-      else
-        $filter .= '<option value="'.$row['group_id'].'">'.$row['groupname'].'</option>'."\n";
-    }
-    $filter .= '</select>';
-    if (@$_REQUEST['s'])
-      $filter .= '<input type="hidden" name="s" value="'.$_REQUEST['s'].'" />
-          ';
-    $settings['managemembers']['filter'] = $filter;
-  
-  if ($settings['manage_members_per_page'] * $page < mysql_num_rows($member_rows))
+  // Load theme to show member lsit
+  if (mysql_num_rows($members))
     loadTheme('ManageMembers');
   else
     loadTheme('ManageMembers','NoMembers');
