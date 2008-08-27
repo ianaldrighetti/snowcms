@@ -8,7 +8,12 @@ function Main() {
 global $cmsurl, $settings, $l, $user, $theme_url;
   echo '
   <h1>'.$l['managepages_header'].'</h1>
-  <p>'.$l['managepages_desc'].'</p>';
+  ';
+  
+  if (@$_SESSION['error'])
+	 echo '<p><b>'.$l['main_error'].':</b> '.$_SESSION['error'].'</p>';
+	
+  echo '<p>'.$l['managepages_desc'].'</p>';
   if($settings['page']['update_page']==1) {
     echo '
     <div id="page_fail">

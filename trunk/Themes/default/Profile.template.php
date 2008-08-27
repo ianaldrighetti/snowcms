@@ -81,8 +81,12 @@ global $l, $settings, $cmsurl, $user;
   $profile = $settings['profile'];
   
   echo '<h1>'.$l['profile_edit_header'].'</h1>
+        ';
+  
+  if (@$_SESSION['error'])
+	 echo '<p><b>'.$l['main_error'].':</b> '.$_SESSION['error'].'</p>';
         
-        <form action="'.$cmsurl.'index.php?action=profile;sa=edit" method="post" style="display: inline">
+  echo '<form action="'.$cmsurl.'index.php?action=profile;sa=edit" method="post" style="display: inline">
         
         <p><input type="hidden" name="ssa" value="process-edit" /></p>
         

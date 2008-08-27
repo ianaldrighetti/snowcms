@@ -11,6 +11,9 @@ global $l, $db_prefix, $settings, $cmsurl, $theme_url;
     <h1>'.$l['managemembers_header'].'</h1>
     ';
   
+  if (@$_SESSION['error'])
+	 echo '<p><b>'.$l['main_error'].':</b> '.$_SESSION['error'].'</p>';
+  
   $page = $settings['manage_members']['page'];
   $member_rows = $settings['manage_members']['member_rows'];
   $total_members = $settings['manage_members']['total_members'];

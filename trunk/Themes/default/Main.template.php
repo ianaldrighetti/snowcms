@@ -39,9 +39,6 @@ echo '<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
 	echo '</div>
 	<div id="content">
 	';
-	
-	if (@$_SESSION['error'])
-	 echo '<p><b>'.$l['main_error'].':</b> '.$_SESSION['error'].'</p>';
 }
 
 // Call on by either theme_menu('main'); or theme_menu('side')
