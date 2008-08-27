@@ -19,7 +19,7 @@ function Page($main_page = false) {
 global $cmsurl, $db_prefix, $l, $settings, $user;
   // If Main Page is true, we need to show the Page ID Set to be shown at the Home, or else get ?page=
   if($main_page) 
-    $PageID = $settings['main_page_id'];
+    $PageID = $settings['homepage'];
   else
     $PageID = clean($_REQUEST['page']);
   // Get it from MySQL
@@ -72,9 +72,22 @@ global $cmsurl, $db_prefix, $l, $settings, $user;
         $settings['page']['update_page'] = 2;
       }
     }
+    // Do they want to change switch page is the homepage?
+    if (@$_REQUEST['homepage']) {
+      // Clean it to prevent dirty hacking
+      $homepage = clean($_REQUEST['homepage']);
+      // Change the homepage
+      sql_query("UPDATE {$db_prefix}settings SET `value` = '$homepage' WHERE `variable` = 'homepage'") or ($_SESSION['error'] = $l['managepages_error_change_homepage']);
+      // Redirect them so that if they refresh it won't do it again
+      redirect('index.php?action=admin;sa=managepages');
+    }
+    // Do they want to delete a page?
     if (@$_REQUEST['did']) {
+      // Clean anything that's used in an SQL query
       $did = clean($_REQUEST['did']);
-      sql_query("DELETE FROM {$db_prefix}pages WHERE `page_id` = '$did'") or die(mysql_error());
+      // Delete the page
+      sql_query("DELETE FROM {$db_prefix}pages WHERE `page_id` = '$did'");
+      // Redirect them so that if they refresh it won't do it again
       redirect('index.php?action=admin;sa=managepages');
     }
     // Or are we supposed to create a page?

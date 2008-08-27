@@ -143,9 +143,10 @@ $l['managepages_make_success'] = 'The page %title% was successfully created!';
 $l['managepages_make_fail'] = 'Failed to create the page %title%.';
 $l['managepages_pagetitle'] = 'Page Title';
 $l['managepages_pageowner'] = 'Page Owner';
-$l['managepages_datemade'] = 'Created on';
+$l['managepages_datemade'] = 'Created On';
 $l['managepages_no_pages'] = 'Their are currently no pages in your database';
 $l['managepages_delete'] = 'Delete';
+$l['managepages_change_homepage'] = 'Change Homepage';
 $l['managepages_edit_title'] = 'Editing %title%';
 $l['managepages_edit_header'] = 'Editing %title%';
 $l['managepages_no_page_title'] = 'That page doesn\'t exist!';
@@ -159,6 +160,7 @@ $l['managepages_editpage_insert_link'] = 'Insert Link';
 $l['managepages_update_failed'] = 'Page update failed!';
 $l['managepages_update_success'] = 'Page updated successfully!';
 $l['managepages_editpage_show_info'] = "Show extra page info";
+$l['managepages_error_change_homepage'] = "Changing the homepage failed.";
 
 // Some Email stuff, for Email Activation, etc.
 $l['mail_smtp_fail'] = 'Sending email failed! Error: %error%';
