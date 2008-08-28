@@ -11,10 +11,9 @@ global $cmsurl, $settings, $l, $user;
   
   <p>'.$l['register_details'].'</p>
   <script type="text/javascript" src="includes/jquery.js"></script>
-  <script type="text/javascript" src="includes/jquery-pstrength.js"></script>'
+  <script type="text/javascript" src="includes/jquery-pstrength.js"></script>
+  <script type="text/javascript">$(function() {$(".password").pstrength();});</script>'
   /*
-  <script type="text/javascript">$(function() {$('.password.').pstrength();});</script>
-  
   This causes a notice to appear.
   */ .
   '<form action="'.$cmsurl.'index.php?action=register" method="post">
