@@ -17,8 +17,8 @@ global $cmsurl, $theme_url, $l, $settings, $user;
         echo '
         <div id="board">
           <p class="title">&nbsp;</p>
-          <table>
-            <tr>  
+          <table width="100%">
+            <tr>
               <td width="10%"><img src="'.$theme_url.'/'.$settings['theme'].'/images/'; if($board['is_new']) { echo 'on.gif" alt="'.$l['forum_board_new'].'"'; } else { echo 'off.gif" alt="'.$l['forum_board_old'].'"'; } echo '/></td>
               <td width="54%"><p><a href="'.$cmsurl.'forum.php?board='.$board['id'].'">'.$board['name'].'</a><br />
                   '.$board['desc'].'</p>
