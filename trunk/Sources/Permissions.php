@@ -228,6 +228,36 @@ global $cmsurl, $db_prefix, $forumperms, $l, $settings, $user;
     }
     elseif(!empty($_REQUEST['bid'])) {
       // Choosing a group they want to edit :o
+      $board_id = (int)$_REQUEST['bid'];
+      $result = sql_query("
+        SELECT
+          b.bid, b.name, b.who_view, b.cid, c.cid, c.cname
+        FROM {$db_prefix}boards AS b
+          LEFT JOIN {$db_prefix}categories AS c ON c.cid = b.cid
+        WHERE b.bid = $board_id");
+      if(mysql_num_rows($result)) {
+        // Ok. It exists, now we need to get the allowed groups ;)
+        $row = mysql_fetch_assoc($result);
+        $result = sql_query("
+          SELECT
+            grp.group_id, grp.groupname
+          FROM {$db_prefix}membergroups AS grp
+          WHERE grp.group_id IN ($row[who_view])");
+        $settings['groups'] = array();
+        while($row = mysql_fetch_assoc($result)) {
+          $settings['groups'][] = array(
+                                    'id' => $row['group_id'],
+                                    'name' => $row['groupname']
+                                  );
+        }
+        $settings['page']['title'] = $l['mf_bp_board_title'];
+        loadTheme('Permissions','MGList');      
+      }
+      else {
+        // That board doesn't exist o.o
+        $settings['page']['title'] = $l['mf_bp_board_title'];
+        loadTheme('Permissions','NoBoard');
+      }
     }
     else {
       // Show a list of boards O_O
