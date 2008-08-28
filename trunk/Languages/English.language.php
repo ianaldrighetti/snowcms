@@ -322,6 +322,10 @@ $l['mf_perms_header'] = 'Board Permissions';
 $l['mf_perms_desc'] = 'Choose a board below, and from there, you can choose a member group to edit permissions for that are allowed access to that board.';
 $l['mf_perms_manage'] = 'Manage';
 $l['mf_perms_nocats'] = 'Error! It appears you don\'t have any <a href="'. $cmsurl. 'index.php?action=admin;sa=forum;fa=categories">categories</a> made, please make some if you want to access this</p>';
+$l['mf_bp_board_title'] = 'Choose Member Group';
+$l['mf_bp_board_header'] = 'Choose Member Group';
+$l['mf_bp_board_desc'] = 'Choose a member group below that you would like to edit board permissions for...';
+$l['mf_bp_board_nogroups'] = 'It looks like no Member Groups have access to this board.';
 
 // ManageMembers.template.php
 $l['managemembers_title'] = 'Manage Members';
@@ -427,6 +431,7 @@ $l['manageboards_no_cats'] = 'No categories have been found! You <em>must</em> h
 $l['manageboards_are_you_sure_del'] = 'Are you SURE you want to delete this board? \nIt can\\\'t be undone!';
 $l['manageboards_edit'] = 'Edit';
 $l['manageboards_delete'] = 'Delete';
+$l['manageboards_modify'] = 'Modify';
 // Add Boards
 $l['manageboards_add_title'] = 'Add Board';
 $l['manageboards_add_header'] = 'Add Board';
