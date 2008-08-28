@@ -117,10 +117,23 @@ global $l, $settings, $cmsurl, $user;
        ';
 }
 
+function NoProfile() {
+global $cmsurl, $l, $settings;
+  
+  echo '
+  <h1>'.$l['profile_noprofile_header'].'</h1>
+  <p>'.$l['profile_noprofile_desc'].'</p>';
+}
+
 function NotAllowed() {
 global $cmsurl, $l, $settings;
-echo '
-  <h1>'.$l['profile_header'].'</h1>
-  <p>'.$l['profile_error_desc'].'</p>';
+  
+  echo '
+  <h1>'.$l['profile_notallowed_header'].'</h1>
+  ';
+  if ($user['is_logged'])
+    echo '<p>'.$l['profile_notallowed_desc'].'</p>';
+  else
+    echo '<p>'.$l['profile_notallowed_desc_loggedout'].'</p>';
 }
 ?>

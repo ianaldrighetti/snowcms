@@ -52,12 +52,16 @@ global $cmsurl, $db_prefix, $l, $settings, $source_dir, $user, $perms;
           $settings['page']['title'] = str_replace("%user%", $mem['name'], $l['profile_profile_of']);
           $settings['profile'] = $mem;
         }
-  else {
-      // Oh noes! It doesn't! Tell'em :P
-      $settings['page']['title'] = $l['profile_error_title'];
-      loadTheme('Profile','NoProfile');
-    }
+  else
+    $invalid = true;
   
+  // Is this an invalid profile?
+  if (@$invalid) {
+    // Oh noes! It is! Tell'em :P
+    $settings['page']['title'] = $l['profile_noprofile_title'];
+    loadTheme('Profile','NoProfile');
+  }
+  else
   // Are they changing settings?
   if ($UID == $user['id'] && @$_REQUEST['sa'] == 'edit') {
     $settings['page']['title'] = $l['profile_edit_title'];
@@ -78,7 +82,7 @@ global $cmsurl, $db_prefix, $l, $settings, $source_dir, $user, $perms;
     loadTheme('Profile');
   // No! Go away! :)
   else {
-    $settings['page']['title'] = $l['profile_error_title'];
+    $settings['page']['title'] = $l['profile_notallowed_title'];
     loadTheme('Profile','NotAllowed');
   }
 }

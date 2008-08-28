@@ -248,10 +248,14 @@ $l['topic_status'] = 'Status:';
 // Profile.template.php
 $l['profile_title'] = 'Profile';
 $l['profile_header'] = 'Profile of %user%';
-$l['profile_own_header'] = 'Profile';
-$l['profile_error_title'] = 'Error';
-$l['profile_error_header'] = 'Error';
-$l['profile_error_desc'] = 'Sorry, but you are not <a href="'.$cmsurl.'index.php?action=login">logged in</a>, if you have not yet done so, why not <a href="'.$cmsurl.'index.php?action=register">register</a> and or <a href="'.$cmsurl.'index.php?action=login">login</a>';
+$l['profile_own_header'] = 'Your Profile';
+$l['profile_notallowed_title'] = 'Profile';
+$l['profile_notallowed_header'] = 'Profile';
+$l['profile_notallowed_desc'] = 'You do not have permission to view this member\'s profile.';
+$l['profile_notallowed_desc_loggedout'] = 'Sorry but you may only view this profile if you are <a href="'.$cmsurl.'index.php?action=login">logged in</a>. If you have not yet done so, why not <a href="'.$cmsurl.'index.php?action=register">register</a> or <a href="'.$cmsurl.'index.php?action=login">login</a>.';
+$l['profile_noprofile_title'] = 'Invalid Profile';
+$l['profile_noprofile_header'] = 'Invalid Profile';
+$l['profile_noprofile_desc'] = 'This is an invalid profile.';
 $l['profile_profile_of'] = 'Profile of %user%';
 $l['profile_online'] = 'Online';
 $l['profile_offline'] = 'Offline';
