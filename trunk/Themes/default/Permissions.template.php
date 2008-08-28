@@ -149,11 +149,19 @@ global $cmsurl, $settings, $l, $user;
   </form>';
 }
 
+// This displays the permissions, with checkboxes and stuff
+function BoardEdit() {
+global $cmsurl, $settings, $l, $user;
+  echo '
+  <h1>', $l['mf_gp_board_header'], '</h1>
+  ';
+}
+
 // This displays a list of member groups that you can set permissions for for the selected board
 function MGList() {
 global $cmsurl, $settings, $l, $user;
   echo '
-  <h3>', $l['mf_bp_board_header'], '</h3>
+  <h1>', $l['mf_bp_board_header'], '</h1>
   <p>', $l['mf_bp_board_desc'], '</p>';
   if(!count($settings['groups'])) {
     echo '<p style="text-align: center; color: red;">', $l['mf_bp_board_nogroups'], '</p>';

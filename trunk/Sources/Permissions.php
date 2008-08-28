@@ -224,7 +224,27 @@ global $cmsurl, $db_prefix, $forumperms, $l, $settings, $user;
   if(can('manage_forum_perms')) {
     // Are they editing a groups board permission right now?
     if(!empty($_REQUEST['bid']) && !empty($_REQUEST['gid'])) {
-    
+      $board_id = (int)$_REQUEST['bid'];
+      $group_id = (int)$_REQUEST['gid'];
+      $result = sql_query("
+        SELECT
+          p.bid, p.group_id, p.what, p.can
+        FROM {$db_prefix}board_permissions AS p
+        WHERE p.group_id = $group_id AND p.bid = $board_id");
+      $settings['permissions'] = array();
+      while($row = mysql_fetch_assoc($result)) {
+        $settings['permissions'][] = array(
+                                       'bid' => $row['bid'],
+                                       'group_id' => $row['group_id'],
+                                       'what' => $row['what'],
+                                       'can' => $row['can'] ? true : false
+                                     );
+      }
+      $settings['board'] = $board_id;
+      $settings['group_id'] = $group_id;
+      $settings['page']['title'] = $l['mf_gp_board_title'];
+      $settings['perms'] = $forumperms;
+      loadTheme('Permissions','BoardEdit');
     }
     elseif(!empty($_REQUEST['bid'])) {
       // Choosing a group they want to edit :o

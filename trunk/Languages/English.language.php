@@ -328,6 +328,7 @@ $l['mf_bp_board_title'] = 'Choose Member Group';
 $l['mf_bp_board_header'] = 'Choose Member Group';
 $l['mf_bp_board_desc'] = 'Choose a member group below that you would like to edit board permissions for...';
 $l['mf_bp_board_nogroups'] = 'It looks like no Member Groups have access to this board.';
+$l['mf_gp_board_title'] = 'Edit Board Permissions';
 
 // ManageMembers.template.php
 $l['managemembers_title'] = 'Manage Members';
