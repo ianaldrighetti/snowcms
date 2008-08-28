@@ -159,7 +159,16 @@ global $cmsurl, $settings, $l, $user;
     echo '<p style="text-align: center; color: red;">', $l['mf_bp_board_nogroups'], '</p>';
   }
   else {
-  
+    echo '
+    <table>';
+    foreach($settings['groups'] as $group) {
+      echo '
+      <tr>
+        <td><a href="', $cmsurl, 'index.php?action=admin;sa=forum;fa=permissions;bid=', $settings['board'], ';gid=', $group['id'], '">', $group['name'], '</a></td>
+      </tr>';
+    }
+    echo '
+    </table>';
   }
 }
 

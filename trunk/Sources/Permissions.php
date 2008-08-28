@@ -250,6 +250,7 @@ global $cmsurl, $db_prefix, $forumperms, $l, $settings, $user;
                                     'name' => $row['groupname']
                                   );
         }
+        $settings['board'] = $board_id;
         $settings['page']['title'] = $l['mf_bp_board_title'];
         loadTheme('Permissions','MGList');      
       }
