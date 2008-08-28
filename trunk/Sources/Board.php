@@ -25,42 +25,26 @@ if(!defined("Snow"))
 function loadBoard() {
 global $cmsurl, $db_prefix, $l, $settings, $user;
   if(can('view_forum')) {
-    $Board_ID = addslashes(mysql_real_escape_string($_REQUEST['board']));
-    // Mark this board now as read... Only if they are logged in :)
-    if($user['is_logged']) {
-      $result = sql_query("SELECT * FROM {$db_prefix}board_logs WHERE `bid` = '$Board_ID' AND `uid` = '{$user['id']}'");
-      if(mysql_num_rows($result)==0) {
-        sql_query("
-          REPLACE INTO {$db_prefix}board_logs
-				    (`bid`,`uid`)
-	        VALUES ($Board_ID, {$user['id']})");
-	    }
-	  }
-	  // Get the board requested
-	  // !!! This function needs MAJOR IMPROVEMENT!
+    // Get the Board ID
+    $board_id = (int)$_REQUEST['board'];
+    // Query! This is just kind of a Query to see if they can view this board or not ;)
     $result = sql_query("
-      SELECT 
-        * 
-      FROM {$db_prefix}boards 
-      WHERE `bid` = '$Board_ID' AND {$user['board_query']}");
-      while($row = mysql_fetch_assoc($result)) {
-        $board = array(
-          'id' => $row['bid'],
-          'cid' => $row['cid'],
-          'name' => $row['name'],
-          'who_view' => @explode(",", $row['who_view'])
-        );
-      }
-    // Any board found? :P
-    if(count($board)>0) {  
-      // Before we do anything else, are they allowed to see this board? :o!
-      if((!in_array($user['group'], $board['who_view'])) && ($user['group']!=1)) {
-        $settings['page']['title'] = $l['forum_error_title'];
-        loadForum('Error','CantViewB');    
-      }
-      else {
-        // Yup, lets go
-        $start = 0;
+      SELECT
+        b.bid, b.name, b.who_view
+      FROM {$db_prefix}boards AS b
+      WHERE b.bid = $board_id AND {$user['board_query']}");
+    // So does it exist / Can they view it?
+    if(mysql_num_rows($result)) {
+      $board = mysql_fetch_assoc($result);
+      if($user['is_logged']) {        
+        $result = sql_query("SELECT * FROM {$db_prefix}board_logs WHERE `bid` = '$board_id' AND `uid` = '{$user['id']}'");
+          if(mysql_num_rows($result)==0) {
+            sql_query("
+              REPLACE INTO {$db_prefix}board_logs
+				        (`bid`,`uid`)
+	            VALUES ($board_id, {$user['id']})");
+	        }
+	      }        
         $result = sql_query("
           SELECT 
             t.tid, t.sticky, t.locked, t.bid, t.first_msg, t.last_msg, IFNULL(t.last_msg, t.first_msg) AS last_msg, t.topic_starter, t.topic_ender AS topic_ender, IFNULL(t.topic_ender, t.topic_starter) AS topic_ender, t.num_replies,
@@ -76,7 +60,7 @@ global $cmsurl, $db_prefix, $l, $settings, $user;
             LEFT JOIN {$db_prefix}members AS mem ON mem.id = t.starter_id
             LEFT JOIN {$db_prefix}members AS mem2 ON mem2.id = t.ender_id
           WHERE 
-            t.bid = $Board_ID
+            t.bid = $board_id
           ORDER BY t.sticky DESC, last_post_time DESC");
           $topics = array();
           while($row = mysql_fetch_assoc($result)) {
@@ -92,10 +76,10 @@ global $cmsurl, $db_prefix, $l, $settings, $user;
               'starter_id' => $row['starter_id']
             );
           }
+          mysql_free_result($result);
         $settings['topics'] = $topics;
         $settings['page']['title'] = $settings['site_name'].' - '.$board['name'];
-        loadForum('MessageIndex');
-      }
+        loadForum('MessageIndex');    
     }
     else {
       // No board has been found
