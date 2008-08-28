@@ -23,13 +23,13 @@ global $l, $settings, $theme_url;
   echo '<h1>'.str_replace('%user%',$profile['display_name'],$l['profile_header']).'</h1>
         <table>
          '.($profile['online']
-          ? '<tr><td><img src="'.$theme_url.'/'.$settings['theme'].'/images/online.gif"
-              alt="'.$l['profile_online'].'" width="16" height="16" /></td><td><b>
+          ? '<tr><td><img src="'.$theme_url.'/'.$settings['theme'].'/images/status_online.png"
+              alt="'.$l['profile_online'].'" width="16" height="16" /></td><td>
             '.$l['profile_online']
-          : '<tr><td><img src="'.$theme_url.'/'.$settings['theme'].'/images/offline.gif"
-              alt="'.$l['profile_offline'].'" width="16" height="16" /></td><td><b>
+          : '<tr><td><img src="'.$theme_url.'/'.$settings['theme'].'/images/status_offline.png"
+              alt="'.$l['profile_offline'].'" width="16" height="16" /></td><td>
             '.$l['profile_offline'])
-          .'</b></td></tr>
+          .'</td></tr>
         </table>';
   
   Info();
@@ -43,13 +43,13 @@ global $l, $settings, $theme_url, $cmsurl;
   echo '<h1>'.str_replace('%user%',$profile['display_name'],$l['profile_header']).'</h1>
         <table>
          '.($profile['online']
-          ? '<tr><td><img src="'.$theme_url.'/'.$settings['theme'].'/images/online.gif"
-              alt="'.$l['profile_online'].'" width="16" height="16" /></td><td><b>
+          ? '<tr><td><img src="'.$theme_url.'/'.$settings['theme'].'/images/status_online.png"
+              alt="'.$l['profile_online'].'" width="16" height="16" /></td><td>
             '.$l['profile_online']
-          : '<tr><td><img src="'.$theme_url.'/'.$settings['theme'].'/images/offline.gif"
-              alt="'.$l['profile_offline'].'" width="16" height="16" /></td><td><b>
+          : '<tr><td><img src="'.$theme_url.'/'.$settings['theme'].'/images/status_offline.png"
+              alt="'.$l['profile_offline'].'" width="16" height="16" /></td><td>
             '.$l['profile_offline'])
-          .'</b> - <a href="'.$cmsurl.'index.php?action=admin;sa=members;u='.$profile['id'].'">'.$l['profile_moderate'].'</a></td></tr>
+          .' - <a href="'.$cmsurl.'index.php?action=admin;sa=members;u='.$profile['id'].'">'.$l['profile_moderate'].'</a></td></tr>
         </table>';
   
   Info();
