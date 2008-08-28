@@ -499,4 +499,7 @@ $l['news_add_category'] = 'Category:';
 $l['news_add_subject'] = 'Subject:';
 $l['news_add_allow_comments'] = 'Allow Comments';
 $l['news_add_submit'] = 'Add Post';
+$l['news_nonews_title'] = 'News';
+$l['news_nonews_header'] = 'Invalid News';
+$l['news_nonews_desc'] = 'This news article does not exist.';
 ?>

@@ -151,4 +151,14 @@ global $cmsurl, $db_prefix, $l, $settings, $user;
   </form>
   ';
 }
+
+function NoNews() {
+global $l;
+  
+  echo '
+  <h1>'.$l['news_nonews_header'].'</h1>
+  
+  <p>'.$l['news_nonews_desc'].'</p>
+  ';
+}
 ?>

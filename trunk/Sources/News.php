@@ -147,8 +147,8 @@ global $cmsurl, $db_prefix, $l, $settings, $user;
     }
     else {
       // It doesn't exist? :O
-      $settings['page']['title'] = $l['news_title'];
-      loadTheme('News','DoesntExist');
+      $settings['page']['title'] = $l['news_nonews_title'];
+      loadTheme('News','NoNews');
     }  
   }
 }
