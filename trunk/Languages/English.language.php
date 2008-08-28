@@ -112,6 +112,8 @@ $l['admin_menu_forum'] = 'Manage Forum';
 $l['admin_menu_forum_desc'] = 'You can manage your forum setup here, such as categories and board management.';
 $l['admin_menu_email'] = 'Mail Settings';
 $l['admin_menu_email_desc'] = 'You can change mail settings here, like whether SMTP or Sendmail are used.';
+$l['admin_menu_news'] = 'Manage News';
+$l['admin_menu_news_desc'] = 'You can add news here.';
 
 // Settings.template.php
 $l['basicsettings_title'] = 'Basic Settings';

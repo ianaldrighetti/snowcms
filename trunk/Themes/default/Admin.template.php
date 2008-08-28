@@ -53,6 +53,10 @@ global $cmsurl, $settings, $l, $user;
     <p class="main"><a href="'. $cmsurl. 'index.php?action=admin;sa=mail-settings" title="'. $l['admin_menu_email']. '">'. $l['admin_menu_email']. '</a></p>
     <p class="desc">'. $l['admin_menu_email_desc']. '</p>  
   </div>
+  <div class="acp_right">
+    <p class="main"><a href="'. $cmsurl. 'index.php?action=admin;sa=news" title="'. $l['admin_menu_news']. '">'. $l['admin_menu_news']. '</a></p>
+    <p class="desc">'. $l['admin_menu_news_desc']. '</p>  
+  </div>
   ';
 }
 
