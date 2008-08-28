@@ -12,6 +12,8 @@ $l['main_sidebar_logout'] = 'Logout';
 $l['main_sidebar_register'] = 'Register';
 $l['main_sidebar_profile'] = 'Profile';
 $l['main_sidebar_control_panel'] = 'Control Panel';
+$l['main_powered_by'] = 'Powered by %snowcms%';
+$l['main_theme_by'] = 'Theme by %whom%';
 $l['main_error'] = 'Error';
 
 // Login.template.php stuff

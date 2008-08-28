@@ -67,11 +67,11 @@ global $l, $cmsurl, $settings, $user;
 // By getting more users, if you do remove it, we can and will deny
 // you of support for your SnowCMS installation. Thanks!
 function theme_footer() {
-global $cmsurl, $theme_url, $settings, $user;
+global $l, $cmsurl, $theme_url, $settings, $user;
 echo '
 	</div>
 	<div id="footer">
-	  <p>Powered by <a href="http://www.snowcms.com/" onClick="window.open(this.href); return false;">SnowCMS</a> '.$settings['version'].' | Theme by <a href="http://www.sourceforge.net/projects/snowcms" onclick="window.open(this.href); return false;">the SnowCMS team</a></p>
+	  <p>'.str_replace('%snowcms%','<a href="http://www.snowcms.com/" onClick="window.open(this.href); return false;">SnowCMS '.$settings['version'].'</a>',$l['main_powered_by']).' | '.str_replace('%whom%','<a href="http://snowcms.googlecode.com/" onclick="window.open(this.href); return false;">The SnowCMS Team</a>',$l['main_theme_by']).'</p>
 	</div>
 </div>
 </body>
