@@ -16,15 +16,15 @@ textarea {
 }
 
 h1 {
-  font-size: x-large;
-}
-
-h2 {
   font-size: large;
 }
 
+h2 {
+  font-size: small;
+}
+
 h3 {
-  font-size: medium;
+  font-size: x-small;
 }
 
 #container {
