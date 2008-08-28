@@ -154,7 +154,22 @@ function BoardEdit() {
 global $cmsurl, $settings, $l, $user;
   echo '
   <h1>', $l['mf_gp_board_header'], '</h1>
-  ';
+  <p>', $l['mf_gp_board_desc'], '</p>
+  <form action="', $cmsurl, 'index.php?action=admin;sa=forum;fa=permissions;bid=', $settings['board'], '" method="post">  
+    <table>';
+  foreach($settings['perms'] as $perm => $default) {
+    echo '
+      <tr>
+        <td width="95%">', @$l['forumperms_'. $perm], '</td><td width="5%"><input name="perms[', $perm, ']" type="checkbox" ', @$settings['permissions'][$perm]['checked'], ' value="1"/></td>
+      </tr>';
+  }
+  echo '
+      <tr>
+        <td colspan="2" align="right"><input name="update_perms" type="submit" value="', $l['mf_gp_board_button'], '"/></td>
+      </tr>
+    </table>
+    <input name="group_id" type="hidden" value="', $settings['group_id'], '"/>
+  </form>';
 }
 
 // This displays a list of member groups that you can set permissions for for the selected board

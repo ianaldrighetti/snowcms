@@ -224,8 +224,27 @@ global $cmsurl, $db_prefix, $forumperms, $l, $settings, $user;
   if(can('manage_forum_perms')) {
     // Are they editing a groups board permission right now?
     if(!empty($_REQUEST['bid']) && !empty($_REQUEST['gid'])) {
+      // Get some data from the URL
       $board_id = (int)$_REQUEST['bid'];
       $group_id = (int)$_REQUEST['gid'];
+      // Get the groups name, just for prettiness :P
+      $result = sql_query("
+        SELECT
+          grp.group_id, grp.groupname
+        FROM {$db_prefix}membergroups AS grp
+        WHERE grp.group_id = $group_id");
+      // I said fetch! Respect my authoritay!
+      $row = mysql_fetch_assoc($result);
+      $group_name = $row['groupname'];
+      // Now the board name ;)
+      $result = sql_query("
+        SELECT
+          b.bid, b.name
+        FROM {$db_prefix}boards AS b
+        WHERE b.bid = $board_id");
+      // Now get it :P I don't pay you for nothing, oh... :\
+      $row = mysql_fetch_assoc($result);
+      $board_name = $row['name'];
       $result = sql_query("
         SELECT
           p.bid, p.group_id, p.what, p.can
@@ -233,22 +252,51 @@ global $cmsurl, $db_prefix, $forumperms, $l, $settings, $user;
         WHERE p.group_id = $group_id AND p.bid = $board_id");
       $settings['permissions'] = array();
       while($row = mysql_fetch_assoc($result)) {
-        $settings['permissions'][] = array(
+        $settings['permissions'][$row['what']] = array(
                                        'bid' => $row['bid'],
                                        'group_id' => $row['group_id'],
                                        'what' => $row['what'],
-                                       'can' => $row['can'] ? true : false
+                                       'can' => $row['can'] ? true : false,
+                                       'checked' => $row['can'] ? 'checked="checked"' : ''
                                      );
       }
       $settings['board'] = $board_id;
       $settings['group_id'] = $group_id;
       $settings['page']['title'] = $l['mf_gp_board_title'];
       $settings['perms'] = $forumperms;
+      $replace = array(
+                   '%group%' => $group_name,
+                   '%boardname%' => $board_name
+                 );
+      $l['mf_gp_board_desc'] = str_replace(array_keys($replace), array_values($replace), $l['mf_gp_board_desc']);
       loadTheme('Permissions','BoardEdit');
     }
     elseif(!empty($_REQUEST['bid'])) {
       // Choosing a group they want to edit :o
       $board_id = (int)$_REQUEST['bid'];
+      // We need to do some updating for you?
+      if(!empty($_REQUEST['update_perms'])) {
+        // What group id are we editing?
+        $group_id = (int)$_REQUEST['group_id'];
+        if(count($_REQUEST['perms'])) {
+          $perms = array();
+          // Go through all the permissions setable and set them ;)
+          foreach($forumperms as $perm => $default) {
+            // Can they or can't they? If it isn't set, they can't :P
+            $can = isset($_REQUEST['perms'][$perm]) ? 1 : 0;
+            // Guests Shouldn't be able to post... Hopefully we will actually make this work later on in SnowCMS
+            if($group_id==-1)
+              $can = 0;
+            $perms[] = "'$board_id','$group_id','$perm','$can'";
+          }
+          $perms_query = implode("),(", $perms);
+          sql_query("REPLACE INTO {$db_prefix}board_permissions (`bid`,`group_id`,`what`,`can`) VALUES({$perms_query})");
+        }
+        else {
+          // D: No permissions were given, set them all to 0 >:D
+          sql_query("UPDATE {$db_prefix}board_permissions SET `can` = '0' WHERE `bid` = $board_id AND `group_id` = $group_id");
+        }
+      }
       $result = sql_query("
         SELECT
           b.bid, b.name, b.who_view, b.cid, c.cid, c.cname

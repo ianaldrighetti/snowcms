@@ -112,8 +112,6 @@ $l['admin_menu_forum'] = 'Manage Forum';
 $l['admin_menu_forum_desc'] = 'You can manage your forum setup here, such as categories and board management.';
 $l['admin_menu_email'] = 'Mail Settings';
 $l['admin_menu_email_desc'] = 'You can change mail settings here, like whether SMTP or Sendmail are used.';
-$l['admin_menu_news'] = 'Manage News';
-$l['admin_menu_news_desc'] = 'You can add news here.';
 
 // Settings.template.php
 $l['basicsettings_title'] = 'Basic Settings';
@@ -329,7 +327,20 @@ $l['mf_bp_board_header'] = 'Choose Member Group';
 $l['mf_bp_board_desc'] = 'Choose a member group below that you would like to edit board permissions for...';
 $l['mf_bp_board_nogroups'] = 'It looks like no Member Groups have access to this board.';
 $l['mf_gp_board_title'] = 'Edit Board Permissions';
-
+$l['mf_gp_board_header'] = 'Edit Permissions';
+$l['mf_gp_board_desc'] = 'Here you can edit the individual permissions for the %group% group in the %boardname% board';
+$l['mf_gp_board_button'] = 'Update Permissions';
+$l['forumperms_delete_any'] = 'Allow them to Delete any topic/post';
+$l['forumperms_delete_own'] = 'Allow them to delete their own topics/posts';
+$l['forumperms_lock_topic'] = 'Allow them to lock topics';
+$l['forumperms_move_any'] = 'Allow them to move any topic';
+$l['forumperms_edit_any'] = 'Allow them to edit any post';
+$l['forumperms_edit_own'] = 'Allow them to edit their own posts';
+$l['forumperms_post_new'] = 'Allow them to post new topics';
+$l['forumperms_post_reply'] = 'Allow them to reply to topics';
+$l['forumperms_sticky_topic'] = 'Allow them to sticky topics';
+$l['forumperms_split_topic'] = 'Allow them to split topics/posts';
+ 
 // ManageMembers.template.php
 $l['managemembers_title'] = 'Manage Members';
 $l['managemembers_header'] = 'Member List';
