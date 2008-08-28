@@ -34,6 +34,12 @@ global $cmsurl, $db_prefix, $l, $settings, $user;
   
   // Are they viewing the ?action=news, or ?action=news&id=specific_news
   if (empty($_REQUEST['id'])) {
+    // The current page number
+    $page = @$_REQUEST['pg'];
+    
+    // The first member number of this page
+    $start = $page * $settings['num_news_items'];
+    
     $result = sql_query("
       SELECT
         n.news_id, n.poster_id, n.poster_name, n.subject, n.body, n.body,
@@ -42,7 +48,7 @@ global $cmsurl, $db_prefix, $l, $settings, $user;
       FROM {$db_prefix}news AS n
         LEFT JOIN {$db_prefix}members AS mem ON mem.id = n.poster_id
       ORDER BY n.post_time DESC
-      LIMIT 0, {$settings['num_news_items']}");
+      LIMIT $start, {$settings['num_news_items']}");
     $news = array();
     // Are there even any news? :O
     if (mysql_num_rows($result)) {
@@ -62,6 +68,18 @@ global $cmsurl, $db_prefix, $l, $settings, $user;
           'allow_comments' => $row['allow_comments']
         );
       }
+      
+      // The first page number
+      $settings['page']['first_page'] = $page + 1;
+      // The previous page number
+      $settings['page']['previous_page'] = $page - 1;
+      // The current page number
+      $settings['page']['current_page'] = $page;
+      // The next page number
+      $settings['page']['next_page'] = $page + 1;
+      // The last page number
+      $settings['page']['last_page'] = $page - 1;
+      
       // Load it up :D (the theme thingy)
       $settings['page']['title'] = $l['news_title'];
       $settings['news'] = $news;

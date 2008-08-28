@@ -9,6 +9,40 @@ global $cmsurl, $db_prefix, $l, $settings, $user;
   echo '
   <h1>', $l['news_header'], '</h1>';
   
+  $page_start = $settings['page']['first_page'];
+  $prev_page = $settings['page']['previous_page'];
+  $page = $settings['page']['current_page'];
+  $next_page = $settings['page']['next_page'];
+  $page_end = $settings['page']['last_page'];
+  $total_members = 4; //$settings['page']['total_members'];
+  
+  // Show the pervious page link if it is at least page two
+  if ($prev_page > 0)
+     echo '<table width="100%">
+      <tr><td><a href="'.$cmsurl.'index.php?action=news;pg='.$prev_page.'">'.$l['managemembers_previous_page'].'</a></td>
+      ';
+  // Show the previous page link if it is page one
+  elseif ($prev_page == 0)
+    echo '<table width="100%">
+      <tr><td><a href="'.$cmsurl.'index.php?action=news">'.$l['managemembers_previous_page'].'</a></td>
+      ';
+  // Don't show the previous page link, because it is the first page
+  else
+    echo '<table width="100%">
+      <tr><td></td>
+      ';
+  // Show the next page link
+  if (@($total_members / $settings['num_news_items']) > $page_end + 2)
+    echo '<td style="text-align: right"><a href="'.$cmsurl.'index.php?action=news;pg='.$next_page.'">'.$l['managemembers_next_page'].'</a></td></tr>
+      </table>
+      ';
+  // Don't show the next page link, because it is the last page
+  else
+    echo '<td style="text-align: right"></td></tr>
+      </table>
+      ';
+  
+  // Show news on this page
   $i = 0;
   while ($i < count($settings['news'])) {
     $news = $settings['news'][$i];
@@ -21,6 +55,32 @@ global $cmsurl, $db_prefix, $l, $settings, $user;
     ';
     $i += 1;
   }
+  
+  // Show the pervious page link if it is at least page two
+  if ($prev_page > 0)
+     echo '<table width="100%">
+      <tr><td><a href="'.$cmsurl.'index.php?action=news;pg='.$prev_page.'">'.$l['managemembers_previous_page'].'</a></td>
+      ';
+  // Show the previous page link if it is page one
+  elseif ($prev_page == 0)
+    echo '<table width="100%">
+      <tr><td><a href="'.$cmsurl.'index.php?action=news">'.$l['managemembers_previous_page'].'</a></td>
+      ';
+  // Don't show the previous page link, because it is the first page
+  else
+    echo '<table width="100%">
+      <tr><td></td>
+      ';
+  // Show the next page link
+  if (@($total_members / $settings['num_news_items']) > $page_end + 2)
+    echo '<td style="text-align: right"><a href="'.$cmsurl.'index.php?action=news;pg='.$next_page.'">'.$l['managemembers_next_page'].'</a></td></tr>
+      </table>
+      ';
+  // Don't show the next page link, because it is the last page
+  else
+    echo '<td style="text-align: right"></td></tr>
+      </table>
+      ';
 }
 
 function None() {
