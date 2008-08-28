@@ -287,7 +287,7 @@ global $l, $db_prefix, $user, $settings, $cookie_prefix;
   if (!can('moderate_profile'))
     $profile = $row['profile'];
   
-  if (!@$$_SESSION['error']) {
+  if (!@$_SESSION['error']) {
   // Update member's data
   if ($_REQUEST['password-new']) // And change password
     sql_query("UPDATE {$db_prefix}members SET `username` = '$username', `display_name` = '$display_name', `email` = '$email', `password` = '$password_new', `group` = '$group', `signature` = '$signature', `profile` = '$profile' WHERE `id` = '{$_REQUEST['u']}'") or die('Internal error');
@@ -295,7 +295,7 @@ global $l, $db_prefix, $user, $settings, $cookie_prefix;
     sql_query("UPDATE {$db_prefix}members SET `username` = '$username', `display_name` = '$display_name', `email` = '$email', `group` = '$group', `signature` = '$signature', `profile` = '$profile' WHERE `id` = '$u'") or die('Internal error');
   
     // If they changed their own username change settings to keep 'em logged in
-    if ($_REQUEST['u'] == $_REQUEST['uid']) {
+    if ($_REQUEST['u'] == $user['id']) {
       setcookie($cookie_prefix.'username',$_REQUEST['user_name']);
       // More settings if they changed their p[assword
       if ($_REQUEST['password-new']) {

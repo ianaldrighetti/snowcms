@@ -15,7 +15,7 @@ global $l, $db_prefix, $settings, $cmsurl, $theme_url;
     ';
   
   if (@$_SESSION['error'])
-	  echo '<p><b>'.$l['main_error'].':</b> '.$_SESSION['error'].'</p>';
+	  echo '<p>'.$_SESSION['error'].'</p>';
   
   $first_member = $settings['page']['first_member'];
   $last_member = $settings['page']['last_member'];
@@ -159,7 +159,12 @@ global $l, $settings, $user, $cmsurl;
   
   echo '
       <h1>'.str_replace('%name%',$settings['managemembers']['member']['display_name'],$l['managemembers_moderate_header']).'</h1>
-        <form action="'.$cmsurl.'index.php?action=admin;sa=members;u='.$_REQUEST['u'].'" method="post" style="display: inline">
+      ';
+  
+  if (@$_SESSION['error'])
+	  echo '<p>'.$_SESSION['error'].'</p>';
+  
+  echo '<form action="'.$cmsurl.'index.php?action=admin;sa=members;u='.$_REQUEST['u'].'" method="post" style="display: inline">
         
         <p>
         <input type="hidden" name="sc" value="'.$user['sc'].'" />
@@ -187,10 +192,12 @@ global $l, $settings, $user, $cmsurl;
         ';
     
     while ($row = mysql_fetch_assoc($settings['managemembers']['groups'])) {
-      if ($settings['managemembers']['member']['group'] == $row['group_id'])
-        echo '<option value="'.$row['group_id'].'" selected="selected">'.$row['groupname'].'</option>'."\n";
-      else
-        echo '<option value="'.$row['group_id'].'">'.$row['groupname'].'</option>'."\n";
+      if ($row['group_id'] != -1) {
+        if ($settings['managemembers']['member']['group'] == $row['group_id'])
+          echo '<option value="'.$row['group_id'].'" selected="selected">'.$row['groupname'].'</option>'."\n";
+        else
+          echo '<option value="'.$row['group_id'].'">'.$row['groupname'].'</option>'."\n";
+      }
     }
     
     echo '</select>

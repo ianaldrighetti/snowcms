@@ -150,8 +150,8 @@ $l['mailsettings_smtp_pass'] = 'SMTP Password:';
 $l['mailsettings_smtp_pass_2'] = 'Verify Password:';
 $l['mailsettings_from_email'] = 'From Email Address:';
 $l['mailsettings_update'] = 'Update Settings';
-$l['mailsettings_error'] = '<b>Error:</b> Failed to update mail settings.';
-$l['mailsettings_error_verification'] = '<b>Error:</b> The verification password was wrong.';
+$l['mailsettings_error'] = 'Failed to update mail settings.';
+$l['mailsettings_error_verification'] = 'The verification password was wrong.';
 
 // ManagePages.template.php
 $l['managepages_title'] = 'Manage Pages';
