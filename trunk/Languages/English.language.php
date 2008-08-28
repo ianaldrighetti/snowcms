@@ -112,6 +112,8 @@ $l['admin_menu_forum'] = 'Manage Forum';
 $l['admin_menu_forum_desc'] = 'You can manage your forum setup here, such as categories and board management.';
 $l['admin_menu_email'] = 'Mail Settings';
 $l['admin_menu_email_desc'] = 'You can change mail settings here, like whether SMTP or Sendmail are used.';
+$l['admin_menu_news'] = 'Manage News';
+$l['admin_menu_news_desc'] = 'You can add, modify and delete news posts here.';
 
 // Settings.template.php
 $l['basicsettings_title'] = 'Basic Settings';
@@ -471,6 +473,24 @@ $l['themeerror_msg'] = 'An error occurred while trying to load the template func
 
 // News.template.php
 $l['news_title'] = 'News';
-$l['news_nonews_header'] = 'No News';
+$l['news_header'] = 'News';
+$l['news_heading'] = '<b>%subject%</b> by %name% at %date%';
+$l['news_comment_heading'] = '<b>%subject%</b> by %name% at %date%';
+$l['news_comments'] = 'Comments: %num%';
+$l['news_comment_subject'] = 'Subject:';
+$l['news_comment_submit'] = 'Add Comment';
+$l['news_nonews_title'] = 'News';
+$l['news_nonews_header'] = 'News';
 $l['news_nonews_desc'] = 'Sorry, but there is currently no news, why not check back later?';
+$l['news_manage_title'] = 'Manage News';
+$l['news_manage_header'] = 'Manage News';
+$l['news_manage_desc'] = 'Here you can add, modify and delete news posts.';
+$l['news_manage_add'] = 'Add News';
+$l['news_manage_add_desc'] = 'You can add a news post here.';
+$l['news_add_title'] = 'Manage News';
+$l['news_add_header'] = 'Add News';
+$l['news_add_category'] = 'Category:';
+$l['news_add_subject'] = 'Subject:';
+$l['news_add_allow_comments'] = 'Allow Comments';
+$l['news_add_submit'] = 'Add Post';
 ?>

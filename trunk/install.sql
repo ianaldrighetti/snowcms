@@ -94,6 +94,7 @@ CREATE TABLE `{$db_prefix}menus` (
 ) ENGINE=MyISAM AUTO_INCREMENT=2 DEFAULT CHARSET=utf8;
 
 INSERT INTO `{$db_prefix}menus` VALUES ('1','1','Home','index.php','0','1');
+INSERT INTO `{$db_prefix}menus` VALUES ('1','1','News','index.php?action=news','0','1');
 INSERT INTO `{$db_prefix}menus` VALUES ('2','2','Forum','forum.php','0','1');
 INSERT INTO `{$db_prefix}menus` VALUES ('3','3','SnowCMS','http://www.snowcms.com/','0','1');
 
@@ -186,13 +187,13 @@ DROP TABLE IF EXISTS `{$db_prefix}news`;
 CREATE TABLE `{$db_prefix}news` (
   `news_id` INT(11) NOT NULL AUTO_INCREMENT,
   `poster_id` INT(11) NOT NULL default '0',
+  `cat_id` INT(11) NOT NULL default '0',
   `poster_name` TEXT NOT NULL,
   `subject` TEXT NOT NULL,
   `body` TEXT NOT NULL,
   `post_time` INT(10) NOT NULL,
   `modify_time` INT(10) NOT NULL default '0',
   `numViews` INT(11) NOT NULL default '0',
-  `numComments` INT(11) NOT NULL default '0',
   `allow_comments` INT(1) NOT NULL default '1',
   PRIMARY KEY(`news_id`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
@@ -208,7 +209,7 @@ CREATE TABLE `{$db_prefix}news_categories` (
 DROP TABLE IF EXISTS `{$db_prefix}news_comments`;
 
 CREATE TABLE `{$db_prefix}news_comments` (
-  `cid` INT(11) NOT NULL AUTO_INCREMENT,
+  `post_id` INT(11) NOT NULL AUTO_INCREMENT,
   `nid` INT(11) NOT NULL,
   `poster_id` INT(11) NOT NULL default '0',
   `poster_name` TEXT NOT NULL,

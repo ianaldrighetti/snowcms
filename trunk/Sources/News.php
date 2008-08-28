@@ -18,33 +18,49 @@ function News() {
 global $cmsurl, $db_prefix, $l, $settings, $user;
   // This prepares the news for display...
   
+  // Are they adding a comment?
+  if (@$_REQUEST['add-comment']) {
+    // Clean the data of dirty injections
+    $nid = clean(@$_REQUEST['nid']); // News ID
+    $subject = clean(@$_REQUEST['subject']); // Subject
+    $body = clean(@$_REQUEST['body']); // Body text
+    
+    // Process SQL query
+    sql_query("INSERT {$db_prefix}news_comments (`nid`, `poster_id`, `poster_name`, `subject`, `body`, `post_time`) VALUES ('$nid','{$user['id']}','{$user['name']}','$subject','$body', '".time()."')") or die(mysql_error());
+    
+    // Redirect the page to the main manage news page
+    redirect('index.php?action=news;id='.clean_header(@$_GET['id']));
+  }
+  
   // Are they viewing the ?action=news, or ?action=news&id=specific_news
-  if(empty($_REQUEST['id'])) {
+  if (empty($_REQUEST['id'])) {
     $result = sql_query("
       SELECT
-        n.news_id AS id, n.poster_id, n.poster_name, n.subject, n.body, n.body,
-        n.modify_time AS post_date, IFNULL(n.modify_time, n.post_time) AS post_date,
-        n.numViews, n.numComments, n.allow_comments,
+        n.news_id, n.poster_id, n.poster_name, n.subject, n.body, n.body,
+        n.post_time, n.numViews, n.allow_comments,
         mem.id, mem.display_name AS username, IFNULL(mem.display_name, mem.username) AS username
       FROM {$db_prefix}news AS n
         LEFT JOIN {$db_prefix}members AS mem ON mem.id = n.poster_id
-      ORDER BY n.post_time DESC");
+      ORDER BY n.post_time DESC
+      LIMIT 0, {$settings['num_news_items']}");
     $news = array();
-    // Is there even any news? :O
-    if(mysql_num_rows($result)) {
-      while($row = mysql_fetch_assoc($result)) {
+    // Are there even any news? :O
+    if (mysql_num_rows($result)) {
+      while ($row = mysql_fetch_assoc($result)) {
+        $comments = mysql_fetch_assoc(sql_query("SELECT COUNT(*) FROM {$db_prefix}news_comments WHERE `nid` = '{$row['news_id']}' GROUP BY `nid`"));
         $news[] = array(
           'id' => $row['news_id'],
           'poster_id' => $row['poster_id'],
           'poster_name' => $row['username'],
           'subject' => $row['subject'],
           'body' => stripslashes($row['body']),
-          'post_date' => formattime($row['post_date']),
+          'user_id' => $row['id'],
+          'username' => $row['username'],
+          'post_date' => formattime($row['post_time'],2),
           'numViews' => $row['numViews'],
-          'numComments' => $row['numComments'],
+          'numComments' => (int)$comments['COUNT(*)'],
           'allow_comments' => $row['allow_comments']
         );
-        mysql_free_result($result);
       }
       // Load it up :D (the theme thingy)
       $settings['page']['title'] = $l['news_title'];
@@ -54,54 +70,54 @@ global $cmsurl, $db_prefix, $l, $settings, $user;
     }
     else {
       // No news? :O
-      $settings['page']['title'] = $l['news_title'];
+      $settings['page']['title'] = $l['news_nonews_title'];
       loadTheme('News','None');
     }
   }
   else {
-    // What News do they want?
+    // What news do they want?
     $news_id = (int)$_REQUEST['id'];
     $result = sql_query("
       SELECT
-        n.news_id AS id, n.poster_id, n.poster_name, n.subject, n.body, n.body,
-        n.modify_time AS post_date, IFNULL(n.modify_time, n.post_time) AS post_date,
-        n.numViews, n.numComments, n.allow_comments,
+        n.news_id, n.poster_id, n.poster_name, n.subject, n.body, n.body,
+        n.post_time, n.numViews, n.numComments, n.allow_comments,
         mem.id, mem.display_name AS username, IFNULL(mem.display_name, mem.username) AS username
       FROM {$db_prefix}news AS n
         LEFT JOIN {$db_prefix}members AS mem ON mem.id = n.poster_id
       WHERE n.news_id = $news_id");
     $news = array();
     // Is there even any news? :O
-    if(mysql_num_rows($result)) {
-      while($row = mysql_fetch_assoc($result)) {
+    if (mysql_num_rows($result)) {
+      while ($row = mysql_fetch_assoc($result)) {
         $news = array(
           'id' => $row['news_id'],
           'poster_id' => $row['poster_id'],
           'poster_name' => $row['username'],
           'subject' => $row['subject'],
           'body' => stripslashes($row['body']),
-          'post_date' => formattime($row['post_date']),
+          'user_id' => $row['id'],
+          'username' => $row['username'],
+          'post_date' => formattime($row['post_time'],2),
           'numViews' => $row['numViews'],
           'numComments' => $row['numComments'],
           'allow_comments' => $row['allow_comments']
         );
-        mysql_free_result($result);
       }
       // We need to do comments too! Awww :[ Only if comments are allowed :D!
       $comments = array();
       if($news['allow_comments']) {
         $result = sql_query("
           SELECT
-            c.cid, c.nid, c.poster_id, c.poster_name, c.subject, c.body, c.modify_time AS post_date,
-            IFNULL(c.modify_time, c.post_time) AS post_date, c.isApproved, c.isSpam, mem.id,
+            c.cid, c.nid, c.poster_id, c.poster_name, c.subject, c.body,
+            c.post_time, c.isApproved, c.isSpam, mem.id,
             mem.display_name AS username, IFNULL(mem.display_name, mem.username) AS username
-          FROM {$db_prefix}news_comments AS n
+          FROM {$db_prefix}news_comments AS c
             LEFT JOIN {$db_prefix}members AS mem ON mem.id = c.poster_id
           WHERE 
             c.nid = $news_id AND isApproved = 1 AND isSpam = 0
           ORDER BY c.post_time DESC");
         // Load up the comments into an array
-        while($row = mysql_fetch_assoc($result)) {
+        while ($row = mysql_fetch_assoc($result)) {
           $comments[] = array(
             'id' => $row['cid'],
             'news_id' => $row['nid'],
@@ -109,20 +125,25 @@ global $cmsurl, $db_prefix, $l, $settings, $user;
             'poster_name' => $row['username'],
             'subject' => $row['subject'] ? $row['subject'] : NULL,
             'body' => bbc($row['body']),
-            'post_date' => formattime($row['post_date']),
+            'user_id' => $row['id'],
+            'username' => $row['username'],
+            'post_date' => formattime($row['post_time'],2),
             'isApproved' => $row['isApproved'],
             'isSpam' => $row['isSpam']
           );
         }
-        // Free! ITS FREE!
+        // Free! IT'S FREE!
         mysql_free_result($result);
       }
-      // Load it up :D (the theme thingy)
+      // Load it up :D (The theme thingy)
       $settings['page']['title'] = $news['subject'];
       $settings['news'] = $news;
       $settings['comments'] = $comments;
       unset($news);
-      loadTheme('News','Single');
+      if ($settings['news']['allow_comments'])
+        loadTheme('News','SingleComments');
+      else
+        loadTheme('News','Single');
     }
     else {
       // It doesn't exist? :O
@@ -132,14 +153,14 @@ global $cmsurl, $db_prefix, $l, $settings, $user;
   }
 }
 
-// This is for the Admin CP, to Manage the news
+// This is for the Admin CP, to manage the news
 function ManageNews() {
 global $cmsurl, $db_prefix, $l, $settings, $user;
   if(can('manage_news')) {
     // Dang, they can do this, now I have to code it :(
     // Some actions they can do...
-    $na = array('add');
-    if(empty($_REQUEST['id']) && (!in_array($_REQUEST['na'], $na))) {
+    $ssa = array('add');
+    if(empty($_REQUEST['id']) && (!in_array(@$_REQUEST['ssa'], $ssa))) {
       // No news ID, and no $na action that exists
       $result = sql_query("
         SELECT
@@ -165,11 +186,35 @@ global $cmsurl, $db_prefix, $l, $settings, $user;
         );
       }
       mysql_free_result($result);
-      $settings['page']['title'] = $l['news_title'];
+      $settings['page']['title'] = $l['news_manage_title'];
       loadTheme('News','Manage');
     }
-    elseif(empty($_REQUEST['id']) && $_REQUEST['na']=='add') {
+    elseif (empty($_REQUEST['id']) && $_REQUEST['ssa']=='add') {
       // Adding news =D
+      if (@$_REQUEST['add-news']) {
+        // Clean the data of dirty injections
+        $cat_id = clean(@$_REQUEST['cat_id']); // Category ID
+        $subject = clean(@$_REQUEST['subject']); // Subject
+        $body = clean(@$_REQUEST['body']); // Body text
+        $allow_comments = @$_REQUEST['allow_comments'] == true; // Are comments for this post allowed
+        // Process SQL query
+        sql_query("INSERT {$db_prefix}news (`poster_id`, `cat_id`, `poster_name`, `subject`, `body`, `post_time`, `allow_comments`) VALUES ('{$user['id']}','$cat_id','{$user['name']}','$subject','$body', '".time()."', '$allow_comments')");
+        
+        // Redirect the page to the main manage news page
+        redirect('index.php?action=admin;sa=news');
+      }
+      
+      // Get categories
+      $result = sql_query("SELECT * FROM {$db_prefix}news_categories") ;
+      while ($row = mysql_fetch_assoc($result)) {
+        $categories[][0] = $row['cat_id'];
+        $categories[][1] = $row['cat_name'];
+      }
+      
+      $settings['page']['categories'] = @$categories;
+      
+      $settings['page']['title'] = $l['news_add_title'];
+      loadTheme('News','Add');
     }
     else {
       // Editing news... =D
