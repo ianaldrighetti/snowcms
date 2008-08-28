@@ -288,7 +288,7 @@ global $db_prefix, $settings, $user;
     if($user['is_logged'] && $row['user_id'] = $user['id'])
       $id_del[] = $user['id'];
     elseif($row['user_id'] != 0 && ($row['last_active']+($settings['login_threshold']*60))<time())
-      $id_del[] = $row['id'];
+      $id_del[] = $row['user_id'];
     elseif($row['user_id'] == 0 && ($row['last_active']+($settings['login_threshold']*60))<time())
       $ip_del[] = $row['ip'];
     elseif($user['id'] == 0 && $row['ip'] = $user['ip'])
