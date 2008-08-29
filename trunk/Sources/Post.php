@@ -158,6 +158,16 @@ global $cmsurl, $db_prefix, $l, $settings, $user;
       sql_query("UPDATE {$db_prefix}boards SET `numtopics` = numtopics + 1, `numposts` = numposts + 1, `last_msg` = '$msg_id', `last_uid` = '{$user['id']}', `last_name` = '{$user['name']}' WHERE `bid` = '$Board_ID'");
       // Delete anything from board logs with the board ID of $Board_ID, there is a new post in town!
       sql_query("DELETE FROM {$db_prefix}board_logs WHERE `bid` = '$Board_ID' AND `uid` != '{$user['id']}'");
+      // Log that this member has viewed this topic
+      if ($user['is_logged']) {
+        $result = sql_query("SELECT * FROM {$db_prefix}topic_logs WHERE `tid` = '$topic_id' AND `uid` = '{$user['id']}'");
+        if(mysql_num_rows($result)==0) {
+          sql_query("
+            REPLACE INTO {$db_prefix}topic_logs
+				      (`tid`,`uid`)
+	          VALUES ($topic_id, {$user['id']})");
+	      }
+	    }
       unset($_SESSION['subject'], $_SESSION['body'], $_SESSION['sticky'], $_SESSION['locked'], $_SESSION['board']);
       redirect("forum.php");
     }

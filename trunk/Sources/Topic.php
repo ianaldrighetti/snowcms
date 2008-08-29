@@ -35,7 +35,7 @@ global $cmsurl, $db_prefix, $l, $settings, $user;
 				      (`tid`,`uid`)
 	          VALUES ($Topic_ID, {$user['id']})");
 	      }
-	      }
+	    }
 	    // Update times this topic has been viewed
       $row = mysql_fetch_assoc(sql_query("SELECT * FROM {$db_prefix}topics WHERE `tid` = '$Topic_ID'"));
       $numviews = $row['numviews'] + 1;
