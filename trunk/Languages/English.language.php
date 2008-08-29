@@ -473,6 +473,14 @@ $l['manageboards_edit_button'] = 'Update Board';
 
 // Post.template.php
 $l['forum_startnew'] = 'Post New Topic';
+$l['forum_post_bold'] = 'Bold';
+$l['forum_post_italic'] = 'Italic';
+$l['forum_post_underline'] = 'Underline';
+$l['forum_post_strikethrough'] = 'Strikethrough';
+$l['forum_post_image'] = 'Image';
+$l['forum_post_link'] = 'Hyperlink';
+$l['forum_post_code'] = 'Code';
+$l['forum_post_quote'] = 'Quote';
 
 // Error.template.php
 $l['themeerror_title'] = 'Theme Error!';
