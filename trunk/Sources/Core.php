@@ -641,4 +641,13 @@ global $db_prefix, $user, $cookie_prefix;
     $user['language'] = $language;
   }
 }
+
+// Return the post's owner
+function PostOwner($post) {
+global $db_prefix;
+  
+  $post = clean($post);
+  $post = mysql_fetch_assoc(sql_query("SELECt * FROM {$db_prefix}messages WHERE `mid` = '$post'"));
+  return $post['uid'];
+}
 ?>

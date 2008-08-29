@@ -134,4 +134,8 @@ echo '
   document.getElementById(\'body\').focus();
 </script>';
 }
+
+function CantPost() {
+
+}
 ?>

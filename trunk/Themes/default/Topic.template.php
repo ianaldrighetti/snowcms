@@ -10,7 +10,10 @@ echo '
 <table id="topic_panel">
   <tr>
     <td style="text-align: left;">Pages: ', $settings['pagination'], '</td>
-    <td style="text-align: right;">'; if(canforum('post_new', $settings['bid'])) { echo '<a href="'.$cmsurl.'forum.php?action=post;board='.$settings['bid'].'">'.$l['topic_newtopic'].'</a>'; } echo ' - '; if(canforum('post_reply', $settings['bid'])) { echo '<a href="'.$cmsurl.'forum.php?action=post;topic='.$_REQUEST['topic'].'">'.$l['topic_reply'].'</a>'; } echo '</td>
+    <td style="text-align: right;">';
+if(canforum('post_new', $settings['bid'])) { echo '<a href="'.$cmsurl.'forum.php?action=post;board='.$settings['bid'].'">'.$l['topic_newtopic'].'</a>'; }
+if (canforum('post_new', $settings['bid']) || canforum('post_reply', $settings['bid'])) echo ' - ';
+if(canforum('post_reply', $settings['bid'])) { echo '<a href="'.$cmsurl.'forum.php?action=post;topic='.$_REQUEST['topic'].'">'.$l['topic_reply'].'</a>'; } echo '</td>
   </tr>
 </table>
 ';

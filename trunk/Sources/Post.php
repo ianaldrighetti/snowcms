@@ -30,7 +30,7 @@ global $cmsurl, $db_prefix, $l, $settings, $user;
     // K, they are replying to a topic...
     // But can they :)    
     $row = mysql_fetch_assoc($result);
-    if(canforum('post_reply', $row['bid'])) {         
+    if (canforum('post_reply', $row['bid']) || (canforum('edit_own', $row['bid']) && @$_REQUEST['edit'] && postOwner(@$_REQUEST['edit']) == $user['id']) || (canforum('edit_any', $row['bid']) && @$_REQUEST['edit'])) {
       // But does it exist? D:!
       if(mysql_num_rows($result)>0) {
         // The topic DOES exist, now we can check if they are allowed to see it
@@ -71,19 +71,19 @@ global $cmsurl, $db_prefix, $l, $settings, $user;
         else {
           // They can't access the board that the topic is in, why should they be able to post, make them think this topic doesnt exist.
           $settings['page']['title'] = $l['forum_error_title'];
-          loadForum('Error','CantPost');
+          loadForum('Post','CantPost');
         }
       }
       else {
         // The topic doesn't exist :o
         $settings['page']['title'] = $l['forum_error_title'];
-        loadForum('Error','CantPost');        
+        loadForum('Post','CantPost');        
       }
     }
     else {
       // They couldn't have posted in the first place ._.
       $settings['page']['title'] = $l['forum_error_title'];
-      loadForum('Error','CantPost');    
+      loadForum('Post','CantPost');    
     }
   }
   elseif(!empty($_REQUEST['board'])) {
@@ -128,7 +128,7 @@ global $cmsurl, $db_prefix, $l, $settings, $user;
     else {
       // Awww, sucks to be them :P
       $settings['page']['title'] = $l['forum_error_title'];
-      loadForum('Error','CantPost');
+      loadForum('Post','CantPost');
     }
   }
   else {
@@ -194,7 +194,8 @@ global $cmsurl, $db_prefix, $l, $settings, $user;
       redirect("forum.php?action=post;board={$Board_ID}");
     }
   }
-  elseif($what == 'post_reply' && canforum('post_reply', boardfromTopic($_REQUEST['topic'])) && postable($_REQUEST['topic'])) {
+  // Are they trying to create or edit a post?
+  elseif ($what == 'post_reply' && (canforum('post_reply', BoardFromTopic(@$_REQUEST['topic'])) || canforum('edit_own', BoardFromTopic(@$_REQUEST['topic'])) && @$_REQUEST['edit'] && postOwner(@$_REQUEST['edit']) == $user['id']) || (canforum('edit_any', BoardFromTopic(@$_REQUEST['topic'])) && @$_REQUEST['edit'])) {
     $Topic_ID = (int)$_REQUEST['topic'];
     // Hmm, make sure it is at least filled out, ya know? :P
     if(strlen($_REQUEST['body'])>2) {
@@ -226,8 +227,8 @@ global $cmsurl, $db_prefix, $l, $settings, $user;
         $subject = "Re: ". $row['subject'];
       }
       
-      // Is a message being edited?
-      if ($edit = clean(@$_REQUEST['edit'])) {
+      // Is a message being edited and are they allowed to do it?
+      if (($edit = clean(@$_REQUEST['edit'])) && (canforum('edit_own', BoardFromTopic($Topic_ID)) && postOwner(@$_REQUEST['edit']) == $user['id']) || (canforum('edit_any', BoardFromTopic($Topic_ID)))) {
         // Yep!
         sql_query("UPDATE {$db_prefix}messages SET `subject` = '$subject', `body` = '$body' WHERE `mid` = '$edit'");
         redirect('forum.php?board='.clean_header($board_id).';topic='.clean_header($Topic_ID));
