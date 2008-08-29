@@ -39,7 +39,12 @@ echo '
            echo 'topic_old.png" alt="'.$l['forum_topic_old'].'"';
          
   echo '/></td>
-         <td style="padding: 5px;"><a href="'. $cmsurl. 'forum.php?topic='. $topic['tid']. '">'. $topic['subject']. '</a></td>
+         <td style="padding: 5px;">
+           ';
+  if ($topic['locked'])
+  echo '<img src="'.$theme_url.'/'.$settings['theme'].'/images/topic_locked.png" style="float: right" />';
+  echo '<a href="'. $cmsurl. 'forum.php?topic='. $topic['tid']. '">'. $topic['subject']. '</a>
+         </td>
          <td style="text-align: center; padding: 5px;"><a href="'. $cmsurl. 'index.php?action=profile;u='. $topic['starter_id']. '">'.$topic['username']. '</a></td>
          <td style="text-align: center; padding: 5px;">'. $topic['numReplies']. '</td>
          <td style="text-align: center; padding: 5px;">'. $topic['numViews']. '</td>
