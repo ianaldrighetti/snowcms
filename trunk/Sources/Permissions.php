@@ -154,10 +154,7 @@ global $cmsurl, $db_prefix, $l, $settings, $user;
         while($row = mysql_fetch_assoc($result)) {
           $groups[$row['group_id']]['numperms'] = $row['COUNT(*)']; 
         }
-      $result = sql_query("SELECT `group_id`, COUNT(*) FROM {$db_prefix}permissions GROUP BY `group_id`");
-        while($row = mysql_fetch_assoc($result)) {
-          $settings['page']['total_permissions'] = $row['COUNT(*)']; 
-        }
+      $settings['page']['total_permissions'] = count($settings['permissions']['group']);
       $settings['page']['title'] = $l['permissions_title'];
       $settings['groups'] = $groups;
       loadTheme('Permissions');
@@ -208,10 +205,7 @@ global $cmsurl, $db_prefix, $l, $settings, $permissions, $user;
                                'can' => $row['can']
                              );
     $settings['page']['title'] = $l['permissions_editperms_title'];
-    $result = sql_query("SELECT `group_id`, COUNT(*) FROM {$db_prefix}permissions GROUP BY `group_id`");
-      while($row = mysql_fetch_assoc($result)) {
-        $settings['page']['total_permissions'] = $row['COUNT(*)']; 
-      }
+    $settings['page']['total_permissions'] = count($settings['permissions']['group']);
     loadTheme('Permissions','Edit');
   }
   else {
