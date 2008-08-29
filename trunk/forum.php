@@ -62,6 +62,7 @@ require_once($source_dir.'/Core.php');
       'pm' => array('PersonalMessages.php','PM'),
       'post' => array('Post.php','Post'),
       'post2' => array('Post.php','Post2'),
+      'delete' => array('Delete.php','Delete'),
       'search' => array('Search.php','FSearch'),
       'search2' => array('Search.php','FSearch2'),
       'sticky' => array('Topic.php','Sticky')
