@@ -135,7 +135,7 @@ global $cmsurl, $db_prefix, $l, $settings, $user;
             'status' => $row['last_active'] ? true : false,
             'can' => array(
                          'edit' => canforum('edit_any', $row['bid']) ? true : edit($row['uid'], canforum('edit_own', $row['bid'])),
-                         'del' => canforum('delete_any', $row['bid']) ? true : del($row['uid'], canforum('delete_own')),
+                         'del' => canforum('delete_any', $row['bid']) ? true : del($row['uid'], canforum('delete_own', $row['bid'])),
                          'split' => Splitable($row['first_msg'], $row['mid'], canforum('split_topic', $row['bid']))
                        )
           );
@@ -303,6 +303,22 @@ global $cmsurl, $db_prefix, $l, $settings, $user;
     $settings['page']['title'] = $l['topic_lock_error'];
     loadTheme('Topic','ErrorLock');
   }
+}
+
+// Delete a post
+function Delete() {
+global $db_prefix;
+  
+  $mid = clean($_REQUEST['msg']);
+  $topic = clean($_REQUEST['topic']);
+  $board = mysql_fetch_assoc(sql_query("SELECT * FROM {$db_prefix}topics AS t LEFT JOIN {$db_prefix}messages AS m ON m.tid = t.tid"));
+  $board = $board['bid'];
+  
+  // Are they allowed to delete it?
+  if (canforum('delete_any', $board) || del(PostOwner($mid), canforum('delete_own', $board)))
+    sql_query("DELETE FROM {$db_prefix}messages WHERE `mid` = '$mid'");
+  
+  redirect('forum.php?topic='.$topic);
 }
 
 // More simple functions to aid in moderation...
