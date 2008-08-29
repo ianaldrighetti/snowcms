@@ -157,7 +157,7 @@ global $cmsurl, $db_prefix, $l, $settings, $user;
       sql_query("UPDATE {$db_prefix}members SET `numposts` = numposts + 1 WHERE `id` = '{$user['id']}'");
       sql_query("UPDATE {$db_prefix}boards SET `numtopics` = numtopics + 1, `numposts` = numposts + 1, `last_msg` = '$msg_id', `last_uid` = '{$user['id']}', `last_name` = '{$user['name']}' WHERE `bid` = '$Board_ID'");
       // Delete anything from board logs with the board ID of $Board_ID, there is a new post in town!
-      sql_query("DELETE FROM {$db_prefix}board_logs WHERE `bid` = '$Board_ID' AND `uid` != '{$user[id]}'");
+      sql_query("DELETE FROM {$db_prefix}board_logs WHERE `bid` = '$Board_ID' AND `uid` != '{$user['id']}'");
       unset($_SESSION['subject'], $_SESSION['body'], $_SESSION['sticky'], $_SESSION['locked'], $_SESSION['board']);
       redirect("forum.php");
     }
@@ -228,7 +228,7 @@ global $cmsurl, $db_prefix, $l, $settings, $user;
   }
   else {
     // Uhh, yeah, this is for if they cant post or reply to the requested thingy...
-    die('You don\'t have permission to do that.') // Yeah this needs work
+    die('You don\'t have permission to do that.'); // Yeah this needs work
   }
 }
 
