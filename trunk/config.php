@@ -10,25 +10,25 @@
 // 
 //            config.php file 
 
-
+// We can't let you access it directly :)
 if(!defined("Snow"))
   die("Hacking Attempt...");
   
 // Your MySQL Information
 $mysql_host = 'localhost'; # Your MySQL Host, doubt you will change this
-$mysql_user = 'root'; # Your MySQL Username
+$mysql_user = ''; # Your MySQL Username
 $mysql_passwd = ''; # Your MySQL Password
-$mysql_db = 'snowcms'; # Your MySQL DB
-$mysql_prefix = ''; # Prefix for your database
+$mysql_db = ''; # Your MySQL DB
+$mysql_prefix = 'scms_'; # Prefix for your database
 
 // Some SnowCMS Specific Settings
-$source_dir = 'C:\\Users\\Myles\\XAMPP\\htdocs\\scms/Sources'; # Path to your Source directory without trailing /!
-$theme_dir = 'C:\\Users\\Myles\\XAMPP\\htdocs\\scms/Themes'; # Path to your Themes directory without trailing /!
-$language_dir = 'C:\\Users\\Myles\\XAMPP\\htdocs\\scms/Languages'; # Path to your Languages directory without trailing /!
-$cmsurl = 'http://localhost/scms/'; # URL to your SnowCMS Installation
-$theme_url = 'http://localhost/scms/Themes'; # URL to your SnowCMS Themes folder
+$source_dir = ''; # Path to your Source directory without trailing /!
+$theme_dir = ''; # Path to your Themes directory without trailing /!
+$language_dir = ''; # Path to your Languages directory without trailing /!
+$cmsurl = ''; # URL to your SnowCMS Installation
+$theme_url = ''; # URL to your SnowCMS Themes folder
 
 /* Don't touch the stuff below! */
 $db_prefix = '`'.$mysql_db.'`.'.$mysql_prefix;
-$scms_installed = true;
+$scms_installed = false;
 ?>
