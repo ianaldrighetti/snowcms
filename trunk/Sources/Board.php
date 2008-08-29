@@ -36,7 +36,7 @@ global $cmsurl, $db_prefix, $l, $settings, $user;
     // So does it exist / Can they view it?
     if(mysql_num_rows($result)) {
       $board = mysql_fetch_assoc($result);
-      if($user['is_logged']) {        
+      if($user['is_logged']) {
         $result = sql_query("SELECT * FROM {$db_prefix}board_logs WHERE `bid` = '$board_id' AND `uid` = '{$user['id']}'");
           if(mysql_num_rows($result)==0) {
             sql_query("
@@ -69,6 +69,10 @@ global $cmsurl, $db_prefix, $l, $settings, $user;
               $new = false;
             else
               $new = true;
+            if (mysql_num_rows(sql_query("SELECT * FROM {$db_prefix}messages WHERE `tid` = '{$row['tid']}' AND `uid` = '{$user['id']}'")))
+              $own = true;
+            else
+              $own = false;
             $topics[] = array(
               'tid' => $row['tid'],
               'subject' => $row['subject'],
@@ -79,7 +83,8 @@ global $cmsurl, $db_prefix, $l, $settings, $user;
               'numReplies' => $row['num_replies'],
               'numViews' => $row['numviews'],
               'starter_id' => $row['starter_id'],
-              'is_new' => $new
+              'is_new' => $new,
+              'is_own' => $own
             );
           }
           mysql_free_result($result);

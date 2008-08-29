@@ -27,7 +27,18 @@ echo '
     foreach($settings['topics'] as $topic) {
        echo '
        <tr class="indexcontent">
-         <td style="text-align: center; padding: 5px;"><img src="'.$theme_url.'/'.$settings['theme'].'/images/'; if($topic['is_new']) { echo 'topic_new.png" alt="'.$l['forum_topic_new'].'"'; } else { echo 'topic_old.png" alt="'.$l['forum_topic_old'].'"'; } echo '/></td>
+         <td style="text-align: center; padding: 5px;"><img src="'.$theme_url.'/'.$settings['theme'].'/images/';
+         
+         if ($topic['is_new'] && $topic['is_own'])
+           echo 'topic_own_new.png" alt="'.$l['forum_topic_own_new'].'"';
+         else if ($topic['is_new'])
+           echo 'topic_new.png" alt="'.$l['forum_topic_new'].'"';
+         else if ($topic['is_own'])
+           echo 'topic_own_old.png" alt="'.$l['forum_topic_own_old'].'"';
+         else
+           echo 'topic_old.png" alt="'.$l['forum_topic_old'].'"';
+         
+  echo '/></td>
          <td style="padding: 5px;"><a href="'. $cmsurl. 'forum.php?topic='. $topic['tid']. '">'. $topic['subject']. '</a></td>
          <td style="text-align: center; padding: 5px;"><a href="'. $cmsurl. 'index.php?action=profile;u='. $topic['starter_id']. '">'.$topic['username']. '</a></td>
          <td style="text-align: center; padding: 5px;">'. $topic['numReplies']. '</td>
