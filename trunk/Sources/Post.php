@@ -22,9 +22,10 @@ global $cmsurl, $db_prefix, $l, $settings, $user;
       $Topic_ID = (int)addslashes(mysql_real_escape_string($_REQUEST['topic']));
       $result = sql_query("
          SELECT
-           t.tid, t.bid, b.bid, b.who_view
+           t.tid, t.bid, m.subject, b.bid, b.who_view
          FROM {$db_prefix}topics AS t
            LEFT JOIN {$db_prefix}boards AS b ON b.bid = t.bid
+           LEFT JOIN {$db_prefix}messages AS m ON m.tid = t.tid
          WHERE t.tid = $Topic_ID");
     // K, they are replying to a topic...
     // But can they :)    
@@ -41,6 +42,8 @@ global $cmsurl, $db_prefix, $l, $settings, $user;
           $settings['locked'] = @$_SESSION['locked'] ? (int)$_SESSION['locked'] : (int)@$_REQUEST['locked'];
           $settings['sticky'] = @$_SESSION['sticky'] ? (int)$_SESSION['sticky'] : (int)@$_REQUEST['sticky'];
           $settings['subject'] = @$_SESSION['subject'] ? clean($_SESSION['subject']) : clean(@$_REQUEST['subject']);
+          // If the subject is empty, make it Re: Topic Subject
+          $settings['subject'] = $settings['subject'] ? $settings['subject'] : 'Re: '.$row['subject'];
           $settings['body'] = @$_SESSION['body'] ? clean($_SESSION['body']) : clean(@$_REQUEST['body']);
           $settings['board'] = $row['bid'];
           $settings['topic'] = $row['tid'];
