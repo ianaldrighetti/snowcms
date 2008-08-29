@@ -38,8 +38,10 @@ global $cmsurl, $db_prefix, $l, $settings, $user;
           $who_view = @explode(",", $row['who_view']);
         if((in_array($user['group'], $who_view)) || ($user['is_admin'])) {
           // Get quote information
-          $quote = mysql_fetch_assoc(sql_query("SELECT * FROM {$db_prefix}messages LEFT JOIN {$db_prefix}members ON `uid` = `id` WHERE `mid` = '".clean(@$_REQUEST['quote'])."'"));
-          $quote = '[quote by="'.$quote['display_name'].'"]'."\n".$quote['body']."\n".'[/quote]';
+          if ($quote = clean(@$_REQUEST['quote'])) {
+            $quote = mysql_fetch_assoc(sql_query("SELECT * FROM {$db_prefix}messages LEFT JOIN {$db_prefix}members ON `uid` = `id` WHERE `mid` = '$quote'"));
+            $quote = '[quote by="'.$quote['display_name'].'"]'."\n".$quote['body']."\n".'[/quote]'."\n";
+          }
           $settings['page']['title'] = $l['forum_postreply'];
           // This is some STUFF to preload, maybe, if you were redirected from ?action=post2 back due to errors :)
           $settings['locked'] = @$_SESSION['locked'] ? (int)$_SESSION['locked'] : (int)@$_REQUEST['locked'];
