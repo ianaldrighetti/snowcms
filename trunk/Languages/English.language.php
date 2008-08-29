@@ -317,6 +317,7 @@ $l['permissions_perm_moderate_unban'] = 'Allow them to unban members.';
 $l['permissions_perm_view_forum'] = 'Allow them to view the forum';
 $l['permissions_perm_view_online'] = 'Allow them to view who is online';
 $l['permissions_perm_view_profile'] = 'Allow them to view others profiles';
+$l['permissions_perm_search'] = 'Allow them to search the forum';
 $l['permissions_perm_manage_mail_settings'] = 'Allow them to edit mail settings';
 $l['permissions_perm_manage_groups'] = 'Allow them to manage member groups';
 $l['permissions_perm_manage_forum'] = 'Allow them to manage the Forum';
@@ -487,8 +488,10 @@ $l['forum_post_quote'] = 'Quote';
 $l['forum_search_title'] = 'Search';
 $l['forum_search_results_title'] = 'Search';
 $l['forum_search_noresults_title'] = 'Search';
+$l['forum_search_notallowed_title'] = 'Search';
 $l['forum_search_submit'] = 'Search';
 $l['forum_search_noresults'] = 'Your search returned no results.';
+$l['forum_search_notallowed'] = 'You\'re not allowed to search the forum.';
 
 // Error.template.php
 $l['themeerror_title'] = 'Theme Error!';

@@ -160,7 +160,7 @@ CREATE TABLE `{$db_prefix}permissions` (
   PRIMARY KEY  (`group_id`,`what`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 
-INSERT INTO `{$db_prefix}permissions` VALUES ('-1','view_forum','1'),('-1','view_online','1'),('-1','view_profile','1'),('2','view_forum','1'),('2','view_online','1'),('2','view_profile','1');
+INSERT INTO `{$db_prefix}permissions` VALUES ('-1','view_forum','1'),('-1','view_online','1'),('2','view_forum','1'),('2','view_online','1'),('2','view_profile','1'),('2','search','1');
 
 DROP TABLE IF EXISTS `{$db_prefix}settings`;
 

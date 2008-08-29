@@ -22,6 +22,7 @@ $settings['permissions']['group'] = array(
   'view_forum' => true,
   'view_online' => true,
   'view_profile' => true,
+  'search' => true,
   'admin' => false,
   'manage_basic-settings' => false,
   'manage_forum' => false,

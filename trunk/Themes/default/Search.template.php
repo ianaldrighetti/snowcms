@@ -94,4 +94,18 @@ global $l, $settings;
   </table>
   ';
 }
+
+function NotAllowed() {
+global $l;
+  
+  echo '
+  <table class="search">
+    <tr>
+      <td>
+        <p>'.$l['forum_search_notallowed'].'</p>
+      </td>
+    </tr>
+  </table>
+  ';
+}
 ?>
