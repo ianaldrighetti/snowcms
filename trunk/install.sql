@@ -99,12 +99,12 @@ CREATE TABLE `{$db_prefix}menus` (
   `target` int(1) NOT NULL default '0',
   `menu` int(1) NOT NULL default '0',
   PRIMARY KEY  (`link_id`)
-) ENGINE=MyISAM AUTO_INCREMENT=2 DEFAULT CHARSET=utf8;
+) ENGINE=MyISAM AUTO_INCREMENT=5 DEFAULT CHARSET=utf8;
 
 INSERT INTO `{$db_prefix}menus` VALUES ('1','1','Home','index.php','0','3');
-INSERT INTO `{$db_prefix}menus` VALUES ('1','1','News','index.php?action=news','0','3');
-INSERT INTO `{$db_prefix}menus` VALUES ('2','2','Forum','forum.php','0','3');
-INSERT INTO `{$db_prefix}menus` VALUES ('3','3','SnowCMS','http://www.snowcms.com/','1','2');
+INSERT INTO `{$db_prefix}menus` VALUES ('2','1','News','index.php?action=news','0','3');
+INSERT INTO `{$db_prefix}menus` VALUES ('3','2','Forum','forum.php','0','3');
+INSERT INTO `{$db_prefix}menus` VALUES ('4','3','SnowCMS','http://www.snowcms.com/','1','2');
 
 DROP TABLE IF EXISTS `{$db_prefix}messages`;
 
@@ -227,6 +227,5 @@ CREATE TABLE `{$db_prefix}news_comments` (
   `modify_time` INT(10) NOT NULL default '0',
   `isApproved` INT(1) NOT NULL default '1',
   `isSpam` INT(1) NOT NULL default '0',
-  PRIMARY KEY (`cid`),
-  UNIQUE KEY (`cid`)
+  PRIMARY KEY (`post_id`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
