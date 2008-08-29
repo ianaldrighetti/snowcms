@@ -90,15 +90,17 @@ global $cmsurl, $db_prefix, $l, $settings, $source_dir, $user;
 	  curl_close($curl);
 	  if(empty($settings['page']['news']))
 	    // Oh noes! We tried, but couldn't get it :'(
-	    $settings['page']['news'] = $l['admin_cant_get_news_2'];
+	    $settings['page']['news'] = $l['admin_news_timeout'];
+	  // Set the Title, and then call on the Admin.template.php template
+    $settings['page']['title'] = $l['admin_title'];
+    loadTheme('Admin');
 	}
+	// We didn't try because you don't have cURL as far as we can tell :(
 	else {
 	  $settings['latest_version'] = $l['admin_version_unavailable'];
-	  // We didn't try because you don't have cURL as far as we can tell :(
-	  $settings['page']['news'] = $l['admin_cant_get_news_1'];
+	  $settings['page']['title'] = $l['admin_title'];
+	  $settings['page']['news_url'] = "http://news.snowcms.com/v0.x-line/news.txt";
+    loadTheme('Admin','NocURL');
 	}
-	// Set the Title, and then call on the Admin.template.php template
-  $settings['page']['title'] = $l['admin_title'];
-  loadTheme('Admin');
 }
 ?>
