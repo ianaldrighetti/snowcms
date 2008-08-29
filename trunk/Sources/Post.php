@@ -37,6 +37,9 @@ global $cmsurl, $db_prefix, $l, $settings, $user;
         //while($row = mysql_fetch_assoc($result))
           $who_view = @explode(",", $row['who_view']);
         if((in_array($user['group'], $who_view)) || ($user['is_admin'])) {
+          // Get quote information
+          $quote = mysql_fetch_assoc(sql_query("SELECT * FROM {$db_prefix}messages LEFT JOIN {$db_prefix}members ON `uid` = `id` WHERE `mid` = '".clean(@$_REQUEST['quote'])."'"));
+          $quote = '[quote by="'.$quote['display_name'].'"]'."\n".$quote['body']."\n".'[/quote]';
           $settings['page']['title'] = $l['forum_postreply'];
           // This is some STUFF to preload, maybe, if you were redirected from ?action=post2 back due to errors :)
           $settings['locked'] = @$_SESSION['locked'] ? (int)$_SESSION['locked'] : (int)@$_REQUEST['locked'];
@@ -44,7 +47,7 @@ global $cmsurl, $db_prefix, $l, $settings, $user;
           $settings['subject'] = @$_SESSION['subject'] ? clean($_SESSION['subject']) : clean(@$_REQUEST['subject']);
           // If the subject is empty, make it Re: Topic Subject
           $settings['subject'] = $settings['subject'] ? $settings['subject'] : 'Re: '.$row['subject'];
-          $settings['body'] = @$_SESSION['body'] ? clean($_SESSION['body']) : clean(@$_REQUEST['body']);
+          $settings['body'] = @$_SESSION['body'] ? clean($_SESSION['body']) : ($quote ? $quote : clean(@$_REQUEST['body']));
           $settings['board'] = $row['bid'];
           $settings['topic'] = $row['tid'];
           // Load the preview of the topic, and if necessary the quote ;)
