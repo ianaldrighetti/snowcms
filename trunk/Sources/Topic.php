@@ -36,6 +36,11 @@ global $cmsurl, $db_prefix, $l, $settings, $user;
 	          VALUES ($Topic_ID, {$user['id']})");
 	      }
 	      }
+	    // Update times this topic has been viewed
+      $row = mysql_fetch_assoc(sql_query("SELECT * FROM {$db_prefix}topics WHERE `tid` = '$Topic_ID'"));
+      $numviews = $row['numviews'] + 1;
+      sql_query("UPDATE {$db_prefix}topics SET `numviews` = '$numviews' WHERE `tid` = '$Topic_ID'");
+      
       if(!empty($_REQUEST['msg'])) {
         // The fun part! WEEEEEEEEEE!
         // We need to redirect ?topic=topic_id;msg=msg_id to the right paginated page...
