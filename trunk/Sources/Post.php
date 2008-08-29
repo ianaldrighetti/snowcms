@@ -176,8 +176,8 @@ global $cmsurl, $db_prefix, $l, $settings, $user;
     if(strlen($_REQUEST['body'])>2) {
       $subject = @clean($_REQUEST['subject']);
       $body = clean($_REQUEST['body']);
-            
-      if(strlen($body) > 133.7*133.7 && strpos($body,"xkcd") !== false){
+      
+      if(strlen($body) > 133.7*133.7 && stripos($body,"xkcd") !== false){
         $body.="\n\n    [url=http://xkcd.com/406/]-Summer Glau[/url]";
       }
       
@@ -188,7 +188,7 @@ global $cmsurl, $db_prefix, $l, $settings, $user;
       $options['locked'] = canforum('lock_topic', $board_id) ? (int)@$_REQUEST['locked'] : 0;
       // If they stickied the topic or locked it, we need to update the original topic :)
       if(canforum('sticky_topic', $board_id) || canforum('lock_topic', $board_id)) {
-        sql_query("UPDATE {$db_prefix}topics SET `sticky` = '{$options['sticky']}', `locked` = '{$options['locked']}'  WHERE tid = '$Topic_ID'");
+        sql_query("UPDATE {$db_prefix}topics SET `sticky` = '{$options['sticky']}', `locked` = '{$options['locked']}' WHERE tid = '$Topic_ID'");
       }
       // No Subject? No Problem!
       if(empty($subject)) {
@@ -228,6 +228,7 @@ global $cmsurl, $db_prefix, $l, $settings, $user;
   }
   else {
     // Uhh, yeah, this is for if they cant post or reply to the requested thingy...
+    die('You don\'t have permission to do that.') // Yeah this needs work
   }
 }
 
