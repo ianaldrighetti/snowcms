@@ -75,7 +75,7 @@ CREATE TABLE `{$db_prefix}members` (
   `reg_date` int(10) NOT NULL default '0',
   `reg_ip` text NOT NULL,
   `last_login` int(10) NOT NULL default '0',
-  `last_ip` text NOT NULL,
+  `last_ip` text NOT NULL default '0.0.0.0',
   `group` int(11) NOT NULL default '0',
   `numposts` int(11) NOT NULL default '0',
   `signature` text NOT NULL,
