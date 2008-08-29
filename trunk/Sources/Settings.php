@@ -58,6 +58,10 @@ global $cmsurl, $db_prefix, $l, $settings, $user, $language_dir, $theme_dir, $th
         array(
           'type' => 'text'
         ),
+      'num_search_results' =>
+        array(
+          'type' => 'text'
+        ),
       'manage_members_per_page' =>
         array(
           'type' => 'text'

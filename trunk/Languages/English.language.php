@@ -135,6 +135,7 @@ $l['basicsettings_timeformat'] = 'Time Format:';
 $l['basicsettings_dateformat'] = 'Date Format:';
 $l['basicsettings_update'] = 'Update Settings';
 $l['basicsettings_num_news_items'] = 'News items per page:';
+$l['basicsettings_num_search_results'] = 'Search results per page:';
 $l['basicsettings_manage_members_per_page'] = 'Members per page:';
 
 // Mail.template.php
@@ -481,6 +482,13 @@ $l['forum_post_image'] = 'Image';
 $l['forum_post_link'] = 'Hyperlink';
 $l['forum_post_code'] = 'Code';
 $l['forum_post_quote'] = 'Quote';
+
+// Search.template.php
+$l['forum_search_title'] = 'Search';
+$l['forum_search_results_title'] = 'Search';
+$l['forum_search_noresults_title'] = 'Search';
+$l['forum_search_submit'] = 'Search';
+$l['forum_search_noresults'] = 'Your search returned no results.';
 
 // Error.template.php
 $l['themeerror_title'] = 'Theme Error!';
