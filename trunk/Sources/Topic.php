@@ -313,10 +313,16 @@ global $db_prefix;
   $topic = clean($_REQUEST['topic']);
   $board = mysql_fetch_assoc(sql_query("SELECT * FROM {$db_prefix}topics AS t LEFT JOIN {$db_prefix}messages AS m ON m.tid = t.tid"));
   $board = $board['bid'];
+  $member = mysql_fetch_assoc(sql_query("SELECT * FROM {$db_prefix}messages WHERE `mid` = '$mid'"));
+  $member = $member['uid'];
   
   // Are they allowed to delete it?
-  if (canforum('delete_any', $board) || del(PostOwner($mid), canforum('delete_own', $board)))
+  if (canforum('delete_any', $board) || del(PostOwner($mid), canforum('delete_own', $board))) {
     sql_query("DELETE FROM {$db_prefix}messages WHERE `mid` = '$mid'");
+    $posts = mysql_fetch_assoc(sql_query("SELECT * FROM {$db_prefix}members WHERE `id` = '$member'"));
+    $posts = $posts['numposts'] - 1;
+    sql_query("UPDATE {$db_prefix}members SET `numposts` = '$posts' WHERE `id` = '$member'");
+  }
   
   redirect('forum.php?topic='.$topic);
 }
