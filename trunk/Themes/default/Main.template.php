@@ -44,7 +44,7 @@ echo '<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
 // Call on by either theme_menu('main'); or theme_menu('side')
 function theme_menu($which) {
 global $l, $cmsurl, $settings, $user;
-  // Is there even any links? Lol.
+  // Are there even any links? Lol.
   if(count($settings['menu'][$which])>0) {
     foreach($settings['menu'][$which] as $link) {
       echo '<li><a href="'.$link['href'].'" '.$link['target'].'>'.$link['name'].'</a></li>';

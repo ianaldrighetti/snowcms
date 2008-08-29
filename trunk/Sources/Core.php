@@ -238,9 +238,9 @@ global $db_prefix, $settings;
   $menu['main'] = array();
   $menu['side'] = array();
   $result = sql_query("SELECT * FROM {$db_prefix}menus ORDER BY `order` ASC") or die(mysql_error());
-  if(mysql_num_rows($result)>0) {  
-    while($row = mysql_fetch_assoc($result)) {
-      if(($row['menu']==0) || ($row['menu']==2)) {
+  if (mysql_num_rows($result)) {  
+    while ($row = mysql_fetch_assoc($result)) {
+      if ($row['menu'] == 1 || $row['menu'] == 3) {
         // This one goes on the main menu...
         $menu['main'][] = array(
           'id' => $row['link_id'],
@@ -251,7 +251,7 @@ global $db_prefix, $settings;
           'menu' => $row['menu']
         );
       }
-      elseif(($row['menu']==1) || ($row['menu']==2)) {
+      if ($row['menu'] == 2 || $row['menu'] == 3) {
         // And this little piggy goes on the sidebar menu
         $menu['side'][] = array(
           'id' => $row['link_id'],
