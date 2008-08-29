@@ -74,6 +74,7 @@ function Reply() {
 global $cmsurl, $settings, $l, $user, $theme_url, $theme_dir;
 echo '
 <form action="', $cmsurl, 'forum.php?action=post2;topic=', $settings['topic'], '" method="post" class="write">
+<p><input type="hidden" name="edit" value="'.$settings['edit'].'" /></p>
 <table id="post" border="0px">
   <tr cellspacing="0px" cellpadding="0px">
     <td class="title" colspan="2">', $l['post_postreply'], '</td>

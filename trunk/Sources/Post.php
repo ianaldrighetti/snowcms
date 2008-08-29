@@ -37,6 +37,15 @@ global $cmsurl, $db_prefix, $l, $settings, $user;
         //while($row = mysql_fetch_assoc($result))
           $who_view = @explode(",", $row['who_view']);
         if((in_array($user['group'], $who_view)) || ($user['is_admin'])) {
+          // Are they editing a post?
+          if ($edit = clean(@$_REQUEST['edit'])) {
+            $edit = mysql_fetch_assoc(sql_query("SELECT * FROM {$db_prefix}messages WHERE `mid` = '$edit'"));
+            $subject = $edit['subject'];
+            $body = $edit['body'];
+            $settings['edit'] = $edit['mid'];
+          }
+          else
+            $settings['edit'] = '';
           // Get quote information
           if ($quote = clean(@$_REQUEST['quote'])) {
             $quote = mysql_fetch_assoc(sql_query("SELECT * FROM {$db_prefix}messages LEFT JOIN {$db_prefix}members ON `uid` = `id` WHERE `mid` = '$quote'"));
@@ -46,10 +55,10 @@ global $cmsurl, $db_prefix, $l, $settings, $user;
           // This is some STUFF to preload, maybe, if you were redirected from ?action=post2 back due to errors :)
           $settings['locked'] = @$_SESSION['locked'] ? (int)$_SESSION['locked'] : (int)@$_REQUEST['locked'];
           $settings['sticky'] = @$_SESSION['sticky'] ? (int)$_SESSION['sticky'] : (int)@$_REQUEST['sticky'];
-          $settings['subject'] = @$_SESSION['subject'] ? clean($_SESSION['subject']) : clean(@$_REQUEST['subject']);
+          $settings['subject'] = @$subject ? $subject : (@$_SESSION['subject'] ? clean($_SESSION['subject']) : clean(@$_REQUEST['subject']));
           // If the subject is empty, make it Re: Topic Subject
           $settings['subject'] = $settings['subject'] ? $settings['subject'] : 'Re: '.$row['subject'];
-          $settings['body'] = @$_SESSION['body'] ? clean($_SESSION['body']) : ($quote ? $quote : clean(@$_REQUEST['body']));
+          $settings['body'] = @$body ? $body : (@$_SESSION['body'] ? clean($_SESSION['body']) : ($quote ? $quote : clean(@$_REQUEST['body'])));
           $settings['board'] = $row['bid'];
           $settings['topic'] = $row['tid'];
           // Load the preview of the topic, and if necessary the quote ;)
@@ -153,9 +162,9 @@ global $cmsurl, $db_prefix, $l, $settings, $user;
       $post_time = time();
       $body = clean($_REQUEST['body']);
       $result = sql_query("
-        INSERT INTO {$db_prefix}messages
-        (`tid`,`bid`,`uid`,`subject`,`post_time`,`poster_name`,`poster_email`,`ip`,`body`)
-        VALUES('$topic_id','$Board_ID','{$user['id']}','$subject','$post_time','{$user['name']}','{$user['email']}','{$user['ip']}','{$body}')");
+      INSERT INTO {$db_prefix}messages
+      (`tid`,`bid`,`uid`,`subject`,`post_time`,`poster_name`,`poster_email`,`ip`,`body`)
+      VALUES('$topic_id','$Board_ID','{$user['id']}','$subject','$post_time','{$user['name']}','{$user['email']}','{$user['ip']}','{$body}')");
       $msg_id = mysql_insert_id();
       sql_query("UPDATE {$db_prefix}topics SET `first_msg` = '$msg_id', `last_msg` = '$msg_id' WHERE `tid` = '$topic_id'");
       // Update a few things :o like post count, number of posts and topics inside the board  
@@ -169,10 +178,10 @@ global $cmsurl, $db_prefix, $l, $settings, $user;
         if(mysql_num_rows($result)==0) {
           sql_query("
             REPLACE INTO {$db_prefix}topic_logs
-				      (`tid`,`uid`)
-	          VALUES ($topic_id, {$user['id']})");
-	      }
-	    }
+		        (`tid`,`uid`)
+           VALUES ($topic_id, {$user['id']})");
+        }
+      }
       unset($_SESSION['subject'], $_SESSION['body'], $_SESSION['sticky'], $_SESSION['locked'], $_SESSION['board']);
       redirect("forum.php");
     }
@@ -217,20 +226,29 @@ global $cmsurl, $db_prefix, $l, $settings, $user;
         $subject = "Re: ". $row['subject'];
       }
       
-      $post_time = time();
-      sql_query("INSERT INTO {$db_prefix}messages
-                 (`tid`,`bid`,`uid`,`subject`,`post_time`,`poster_name`,`poster_email`,`ip`,`body`)
-           VALUES('$Topic_ID','$board_id','{$user['id']}','$subject','$post_time','{$user['name']}','{$user['email']}','{$user['ip']}','{$body}')");
-      $msg_id = mysql_insert_id();
-      sql_query("UPDATE {$db_prefix}topics SET `last_msg` = '$msg_id', `ender_id` = '{$user['id']}', `topic_ender` = '{$user['name']}', `num_replies` = num_replies + 1 WHERE `tid` = '$Topic_ID'");
-      sql_query("UPDATE {$db_prefix}members SET `numposts` = numposts + 1 WHERE `id` = '{$user['id']}'");
-      sql_query("UPDATE {$db_prefix}boards SET `numposts` = numposts + 1, `last_msg` = '$msg_id', `last_uid` = '{$user['id']}', `last_name` = '{$user['name']}' WHERE `bid` = '$board_id'");
-      // Delete anything from board logs with the board ID of $board_id, unless they are th current member
-      sql_query("DELETE FROM {$db_prefix}board_logs WHERE `bid` = '$board_id' AND `uid` != '{$user['id']}'");
-      // Delete anything from topic logs with the topic ID of $Topic_ID, unless they are th current member
-      sql_query("DELETE FROM {$db_prefix}topic_logs WHERE `tid` = '$Topic_ID' AND `uid` != '{$user['id']}'");
-      unset($_SESSION['subject'], $_SESSION['body'], $_SESSION['sticky'], $_SESSION['locked'], $_SESSION['board']);
-      redirect("forum.php?board={$board_id}");
+      // Is a message being edited?
+      if ($edit = clean(@$_REQUEST['edit'])) {
+        // Yep!
+        sql_query("UPDATE {$db_prefix}messages SET `subject` = '$subject', `body` = '$body' WHERE `mid` = '$edit'");
+        redirect('forum.php?board='.clean_header($board_id).';topic='.clean_header($Topic_ID));
+      }
+      else {
+        // Nope!
+        $post_time = time();
+        sql_query("INSERT INTO {$db_prefix}messages
+                   (`tid`,`bid`,`uid`,`subject`,`post_time`,`poster_name`,`poster_email`,`ip`,`body`)
+             VALUES('$Topic_ID','$board_id','{$user['id']}','$subject','$post_time','{$user['name']}','{$user['email']}','{$user['ip']}','{$body}')");
+        $msg_id = mysql_insert_id();
+        sql_query("UPDATE {$db_prefix}topics SET `last_msg` = '$msg_id', `ender_id` = '{$user['id']}', `topic_ender` = '{$user['name']}', `num_replies` = num_replies + 1 WHERE `tid` = '$Topic_ID'");
+        sql_query("UPDATE {$db_prefix}members SET `numposts` = numposts + 1 WHERE `id` = '{$user['id']}'");
+        sql_query("UPDATE {$db_prefix}boards SET `numposts` = numposts + 1, `last_msg` = '$msg_id', `last_uid` = '{$user['id']}', `last_name` = '{$user['name']}' WHERE `bid` = '$board_id'");
+        // Delete anything from board logs with the board ID of $board_id, unless they are th current member
+        sql_query("DELETE FROM {$db_prefix}board_logs WHERE `bid` = '$board_id' AND `uid` != '{$user['id']}'");
+        // Delete anything from topic logs with the topic ID of $Topic_ID, unless they are th current member
+        sql_query("DELETE FROM {$db_prefix}topic_logs WHERE `tid` = '$Topic_ID' AND `uid` != '{$user['id']}'");
+        unset($_SESSION['subject'], $_SESSION['body'], $_SESSION['sticky'], $_SESSION['locked'], $_SESSION['board']);
+        redirect("forum.php?board={$board_id}");
+      }
     }
     else {
       $_SESSION['subject'] = @$_REQUEST['subject'];
@@ -239,7 +257,7 @@ global $cmsurl, $db_prefix, $l, $settings, $user;
       $_SESSION['locked'] = (int)@$_REQUEST['locked'];
       $_SESSION['board'] = (int)@$_REQUEST['board'];
       redirect("forum.php?action=post;topic={$Topic_ID}");
-    }    
+    }
   }
   else {
     // Uhh, yeah, this is for if they cant post or reply to the requested thingy...
