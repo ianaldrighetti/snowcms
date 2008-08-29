@@ -5,7 +5,7 @@ if(!defined('Snow'))
   die('Hacking Attempt...');
   
 function Main() {
-global $bperms, $cmsurl, $l, $settings, $user;
+global $bperms, $cmsurl, $l, $settings, $user, $theme_url;
 echo '
 <table id="messageindex_panel">
   <tr>
@@ -27,7 +27,7 @@ echo '
     foreach($settings['topics'] as $topic) {
        echo '
        <tr class="indexcontent">
-         <td style="padding: 5px;">XX</td>
+         <td style="text-align: center; padding: 5px;"><img src="'.$theme_url.'/'.$settings['theme'].'/images/'; if($topic['is_new']) { echo 'topic_new.png" alt="'.$l['forum_topic_new'].'"'; } else { echo 'topic_old.png" alt="'.$l['forum_topic_old'].'"'; } echo '/></td>
          <td style="padding: 5px;"><a href="'. $cmsurl. 'forum.php?topic='. $topic['tid']. '">'. $topic['subject']. '</a></td>
          <td style="text-align: center; padding: 5px;"><a href="'. $cmsurl. 'index.php?action=profile;u='. $topic['starter_id']. '">'.$topic['username']. '</a></td>
          <td style="text-align: center; padding: 5px;">'. $topic['numReplies']. '</td>

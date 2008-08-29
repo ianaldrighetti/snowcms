@@ -44,10 +44,10 @@ global $cmsurl, $db_prefix, $l, $settings, $user;
 				        (`bid`,`uid`)
 	            VALUES ($board_id, {$user['id']})");
 	        }
-	      }        
+	      }
         $result = sql_query("
           SELECT 
-            t.tid, t.sticky, t.locked, t.bid, t.first_msg, t.last_msg, IFNULL(t.last_msg, t.first_msg) AS last_msg, t.topic_starter, t.topic_ender AS topic_ender, IFNULL(t.topic_ender, t.topic_starter) AS topic_ender, t.num_replies,
+            t.tid, t.sticky, t.locked, t.bid, t.first_msg, t.last_msg, IFNULL(t.last_msg, t.first_msg) AS last_msg, t.topic_starter, t.topic_ender AS topic_ender, IFNULL(t.topic_ender, t.topic_starter) AS topic_ender, t.num_replies, log.uid AS is_new, log.tid,
             t.numviews, t.starter_id, t.ender_id, IFNULL(t.ender_id, t.starter_id) AS ender_id, msg.mid, msg.tid, msg.uid, msg.subject, msg.post_time, msg.poster_name,
             msg2.mid AS mid2, IFNULL(msg2.mid, msg.mid) AS mid2, msg2.uid AS uid2, IFNULL(msg2.uid, msg.uid) AS uid2, 
             msg2.subject AS subject2, IFNULL(msg2.subject, msg.subject) AS subject2, msg2.post_time AS last_post_time, IFNULL(msg2.post_time, msg.post_time) AS last_post_time,
@@ -59,11 +59,16 @@ global $cmsurl, $db_prefix, $l, $settings, $user;
             LEFT JOIN {$db_prefix}messages AS msg2 ON msg2.mid = t.last_msg
             LEFT JOIN {$db_prefix}members AS mem ON mem.id = t.starter_id
             LEFT JOIN {$db_prefix}members AS mem2 ON mem2.id = t.ender_id
+            LEFT JOIN {$db_prefix}topic_logs AS log ON log.uid = {$user['id']} AND log.tid = t.tid
           WHERE 
             t.bid = $board_id
-          ORDER BY t.sticky DESC, last_post_time DESC");
+          ORDER BY t.sticky DESC, last_post_time DESC") or die(mysql_error());
           $topics = array();
           while($row = mysql_fetch_assoc($result)) {
+            if(isset($row['is_new']))
+              $new = false;
+            else
+              $new = true;
             $topics[] = array(
               'tid' => $row['tid'],
               'subject' => $row['subject'],
@@ -73,7 +78,8 @@ global $cmsurl, $db_prefix, $l, $settings, $user;
               'username' => $row['username'],
               'numReplies' => $row['num_replies'],
               'numViews' => $row['numviews'],
-              'starter_id' => $row['starter_id']
+              'starter_id' => $row['starter_id'],
+              'is_new' => $new
             );
           }
           mysql_free_result($result);

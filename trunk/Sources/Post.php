@@ -46,7 +46,7 @@ global $cmsurl, $db_prefix, $l, $settings, $user;
           $settings['topic'] = $row['tid'];
           // Load the preview of the topic, and if necessary the quote ;)
           loadPreview();
-          loadQuote();
+          //loadQuote(); Note: This is not coded yet
           loadForum('Post','Reply');
           // Undelete a few things ;)
           unset($_SESSION['subject'], $_SESSION['body'], $_SESSION['sticky'], $_SESSION['locked'], $_SESSION['board']);
@@ -150,11 +150,11 @@ global $cmsurl, $db_prefix, $l, $settings, $user;
         VALUES('$topic_id','$Board_ID','{$user['id']}','$subject','$post_time','{$user['name']}','{$user['email']}','{$user['ip']}','{$body}')");
       $msg_id = mysql_insert_id();
       sql_query("UPDATE {$db_prefix}topics SET `first_msg` = '$msg_id', `last_msg` = '$msg_id' WHERE `tid` = '$topic_id'");
-      // Update a few things :o Like Post Count and Number of posts and topics inside the board...
+      // Update a few things :o like post count, number of posts and topics inside the board  
       sql_query("UPDATE {$db_prefix}members SET `numposts` = numposts + 1 WHERE `id` = '{$user['id']}'");
       sql_query("UPDATE {$db_prefix}boards SET `numtopics` = numtopics + 1, `numposts` = numposts + 1, `last_msg` = '$msg_id', `last_uid` = '{$user['id']}', `last_name` = '{$user['name']}' WHERE `bid` = '$Board_ID'");
-      // Delete anything from board logs with the Board ID of $Board_ID, there is a new post in town!
-      sql_query("DELETE FROM {$db_prefix}board_logs WHERE `bid` = '$Board_ID'");
+      // Delete anything from board logs with the board ID of $Board_ID, there is a new post in town!
+      sql_query("DELETE FROM {$db_prefix}board_logs WHERE `bid` = '$Board_ID' AND `uid` != '{$user[id]}'");
       unset($_SESSION['subject'], $_SESSION['body'], $_SESSION['sticky'], $_SESSION['locked'], $_SESSION['board']);
       redirect("forum.php");
     }
@@ -207,6 +207,10 @@ global $cmsurl, $db_prefix, $l, $settings, $user;
       sql_query("UPDATE {$db_prefix}topics SET `last_msg` = '$msg_id', `ender_id` = '{$user['id']}', `topic_ender` = '{$user['name']}', `num_replies` = num_replies + 1 WHERE `tid` = '$Topic_ID'");
       sql_query("UPDATE {$db_prefix}members SET `numposts` = numposts + 1 WHERE `id` = '{$user['id']}'");
       sql_query("UPDATE {$db_prefix}boards SET `numposts` = numposts + 1, `last_msg` = '$msg_id', `last_uid` = '{$user['id']}', `last_name` = '{$user['name']}' WHERE `bid` = '$board_id'");
+      // Delete anything from board logs with the board ID of $board_id, unless they are th current member
+      sql_query("DELETE FROM {$db_prefix}board_logs WHERE `bid` = '$board_id' AND `uid` != '{$user['id']}'");
+      // Delete anything from topic logs with the topic ID of $Topic_ID, unless they are th current member
+      sql_query("DELETE FROM {$db_prefix}topic_logs WHERE `tid` = '$Topic_ID' AND `uid` != '{$user['id']}'");
       unset($_SESSION['subject'], $_SESSION['body'], $_SESSION['sticky'], $_SESSION['locked'], $_SESSION['board']);
       redirect("forum.php?board={$board_id}");
     }
@@ -315,7 +319,7 @@ global $db_prefix, $settings, $Topic_ID, $user;
      mem.id, mem.display_name AS username, IFNULL(mem.display_name, msg.poster_name) AS username
     FROM {$db_prefix}messages AS msg
       LEFT JOIN {$db_prefix}members AS mem ON mem.id = msg.uid
-    WHERE msg.tid = $Topic_ID AND {$user['board_query']}
+    WHERE msg.tid = '$Topic_ID' AND msg.uid = '{$user['board_query']}'
     ORDER BY msg.mid DESC LIMIT 6");
   $settings['preview'] = array();
   while($row = mysql_fetch_assoc($result)) {

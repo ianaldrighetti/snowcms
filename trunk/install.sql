@@ -1,3 +1,11 @@
+DROP TABLE IF EXISTS `{$db_prefix}topic_logs`;
+
+CREATE TABLE `{$db_prefix}topic_logs` (
+  `tid` int(11) NOT NULL default '0',
+  `uid` int(11) NOT NULL default '0',
+  UNIQUE KEY (`tid`,`uid`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+
 DROP TABLE IF EXISTS `{$db_prefix}board_logs`;
 
 CREATE TABLE `{$db_prefix}board_logs` (

@@ -26,6 +26,16 @@ global $cmsurl, $db_prefix, $l, $settings, $user;
       WHERE t.tid = '$Topic_ID' AND {$user['board_query']}");
     // Can they even view this topic? As in, is this in a board they aren't allowed to view?
     if(mysql_num_rows($result)) {
+      // Log that this member has viewed this topic
+      if ($user['is_logged']) {
+        $result = sql_query("SELECT * FROM {$db_prefix}topic_logs WHERE `tid` = '$Topic_ID' AND `uid` = '{$user['id']}'");
+        if(mysql_num_rows($result)==0) {
+          sql_query("
+            REPLACE INTO {$db_prefix}topic_logs
+				      (`tid`,`uid`)
+	          VALUES ($Topic_ID, {$user['id']})");
+	      }
+	      }
       if(!empty($_REQUEST['msg'])) {
         // The fun part! WEEEEEEEEEE!
         // We need to redirect ?topic=topic_id;msg=msg_id to the right paginated page...
