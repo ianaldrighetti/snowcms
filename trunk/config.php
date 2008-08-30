@@ -21,6 +21,9 @@ $mysql_passwd = ''; # Your MySQL Password
 $mysql_db = ''; # Your MySQL DB
 $mysql_prefix = 'scms_'; # Prefix for your database
 
+// Misc
+$cookie_prefix = 'scms_'; # Prefix for cookies
+
 // Some SnowCMS Specific Settings
 $source_dir = ''; # Path to your Source directory without trailing /!
 $theme_dir = ''; # Path to your Themes directory without trailing /!
