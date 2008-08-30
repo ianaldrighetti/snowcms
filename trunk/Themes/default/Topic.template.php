@@ -68,7 +68,7 @@ echo '
 echo '
 <div id="post-container">
 <div id="post-left">
-Quick Reply
+'.$l['forum_quickreply'].'
 </div>
 <div id="post-right">
 <form action="', $cmsurl, 'forum.php?action=post2;topic=', $settings['topic'], '" method="post" class="write">

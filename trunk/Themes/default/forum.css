@@ -225,3 +225,8 @@ a:hover {
 .results .sidebar {
   background: url('images/navbg.png');
 }
+
+textarea.quickreply {
+  width: 100%;
+  height: 100px;
+}
