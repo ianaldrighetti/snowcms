@@ -145,7 +145,47 @@ global $l, $cmsurl;
   </form>
   
   ';
-  
+}
+
+function ShowCats() {
+global $cmsurl, $db_prefix, $l, $settings, $user, $theme_url;
+  echo '<h1>', $l['news_cats_header'], '</h1>
+        <p>', $l['news_cats_desc'], '</p>
+        <form action="', $cmsurl, 'index.php?action=admin;sa=news;ssa=categories" method="post">
+          <table width="100%" id="mc">
+            <tr>
+              <th class="border" width="80%">', $l['news_cats_name'], '</th><th></th>
+            </tr>';
+          foreach($settings['cats'] as $cat) {
+            echo '
+            <tr>
+              <td><input name="cat_name[', $cat['id'], ']" type="text" class="name" value="', $cat['name'], '"/></td>
+              <td class="delete"><a href="', $cmsurl, 'index.php?action=admin;sa=news;ssa=categories;delete=', $cat['id'], ';sc=', $user['sc'], '" onClick="return confirm(\'', $l['news_cats_areyousure'], '\');"><img src="'.$theme_url.'/'.$settings['theme'].'/images/delete.png" alt="'.$l['news_cats_delete'].'" width="15" height="15" /></td>
+            </tr>';
+          }
+          echo '
+          </table>
+          <p>
+            <input type="hidden" name="update_cats" value="true" />
+            <input type="submit" value="', $l['news_cats_update'], '" />
+          </p>
+        </form>
+        <br />
+        <form action="', $cmsurl, 'index.php?action=admin;sa=news;ssa=categories" method="post">
+          <table id="add_cat">
+            <tr>
+              <th style="border-style: solid; border-width: 1px">'.$l['news_cats_add_name'].'</th>
+              <th></th>
+            </tr>
+            <tr>
+              <td style="text-align: center"><input class="cat_name" name="cat_name" style="width: 90%" /></td>
+              <td>
+                <input type="hidden" name="add_cat" value="true" />
+                <input type="submit" value="'.$l['news_cats_add_submit'].'"/>
+              </td>
+            </tr>
+          </table>
+        </form>';
 }
 
 function Single() {

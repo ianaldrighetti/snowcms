@@ -26,7 +26,7 @@ global $cmsurl, $db_prefix, $l, $settings, $user;
     $body = clean(@$_REQUEST['body']); // Body text
     
     // Process SQL query
-    sql_query("INSERT {$db_prefix}news_comments (`nid`, `poster_id`, `poster_name`, `subject`, `body`, `post_time`) VALUES ('$nid','{$user['id']}','{$user['name']}','$subject','$body', '".time()."')") or die(mysql_error());
+    sql_query("INSERT {$db_prefix}news_comments (`nid`, `poster_id`, `poster_name`, `subject`, `body`, `post_time`) VALUES ('$nid','{$user['id']}','{$user['name']}','$subject','$body', '".time()."')");
     
     // Redirect the page to the main manage news page
     redirect('index.php?action=news;id='.clean_header(@$_GET['id']));
@@ -177,7 +177,7 @@ global $cmsurl, $db_prefix, $l, $settings, $user;
   if(can('manage_news')) {
     // Dang, they can do this, now I have to code it :(
     // Some actions they can do...
-    $ssa = array('add');
+    $ssa = array('add','categories');
     if(empty($_REQUEST['id']) && (!in_array(@$_REQUEST['ssa'], $ssa))) {
       // No news ID, and no $na action that exists
       $result = sql_query("
@@ -236,6 +236,10 @@ global $cmsurl, $db_prefix, $l, $settings, $user;
       $settings['page']['title'] = $l['news_add_title'];
       loadTheme('News','Add');
     }
+    elseif (empty($_REQUEST['id']) && $_REQUEST['ssa']=='categories') {
+      // Managing categories
+      ManageCats();
+    }
     else {
       // Editing news... =D
     }
@@ -245,5 +249,49 @@ global $cmsurl, $db_prefix, $l, $settings, $user;
     $settings['page']['title'] = $l['admin_error_title'];
     loadTheme('Admin','Error');
   }
+}
+
+// Manage news categories
+function ManageCats() {
+global $cmsurl, $db_prefix, $l, $settings, $user;
+  // Rename categories
+  if(!empty($_REQUEST['update_cats'])) {  
+    $rows = array();
+    foreach($_POST['cat_name'] as $cat_id => $name) {
+      $cat_id = (int)$cat_id;
+      $name = clean($name);
+      $rows[] = "('$cat_id','$name')";
+    }
+    $updated = implode(",", $rows);
+    sql_query("REPLACE INTO {$db_prefix}news_categories (`cat_id`,`cat_name`) VALUES{$updated}");
+    // Redirect to stop the action of reoccuring if the page is refreshed
+    redirect('index.php?action=admin;sa=news;ssa=categories');
+  }
+  // Delete a category
+  if(!empty($_REQUEST['delete']) && validateSession($_REQUEST['sc'])) {
+    $cat_id = (int)$_REQUEST['delete'];
+    sql_query("DELETE FROM {$db_prefix}news_categories WHERE `cat_id` = '$cat_id'");
+    // Redirect to stop the action of reoccuring if the page is refreshed
+    redirect('index.php?action=admin;sa=news;ssa=categories');
+  }
+  // Add a category
+  if(!empty($_REQUEST['add_cat'])) {
+    $cat_name = clean($_REQUEST['cat_name']);
+    sql_query("INSERT INTO {$db_prefix}news_categories (`cat_name`) VALUES('$cat_name')");
+    // Redirect to stop the action of reoccuring if the page is refreshed
+    redirect('index.php?action=admin;sa=news;ssa=categories');
+  }
+  // Show a list of categories...
+  $result = sql_query("SELECT * FROM {$db_prefix}news_categories");
+  $cats = array();
+  while($row = mysql_fetch_assoc($result)) {
+    $cats[] = array(
+      'id' => $row['cat_id'],
+      'name' => $row['cat_name']
+    );
+  }
+  $settings['cats'] = $cats;
+  $settings['page']['title'] = $l['news_cats_title'];
+  loadTheme('News','ShowCats');
 }
 ?>

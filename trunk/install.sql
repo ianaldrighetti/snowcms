@@ -214,6 +214,8 @@ CREATE TABLE `{$db_prefix}news_categories` (
   PRIMARY KEY (`cat_id`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 
+INSERT INTO {$db_prefix}news_categories (`cat_name`) VALUES ('Main');
+
 DROP TABLE IF EXISTS `{$db_prefix}news_comments`;
 
 CREATE TABLE `{$db_prefix}news_comments` (
