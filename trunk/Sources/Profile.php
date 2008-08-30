@@ -27,63 +27,94 @@ global $cmsurl, $db_prefix, $l, $settings, $source_dir, $user, $perms;
      FROM {$db_prefix}members AS m
        LEFT JOIN {$db_prefix}membergroups AS grp ON grp.group_id = m.group
        LEFT JOIN {$db_prefix}online AS o ON o.user_id = m.id
-     WHERE m.id = $UID") or die(mysql_error());
+     WHERE m.id = $UID");
   
-  // Hmmm, is this account in the DB? D:
-  if(mysql_num_rows($result))
-    // It exists! :D
-    while($row = mysql_fetch_assoc($result)) {
-          $mem = array(
-            'id' => $row['id'],
-            'name' => $row['display_name'] ? $row['display_name'] : $row['username'],
-            'username' => $row['display_name'] ? $row['display_name'] : $row['username'],
-            'email' => $row['email'],
-            'display_name' => $row['display_name'],
-            'reg_date' => formattime($row['reg_date']),
-            'online' => $row['last_active'] > time() - $settings['login_detection_time'] * 60,
-            'ip' => $row['last_ip'] ? $row['last_ip'] : $row['reg_ip'],
-            'group_name' => $row['groupname'],
-            'group_id' => $row['group'],
-            'posts' => $row['numposts'],
-            'signature' => $row['signature'],
-            'text' => $row['profile'],
-            'activated' => $row['activated'],
-          );
-          $settings['page']['title'] = str_replace("%user%", $mem['name'], $l['profile_profile_of']);
-          $settings['profile'] = $mem;
-        }
-  else
-    $invalid = true;
-  
-  // Is this an invalid profile?
-  if (@$invalid) {
-    // Oh noes! It is! Tell'em :P
-    $settings['page']['title'] = $l['profile_noprofile_title'];
-    loadTheme('Profile','NoProfile');
+  // Are they a guest trying to view someone's email address?
+  if (@$_REQUEST['sa'] == 'show-email' && $user['group'] == -1) {
+    // Have they already completed the CAPTCHA?
+    if ($captcha = @$_REQUEST['captcha']) {
+      // Yep, but is it correct?
+      require_once($source_dir.'/Captcha.php');
+      if (PhpCaptcha::Validate($captcha)) {
+        // It is, now let's redirect them back to their profile with this fact
+        $_SESSION['captcha'] = true;
+        redirect('index.php?action=profile;u='.clean_header($UID));
+      }
+      else {
+        // It isn't, let's inform them, incase they are human
+        $_SESSION['error'] = $l['profile_showemail_error_captcha'];
+        redirect('index.php?action=profile;sa=show-email;u='.clean_header($UID));
+      }
+    }
+    else {
+      // Nope, so let's make 'em
+      $row = mysql_fetch_assoc($result);
+      $settings['page']['uid'] = $UID;
+      $settings['page']['username'] = $row['display_name'];
+      $settings['page']['title'] = str_replace("%user%",$row['display_name'],$l['profile_showemail_title']);
+      loadTheme('Profile','ShowEmail');
+    }
   }
-  else
-  // Are they changing settings?
-  if ($UID == $user['id'] && @$_REQUEST['sa'] == 'edit') {
-    $settings['page']['title'] = $l['profile_edit_title'];
-    
-    if (@$_REQUEST['ssa'] == 'process-edit')
-      processEdit();
-    else
-      loadTheme('Profile','Settings');
-  }
-  // Is an admin trying to view someone's profile?
-  elseif (can('view_profile') && $UID != $user['id'] && can('manage_members'))
-    loadTheme('Profile','AdminView');
-  // Maybe they are trying to view someone's profile? o.O
-  elseif ((can('view_profile')) && ($UID!=$user['id']))
-    loadTheme('Profile','View');
-  // Are they logged in? .-.
-  elseif ($user['is_logged'])
-    loadTheme('Profile');
-  // No! Go away! :)
   else {
-    $settings['page']['title'] = $l['profile_notallowed_title'];
-    loadTheme('Profile','NotAllowed');
+    // Hmmm, is this account in the DB? D:
+    if(mysql_num_rows($result))
+      // It exists! :D
+      while($row = mysql_fetch_assoc($result)) {
+            $mem = array(
+              'id' => $row['id'],
+              'name' => $row['display_name'] ? $row['display_name'] : $row['username'],
+              'username' => $row['display_name'] ? $row['display_name'] : $row['username'],
+              'email' => $row['email'],
+              'email_guest' => hideEmail($row['email']),
+              'display_name' => $row['display_name'],
+              'reg_date' => formattime($row['reg_date']),
+              'online' => $row['last_active'] > time() - $settings['login_detection_time'] * 60,
+              'ip' => $row['last_ip'] ? $row['last_ip'] : $row['reg_ip'],
+              'group_name' => $row['groupname'],
+              'group_id' => $row['group'],
+              'posts' => $row['numposts'],
+              'signature' => $row['signature'],
+              'text' => $row['profile'],
+              'activated' => $row['activated'],
+            );
+            $settings['page']['title'] = str_replace("%user%", $mem['name'], $l['profile_profile_of']);
+            $settings['profile'] = $mem;
+          }
+    else
+      $invalid = true;
+    
+    // Is this an invalid profile?
+    if (@$invalid) {
+      // Oh noes! It is! Tell'em :P
+      $settings['page']['title'] = $l['profile_noprofile_title'];
+      loadTheme('Profile','NoProfile');
+    }
+    else
+    // Are they changing settings?
+    if ($UID == $user['id'] && @$_REQUEST['sa'] == 'edit') {
+      $settings['page']['title'] = $l['profile_edit_title'];
+      
+      if (@$_REQUEST['ssa'] == 'process-edit')
+        processEdit();
+      else
+        loadTheme('Profile','Settings');
+    }
+    // Is an admin trying to view someone's profile?
+    elseif (can('view_profile') && $UID != $user['id'] && can('manage_members'))
+      loadTheme('Profile','AdminView');
+    // Maybe they are trying to view someone's profile? o.O
+    elseif ((can('view_profile')) && ($UID!=$user['id'])) {
+      $settings['captcha'] = @$_SESSION['captcha'];
+      loadTheme('Profile','View');
+    }
+    // Are they logged in? .-.
+    elseif ($user['is_logged'])
+    loadTheme('Profile');
+    // No! Go away! :)
+    else {
+      $settings['page']['title'] = $l['profile_notallowed_title'];
+      loadTheme('Profile','NotAllowed');
+    }
   }
 }
 

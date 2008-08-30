@@ -56,7 +56,7 @@ global $l, $settings, $theme_url, $cmsurl;
 }
 
 function Info() {
-global $l, $settings;
+global $l, $settings, $user, $cmsurl;
   
   $profile = $settings['profile'];
         
@@ -66,7 +66,12 @@ global $l, $settings;
         <tr><th style="text-align: left">Member Group:</th><td>'.$profile['group_name'].'</td></tr>
         <tr><th style="text-align: left; width: 30%">Member Since:</th><td>'.$profile['reg_date'].'</td></tr>
         <tr><th style="text-align: left">Total Posts:</th><td>'.$profile['posts'].'</td></tr>
-        <tr><th style="text-align: left">Email:</th><td><a href="mailto:'.$profile['email'].'">'.$profile['email'].'</a></td></tr>
+        ';
+  if ($user['group'] != -1 || $settings['captcha'])
+    echo '<tr><th style="text-align: left">Email:</th><td><a href="mailto:'.$profile['email'].'">'.$profile['email'].'</a></td></tr>';
+  else
+    echo '<tr><th style="text-align: left">Email:</th><td><a href="'.$cmsurl.'index.php?action=profile;sa=show-email;u='.$profile['id'].'">'.$profile['email_guest'].'</a></td></tr>';
+  echo '
         </table>
         
         <p>
@@ -84,7 +89,7 @@ global $l, $settings, $cmsurl, $user;
         ';
   
   if (@$_SESSION['error'])
-	 echo '<p><b>'.$l['main_error'].':</b> '.$_SESSION['error'].'</p>';
+	 echo '<p>'.$_SESSION['error'].'</p>';
         
   echo '<form action="'.$cmsurl.'index.php?action=profile;sa=edit" method="post" style="display: inline">
         
@@ -126,7 +131,7 @@ global $cmsurl, $l, $settings;
 }
 
 function NotAllowed() {
-global $cmsurl, $l, $settings;
+global $cmsurl, $l, $settings, $user;
   
   echo '
   <h1>'.$l['profile_notallowed_header'].'</h1>
@@ -135,5 +140,28 @@ global $cmsurl, $l, $settings;
     echo '<p>'.$l['profile_notallowed_desc'].'</p>';
   else
     echo '<p>'.$l['profile_notallowed_desc_loggedout'].'</p>';
+}
+
+function ShowEmail() {
+global $l, $settings, $cmsurl;
+  
+  echo '
+  <h1>'.str_replace('%user%',$settings['page']['username'],$l['profile_showemail_header']).'</h1>
+  ';
+  
+  if (@$_SESSION['error'])
+	 echo '<p>'.$_SESSION['error'].'</p>';
+  
+  echo '
+  <p>'.$l['profile_showemail_desc'].'</p>
+  
+  <form action="'.$cmsurl.'index.php?action=profile;sa=show-email;u='.$settings['page']['uid'].'" method="post">
+    <p><img src="'.$cmsurl.'image.php" alt="CAPTCHA" /></p>
+    <p>
+      <input name="captcha" />
+      <input type="submit" value="'.$l['profile_showemail_submit'].'" />
+    </p>
+  </form>
+  ';
 }
 ?>

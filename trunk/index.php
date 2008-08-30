@@ -80,4 +80,7 @@ require_once($source_dir.'/Core.php');
   }  
   // Remove any error messages so they aren't displayed again
   unset($_SESSION['error']);
+  // Remove the fact that they have completed the CAPTCHA
+  // Otherwise they just need a person to complete it once and the bot gets free roaming forever
+  unset($_SESSION['captcha']);
 ?>

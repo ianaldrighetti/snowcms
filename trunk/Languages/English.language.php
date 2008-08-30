@@ -283,6 +283,11 @@ $l['profile_edit_password_new'] = 'New Password';
 $l['profile_edit_password_verify'] = 'Verify Password';
 $l['profile_edit_change'] = 'Change Details';
 $l['profile_edit_cancel'] = 'Cancel';
+$l['profile_showemail_title'] = 'Profile of %user%';
+$l['profile_showemail_header'] = 'Show Email';
+$l['profile_showemail_desc'] = 'To see this member\'s email address you must complete a CAPTCHA test. This is to prevent spam bots from spamming this member\'s email account. Please enter the characters in the scrambled image.';
+$l['profile_showemail_submit'] = 'Show Email';
+$l['profile_showemail_error_captcha'] = 'You entered the characters incorrectly, please try again.';
 
 // Permissions.template.php
 $l['permissions_title'] = 'Manage Permissions';
