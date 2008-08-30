@@ -104,6 +104,10 @@ global $l, $cmsurl;
     <p class="main"><a href="'. $cmsurl. 'index.php?action=admin;sa=news;ssa=add" title="'. $l['news_manage_add']. '">'. $l['news_manage_add']. '</a></p>
     <p class="desc">'. $l['news_manage_add_desc']. '</p>
   </div>
+  <div class="acp_right">
+    <p class="main"><a href="'. $cmsurl. 'index.php?action=admin;sa=news;ssa=categories" title="'. $l['news_manage_categories']. '">'. $l['news_manage_categories']. '</a></p>
+    <p class="desc">'. $l['news_manage_categories_desc']. '</p>
+  </div>
   ';
   
 }

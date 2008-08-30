@@ -182,12 +182,14 @@ global $cmsurl, $db_prefix, $l, $settings, $user;
       // No news ID, and no $na action that exists
       $result = sql_query("
         SELECT
-          n.news_id, n.poster_id, n.poster_name, n.cat_id, n.subject, n.post_time, n.numViews, n.numComments, n.allow_comments,
+          n.news_id, n.poster_id, n.poster_name, n.cat_id, n.subject, n.post_time, n.numViews, n.allow_comments,
           nc.cat_id, nc.cat_name, m.id, m.display_name AS username, IFNULL(m.display_name, m.username) AS username
         FROM {$db_prefix}news AS n
           LEFT JOIN {$db_prefix}news_categories AS nc ON nc.cat_id = n.cat_id
           LEFT JOIN {$db_prefix}members AS m ON m.id = n.poster_id
         ORDER BY n.news_id DESC");
+      $comments = mysql_fetch_array(sql_query("SELECT COUNT(*) FROM {$db_prefix}news_comments GROUP BY nid"));
+      $comments = $comments['COUNT(*)'];
       $settings['news'] = array();
       while($row = mysql_fetch_assoc($result)) {
         $settings['news'][] = array(
