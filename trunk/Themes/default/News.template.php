@@ -47,7 +47,10 @@ global $cmsurl, $db_prefix, $l, $settings, $user;
   while ($i < count($settings['news'])) {
     $news = $settings['news'][$i];
     echo '
-    <p><b>'.$news['subject'].'</b> by '.$news['username'].' @ '.$news['post_date'].'</p>
+    <p>'.str_replace('%subject%','<a href="'.$cmsurl.'index.php?action=news;id='.$news['id'].'">'.$news['subject'].'</a>',
+         str_replace('%category%','<a href="'.$cmsurl.'index.php?action=news;cat='.$news['cat_id'].'">'.$news['cat_name'].'</a>',
+         str_replace('%name%','<a href="'.$cmsurl.'index.php?action=profile;u='.$news['user_id'].'">'.$news['username'].'</a>',
+         str_replace('%date%',$news['post_date'],$l['news_heading'])))).'</p>
     <p>'.bbc($news['body']).'</p>
     ';
     if ($news['allow_comments'])
@@ -113,7 +116,7 @@ global $l, $cmsurl;
 }
 
 function Add() {
-global $l, $cmsurl;
+global $l, $settings, $cmsurl;
   
   echo '
   <h1>'.$l['news_add_header'].'</h1>
@@ -128,7 +131,7 @@ global $l, $cmsurl;
   
   $categories = $settings['page']['categories'];
   foreach ($categories as $value) {
-    echo '<option value="'.$value[0].'">'.$value[1].'</option>
+    echo '<option value="'.$value['id'].'">'.$value['name'].'</option>
     ';
   }
   
@@ -197,9 +200,10 @@ global $cmsurl, $db_prefix, $l, $settings, $user;
   // Show news
   $news = $settings['news'];
   echo '
-    <p>'.str_replace('%subject%',$news['subject'],
+    <p>'.str_replace('%subject%','<a href="'.$cmsurl.'index.php?action=news;id='.$news['id'].'">'.$news['subject'].'</a>',
+         str_replace('%category%','<a href="'.$cmsurl.'index.php?action=news;cat='.$news['cat_id'].'">'.$news['cat_name'].'</a>',
          str_replace('%name%','<a href="'.$cmsurl.'index.php?action=profile;u='.$news['user_id'].'">'.$news['username'].'</a>',
-         str_replace('%date%',$news['post_date'],$l['news_heading']))).'</p>
+         str_replace('%date%',$news['post_date'],$l['news_heading'])))).'</p>
     <p>'.bbc($news['body']).'</p>
     ';
 }
@@ -213,9 +217,10 @@ global $cmsurl, $db_prefix, $l, $settings, $user;
   // Show news
   $news = $settings['news'];
   echo '
-    <p>'.str_replace('%subject%',$news['subject'],
+    <p>'.str_replace('%subject%','<a href="'.$cmsurl.'index.php?action=news;id='.$news['id'].'">'.$news['subject'].'</a>',
+         str_replace('%category%','<a href="'.$cmsurl.'index.php?action=news;cat='.$news['cat_id'].'">'.$news['cat_name'].'</a>',
          str_replace('%name%','<a href="'.$cmsurl.'index.php?action=profile;u='.$news['user_id'].'">'.$news['username'].'</a>',
-         str_replace('%date%',$news['post_date'],$l['news_heading']))).'</p>
+         str_replace('%date%',$news['post_date'],$l['news_heading'])))).'</p>
     <p>'.bbc($news['body']).'</p>
     <hr />
     ';

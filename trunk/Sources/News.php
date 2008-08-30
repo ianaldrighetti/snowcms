@@ -42,9 +42,7 @@ global $cmsurl, $db_prefix, $l, $settings, $user;
     
     $result = sql_query("
       SELECT
-        n.news_id, n.poster_id, n.poster_name, n.subject, n.body, n.body,
-        n.post_time, n.numViews, n.allow_comments,
-        mem.id, mem.display_name AS username, IFNULL(mem.display_name, mem.username) AS username
+        *, mem.display_name AS username, IFNULL(mem.display_name, mem.username) AS username
       FROM {$db_prefix}news AS n
         LEFT JOIN {$db_prefix}members AS mem ON mem.id = n.poster_id
       ORDER BY n.post_time DESC
@@ -54,11 +52,14 @@ global $cmsurl, $db_prefix, $l, $settings, $user;
     if (mysql_num_rows($result)) {
       while ($row = mysql_fetch_assoc($result)) {
         $comments = mysql_fetch_assoc(sql_query("SELECT COUNT(*) FROM {$db_prefix}news_comments WHERE `nid` = '{$row['news_id']}' GROUP BY `nid`"));
+        $category = mysql_fetch_assoc(sql_query("SELECT * FROM {$db_prefix}news_categories WHERE `cat_id` = '{$row['cat_id']}'"));
         $news[] = array(
           'id' => $row['news_id'],
           'poster_id' => $row['poster_id'],
           'poster_name' => $row['username'],
           'subject' => $row['subject'],
+          'cat_id' => $category['cat_id'],
+          'cat_name' => $category['cat_name'],
           'body' => stripslashes($row['body']),
           'user_id' => $row['id'],
           'username' => $row['username'],
@@ -97,9 +98,7 @@ global $cmsurl, $db_prefix, $l, $settings, $user;
     $news_id = (int)$_REQUEST['id'];
     $result = sql_query("
       SELECT
-        n.news_id, n.poster_id, n.poster_name, n.subject, n.body, n.body,
-        n.post_time, n.numViews, n.numComments, n.allow_comments,
-        mem.id, mem.display_name AS username, IFNULL(mem.display_name, mem.username) AS username
+        *, mem.display_name AS username, IFNULL(mem.display_name, mem.username) AS username
       FROM {$db_prefix}news AS n
         LEFT JOIN {$db_prefix}members AS mem ON mem.id = n.poster_id
       WHERE n.news_id = $news_id");
@@ -107,17 +106,19 @@ global $cmsurl, $db_prefix, $l, $settings, $user;
     // Is there even any news? :O
     if (mysql_num_rows($result)) {
       while ($row = mysql_fetch_assoc($result)) {
+        $category = mysql_fetch_assoc(sql_query("SELECT * FROM {$db_prefix}news_categories WHERE `cat_id` = '{$row['cat_id']}'"));
         $news = array(
           'id' => $row['news_id'],
           'poster_id' => $row['poster_id'],
           'poster_name' => $row['username'],
           'subject' => $row['subject'],
+          'cat_id' => $category['cat_id'],
+          'cat_name' => $category['cat_name'],
           'body' => stripslashes($row['body']),
           'user_id' => $row['id'],
           'username' => $row['username'],
           'post_date' => formattime($row['post_time'],2),
           'numViews' => $row['numViews'],
-          'numComments' => $row['numComments'],
           'allow_comments' => $row['allow_comments']
         );
       }
@@ -126,7 +127,7 @@ global $cmsurl, $db_prefix, $l, $settings, $user;
       if($news['allow_comments']) {
         $result = sql_query("
           SELECT
-            c.cid, c.nid, c.poster_id, c.poster_name, c.subject, c.body,
+            c.post_id, c.nid, c.poster_id, c.poster_name, c.subject, c.body,
             c.post_time, c.isApproved, c.isSpam, mem.id,
             mem.display_name AS username, IFNULL(mem.display_name, mem.username) AS username
           FROM {$db_prefix}news_comments AS c
@@ -137,7 +138,7 @@ global $cmsurl, $db_prefix, $l, $settings, $user;
         // Load up the comments into an array
         while ($row = mysql_fetch_assoc($result)) {
           $comments[] = array(
-            'id' => $row['cid'],
+            'id' => $row['post_id'],
             'news_id' => $row['nid'],
             'poster_id' => $row['poster_id'],
             'poster_name' => $row['username'],
@@ -201,7 +202,6 @@ global $cmsurl, $db_prefix, $l, $settings, $user;
           'subject' => $row['subject'],
           'time' => formattime($row['post_time']),
           'numViews' => $row['numViews'],
-          'numComments' => $row['numComments'],
           'allow_comments' => $row['allow_comments']
         );
       }
@@ -225,10 +225,12 @@ global $cmsurl, $db_prefix, $l, $settings, $user;
       }
       
       // Get categories
-      $result = sql_query("SELECT * FROM {$db_prefix}news_categories") ;
+      $result = sql_query("SELECT * FROM {$db_prefix}news_categories");
+      $i = 0;
       while ($row = mysql_fetch_assoc($result)) {
-        $categories[][0] = $row['cat_id'];
-        $categories[][1] = $row['cat_name'];
+        $categories[$i]['id'] = $row['cat_id'];
+        $categories[$i]['name'] = $row['cat_name'];
+        $i += 1;
       }
       
       $settings['page']['categories'] = @$categories;

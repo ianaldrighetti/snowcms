@@ -502,8 +502,8 @@ $l['themeerror_msg'] = 'An error occurred while trying to load the template func
 // News.template.php
 $l['news_title'] = 'News';
 $l['news_header'] = 'News';
-$l['news_heading'] = '<b>%subject%</b> by %name% at %date%';
-$l['news_comment_heading'] = '<b>%subject%</b> by %name% at %date%';
+$l['news_heading'] = '%subject% in %category% by %name% at %date%';
+$l['news_comment_heading'] = '%subject% by %name% at %date%';
 $l['news_comments'] = 'Comments: %num%';
 $l['news_comment_subject'] = 'Subject:';
 $l['news_comment_submit'] = 'Add Comment';
