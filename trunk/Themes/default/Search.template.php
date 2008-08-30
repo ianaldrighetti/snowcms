@@ -75,8 +75,8 @@ global $l, $settings, $cmsurl;
   // Show search results
   
   if ($settings['page']['results']) {
-  foreach ($settings['page']['results'] as $result) {
-    echo '
+    foreach ($settings['page']['results'] as $result) {
+      echo '
       <table class="results" width="100%">
       <tr>
         <td width="80%" class="header">
@@ -95,8 +95,34 @@ global $l, $settings, $cmsurl;
       </tr>
     </table>
     ';
+    }
   }
-  }
+  
+  // Show the pervious page link if it is at least page two
+    if ($prev_page > 0)
+      echo '<table width="100%">
+        <tr><td><a href="'.$cmsurl.'forum.php?action=search;q='.$query.';pg='.$prev_page.'">'.$l['memberlist_previous_page'].'</a></td>
+        ';
+    // Show the previous page link if it is page one
+    elseif ($prev_page == 0)
+      echo '<table width="100%">
+        <tr><td><a href="'.$cmsurl.'forum.php?action=search;q='.$query.'">'.$l['memberlist_previous_page'].'</a></td>
+        ';
+    // Don't show the previous page link, because it is the first page
+    else
+      echo '<table width="100%">
+        <tr><td></td>
+        ';
+    // Show the next page link
+    if (@($total_members / $settings['num_search_results']) > $next_page)
+      echo '<td style="text-align: right"><a href="'.$cmsurl.'forum.php?action=search;q='.$query.';pg='.$next_page.'">'.$l['memberlist_next_page'].'</a></td></tr>
+        </table>
+        ';
+    // Don't show the next page link, because it is the last page
+    else
+      echo '<td style="text-align: right"></td></tr>
+        </table>
+        ';
   
   // Show search footer
   echo '
