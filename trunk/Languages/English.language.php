@@ -219,6 +219,7 @@ $l['forum_error_cantviewb_message'] = 'Sorry, you are not allowed to view or acc
 $l['forum_error_noboard_message'] = 'The Board ID you have requested does not exist!';
 $l['topic_lastby'] = 'Last Post by';
 $l['topic_in'] = 'in';
+$l['forum_quickreply'] = "Quick Reply";
 
 // Links for Forum.template.php
 $l['forum_link_home'] = 'Home';
