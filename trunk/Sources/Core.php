@@ -386,6 +386,10 @@ global $settings;
 }
 
 function bbc($str) {
+/*
+* Features super-hackish but functional BBCODE Quote Hack courtesy of Antimatter15
+*/
+
 global $theme_dir, $theme_url, $settings;
   
   // Process newline characters
@@ -400,8 +404,8 @@ global $theme_dir, $theme_url, $settings;
     '/\[url\]((http:\/\/|ftp:\/\/|https:\/\/|ftps:\/\/).*?)\[\/url\]/is',
     '/\[url="?((http:\/\/|ftp:\/\/|https:\/\/|ftps:\/\/).*?)"?\](.*?)\[\/url\]/is',
     '/\[code\](.*?)\[\/code\]/is',
-    '/\[quote\](.*?)\[\/quote\]/is',
-    '/\[quote by="?(.*?)"?\](.*?)\[\/quote\]/is',
+    '/\[quote\]/is',
+    '/\[quote by="?(.*?)"?\]/is',
     '/\[br\]/is',
     '/\[hr\]/is',
     '/\[img\]((http:\/\/|https:\/\/).*?)\[\/img\]/is',
@@ -417,8 +421,8 @@ global $theme_dir, $theme_url, $settings;
     '<a href="$1">$1</a>',
     '<a href="$1">$3</a>',
     '<div class="code"><p>$1</p></div>',
-    '<p style="font-weight: bold; padding: 0px; margin: 0px;">Quote:</p><blockquote style="padding: 5px; margin: 0px;">$1<br /></blockquote>',
-    '<p style="font-weight: bold; padding: 0px; margin: 0px;">Quote from $1:</p><blockquote style="padding: 5px; margin: 0px;">$2<br /></blockquote>',
+    '<p style="font-weight: bold; padding: 0px; margin: 0px;">Quote:</p><blockquote style="padding: 5px; margin: 0px;">',
+    '<p style="font-weight: bold; padding: 0px; margin: 0px;">Quote from $1:</p><blockquote style="padding: 5px; margin: 0px;">',
     '<br />',
     '<hr />',
     '<img src="$1" alt=""/>',
@@ -428,6 +432,8 @@ global $theme_dir, $theme_url, $settings;
 	
   );
   $str = preg_replace($simple_search, $simple_replace, $str);
+  
+  $str = str_replace("[/quote]","<br /></blockquote>",$str); //HACK!
   
   // Process emoticons
   $str = '<bbcode-process>'.$str.'</bbcode-process>';
@@ -465,6 +471,7 @@ global $theme_dir, $theme_url, $settings;
   // Return finished product
   return $str;
 }
+
 
 // Our Version of mysql_query(), this function looks sad right now, but will be improved sooner or later...
 function sql_query($query) {
