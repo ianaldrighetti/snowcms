@@ -43,7 +43,7 @@ global $l, $settings, $cmsurl;
     $prev_page = $settings['page']['previous_page'];
     $page = $settings['page']['current_page'];
     $next_page = $settings['page']['next_page'];
-    $total_members = $settings['page']['total_members'];
+    $total_topics = $settings['page']['total_topics'];
     $query = $settings['page']['query_url'];
     
     // Show the pervious page link if it is at least page two
@@ -62,7 +62,7 @@ global $l, $settings, $cmsurl;
         <tr><td></td>
         ';
     // Show the next page link
-    if (@($total_members / $settings['num_search_results']) > $next_page)
+    if (@($total_topics / $settings['num_search_results']) > $next_page)
       echo '<td style="text-align: right"><a href="'.$cmsurl.'forum.php?action=search;q='.$query.';pg='.$next_page.'">'.$l['memberlist_next_page'].'</a></td></tr>
         </table>
         ';
@@ -73,7 +73,6 @@ global $l, $settings, $cmsurl;
         ';
   
   // Show search results
-  
   if ($settings['page']['results']) {
     foreach ($settings['page']['results'] as $result) {
       echo '
@@ -114,7 +113,7 @@ global $l, $settings, $cmsurl;
         <tr><td></td>
         ';
     // Show the next page link
-    if (@($total_members / $settings['num_search_results']) > $next_page)
+    if (@($total_topics / $settings['num_search_results']) > $next_page)
       echo '<td style="text-align: right"><a href="'.$cmsurl.'forum.php?action=search;q='.$query.';pg='.$next_page.'">'.$l['memberlist_next_page'].'</a></td></tr>
         </table>
         ';

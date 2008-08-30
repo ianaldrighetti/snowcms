@@ -66,6 +66,10 @@ global $cmsurl, $db_prefix, $l, $settings, $user, $language_dir, $theme_dir, $th
         array(
           'type' => 'text'
         ),
+      'num_pages' =>
+        array(
+          'type' => 'text'
+        ),
       'timeformat' =>
         array(
           'type' => 'text'

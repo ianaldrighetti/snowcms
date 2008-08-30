@@ -48,8 +48,40 @@ global $cmsurl, $settings, $l, $user, $theme_url;
   if($settings['page']['num_pages']>0) {
     echo '
     <form action="'.$cmsurl.'index.php?action=admin;sa=managepages" method="post">
+    ';
     
-    <table width="100%" style="text-align: center">
+    $prev_page = $settings['page']['previous_page'];
+    $page = $settings['page']['current_page'];
+    $next_page = $settings['page']['next_page'];
+    $total_pages = $settings['page']['total_pages'];
+    
+    // Show the pervious page link if it is at least page two
+    if ($prev_page > 0)
+      echo '<table width="100%">
+        <tr><td><a href="'.$cmsurl.'index.php?action=admin;sa=managepages;pg='.$prev_page.'">'.$l['memberlist_previous_page'].'</a></td>
+        ';
+    // Show the previous page link if it is page one
+    elseif ($prev_page == 0)
+      echo '<table width="100%">
+        <tr><td><a href="'.$cmsurl.'index.php?action=admin;sa=managepages">'.$l['memberlist_previous_page'].'</a></td>
+        ';
+    // Don't show the previous page link, because it is the first page
+    else
+      echo '<table width="100%">
+        <tr><td></td>
+        ';
+    // Show the next page link
+    if (@($total_pages / $settings['num_pages']) > $next_page)
+      echo '<td style="text-align: right"><a href="'.$cmsurl.'index.php?action=admin;sa=managepages;pg='.$next_page.'">'.$l['memberlist_next_page'].'</a></td></tr>
+        </table>
+        ';
+    // Don't show the next page link, because it is the last page
+    else
+      echo '<td style="text-align: right"></td></tr>
+        </table>
+        ';
+    
+    echo '<table width="100%" style="text-align: center">
       <tr>
         <th></th>
         <th style="border-style: solid; border-width: 1px">'.$l['managepages_pagetitle'].'</th>
@@ -76,8 +108,35 @@ global $cmsurl, $settings, $l, $user, $theme_url;
     }
     echo '
     </table>
+    ';
     
-    <p><input type="submit" value="'.$l['managepages_change_homepage'].'" /></p>
+    // Show the pervious page link if it is at least page two
+    if ($prev_page > 0)
+      echo '<table width="100%">
+        <tr><td><a href="'.$cmsurl.'index.php?action=admin;sa=managepages;pg='.$prev_page.'">'.$l['memberlist_previous_page'].'</a></td>
+        ';
+    // Show the previous page link if it is page one
+    elseif ($prev_page == 0)
+      echo '<table width="100%">
+        <tr><td><a href="'.$cmsurl.'index.php?action=admin;sa=managepages">'.$l['memberlist_previous_page'].'</a></td>
+        ';
+    // Don't show the previous page link, because it is the first page
+    else
+      echo '<table width="100%">
+        <tr><td></td>
+        ';
+    // Show the next page link
+    if (@($total_pages / $settings['num_pages']) > $next_page)
+      echo '<td style="text-align: right"><a href="'.$cmsurl.'index.php?action=admin;sa=managepages;pg='.$next_page.'">'.$l['memberlist_next_page'].'</a></td></tr>
+        </table>
+        ';
+    // Don't show the next page link, because it is the last page
+    else
+      echo '<td style="text-align: right"></td></tr>
+        </table>
+        ';
+    
+    echo '<p><input type="submit" value="'.$l['managepages_change_homepage'].'" /></p>
     
     </form>';
   }

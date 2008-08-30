@@ -112,9 +112,8 @@ global $l, $settings, $db_prefix;
       }
       $settings['page']['query'] = $q ? implode(' ',$q) : '';
       
-      // The total amount of members
-      $settings['page']['total_members'] = @mysql_num_rows(sql_query("SELECT * FROM {$db_prefix}topics"));
-      
+      // The total amount of topics
+      $settings['page']['total_topics'] = mysql_num_rows(sql_query("SELECT * FROM {$db_prefix}topics"));
       // The previous page number
       $settings['page']['previous_page'] = $page - 1;
       // The current page number

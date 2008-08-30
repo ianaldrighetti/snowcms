@@ -113,6 +113,11 @@ global $cmsurl, $db_prefix, $l, $settings, $user;
       }
       redirect('index.php?action=admin;sa=managepages');
     }
+    // The current page
+    $page = @$_REQUEST['pg'];
+    // Get the first page on this page, confusing, no?
+    $start = $page * $settings['num_pages'];
+    
     // Get all the pages in the database so we can list them :)
     $result = sql_query("
        SELECT
@@ -120,7 +125,8 @@ global $cmsurl, $db_prefix, $l, $settings, $user;
          p.modify_date, p.title, m.id, m.username, m.display_name
        FROM {$db_prefix}pages AS p
          LEFT JOIN {$db_prefix}members AS m ON m.id = p.page_owner
-       ORDER BY p.page_id DESC");
+       ORDER BY p.page_id DESC
+       LIMIT $start, {$settings['num_pages']}");
       $pages = array();
       while($row = mysql_fetch_assoc($result)) {
         if(!$row['id']) {
@@ -141,6 +147,16 @@ global $cmsurl, $db_prefix, $l, $settings, $user;
           'date' => $row['modify_date'] ? formattime($row['modify_date']) : formattime($row['create_date'])
         );          
       }
+    
+    // The total amount of pages, real pages, not from the pagination
+    $settings['page']['total_pages'] = mysql_num_rows(sql_query("SELECT * FROM {$db_prefix}pages"));
+    // The previous page number
+    $settings['page']['previous_page'] = $page - 1;
+    // The current page number
+    $settings['page']['current_page'] = (int)$page;
+    // The next page number
+    $settings['page']['next_page'] = $page + 1;
+    
     // Load the $pages array into $settings so we can pass it on
     $settings['page']['pages'] = $pages;
     // Lets make it simple, count how many pages their are

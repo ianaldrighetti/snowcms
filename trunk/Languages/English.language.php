@@ -140,6 +140,7 @@ $l['basicsettings_update'] = 'Update Settings';
 $l['basicsettings_num_news_items'] = 'News items per page:';
 $l['basicsettings_num_search_results'] = 'Search results per page:';
 $l['basicsettings_manage_members_per_page'] = 'Members per page:';
+$l['basicsettings_num_pages'] = 'Pages per page:';
 
 // Mail.template.php
 $l['mailsettings_title'] = 'Email Settings';
