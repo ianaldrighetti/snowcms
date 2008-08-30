@@ -546,6 +546,15 @@ global $db_prefix, $user;
 // !!! This function needs improvement!!!!
 function cleanQuery() {
 global $_REQUEST, $_GET;
+  
+  // Remove current request variables
+  unset($_REQUEST);
+  
+  // Add post variables to request
+  foreach ($_POST as $key => $value) {
+    $_REQUEST[$key] = $value;
+  }
+  
   // Make sure there is even somehting that needs handling, we don't want errors
   if(!empty($_SERVER['QUERY_STRING'])) {
   // EXPLOSION! Quick and Dirty
