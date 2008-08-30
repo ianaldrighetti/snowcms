@@ -19,7 +19,9 @@ global $cmsurl, $db_prefix, $l, $settings, $user;
   // This prepares the news for display...
   
   // Redirect post data into get data
-  if (@$_POST['cat'])
+  if (@$_POST['cat'] == 'all')
+    redirect('index.php?action=news');
+  elseif (@$_POST['cat'])
     redirect('index.php?action=news;cat='.$_POST['cat']);
   
   // Are they adding a comment?
@@ -46,19 +48,18 @@ global $cmsurl, $db_prefix, $l, $settings, $user;
     
     // Setup category SQL
     if ($cat = (int)@$_REQUEST['cat'])
-      $cat_sql = "WHERE `cat_id` = '$cat'";
+      $cat = "WHERE `cat_id` = '$cat'";
     else
-      $cat_sql = "";
+      $cat = "";
     
     $result = sql_query("
       SELECT
         *, mem.display_name AS username, IFNULL(mem.display_name, mem.username) AS username
       FROM {$db_prefix}news AS n
         LEFT JOIN {$db_prefix}members AS mem ON mem.id = n.poster_id
-      $cat_sql
+      $cat
       ORDER BY n.post_time DESC
       LIMIT $start, {$settings['num_news_items']}");
-    $cat_sql = "AND `cat_id` = '$cat'";
     $news = array();
     // Is there even any news? :O
     if (mysql_num_rows($result)) {
@@ -82,16 +83,21 @@ global $cmsurl, $db_prefix, $l, $settings, $user;
         );
       }
       
-      // The first page number
-      $settings['page']['first_page'] = $page + 1;
       // The previous page number
       $settings['page']['previous_page'] = $page - 1;
       // The current page number
       $settings['page']['current_page'] = $page;
       // The next page number
       $settings['page']['next_page'] = $page + 1;
-      // The last page number
-      $settings['page']['last_page'] = $page - 1;
+      // Total amount of news articles
+      $news_count = sql_query("SELECT * FROM {$db_prefix}news $cat");
+      $settings['page']['total_news'] = 0;
+      while (mysql_fetch_assoc($news_count)) {
+        $settings['page']['total_news'] += 1;
+      }
+      
+      // The current category
+      $settings['page']['cat'] = @$_REQUEST['cat'];
       
       // Load news categories
       $result = sql_query("SELECT * FROM {$db_prefix}news_categories");
@@ -106,8 +112,31 @@ global $cmsurl, $db_prefix, $l, $settings, $user;
     }
     else {
       // No news? :O
+      
+      // The previous page number
+      $settings['page']['previous_page'] = $page - 1;
+      // The current page number
+      $settings['page']['current_page'] = $page;
+      // The next page number
+      $settings['page']['next_page'] = $page + 1;
+      // Total amount of news articles
+      $news_count = sql_query("SELECT * FROM {$db_prefix}news $cat");
+      $settings['page']['total_news'] = 0;
+      while (mysql_fetch_assoc($news_count)) {
+        $settings['page']['total_news'] += 1;
+      }
+      
+      // The current category
+      $settings['page']['cat'] = @$_REQUEST['cat'];
+      
+      // Load news categories
+      $result = sql_query("SELECT * FROM {$db_prefix}news_categories");
+      while ($row = mysql_fetch_array($result))
+        $settings['page']['categories'][] = $row;
+      
+      // Load the them
       $settings['page']['title'] = $l['news_nonews_title'];
-      loadTheme('News','None');
+      loadTheme('News','Nonews');
     }
   }
   else {
@@ -183,8 +212,8 @@ global $cmsurl, $db_prefix, $l, $settings, $user;
     }
     else {
       // It doesn't exist? :O
-      $settings['page']['title'] = $l['news_nonews_title'];
-      loadTheme('News','NoNews');
+      $settings['page']['title'] = $l['news_doesntexist_title'];
+      loadTheme('News','DoesntExist');
     }  
   }
 }

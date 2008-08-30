@@ -12,12 +12,12 @@ global $cmsurl, $db_prefix, $l, $settings, $user;
   echo '
   <h1>', $l['news_header'], '</h1>';
   
-  $page_start = $settings['page']['first_page'];
   $prev_page = $settings['page']['previous_page'];
   $page = $settings['page']['current_page'];
   $next_page = $settings['page']['next_page'];
-  $page_end = $settings['page']['last_page'];
-  $total_members = 4; //$settings['page']['total_members'];
+  $total_news = $settings['page']['total_news'];
+  if ($cat = $settings['page']['cat'])
+    $cat = ';cat='.$cat;
   
   // Show categories
   echo '<form action="'.$cmsurl.'index.php?action=news" method="post" style="float: right; margin-bottom: 0"><p style="display: inline">
@@ -28,12 +28,12 @@ global $cmsurl, $db_prefix, $l, $settings, $user;
   // Show the pervious page link if it is at least page two
   if ($prev_page > 0)
      echo '<table width="100%">
-      <tr><td><a href="'.$cmsurl.'index.php?action=news;pg='.$prev_page.'">'.$l['managemembers_previous_page'].'</a></td>
+      <tr><td><a href="'.$cmsurl.'index.php?action=news'.$cat.';pg='.$prev_page.'">'.$l['news_previous_page'].'</a></td>
       ';
   // Show the previous page link if it is page one
   elseif ($prev_page == 0)
     echo '<table width="100%">
-      <tr><td><a href="'.$cmsurl.'index.php?action=news">'.$l['managemembers_previous_page'].'</a></td>
+      <tr><td><a href="'.$cmsurl.'index.php?action=news'.$cat.'">'.$l['news_previous_page'].'</a></td>
       ';
   // Don't show the previous page link, because it is the first page
   else
@@ -41,8 +41,8 @@ global $cmsurl, $db_prefix, $l, $settings, $user;
       <tr><td></td>
       ';
   // Show the next page link
-  if (@($total_members / $settings['num_news_items']) > $page_end + 2)
-    echo '<td style="text-align: right"><a href="'.$cmsurl.'index.php?action=news;pg='.$next_page.'">'.$l['managemembers_next_page'].'</a></td></tr>
+  if (@($total_news / $settings['num_news_items']) > $next_page)
+    echo '<td style="text-align: right"><a href="'.$cmsurl.'index.php?action=news'.$cat.';pg='.$next_page.'">'.$l['news_next_page'].'</a></td></tr>
       </table>
       ';
   // Don't show the next page link, because it is the last page
@@ -56,10 +56,10 @@ global $cmsurl, $db_prefix, $l, $settings, $user;
   while ($i < count($settings['news'])) {
     $news = $settings['news'][$i];
     echo '
-    <p>'.str_replace('%subject%','<a href="'.$cmsurl.'index.php?action=news;id='.$news['id'].'">'.$news['subject'].'</a>',
+    <p><b>'.str_replace('%subject%','<a href="'.$cmsurl.'index.php?action=news;id='.$news['id'].'">'.$news['subject'].'</a>',
          str_replace('%category%','<a href="'.$cmsurl.'index.php?action=news;cat='.$news['cat_id'].'">'.$news['cat_name'].'</a>',
          str_replace('%name%','<a href="'.$cmsurl.'index.php?action=profile;u='.$news['user_id'].'">'.$news['username'].'</a>',
-         str_replace('%date%',$news['post_date'],$l['news_heading'])))).'</p>
+         str_replace('%date%',$news['post_date'],$l['news_heading'])))).'</b></p>
     <p>'.bbc($news['body']).'</p>
     ';
     if ($news['allow_comments'])
@@ -71,12 +71,12 @@ global $cmsurl, $db_prefix, $l, $settings, $user;
   // Show the pervious page link if it is at least page two
   if ($prev_page > 0)
      echo '<table width="100%">
-      <tr><td><a href="'.$cmsurl.'index.php?action=news;pg='.$prev_page.'">'.$l['managemembers_previous_page'].'</a></td>
+      <tr><td><a href="'.$cmsurl.'index.php?action=news'.$cat.';pg='.$prev_page.'">'.$l['news_previous_page'].'</a></td>
       ';
   // Show the previous page link if it is page one
   elseif ($prev_page == 0)
     echo '<table width="100%">
-      <tr><td><a href="'.$cmsurl.'index.php?action=news">'.$l['managemembers_previous_page'].'</a></td>
+      <tr><td><a href="'.$cmsurl.'index.php?action=news'.$cat.'">'.$l['news_previous_page'].'</a></td>
       ';
   // Don't show the previous page link, because it is the first page
   else
@@ -84,8 +84,8 @@ global $cmsurl, $db_prefix, $l, $settings, $user;
       <tr><td></td>
       ';
   // Show the next page link
-  if (@($total_members / $settings['num_news_items']) > $page_end + 2)
-    echo '<td style="text-align: right"><a href="'.$cmsurl.'index.php?action=news;pg='.$next_page.'">'.$l['managemembers_next_page'].'</a></td></tr>
+  if (@($total_news / $settings['num_news_items']) > $next_page)
+    echo '<td style="text-align: right"><a href="'.$cmsurl.'index.php?action=news'.$cat.';pg='.$next_page.'">'.$l['news_next_page'].'</a></td></tr>
       </table>
       ';
   // Don't show the next page link, because it is the last page
@@ -99,15 +99,6 @@ global $cmsurl, $db_prefix, $l, $settings, $user;
      '.$settings['page']['categories'].'
       </p></form>
       ';
-}
-
-function None() {
-global $cmsurl, $db_prefix, $l, $settings, $user;
-  
-  echo '
-  <h1>', $l['news_nonews_header'], '</h1>
-  <p>', $l['news_nonews_desc'], '</p>
-  ';
 }
 
 function Manage() {
@@ -215,10 +206,10 @@ global $cmsurl, $db_prefix, $l, $settings, $user;
   // Show news
   $news = $settings['news'];
   echo '
-    <p>'.str_replace('%subject%','<a href="'.$cmsurl.'index.php?action=news;id='.$news['id'].'">'.$news['subject'].'</a>',
+    <p><b>'.str_replace('%subject%','<a href="'.$cmsurl.'index.php?action=news;id='.$news['id'].'">'.$news['subject'].'</a>',
          str_replace('%category%','<a href="'.$cmsurl.'index.php?action=news;cat='.$news['cat_id'].'">'.$news['cat_name'].'</a>',
          str_replace('%name%','<a href="'.$cmsurl.'index.php?action=profile;u='.$news['user_id'].'">'.$news['username'].'</a>',
-         str_replace('%date%',$news['post_date'],$l['news_heading'])))).'</p>
+         str_replace('%date%',$news['post_date'],$l['news_heading'])))).'</b></p>
     <p>'.bbc($news['body']).'</p>
     ';
 }
@@ -232,10 +223,10 @@ global $cmsurl, $db_prefix, $l, $settings, $user;
   // Show news
   $news = $settings['news'];
   echo '
-    <p>'.str_replace('%subject%','<a href="'.$cmsurl.'index.php?action=news;id='.$news['id'].'">'.$news['subject'].'</a>',
+    <p><b>'.str_replace('%subject%','<a href="'.$cmsurl.'index.php?action=news;id='.$news['id'].'">'.$news['subject'].'</a>',
          str_replace('%category%','<a href="'.$cmsurl.'index.php?action=news;cat='.$news['cat_id'].'">'.$news['cat_name'].'</a>',
          str_replace('%name%','<a href="'.$cmsurl.'index.php?action=profile;u='.$news['user_id'].'">'.$news['username'].'</a>',
-         str_replace('%date%',$news['post_date'],$l['news_heading'])))).'</p>
+         str_replace('%date%',$news['post_date'],$l['news_heading'])))).'</b></p>
     <p>'.bbc($news['body']).'</p>
     <hr />
     ';
@@ -245,9 +236,9 @@ global $cmsurl, $db_prefix, $l, $settings, $user;
   $i = 0;
   while ($i < count($comments)) {
     echo '
-    <p>'.str_replace('%subject%',$comments[$i]['subject'],
+    <p><b>'.str_replace('%subject%',$comments[$i]['subject'],
          str_replace('%name%','<a href="'.$cmsurl.'index.php?action=profile;u='.$comments[$i]['user_id'].'">'.$comments[$i]['username'].'</a>',
-         str_replace('%date%',$comments[$i]['post_date'],$l['news_comment_heading']))).'</p>
+         str_replace('%date%',$comments[$i]['post_date'],$l['news_comment_heading']))).'</b></p>
     <p>'.bbc($comments[$i]['body']).'</p>
     <hr />
     ';
@@ -277,13 +268,42 @@ global $cmsurl, $db_prefix, $l, $settings, $user;
 }
 
 function NoNews() {
-global $l;
+global $l, $settings, $cmsurl;
+  
+  // Load the categories listbox element
+  loadCategories();
   
   echo '
-  <h1>'.$l['news_nonews_header'].'</h1>
+  <h1>', $l['news_nonews_header'], '</h1>';
   
-  <p>'.$l['news_nonews_desc'].'</p>
-  ';
+  $prev_page = $settings['page']['previous_page'];
+  $page = $settings['page']['current_page'];
+  $next_page = $settings['page']['next_page'];
+  $total_news = $settings['page']['total_news'];
+  if ($cat = $settings['page']['cat'])
+    $cat = ';cat='.$cat;
+  
+  // Show categories
+  echo '<form action="'.$cmsurl.'index.php?action=news" method="post" style="float: right; margin-bottom: 0"><p style="display: inline">
+     '.$settings['page']['categories'].'
+      </p></form>
+      ';
+  
+  echo '<p style="clear: both">'.$l['news_nonews_desc'].'</p>';
+  
+  // Show categories
+  echo '<form action="'.$cmsurl.'index.php?action=news" method="post" style="float: right; margin-bottom: 0"><p style="display: inline">
+     '.$settings['page']['categories'].'
+      </p></form>
+      ';
+}
+
+function DoesntExist() {
+global $l, $settings, $cmsurl;
+  
+  echo '
+  <h1>', $l['news_doesntexist_header'], '</h1>
+  <p style="clear: both">'.$l['news_doesntexist_desc'].'</p>';
 }
 
 function loadCategories() {
@@ -295,10 +315,10 @@ global $l, $settings;
     <select name="cat">
     ';
  if (!@$_REQUEST['cat'])
-   $categories .= '<option value="" selected="selected">All</option>
+   $categories .= '<option value="all" selected="selected">All</option>
     ';
  else
-   $categories .= '<option value="">All</option>
+   $categories .= '<option value="all">All</option>
     ';
   
   foreach ($settings['page']['categories'] as $cat) {
