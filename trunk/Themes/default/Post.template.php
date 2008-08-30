@@ -47,7 +47,7 @@ echo '
   <tr align="center">
     <td colspan="3"><textarea id="body" name="body" rows="12" cols="60" onclick="if(document.selection){this.selection = document.selection.createRange()}" onkeyup="if(document.selection){this.selection = document.selection.createRange()}" onchange="if(document.selection){this.selection = document.selection.createRange().duplicate()}" onfocus="if(document.selection){this.selection = document.selection.createRange().duplicate()}">', $settings['body'], '</textarea></td>
   </tr>';
-  if(canforum('post_sticky', $settings['board']) || canforum('lock_topic', $settings['board'])) {
+  if(canforum('sticky_topic', $settings['board']) || canforum('lock_topic', $settings['board'])) {
     if($settings['sticky'])
       $settings['sticky'] = 'checked="checked"';
     else
@@ -102,7 +102,7 @@ echo '
 	  </td>	
   </tr>
   <tr align="center" valign="middle">
-  	<td colspan="2">';
+  	<td colspan="3">';
 	
 	include_once $theme_dir.'/'.$settings['theme'].'/emoticons/emoticons.php';
 	
@@ -117,7 +117,7 @@ echo '
   <tr align="center">
     <td colspan="3"><textarea name="body" id="body" rows="12" cols="60"onclick="if(document.selection){this.selection = document.selection.createRange()}" onkeyup="if(document.selection){this.selection = document.selection.createRange()}" onchange="if(document.selection){this.selection = document.selection.createRange().duplicate()}" onfocus="if(document.selection){this.selection = document.selection.createRange().duplicate()}">', $settings['body'], '</textarea></td>
   </tr>';
-  if(canforum('post_sticky', $settings['board']) || canforum('lock_topic', $settings['board'])) {
+  if(canforum('sticky_topic', $settings['board']) || canforum('lock_topic', $settings['board'])) {
     if($settings['sticky'])
       $settings['sticky'] = 'checked="checked"';
     else
@@ -128,7 +128,7 @@ echo '
       $settings['locked'] = '';
     echo '
     <tr align="center">
-      <td colspan="3">', canforum('post_sticky', $settings['board']) ? $l['topic_sticky'].' <input name="sticky" '. $settings['sticky']. ' type="checkbox" value="1"/>' : '', '</td>
+      <td colspan="3">', canforum('sticky_topic', $settings['board']) ? $l['topic_sticky'].' <input name="sticky" '. $settings['sticky']. ' type="checkbox" value="1"/>' : '', '</td>
     </tr>
     <tr align="center">
       <td colspan="3">', canforum('lock_topic', $settings['board']) ? $l['topic_lock'].' <input name="locked" '. $settings['locked']. ' type="checkbox" value="1"/>' : '', '</td>

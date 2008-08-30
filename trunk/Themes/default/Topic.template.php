@@ -11,9 +11,24 @@ echo '
   <tr>
     <td style="text-align: left;">Pages: ', $settings['pagination'], '</td>
     <td style="text-align: right;">';
-if(canforum('post_new', $settings['bid'])) { echo '<a href="'.$cmsurl.'forum.php?action=post;board='.$settings['bid'].'">'.$l['topic_newtopic'].'</a>'; }
+if (canforum('sticky_topic', $settings['bid'])) {
+  if ($settings['sticky'])
+    echo '<a href="'.$cmsurl.'forum.php?action=sticky;topic='.$settings['topic'].';sc='.$user['sc'].'">'.$l['topic_unsticky'].'</a>';
+  else
+    echo '<a href="'.$cmsurl.'forum.php?action=sticky;topic='.$settings['topic'].';sc='.$user['sc'].'">'.$l['topic_sticky'].'</a>';
+}
+if (canforum('sticky_topic', $settings['bid']) && (canforum('lock_topic', $settings['bid']) || canforum('post_new', $settings['bid']) || canforum('post_reply', $settings['bid']))) echo ' - ';
+if (canforum('lock_topic', $settings['bid'])) {
+  if ($settings['locked'])
+    echo '<a href="'.$cmsurl.'forum.php?action=lock;topic='.$settings['topic'].';sc='.$user['sc'].'">'.$l['topic_unlock'].'</a>';
+  else
+    echo '<a href="'.$cmsurl.'forum.php?action=lock;topic='.$settings['topic'].';sc='.$user['sc'].'">'.$l['topic_lock'].'</a>';
+}
+if (canforum('lock_topic', $settings['bid']) && (canforum('post_new', $settings['bid']) || canforum('post_reply', $settings['bid']))) echo ' - ';
+if (canforum('post_new', $settings['bid'])) echo '<a href="'.$cmsurl.'forum.php?action=post;board='.$settings['bid'].'">'.$l['topic_newtopic'].'</a>';
 if (canforum('post_new', $settings['bid']) && canforum('post_reply', $settings['bid'])) echo ' - ';
-if(canforum('post_reply', $settings['bid'])) { echo '<a href="'.$cmsurl.'forum.php?action=post;topic='.$_REQUEST['topic'].'">'.$l['topic_reply'].'</a>'; } echo '</td>
+if (canforum('post_reply', $settings['bid'])) echo '<a href="'.$cmsurl.'forum.php?action=post;topic='.$settings['topic'].'">'.$l['topic_reply'].'</a>';
+echo '</td>
   </tr>
 </table>
 ';

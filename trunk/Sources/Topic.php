@@ -125,6 +125,8 @@ global $cmsurl, $db_prefix, $l, $settings, $user;
             'mid' => $row['mid'],
             'bid' => $row['bid'],
             'uid' => $row['uid'],
+            'sticky' => $row['sticky'],
+            'locked' => $row['locked'],
             'subject' => $row['subject'],
             'post_time' => formattime($row['post_time'],2),
             'body' => bbc($row['body']),
@@ -144,6 +146,9 @@ global $cmsurl, $db_prefix, $l, $settings, $user;
         $settings['page']['title'] = $title;
         $settings['posts'] = $posts;
         $settings['pagination'] = $pagination;
+        $settings['topic'] = (int)$_REQUEST['topic'];
+        $settings['sticky'] = $posts[0]['sticky'];
+        $settings['locked'] = $posts[0]['locked'];
         $settings['bid'] = (int)$bid;
         loadForum('Topic');
     }
@@ -260,7 +265,7 @@ global $cmsurl, $db_prefix, $l, $settings, $user;
     $board_id = $row['bid'];
   }
   // So. Can they?
-  if(canforum('sticky_topic', $board_id) && validateSession($_REQUEST['sc'])) {
+  if(canforum('sticky_topic', $board_id) && validateSession(@$_REQUEST['sc'])) {
     // This seems simple :P just an update... Then Redirect back to the topic :D
     if($row['sticky'])
       $sticky = 0;
@@ -282,7 +287,7 @@ global $cmsurl, $db_prefix, $l, $settings, $user;
   $result = sql_query("
     SELECT
       t.tid, t.bid, t.locked
-    FROM {$db_prefix}topics
+    FROM {$db_prefix}topics AS t
     WHERE t.tid = $topic_id");
   if(!mysql_num_rows($result)) 
     $board_id = 0;
