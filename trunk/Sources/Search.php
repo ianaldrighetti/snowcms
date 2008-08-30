@@ -69,8 +69,8 @@ global $l, $settings, $db_prefix;
       
       // Sort search results in the order of relevency
       $ordered = array();
-      $i = (int)@$_REQUEST['pg'];
-      while ($i < $settings['num_search_results']) {
+      $i = 0;
+      while ($i < count($results)) {
         $highest['times'] = 0;
        // Sort each one, one at a time
         foreach ($results as $key => $value) {
@@ -93,8 +93,18 @@ global $l, $settings, $db_prefix;
         $i += 1;
       }
       
+      // Remove results not on this page
+      $results = array();
+      $page = @$_REQUEST['pg'];
+      $i = 0;
+      foreach ($ordered as $key => $value) {
+        if ($i >= $page * $settings['num_search_results'] && $i < ($page + 1) * $settings['num_search_results'])
+          $results[] = $ordered[$key];
+        $i += 1;
+      }
+      
       // Transfer which variable contains the search results
-      $settings['page']['results'] = $ordered;
+      $settings['page']['results'] = $results;
       
       // Set the default query
       foreach ($q as $key => $value) {
