@@ -49,14 +49,16 @@ global $cmsurl, $db_prefix, $l, $settings, $user;
 function loadMlist() {
 global $l, $settings, $db_prefix, $cmsurl;
   
-  // Redirect post data into get data if filter and sort are set
-  if (@$_POST['f'] && @$_POST['s'])
+  // Redirect post data into get data
+  if (@$_POST['f'] == 'all' && @$_POST['s'])
+    redirect('index.php?action=admin;sa=members;s='.$_POST['s']);
+  elseif (@$_POST['f'] && @$_POST['s'])
     redirect('index.php?action=admin;sa=members;f='.$_POST['f'].';s='.$_POST['s']);
-  // Redirect post data into get data if only filter is set
-  else if (@$_POST['f'])
+  elseif (@$_POST['f'] == 'all')
+    redirect('index.php?action=admin;sa=members');
+  elseif (@$_POST['f'])
     redirect('index.php?action=admin;sa=members;f='.$_POST['f']);
-  // And redirect post data into get data if only sort is set
-  else if (@$_POST['s'])
+  elseif (@$_POST['s'])
     redirect('index.php?action=admin;sa=members;s='.$_POST['s']);
   
   // The page's title
@@ -152,40 +154,39 @@ global $l, $settings, $db_prefix, $cmsurl;
   
   // Get the member records of this page out of the database
   $members = sql_query("SELECT * FROM {$db_prefix}members LEFT JOIN {$db_prefix}membergroups ON `group` = `group_id` $filter $sort LIMIT $start, ".$settings['manage_members_per_page']);
-  // The members as an SQL result resource
-  $settings['page']['members'] = $members;
+  // Convert the members from an SQL result resource into a multi-demensional array
+  while ($row = mysql_fetch_assoc($members)) {
+    $settings['page']['members'][] = $row;
+  }
   
-  // The first page number
-  $settings['page']['first_page'] = $page + 1;
   // The previous page number
   $settings['page']['previous_page'] = $page - 1;
   // The current page number
   $settings['page']['current_page'] = $page;
   // The next page number
   $settings['page']['next_page'] = $page + 1;
-  // The last page number
-  $settings['page']['last_page'] = $page - 1;
   
   // Get the page number from the query string
   if (@$_REQUEST['pg'])
-    $settings['manage_members']['page_get'] = ';pg='.@$_REQUEST['pg'];
+    $settings['page']['page_get'] = @$_REQUEST['pg'];
   else
-    $settings['manage_members']['page_get'] = '';
+    $settings['page']['page_get'] = '';
    // Get the filter from the query string
   if (@$_REQUEST['f'])
-    $settings['manage_members']['filter_get'] = ';f='.@$_REQUEST['f'];
+    $settings['page']['filter_get'] = @$_REQUEST['f'];
   else
-    $settings['manage_members']['filter_get'] = '';
+    $settings['page']['filter_get'] = '';
   // Get the sort from the query string
   if (@$_REQUEST['s'])
-    $settings['manage_members']['sort_get'] = ';s='.@$_REQUEST['s'];
+    $settings['page']['sort_get'] = @$_REQUEST['s'];
   else
-    $settings['manage_members']['sort_get'] = '';
+    $settings['page']['sort_get'] = '';
   
   // Load groups
-  $result = sql_query("SELECT * FROM {$db_prefix}membergroups") or die(mysql_error());
-  if (mysql_num_rows($result)) {
-    $settings['managemembers']['groups'] = $result;
+  $result = sql_query("SELECT * FROM {$db_prefix}membergroups");
+  while ($row = mysql_fetch_assoc($result)) {
+    if ($row['group_id'] != -1)
+      $settings['page']['groups'][] = $row;
   }
   
   // Load theme to show member lsit
@@ -198,26 +199,22 @@ global $l, $settings, $db_prefix, $cmsurl;
 function loadProf() {
 global $l, $settings, $db_prefix;
   
-  $loadTheme = 0;
-  
   // Load member data
-  $result = sql_query("SELECT * FROM {$db_prefix}members LEFT JOIN {$db_prefix}membergroups ON `group` = `group_id` WHERE id = ".@$_REQUEST['u']) or die(mysql_error());
+  $result = sql_query("SELECT * FROM {$db_prefix}members LEFT JOIN {$db_prefix}membergroups ON `group` = `group_id` WHERE id = ".@$_REQUEST['u']);
   if (mysql_num_rows($result))
     if ($row = mysql_fetch_assoc($result)) {
       $settings['page']['title'] = str_replace("%name%",$row['display_name'] ? $row['display_name'] : $row['username'],$l['managemembers_moderate_title']);
-      $settings['managemembers']['member'] = $row;
-      $loadTheme += 1;
+      $settings['page']['member'] = $row;
     }
   
   // Load groups
-  $result = sql_query("SELECT * FROM {$db_prefix}membergroups") or die(mysql_error());
-  if (mysql_num_rows($result)) {
-    $settings['managemembers']['groups'] = $result;
-    $loadTheme += 1;
+  $result = sql_query("SELECT * FROM {$db_prefix}membergroups");
+  while ($row = mysql_fetch_assoc($result)) {
+    if ($row['group_id'] != -1)
+      $settings['page']['groups'][] = $row;
   }
   
-  if ($loadTheme == 2)
-    loadTheme('ManageMembers','Moderate');
+  loadTheme('ManageMembers','Moderate');
 }
 
 function processModeration() {

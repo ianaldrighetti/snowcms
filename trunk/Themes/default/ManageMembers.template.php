@@ -20,12 +20,18 @@ global $l, $db_prefix, $settings, $cmsurl, $theme_url;
   $first_member = $settings['page']['first_member'];
   $last_member = $settings['page']['last_member'];
   $members = $settings['page']['members'];
-  $page_start = $settings['page']['first_page'];
   $prev_page = $settings['page']['previous_page'];
   $page = $settings['page']['current_page'];
   $next_page = $settings['page']['next_page'];
-  $page_end = $settings['page']['last_page'];
   $total_members = $settings['page']['total_members'];
+  if ($page_get = $settings['page']['page_get'])
+    $page_get = ';pg='.$page_get;
+  if ($page_get = $settings['page']['page_get'])
+    $page_get = ';pg='.$page_get;
+  if ($filter_get = $settings['page']['filter_get'])
+    $filter_get = ';f='.$filter_get;
+  if ($sort_get = $settings['page']['sort_get'])
+    $sort_get = ';s='.$sort_get;
   
   if ($first_member != $last_member)
     echo '<p>'.str_replace("%from%",$first_member,str_replace("%to%",$last_member,$l['managemembers_showing'])).'</p>';
@@ -42,12 +48,12 @@ global $l, $db_prefix, $settings, $cmsurl, $theme_url;
     // Show the pervious page link if it is at least page two
     if ($prev_page > 0)
       echo '<table width="100%">
-        <tr><td><a href="'.$cmsurl.'index.php?action=admin;sa=members;pg='.$prev_page.$settings['manage_members']['filter_get'].$settings['manage_members']['sort_get'].'">'.$l['managemembers_previous_page'].'</a></td>
+        <tr><td><a href="'.$cmsurl.'index.php?action=admin;sa=members;pg='.$prev_page.$filter_get.$sort_get.'">'.$l['managemembers_previous_page'].'</a></td>
         ';
     // Show the previous page link if it is page one
     elseif ($prev_page == 0)
       echo '<table width="100%">
-        <tr><td><a href="'.$cmsurl.'index.php?action=admin;sa=members'.$settings['manage_members']['filter_get'].$settings['manage_members']['sort_get'].'">'.$l['managemembers_previous_page'].'</a></td>
+        <tr><td><a href="'.$cmsurl.'index.php?action=admin;sa=members'.$filter_get.$sort_get.'">'.$l['managemembers_previous_page'].'</a></td>
         ';
     // Don't show the previous page link, because it is the first page
     else
@@ -55,8 +61,8 @@ global $l, $db_prefix, $settings, $cmsurl, $theme_url;
         <tr><td></td>
         ';
     // Show the next page link
-    if (@($total_members / $settings['manage_members_per_page']) > $page_end + 2)
-      echo '<td style="text-align: right"><a href="'.$cmsurl.'index.php?action=admin;sa=members;pg='.$next_page.$settings['manage_members']['filter_get'].$settings['manage_members']['sort_get'].'">'.$l['managemembers_next_page'].'</a></td></tr>
+    if (@($total_members / $settings['manage_members_per_page']) > $next_page)
+      echo '<td style="text-align: right"><a href="'.$cmsurl.'index.php?action=admin;sa=members;pg='.$next_page.$filter_get.$sort_get.'">'.$l['managemembers_next_page'].'</a></td></tr>
         </table>
         ';
     // Don't show the next page link, because it is the last page
@@ -68,25 +74,23 @@ global $l, $db_prefix, $settings, $cmsurl, $theme_url;
     // Show member list header
     echo '<table style="width: 100%; text-align: center">
           <tr>
-            <th style="border-style: solid; border-width: 1px; width: 11%"><a href="'.$cmsurl.'index.php?action=admin;sa=members'.$settings['manage_members']['page_get'].$settings['manage_members']['filter_get'].';s=id'.$settings['manage_members']['id_desc'].'">'.$l['managemembers_id'].'</a></th>
-            <th style="border-style: solid; border-width: 1px; width: 29%"><a href="'.$cmsurl.'index.php?action=admin;sa=members'.$settings['manage_members']['page_get'].$settings['manage_members']['filter_get'].';s=username'.$settings['manage_members']['username_desc'].'">'.$l['managemembers_username'].'</a></th>
-            <th style="border-style: solid; border-width: 1px; width: 28%"><a href="'.$cmsurl.'index.php?action=admin;sa=members'.$settings['manage_members']['page_get'].$settings['manage_members']['filter_get'].';s=group'.$settings['manage_members']['group_desc'].'">'.$l['managemembers_group'].'</a></th>
-            <th style="border-style: solid; border-width: 1px; width: 29%"><a href="'.$cmsurl.'index.php?action=admin;sa=members'.$settings['manage_members']['page_get'].$settings['manage_members']['filter_get'].';s=joindate'.$settings['manage_members']['joindate_desc'].'">'.$l['managemembers_join_date'].'</a></th>
+            <th style="border-style: solid; border-width: 1px; width: 11%"><a href="'.$cmsurl.'index.php?action=admin;sa=members'.$page_get.$filter_get.';s=id'.$settings['manage_members']['id_desc'].'">'.$l['managemembers_id'].'</a></th>
+            <th style="border-style: solid; border-width: 1px; width: 29%"><a href="'.$cmsurl.'index.php?action=admin;sa=members'.$page_get.$filter_get.';s=username'.$settings['manage_members']['username_desc'].'">'.$l['managemembers_username'].'</a></th>
+            <th style="border-style: solid; border-width: 1px; width: 28%"><a href="'.$cmsurl.'index.php?action=admin;sa=members'.$page_get.$filter_get.';s=group'.$settings['manage_members']['group_desc'].'">'.$l['managemembers_group'].'</a></th>
+            <th style="border-style: solid; border-width: 1px; width: 29%"><a href="'.$cmsurl.'index.php?action=admin;sa=members'.$page_get.$filter_get.';s=joindate'.$settings['manage_members']['joindate_desc'].'">'.$l['managemembers_join_date'].'</a></th>
             <th width="6%"></th>
           </tr>';
     
     // Show members on this page
-    $i = 0;
-    while ($row = mysql_fetch_assoc($members)) {
+    foreach ($members as $member) {
       echo '<tr>
-        <td>'.$row['id'].'</td>
-        <td><a href="'.$cmsurl.'index.php?action=profile;u='.$row['id'].'">'.($row['display_name'] ? $row['display_name'] : $row['username']).'</a></td>
-        <td>'.$row['groupname'].'</td><td>'.date($settings['dateformat'],$row['reg_date']).'</td>
-        <td><a href="'.$cmsurl.'index.php?action=admin;sa=members;u='.$row['id'].'">
+        <td>'.$member['id'].'</td>
+        <td><a href="'.$cmsurl.'index.php?action=profile;u='.$member['id'].'">'.($member['display_name'] ? $member['display_name'] : $member['username']).'</a></td>
+        <td>'.$member['groupname'].'</td><td>'.date($settings['dateformat'],$member['reg_date']).'</td>
+        <td><a href="'.$cmsurl.'index.php?action=admin;sa=members;u='.$member['id'].'">
             <img src="'.$theme_url.'/'.$settings['theme'].'/images/modify.png" alt="'.$l['managemembers_moderate_button'].'" width="15" height="15" />
             </a></td>
       </tr>';
-      $i += 1;
     }
     
     // Show member list footer
@@ -95,12 +99,12 @@ global $l, $db_prefix, $settings, $cmsurl, $theme_url;
     // Show the pervious page link if it is at least page two
     if ($prev_page > 0)
       echo '<table width="100%">
-        <tr><td><a href="'.$cmsurl.'index.php?action=admin;sa=members;pg='.$prev_page.$settings['manage_members']['filter_get'].$settings['manage_members']['sort_get'].'">'.$l['managemembers_previous_page'].'</a></td>
+        <tr><td><a href="'.$cmsurl.'index.php?action=admin;sa=members;pg='.$prev_page.$filter_get.$sort_get.'">'.$l['managemembers_previous_page'].'</a></td>
         ';
     // Show the previous page link if it is page one
     elseif ($prev_page == 0)
       echo '<table width="100%">
-        <tr><td><a href="'.$cmsurl.'index.php?action=admin;sa=members'.$settings['manage_members']['filter_get'].$settings['manage_members']['sort_get'].'">'.$l['managemembers_previous_page'].'</a></td>
+        <tr><td><a href="'.$cmsurl.'index.php?action=admin;sa=members'.$filter_get.$sort_get.'">'.$l['managemembers_previous_page'].'</a></td>
         ';
     // Don't show the previous page link, because it is the first page
     else
@@ -108,8 +112,8 @@ global $l, $db_prefix, $settings, $cmsurl, $theme_url;
         <tr><td></td>
         ';
     // Show the next page link
-    if (@($total_members / $settings['manage_members_per_page']) > $page_end + 2)
-      echo '<td style="text-align: right"><a href="'.$cmsurl.'index.php?action=admin;sa=members;pg='.$next_page.$settings['manage_members']['filter_get'].$settings['manage_members']['sort_get'].'">'.$l['managemembers_next_page'].'</a></td></tr>
+    if (@($total_members / $settings['manage_members_per_page']) > $next_page)
+      echo '<td style="text-align: right"><a href="'.$cmsurl.'index.php?action=admin;sa=members;pg='.$next_page.$filter_get.$sort_get.'">'.$l['managemembers_next_page'].'</a></td></tr>
         </table>
         ';
     // Don't show the next page link, because it is the last page
@@ -154,11 +158,12 @@ global $l, $settings, $cmsurl;
 function Moderate() {
 global $l, $settings, $user, $cmsurl;
   
-  $last_ip = $settings['managemembers']['member']['last_ip'] ? $settings['managemembers']['member']['last_ip'] : $settings['managemembers']['member']['reg_ip'];
-  $last_login = $settings['managemembers']['member']['last_login'] ? date($settings['timeformat'].', '.$settings['dateformat'],$settings['managemembers']['member']['last_login']) : $l['managemembers_moderate_never'];
+  $member = $settings['page']['member'];
+  $last_ip = $member['last_ip'] ? $member['last_ip'] : $member['reg_ip'];
+  $last_login = $member['last_login'] ? date($settings['timeformat'].', '.$settings['dateformat'],$member['last_login']) : $l['managemembers_moderate_never'];
   
   echo '
-      <h1>'.str_replace('%name%',$settings['managemembers']['member']['display_name'],$l['managemembers_moderate_header']).'</h1>
+      <h1>'.str_replace('%name%',$member['display_name'],$l['managemembers_moderate_header']).'</h1>
       ';
   
   if (@$_SESSION['error'])
@@ -172,14 +177,14 @@ global $l, $settings, $user, $cmsurl;
         </p>
         
         <table style="width: 100%" class="padding">
-        <tr><th style="text-align: left; width: 30%">'.$l['managemembers_moderate_id'].':</th><td>'.$settings['managemembers']['member']['id'].'</td></tr>';
+        <tr><th style="text-align: left; width: 30%">'.$l['managemembers_moderate_id'].':</th><td>'.$member['id'].'</td></tr>';
    
   if (can('moderate_username'))
-    echo '<tr><th style="text-align: left">'.$l['managemembers_moderate_username'].':</th><td><input name="user_name" value="'.$settings['managemembers']['member']['username'].'" /></td></tr>';
+    echo '<tr><th style="text-align: left">'.$l['managemembers_moderate_username'].':</th><td><input name="user_name" value="'.$member['username'].'" /></td></tr>';
   if (can('moderate_display_name'))
-    echo '<tr><th style="text-align: left">'.$l['managemembers_moderate_display_name'].':</th><td><input name="display_name" value="'.$settings['managemembers']['member']['display_name'].'" /></td></tr>';
+    echo '<tr><th style="text-align: left">'.$l['managemembers_moderate_display_name'].':</th><td><input name="display_name" value="'.$member['display_name'].'" /></td></tr>';
   if (can('moderate_email'))
-    echo '<tr><th style="text-align: left">'.$l['managemembers_moderate_email'].':</th><td><input name="email" value="'.$settings['managemembers']['member']['email'].'" /></td></tr>';
+    echo '<tr><th style="text-align: left">'.$l['managemembers_moderate_email'].':</th><td><input name="email" value="'.$member['email'].'" /></td></tr>';
   
   if (can('moderate_password'))
     echo '<tr><td colspan="2"><br /></td></tr>
@@ -191,33 +196,31 @@ global $l, $settings, $user, $cmsurl;
         <select name="group">
         ';
     
-    while ($row = mysql_fetch_assoc($settings['managemembers']['groups'])) {
-      if ($row['group_id'] != -1) {
-        if ($settings['managemembers']['member']['group'] == $row['group_id'])
-          echo '<option value="'.$row['group_id'].'" selected="selected">'.$row['groupname'].'</option>'."\n";
-        else
-          echo '<option value="'.$row['group_id'].'">'.$row['groupname'].'</option>'."\n";
-      }
+    foreach ($settings['page']['groups'] as $row) {
+      if ($member['group'] == $row['group_id'])
+        echo '<option value="'.$row['group_id'].'" selected="selected">'.$row['groupname'].'</option>'."\n";
+      else
+        echo '<option value="'.$row['group_id'].'">'.$row['groupname'].'</option>'."\n";
     }
     
     echo '</select>
         </td></tr>';
   }
-  echo '<tr><th style="text-align: left">'.$l['managemembers_moderate_posts'].':</th><td>'.$settings['managemembers']['member']['numposts'].'</td></tr>
-        <tr><th style="text-align: left">'.$l['managemembers_moderate_registration_date'].':</th><td>'.date($settings['timeformat'].', '.$settings['dateformat'],$settings['managemembers']['member']['reg_date']).'</td></tr>
+  echo '<tr><th style="text-align: left">'.$l['managemembers_moderate_posts'].':</th><td>'.$member['numposts'].'</td></tr>
+        <tr><th style="text-align: left">'.$l['managemembers_moderate_registration_date'].':</th><td>'.date($settings['timeformat'].', '.$settings['dateformat'],$member['reg_date']).'</td></tr>
         <tr><th style="text-align: left">'.$l['managemembers_moderate_last_login'].':</th><td>'.$last_login.'</td></tr>
         ';
   
-  if ($settings['managemembers']['member']['suspension'] > time())
-    echo '<tr><th style="text-align: left">'.$l['managemembers_moderate_suspended_until'].':</th><td>'.date($settings['timeformat'].', '.$settings['dateformat'],$settings['managemembers']['member']['suspension']).'</td></tr>';
+  if ($member['suspension'] > time())
+    echo '<tr><th style="text-align: left">'.$l['managemembers_moderate_suspended_until'].':</th><td>'.date($settings['timeformat'].', '.$settings['dateformat'],$member['suspension']).'</td></tr>';
   
-  echo '<tr><th style="text-align: left">'.$l['managemembers_moderate_registration_ip'].':</th><td>'.$settings['managemembers']['member']['reg_ip'].'</td></tr>
+  echo '<tr><th style="text-align: left">'.$l['managemembers_moderate_registration_ip'].':</th><td>'.$member['reg_ip'].'</td></tr>
         <tr><th style="text-align: left">'.$l['managemembers_moderate_last_ip'].':</th><td>'.$last_ip.'</td></tr>';
   
   if (can('moderate_signature'))
-    echo '<tr><th style="text-align: left">'.$l['managemembers_moderate_signature'].':</th><td><textarea name="signature" cols="45" rows="4">'.$settings['managemembers']['member']['signature'].'</textarea></td></tr>';
+    echo '<tr><th style="text-align: left">'.$l['managemembers_moderate_signature'].':</th><td><textarea name="signature" cols="45" rows="4">'.$member['signature'].'</textarea></td></tr>';
   if (can('moderate_profile'))
-    echo '<tr><th style="text-align: left">'.$l['managemembers_moderate_profile_text'].':</th><td><textarea name="profile" cols="45" rows="4">'.$settings['managemembers']['member']['profile'].'</textarea></td></tr>';
+    echo '<tr><th style="text-align: left">'.$l['managemembers_moderate_profile_text'].':</th><td><textarea name="profile" cols="45" rows="4">'.$member['profile'].'</textarea></td></tr>';
   
   echo '</table>
         
@@ -228,7 +231,7 @@ global $l, $settings, $user, $cmsurl;
   echo '<p style="display: inline"><input type="submit" value="'.$l['managemembers_moderate_change'].'" /></p>';
   echo '</form>
         
-        <form action="'.$cmsurl.'index.php?action=profile;u='.$settings['managemembers']['member']['id'].'" method="post" style="display: inline">
+        <form action="'.$cmsurl.'index.php?action=profile;u='.$member['id'].'" method="post" style="display: inline">
         <p style="display: inline">
         <input type="hidden" name="action" value="profile" />
         <input type="submit" value="'.$l['managemembers_moderate_profile'].'" />
@@ -237,7 +240,7 @@ global $l, $settings, $user, $cmsurl;
        <br />
        <br />
        ';
-  if (!$settings['managemembers']['member']['activated']) {
+  if (!$member['activated']) {
     if (can('moderate_activate'))
       echo '<form action="'.$cmsurl.'index.php" method="get" style="display: inline">
         <p style="display: inline">
@@ -245,14 +248,14 @@ global $l, $settings, $user, $cmsurl;
         <input type="hidden" name="sa" value="members" />
         <input type="hidden" name="ssa" value="activate" />
         <input type="hidden" name="sc" value="'.$user['sc'].'" />
-        <input type="hidden" name="u" value="'.$settings['managemembers']['member']['id'].'" />
+        <input type="hidden" name="u" value="'.$member['id'].'" />
         <input type="submit" value="'.$l['managemembers_moderate_activate'].'" />
         </p>
         </form>
         ';
   }
   else {
-    if ($settings['managemembers']['member']['suspension'] <= time()) {
+    if ($member['suspension'] <= time()) {
       if (can('moderate_suspend'))
         echo '<form action="'.$cmsurl.'index.php?action=admin;sa=members;u='.$_REQUEST['u'].'" method="post" style="display: inline"><p style="display: inline">
         <input type="hidden" name="action" value="admin" />
@@ -293,7 +296,7 @@ global $l, $settings, $user, $cmsurl;
         </p></form>',$l['managemembers_moderate_renew_suspension'])).'<br />
         <br />';
     }
-    if (!@$settings['managemembers']['member']['banned']) {
+    if (!@$member['banned']) {
       if (can('moderate_ban'))
         echo '<form action="'.$cmsurl.'index.php?action=admin;sa=members;u='.$_REQUEST['u'].'" method="post" style="display: inline">
         <p style="display: inline">
@@ -301,7 +304,7 @@ global $l, $settings, $user, $cmsurl;
         <input type="hidden" name="sa" value="members" />
         <input type="hidden" name="ssa" value="ban" />
         <input type="hidden" name="sc" value="'.$user['sc'].'" />
-        <input type="hidden" name="u" value="'.$settings['managemembers']['member']['id'].'" />
+        <input type="hidden" name="u" value="'.$member['id'].'" />
         <input type="submit" value="'.$l['managemembers_moderate_ban'].'" />
         </p>
        </form>
@@ -315,7 +318,7 @@ global $l, $settings, $user, $cmsurl;
         <input type="hidden" name="sa" value="members" />
         <input type="hidden" name="ssa" value="unban" />
         <input type="hidden" name="sc" value="'.$user['sc'].'" />
-        <input type="hidden" name="u" value="'.$settings['managemembers']['member']['id'].'" />
+        <input type="hidden" name="u" value="'.$member['id'].'" />
         <input type="submit" value="'.$l['managemembers_moderate_unban'].'" />
         </p>
        </form>
@@ -335,7 +338,7 @@ global $l, $settings;
   $filter .= '<select name="f">';
   switch (@$_REQUEST['f']) {
     case '':
-        $filter .= '<option value="" selected="selected">'.$l['managemembers_filter_everyone'].'</option>
+        $filter .= '<option value="all" selected="selected">'.$l['managemembers_filter_everyone'].'</option>
           <option value="active">'.$l['managemembers_filter_active'].'</option>
           <option value="activated">'.$l['managemembers_filter_activated'].'</option>
           <option value="unactivated">'.$l['managemembers_filter_unactivated'].'</option>
@@ -343,7 +346,7 @@ global $l, $settings;
           <option value="banned">'.$l['managemembers_filter_banned'].'</option>
           '; break;
     case 'active':
-      $filter .= '<option value="" selected="selected">'.$l['managemembers_filter_everyone'].'</option>
+      $filter .= '<option value="all" selected="selected">'.$l['managemembers_filter_everyone'].'</option>
           <option value="active" selected="selected">'.$l['managemembers_filter_active'].'</option>
           <option value="activated">'.$l['managemembers_filter_activated'].'</option>
           <option value="unactivated">'.$l['managemembers_filter_unactivated'].'</option>
@@ -351,7 +354,7 @@ global $l, $settings;
           <option value="banned">'.$l['managemembers_filter_banned'].'</option>
           '; break;
     case 'activated':
-      $filter .= '<option value="">'.$l['managemembers_filter_everyone'].'</option>
+      $filter .= '<option value="all">'.$l['managemembers_filter_everyone'].'</option>
           <option value="active">'.$l['managemembers_filter_active'].'</option>
           <option value="activated" selected="selected">'.$l['managemembers_filter_activated'].'</option>
           <option value="unactivated">'.$l['managemembers_filter_unactivated'].'</option>
@@ -359,7 +362,7 @@ global $l, $settings;
           <option value="banned">'.$l['managemembers_filter_banned'].'</option>
           '; break;
     case 'unactivated':
-      $filter .= '<option value="">'.$l['managemembers_filter_everyone'].'</option>
+      $filter .= '<option value="all">'.$l['managemembers_filter_everyone'].'</option>
           <option value="active">'.$l['managemembers_filter_active'].'</option>
           <option value="activated">'.$l['managemembers_filter_activated'].'</option>
           <option value="unactivated" selected="selected">'.$l['managemembers_filter_unactivated'].'</option>
@@ -367,7 +370,7 @@ global $l, $settings;
           <option value="banned">'.$l['managemembers_filter_banned'].'</option>
           '; break;
     case 'suspended':
-      $filter .= '<option value="">'.$l['managemembers_filter_everyone'].'</option>
+      $filter .= '<option value="all">'.$l['managemembers_filter_everyone'].'</option>
           <option value="active">'.$l['managemembers_filter_active'].'</option>
           <option value="activated">'.$l['managemembers_filter_activated'].'</option>
           <option value="unactivated">'.$l['managemembers_filter_unactivated'].'</option>
@@ -375,7 +378,7 @@ global $l, $settings;
           <option value="banned">'.$l['managemembers_filter_banned'].'</option>
           '; break;
     case 'banned':
-      $filter .= '<option value="">'.$l['managemembers_filter_everyone'].'</option>
+      $filter .= '<option value="all">'.$l['managemembers_filter_everyone'].'</option>
           <option value="active">'.$l['managemembers_filter_active'].'</option>
           <option value="activated">'.$l['managemembers_filter_activated'].'</option>
           <option value="unactivated">'.$l['managemembers_filter_unactivated'].'</option>
@@ -383,7 +386,7 @@ global $l, $settings;
           <option value="banned" selected="selected">Banned</option>
           '; break;
     default:
-      $filter .= '<option value="">'.$l['managemembers_filter_everyone'].'</option>
+      $filter .= '<option value="all">'.$l['managemembers_filter_everyone'].'</option>
           <option value="active">'.$l['managemembers_filter_active'].'</option>
           <option value="activated">'.$l['managemembers_filter_activated'].'</option>
           <option value="unactivated">'.$l['managemembers_filter_unactivated'].'</option>
@@ -391,15 +394,13 @@ global $l, $settings;
           <option value="banned">'.$l['managemembers_filter_banned'].'</option>
           ';
   }
-  $filter .= '<option value="">-----------------</option>
+  $filter .= '<option value="all">-----------------</option>
           ';
-  while ($row = mysql_fetch_assoc($settings['managemembers']['groups'])) {
-    if ($row['group_id'] != -1) {
-      if (@$_REQUEST['f'] == $row['group_id'])
-        $filter .= '<option value="'.$row['group_id'].'" selected="selected">'.$row['groupname'].'</option>'."\n";
-      else
-        $filter .= '<option value="'.$row['group_id'].'">'.$row['groupname'].'</option>'."\n";
-    }
+  foreach ($settings['page']['groups'] as $group) {
+    if ($settings['page']['filter_get'] == $group['group_id'])
+      $filter .= '<option value="'.$group['group_id'].'" selected="selected">'.$group['groupname'].'</option>'."\n";
+    else
+      $filter .= '<option value="'.$group['group_id'].'">'.$group['groupname'].'</option>'."\n";
   }
   $filter .= '</select>';
   if (@$_REQUEST['s'])
