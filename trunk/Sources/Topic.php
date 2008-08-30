@@ -126,7 +126,7 @@ global $cmsurl, $db_prefix, $l, $settings, $user;
             'bid' => $row['bid'],
             'uid' => $row['uid'],
             'subject' => $row['subject'],
-            'post_time' => formattime($row['post_time']),
+            'post_time' => formattime($row['post_time'],2),
             'body' => bbc($row['body']),
             'username' => $row['username'] ? $row['username'] : $row['poster_name'],
             'signature' => bbc($row['signature']),
