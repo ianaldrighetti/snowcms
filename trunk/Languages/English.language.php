@@ -51,6 +51,7 @@ $l['register_successbut1'] = 'Thanks for registering! The administrators require
 $l['register_resend'] = 'Resend';
 $l['register_successbut2'] = 'Thanks for registering! The administrators require themselves to activate accounts; you will recieve an email once your account is activated.';
 $l['register_failed'] = 'Registration failed!';
+$l['register_tos'] = 'I have read, I understand and I accept the %site% %link%terms of service%/link%.';
 // For Account Activation...
 $l['activate_title'] = 'Activate your Account';
 $l['activate_acode_no_match'] = 'Wrong Activation Code';
@@ -68,6 +69,7 @@ $l['register_error_passwords'] = 'Those passwords don\'t match!';
 $l['register_error_password_to_short'] = 'Your password is too short!';
 $l['register_error_invalid_email'] = 'That email address is invalid!';
 $l['register_error_captcha'] = 'You failed the CAPTCHA test! Please try again.';
+$l['register_error_tos'] = 'You must accept our TOS.';
 $l['register_error_activation_email'] = 'There was an error sending your activation email. Please wait for an administrator to manually register your account.';
 $l['register_error_unknown'] = 'An unknown error has disabled us from registering your account. Please try again later.';
 $l['register_button'] = 'Register';
@@ -115,6 +117,8 @@ $l['admin_menu_email'] = 'Mail Settings';
 $l['admin_menu_email_desc'] = 'You can change mail settings here, like whether SMTP or Sendmail are used.';
 $l['admin_menu_news'] = 'Manage News';
 $l['admin_menu_news_desc'] = 'You can add, modify and delete news posts here.';
+$l['admin_menu_tos'] = 'Terms of Service';
+$l['admin_menu_tos_desc'] = 'You can turn on or off and modify your site\'s terms of service here.';
 
 // Settings.template.php
 $l['basicsettings_title'] = 'Basic Settings';
@@ -539,4 +543,23 @@ $l['news_nonews_desc'] = 'There is no news in this category.';
 $l['news_doesntexist_title'] = 'News';
 $l['news_doesntexist_header'] = 'News';
 $l['news_doesntexist_desc'] = 'There is no news article with this ID.';
+
+// TOS.template.php
+$l['tos_title'] = 'Terms of Service';
+$l['tos_header'] = 'Terms of Service';
+$l['tos_manage_title'] = 'Manage TOS';
+$l['tos_manage_header'] = 'Manage Terms of Service';
+$l['tos_manage_desc'] = 'Here you can modify your site\'s terms of service. You can also turn it on or off here.';
+$l['tos_change_title'] = 'Manage TOS';
+$l['tos_change_header'] = 'Change %lang% TOS';
+$l['tos_change_desc'] = 'Here you can modify your site\'s terms of service. You can also turn it on or off here. HTML is allowed.';
+$l['tos_onelang_title'] = 'Manage TOS';
+$l['tos_onelang_header'] = 'Manage TOS';
+$l['tos_onelang_desc'] = 'Here you can modify your site\'s terms of service. You can also turn it on or off here. HTML is allowed.';
+$l['tos_enable'] = 'Enable TOS';
+$l['tos_disable'] = 'Disable TOS';
+$l['tos_change'] = 'Change TOS';
+$l['tos_change_submit'] = 'Save Changes';
+$l['tos_onelanguage_submit'] = 'Save Changes';
+$l['tos_notos'] = 'There is no TOS written in this language.';
 ?>

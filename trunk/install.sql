@@ -170,7 +170,7 @@ CREATE TABLE `{$db_prefix}settings` (
   UNIQUE KEY (`variable`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 
-INSERT INTO `{$db_prefix}settings` VALUES ('site_name','SnowCMS'),('slogan','Its a CMS alright...'),('language','English'),('theme','default'),('account_activation','0'),('login_threshold','15'),('version','0.7'),('main_page','1'),('remember_time','120'),('timeformat','H:i:s'),('dateformat','F jS, Y'),('mail_with_fsockopen','0'),('smtp_host',''),('smtp_user',''),('smtp_pass',''),('from_email',''),('smtp_port','25'),('board_posts_per_page','20'),('topic_posts_per_page','10'),('num_news_items','6'),('num_search_results','20'),('manage_members_per_page','20'),('homepage',1),('default_group',2),('login_detection_time',15);
+INSERT INTO `{$db_prefix}settings` VALUES ('site_name','SnowCMS'),('slogan','Its a CMS alright...'),('language','English'),('theme','default'),('account_activation','0'),('login_threshold','15'),('version','0.7'),('main_page','1'),('remember_time','120'),('timeformat','H:i:s'),('dateformat','F jS, Y'),('mail_with_fsockopen','0'),('smtp_host',''),('smtp_user',''),('smtp_pass',''),('from_email',''),('smtp_port','25'),('board_posts_per_page','20'),('topic_posts_per_page','10'),('num_news_items','6'),('num_search_results','20'),('manage_members_per_page','20'),('homepage','1'),('default_group','2'),('login_detection_time','15'),('enable_tos','1');
 
 DROP TABLE IF EXISTS `{$db_prefix}topics`;
 
@@ -230,4 +230,12 @@ CREATE TABLE `{$db_prefix}news_comments` (
   `isApproved` INT(1) NOT NULL default '1',
   `isSpam` INT(1) NOT NULL default '0',
   PRIMARY KEY (`post_id`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+
+DROP TABLE IF EXISTS `{$db_prefix}tos`;
+
+CREATE TABLE `{$db_prefix}tos` (
+  `tos_lang` VARCHAR(255) NOT NULL,
+  `body` TEXT NOT NULL,
+  PRIMARY KEY (`tos_lang`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;

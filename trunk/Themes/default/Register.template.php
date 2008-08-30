@@ -50,7 +50,16 @@ global $cmsurl, $settings, $l, $user;
         <tr>
           <td>&nbsp;</td><td colspan="2"><img src="'.$cmsurl.'image.php" alt="CAPTCHA" /></td>
         </tr>
-        <tr>
+        ';
+      if ($settings['enable_tos'])
+        echo '<tr>
+          <td colspan="2"><input type="checkbox" name="tos" id="tos" /> <label for="tos">'.
+          str_replace('%site%',$settings['site_name'],
+          str_replace('%link%','<a href="'.$cmsurl.'index.php?action=tos" onclick="window.open(this.href); return false;">',
+          str_replace('%/link%','</a>',
+          $l['register_tos']))).'</label></td>
+        </tr>';
+      echo '<tr>
           <td colspan="2"><input type="submit" value="'.$l['register_button'].'"/></td>
         </tr>
       </table>

@@ -57,6 +57,10 @@ global $cmsurl, $settings, $l, $user;
     <p class="main"><a href="'. $cmsurl. 'index.php?action=admin;sa=news" title="'. $l['admin_menu_news']. '">'. $l['admin_menu_news']. '</a></p>
     <p class="desc">'. $l['admin_menu_news_desc']. '</p>  
   </div>
+  <div class="acp_left">
+    <p class="main"><a href="'. $cmsurl. 'index.php?action=admin;sa=tos" title="'. $l['admin_menu_tos']. '">'. $l['admin_menu_tos']. '</a></p>
+    <p class="desc">'. $l['admin_menu_tos_desc']. '</p>  
+  </div>
   ';
 }
 
@@ -110,6 +114,10 @@ global $cmsurl, $settings, $l, $user, $theme_url;
   <div class="acp_right">
     <p class="main"><a href="'. $cmsurl. 'index.php?action=admin;sa=news" title="'. $l['admin_menu_news']. '">'. $l['admin_menu_news']. '</a></p>
     <p class="desc">'. $l['admin_menu_news_desc']. '</p>  
+  </div>
+  <div class="acp_left">
+    <p class="main"><a href="'. $cmsurl. 'index.php?action=admin;sa=tos" title="'. $l['admin_menu_tos']. '">'. $l['admin_menu_tos']. '</a></p>
+    <p class="desc">'. $l['admin_menu_tos_desc']. '</p>  
   </div>
   ';
 }

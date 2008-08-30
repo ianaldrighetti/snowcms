@@ -92,6 +92,9 @@ global $cmsurl, $db_prefix, $l, $settings, $source_dir, $user;
     if(PhpCaptcha::Validate($captcha)) { } else {
       $settings['page']['error'][] = $l['register_error_captcha'];
     }
+    // Did they except the TOS?
+    if (!@$_REQUEST['tos'] && $settings['enable_tos'])
+      $settings['page']['error'][] = $l['register_error_tos'];
     // Did we get no errors? If no, register them
     if(count($settings['page']['error'])==0) {
       // Clean username, encrypt pass, clean email, set time registered

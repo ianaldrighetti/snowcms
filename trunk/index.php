@@ -64,6 +64,8 @@ require_once($source_dir.'/Core.php');
       'register' => array('Register.php','Register'),
       'register3' => array('Register.php','Register3')
     );
+    if ($settings['enable_tos'])
+      $actions['tos'] = array('TOS.php','TOS');
     // Is this action they are requesting even in the $actions array? If not, we don't want an error message.
     // So, lets load the Home() Function
     if(!is_array(@$actions[$_REQUEST['action']])) {
