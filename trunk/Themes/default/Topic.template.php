@@ -65,5 +65,20 @@ echo '
   </div>
 </div>';
 }
+echo '
+<div id="post-container">
+<div id="post-left">
+Quick Reply
+</div>
+<div id="post-right">
+<form action="', $cmsurl, 'forum.php?action=post2;topic=', $settings['topic'], '" method="post" class="write">
+<textarea class="quickreply" name="body"></textarea>
+<input type="submit" value="'. $l['topic_post_button'].'">
+</form>
+</div>
+  <div class="break">
+  </div>
+</div>
+';
 }
 ?>
