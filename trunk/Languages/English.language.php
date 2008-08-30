@@ -507,6 +507,7 @@ $l['news_comment_heading'] = '%subject% by %name% at %date%';
 $l['news_comments'] = 'Comments: %num%';
 $l['news_comment_subject'] = 'Subject:';
 $l['news_comment_submit'] = 'Add Comment';
+$l['news_category_change'] = 'Change';
 $l['news_nonews_title'] = 'News';
 $l['news_nonews_header'] = 'News';
 $l['news_nonews_desc'] = 'Sorry, but there is currently no news, why not check back later?';

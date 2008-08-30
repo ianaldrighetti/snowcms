@@ -18,6 +18,10 @@ function News() {
 global $cmsurl, $db_prefix, $l, $settings, $user;
   // This prepares the news for display...
   
+  // Redirect post data into get data
+  if (@$_POST['cat'])
+    redirect('index.php?action=news;cat='.$_POST['cat']);
+  
   // Are they adding a comment?
   if (@$_REQUEST['add-comment']) {
     // Clean the data of dirty injections
@@ -37,18 +41,26 @@ global $cmsurl, $db_prefix, $l, $settings, $user;
     // The current page number
     $page = @$_REQUEST['pg'];
     
-    // The first member number of this page
+    // The first news article number of this page
     $start = $page * $settings['num_news_items'];
+    
+    // Setup category SQL
+    if ($cat = (int)@$_REQUEST['cat'])
+      $cat_sql = "WHERE `cat_id` = '$cat'";
+    else
+      $cat_sql = "";
     
     $result = sql_query("
       SELECT
         *, mem.display_name AS username, IFNULL(mem.display_name, mem.username) AS username
       FROM {$db_prefix}news AS n
         LEFT JOIN {$db_prefix}members AS mem ON mem.id = n.poster_id
+      $cat_sql
       ORDER BY n.post_time DESC
       LIMIT $start, {$settings['num_news_items']}");
+    $cat_sql = "AND `cat_id` = '$cat'";
     $news = array();
-    // Are there even any news? :O
+    // Is there even any news? :O
     if (mysql_num_rows($result)) {
       while ($row = mysql_fetch_assoc($result)) {
         $comments = mysql_fetch_assoc(sql_query("SELECT COUNT(*) FROM {$db_prefix}news_comments WHERE `nid` = '{$row['news_id']}' GROUP BY `nid`"));
@@ -80,6 +92,11 @@ global $cmsurl, $db_prefix, $l, $settings, $user;
       $settings['page']['next_page'] = $page + 1;
       // The last page number
       $settings['page']['last_page'] = $page - 1;
+      
+      // Load news categories
+      $result = sql_query("SELECT * FROM {$db_prefix}news_categories");
+      while ($row = mysql_fetch_array($result))
+        $settings['page']['categories'][] = $row;
       
       // Load it up :D (the theme thingy)
       $settings['page']['title'] = $l['news_title'];

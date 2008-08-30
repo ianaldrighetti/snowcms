@@ -6,6 +6,9 @@ if(!defined('Snow'))
 function Main() {
 global $cmsurl, $db_prefix, $l, $settings, $user;
   
+  // Load the categories listbox element
+  loadCategories();
+  
   echo '
   <h1>', $l['news_header'], '</h1>';
   
@@ -15,6 +18,12 @@ global $cmsurl, $db_prefix, $l, $settings, $user;
   $next_page = $settings['page']['next_page'];
   $page_end = $settings['page']['last_page'];
   $total_members = 4; //$settings['page']['total_members'];
+  
+  // Show categories
+  echo '<form action="'.$cmsurl.'index.php?action=news" method="post" style="float: right; margin-bottom: 0"><p style="display: inline">
+     '.$settings['page']['categories'].'
+      </p></form>
+      ';
   
   // Show the pervious page link if it is at least page two
   if ($prev_page > 0)
@@ -83,6 +92,12 @@ global $cmsurl, $db_prefix, $l, $settings, $user;
   else
     echo '<td style="text-align: right"></td></tr>
       </table>
+      ';
+  
+  // Show categories
+  echo '<form action="'.$cmsurl.'index.php?action=news" method="post" style="float: right; margin-bottom: 0"><p style="display: inline">
+     '.$settings['page']['categories'].'
+      </p></form>
       ';
 }
 
@@ -269,5 +284,35 @@ global $l;
   
   <p>'.$l['news_nonews_desc'].'</p>
   ';
+}
+
+function loadCategories() {
+global $l, $settings;
+  
+  // Get categories HTML
+  $categories = '
+    <input type="hidden" name="action" value="news" />
+    <select name="cat">
+    ';
+ if (!@$_REQUEST['cat'])
+   $categories .= '<option value="" selected="selected">All</option>
+    ';
+ else
+   $categories .= '<option value="">All</option>
+    ';
+  
+  foreach ($settings['page']['categories'] as $cat) {
+    if (@$_REQUEST['cat'] == $cat['cat_id'])
+      $categories .= '<option value="'.$cat['cat_id'].'" selected="selected">'.$cat['cat_name'].'</option>'."\n";
+    else
+      $categories .= '<option value="'.$cat['cat_id'].'">'.$cat['cat_name'].'</option>'."\n";
+  }
+  $categories .= '</select>';
+  
+  $categories .= '
+          <input type="submit" value="'.$l['news_category_change'].'" />
+          ';
+  
+  $settings['page']['categories'] = $categories;
 }
 ?>
