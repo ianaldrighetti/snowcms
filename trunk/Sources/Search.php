@@ -112,6 +112,19 @@ global $l, $settings, $db_prefix;
       }
       $settings['page']['query'] = $q ? implode(' ',$q) : '';
       
+      // The total amount of members
+      $settings['page']['total_members'] = @mysql_num_rows(sql_query("SELECT * FROM {$db_prefix}topics"));
+      
+      // The previous page number
+      $settings['page']['previous_page'] = $page - 1;
+      // The current page number
+      $settings['page']['current_page'] = (int)$page;
+      // The next page number
+      $settings['page']['next_page'] = $page + 1;
+      
+      // The query for use in URLs
+      $settings['page']['query_url'] = clean(@$_REQUEST['q']);
+      
       // Were there any results?
       if ($settings['page']['results']) {
         // There were, load theme
