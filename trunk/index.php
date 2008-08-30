@@ -62,7 +62,8 @@ require_once($source_dir.'/Core.php');
       'online' => array('Online.php','Online'),
       'profile' => array('Profile.php','Profile'),
       'register' => array('Register.php','Register'),
-      'register3' => array('Register.php','Register3')
+      'register3' => array('Register.php','Register3'),
+      'members' => array('Members.php','loadMlist')
     );
     if ($settings['enable_tos'])
       $actions['tos'] = array('TOS.php','TOS');

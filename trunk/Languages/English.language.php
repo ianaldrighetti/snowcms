@@ -419,6 +419,26 @@ $l['managemembers_error_unsuspend'] = 'Failed to unsuspend member.';
 $l['managemembers_error_ban'] = 'Failed to ban member.';
 $l['managemembers_error_unban'] = 'Failed to unban member.';
 
+// MemberList.template.php
+$l['memberlist_title'] = 'Member List';
+$l['memberlist_header'] = 'Member List';
+$l['memberlist_showing'] = 'Showing members %from% to %to%.';
+$l['memberlist_showing_one'] = 'Showing member %number%.';
+$l['memberlist_showing_none'] = 'No members match this filter.';
+$l['memberlist_next_page'] = 'Next Page';
+$l['memberlist_previous_page'] = 'Previous Page';
+$l['memberlist_id'] = 'ID';
+$l['memberlist_username'] = 'Username';
+$l['memberlist_group'] = 'Group';
+$l['memberlist_join_date'] = 'Join Date';
+$l['memberlist_filter_button'] = 'Filter';
+$l['memberlist_filter_everyone'] = 'Everyone';
+$l['memberlist_filter_active'] = 'Active';
+$l['memberlist_filter_activated'] = 'Activated';
+$l['memberlist_filter_unactivated'] = 'Unactivated';
+$l['memberlist_filter_suspended'] = 'Suspended';
+$l['memberlist_filter_banned'] = 'Banned';
+
 // ManageMenus.template.php
 $l['managemenus_title'] = 'Manage Menus';
 $l['managemenus_header'] = 'Manage Menus';

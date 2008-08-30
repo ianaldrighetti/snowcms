@@ -1,9 +1,9 @@
 <?php
-// default/ManagePages.template.php by SnowCMS Dev's
+// default/ManageMembers.template.php by SnowCMS Dev's
 
 if(!defined('Snow'))
   die("Hacking Attempt...");
-  
+
 function Main() {
 global $l, $db_prefix, $settings, $cmsurl, $theme_url;
   

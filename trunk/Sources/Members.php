@@ -21,7 +21,7 @@ global $cmsurl, $db_prefix, $l, $settings, $user;
     // Are they just viewing the list, or managing a member, or something else perhaps?
     if (!@$_REQUEST['u'] && !@$_REQUEST['ssa']) {
       // K, just load the list of members
-      loadMlist();
+      loadMlist(true);
     }
     elseif (@$_REQUEST['u'] && !@$_REQUEST['ssa']) {
       // :o They are moderating/viewing someone's profile
@@ -46,23 +46,34 @@ global $cmsurl, $db_prefix, $l, $settings, $user;
   }
 }
 
-function loadMlist() {
+function loadMlist($admin = false) {
 global $l, $settings, $db_prefix, $cmsurl;
   
   // Redirect post data into get data
-  if (@$_POST['f'] == 'all' && @$_POST['s'])
-    redirect('index.php?action=admin;sa=members;s='.$_POST['s']);
-  elseif (@$_POST['f'] && @$_POST['s'])
-    redirect('index.php?action=admin;sa=members;f='.$_POST['f'].';s='.$_POST['s']);
-  elseif (@$_POST['f'] == 'all')
-    redirect('index.php?action=admin;sa=members');
-  elseif (@$_POST['f'])
-    redirect('index.php?action=admin;sa=members;f='.$_POST['f']);
-  elseif (@$_POST['s'])
-    redirect('index.php?action=admin;sa=members;s='.$_POST['s']);
-  
-  // The page's title
-  $settings['page']['title'] = $l['managemembers_title'];
+  if ($admin) {
+    if (@$_POST['f'] == 'all' && @$_POST['s'])
+      redirect('index.php?action=admin;sa=members;s='.$_POST['s']);
+    elseif (@$_POST['f'] && @$_POST['s'])
+      redirect('index.php?action=admin;sa=members;f='.$_POST['f'].';s='.$_POST['s']);
+    elseif (@$_POST['f'] == 'all')
+      redirect('index.php?action=admin;sa=members');
+    elseif (@$_POST['f'])
+      redirect('index.php?action=admin;sa=members;f='.$_POST['f']);
+    elseif (@$_POST['s'])
+      redirect('index.php?action=admin;sa=members;s='.$_POST['s']);
+  }
+  else {
+    if (@$_POST['f'] == 'all' && @$_POST['s'])
+      redirect('index.php?action=members;s='.$_POST['s']);
+    elseif (@$_POST['f'] && @$_POST['s'])
+      redirect('index.php?action=members;f='.$_POST['f'].';s='.$_POST['s']);
+    elseif (@$_POST['f'] == 'all')
+      redirect('index.php?action=members');
+    elseif (@$_POST['f'])
+      redirect('index.php?action=members;f='.$_POST['f']);
+    elseif (@$_POST['s'])
+      redirect('index.php?action=members;s='.$_POST['s']);
+  }
   
   // Set some variables' defaults incase they don't get set in the following switch statement
   $settings['manage_members']['id_desc'] = '';
@@ -190,8 +201,16 @@ global $l, $settings, $db_prefix, $cmsurl;
   }
   
   // Load theme to show member lsit
-  if (mysql_num_rows($members))
-    loadTheme('ManageMembers');
+  if (mysql_num_rows($members)) {
+    if ($admin) {
+      $settings['page']['title'] = $l['managemembers_title'];
+      loadTheme('ManageMembers');
+    }
+    else {
+      $settings['page']['title'] = $l['memberlist_title'];
+      loadTheme('MemberList');
+    }
+  }
   else
     loadTheme('ManageMembers','NoMembers');
 }
