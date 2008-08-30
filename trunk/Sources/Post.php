@@ -228,10 +228,12 @@ global $cmsurl, $db_prefix, $l, $settings, $user;
       }
       
       // Is a message being edited and are they allowed to do it?
-      if (($edit = clean(@$_REQUEST['edit'])) && (canforum('edit_own', BoardFromTopic($Topic_ID)) && postOwner(@$_REQUEST['edit']) == $user['id']) || (canforum('edit_any', BoardFromTopic($Topic_ID)))) {
-        // Yep!
-        sql_query("UPDATE {$db_prefix}messages SET `subject` = '$subject', `body` = '$body' WHERE `mid` = '$edit'");
-        redirect('forum.php?board='.clean_header($board_id).';topic='.clean_header($Topic_ID));
+      if (($edit = clean(@$_REQUEST['edit']))) {
+        if ((canforum('edit_own', BoardFromTopic($Topic_ID)) && postOwner(@$_REQUEST['edit']) == $user['id']) || (canforum('edit_any', BoardFromTopic($Topic_ID)))) {
+          // Yep!
+          sql_query("UPDATE {$db_prefix}messages SET `subject` = '$subject', `body` = '$body' WHERE `mid` = '$edit'");
+          redirect('forum.php?topic='.clean_header($Topic_ID));
+        }
       }
       else {
         // Nope!
