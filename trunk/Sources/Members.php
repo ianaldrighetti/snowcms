@@ -64,15 +64,15 @@ global $l, $settings, $db_prefix, $cmsurl;
   }
   else {
     if (@$_POST['f'] == 'all' && @$_POST['s'])
-      redirect('index.php?action=members;s='.$_POST['s']);
+      redirect('forum.php?action=members;s='.$_POST['s']);
     elseif (@$_POST['f'] && @$_POST['s'])
-      redirect('index.php?action=members;f='.$_POST['f'].';s='.$_POST['s']);
+      redirect('forum.php?action=members;f='.$_POST['f'].';s='.$_POST['s']);
     elseif (@$_POST['f'] == 'all')
-      redirect('index.php?action=members');
+      redirect('forum.php?action=members');
     elseif (@$_POST['f'])
-      redirect('index.php?action=members;f='.$_POST['f']);
+      redirect('forum.php?action=members;f='.$_POST['f']);
     elseif (@$_POST['s'])
-      redirect('index.php?action=members;s='.$_POST['s']);
+      redirect('forum.php?action=members;s='.$_POST['s']);
   }
   
   // Set some variables' defaults incase they don't get set in the following switch statement
@@ -208,7 +208,7 @@ global $l, $settings, $db_prefix, $cmsurl;
     }
     else {
       $settings['page']['title'] = $l['memberlist_title'];
-      loadTheme('MemberList');
+      loadForum('MemberList');
     }
   }
   else

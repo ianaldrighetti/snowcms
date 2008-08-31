@@ -11,6 +11,8 @@ global $l, $db_prefix, $settings, $cmsurl, $theme_url;
   loadFilter();
   
   echo '
+    <table class="memberlist"><tr><td>
+    
     <h1>'.$l['memberlist_header'].'</h1>
     ';
   
@@ -40,7 +42,7 @@ global $l, $db_prefix, $settings, $cmsurl, $theme_url;
   
   if ($total_members) {
     // Show filter
-    echo '<form action="'.$cmsurl.'index.php?action=members" method="post" style="float: right; margin-bottom: 0"><p style="display: inline">
+    echo '<form action="'.$cmsurl.'forum.php?action=members" method="post" style="float: right; margin-bottom: 0"><p style="display: inline">
        '.$settings['memberlist']['filter'].'
         </p></form>
         ';
@@ -48,12 +50,12 @@ global $l, $db_prefix, $settings, $cmsurl, $theme_url;
     // Show the pervious page link if it is at least page two
     if ($prev_page > 0)
       echo '<table width="100%">
-        <tr><td><a href="'.$cmsurl.'index.php?action=members;pg='.$prev_page.$filter_get.$sort_get.'">'.$l['memberlist_previous_page'].'</a></td>
+        <tr><td><a href="'.$cmsurl.'forum.php?action=members;pg='.$prev_page.$filter_get.$sort_get.'">'.$l['memberlist_previous_page'].'</a></td>
         ';
     // Show the previous page link if it is page one
     elseif ($prev_page == 0)
       echo '<table width="100%">
-        <tr><td><a href="'.$cmsurl.'index.php?action=members'.$filter_get.$sort_get.'">'.$l['memberlist_previous_page'].'</a></td>
+        <tr><td><a href="'.$cmsurl.'forum.php?action=members'.$filter_get.$sort_get.'">'.$l['memberlist_previous_page'].'</a></td>
         ';
     // Don't show the previous page link, because it is the first page
     else
@@ -62,7 +64,7 @@ global $l, $db_prefix, $settings, $cmsurl, $theme_url;
         ';
     // Show the next page link
     if (@($total_members / $settings['manage_members_per_page']) > $next_page)
-      echo '<td style="text-align: right"><a href="'.$cmsurl.'index.php?action=members;pg='.$next_page.$filter_get.$sort_get.'">'.$l['memberlist_next_page'].'</a></td></tr>
+      echo '<td style="text-align: right"><a href="'.$cmsurl.'forum.php?action=members;pg='.$next_page.$filter_get.$sort_get.'">'.$l['memberlist_next_page'].'</a></td></tr>
         </table>
         ';
     // Don't show the next page link, because it is the last page
@@ -74,17 +76,17 @@ global $l, $db_prefix, $settings, $cmsurl, $theme_url;
     // Show member list header
     echo '<table style="width: 100%; text-align: center">
           <tr>
-            <th style="border-style: solid; border-width: 1px; width: 11%"><a href="'.$cmsurl.'index.php?action=members'.$page_get.$filter_get.';s=id'.$settings['manage_members']['id_desc'].'">'.$l['memberlist_id'].'</a></th>
-            <th style="border-style: solid; border-width: 1px; width: 29%"><a href="'.$cmsurl.'index.php?action=members'.$page_get.$filter_get.';s=username'.$settings['manage_members']['username_desc'].'">'.$l['memberlist_username'].'</a></th>
-            <th style="border-style: solid; border-width: 1px; width: 28%"><a href="'.$cmsurl.'index.php?action=members'.$page_get.$filter_get.';s=group'.$settings['manage_members']['group_desc'].'">'.$l['memberlist_group'].'</a></th>
-            <th style="border-style: solid; border-width: 1px; width: 29%"><a href="'.$cmsurl.'index.php?action=members'.$page_get.$filter_get.';s=joindate'.$settings['manage_members']['joindate_desc'].'">'.$l['memberlist_join_date'].'</a></th>
+            <th style="border-style: solid; border-width: 1px; width: 11%"><a href="'.$cmsurl.'forum.php?action=members'.$page_get.$filter_get.';s=id'.$settings['manage_members']['id_desc'].'">'.$l['memberlist_id'].'</a></th>
+            <th style="border-style: solid; border-width: 1px; width: 29%"><a href="'.$cmsurl.'forum.php?action=members'.$page_get.$filter_get.';s=username'.$settings['manage_members']['username_desc'].'">'.$l['memberlist_username'].'</a></th>
+            <th style="border-style: solid; border-width: 1px; width: 28%"><a href="'.$cmsurl.'forum.php?action=members'.$page_get.$filter_get.';s=group'.$settings['manage_members']['group_desc'].'">'.$l['memberlist_group'].'</a></th>
+            <th style="border-style: solid; border-width: 1px; width: 29%"><a href="'.$cmsurl.'forum.php?action=members'.$page_get.$filter_get.';s=joindate'.$settings['manage_members']['joindate_desc'].'">'.$l['memberlist_join_date'].'</a></th>
           </tr>';
     
     // Show members on this page
     foreach ($members as $member) {
       echo '<tr>
         <td>'.$member['id'].'</td>
-        <td><a href="'.$cmsurl.'index.php?action=profile;u='.$member['id'].'">'.($member['display_name'] ? $member['display_name'] : $member['username']).'</a></td>
+        <td><a href="'.$cmsurl.'forum.php?action=profile;u='.$member['id'].'">'.($member['display_name'] ? $member['display_name'] : $member['username']).'</a></td>
         <td>'.$member['groupname'].'</td><td>'.date($settings['dateformat'],$member['reg_date']).'</td>
       </tr>';
     }
@@ -95,12 +97,12 @@ global $l, $db_prefix, $settings, $cmsurl, $theme_url;
     // Show the pervious page link if it is at least page two
     if ($prev_page > 0)
       echo '<table width="100%">
-        <tr><td><a href="'.$cmsurl.'index.php?action=members;pg='.$prev_page.$filter_get.$sort_get.'">'.$l['memberlist_previous_page'].'</a></td>
+        <tr><td><a href="'.$cmsurl.'forum.php?action=members;pg='.$prev_page.$filter_get.$sort_get.'">'.$l['memberlist_previous_page'].'</a></td>
         ';
     // Show the previous page link if it is page one
     elseif ($prev_page == 0)
       echo '<table width="100%">
-        <tr><td><a href="'.$cmsurl.'index.php?action=members'.$filter_get.$sort_get.'">'.$l['memberlist_previous_page'].'</a></td>
+        <tr><td><a href="'.$cmsurl.'forum.php?action=members'.$filter_get.$sort_get.'">'.$l['memberlist_previous_page'].'</a></td>
         ';
     // Don't show the previous page link, because it is the first page
     else
@@ -109,7 +111,7 @@ global $l, $db_prefix, $settings, $cmsurl, $theme_url;
         ';
     // Show the next page link
     if (@($total_members / $settings['manage_members_per_page']) > $next_page)
-      echo '<td style="text-align: right"><a href="'.$cmsurl.'index.php?action=members;pg='.$next_page.$filter_get.$sort_get.'">'.$l['memberlist_next_page'].'</a></td></tr>
+      echo '<td style="text-align: right"><a href="'.$cmsurl.'forum.php?action=members;pg='.$next_page.$filter_get.$sort_get.'">'.$l['memberlist_next_page'].'</a></td></tr>
         </table>
         ';
     // Don't show the next page link, because it is the last page
@@ -119,10 +121,13 @@ global $l, $db_prefix, $settings, $cmsurl, $theme_url;
         ';
     
     // Show filter
-    echo '<form action="'.$cmsurl.'index.php" method="post" style="float: right; margin-bottom: 0"><p style="display: inline">
+    echo '<form action="'.$cmsurl.'forum.php" method="post" style="float: right; margin-bottom: 0"><p style="display: inline">
        '.$settings['memberlist']['filter'].'
        </p></form>';
   }
+  
+  echo '
+  </td></tr></table>';
 }
 
 function loadFilter() {

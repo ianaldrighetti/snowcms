@@ -58,7 +58,7 @@ require_once($source_dir.'/Core.php');
     // they want an action O.o Want some fries with that shake? lol
     $actions = array(
       'lock' => array('Topic.php','Lock'),
-      'members' => array('Members.php','ForumList'),
+      'members' => array('Members.php','loadMlist'),
       'pm' => array('PersonalMessages.php','PM'),
       'post' => array('Post.php','Post'),
       'post2' => array('Post.php','Post2'),
