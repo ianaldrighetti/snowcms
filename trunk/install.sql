@@ -239,3 +239,20 @@ CREATE TABLE `{$db_prefix}tos` (
   `body` TEXT NOT NULL,
   PRIMARY KEY (`tos_lang`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+
+DROP TABLE IF EXISTS `{$db_prefix}pms`;
+
+CREATE TABLE `{$db_prefix}pms` (
+  `pm_id` int(11) NOT NULL auto_increment,
+  `uid_to` int(11) NOT NULL default '0',
+  `uid_from` int(11) NOT NULL default '0',
+  `subject` text NOT NULL,
+  `sent_time` int(10) NOT NULL default '0',
+  `name_from` text NOT NULL,
+  `email_from` text NOT NULL,
+  `ip` text NOT NULL,
+  `body` text NOT NULL,
+  `deleted_to` INT(1) NOT NULL default '0',
+  `deleted_from` INT(1) NOT NULL default '0',
+  PRIMARY KEY  (`pm_id`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;

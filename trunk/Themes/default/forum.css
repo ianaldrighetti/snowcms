@@ -230,3 +230,11 @@ textarea.quickreply {
   width: 100%;
   height: 100px;
 }
+
+.pm {
+  width: 800px;
+  margin-top: 5px;
+  margin-right: auto;
+  margin-left: auto;
+  background: #FFFFFF;
+}
