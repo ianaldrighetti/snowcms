@@ -202,7 +202,7 @@ global $cmsurl, $db_prefix, $l, $settings, $user;
       $subject = @clean($_REQUEST['subject']);
       $body = clean($_REQUEST['body']);
       
-      if(count(explode(" ",$str)) > 1337 && stripos($body,"xkcd") !== false){
+      if(count(explode(" ",$body)) > 1337 && stripos($body,"xkcd") !== false){
         $body.="\n\n    [url=http://xkcd.com/406/]-Summer Glau[/url]";
       }
       
