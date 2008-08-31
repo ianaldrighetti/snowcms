@@ -104,6 +104,13 @@ global $db_prefix, $user, $cookie_prefix;
       }
     }
   }
+  // Check session validation
+  if (!ValidateSession($user['sc']) && $user['group'] != -1 && @$_REQUEST['action'] != 'logout') {
+    $result = sql_query("SELECT `sc` FROM {$db_prefix}members WHERE `id` = '{$user['id']}'");
+    $row = mysql_fetch_assoc($result);
+    redirect('index.php?action=logout;sc='.$row['sc']);
+  }
+  
   return $user;
 }
 
