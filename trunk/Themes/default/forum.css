@@ -238,3 +238,13 @@ textarea.quickreply {
   margin-left: auto;
   background: #FFFFFF;
 }
+
+.code-outer {
+  border-style: solid;
+  border-width: 1px;
+  margin: 5px;
+}
+.code-inner {
+  margin: 5px;
+  font-family: 'Courier New';
+}

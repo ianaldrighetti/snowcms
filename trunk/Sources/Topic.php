@@ -164,7 +164,7 @@ global $cmsurl, $db_prefix, $l, $settings, $user;
   }   
 }
 function paginate($topic) {
-global $cmsurl, $db_prefix, $settings;
+global $l, $cmsurl, $db_prefix, $settings;
 
  $query = mysql_query("SELECT * FROM {$db_prefix}messages WHERE `tid` = $topic");
  $num_posts = mysql_num_rows($query);
