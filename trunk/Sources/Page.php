@@ -50,59 +50,92 @@ global $cmsurl, $db_prefix, $l, $settings, $user;
   if (@$_REQUEST['redirect'])
     redirect('index.php?action=admin;sa=pages');
   
+  $page = @$_GET['page'];
+  
   // If a page is set then we should be editing a page, not listing them
-  if (@$_GET['page'])
-    EditPage();
-  elseif(can('manage_pages')) { 
+  if ($page) {
+    // Are they allowed to modify pages?
+    if (can('manage_pages_modify'))
+      // Are they modifing the homepage and if so, are they allowed to?
+      if ($page != $settings['homepage'] || can('manage_pages_home'))
+        EditPage();
+      else {
+      $_SESSION['error'] = $l['managepages_error_notallowed_homepage'];
+      redirect('index.php?action=admin;sa=pages');
+    }
+    else {
+      $_SESSION['error'] = $l['managepages_error_notallowed_modify'];
+      redirect('index.php?action=admin;sa=pages');
+    }
+  }
+  elseif (can('manage_pages_modify') || can('manage_pages_create') || can('manage_pages_delete') || can('manage_pages_home')) {
     $settings['page']['make_page']['do'] = false;
     $settings['page']['update_page'] = 0;
     // Do we need to update a page?
-    if(!empty($_REQUEST['update_page'])) {
-      // If so, get the info, and clean it :P
-      $page = clean($_REQUEST['page']);
-      if (!($page_title = clean($_REQUEST['page_title']))) {
-        // If they remove the page title, they'll regret it later
-        $_SESSION['error'] = $l['managepages_no_title'];
-        redirect('index.php?action=admin;sa=pages;page='.clean_header($page));
+    if (!empty($_REQUEST['update_page'])) {
+      // Are they allowed to modify pages?
+      if (can('manage_pages_modify')) {
+        if (!($page_title = clean($_REQUEST['page_title']))) {
+          // If they remove the page title, they'll regret it later
+          $_SESSION['error'] = $l['managepages_no_title'];
+          redirect('index.php?action=admin;sa=pages;page='.clean_header($page));
+        }
+        $page_content = addslashes($_REQUEST['page_content']);
+  	    if(isset($_REQUEST['page_show_info']))
+	      	$page_show_info = $_REQUEST['page_show_info'];
+	      else
+		      $page_show_info = 0;
+        // Update it
+        $result = sql_query("UPDATE {$db_prefix}pages SET `title` = '{$page_title}', `content` = '{$page_content}' WHERE `page_id` = '{$page}'");
       }
-      $page_content = addslashes($_REQUEST['page_content']);
-  	  if(isset($_REQUEST['page_show_info']))
-	    	$page_show_info = $_REQUEST['page_show_info'];
-	    else
-		    $page_show_info = 0;
-      // Update it
-      $result = sql_query("UPDATE {$db_prefix}pages SET `title` = '{$page_title}', `content` = '{$page_content}' WHERE `page_id` = '{$page}'");
+      // They are not allowed to modify pages
+      else
+        $_SESSION['error'] = $l['managepages_error_notallowed_modify'];
       redirect('index.php?action=admin;sa=pages');
     }
     // Do they want to change which page is the homepage?
     if (@$_REQUEST['homepage']) {
-      // Clean it to prevent dirty hacking
-      $homepage = clean($_REQUEST['homepage']);
-      // Check if that page exists
-      if (mysql_num_rows(sql_query("SELECT * FROM {$db_prefix}pages WHERE `page_id` = '$homepage'")))
-        // Change the homepage
-        sql_query("UPDATE {$db_prefix}settings SET `value` = '$homepage' WHERE `variable` = 'homepage'");
+      // Are they allowed to change the homepage?
+      if (can('manage_pages_home')) {
+        // Clean it to prevent dirty hacking
+        $homepage = clean($_REQUEST['homepage']);
+        // Check if that page exists
+        if (mysql_num_rows(sql_query("SELECT * FROM {$db_prefix}pages WHERE `page_id` = '$homepage'")))
+          // Change the homepage
+          sql_query("UPDATE {$db_prefix}settings SET `value` = '$homepage' WHERE `variable` = 'homepage'");
+        else
+          $_SESSION['error'] = $l['managepages_error_invalid_homepage'];
+      }
+      // They can't change the homepage
       else
-        $_SESSION['error'] = $l['managepages_error_invalid_homepage'];
+        $_SESSION['error'] = $l['managepages_error_notallowed_homepage'];
       // Redirect them so that if they refresh it won't do it again
       redirect('index.php?action=admin;sa=pages');
     }
     // Do they want to delete a page?
     if (@$_REQUEST['did']) {
-      // Is their session valid?
-      if (ValidateSession(@$_REQUEST['sc'])) {
-        // Are they trying to delete the homepage?
-        if ($settings['homepage'] != $_REQUEST['did']) {
-          // Clean anything that's used in an SQL query
-          $did = clean($_REQUEST['did']);
-          // Delete the page
-          sql_query("DELETE FROM {$db_prefix}pages WHERE `page_id` = '$did'");
+      // Are they allowed to delete pages?
+      if (can('manage_pages_delete')) {
+        // Is their session valid?
+        if (ValidateSession(@$_REQUEST['sc'])) {
+          // Are they trying to delete the homepage?
+          if ($settings['homepage'] != $_REQUEST['did']) {
+            // Clean anything that's used in an SQL query
+            $did = clean($_REQUEST['did']);
+            // Delete the page
+            sql_query("DELETE FROM {$db_prefix}pages WHERE `page_id` = '$did'");
+          }
+          // They are trying to delete the homepage
+          else
+            $_SESSION['error'] = $l['managepages_error_delete_homepage'];
         }
+        // Their session verification failed
         else
-          $_SESSION['error'] = $l['managepages_error_delete_homepage'];
+          $_SESSION['error'] = $l['managepages_error_invalid_session'];
       }
+      // They are not allowed to delete pages
       else
-        $_SESSION['error'] = $l['managepages_error_invalid_session'];
+        $_SESSION['error'] = $l['managepages_error_notallowed_delete'];
       // Get the sort query
       $s = clean_header(@$_REQUEST['s'] ? ';s='.$_REQUEST['s'] : '');
       // Get the page
@@ -112,25 +145,31 @@ global $cmsurl, $db_prefix, $l, $settings, $user;
     }
     // Or are we supposed to create a page?
     if(!empty($_REQUEST['create_page'])) {
-      $settings['page']['make_page']['do'] = true;  
-      // Who is the Page Owner? (Their User ID)
-      $page_owner = clean($user['id']);
-      // We save their name, just incase their account is deleted
-      $owner_name = clean($user['name']);
-      // The Time stamp of when it was made
-      $create_date = time();
-      // Clean the page's title
-		  if (!($title = clean($_REQUEST['page_title']))) {
-		    // They didn't even enter a page title
-		    $_SESSION['error'] = $l['managepages_no_title'];
-		    redirect('index.php?action=admin;sa=pages');
-		  }
-      // Insert it
-      $result = sql_query("INSERT INTO {$db_prefix}pages (`page_owner`,`owner_name`,`create_date`,`title`) VALUES('{$page_owner}','{$owner_name}','{$create_date}','{$title}')");
-      if(!$result) {
-        // Oh NOES! It failed!
-        $_SESSION['error'] = str_replace('%title%',$title,$l['managepages_make_fail']);
+      // Are they allowed to create a page?
+      if (can('manage_pages_create')) {
+        $settings['page']['make_page']['do'] = true;  
+        // Who is the Page Owner? (Their User ID)
+        $page_owner = clean($user['id']);
+        // We save their name, just incase their account is deleted
+        $owner_name = clean($user['name']);
+        // The Time stamp of when it was made
+        $create_date = time();
+        // Clean the page's title
+		    if (!($title = clean($_REQUEST['page_title']))) {
+		      // They didn't even enter a page title
+		      $_SESSION['error'] = $l['managepages_no_title'];
+		      redirect('index.php?action=admin;sa=pages');
+		    }
+        // Insert it
+        $result = sql_query("INSERT INTO {$db_prefix}pages (`page_owner`,`owner_name`,`create_date`,`title`) VALUES('{$page_owner}','{$owner_name}','{$create_date}','{$title}')");
+        if(!$result) {
+          // Oh NOES! It failed!
+          $_SESSION['error'] = str_replace('%title%',$title,$l['managepages_make_fail']);
+        }
       }
+      // They are not allowed to create pages
+      else
+        $_SESSION['error'] = $l['managepages_error_notallowed_create'];
       redirect('index.php?action=admin;sa=pages');
     }
     

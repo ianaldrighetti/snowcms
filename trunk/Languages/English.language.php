@@ -190,6 +190,10 @@ $l['managepages_edit_show_info'] = 'Show extra page info';
 $l['managepages_error_invalid_session'] = 'Your session verification failed. Please try again.';
 $l['managepages_error_invalid_homepage'] = 'That is an invalid page.';
 $l['managepages_error_delete_homepage'] = 'You cannot delete the homepage.';
+$l['managepages_error_notallowed_modify'] = 'You are not allowed to modify pages.';
+$l['managepages_error_notallowed_create'] = 'You are not allowed to create pages.';
+$l['managepages_error_notallowed_delete'] = 'You are not allowed to delete pages.';
+$l['managepages_error_notallowed_homepage'] = 'You are not allowed to change the homepage.';
 
 // Some Email stuff, for Email Activation, etc.
 $l['mail_smtp_fail'] = 'Sending email failed! Error: %error%';
@@ -315,7 +319,10 @@ $l['permissions_perm_manage_basic-settings'] = 'Allow them to edit basic setting
 $l['permissions_perm_manage_members'] = 'Allow them to manage members';
 $l['permissions_perm_manage_menus'] = 'Allow them to manage menus';
 $l['permissions_perm_manage_news'] = 'Allow them to manage news';
-$l['permissions_perm_manage_pages'] = 'Allow them to manage pages';
+$l['permissions_perm_manage_pages_modify'] = 'Allow them to modify pages';
+$l['permissions_perm_manage_pages_create'] = 'Allow them to create new pages';
+$l['permissions_perm_manage_pages_delete'] = 'Allow them to delete pages';
+$l['permissions_perm_manage_pages_home'] = 'Allow them to modify the homepage';
 $l['permissions_perm_manage_permissions'] = 'Allow them to manage permissions';
 $l['permissions_perm_manage_forum_perms'] = 'Allow them to manage forum permissions';
 $l['permissions_perm_moderate_username'] = 'Allow them to change members\' usernames.';

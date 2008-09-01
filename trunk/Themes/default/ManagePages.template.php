@@ -34,12 +34,16 @@ global $cmsurl, $settings, $l, $user, $theme_url;
       </div>';    
     }
   }
+  
+  if (can('manage_pages_create'))
   echo '
   <form action="'.$cmsurl.'index.php?action=admin;sa=pages" method="post">
     <p><input type="hidden" name="create_page" value="true"></p>
     <p><label>'.$l['managepages_newpagetitle'].'</label> <input name="page_title" type="text" /> <input type="submit" value="'.$l['managepages_createpage'].'" /></p>
   </form>
+  ';
   
+  echo '
   <form action="'.$cmsurl.'index.php?action=admin;sa=pages" method="post">
   ';
   
@@ -76,8 +80,8 @@ global $cmsurl, $settings, $l, $user, $theme_url;
   
   echo '<table width="100%" style="text-align: center">
     <tr>
-      <th style="width: 4%"></th>
-      <th style="border-style: solid; border-width: 1px; width: 38%"><a href="'.$cmsurl.'index.php?action=admin;sa=pages'.$pg.';s=title'.
+      <th style="width: 5%"></th>
+      <th style="border-style: solid; border-width: 1px; width: 37%"><a href="'.$cmsurl.'index.php?action=admin;sa=pages'.$pg.';s=title'.
         ($settings['page']['sort'] == 'title' ? '_desc' : '')
         .'">'.$l['managepages_pagetitle'].'</a></th>
       <th style="border-style: solid; border-width: 1px; width: 22%"><a href="'.$cmsurl.'index.php?action=admin;sa=pages'.$pg.';s=owner'.
@@ -91,19 +95,34 @@ global $cmsurl, $settings, $l, $user, $theme_url;
   foreach($settings['page']['pages'] as $page) {
     echo '
     <tr>';
-    if ($settings['homepage'] == $page['page'])
+    if (!can('manage_pages_home'))
+      echo '<td></td>
+    ';
+    elseif ($settings['homepage'] == $page['page'])
       echo '<td><input type="radio" name="homepage" value="'.$page['page'].'" checked="checked"></td>
     ';
     else
       echo '<td><input type="radio" name="homepage" value="'.$page['page'].'"></td>
     ';
-    echo '<td><a href="'.$cmsurl.'index.php?action=admin;sa=pages;page='.$page['page'].'">'.$page['title'].'</a></td><td>';
+    
+    if (can('manage_pages_modify'))
+      echo '<td><a href="'.$cmsurl.'index.php?action=admin;sa=pages;page='.$page['page'].'">'.$page['title'].'</a></td><td>';
+    else
+      echo '<td>'.$page['title'].'</td><td>';
+    
     if ($page['page_owner'] != -1)
       echo '<a href="'.$cmsurl.'index.php?action=profile;u='.$page['page_owner'].'">'.$page['owner'].'</a>';
     else
       echo $page['owner'];
     
-    echo '</td><td>'.$page['date'].'</td><td><a href="'.$cmsurl.'index.php?action=admin;sa=pages'.$s.$pg.';did='.$page['page'].';sc='.$user['sc'].'" onclick="return confirm(\'', $l['managepages_delete_areyousure'], '\');"><img src="'.$theme_url.'/'.$settings['theme'].'/images/delete.png" alt="'.$l['managepages_delete'].'" width="15" height="15" style="border: 0" /></a></td>
+    echo '</td><td>'.$page['date'].'</td>';
+    
+    if (can('manage_pages_delete'))
+      echo '<td><a href="'.$cmsurl.'index.php?action=admin;sa=pages'.$s.$pg.';did='.$page['page'].';sc='.$user['sc'].'" onclick="return confirm(\'', $l['managepages_delete_areyousure'], '\');"><img src="'.$theme_url.'/'.$settings['theme'].'/images/delete.png" alt="'.$l['managepages_delete'].'" width="15" height="15" style="border: 0" /></a></td>';
+    else
+      echo '<td></td>';
+    
+    echo '
     </tr>';
   }
   echo '
@@ -136,7 +155,8 @@ global $cmsurl, $settings, $l, $user, $theme_url;
       </table>
       ';
   
-  echo '<p><input type="submit" value="'.$l['managepages_change_homepage'].'" /></p>
+  if (can('manage_pages_home'))
+    echo '<p><input type="submit" value="'.$l['managepages_change_homepage'].'" /></p>
   
   </form>';
   
