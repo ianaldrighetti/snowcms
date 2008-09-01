@@ -26,7 +26,7 @@ global $cmsurl, $settings, $l, $user;
 	
   <h2>'.$l['admin_options'].'</h2>
   <div class="acp_left">
-    <p class="main"><a href="'. $cmsurl. 'index.php?action=admin;sa=managepages" title="'. $l['admin_menu_managepages']. '">'. $l['admin_menu_managepages']. '</a></p>
+    <p class="main"><a href="'. $cmsurl. 'index.php?action=admin;sa=pages" title="'. $l['admin_menu_managepages']. '">'. $l['admin_menu_managepages']. '</a></p>
     <p class="desc">'. $l['admin_menu_managepages_desc']. '</p>
   </div>
   <div class="acp_right">
@@ -84,7 +84,7 @@ global $cmsurl, $settings, $l, $user, $theme_url;
 	
   <h2>'.$l['admin_options'].'</h2>
   <div class="acp_left">
-    <p class="main"><a href="'. $cmsurl. 'index.php?action=admin;sa=managepages" title="'. $l['admin_menu_managepages']. '">'. $l['admin_menu_managepages']. '</a></p>
+    <p class="main"><a href="'. $cmsurl. 'index.php?action=admin;sa=pages" title="'. $l['admin_menu_managepages']. '">'. $l['admin_menu_managepages']. '</a></p>
     <p class="desc">'. $l['admin_menu_managepages_desc']. '</p>
   </div>
   <div class="acp_right">

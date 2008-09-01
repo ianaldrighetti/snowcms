@@ -31,14 +31,18 @@ if(!defined("Snow"))
   
 function Admin() {
 global $cmsurl, $db_prefix, $l, $settings, $source_dir, $user;
+  
+  // This variable will be set if redirection is required to stop IE showing an alert if refreshed
+  if (@$_REQUEST['redirect'] == 'admin')
+    redirect('index.php?action=admin');
+  
   if(can('admin')) {
     if(!empty($_REQUEST['sa'])) {
       $sa = array(
         'basic-settings' => array('Settings.php','BasicSettings'),
-        'editpage' => array('Page.php','EditPage'),
         'forum' => array('ManageForum.php','ManageForum'),
         'groups' => array('Groups.php','ManageGroups'),
-        'managepages' => array('Page.php','ManagePages'),
+        'pages' => array('Page.php','ManagePages'),
         'members' => array('Members.php','ManageMembers'),
         'permissions' => array('Permissions.php','GroupPermissions'),
         'menus' => array('Menus.php','ManageMenus'),

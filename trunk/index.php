@@ -38,12 +38,12 @@ require_once($source_dir.'/Core.php');
   WriteOnline();
   
   // What should we do? ._.
-  if((empty($_REQUEST['action'])) && (empty($_REQUEST['page']))) {
+  if(empty($_REQUEST['action']) && empty($_REQUEST['page'])) {
     // Neither the ?action= is set, nor the ?page= is set, so load Home()
     require_once($source_dir.'/Main.php');
       Home();
   }
-  elseif(!empty($_REQUEST['page'])) {
+  elseif(!empty($_REQUEST['page']) && empty($_REQUEST['action'])) {
     // ?page= is not empty, load the page
     require_once($source_dir.'/Page.php');
       Page();

@@ -17,6 +17,7 @@ if(!defined("Snow"))
 // Displays the page
 function Page($main_page = false) {
 global $cmsurl, $db_prefix, $l, $settings, $user;
+  
   // If Main Page is true, we need to show the Page ID Set to be shown at the Home, or else get ?page=
   if($main_page) 
     $PageID = $settings['homepage'];
@@ -44,17 +45,25 @@ global $cmsurl, $db_prefix, $l, $settings, $user;
 // An Admin Function to Make/Manage Pages
 function ManagePages() {
 global $cmsurl, $db_prefix, $l, $settings, $user;
-  if(can('manage_pages')) { 
+  
+  // This variable will be set if redirection is required to stop IE showing an alert if refreshed
+  if (@$_REQUEST['redirect'])
+    redirect('index.php?action=admin;sa=pages');
+  
+  // If a page is set then we should be editing a page, not listing them
+  if (@$_GET['page'])
+    EditPage();
+  elseif(can('manage_pages')) { 
     $settings['page']['make_page']['do'] = false;
     $settings['page']['update_page'] = 0;
     // Do we need to update a page?
     if(!empty($_REQUEST['update_page'])) {
       // If so, get the info, and clean it :P
-      $page_id = clean($_REQUEST['page_id']);
+      $page = clean($_REQUEST['page']);
       if (!($page_title = clean($_REQUEST['page_title']))) {
         // If they remove the page title, they'll regret it later
         $_SESSION['error'] = $l['managepages_no_title'];
-        redirect('index.php?action=admin;sa=editpage;page_id='.clean_header($page_id));
+        redirect('index.php?action=admin;sa=pages;page='.clean_header($page));
       }
       $page_content = addslashes($_REQUEST['page_content']);
   	  if(isset($_REQUEST['page_show_info']))
@@ -62,33 +71,40 @@ global $cmsurl, $db_prefix, $l, $settings, $user;
 	    else
 		    $page_show_info = 0;
       // Update it
-      $result = sql_query("UPDATE {$db_prefix}pages SET `title` = '{$page_title}', `content` = '{$page_content}' WHERE `page_id` = '{$page_id}'");
-      if($result) {
-        // It was successful!
-        $settings['page']['update_page'] = 1;
-      }
-      else {
-        // Wasn't Successful! Oh Noes!
-        $settings['page']['update_page'] = 2;
-      }
+      $result = sql_query("UPDATE {$db_prefix}pages SET `title` = '{$page_title}', `content` = '{$page_content}' WHERE `page_id` = '{$page}'");
+      redirect('index.php?action=admin;sa=pages');
     }
-    // Do they want to change switch page is the homepage?
+    // Do they want to change which page is the homepage?
     if (@$_REQUEST['homepage']) {
       // Clean it to prevent dirty hacking
       $homepage = clean($_REQUEST['homepage']);
-      // Change the homepage
-      sql_query("UPDATE {$db_prefix}settings SET `value` = '$homepage' WHERE `variable` = 'homepage'") or ($_SESSION['error'] = $l['managepages_error_change_homepage']);
+      // Check if that page exists
+      if (mysql_num_rows(sql_query("SELECT * FROM {$db_prefix}pages WHERE `page_id` = '$homepage'")))
+        // Change the homepage
+        sql_query("UPDATE {$db_prefix}settings SET `value` = '$homepage' WHERE `variable` = 'homepage'");
+      else
+        $_SESSION['error'] = $l['managepages_error_invalid_homepage'];
       // Redirect them so that if they refresh it won't do it again
-      redirect('index.php?action=admin;sa=managepages');
+      redirect('index.php?action=admin;sa=pages');
     }
     // Do they want to delete a page?
     if (@$_REQUEST['did']) {
-      // Clean anything that's used in an SQL query
-      $did = clean($_REQUEST['did']);
-      // Delete the page
-      sql_query("DELETE FROM {$db_prefix}pages WHERE `page_id` = '$did'");
+      // Is their session valid?
+      if (ValidateSession(@$_REQUEST['sc'])) {
+        // Are they trying to delete the homepage?
+        if ($settings['homepage'] != $_REQUEST['did']) {
+          // Clean anything that's used in an SQL query
+          $did = clean($_REQUEST['did']);
+          // Delete the page
+          sql_query("DELETE FROM {$db_prefix}pages WHERE `page_id` = '$did'");
+        }
+        else
+          $_SESSION['error'] = $l['managepages_error_delete_homepage'];
+      }
+      else
+        $_SESSION['error'] = $l['managepages_error_invalid_session'];
       // Redirect them so that if they refresh it won't do it again
-      redirect('index.php?action=admin;sa=managepages');
+      redirect('index.php?action=admin;sa=pages');
     }
     // Or are we supposed to create a page?
     if(!empty($_REQUEST['create_page'])) {
@@ -103,7 +119,7 @@ global $cmsurl, $db_prefix, $l, $settings, $user;
 		  if (!($title = clean($_REQUEST['page_title']))) {
 		    // They didn't even enter a page title
 		    $_SESSION['error'] = $l['managepages_no_title'];
-		    redirect('index.php?action=admin;sa=managepages');
+		    redirect('index.php?action=admin;sa=pages');
 		  }
       // Insert it
       $result = sql_query("INSERT INTO {$db_prefix}pages (`page_owner`,`owner_name`,`create_date`,`title`) VALUES('{$page_owner}','{$owner_name}','{$create_date}','{$title}')");
@@ -111,10 +127,19 @@ global $cmsurl, $db_prefix, $l, $settings, $user;
         // Oh NOES! It failed!
         $_SESSION['error'] = str_replace('%title%',$title,$l['managepages_make_fail']);
       }
-      redirect('index.php?action=admin;sa=managepages');
+      redirect('index.php?action=admin;sa=pages');
     }
-    // The current page
+    
+    // The current page number
     $page = @$_REQUEST['pg'];
+    // If the page number is lower then zero then make it zero
+    if ($page < 0)
+      $page = 0;
+    // The total amount of pages, real pages, not from the pagination
+    $settings['page']['total_pages'] = mysql_num_rows(sql_query("SELECT * FROM {$db_prefix}pages"));
+    // If page number is higher then maximum, lower it until it isn't
+    while ($settings['num_pages'] * $page >= $settings['page']['total_pages'] && $page > 0)
+      $page -= 1;
     // Get the first page on this page, confusing, no?
     $start = $page * $settings['num_pages'];
     
@@ -140,7 +165,7 @@ global $cmsurl, $db_prefix, $l, $settings, $user;
         else
           $owner = $row['username'];
         $pages[] = array(
-          'page_id' => $row['page_id'],
+          'page' => $row['page_id'],
           'title' => $row['title'],
           'page_owner' => $page_owner,
           'owner' => $owner,
@@ -148,8 +173,6 @@ global $cmsurl, $db_prefix, $l, $settings, $user;
         );          
       }
     
-    // The total amount of pages, real pages, not from the pagination
-    $settings['page']['total_pages'] = mysql_num_rows(sql_query("SELECT * FROM {$db_prefix}pages"));
     // The previous page number
     $settings['page']['previous_page'] = $page - 1;
     // The current page number
@@ -175,15 +198,15 @@ function EditPage() {
 global $cmsurl, $db_prefix, $l, $settings, $user;
   if(can('manage_pages')) {  
     // Get the Page ID and clean it!
-    $page_id = (int)addslashes(mysql_real_escape_string($_REQUEST['page_id']));
-    if(!empty($page_id)) {
+    $page = (int)addslashes(mysql_real_escape_string(@$_REQUEST['page']));
+    if(!empty($page)) {
       // Get it!
-      $result = sql_query("SELECT * FROM {$db_prefix}pages WHERE `page_id` = '{$page_id}'");
+      $result = sql_query("SELECT * FROM {$db_prefix}pages WHERE `page_id` = '{$page}'");
       // Does it exist? o.O
-      if(mysql_num_rows($result)>0) {
+      if(mysql_num_rows($result)) {
         while($row = mysql_fetch_assoc($result)) {
           $page = array(
-            'page_id' => $row['page_id'],
+            'page' => $row['page_id'],
             'title' => $row['title'],
             'content' => stripslashes($row['content'])
           );
@@ -192,7 +215,7 @@ global $cmsurl, $db_prefix, $l, $settings, $user;
           $settings['page']['edit_page'] = $page;
           $settings['page']['edit_page']['content'] = clean($settings['page']['edit_page']['content']);
           $settings['page']['title'] = str_replace("%title%", $page['title'], $l['managepages_edit_title']);
-          $settings['page']['all-pages'] = sql_query("SELECT * FROM {$db_prefix}pages") or die('Internal error');
+          $settings['page']['all-pages'] = sql_query("SELECT * FROM {$db_prefix}pages");
           loadTheme('ManagePages','Editor');
         }
       }
@@ -203,13 +226,13 @@ global $cmsurl, $db_prefix, $l, $settings, $user;
       }
     }
     else {
-      // $page_id is empty, load the error...
+      // $page is empty, load the error...
       $settings['page']['title'] = $l['managepages_no_page_title'];
       loadTheme('ManagePages','NoPage');
     }
   }
   else {
-    // They cant manage pages, why should they be able to edit them? xD
+    // They can't manage pages, why should they be able to edit them? xD
     $settings['page']['title'] = $l['admin_error_title'];
     loadTheme('Admin','Error');
   }
