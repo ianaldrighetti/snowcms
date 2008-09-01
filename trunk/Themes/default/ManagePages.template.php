@@ -6,6 +6,10 @@ if(!defined('Snow'))
 
 function Main() {
 global $cmsurl, $settings, $l, $user, $theme_url;
+  
+  $pg = $settings['page']['current_page'] ? ';pg='.$settings['page']['current_page'] : '';
+  $s = $settings['page']['sort'] ? ';s='.$settings['page']['sort'] : '';
+  
   echo '
   <h1>'.$l['managepages_header'].'</h1>
   ';
@@ -47,12 +51,12 @@ global $cmsurl, $settings, $l, $user, $theme_url;
   // Show the pervious page link if it is at least page two
   if ($prev_page > 0)
     echo '<table width="100%">
-      <tr><td><a href="'.$cmsurl.'index.php?action=admin;sa=pages;pg='.$prev_page.'">'.$l['memberlist_previous_page'].'</a></td>
+      <tr><td><a href="'.$cmsurl.'index.php?action=admin;sa=pages'.$s.';pg='.$prev_page.'">'.$l['memberlist_previous_page'].'</a></td>
        ';
   // Show the previous page link if it is page one
   elseif ($prev_page == 0)
     echo '<table width="100%">
-      <tr><td><a href="'.$cmsurl.'index.php?action=admin;sa=pages">'.$l['memberlist_previous_page'].'</a></td>
+      <tr><td><a href="'.$cmsurl.'index.php?action=admin;sa=pages'.$s.'">'.$l['memberlist_previous_page'].'</a></td>
       ';
   // Don't show the previous page link, because it is the first page
   else
@@ -61,7 +65,7 @@ global $cmsurl, $settings, $l, $user, $theme_url;
       ';
   // Show the next page link
   if (@($total_pages / $settings['num_pages']) > $next_page)
-    echo '<td style="text-align: right"><a href="'.$cmsurl.'index.php?action=admin;sa=pages;pg='.$next_page.'">'.$l['memberlist_next_page'].'</a></td></tr>
+    echo '<td style="text-align: right"><a href="'.$cmsurl.'index.php?action=admin;sa=pages'.$s.';pg='.$next_page.'">'.$l['memberlist_next_page'].'</a></td></tr>
       </table>
       ';
   // Don't show the next page link, because it is the last page
@@ -72,11 +76,17 @@ global $cmsurl, $settings, $l, $user, $theme_url;
   
   echo '<table width="100%" style="text-align: center">
     <tr>
-      <th></th>
-      <th style="border-style: solid; border-width: 1px">'.$l['managepages_pagetitle'].'</th>
-      <th style="border-style: solid; border-width: 1px">'.$l['managepages_pageowner'].'</th>
-      <th style="border-style: solid; border-width: 1px">'.$l['managepages_datemade'].'</th>
-      <th></th>
+      <th style="width: 4%"></th>
+      <th style="border-style: solid; border-width: 1px; width: 38%"><a href="'.$cmsurl.'index.php?action=admin;sa=pages'.$pg.';s=title'.
+        ($settings['page']['sort'] == 'title' ? '_desc' : '')
+        .'">'.$l['managepages_pagetitle'].'</a></th>
+      <th style="border-style: solid; border-width: 1px; width: 22%"><a href="'.$cmsurl.'index.php?action=admin;sa=pages'.$pg.';s=owner'.
+        ($settings['page']['sort'] == 'owner' ? '_desc' : '')
+        .'">'.$l['managepages_pageowner'].'</a></th>
+      <th style="border-style: solid; border-width: 1px; width: 32%"><a href="'.$cmsurl.'index.php?action=admin;sa=pages'.$pg.';s=creationdate'.
+        ($settings['page']['sort'] == 'creationdate' ? '_desc' : '')
+        .'">'.$l['managepages_datemade'].'</a></th>
+      <th style="width: 4%"></th>
     </tr>';
   foreach($settings['page']['pages'] as $page) {
     echo '
@@ -92,7 +102,8 @@ global $cmsurl, $settings, $l, $user, $theme_url;
       echo '<a href="'.$cmsurl.'index.php?action=profile;u='.$page['page_owner'].'">'.$page['owner'].'</a>';
     else
       echo $page['owner'];
-    echo '</td><td>'.$page['date'].'</td><td><a href="'.$cmsurl.'index.php?action=admin;sa=pages;did='.$page['page'].';sc='.$user['sc'].'"><img src="'.$theme_url.'/'.$settings['theme'].'/images/delete.png" alt="'.$l['managepages_delete'].'" width="15" height="15" style="border: 0" /></a></td>
+    
+    echo '</td><td>'.$page['date'].'</td><td><a href="'.$cmsurl.'index.php?action=admin;sa=pages'.$s.$pg.';did='.$page['page'].';sc='.$user['sc'].'" onclick="return confirm(\'', $l['managepages_delete_areyousure'], '\');"><img src="'.$theme_url.'/'.$settings['theme'].'/images/delete.png" alt="'.$l['managepages_delete'].'" width="15" height="15" style="border: 0" /></a></td>
     </tr>';
   }
   echo '
@@ -102,12 +113,12 @@ global $cmsurl, $settings, $l, $user, $theme_url;
   // Show the pervious page link if it is at least page two
   if ($prev_page > 0)
     echo '<table width="100%">
-      <tr><td><a href="'.$cmsurl.'index.php?action=admin;sa=pages;pg='.$prev_page.'">'.$l['memberlist_previous_page'].'</a></td>
-      ';
+      <tr><td><a href="'.$cmsurl.'index.php?action=admin;sa=pages'.$s.';pg='.$prev_page.'">'.$l['memberlist_previous_page'].'</a></td>
+       ';
   // Show the previous page link if it is page one
   elseif ($prev_page == 0)
     echo '<table width="100%">
-      <tr><td><a href="'.$cmsurl.'index.php?action=admin;sa=pages">'.$l['memberlist_previous_page'].'</a></td>
+      <tr><td><a href="'.$cmsurl.'index.php?action=admin;sa=pages'.$s.'">'.$l['memberlist_previous_page'].'</a></td>
       ';
   // Don't show the previous page link, because it is the first page
   else
@@ -116,12 +127,12 @@ global $cmsurl, $settings, $l, $user, $theme_url;
       ';
   // Show the next page link
   if (@($total_pages / $settings['num_pages']) > $next_page)
-    echo '<td style="text-align: right"><a href="'.$cmsurl.'index.php?action=admin;sa=pages;pg='.$next_page.'">'.$l['memberlist_next_page'].'</a></td></tr>
+    echo '<td style="text-align: right"><a href="'.$cmsurl.'index.php?action=admin;sa=pages'.$s.';pg='.$next_page.'">'.$l['memberlist_next_page'].'</a></td></tr>
       </table>
       ';
   // Don't show the next page link, because it is the last page
   else
-  echo '<td style="text-align: right"></td></tr>
+    echo '<td style="text-align: right"></td></tr>
       </table>
       ';
   

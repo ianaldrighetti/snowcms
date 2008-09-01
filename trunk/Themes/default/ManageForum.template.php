@@ -37,7 +37,7 @@ global $cmsurl, $db_prefix, $l, $settings, $user, $theme_url;
             <tr>
               <td><input name="cat_name[', $cat['id'], ']" type="text" class="name" value="', $cat['name'], '"/></td>
               <td><input name="cat_order[', $cat['id'], ']" type="text" class="order" value="', $cat['order'], '"/></td>
-              <td class="delete"><a href="', $cmsurl, 'index.php?action=admin;sa=forum;fa=categories;delete=', $cat['id'], ';sc=', $user['sc'], '" onClick="return confirm(\'', $l['managecats_are_you_sure'], '\');"><img src="'.$theme_url.'/'.$settings['theme'].'/images/delete.png" alt="'.$l['managecats_category_delete'].'" width="15" height="15" /></td>
+              <td class="delete"><a href="', $cmsurl, 'index.php?action=admin;sa=forum;fa=categories;delete=', $cat['id'], ';sc=', $user['sc'], '" onclick="return confirm(\'', $l['managecats_are_you_sure'], '\');"><img src="'.$theme_url.'/'.$settings['theme'].'/images/delete.png" alt="'.$l['managecats_category_delete'].'" width="15" height="15" /></td>
             </tr>';
           }
           echo '
@@ -80,7 +80,7 @@ global $cmsurl, $db_prefix, $l, $settings, $user, $theme_url;
         foreach($cat['boards'] as $board) {
           echo '
           <div class="board">
-            <p><input class="board_name" name="board_name[', $board['id'], ']" type="text" value="', $board['name'], '"/> <input class="board_order" name="board_order[', $board['id'], ']" type="text" value="', $board['order'], '"/> <a href="', $cmsurl, 'index.php?action=admin;sa=forum;fa=boards;do=edit;id=', $board['id'], '"><img src="'.$theme_url.'/'.$settings['theme'].'/images/modify.png" alt="'.$l['manageboards_delete'].'" width="15" height="15" /></a> <a class="del" href="', $cmsurl, 'index.php?action=admin;sa=forum;fa=boards;delete=', $board['id'], ';sc=', $user['sc'], '" onClick="return confirm(\'', $l['manageboards_are_you_sure_del'], '\');"><img src="'.$theme_url.'/'.$settings['theme'].'/images/delete.png" alt="'.$l['manageboards_delete'].'" width="15" height="15" /></a></p>
+            <p><input class="board_name" name="board_name[', $board['id'], ']" type="text" value="', $board['name'], '"/> <input class="board_order" name="board_order[', $board['id'], ']" type="text" value="', $board['order'], '"/> <a href="', $cmsurl, 'index.php?action=admin;sa=forum;fa=boards;do=edit;id=', $board['id'], '"><img src="'.$theme_url.'/'.$settings['theme'].'/images/modify.png" alt="'.$l['manageboards_delete'].'" width="15" height="15" /></a> <a class="del" href="', $cmsurl, 'index.php?action=admin;sa=forum;fa=boards;delete=', $board['id'], ';sc=', $user['sc'], '" onclick="return confirm(\'', $l['manageboards_are_you_sure_del'], '\');"><img src="'.$theme_url.'/'.$settings['theme'].'/images/delete.png" alt="'.$l['manageboards_delete'].'" width="15" height="15" /></a></p>
           </div>';
         }
       }

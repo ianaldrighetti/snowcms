@@ -103,8 +103,12 @@ global $cmsurl, $db_prefix, $l, $settings, $user;
       }
       else
         $_SESSION['error'] = $l['managepages_error_invalid_session'];
+      // Get the sort query
+      $s = clean_header(@$_REQUEST['s'] ? ';s='.$_REQUEST['s'] : '');
+      // Get the page
+      $pg = clean_header(@$_REQUEST['pg'] ? ';pg='.$_REQUEST['pg'] : '');
       // Redirect them so that if they refresh it won't do it again
-      redirect('index.php?action=admin;sa=pages');
+      redirect('index.php?action=admin;sa=pages'.$s.$pg);
     }
     // Or are we supposed to create a page?
     if(!empty($_REQUEST['create_page'])) {
@@ -130,8 +134,22 @@ global $cmsurl, $db_prefix, $l, $settings, $user;
       redirect('index.php?action=admin;sa=pages');
     }
     
+    // What to sort by sort
+    $sort = $settings['page']['sort'] = @$_REQUEST['s'];
+    
+    // Get the sort SQL
+    switch ($sort) {
+      case 'title':             $sort = 'p.title, p.create_date'; break;
+      case 'title_desc':        $sort = 'p.title DESC, p.create_date'; break;
+      case 'creator':           $sort = 'p.page_owner, p.create_date'; break;
+      case 'creator_desc':      $sort = 'p.page_owner DESC, p.create_date'; break;
+      case 'creationdate':      $sort = 'p.create_date'; break;
+      case 'creationdate_desc': $sort = 'p.create_date DESC'; break;
+      default:                  $sort = 'p.create_date';
+    }
+    
     // The current page number
-    $page = @$_REQUEST['pg'];
+    $page = $page_before = @$_REQUEST['pg'];
     // If the page number is lower then zero then make it zero
     if ($page < 0)
       $page = 0;
@@ -140,6 +158,14 @@ global $cmsurl, $db_prefix, $l, $settings, $user;
     // If page number is higher then maximum, lower it until it isn't
     while ($settings['num_pages'] * $page >= $settings['page']['total_pages'] && $page > 0)
       $page -= 1;
+    // If the page changed, redirect
+    if ($page != $page_before) {
+      $page = clean_header($page ? ';pg='.$page : '');
+      // Get the sort query
+      $s = clean_header(@$_REQUEST['s'] ? ';s='.$_REQUEST['s'] : '');
+      redirect('index.php?action=admin;sa=pages'.$s.$page);
+    }
+    
     // Get the first page on this page, confusing, no?
     $start = $page * $settings['num_pages'];
     
@@ -150,7 +176,7 @@ global $cmsurl, $db_prefix, $l, $settings, $user;
          p.modify_date, p.title, m.id, m.username, m.display_name
        FROM {$db_prefix}pages AS p
          LEFT JOIN {$db_prefix}members AS m ON m.id = p.page_owner
-       ORDER BY p.page_id DESC
+       ORDER BY $sort
        LIMIT $start, {$settings['num_pages']}");
       $pages = array();
       while($row = mysql_fetch_assoc($result)) {
