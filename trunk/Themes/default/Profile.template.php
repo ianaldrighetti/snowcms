@@ -9,9 +9,11 @@ global $l, $settings, $cmsurl;
   
   $profile = $settings['profile'];
   
-  echo '
-  <p style="float: right"><img src="'.$profile['avatar'].'" alt="'.str_replace('%user%',$profile['username'],$l['profile_avatar_own']).'" /></p>
+  if ($profile['avatar'])
+    echo '
+  <p style="float: right"><img src="'.$profile['avatar'].'" alt="'.str_replace('%user%',$profile['username'],$l['profile_avatar_own']).'" /></p>';
   
+  echo '
   <h1>'.str_replace('%user%',$profile['display_name'],$l['profile_own_header']).'</h1>
         <p style="margin-top: 0"><a href="'.$cmsurl.'index.php?action=profile;sa=edit">'.$l['profile_edit_link'].'</a></p>';
   
@@ -23,9 +25,11 @@ global $l, $settings, $theme_url;
   
   $profile = $settings['profile'];
   
-  echo '
-  <p style="float: right"><img src="'.$profile['avatar'].'" alt="'.str_replace('%user%',$profile['username'],$l['profile_avatar']).'" /></p>
+  if ($profile['avatar'])
+    echo '
+  <p style="float: right"><img src="'.$profile['avatar'].'" alt="'.str_replace('%user%',$profile['username'],$l['profile_avatar']).'" /></p>';
   
+  echo '
   <h1>'.str_replace('%user%',$profile['display_name'],$l['profile_header']).'</h1>
         <table>
          '.($profile['online']
@@ -46,9 +50,11 @@ global $l, $settings, $theme_url, $cmsurl;
   
   $profile = $settings['profile'];
   
-  echo '
-  <p style="float: right"><img src="'.$profile['avatar'].'" alt="'.str_replace('%user%',$profile['username'],$l['profile_avatar']).'" /></p>
+  if ($profile['avatar'])
+    echo '
+  <p style="float: right"><img src="'.$profile['avatar'].'" alt="'.str_replace('%user%',$profile['username'],$l['profile_avatar']).'" /></p>';
   
+  echo '
   <h1>'.str_replace('%user%',$profile['display_name'],$l['profile_header']).'</h1>
         <table>
          '.($profile['online']
@@ -74,6 +80,7 @@ global $l, $settings, $user, $cmsurl;
         <table width="100%">
         <tr><th style="text-align: left">'.$l['profile_group'].'</th><td>'.$profile['group_name'].'</td></tr>
         <tr><th style="text-align: left; width: 30%">'.$l['profile_joindate'].'</th><td>'.$profile['reg_date'].'</td></tr>
+        <tr><th style="text-align: left; width: 30%">'.$l['profile_birthdate'].'</th><td>'.($profile['birthdate'] ? $profile['birthdate'] : '<i>'.$l['profile_birthdate_unknown'].'</i>').'</td></tr>
         <tr><th style="text-align: left">'.$l['profile_posts'].'</th><td>'.$profile['posts'].'</td></tr>
         ';
   if ($user['group'] != -1 || $settings['captcha'])
@@ -108,6 +115,25 @@ global $l, $settings, $cmsurl, $user;
         <table style="width: 100%" class="padding">
         <tr><th style="text-align: left">'.$l['profile_edit_display_name'].'</th><td><input name="display_name" value="'.$profile['display_name'].'" /></td></tr>
         <tr><th style="text-align: left">'.$l['profile_edit_email'].'</th><td><input name="email" value="'.$profile['email'].'" /></td></tr>
+        <tr><th style="text-align: left">'.$l['profile_edit_birthdate'].'</th><td>
+          <input name="day" value="'.$profile['birthdate_day'].'" size="1" />
+          -
+          <select name="month" style="width: 50px">
+            ';
+  
+  $i = 1;
+  while ($i <= 12) {
+    if ($profile['birthdate_month'] == $i)
+      echo '<option value="'.$i.'" selected="selected">'.$l['main_month_'.$i.'_short'].'</option>';
+    else
+      echo '<option value="'.$i.'">'.$l['main_month_'.$i.'_short'].'</option>';
+    $i += 1;
+  }
+  
+  echo '</select>
+          -
+          <input name="year" value="'.$profile['birthdate_year'].'" size="1" />
+        </td></tr>
         <tr><th style="text-align: left">'.$l['profile_edit_avatar'].'</th><td><input name="avatar" value="'.$profile['avatar'].'" /></td></tr>
         <tr><th style="text-align: left">'.$l['profile_edit_signature'].'</th><td><textarea name="signature" cols="45" rows="4">'.$profile['signature'].'</textarea></td></tr>
         <tr><th style="text-align: left">'.$l['profile_edit_profile_text'].'</th><td><textarea name="profile" cols="45" rows="4">'.$profile['text'].'</textarea></td></tr>

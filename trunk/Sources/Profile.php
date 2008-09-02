@@ -64,6 +64,10 @@ global $cmsurl, $db_prefix, $l, $settings, $source_dir, $user, $perms;
               'username' => $row['display_name'] ? $row['display_name'] : $row['username'],
               'email' => $row['email'],
               'email_guest' => hideEmail($row['email']),
+              'birthdate' => ($row['birthdate']) ? formattime($row['birthdate']) : '',
+              'birthdate_day' => ($row['birthdate']) ? date('j',$row['birthdate']) : '',
+              'birthdate_month' => ($row['birthdate']) ? date('n',$row['birthdate']) : '',
+              'birthdate_year' => ($row['birthdate']) ? date('Y',$row['birthdate']) : '',
               'avatar' => $row['avatar'],
               'display_name' => $row['display_name'],
               'reg_date' => formattime($row['reg_date']),
@@ -149,6 +153,7 @@ global $settings, $db_prefix, $user, $cmsurl,$cookie_prefix;
   if(!preg_match("/^([a-z0-9._-](\+[a-z0-9])*)+@[a-z0-9.-]+\.[a-z]{2,6}$/i", @$_REQUEST['email']))
     die("Invalid email address");
   
+  // Clean the display name and if empty, make it the username
   if (clean($_REQUEST['display_name']))
     $display_name = clean($_REQUEST['display_name']);
   else {
@@ -158,8 +163,15 @@ global $settings, $db_prefix, $user, $cmsurl,$cookie_prefix;
     $display_name = $row['username'];
   }
   $email = clean($_REQUEST['email']);
+  $day = (int)$_REQUEST['day'];
+  $month = (int)$_REQUEST['month'];
+  $year = (int)$_REQUEST['year'];
+  if ($day && $year)
+    $birthdate = strtotime($year.'-'.$month.'-'.$day);
+  else
+    $birthdate = 0;
   $avatar = clean($_REQUEST['avatar']);
-  if (substr($avatar,0,7) != 'http://' && substr($avatar,0,8) != 'https://' && substr($avatar,0,6) != 'ftp://' && substr($avatar,0,7) != 'ftps://')
+  if (substr($avatar,0,7) != 'http://' && substr($avatar,0,8) != 'https://' && substr($avatar,0,6) != 'ftp://' && substr($avatar,0,7) != 'ftps://' && $avatar != '')
     $avatar = 'http://'.$avatar;
   $signature = clean($_REQUEST['signature']);
   $profile = clean($_REQUEST['profile']);
@@ -167,13 +179,13 @@ global $settings, $db_prefix, $user, $cmsurl,$cookie_prefix;
   // Update member's data
   if (@$_REQUEST['password-new']) {
     $password_new = md5(@$_REQUEST['password-new']);
-    sql_query("UPDATE {$db_prefix}members SET `display_name` = '$display_name', `email` = '$email', `avatar` = '$avatar' `signature` = '$signature', `profile` = '$profile', `password` = '$password_new' WHERE `id` = '{$user['id']}'");
+    sql_query("UPDATE {$db_prefix}members SET `display_name` = '$display_name', `email` = '$email', `birthdate` = '$birthdate', `avatar` = '$avatar' `signature` = '$signature', `profile` = '$profile', `password` = '$password_new' WHERE `id` = '{$user['id']}'");
     
     setcookie($cookie_prefix."password", $password_new);
     $_SESSION['pass'] = $password_new;
   }
   else
-    sql_query("UPDATE {$db_prefix}members SET `display_name` = '$display_name', `email` = '$email', `avatar` = '$avatar', `signature` = '$signature', `profile` = '$profile' WHERE `id` = '{$user['id']}'");
+    sql_query("UPDATE {$db_prefix}members SET `display_name` = '$display_name', `email` = '$email', `birthdate` = '$birthdate', `avatar` = '$avatar', `signature` = '$signature', `profile` = '$profile' WHERE `id` = '{$user['id']}'");
   
   redirect('index.php?action=profile;u='.$user['id']);
 }
