@@ -39,11 +39,24 @@ echo '
   <div id="post-left">
     <p><a href="'.$cmsurl.'index.php?action=profile;u='.$post['uid'].'">'.$post['username'].'</a></p>
     <p>'.$post['membergroup'].'</p>
+    <p><img src="'.$post['avatar'].'" alt="'.str_replace('%user%',$post['username'],$l['topic_avatar']).'" /></p>
     <br />
     <p>
-    ', $l['topic_status'], ' ', $post['status'] ? '<img src="'. $theme_url.'/'.$settings['theme'].'/images/status_online.png" alt=""/>' : '', '<br />
-    ', $l['topic_posts'], ' ',$post['numposts'], '
+      ', $l['topic_posts'], ' ',$post['numposts'], '
     </p>
+    <br />
+    <table style="display: inline">
+      <tr><td>
+    '.($post['status']
+        ? '<img src="'.$theme_url.'/'.$settings['theme'].'/images/status_online.png"
+            alt="'.$l['topic_online'].'" width="16" height="16" /></td>
+          <td>'.$l['topic_online']
+        : '<img src="'.$theme_url.'/'.$settings['theme'].'/images/status_offline.png"
+            alt="'.$l['topic_offline'].'" width="16" height="16" /></td>
+          <td>'.$l['topic_offline'])
+    .'
+      </td></tr>
+    </table>
   </div>
   <div id="post-right">
     <div id="post-info">

@@ -108,7 +108,7 @@ global $cmsurl, $db_prefix, $l, $settings, $user;
         SELECT
           t.tid, t.sticky, t.locked, t.bid, t.first_msg, grp.group_id, grp.groupname,
           msg.mid, msg.tid, msg.bid, msg.uid, msg.subject, msg.post_time, msg.poster_name, msg.ip, msg.body,
-          mem.id AS uid, mem.username, IFNULL(mem.username, msg.poster_name) AS username, mem.display_name, 
+          mem.id AS uid, mem.username, IFNULL(mem.username, msg.poster_name) AS username, mem.display_name, mem.avatar,
           mem.signature, mem.group, mem.email, mem.numposts, ol.user_id, ol.last_active
         FROM {$db_prefix}topics AS t
           LEFT JOIN {$db_prefix}messages AS msg ON msg.tid = t.tid
@@ -130,7 +130,8 @@ global $cmsurl, $db_prefix, $l, $settings, $user;
             'subject' => $row['subject'],
             'post_time' => formattime($row['post_time'],2),
             'body' => bbc($row['body']),
-            'username' => $row['username'] ? $row['username'] : $row['poster_name'],
+            'username' => $row['display_name'] ? $row['display_name'] : $row['poster_name'],
+            'avatar' => $row['avatar'],
             'signature' => bbc($row['signature']),
             'membergroup' => $row['groupname'],
             'numposts' => $row['numposts'],

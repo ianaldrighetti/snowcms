@@ -21,9 +21,7 @@ global $cmsurl, $db_prefix, $l, $settings, $source_dir, $user, $perms;
   $UID = @$_REQUEST['u'] ? (int)addslashes(mysql_real_escape_string($_REQUEST['u'])) : $user['id'];
   $result = sql_query("
      SELECT
-       m.id, m.username, m.email, m.display_name, m.reg_date, m.reg_ip, m.last_login,
-       m.last_ip, m.group, m.numposts, m.signature, m.profile, m.activated, grp.group_id, 
-       grp.groupname, o.last_active
+       *
      FROM {$db_prefix}members AS m
        LEFT JOIN {$db_prefix}membergroups AS grp ON grp.group_id = m.group
        LEFT JOIN {$db_prefix}online AS o ON o.user_id = m.id
@@ -66,6 +64,7 @@ global $cmsurl, $db_prefix, $l, $settings, $source_dir, $user, $perms;
               'username' => $row['display_name'] ? $row['display_name'] : $row['username'],
               'email' => $row['email'],
               'email_guest' => hideEmail($row['email']),
+              'avatar' => $row['avatar'],
               'display_name' => $row['display_name'],
               'reg_date' => formattime($row['reg_date']),
               'online' => $row['last_active'] > time() - $settings['login_detection_time'] * 60,
@@ -158,20 +157,23 @@ global $settings, $db_prefix, $user, $cmsurl,$cookie_prefix;
     
     $display_name = $row['username'];
   }
-  $email = clean($_REQUEST[ 'email']);
+  $email = clean($_REQUEST['email']);
+  $avatar = clean($_REQUEST['avatar']);
+  if (substr($avatar,0,7) != 'http://' && substr($avatar,0,8) != 'https://' && substr($avatar,0,6) != 'ftp://' && substr($avatar,0,7) != 'ftps://')
+    $avatar = 'http://'.$avatar;
   $signature = clean($_REQUEST['signature']);
   $profile = clean($_REQUEST['profile']);
   
   // Update member's data
   if (@$_REQUEST['password-new']) {
     $password_new = md5(@$_REQUEST['password-new']);
-    sql_query("UPDATE {$db_prefix}members SET `display_name` = '$display_name', `email` = '$email', `signature` = '$signature', `profile` = '$profile', `password` = '$password_new' WHERE `id` = '{$user['id']}'");
+    sql_query("UPDATE {$db_prefix}members SET `display_name` = '$display_name', `email` = '$email', `avatar` = '$avatar' `signature` = '$signature', `profile` = '$profile', `password` = '$password_new' WHERE `id` = '{$user['id']}'");
     
     setcookie($cookie_prefix."password", $password_new);
     $_SESSION['pass'] = $password_new;
   }
   else
-    sql_query("UPDATE {$db_prefix}members SET `display_name` = '$display_name', `email` = '$email', `signature` = '$signature', `profile` = '$profile' WHERE `id` = '{$user['id']}'");
+    sql_query("UPDATE {$db_prefix}members SET `display_name` = '$display_name', `email` = '$email', `avatar` = '$avatar', `signature` = '$signature', `profile` = '$profile' WHERE `id` = '{$user['id']}'");
   
   redirect('index.php?action=profile;u='.$user['id']);
 }
