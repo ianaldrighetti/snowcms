@@ -313,6 +313,20 @@ global $db_prefix, $settings, $user;
 // This returns true or false (bool) of whether or not they can do said function
 function can($what) {
 global $perms, $user;
+  
+  // Groups of permissions
+  $groups = array(
+    'change_settings' => array('change_displayname','change_email','change_birthdate','change_avatar','change_signature','change_profile',
+                               'change_password')
+  );
+  
+  // Check if they are allowed to perform any action in the group
+  foreach ($groups as $group => $permissions)
+    if ($what == $group)
+      foreach ($permissions as $permission)
+        if (can($permission))
+          return true;
+  
   // This is a super simple Permission handler, simply, can they do the requested $what or not?
   // If it isn't set, we say false because we dont know ._.
   if($user['group']!=1) {
