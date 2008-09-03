@@ -488,11 +488,11 @@ global $theme_dir, $theme_url, $settings;
     $str = preg_replace('/(\\\r['.$all_chars.']*)\[url\](['.$link_chars.']*)\[\/url\](['.$all_chars.']*\|)/is','$1 <a href="http://$2">$2</a> $3',$str);
     
     // [quote]\n
-    $str = preg_replace('/(\\\r['.$all_chars.']*)\[quote\]\n(['.$all_chars.']*\|)/is','$1<p style="font-weight: bold; padding: 0px; margin: 0px;">Quote:</p><blockquote style="padding: 5px; margin: 0px;">$2',$str);
+    $str = preg_replace('/(\\\r['.$all_chars.']*)\[quote\]\n?(['.$all_chars.']*\|)/is','$1<p style="font-weight: bold; padding: 0px; margin: 0px;">Quote:</p><blockquote style="padding: 5px; margin: 0px;">$2',$str);
     // [quote=...]\n
-    $str = preg_replace('/(\\\r['.$all_chars.']*)\[quote=(['.$all_chars.']*)\]\n(['.$all_chars.']*\|)/is','$1<p style="font-weight: bold; padding: 0px; margin: 0px;">Quote from $2:</p><blockquote style="padding: 5px; margin: 0px;">$3',$str);
+    $str = preg_replace('/(\\\r['.$all_chars.']*)\[quote=(['.$all_chars.']*)\]\n?(['.$all_chars.']*\|)/is','$1<p style="font-weight: bold; padding: 0px; margin: 0px;">Quote from $2:</p><blockquote style="padding: 5px; margin: 0px;">$3',$str);
     // [quote by=...]\n
-    $str = preg_replace('/(\\\r['.$all_chars.']*)\[quote by=(['.$link_chars.']*)\]\n(['.$all_chars.']*\|)/is','$1<p style="font-weight: bold; padding: 0px; margin: 0px;">Quote from $2:</p><blockquote style="padding: 5px; margin: 0px;">$3',$str);
+    $str = preg_replace('/(\\\r['.$all_chars.']*)\[quote by=(['.$link_chars.']*)\]\n?(['.$all_chars.']*\|)/is','$1<p style="font-weight: bold; padding: 0px; margin: 0px;">Quote from $2:</p><blockquote style="padding: 5px; margin: 0px;">$3',$str);
     // [/quote]
     $str = preg_replace('/(\\\r['.$all_chars.']*)\[\/quote\](['.$all_chars.']*\|)/is','$1</blockquote>$2',$str);
     
@@ -523,19 +523,6 @@ global $theme_dir, $theme_url, $settings;
     $str = preg_replace('/(\\\r['.$all_chars.']*)\[img=(ftps:\/\/['.$link_chars.']*)\](['.$all_chars.']*)\[\/img\](['.$all_chars.']*\|)/is','$1<img src="$2" alt="$3" />$4',$str);
     // [img=...]...[/img]
     $str = preg_replace('/(\\\r['.$all_chars.']*)\[img=(['.$link_chars.']*)\](['.$all_chars.']*)\[\/img\](['.$all_chars.']*\|)/is','$1<img src="http://$2" alt="$3" />$4',$str);
-  }
-  
-  // These quotes don't have newlines at the start, they have to be done seperately
-  $str_prev = '';
-  while ($str_prev != $str) {
-    $str_prev = $str;
-    
-    // [quote]
-    $str = preg_replace('/(\\\r['.$all_chars.']*)\[quote\](['.$all_chars.']*\|)/is','$1<p style="font-weight: bold; padding: 0px; margin: 0px;">Quote:</p><blockquote style="padding: 5px; margin: 0px;">$2',$str);
-    // [quote=...]
-    $str = preg_replace('/(\\\r['.$all_chars.']*)\[quote=(['.$all_chars.']*)\](['.$all_chars.']*\|)/is','$1<p style="font-weight: bold; padding: 0px; margin: 0px;">Quote from $2:</p><blockquote style="padding: 5px; margin: 0px;">$3',$str);
-    // [quote by=...]
-    $str = preg_replace('/(\\\r['.$all_chars.']*)\[quote by=(['.$link_chars.']*)\](['.$all_chars.']*\|)/is','$1<p style="font-weight: bold; padding: 0px; margin: 0px;">Quote from $2:</p><blockquote style="padding: 5px; margin: 0px;">$3',$str);
   }
   
   // Process emoticons
@@ -581,19 +568,8 @@ global $theme_dir, $theme_url, $settings;
       $str_prev = $str;
       
       // [code]\n
-      $str = preg_replace('/([\\\r|!]['.$all_chars.']*)\|\n(['.$all_chars.']*\|)/is','$1<p style="font-weight: bold; padding: 0px; margin: 0px;">Code:</p><div class="code-outer"><div class="code-inner">$2',$str);
+      $str = preg_replace('/([\\\r|!]['.$all_chars.']*)\|\n?(['.$all_chars.']*\|)/is','$1<p style="font-weight: bold; padding: 0px; margin: 0px;">Code:</p><div class="code-outer"><div class="code-inner">$2',$str);
       // [/code]\n - You may notice we added % and ! they stop code tags from being embedded inside each other
-      $str = preg_replace('/([\\\r|!]['.$all_chars.']*)\\\r(['.$all_chars.']*\|)/is','$1%</div></div>!$2',$str);
-    }
-    
-    // Now do it again, this time without newlines
-    $str_prev = '';
-    while ($str_prev != $str) {
-      $str_prev = $str;
-      
-      // [code]
-      $str = preg_replace('/([\\\r|!]['.$all_chars.']*)\|(['.$all_chars.']*\|)/is','$1<p style="font-weight: bold; padding: 0px; margin: 0px;">Code:</p><div class="code-outer"><div class="code-inner">$2',$str);
-      // [/code] - Again we add those characters
       $str = preg_replace('/([\\\r|!]['.$all_chars.']*)\\\r(['.$all_chars.']*\|)/is','$1%</div></div>!$2',$str);
     }
   }
