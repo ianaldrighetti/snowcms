@@ -40,7 +40,7 @@ global $l, $db_prefix, $settings, $cmsurl, $theme_url;
   
   if ($total_members) {
     // Show filter
-    echo '<form action="'.$cmsurl.'index.php?action=admin;sa=members" method="post" style="float: right; margin-bottom: 0"><p style="display: inline">
+    echo '<form action="'.$cmsurl.'index.php?action=admin;sa=members" method="post" style="text-align: right; margin-bottom: 0"><p style="display: inline">
        '.$settings['managemembers']['filter'].'
         </p></form>
         ';
@@ -123,7 +123,7 @@ global $l, $db_prefix, $settings, $cmsurl, $theme_url;
         ';
     
     // Show filter
-    echo '<form action="'.$cmsurl.'index.php" method="post" style="float: right; margin-bottom: 0"><p style="display: inline">
+    echo '<form action="'.$cmsurl.'index.php" method="post" style="text-align: right; margin-bottom: 0"><p style="display: inline">
        '.$settings['managemembers']['filter'].'
        </p></form>';
   }
@@ -139,7 +139,7 @@ global $l, $settings, $cmsurl;
         ';
   
   // Show filter
-    echo '<form action="'.$cmsurl.'index.php" method="post" style="float: right; margin-bottom: 0"><p style="display: inline">
+    echo '<form action="'.$cmsurl.'index.php" method="post" style="text-align: right; margin-bottom: 0"><p style="display: inline">
        '.$settings['managemembers']['filter'].'
         </p></form>
         <br />
@@ -150,7 +150,7 @@ global $l, $settings, $cmsurl;
         ';
   
   // Show filter
-    echo '<form action="'.$cmsurl.'index.php" method="post" style="float: right; margin-bottom: 0"><p style="display: inline">
+    echo '<form action="'.$cmsurl.'index.php" method="post" style="text-align: right; margin-bottom: 0"><p style="display: inline">
        '.$settings['managemembers']['filter'].'
        </p></form>';
 }
