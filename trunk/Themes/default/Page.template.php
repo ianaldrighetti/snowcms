@@ -8,8 +8,13 @@ function Main() {
 global $cmsurl, $l, $settings, $user;
   echo '
     <h1>'.$settings['page']['title'].'</h1>
-		<p>'.$settings['page']['content'].'</p> 
-		<br />';
+    ';
+  if ($settings['page']['html'])
+    echo '<p>'.$settings['page']['content'].'</p>';
+  else
+    echo '<div>'.bbc($settings['page']['content']).'</div>';
+  echo '
+  <br />';
 }
 
 function Error() {

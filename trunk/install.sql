@@ -148,10 +148,11 @@ CREATE TABLE `{$db_prefix}pages` (
   `modify_date` int(10) NOT NULL default '0',
   `title` text NOT NULL,
   `content` text NOT NULL,
+  `html` int(1) NOT NULL default '0',
   PRIMARY KEY  (`page_id`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 
-INSERT INTO `{$db_prefix}pages` (`page_owner`, `owner_name`, `create_date`, `title`, `content`) VALUES ('-1','The SnowCMS Team','%current_time%','Welcome to SnowCMS','<p>Start modifing the default settings and creating pages now. Thank you for choosing SnowCMS.</p>\n\n<p>The SnowCMS Team</p>');
+INSERT INTO `{$db_prefix}pages` (`page_owner`, `owner_name`, `create_date`, `title`, `content`, `html`) VALUES ('-1','The SnowCMS Team','%current_time%','Welcome to SnowCMS','<p>Start modifing the default settings and creating pages now. Thank you for choosing SnowCMS.</p>\n\n<p>The SnowCMS Team</p>','1');
 
 DROP TABLE IF EXISTS `{$db_prefix}permissions`;
 
@@ -172,7 +173,7 @@ CREATE TABLE `{$db_prefix}settings` (
   UNIQUE KEY (`variable`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 
-INSERT INTO `{$db_prefix}settings` VALUES ('site_name','SnowCMS'),('slogan','Its a CMS alright...'),('language','English'),('theme','default'),('account_activation','0'),('login_threshold','15'),('version','0.7'),('main_page','1'),('remember_time','120'),('timeformat','H:i:s'),('dateformat','F jS, Y'),('mail_with_fsockopen','0'),('smtp_host',''),('smtp_user',''),('smtp_pass',''),('from_email',''),('smtp_port','25'),('board_posts_per_page','20'),('topic_posts_per_page','10'),('num_news_items','6'),('num_search_results','20'),('manage_members_per_page','20'),('num_pages','20'),('enable_tos','0'),('homepage','1'),('default_group','2'),('login_detection_time','15');
+INSERT INTO `{$db_prefix}settings` VALUES ('site_name','SnowCMS'),('slogan','Its a CMS alright...'),('language','English'),('theme','default'),('account_activation','0'),('login_threshold','15'),('version','0.7'),('main_page','1'),('remember_time','120'),('timeformat','H:i:s'),('dateformat','F jS, Y'),('mail_with_fsockopen','0'),('smtp_host',''),('smtp_user',''),('smtp_pass',''),('from_email',''),('smtp_port','25'),('board_posts_per_page','20'),('topic_posts_per_page','10'),('num_news_items','6'),('num_search_results','20'),('manage_members_per_page','20'),('num_pages','20'),('enable_tos','0'),('homepage','1'),('default_group','2'),('login_detection_time','15'),('page_type','1');
 
 DROP TABLE IF EXISTS `{$db_prefix}topics`;
 

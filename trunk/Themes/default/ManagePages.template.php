@@ -185,7 +185,10 @@ global $cmsurl, $settings, $l, $user, $theme_url;
   <script type="text/javascript" src="'.$theme_url.'/'.$settings['theme'].'/scripts/bbcode.js"></script>
   
   <form action="'.$cmsurl.'index.php?action=admin;sa=pages" method="post" style="display: inline">
-    <p><input type="hidden" name="update_page" value="true" /></p>
+    <p>
+      <input type="hidden" name="update_page" value="true" />
+      <input type="hidden" name="page" value="'.$settings['page']['edit_page']['page'].'" />
+    </p>
     <table>
       <tr>
         <td><label>'.$l['managepages_edit_pagetitle'].'</label></td><td><input name="page_title" type="text" value="'.$settings['page']['edit_page']['title'].'"/></td>
@@ -206,6 +209,19 @@ global $cmsurl, $settings, $l, $user, $theme_url;
         <td colspan="2"><textarea name="page_content" rows="16" cols="70" onclick="this.selection = document.selection.createRange()" onkeyup="this.selection = document.selection.createRange()" onchange="this.selection = document.selection.createRange().duplicate()" onfocus="this.selection = document.selection.createRange().duplicate()">'.$settings['page']['edit_page']['content'].'</textarea></td>
       </tr>
     </table>
+    
+    <p>
+      ';
+    if ($settings['page']['edit_page']['html']) {
+      echo '<input type="radio" name="html" id="html" value="1" checked="checked" /> <label for="html">'.$l['managepages_edit_html'].'</label>';
+      echo '<input type="radio" name="html" id="bbcode" value="0" /> <label for="bbcode">'.$l['managepages_edit_bbcode'].'</label>';
+    }
+    else {
+      echo '<input type="radio" name="html" id="html" value="1" /> <label for="html">'.$l['managepages_edit_html'].'</label>';
+      echo '<input type="radio" name="html" id="bbcode" value="0" checked="checked" /> <label for="bbcode">'.$l['managepages_edit_bbcode'].'</label>';
+    }
+    echo '
+    </p>
     
     <p style="display: inline">
       <input type="hidden" name="page" value="'.$settings['page']['edit_page']['page'].'" />

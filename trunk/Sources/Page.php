@@ -31,6 +31,7 @@ global $cmsurl, $db_prefix, $l, $settings, $user;
       $settings['page']['title'] = $row['title'];
 	    $settings['page']['date'] = $row['modify_date'] ? formattime($row['modify_date']) : formattime($row['create_date']);
       $settings['page']['content'] = stripslashes($row['content']);
+      $settings['page']['html'] = $row['html'];
     }
     // It does! Set content and page title, then load Page.template.php
     loadTheme('Page');
@@ -50,7 +51,7 @@ global $cmsurl, $db_prefix, $l, $settings, $user;
   if (@$_REQUEST['redirect'])
     redirect('index.php?action=admin;sa=pages');
   
-  $page = @$_GET['page'];
+  $page = (int)@$_GET['page'];
   
   // If a page is set then we should be editing a page, not listing them
   if ($page) {
@@ -69,6 +70,7 @@ global $cmsurl, $db_prefix, $l, $settings, $user;
     }
   }
   elseif (can('manage_pages_modify') || can('manage_pages_create') || can('manage_pages_delete') || can('manage_pages_home')) {
+    $page = (int)@$_POST['page'];
     $settings['page']['make_page']['do'] = false;
     $settings['page']['update_page'] = 0;
     // Do we need to update a page?
@@ -85,8 +87,11 @@ global $cmsurl, $db_prefix, $l, $settings, $user;
 	      	$page_show_info = $_REQUEST['page_show_info'];
 	      else
 		      $page_show_info = 0;
+		    // Check if it is HTML or BBCode
+		    if (!($html = (int)@$_REQUEST['html']))
+		      $page_content = clean(stripslashes($page_content));
         // Update it
-        $result = sql_query("UPDATE {$db_prefix}pages SET `title` = '{$page_title}', `content` = '{$page_content}' WHERE `page_id` = '{$page}'");
+        $result = sql_query("UPDATE {$db_prefix}pages SET `title` = '$page_title', `content` = '$page_content', `html` = '$html' WHERE `page_id` = '$page'");
       }
       // They are not allowed to modify pages
       else
@@ -268,21 +273,19 @@ global $cmsurl, $db_prefix, $l, $settings, $user;
       // Get it!
       $result = sql_query("SELECT * FROM {$db_prefix}pages WHERE `page_id` = '{$page}'");
       // Does it exist? o.O
-      if(mysql_num_rows($result)) {
-        while($row = mysql_fetch_assoc($result)) {
-          $page = array(
-            'page' => $row['page_id'],
-            'title' => $row['title'],
-            'content' => stripslashes($row['content'])
-          );
-          // Load $page (the pages info) into $settings, clean() the content with clean() so it won't parse any HTML Entities like &copy; as what you would see (c)
-          // Set the title, and load the ManagePages template with the Editor function
-          $settings['page']['edit_page'] = $page;
-          $settings['page']['edit_page']['content'] = clean($settings['page']['edit_page']['content']);
-          $settings['page']['title'] = str_replace("%title%", $page['title'], $l['managepages_edit_title']);
-          $settings['page']['all-pages'] = sql_query("SELECT * FROM {$db_prefix}pages");
-          loadTheme('ManagePages','Editor');
-        }
+      if ($row = mysql_fetch_assoc($result)) {
+        $page = array(
+          'page' => $row['page_id'],
+          'title' => $row['title'],
+          'content' => clean(stripslashes($row['content'])),
+          'html' => $row['html']
+        );
+        // Load $page (the pages info) into $settings, clean() the content with clean() so it won't parse any HTML Entities like &copy; as what you would see (c)
+        // Set the title, and load the ManagePages template with the Editor function
+        $settings['page']['edit_page'] = $page;
+        $settings['page']['title'] = str_replace("%title%", $page['title'], $l['managepages_edit_title']);
+        $settings['page']['all-pages'] = sql_query("SELECT * FROM {$db_prefix}pages");
+        loadTheme('ManagePages','Editor');
       }
       else {
         // The Page doesn't exist! Load up the Error :P
