@@ -38,9 +38,10 @@ echo '
   <div id="post-container">
   <div id="post-left">
     <p><a href="'.$cmsurl.'index.php?action=profile;u='.$post['uid'].'">'.$post['username'].'</a></p>
-    <p>'.$post['membergroup'].'</p>
-    <p><img src="'.$post['avatar'].'" alt="'.str_replace('%user%',$post['username'],$l['topic_avatar']).'" /></p>
-    <br />
+    <p>'.$post['membergroup'].'</p>';
+if ($post['avatar'])
+  echo '<p><img src="'.$post['avatar'].'" alt="'.str_replace('%user%',$post['username'],$l['topic_avatar']).'" /></p>';
+echo '<br />
     <p>
       ', $l['topic_posts'], ' ',$post['numposts'], '
     </p>
