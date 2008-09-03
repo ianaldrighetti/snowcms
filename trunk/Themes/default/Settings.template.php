@@ -12,10 +12,15 @@ function Basic() {
 global $cmsurl, $settings, $l, $user;
   echo '
   <h1>'.$l['basicsettings_header'].'</h1>
+  ';
   
+  if (@$_SESSION['error'])
+    echo '<p><b>'.$l['main_error'].':</b> '.$_SESSION['error'].'</p>';
+  
+  echo '
   <p>'.$l['basicsettings_desc'].'</p>';
   echo '
-  <form action="" method="post">
+  <form action="'.$cmsurl.'index.php?action=admin;sa=basic-settings" method="post" style="display: inline">
     <table>';
   foreach($settings['page']['settings'] as $setting => $info) {
     if($info['type']=='text') {
@@ -35,14 +40,20 @@ global $cmsurl, $settings, $l, $user;
     }
     echo '
       <tr>
-        <td>'.$l['basicsettings_'.$setting].'</td><td>'.$field.'</td>
+        <td>'.$l['basicsettings_'.$setting].':</td><td>'.$field.'</td>
       </tr>';
   }
   echo '
-      <tr>
-        <td>&nbsp;</td><td><input name="update" type="submit" value="'.$l['basicsettings_update'].'"/></td>
-      </tr>
     </table>
+    <br />
+    <p style="display: inline"><input name="update" type="submit" value="'.$l['basicsettings_update'].'" /></p>
+  </form>
+  
+  <form action="'.$cmsurl.'index.php?action=admin" method="post" style="display: inline">
+    <p style="display: inline">
+      <input type="hidden" name="redirect" value="admin" />
+      <input type="submit" name="update" value="'.$l['basicsettings_cancel'].'" />
+    </p>
   </form>';
 }
 

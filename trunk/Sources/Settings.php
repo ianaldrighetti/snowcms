@@ -18,14 +18,24 @@ function BasicSettings() {
 global $cmsurl, $db_prefix, $l, $settings, $user, $language_dir, $theme_dir, $theme_name;
   if(can('manage_basic-settings')) {
     // An array of all the settings that can be set on this page...
+    //  A  = text of any length
+    // 3A  = at least three characters
+    //  A5 = five or less characters
+    // 2A7 = two to seven characters
+    //  1  = any number
+    // >3 = number higher than three
+    // <5  = number lower than five
+    // 5-8 = number between five and eight
     $basic = array(
       'site_name' => 
         array(
-          'type' => 'text'
+          'type' => 'text',
+          'validation' => '1A'
          ),
       'slogan' =>
         array(
-          'type' => 'text'
+          'type' => 'text',
+          'validation' => 'A'
         ),
       'language' =>
         array(
@@ -48,35 +58,43 @@ global $cmsurl, $db_prefix, $l, $settings, $user, $language_dir, $theme_dir, $th
         ),
       'login_threshold' =>
         array(
-          'type' => 'text'
+          'type' => 'text',
+          'validation' => '>0'
         ),
       'remember_time' =>
         array(
-          'type' => 'text'
+          'type' => 'text',
+          'validation' => '>0'
         ),
       'num_news_items' =>
         array(
-          'type' => 'text'
+          'type' => 'text',
+          'validation' => '>0'
         ),
       'num_search_results' =>
         array(
-          'type' => 'text'
+          'type' => 'text',
+          'validation' => '>0'
         ),
       'manage_members_per_page' =>
         array(
-          'type' => 'text'
+          'type' => 'text',
+          'validation' => '>0'
         ),
       'num_pages' =>
         array(
-          'type' => 'text'
+          'type' => 'text',
+          'validation' => '>0'
         ),
       'timeformat' =>
         array(
-          'type' => 'text'
+          'type' => 'text',
+          'validation' => 'A'
         ),
       'dateformat' =>
         array(
-          'type' => 'text'
+          'type' => 'text',
+          'validation' => 'A'
         )
     );
     // You can add options into the above array, with the name of the setting in the settings table...
@@ -102,18 +120,74 @@ global $cmsurl, $db_prefix, $l, $settings, $user, $language_dir, $theme_dir, $th
     
     // Are we updating them?
     if(!empty($_REQUEST['update'])) {
-      // Set them all!
-      foreach($basic as $key => $value) {
-        $_REQUEST[$key] = clean($_REQUEST[$key]);
-        $query = "UPDATE {$db_prefix}settings SET `value` = '{$_REQUEST[$key]}' WHERE `variable` = '{$key}' LIMIT 1";
-        $result = sql_query($query);
+      // Check the validation for each on individually
+      foreach($basic as $key => $value)
+        if (!@$_SESSION['error']) {
+          $setting = clean(@$_REQUEST[$key]);
+          // If it's suppose to be a number, make sure it is
+          if (preg_match('/^[<>]?-?[0-9]+$/',@$value['validation']) || preg_match('/^-?[0-9]+--?[0-9]+$/',@$value['validation']))
+            $setting = (int)$setting;
+          // Check validation for listboxes
+          if (@$value['values']) {
+            $i = 0;
+            $valid = false;
+            while ($i < count($value['values'])) {
+              if ($setting == $value['values'][$i+1])
+                $valid = true;
+              $i += 2;
+            }
+            if (!$valid)
+              $_SESSION['error'] = $l['basicsettings_error_'.$key.'_invalid'];
+          }
+          // Check validation for 'at least # characters'
+          elseif (preg_match('/^[0-9]+A$/i',$value['validation'])) {
+            if (strlen($setting) < preg_replace('/^([0-9]+)A$/i','$1',$value['validation']))
+              $_SESSION['error'] = $l['basicsettings_error_'.$key.'_short'];
+          }
+          // Check validation for '# or less characters'
+          elseif (preg_match('/^A[0-9]+$/i',$value['validation'])) {
+            if (strlen($setting) > preg_replace('/^A([0-9]+)$/i','$1',$value['validation']))
+              $_SESSION['error'] = $l['basicsettings_error_'.$key.'_long'];
+          }
+          // Check validation for '# to # characters'
+          elseif (preg_match('/^[0-9]+A[0-9]+$/i',$value['validation'])) {
+            if (strlen($setting) > preg_replace('/^[0-9]+A([0-9]+)$/i','$1',$value['validation']))
+              $_SESSION['error'] = $l['basicsettings_error_'.$key.'_short'];
+            if (strlen($setting) < preg_replace('/^([0-9]+)A[0-9]+$/i','$1',$value['validation']))
+              $_SESSION['error'] = $l['basicsettings_error_'.$key.'_long'];
+          }
+          // Check validation for 'number higher than #'
+          elseif (preg_match('/^>-?[0-9]+$/',$value['validation'])) {
+            if ($setting <= preg_replace('/^>(-?[0-9]+)$/','$1',$value['validation']))
+              $_SESSION['error'] = $l['basicsettings_error_'.$key.'_low'];
+          }
+          // Check validation for 'number lower than #'
+          elseif (preg_match('/^<-?[0-9]+$/',$value['validation'])) {
+            if ($setting >= preg_replace('/^<(-?[0-9]+)$/','$1',$value['validation']))
+              $_SESSION['error'] = $l['basicsettings_error_'.$key.'_high'];
+          }
+          // Check validation for 'number between # and #'
+          elseif (preg_match('/^-?[0-9]+--?[0-9]+$/',$value['validation'])) {
+            if ($setting <= preg_replace('/^(-?[0-9]+)--?[0-9]+$/','$1',$value['validation']))
+            if ($setting >= preg_replace('/^-?[0-9]+-(-?[0-9]+)$/','$1',$value['validation']))
+              $_SESSION['error'] = $l['basicsettings_error_'.$key.'_low'];
+              $_SESSION['error'] = $l['basicsettings_error_'.$key.'_high'];
+          }
+        }
+      // Was there an error in validation?
+      if (!@$_SESSION['error']) {
+        // There wasn't, so set them all!
+        foreach($basic as $key => $value) {
+          $setting = clean(@$_REQUEST[$key]);
+          // Set setting
+          $query = "UPDATE {$db_prefix}settings SET `value` = '$setting' WHERE `variable` = '{$key}' LIMIT 1";
+          $result = sql_query($query);
+        }
+        redirect('index.php?action=admin');
       }
-      // Reload Settings D: Or they won't be the latest, menu's need to be reset too O.o
-      loadSettings();
-      loadMenus();
-      unset($menus);
-      redirect('index.php?action=admin');
-      
+      // There was an error in validation
+      else
+        redirect('index.php?action=admin;sa=basic-settings');
     }
     // Set title, pass on $basic, and load Settings template with the Basic function
     $settings['page']['title'] = $l['basicsettings_title'];
