@@ -26,7 +26,7 @@ global $cmsurl, $db_prefix, $l, $settings, $user;
   // Get it from MySQL
   $result = sql_query("SELECT * FROM {$db_prefix}pages WHERE `page_id` = '{$PageID}'");
   // Does it exist or not?
-  if(mysql_num_rows($result)>0) {
+  if (mysql_num_rows($result)) {
     while($row = mysql_fetch_assoc($result)) {
       $settings['page']['title'] = $row['title'];
 	    $settings['page']['date'] = $row['modify_date'] ? formattime($row['modify_date']) : formattime($row['create_date']);
@@ -56,7 +56,7 @@ global $cmsurl, $db_prefix, $l, $settings, $user;
   // If a page is set then we should be editing a page, not listing them
   if ($page) {
     // Are they allowed to modify pages?
-    if (can('manage_pages_modify'))
+    if (can('manage_pages_modify_html') || can('manage_pages_modify_bbcode'))
       // Are they modifing the homepage and if so, are they allowed to?
       if ($page != $settings['homepage'] || can('manage_pages_home'))
         EditPage();
@@ -69,14 +69,14 @@ global $cmsurl, $db_prefix, $l, $settings, $user;
       redirect('index.php?action=admin;sa=pages');
     }
   }
-  elseif (can('manage_pages_modify') || can('manage_pages_create') || can('manage_pages_delete') || can('manage_pages_home')) {
+  elseif (can('manage_pages_modify_html') || can('manage_pages_modify_bbcode') || can('manage_pages_create') || can('manage_pages_delete') || can('manage_pages_home')) {
     $page = (int)@$_POST['page'];
     $settings['page']['make_page']['do'] = false;
     $settings['page']['update_page'] = 0;
     // Do we need to update a page?
     if (!empty($_REQUEST['update_page'])) {
       // Are they allowed to modify pages?
-      if (can('manage_pages_modify')) {
+      if (can('manage_pages_modify_html') || can('manage_pages_modify_bbcode')) {
         if (!($page_title = clean($_REQUEST['page_title']))) {
           // If they remove the page title, they'll regret it later
           $_SESSION['error'] = $l['managepages_no_title'];
@@ -88,7 +88,13 @@ global $cmsurl, $db_prefix, $l, $settings, $user;
 	      else
 		      $page_show_info = 0;
 		    // Check if it is HTML or BBCode
-		    if (!($html = (int)@$_REQUEST['html']))
+		    $html = can('manage_pages_modify_html') && !can('manage_pages_modify_bbcode') // Can only modify HTML
+		          ? 1
+		          :(!can('manage_pages_modify_html') && can('manage_pages_modify_bbcode') // Can only modify BBCode
+		          ? 0
+		          : (int)@$_REQUEST['html']); // Can modify both, so check what they selected
+		    // If it's BBCode, clean it
+		    if (!$html)
 		      $page_content = clean(stripslashes($page_content));
         // Update it
         $result = sql_query("UPDATE {$db_prefix}pages SET `title` = '$page_title', `content` = '$page_content', `html` = '$html' WHERE `page_id` = '$page'");
@@ -165,9 +171,15 @@ global $cmsurl, $db_prefix, $l, $settings, $user;
 		      $_SESSION['error'] = $l['managepages_no_title'];
 		      redirect('index.php?action=admin;sa=pages');
 		    }
+		    // Set the page type
+		    $html = can('manage_pages_modify_html') && !can('manage_pages_modify_bbcode') // Can only modify HTML
+		          ? 1
+		          :(!can('manage_pages_modify_html') && can('manage_pages_modify_bbcode') // Can only modify BBCode
+		          ? 0
+		          : $settings['page_type']); // Can modify both or neither, so just use the site default
         // Insert it
         if(!$result = sql_query("INSERT INTO {$db_prefix}pages (`page_owner`,`owner_name`,`create_date`,`title`,`html`)
-                                 VALUES ('{$page_owner}','{$owner_name}','{$create_date}','{$title}','{$settings['page_type']}')")) {
+                                 VALUES ('$page_owner','$owner_name','$create_date','$title','$html')")) {
           // Oh NOES! It failed!
           $_SESSION['error'] = str_replace('%title%',$title,$l['managepages_make_fail']);
         }
@@ -258,15 +270,14 @@ global $cmsurl, $db_prefix, $l, $settings, $user;
     $settings['page']['title'] = $l['managepages_title'];
     loadTheme('ManagePages');
   }
-  else {
-    $settings['page']['title'] = $l['admin_error_title'];
-    loadTheme('Admin','Error');
-  }
+  // They don't have permission, so redrect them to the main control panel
+  else
+    redirect('index.php?action=admin');
 }
 
 function EditPage() {
 global $cmsurl, $db_prefix, $l, $settings, $user;
-  if(can('manage_pages')) {  
+  if(can('manage_pages_modify_html') || can('manage_pages_modify_bbcode')) {  
     // Get the Page ID and clean it!
     $page = (int)addslashes(mysql_real_escape_string(@$_REQUEST['page']));
     if(!empty($page)) {
@@ -299,10 +310,8 @@ global $cmsurl, $db_prefix, $l, $settings, $user;
       loadTheme('ManagePages','NoPage');
     }
   }
-  else {
-    // They can't manage pages, why should they be able to edit them? xD
-    $settings['page']['title'] = $l['admin_error_title'];
-    loadTheme('Admin','Error');
-  }
+  // They don't have permission, so redrect them to page management
+  else
+    redirect('index.php?action=admin;sa=pages');
 }
 ?>

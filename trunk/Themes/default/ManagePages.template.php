@@ -105,7 +105,7 @@ global $cmsurl, $settings, $l, $user, $theme_url;
       echo '<td><input type="radio" name="homepage" value="'.$page['page'].'"></td>
     ';
     
-    if (can('manage_pages_modify'))
+    if (can('manage_pages_modify_html') || can('manage_pages_modify_bbcode'))
       echo '<td><a href="'.$cmsurl.'index.php?action=admin;sa=pages;page='.$page['page'].'">'.$page['title'].'</a></td><td>';
     else
       echo '<td>'.$page['title'].'</td><td>';
@@ -212,14 +212,20 @@ global $cmsurl, $settings, $l, $user, $theme_url;
     
     <p>
       ';
-    if ($settings['page']['edit_page']['html']) {
-      echo '<input type="radio" name="html" id="html" value="1" checked="checked" /> <label for="html">'.$l['managepages_edit_html'].'</label>';
-      echo '<input type="radio" name="html" id="bbcode" value="0" /> <label for="bbcode">'.$l['managepages_edit_bbcode'].'</label>';
+    if (can('manage_pages_modify_html') && !can('manage_pages_modify_bbcode')) {
+      if (!$settings['page']['edit_page']['html'])
+        echo $l['managepages_edit_bbcode_to_html'];
     }
-    else {
-      echo '<input type="radio" name="html" id="html" value="1" /> <label for="html">'.$l['managepages_edit_html'].'</label>';
-      echo '<input type="radio" name="html" id="bbcode" value="0" checked="checked" /> <label for="bbcode">'.$l['managepages_edit_bbcode'].'</label>';
+    elseif (!can('manage_pages_modify_html') && can('manage_pages_modify_bbcode')) {
+      if ($settings['page']['edit_page']['html'])
+        echo $l['managepages_edit_html_to_bbcode'];
     }
+    elseif ($settings['page']['edit_page']['html'])
+      echo '<input type="radio" name="html" id="html" value="1" checked="checked" /> <label for="html">'.$l['managepages_edit_html'].'</label>
+      <input type="radio" name="html" id="bbcode" value="0" /> <label for="bbcode">'.$l['managepages_edit_bbcode'].'</label>';
+    else
+      echo '<input type="radio" name="html" id="html" value="1" /> <label for="html">'.$l['managepages_edit_html'].'</label>
+      <input type="radio" name="html" id="bbcode" value="0" checked="checked" /> <label for="bbcode">'.$l['managepages_edit_bbcode'].'</label>';
     echo '
     </p>
     
