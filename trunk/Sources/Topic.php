@@ -315,21 +315,31 @@ global $cmsurl, $db_prefix, $l, $settings, $user;
 function Delete() {
 global $db_prefix;
   
-  $mid = clean($_REQUEST['msg']);
-  $topic = clean($_REQUEST['topic']);
-  $board = mysql_fetch_assoc(sql_query("SELECT * FROM {$db_prefix}topics AS t LEFT JOIN {$db_prefix}messages AS m ON m.tid = t.tid"));
-  $board = $board['bid'];
-  $member = mysql_fetch_assoc(sql_query("SELECT * FROM {$db_prefix}messages WHERE `mid` = '$mid'"));
-  $member = $member['uid'];
+  $msg = clean($_REQUEST['msg']);
+  $msg_info = mysql_fetch_assoc(sql_query("SELECT * FROM {$db_prefix}messages WHERE `mid` = '$msg'"));
+  $member = $msg_info['uid'];
+  $topic = $msg_info['tid'];
+  $board = $msg_info['bid'];
   
   // Are they allowed to delete it?
-  if (canforum('delete_any', $board) || del(PostOwner($mid), canforum('delete_own', $board))) {
-    sql_query("DELETE FROM {$db_prefix}messages WHERE `mid` = '$mid'");
+  if (canforum('delete_any', $board) || del(PostOwner($msg), canforum('delete_own', $board))) {
+    sql_query("DELETE FROM {$db_prefix}messages WHERE `mid` = '$msg'");
     $posts = mysql_fetch_assoc(sql_query("SELECT * FROM {$db_prefix}members WHERE `id` = '$member'"));
     $posts = $posts['numposts'] - 1;
     sql_query("UPDATE {$db_prefix}members SET `numposts` = '$posts' WHERE `id` = '$member'");
+    // Are they trying to a delete a topic?
+    $first_msg = mysql_fetch_assoc(sql_query("SELECT * FROM {$db_prefix}topics WHERE `tid` = '$topic'"));
+    if ($first_msg['first_msg'] == $msg) {
+      // Yes, they are
+      // Delete the topic
+      sql_query("DELETE FROM {$db_prefix}topics WHERE `tid` = '$topic'");
+      // Delete all of the messages in the topic
+      sql_query("DELETE FROM {$db_prefix}messages WHERE `tid` = '$topic'");
+      // Delete the topic log
+      sql_query("DELETE FROM {$db_prefix}topic_logs WHERE `tid` = '$topic'");
+      redirect('forum.php?board='.$board);
+    }
   }
-  
   redirect('forum.php?topic='.$topic);
 }
 
