@@ -166,8 +166,8 @@ global $cmsurl, $db_prefix, $l, $settings, $user;
 		      redirect('index.php?action=admin;sa=pages');
 		    }
         // Insert it
-        $result = sql_query("INSERT INTO {$db_prefix}pages (`page_owner`,`owner_name`,`create_date`,`title`) VALUES('{$page_owner}','{$owner_name}','{$create_date}','{$title}')");
-        if(!$result) {
+        if(!$result = sql_query("INSERT INTO {$db_prefix}pages (`page_owner`,`owner_name`,`create_date`,`title`,`html`)
+                                 VALUES ('{$page_owner}','{$owner_name}','{$create_date}','{$title}','{$settings['page_type']}')")) {
           // Oh NOES! It failed!
           $_SESSION['error'] = str_replace('%title%',$title,$l['managepages_make_fail']);
         }

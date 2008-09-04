@@ -47,6 +47,14 @@ global $cmsurl, $db_prefix, $l, $settings, $user, $language_dir, $theme_dir, $th
           'type' => 'select',
           'values' => array()
         ),
+      'page_type' =>
+        array(
+          'type' => 'select',
+          'values' => array(
+                        $l['basicsettings_value_html'], 1,
+                        $l['basicsettings_value_bbcode'], 0
+                      )
+        ),
       'account_activation' =>
         array(
           'type' => 'select',
