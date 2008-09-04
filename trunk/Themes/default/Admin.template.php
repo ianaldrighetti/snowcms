@@ -25,43 +25,10 @@ global $cmsurl, $settings, $l, $user;
 	</div>
 	
   <h2>'.$l['admin_options'].'</h2>
-  <div class="acp_left">
-    <p class="main"><a href="'. $cmsurl. 'index.php?action=admin;sa=pages" title="'. $l['admin_menu_managepages']. '">'. $l['admin_menu_managepages']. '</a></p>
-    <p class="desc">'. $l['admin_menu_managepages_desc']. '</p>
-  </div>
-  <div class="acp_right">
-    <p class="main"><a href="'. $cmsurl. 'index.php?action=admin;sa=basic-settings" title="'. $l['admin_menu_basic-settings']. '">'. $l['admin_menu_basic-settings']. '</a></p>
-    <p class="desc">'. $l['admin_menu_basic-settings_desc']. '</p>  
-  </div>
-    <div class="acp_left">
-    <p class="main"><a href="'. $cmsurl. 'index.php?action=admin;sa=members" title="'. $l['admin_menu_members']. '">'. $l['admin_menu_members']. '</a></p>
-    <p class="desc">'. $l['admin_menu_members_desc']. '</p>
-  </div>
-  <div class="acp_right">
-    <p class="main"><a href="'. $cmsurl. 'index.php?action=admin;sa=permissions" title="'. $l['admin_menu_permissions']. '">'. $l['admin_menu_permissions']. '</a></p>
-    <p class="desc">'. $l['admin_menu_permissions_desc']. '</p>  
-  </div>
-  <div class="acp_left">
-    <p class="main"><a href="'. $cmsurl. 'index.php?action=admin;sa=menus" title="'. $l['admin_menu_menus']. '">'. $l['admin_menu_menus']. '</a></p>
-    <p class="desc">'. $l['admin_menu_menus_desc']. '</p>  
-  </div>
-  <div class="acp_right">
-    <p class="main"><a href="'. $cmsurl. 'index.php?action=admin;sa=forum" title="'. $l['admin_menu_forum']. '">'. $l['admin_menu_forum']. '</a></p>
-    <p class="desc">'. $l['admin_menu_forum_desc']. '</p>  
-  </div>
-  <div class="acp_left">
-    <p class="main"><a href="'. $cmsurl. 'index.php?action=admin;sa=mail-settings" title="'. $l['admin_menu_email']. '">'. $l['admin_menu_email']. '</a></p>
-    <p class="desc">'. $l['admin_menu_email_desc']. '</p>  
-  </div>
-  <div class="acp_right">
-    <p class="main"><a href="'. $cmsurl. 'index.php?action=admin;sa=news" title="'. $l['admin_menu_news']. '">'. $l['admin_menu_news']. '</a></p>
-    <p class="desc">'. $l['admin_menu_news_desc']. '</p>  
-  </div>
-  <div class="acp_left">
-    <p class="main"><a href="'. $cmsurl. 'index.php?action=admin;sa=tos" title="'. $l['admin_menu_tos']. '">'. $l['admin_menu_tos']. '</a></p>
-    <p class="desc">'. $l['admin_menu_tos_desc']. '</p>  
-  </div>
+  
   ';
+  
+  AdminOptions();
 }
 
 function NocURL() {
@@ -83,43 +50,38 @@ global $cmsurl, $settings, $l, $user, $theme_url;
   <iframe style="overflow: auto; width: 475px; height: 100px;" src="'.$settings['page']['news_url'].'?stylesheet='.$theme_url.'/'.$settings['theme'].'/news.css"></iframe>
 	
   <h2>'.$l['admin_options'].'</h2>
-  <div class="acp_left">
-    <p class="main"><a href="'. $cmsurl. 'index.php?action=admin;sa=pages" title="'. $l['admin_menu_managepages']. '">'. $l['admin_menu_managepages']. '</a></p>
-    <p class="desc">'. $l['admin_menu_managepages_desc']. '</p>
-  </div>
-  <div class="acp_right">
-    <p class="main"><a href="'. $cmsurl. 'index.php?action=admin;sa=basic-settings" title="'. $l['admin_menu_basic-settings']. '">'. $l['admin_menu_basic-settings']. '</a></p>
-    <p class="desc">'. $l['admin_menu_basic-settings_desc']. '</p>  
-  </div>
-    <div class="acp_left">
-    <p class="main"><a href="'. $cmsurl. 'index.php?action=admin;sa=members" title="'. $l['admin_menu_members']. '">'. $l['admin_menu_members']. '</a></p>
-    <p class="desc">'. $l['admin_menu_members_desc']. '</p>
-  </div>
-  <div class="acp_right">
-    <p class="main"><a href="'. $cmsurl. 'index.php?action=admin;sa=permissions" title="'. $l['admin_menu_permissions']. '">'. $l['admin_menu_permissions']. '</a></p>
-    <p class="desc">'. $l['admin_menu_permissions_desc']. '</p>  
-  </div>
-  <div class="acp_left">
-    <p class="main"><a href="'. $cmsurl. 'index.php?action=admin;sa=menus" title="'. $l['admin_menu_menus']. '">'. $l['admin_menu_menus']. '</a></p>
-    <p class="desc">'. $l['admin_menu_menus_desc']. '</p>  
-  </div>
-  <div class="acp_right">
-    <p class="main"><a href="'. $cmsurl. 'index.php?action=admin;sa=forum" title="'. $l['admin_menu_forum']. '">'. $l['admin_menu_forum']. '</a></p>
-    <p class="desc">'. $l['admin_menu_forum_desc']. '</p>  
-  </div>
-  <div class="acp_left">
-    <p class="main"><a href="'. $cmsurl. 'index.php?action=admin;sa=mail-settings" title="'. $l['admin_menu_email']. '">'. $l['admin_menu_email']. '</a></p>
-    <p class="desc">'. $l['admin_menu_email_desc']. '</p>  
-  </div>
-  <div class="acp_right">
-    <p class="main"><a href="'. $cmsurl. 'index.php?action=admin;sa=news" title="'. $l['admin_menu_news']. '">'. $l['admin_menu_news']. '</a></p>
-    <p class="desc">'. $l['admin_menu_news_desc']. '</p>  
-  </div>
-  <div class="acp_left">
-    <p class="main"><a href="'. $cmsurl. 'index.php?action=admin;sa=tos" title="'. $l['admin_menu_tos']. '">'. $l['admin_menu_tos']. '</a></p>
-    <p class="desc">'. $l['admin_menu_tos_desc']. '</p>  
+  
+  ';
+  
+  AdminOptions();
+}
+
+function AdminOptions() {
+global $l, $cmsurl;
+  
+  $options = array();
+  if (can('manage_pages'))
+    $options[] = 'pages';
+  if (can('manage_basic-settings'))
+    $options[] = 'basic-settings';
+  $options[] = 'members';
+  $options[] = 'permissions';
+  $options[] = 'menus';
+  $options[] = 'forum';
+  $options[] = 'email';
+  $options[] = 'news';
+  $options[] = 'tos';
+  
+  $odd = true;
+  foreach ($options as $option) {
+    echo '
+  <div class="acp_'.($odd ? 'left' : 'right').'">
+    <p class="main"><a href="'.$cmsurl.'index.php?action=admin;sa='.$option.'" title="'.$l['admin_menu_'.$option].'">'.$l['admin_menu_'.$option].'</a></p>
+    <p class="desc">'.$l['admin_menu_'.$option.'_desc'].'</p>
   </div>
   ';
+    $odd = !$odd;
+  }
 }
 
 // Now, you can show this by doing loadTheme('Admin','Error'); which tells them they can't access the ACP :P

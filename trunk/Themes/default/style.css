@@ -151,12 +151,15 @@ th.border {
 .acp_left {
   float: left;
   width: 240px;
+  height: 65px;
+  overflow: hide;
   border: 1px solid #467aa7;
   margin-top: 3px;
 }
 .acp_right {
   float: right;
   width: 240px;
+  height: 65px;
   border: 1px solid #467aa7;
   margin-top: 3px;
 }

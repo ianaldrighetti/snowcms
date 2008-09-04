@@ -16,7 +16,7 @@ if(!defined("Snow"))
   
 function BasicSettings() {
 global $cmsurl, $db_prefix, $l, $settings, $user, $language_dir, $theme_dir, $theme_name;
-  if(can('manage_basic-settings')) {
+  if (can('manage_basic-settings')) {
     // An array of all the settings that can be set on this page...
     //  A  = text of any length
     // 3A  = at least three characters
@@ -202,10 +202,9 @@ global $cmsurl, $db_prefix, $l, $settings, $user, $language_dir, $theme_dir, $th
     $settings['page']['settings'] = $basic;
     loadTheme('Settings','Basic');
   }
-  else {
-    $settings['page']['title'] = $l['admin_error_title'];
-    loadTheme('Admin','Error');
-  }
+  // They don't have permission to change basic settings
+  else
+    redirect('index.php?action=admin');
 }
 
 function MailSettings() {

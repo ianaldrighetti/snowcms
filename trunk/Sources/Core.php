@@ -317,7 +317,8 @@ global $perms, $user;
   // Groups of permissions
   $groups = array(
     'change_settings' => array('change_displayname','change_email','change_birthdate','change_avatar','change_signature','change_profile',
-                               'change_password')
+                               'change_password'),
+    'manage_pages' => array('manage_pages_modify_html','manage_pages_modify_bbcode','manage_pages_create','manage_pages_delete','manage_pages_home')
   );
   
   // Check if they are allowed to perform any action in the group
