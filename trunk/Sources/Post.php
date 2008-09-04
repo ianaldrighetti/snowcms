@@ -183,7 +183,7 @@ global $cmsurl, $db_prefix, $l, $settings, $user;
         }
       }
       unset($_SESSION['subject'], $_SESSION['body'], $_SESSION['sticky'], $_SESSION['locked'], $_SESSION['board']);
-      redirect("forum.php");
+      redirect("forum.php?board=".clean_header($Board_ID));
     }
     else {
       $_SESSION['subject'] = @$_REQUEST['subject'];
