@@ -84,12 +84,22 @@ global $cmsurl, $db_prefix, $l, $settings, $user, $language_dir, $theme_dir, $th
           'type' => 'text',
           'validation' => '>0'
         ),
+      'num_pages' =>
+        array(
+          'type' => 'text',
+          'validation' => '>0'
+        ),
       'num_members' =>
         array(
           'type' => 'text',
           'validation' => '>0'
         ),
-      'num_pages' =>
+      'num_topics' =>
+        array(
+          'type' => 'text',
+          'validation' => '>0'
+        ),
+      'num_posts' =>
         array(
           'type' => 'text',
           'validation' => '>0'
