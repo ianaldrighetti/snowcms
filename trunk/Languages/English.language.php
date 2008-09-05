@@ -253,13 +253,20 @@ $l['listepage_desc'] = 'This page shows all the pages that was writen in the CMS
 
 // Forum.template.php
 $l['forum_title'] = $settings['site_name'].' - Index';
+$l['forum_new_topic'] = 'New Topic';
 $l['forum_error_title'] = $settings['site_name'].' - Error';
 $l['forum_error_header'] = 'Error';
 $l['forum_error_message'] = 'Sorry, but you aren\'t allowed to view the '.$settings['site_name'].' board, if you have not yet tried, maybe <a href="'.$cmsurl.'index.php?action=register">registering</a> and <a href="'.$cmsurl.'index.php?action=login">logging</a> will allow you to view the forum';
-$l['forum_posts_in'] = 'posts in';
-$l['forum_topics'] = 'topics';
+$l['forum_last_post'] = 'Last post by %user% in %msg%';
+$l['forum_board_stats'] = '%posts% posts in %topics% topics';
 $l['forum_board_new'] = 'New posts';
 $l['forum_board_old'] = 'No new posts';
+$l['forum_board_subject'] = 'Subject';
+$l['forum_board_creator'] = 'Creator';
+$l['forum_board_replies'] = 'Replies';
+$l['forum_board_views'] = 'Views';
+$l['forum_board_last_post_title'] = 'Last Post';
+$l['forum_board_last_post'] = '%msg% by %user%';
 $l['forum_no_posts'] = 'No Posts';
 $l['forum_topic_own_new'] = 'New replies';
 $l['forum_topic_new'] = 'New replies';
@@ -267,8 +274,6 @@ $l['forum_topic_own_old'] = 'No new replies';
 $l['forum_topic_old'] = 'No new replies';
 $l['forum_error_cantviewb_message'] = 'Sorry, you are not allowed to view or access this board';
 $l['forum_error_noboard_message'] = 'The Board ID you have requested does not exist!';
-$l['topic_lastby'] = 'Last Post by';
-$l['topic_in'] = 'in';
 $l['forum_quickreply'] = "Quick Reply";
 
 // Links for Forum.template.php

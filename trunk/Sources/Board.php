@@ -84,7 +84,15 @@ global $cmsurl, $db_prefix, $l, $settings, $user;
             'numViews' => $row['numviews'],
             'starter_id' => $row['starter_id'],
             'is_new' => $new,
-            'is_own' => $own
+            'is_own' => $own,
+            'last_post' => array(
+                           'mid' => $row['mid2'],
+                           'subject' => $row['subject2'],
+                           'username' => $row['username2'],
+                           'time' => formattime($row['last_post_time']),
+                           'uid' => $row['uid2'],
+                           'is_post' => $row['mid2'] ? true : false
+                         )
           );
         }
         mysql_free_result($result);

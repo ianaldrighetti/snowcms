@@ -10,18 +10,18 @@ echo '
 <table id="messageindex_panel">
   <tr>
     <td style="text-align: left;">', pagination($settings['page']['page'],$settings['page']['page_last'],'forum.php?board='.$_REQUEST['board']), '</td>
-    <td style="text-align: right;">'; if(canforum('post_new', $_REQUEST['board'])) { echo '<a href="'. $cmsurl. 'forum.php?action=post;board='. $_REQUEST['board']. '">New Topic</a>'; } echo '</td>
+    <td style="text-align: right;">'; if(canforum('post_new', $_REQUEST['board'])) { echo '<a href="'. $cmsurl. 'forum.php?action=post;board='. $_REQUEST['board']. '">'.$l['forum_new_topic'].'</a>'; } echo '</td>
   </tr>
 </table>
 <div id="messageindex">
   <table width="800px">
     <tr id="title">
       <td width="5%" style="padding: 5px;">&nbsp;</td>
-      <td width="50%" style="padding: 5px;">Subject</td>
-      <td width="15%" style="padding: 5px;">Started By</td>
-      <td width="5%" style="padding: 5px;">Replies</td>
-      <td width="5%" style="padding: 5px;">Views</td>
-      <td width="20%" style="padding: 5px;">Last Post</td>
+      <td width="50%" style="padding: 5px;">'.$l['forum_board_subject'].'</td>
+      <td width="15%" style="padding: 5px;">'.$l['forum_board_creator'].'</td>
+      <td width="5%" style="padding: 5px;">'.$l['forum_board_replies'].'</td>
+      <td width="5%" style="padding: 5px;">'.$l['forum_board_views'].'</td>
+      <td width="20%" style="padding: 5px;">'.$l['forum_board_last_post_title'].'</td>
     </tr>';
   if(count($settings['topics'])>0) {
     foreach($settings['topics'] as $topic) {
@@ -48,7 +48,10 @@ echo '
          <td style="text-align: center; padding: 5px;"><a href="'. $cmsurl. 'index.php?action=profile;u='. $topic['starter_id']. '">'.$topic['username']. '</a></td>
          <td style="text-align: center; padding: 5px;">'. $topic['numReplies']. '</td>
          <td style="text-align: center; padding: 5px;">'. $topic['numViews']. '</td>
-         <td style="padding: 5px;">Last Post info :o</td>
+         <td style="padding: 5px;">'.str_replace(
+         '%msg%','<a href="'.$cmsurl.'forum.php?topic='.$topic['tid'].';msg='.$topic['last_post']['mid'].'">'.$topic['last_post']['subject'].'</a>',
+         str_replace('%user%','<a href="'.$cmsurl.'index.php?action=profile;u='.$topic['last_post']['uid'].'">'.$topic['last_post']['username'].'</a>',
+         $l['forum_board_last_post'])).'</td>
        </tr>';
     }
   }
@@ -64,7 +67,7 @@ echo '
 <table id="messageindex_panel">
   <tr>
     <td style="text-align: left;">', pagination($settings['page']['page'],$settings['page']['page_last'],'forum.php?board='.$_REQUEST['board']), '</td>
-    <td style="text-align: right;">'; if(canforum('post_new', $_REQUEST['board'])) { echo '<a href="'. $cmsurl. 'forum.php?action=post;board='. $_REQUEST['board']. '">New Topic</a>'; } echo '</td>
+    <td style="text-align: right;">'; if(canforum('post_new', $_REQUEST['board'])) { echo '<a href="'. $cmsurl. 'forum.php?action=post;board='. $_REQUEST['board']. '">'.$l['forum_new_topic'].'</a>'; } echo '</td>
   </tr>
 </table>';
 }
