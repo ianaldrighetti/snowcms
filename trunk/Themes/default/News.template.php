@@ -12,10 +12,6 @@ global $cmsurl, $db_prefix, $l, $settings, $user;
   echo '
   <h1>', $l['news_header'], '</h1>';
   
-  $prev_page = $settings['page']['previous_page'];
-  $page = $settings['page']['current_page'];
-  $next_page = $settings['page']['next_page'];
-  $total_news = $settings['page']['total_news'];
   if ($cat = $settings['page']['cat'])
     $cat = ';cat='.$cat;
   
@@ -23,33 +19,10 @@ global $cmsurl, $db_prefix, $l, $settings, $user;
   echo '<form action="'.$cmsurl.'index.php?action=news" method="post" style="float: right; margin-bottom: 0"><p style="display: inline">
      '.$settings['page']['categories'].'
       </p></form>
+      <br />
       ';
   
-  // Show the pervious page link if it is at least page two
-  if ($prev_page > 0)
-     echo '<table width="100%">
-      <tr><td><a href="'.$cmsurl.'index.php?action=news'.$cat.';pg='.$prev_page.'">'.$l['news_previous_page'].'</a></td>
-      ';
-  // Show the previous page link if it is page one
-  elseif ($prev_page == 0)
-    echo '<table width="100%">
-      <tr><td><a href="'.$cmsurl.'index.php?action=news'.$cat.'">'.$l['news_previous_page'].'</a></td>
-      ';
-  // Don't show the previous page link, because it is the first page
-  else
-    echo '<table width="100%">
-      <tr><td></td>
-      ';
-  // Show the next page link
-  if (@($total_news / $settings['num_news_items']) > $next_page)
-    echo '<td style="text-align: right"><a href="'.$cmsurl.'index.php?action=news'.$cat.';pg='.$next_page.'">'.$l['news_next_page'].'</a></td></tr>
-      </table>
-      ';
-  // Don't show the next page link, because it is the last page
-  else
-    echo '<td style="text-align: right"></td></tr>
-      </table>
-      ';
+  pagination($settings['page']['page'],$settings['page']['page_last'],'index.php?action=news'.$cat);
   
   // Show news on this page
   $i = 0;
@@ -68,31 +41,7 @@ global $cmsurl, $db_prefix, $l, $settings, $user;
     $i += 1;
   }
   
-  // Show the pervious page link if it is at least page two
-  if ($prev_page > 0)
-     echo '<table width="100%">
-      <tr><td><a href="'.$cmsurl.'index.php?action=news'.$cat.';pg='.$prev_page.'">'.$l['news_previous_page'].'</a></td>
-      ';
-  // Show the previous page link if it is page one
-  elseif ($prev_page == 0)
-    echo '<table width="100%">
-      <tr><td><a href="'.$cmsurl.'index.php?action=news'.$cat.'">'.$l['news_previous_page'].'</a></td>
-      ';
-  // Don't show the previous page link, because it is the first page
-  else
-    echo '<table width="100%">
-      <tr><td></td>
-      ';
-  // Show the next page link
-  if (@($total_news / $settings['num_news_items']) > $next_page)
-    echo '<td style="text-align: right"><a href="'.$cmsurl.'index.php?action=news'.$cat.';pg='.$next_page.'">'.$l['news_next_page'].'</a></td></tr>
-      </table>
-      ';
-  // Don't show the next page link, because it is the last page
-  else
-    echo '<td style="text-align: right"></td></tr>
-      </table>
-      ';
+  pagination($settings['page']['page'],$settings['page']['page_last'],'index.php?action=news'.$cat);
   
   // Show categories
   echo '<form action="'.$cmsurl.'index.php?action=news" method="post" style="float: right; margin-bottom: 0"><p style="display: inline">
@@ -334,5 +283,30 @@ global $l, $settings;
           ';
   
   $settings['page']['categories'] = $categories;
+}
+
+function pagination($page, $last, $url) {
+global $l, $cmsurl;
+  
+  echo '<p>';
+  $i = $page < 2 ? 0 : $page - 2;
+  if ($i > 1)
+    echo '<a href="'.$cmsurl.$url.'">1</a> ... ';
+  elseif ($i == 1)
+    echo '<a href="'.$cmsurl.$url.'">1</a> ';
+  while ($i < ($page + 3 < $last ? $page + 3 : $last)) {
+    if ($i == $page)
+      echo '<b>['.($i+1).']</b> ';
+    elseif ($i)
+      echo '<a href="'.$cmsurl.$url.';pg='.$i.'">'.($i+1).'</a> ';
+    else
+      echo '<a href="'.$cmsurl.$url.'">'.($i+1).'</a> ';
+    $i += 1;
+  }
+  if ($i < $last - 1)
+    echo '... <a href="'.$cmsurl.$url.';pg='.($last-1).'">'.$last.'</a>';
+  elseif ($i == $last - 1)
+    echo '<a href="'.$cmsurl.$url.';pg='.($last-1).'">'.$last.'</a>';
+  echo '</p>';
 }
 ?>

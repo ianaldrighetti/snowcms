@@ -255,12 +255,10 @@ global $cmsurl, $db_prefix, $l, $settings, $user;
         );          
       }
     
-    // The previous page number
-    $settings['page']['previous_page'] = $page - 1;
     // The current page number
-    $settings['page']['current_page'] = (int)$page;
-    // The next page number
-    $settings['page']['next_page'] = $page + 1;
+    $settings['page']['page'] = (int)$page;
+    // The last page number
+    $settings['page']['page_last'] = ceil($settings['page']['total_pages'] / $settings['num_pages']);
     
     // Load the $pages array into $settings so we can pass it on
     $settings['page']['pages'] = $pages;

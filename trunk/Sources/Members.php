@@ -153,29 +153,27 @@ global $l, $settings, $db_prefix, $cmsurl;
   if ($page < 0)
     $page = 0;
   // If page number is higher then maximum, lower it until it isn't
-  while ($settings['manage_members_per_page'] * $page >= $settings['page']['total_members'] && $page > 0)
+  while ($settings['num_members'] * $page >= $settings['page']['total_members'] && $page > 0)
     $page -= 1;
   
   // The first member number of this page
-  $settings['page']['first_member'] = 1 + $start = $page * $settings['manage_members_per_page'];
+  $settings['page']['first_member'] = 1 + $start = $page * $settings['num_members'];
   // The last member number of this page
-  $settings['page']['last_member'] = $settings['page']['total_members'] < $start + $settings['manage_members_per_page']
+  $settings['page']['last_member'] = $settings['page']['total_members'] < $start + $settings['num_members']
                                    ? $settings['page']['total_members']
-                                   : $start + $settings['manage_members_per_page'];
+                                   : $start + $settings['num_members'];
   
   // Get the member records of this page out of the database
-  $members = sql_query("SELECT * FROM {$db_prefix}members LEFT JOIN {$db_prefix}membergroups ON `group` = `group_id` $filter $sort LIMIT $start, ".$settings['manage_members_per_page']);
+  $members = sql_query("SELECT * FROM {$db_prefix}members LEFT JOIN {$db_prefix}membergroups ON `group` = `group_id` $filter $sort LIMIT $start, ".$settings['num_members']);
   // Convert the members from an SQL result resource into a multi-demensional array
   while ($row = mysql_fetch_assoc($members)) {
     $settings['page']['members'][] = $row;
   }
   
-  // The previous page number
-  $settings['page']['previous_page'] = $page - 1;
   // The current page number
-  $settings['page']['current_page'] = $page;
-  // The next page number
-  $settings['page']['next_page'] = $page + 1;
+  $settings['page']['page'] = $page;
+  // The last page number
+  $settings['page']['page_last'] = ceil($settings['page']['total_members'] / $settings['num_members']);
   
   // Get the page number from the query string
   if (@$_REQUEST['pg'])

@@ -84,7 +84,7 @@ global $cmsurl, $db_prefix, $l, $settings, $user, $language_dir, $theme_dir, $th
           'type' => 'text',
           'validation' => '>0'
         ),
-      'manage_members_per_page' =>
+      'num_members' =>
         array(
           'type' => 'text',
           'validation' => '>0'

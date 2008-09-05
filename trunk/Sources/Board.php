@@ -62,32 +62,36 @@ global $cmsurl, $db_prefix, $l, $settings, $user;
             LEFT JOIN {$db_prefix}topic_logs AS log ON log.uid = {$user['id']} AND log.tid = t.tid
           WHERE 
             t.bid = $board_id
-          ORDER BY t.sticky DESC, last_post_time DESC") or die(mysql_error());
-          $topics = array();
-          while($row = mysql_fetch_assoc($result)) {
-            if(isset($row['is_new']))
-              $new = false;
-            else
-              $new = true;
-            if (mysql_num_rows(sql_query("SELECT * FROM {$db_prefix}messages WHERE `tid` = '{$row['tid']}' AND `uid` = '{$user['id']}'")))
-              $own = true;
-            else
-              $own = false;
-            $topics[] = array(
-              'tid' => $row['tid'],
-              'subject' => $row['subject'],
-              'sticky' => $row['sticky'],
-              'locked' => $row['locked'],
-              'bid' => $row['bid'],
-              'username' => $row['username'],
-              'numReplies' => $row['num_replies'],
-              'numViews' => $row['numviews'],
-              'starter_id' => $row['starter_id'],
-              'is_new' => $new,
-              'is_own' => $own
-            );
-          }
-          mysql_free_result($result);
+          ORDER BY t.sticky DESC, last_post_time DESC");
+        $topics = array();
+        while($row = mysql_fetch_assoc($result)) {
+          if(isset($row['is_new']))
+            $new = false;
+          else
+            $new = true;
+          if (mysql_num_rows(sql_query("SELECT * FROM {$db_prefix}messages WHERE `tid` = '{$row['tid']}' AND `uid` = '{$user['id']}'")))
+            $own = true;
+          else
+            $own = false;
+          $topics[] = array(
+            'tid' => $row['tid'],
+            'subject' => $row['subject'],
+            'sticky' => $row['sticky'],
+            'locked' => $row['locked'],
+            'bid' => $row['bid'],
+            'username' => $row['username'],
+            'numReplies' => $row['num_replies'],
+            'numViews' => $row['numviews'],
+            'starter_id' => $row['starter_id'],
+            'is_new' => $new,
+            'is_own' => $own
+          );
+        }
+        mysql_free_result($result);
+        $settings['page']['page'] = (int)@$_REQUEST['pg'];
+        $total_topics = mysql_num_rows(sql_query("SELECT * FROM {$db_prefix}topics WHERE `bid` = '$board_id'"));
+        $settings['page']['page_last'] = $total_topics / $settings['num_topics'];
+        $settings['page']['page_last'] = 1;
         $settings['topics'] = $topics;
         $settings['page']['title'] = $settings['site_name'].' - '.$board['name'];
         loadForum('MessageIndex');    

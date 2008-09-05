@@ -7,7 +7,7 @@ if(!defined('Snow'))
 function Main() {
 global $cmsurl, $settings, $l, $user, $theme_url;
   
-  $pg = $settings['page']['current_page'] ? ';pg='.$settings['page']['current_page'] : '';
+  $pg = $settings['page']['page'] ? ';pg='.$settings['page']['page'] : '';
   $s = $settings['page']['sort'] ? ';s='.$settings['page']['sort'] : '';
   
   echo '
@@ -47,36 +47,7 @@ global $cmsurl, $settings, $l, $user, $theme_url;
   <form action="'.$cmsurl.'index.php?action=admin;sa=pages" method="post">
   ';
   
-  $prev_page = $settings['page']['previous_page'];
-  $page = $settings['page']['current_page'];
-  $next_page = $settings['page']['next_page'];
-  $total_pages = $settings['page']['total_pages'];
-  
-  // Show the pervious page link if it is at least page two
-  if ($prev_page > 0)
-    echo '<table width="100%">
-      <tr><td><a href="'.$cmsurl.'index.php?action=admin;sa=pages'.$s.';pg='.$prev_page.'">'.$l['memberlist_previous_page'].'</a></td>
-       ';
-  // Show the previous page link if it is page one
-  elseif ($prev_page == 0)
-    echo '<table width="100%">
-      <tr><td><a href="'.$cmsurl.'index.php?action=admin;sa=pages'.$s.'">'.$l['memberlist_previous_page'].'</a></td>
-      ';
-  // Don't show the previous page link, because it is the first page
-  else
-    echo '<table width="100%">
-      <tr><td></td>
-      ';
-  // Show the next page link
-  if (@($total_pages / $settings['num_pages']) > $next_page)
-    echo '<td style="text-align: right"><a href="'.$cmsurl.'index.php?action=admin;sa=pages'.$s.';pg='.$next_page.'">'.$l['memberlist_next_page'].'</a></td></tr>
-      </table>
-      ';
-  // Don't show the next page link, because it is the last page
-  else
-    echo '<td style="text-align: right"></td></tr>
-      </table>
-      ';
+  pagination($settings['page']['page'],$settings['page']['page_last'],'index.php?action=admin;sa=pages'.$s);
   
   echo '<table width="100%" style="text-align: center">
     <tr>
@@ -129,31 +100,7 @@ global $cmsurl, $settings, $l, $user, $theme_url;
   </table>
   ';
   
-  // Show the pervious page link if it is at least page two
-  if ($prev_page > 0)
-    echo '<table width="100%">
-      <tr><td><a href="'.$cmsurl.'index.php?action=admin;sa=pages'.$s.';pg='.$prev_page.'">'.$l['memberlist_previous_page'].'</a></td>
-       ';
-  // Show the previous page link if it is page one
-  elseif ($prev_page == 0)
-    echo '<table width="100%">
-      <tr><td><a href="'.$cmsurl.'index.php?action=admin;sa=pages'.$s.'">'.$l['memberlist_previous_page'].'</a></td>
-      ';
-  // Don't show the previous page link, because it is the first page
-  else
-    echo '<table width="100%">
-      <tr><td></td>
-      ';
-  // Show the next page link
-  if (@($total_pages / $settings['num_pages']) > $next_page)
-    echo '<td style="text-align: right"><a href="'.$cmsurl.'index.php?action=admin;sa=pages'.$s.';pg='.$next_page.'">'.$l['memberlist_next_page'].'</a></td></tr>
-      </table>
-      ';
-  // Don't show the next page link, because it is the last page
-  else
-    echo '<td style="text-align: right"></td></tr>
-      </table>
-      ';
+  pagination($settings['page']['page'],$settings['page']['page_last'],'index.php?action=admin;sa=pages'.$s);
   
   if (can('manage_pages_home'))
     echo '<p><input type="submit" value="'.$l['managepages_change_homepage'].'" /></p>
@@ -253,5 +200,30 @@ global $cmsurl, $settings, $l, $user;
   <h1>'.$l['managepages_no_page_header'].'</h1>
   
   <p>'.$l['managepages_no_page_desc'].'</p>';
+}
+
+function pagination($page, $last, $url) {
+global $l, $cmsurl;
+  
+  echo '<p>';
+  $i = $page < 2 ? 0 : $page - 2;
+  if ($i > 1)
+    echo '<a href="'.$cmsurl.$url.'">1</a> ... ';
+  elseif ($i == 1)
+    echo '<a href="'.$cmsurl.$url.'">1</a> ';
+  while ($i < ($page + 3 < $last ? $page + 3 : $last)) {
+    if ($i == $page)
+      echo '<b>['.($i+1).']</b> ';
+    elseif ($i)
+      echo '<a href="'.$cmsurl.$url.';pg='.$i.'">'.($i+1).'</a> ';
+    else
+      echo '<a href="'.$cmsurl.$url.'">'.($i+1).'</a> ';
+    $i += 1;
+  }
+  if ($i < $last - 1)
+    echo '... <a href="'.$cmsurl.$url.';pg='.($last-1).'">'.$last.'</a>';
+  elseif ($i == $last - 1)
+    echo '<a href="'.$cmsurl.$url.';pg='.($last-1).'">'.$last.'</a>';
+  echo '</p>';
 }
 ?>

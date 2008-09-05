@@ -83,18 +83,16 @@ global $cmsurl, $db_prefix, $l, $settings, $user;
         );
       }
       
-      // The previous page number
-      $settings['page']['previous_page'] = $page - 1;
-      // The current page number
-      $settings['page']['current_page'] = $page;
-      // The next page number
-      $settings['page']['next_page'] = $page + 1;
       // Total amount of news articles
       $news_count = sql_query("SELECT * FROM {$db_prefix}news $cat");
-      $settings['page']['total_news'] = 0;
+      $total_news = 0;
       while (mysql_fetch_assoc($news_count)) {
-        $settings['page']['total_news'] += 1;
+        $total_news += 1;
       }
+      // The current page number
+      $settings['page']['page'] = $page;
+      // The last page number
+      $settings['page']['page_last'] = $total_news / $settings['num_news_items'];
       
       // The current category
       $settings['page']['cat'] = @$_REQUEST['cat'];

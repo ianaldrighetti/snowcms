@@ -8,7 +8,7 @@
 // Which means you are free to edit it and then
 //       redistribute it as your wish!
 // 
-//             Topic.php file 
+//              Topic.php file 
 
 
 if(!defined("Snow"))
@@ -54,12 +54,12 @@ global $cmsurl, $db_prefix, $l, $settings, $user;
           WHERE msg.tid = $topic_id");
         // How many messages are there? :o
         $num_msg = mysql_num_rows($result)-1;
-        // If the number of messages is less then $settings['topic_posts_per_page'], no need to do anything fancy :]
-        if($num_msg<$settings['topic_posts_per_page']) {
+        // If the number of messages is less then $settings['num_posts'], no need to do anything fancy :]
+        if($num_msg<$settings['num_posts']) {
           redirect("forum.php?topic={$topic_id}#mid{$msg_id}");
         }
         else {
-          $num_pages = ceil($num_msg/$settings['topic_posts_per_page']);
+          $num_pages = ceil($num_msg/$settings['num_posts']);
           $mids = array();
           while($row = mysql_fetch_assoc($result))
             $mids[] = $row['mid'];
@@ -73,7 +73,7 @@ global $cmsurl, $db_prefix, $l, $settings, $user;
               if($mids[$i]==$msg_id) {
                $mid_page = $page;
               }
-              if($msgs==$settings['topic_posts_per_page']) {
+              if($msgs==$settings['num_posts']) {
                 $msgs = 1;
                 $page++;
               }
@@ -90,12 +90,7 @@ global $cmsurl, $db_prefix, $l, $settings, $user;
           }
         }
       }
-      // We don't want ;page=1 :P
-      if(!empty($_REQUEST['page']) && $_REQUEST['page']==1)
-        redirect("forum.php?topic={$_REQUEST['topic']}");
-      $info = paginate($Topic_ID);
-      $pagination = $info['pagination'];
-      $start = $info['start'];
+      $start = (int)@$_REQUEST['pg'];
       $result = sql_query("
         SELECT
           t.tid, t.first_msg, msg.subject, msg.mid
@@ -115,8 +110,8 @@ global $cmsurl, $db_prefix, $l, $settings, $user;
           LEFT JOIN {$db_prefix}members AS mem ON mem.id = msg.uid
           LEFT JOIN {$db_prefix}membergroups AS grp ON grp.group_id = mem.group
           LEFT JOIN {$db_prefix}online AS ol ON ol.user_id = mem.id
-        WHERE t.tid = $Topic_ID
-        ORDER BY msg.mid ASC LIMIT $start,{$settings['topic_posts_per_page']}");
+        WHERE t.tid = '$Topic_ID'
+        ORDER BY msg.mid ASC LIMIT $start, {$settings['num_posts']}");
         while($row = mysql_fetch_assoc($result)) {
           if($row['display_name']!=null)
             $row['username'] = $row['display_name'];
@@ -144,9 +139,11 @@ global $cmsurl, $db_prefix, $l, $settings, $user;
           );
           $bid = $row['bid'];
         }
+        $settings['page']['page'] = (int)@$_REQUEST['pg'];
+        $total_posts = mysql_num_rows(sql_query("SELECT * FROM {$db_prefix}topics WHERE `tid` = '$Topic_ID'"));
+        $settings['page']['page_last'] = $total_posts / $settings['num_posts'];
         $settings['page']['title'] = $title;
         $settings['posts'] = $posts;
-        $settings['pagination'] = $pagination;
         $settings['topic'] = (int)$_REQUEST['topic'];
         $settings['sticky'] = $posts[0]['sticky'];
         $settings['locked'] = $posts[0]['locked'];
@@ -163,91 +160,6 @@ global $cmsurl, $db_prefix, $l, $settings, $user;
     $settings['page']['title'] = $l['forum_error_title'];
     loadForum('Error','BNotAllowed');
   }   
-}
-function paginate($topic) {
-global $l, $cmsurl, $db_prefix, $settings;
-
- $query = mysql_query("SELECT * FROM {$db_prefix}messages WHERE `tid` = $topic");
- $num_posts = mysql_num_rows($query);
-
- $lastpage = ceil($num_posts/$settings['topic_posts_per_page']);
-
- if(!empty($_REQUEST['page'])) {
-   $page = (int)$_REQUEST['page'];
- }
- else {
-   $page = 1;
- }
- if($page > $lastpage) {
-   $page = $lastpage;
- }
- elseif($page < 1) {
-   $page = 1;
- }
- if($page==1) {
-   $start = 0;
- }
- elseif($page > 1) {
-   $start = ($page-1)*$settings['topic_posts_per_page'];
- }
-
- $pagination = '';
- if($lastpage > 3) {
-   if($page!=$lastpage) {
-     if($page==1) {
-       for($i = 1; $i <= 3; $i++) {
-         if($page==$i) {
-           $pagination .= '[ <a href="'.$cmsurl.'forum.php?topic='.$topic.';page='.$i.'">'.$i.'</a> ] ';
-         }
-         else {
-           $pagination .= '<a href="'.$cmsurl.'forum.php?topic='.$topic.';page='.$i.'">'.$i.'</a> ';
-         }
-       }
-       $pagination .= ' <a href="'.$cmsurl.'forum.php?topic='.$topic.';page='.$lastpage.'">'.$l['topic_lastpage'].'</a>';
-     }
-     else {
-       if(($page-1)!=1)
-         $pagination .= ' <a href="'.$cmsurl.'forum.php?topic='.$topic.';page=1">'.$l['topic_firstpage'].'</a> ';
-       for($i = ($page-1); $i <= ($page+1); $i++) {
-         if($page==$i) {
-           $pagination .= '[ <a href="'.$cmsurl.'forum.php?topic='.$topic.';page='.$i.'">'.$i.'</a> ] ';
-         }
-         else {
-           $pagination .= '<a href="'.$cmsurl.'forum.php?topic='.$topic.';page='.$i.'">'.$i.'</a> ';
-         }       
-       }
-       if(($page+1)!=$lastpage)
-         $pagination .= ' <a href="'.$cmsurl.'forum.php?topic='.$topic.';page='.$lastpage.'">'.$l['topic_lastpage'].'</a>';
-     }
-   }
-   else {
-     $pagination .= ' <a href="'.$cmsurl.'forum.php?topic='.$topic.';page=1">'.$l['topic_firstpage'].'</a> ';
-     for($i = ($lastpage-2); $i <= $lastpage; $i++) {
-       if($page==$i) {
-         $pagination .= '[ <a href="'.$cmsurl.'forum.php?topic='.$topic.';page='.$i.'">'.$i.'</a> ] ';
-       }
-       else {
-         $pagination .= '<a href="'.$cmsurl.'forum.php?topic='.$topic.';page='.$i.'">'.$i.'</a> ';
-       }
-     }     
-   }     
- }
- elseif($lastpage==1) {
-   $pagination = '[ 1 ]';
- }
- else {
-   for($i = 1; $i <= $lastpage; $i++) {
-     if($page==$i) {
-       $pagination .= '[ <a href="'.$cmsurl.'forum.php?topic='.$topic.';page='.$i.'">'.$i.'</a> ] ';
-     }
-     else {
-       $pagination .= '<a href="'.$cmsurl.'forum.php?topic='.$topic.';page='.$i.'">'.$i.'</a> ';
-     }
-   }
- }
- $info['pagination'] = $pagination;
- $info['start'] = $start;
- return $info;
 }
 
 function Sticky() {

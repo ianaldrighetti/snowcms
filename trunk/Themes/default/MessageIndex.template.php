@@ -9,7 +9,7 @@ global $bperms, $cmsurl, $l, $settings, $user, $theme_url;
 echo '
 <table id="messageindex_panel">
   <tr>
-    <td style="text-align: left;">Pages: [1]</td>
+    <td style="text-align: left;">', pagination($settings['page']['page'],$settings['page']['page_last'],'forum.php?board='.$_REQUEST['board']), '</td>
     <td style="text-align: right;">'; if(canforum('post_new', $_REQUEST['board'])) { echo '<a href="'. $cmsurl. 'forum.php?action=post;board='. $_REQUEST['board']. '">New Topic</a>'; } echo '</td>
   </tr>
 </table>
@@ -60,6 +60,37 @@ echo '
   }
 echo '
   </table>
-</div>';
+</div>
+<table id="messageindex_panel">
+  <tr>
+    <td style="text-align: left;">', pagination($settings['page']['page'],$settings['page']['page_last'],'forum.php?board='.$_REQUEST['board']), '</td>
+    <td style="text-align: right;">'; if(canforum('post_new', $_REQUEST['board'])) { echo '<a href="'. $cmsurl. 'forum.php?action=post;board='. $_REQUEST['board']. '">New Topic</a>'; } echo '</td>
+  </tr>
+</table>';
+}
+
+function pagination($page, $last, $url) {
+global $l, $cmsurl;
+  
+  echo '<p>';
+  $i = $page < 2 ? 0 : $page - 2;
+  if ($i > 1)
+    echo '<a href="'.$cmsurl.$url.'">1</a> ... ';
+  elseif ($i == 1)
+    echo '<a href="'.$cmsurl.$url.'">1</a> ';
+  while ($i < ($page + 3 < $last ? $page + 3 : $last)) {
+    if ($i == $page)
+      echo '<b>['.($i+1).']</b> ';
+    elseif ($i)
+      echo '<a href="'.$cmsurl.$url.';pg='.$i.'">'.($i+1).'</a> ';
+    else
+      echo '<a href="'.$cmsurl.$url.'">'.($i+1).'</a> ';
+    $i += 1;
+  }
+  if ($i < $last - 1)
+    echo '... <a href="'.$cmsurl.$url.';pg='.($last-1).'">'.$last.'</a>';
+  elseif ($i == $last - 1)
+    echo '<a href="'.$cmsurl.$url.';pg='.($last-1).'">'.$last.'</a>';
+  echo '</p>';
 }
 ?>

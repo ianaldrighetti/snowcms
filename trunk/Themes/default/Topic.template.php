@@ -9,7 +9,7 @@ global $cmsurl, $theme_url, $l, $settings, $user;
 echo '
 <table id="topic_panel">
   <tr>
-    <td style="text-align: left;">Pages: ', $settings['pagination'], '</td>
+    <td style="text-align: left;">', pagination($settings['page']['page'],$settings['page']['page_last'],'forum.php?topic='.$settings['topic']), '</td>
     <td style="text-align: right;">';
 if (canforum('sticky_topic', $settings['bid'])) {
   if ($settings['sticky'])
@@ -82,7 +82,7 @@ echo '
 echo '
 <table id="topic_panel">
   <tr>
-    <td style="text-align: left;">Pages: ', $settings['pagination'], '</td>
+    <td style="text-align: left;">', pagination($settings['page']['page'],$settings['page']['page_last'],'forum.php?topic='.$settings['topic']), '</td>
     <td style="text-align: right;">';
 if (canforum('sticky_topic', $settings['bid'])) {
   if ($settings['sticky'])
@@ -121,5 +121,30 @@ echo '
   </div>
 </div>
 ';
+}
+
+function pagination($page, $last, $url) {
+global $l, $cmsurl;
+  
+  echo '<p>';
+  $i = $page < 2 ? 0 : $page - 2;
+  if ($i > 1)
+    echo '<a href="'.$cmsurl.$url.'">1</a> ... ';
+  elseif ($i == 1)
+    echo '<a href="'.$cmsurl.$url.'">1</a> ';
+  while ($i < ($page + 3 < $last ? $page + 3 : $last)) {
+    if ($i == $page)
+      echo '<b>['.($i+1).']</b> ';
+    elseif ($i)
+      echo '<a href="'.$cmsurl.$url.';pg='.$i.'">'.($i+1).'</a> ';
+    else
+      echo '<a href="'.$cmsurl.$url.'">'.($i+1).'</a> ';
+    $i += 1;
+  }
+  if ($i < $last - 1)
+    echo '... <a href="'.$cmsurl.$url.';pg='.($last-1).'">'.$last.'</a>';
+  elseif ($i == $last - 1)
+    echo '<a href="'.$cmsurl.$url.';pg='.($last-1).'">'.$last.'</a>';
+  echo '</p>';
 }
 ?>
