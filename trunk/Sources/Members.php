@@ -218,11 +218,13 @@ global $l, $settings, $db_prefix;
   
   // Load member data
   $result = sql_query("SELECT * FROM {$db_prefix}members LEFT JOIN {$db_prefix}membergroups ON `group` = `group_id` WHERE id = ".@$_REQUEST['u']);
-  if (mysql_num_rows($result))
-    if ($row = mysql_fetch_assoc($result)) {
-      $settings['page']['title'] = str_replace("%name%",$row['display_name'] ? $row['display_name'] : $row['username'],$l['managemembers_moderate_title']);
-      $settings['page']['member'] = $row;
-    }
+  $row = mysql_fetch_assoc($result);
+  $settings['page']['title'] = str_replace("%name%",$row['display_name'] ? $row['display_name'] : $row['username'],$l['managemembers_moderate_title']);
+  $settings['page']['member'] = $row;
+  
+  $settings['page']['member']['birthdate_day'] = ($row['birthdate']) ? date('j',$row['birthdate']) : '';
+  $settings['page']['member']['birthdate_month'] = ($row['birthdate']) ? date('n',$row['birthdate']) : '';
+  $settings['page']['member']['birthdate_year'] = ($row['birthdate']) ? date('Y',$row['birthdate']) : '';
   
   // Load groups
   $result = sql_query("SELECT * FROM {$db_prefix}membergroups");
@@ -253,14 +255,33 @@ global $l, $db_prefix, $user, $settings, $cookie_prefix;
         $settings['error'] = $l['managemembers_error_display_name_already_used'];
     }
   
-  // Clean the data of possible injections (Hacking)
+  // Clean the user ID
   $u = clean($_REQUEST['u']);
+  // Clean the username
   $username = clean($_REQUEST['user_name']);
+  // Clean the display name
   $display_name = clean($_REQUEST['display_name']) ? clean($_REQUEST['display_name']) : $username;
+  // Clean the email address
   $email = clean($_REQUEST['email']);
+  // Clean the member group
   $group = clean($_REQUEST['group']);
+  // Clean the birthdate
+  $day = (int)@$_REQUEST['day'];
+  $month = (int)@$_REQUEST['month'];
+  $year = (int)@$_REQUEST['year'];
+  if ($day && $year)
+    $birthdate = strtotime($year.'-'.$month.'-'.$day);
+  else
+    $birthdate = 0;
+  // Clean the avatar
+  $avatar = clean(@$_REQUEST['avatar']);
+  if (substr($avatar,0,7) != 'http://' && substr($avatar,0,8) != 'https://' && substr($avatar,0,6) != 'ftp://' && substr($avatar,0,7) != 'ftps://' && $avatar != '')
+    $avatar = 'http://'.$avatar;
+  // Clean the signature
   $signature = clean($_REQUEST['signature']);
+  // Clean the profile text
   $profile = clean($_REQUEST['profile']);
+  // Clean the password
   $password_new = clean($_REQUEST['password-new']);
   $password_verify = clean($_REQUEST['password-verify']);
   
@@ -286,27 +307,40 @@ global $l, $db_prefix, $user, $settings, $cookie_prefix;
     die('Internal error');
   $row = mysql_fetch_assoc($result);
   
-  if (!can('moderate_username'))
-    $username = $row['username'];
-  if (!can('moderate_display_name'))
-    $display_name = $row['display_name'];
-  if (!can('moderate_email'))
-    $email = $row['email'];
-  if (!can('moderate_password'))
-    $password = $row['password'];
-  if (!can('moderate_group'))
-    $group = $row['group'];
-  if (!can('moderate_signature'))
-    $signature = $row['signature'];
-  if (!can('moderate_profile'))
-    $profile = $row['profile'];
+  // Are they trying to change their username and are they allowed to?
+  if (!can('moderate_usrname') && $username != $row['username'])
+    $_SESSION['error'] = $l['managemembers_error_notallowed_username'];
+  // Are they trying to change their display name and are they allowed to?
+  if (!can('moderate_display_name') && $display_name != $row['display_name'])
+    $_SESSION['error'] = $l['managemembers_error_notallowed_displayname'];
+  // Are they trying to change their email address and are they allowed to?
+  elseif (!can('moderate_email') && $email != $row['email'])
+    $_SESSION['error'] = $l['managemembers_error_notallowed_email'];
+  // Are they trying to change their username and are they allowed to?
+  if (!can('moderate_group') && $group != $row['group'])
+    $_SESSION['error'] = $l['managemembers_error_notallowed_group'];
+  // Are they trying to change their birthdate and are they allowed to?
+  elseif (!can('moderate_birthdate') && $birthdate != $row['birthdate'])
+    $_SESSION['error'] = $l['managemembers_error_notallowed_birthdate'];
+  // Are they trying to change their avatar and are they allowed to?
+  elseif (!can('moderate_avatar') && $avatar != $row['avatar'])
+    $_SESSION['error'] = $l['managemembers_error_notallowed_avatar'];
+  // Are they trying to change their signature and are they allowed to?
+  elseif (!can('moderate_signature') && $signature != $row['signature'])
+    $_SESSION['error'] = $l['managemembers_error_notallowed_signature'];
+  // Are they trying to change their profile text and are they allowed to?
+  elseif (!can('moderate_profile') && $profile != $row['profile'])
+    $_SESSION['error'] = $l['managemembers_error_notallowed_profile'];
+  // Are they trying to change their password and are they allowed to?
+  elseif (!can('moderate_password') && $password_new != $row['password'] && @$_REQUEST['password-new'] != '')
+    $_SESSION['error'] = $l['managemembers_error_notallowed_password'];
   
   if (!@$_SESSION['error']) {
   // Update member's data
   if ($_REQUEST['password-new']) // And change password
-    sql_query("UPDATE {$db_prefix}members SET `username` = '$username', `display_name` = '$display_name', `email` = '$email', `password` = '$password_new', `group` = '$group', `signature` = '$signature', `profile` = '$profile' WHERE `id` = '{$_REQUEST['u']}'") or die('Internal error');
+    sql_query("UPDATE {$db_prefix}members SET `username` = '$username', `display_name` = '$display_name', `email` = '$email', `birthdate` = '$birthdate', `avatar` = '$avatar', `password` = '$password_new', `group` = '$group', `signature` = '$signature', `profile` = '$profile' WHERE `id` = '{$_REQUEST['u']}'") or die('Internal error');
   else // And don't change password
-    sql_query("UPDATE {$db_prefix}members SET `username` = '$username', `display_name` = '$display_name', `email` = '$email', `group` = '$group', `signature` = '$signature', `profile` = '$profile' WHERE `id` = '$u'") or die('Internal error');
+    sql_query("UPDATE {$db_prefix}members SET `username` = '$username', `display_name` = '$display_name', `email` = '$email', `birthdate` = '$birthdate', `avatar` = '$avatar', `group` = '$group', `signature` = '$signature', `profile` = '$profile' WHERE `id` = '$u'") or die('Internal error');
   
     // If they changed their own username change settings to keep 'em logged in
     if ($_REQUEST['u'] == $user['id']) {

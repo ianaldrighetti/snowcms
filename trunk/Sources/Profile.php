@@ -192,7 +192,7 @@ global $l, $settings, $db_prefix, $user, $cmsurl, $cookie_prefix;
   if (!can('change_display_name') && $display_name != $member_data['display_name'])
     $_SESSION['error'] = $l['profile_error_notallowed_displayname'];
   // Are they trying to change their email address and are they allowed to?
-  elseif (!can('change_display_name') && $email != $member_data['email'])
+  elseif (!can('change_email') && $email != $member_data['email'])
     $_SESSION['error'] = $l['profile_error_notallowed_email'];
   // Are they trying to change their birthdate and are they allowed to?
   elseif (!can('change_birthdate') && $birthdate != $member_data['birthdate'])
@@ -214,7 +214,7 @@ global $l, $settings, $db_prefix, $user, $cmsurl, $cookie_prefix;
   if (!@$_SESSION['error']) {
     // Update member's data
     if (@$_REQUEST['password-new']) {
-      sql_query("UPDATE {$db_prefix}members SET `display_name` = '$display_name', `email` = '$email', `birthdate` = '$birthdate', `avatar` = '$avatar' `signature` = '$signature', `profile` = '$profile', `password` = '$password_new' WHERE `id` = '{$user['id']}'");
+      sql_query("UPDATE {$db_prefix}members SET `display_name` = '$display_name', `email` = '$email', `birthdate` = '$birthdate', `avatar` = '$avatar', `signature` = '$signature', `profile` = '$profile', `password` = '$password_new' WHERE `id` = '{$user['id']}'");
       
       setcookie($cookie_prefix."password", $password_new);
       $_SESSION['pass'] = $password_new;
