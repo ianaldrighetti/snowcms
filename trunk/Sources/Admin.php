@@ -47,7 +47,8 @@ global $cmsurl, $db_prefix, $l, $settings, $source_dir, $user;
         'menus' => array('Menus.php','ManageMenus'),
         'news' => array('News.php','ManageNews'),
         'mail-settings' => array('Settings.php','MailSettings'),
-        'tos' => array('TOS.php','ManageTOS')
+        'tos' => array('TOS.php','ManageTOS'),
+        'ips' => array('IPs.php','ManageIPs')
       );
       // Is the sa= in the $sa array? If so do it :D
       if(is_array(@$sa[$_REQUEST['sa']])) {

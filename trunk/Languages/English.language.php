@@ -143,6 +143,8 @@ $l['admin_menu_news'] = 'Manage News';
 $l['admin_menu_news_desc'] = 'You can add, modify and delete news posts here.';
 $l['admin_menu_tos'] = 'Terms of Service';
 $l['admin_menu_tos_desc'] = 'You can turn on or off and modify your site\'s terms of service here.';
+$l['admin_menu_ips'] = 'Manage Banned IPs';
+$l['admin_menu_ips_desc'] = 'You can ban and unban IPs here.';
 
 // Settings.template.php
 $l['basicsettings_title'] = 'Basic Settings';
@@ -736,4 +738,13 @@ $l['pm_outbox_desc'] = 'Here are the messages that you have sent to other member
 $l['pm_compile_title'] = 'Personal Messages';
 $l['pm_compile_header'] = 'Send a Message';
 $l['pm_compile_desc'] = 'Here you can send other members personal messages.';
+
+// ManageIPs.template.php
+$l['manageips_title'] = 'Manage IPs';
+$l['manageips_header'] = 'Manage Banned IPs';
+$l['manageips_desc'] = 'Here you can ban and unban IPs and IP ranges.';
+$l['manageips_ip'] = 'IP';
+$l['manageips_reason'] = 'Reason';
+$l['manageips_unban'] = 'Unban';
+$l['manageips_save'] = 'Save Changes';
 ?>

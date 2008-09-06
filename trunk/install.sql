@@ -132,7 +132,7 @@ DROP TABLE IF EXISTS `{$db_prefix}online`;
 
 CREATE TABLE `{$db_prefix}online` (
   `user_id` int(11) NOT NULL default '0',
-  `sc` VARCHAR(50) NOT NULL default '',
+  `sc` varchar(50) NOT NULL default '',
   `ip` text NOT NULL,
   `page` text NOT NULL,
   `last_active` int(10) NOT NULL default '0'
@@ -168,7 +168,7 @@ INSERT INTO `{$db_prefix}permissions` VALUES ('-1','view_forum','1'),('-1','view
 DROP TABLE IF EXISTS `{$db_prefix}settings`;
 
 CREATE TABLE `{$db_prefix}settings` (
-  `variable` VARCHAR(100) NOT NULL,
+  `variable` varchar(100) NOT NULL,
   `value` text NOT NULL,
   UNIQUE KEY (`variable`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
@@ -196,24 +196,24 @@ CREATE TABLE `{$db_prefix}topics` (
 DROP TABLE IF EXISTS `{$db_prefix}news`;
 
 CREATE TABLE `{$db_prefix}news` (
-  `news_id` INT(11) NOT NULL AUTO_INCREMENT,
-  `poster_id` INT(11) NOT NULL default '0',
-  `cat_id` INT(11) NOT NULL default '0',
-  `poster_name` TEXT NOT NULL,
-  `subject` TEXT NOT NULL,
-  `body` TEXT NOT NULL,
-  `post_time` INT(10) NOT NULL,
-  `modify_time` INT(10) NOT NULL default '0',
-  `numViews` INT(11) NOT NULL default '0',
-  `allow_comments` INT(1) NOT NULL default '1',
+  `news_id` int(11) NOT NULL AUTO_INCREMENT,
+  `poster_id` int(11) NOT NULL default '0',
+  `cat_id` int(11) NOT NULL default '0',
+  `poster_name` text NOT NULL,
+  `subject` text NOT NULL,
+  `body` text NOT NULL,
+  `post_time` int(10) NOT NULL,
+  `modify_time` int(10) NOT NULL default '0',
+  `numViews` int(11) NOT NULL default '0',
+  `allow_comments` int(1) NOT NULL default '1',
   PRIMARY KEY(`news_id`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 
 DROP TABLE IF EXISTS `{$db_prefix}news_categories`;
 
 CREATE TABLE `{$db_prefix}news_categories` (
-  `cat_id` INT(11) NOT NULL AUTO_INCREMENT,
-  `cat_name` VARCHAR(200) NOT NULL,
+  `cat_id` int(11) NOT NULL AUTO_INCREMENT,
+  `cat_name` varchar(200) NOT NULL,
   PRIMARY KEY (`cat_id`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 
@@ -222,24 +222,24 @@ INSERT INTO {$db_prefix}news_categories (`cat_name`) VALUES ('Main');
 DROP TABLE IF EXISTS `{$db_prefix}news_comments`;
 
 CREATE TABLE `{$db_prefix}news_comments` (
-  `post_id` INT(11) NOT NULL AUTO_INCREMENT,
-  `nid` INT(11) NOT NULL,
-  `poster_id` INT(11) NOT NULL default '0',
-  `poster_name` TEXT NOT NULL,
-  `subject` TEXT NOT NULL,
-  `body` TEXT NOT NULL,
-  `post_time` INT(10) NOT NULL,
-  `modify_time` INT(10) NOT NULL default '0',
-  `isApproved` INT(1) NOT NULL default '1',
-  `isSpam` INT(1) NOT NULL default '0',
+  `post_id` int(11) NOT NULL auto_increment,
+  `nid` int(11) NOT NULL,
+  `poster_id` int(11) NOT NULL default '0',
+  `poster_name` text NOT NULL,
+  `subject` text NOT NULL,
+  `body` text NOT NULL,
+  `post_time` int(10) NOT NULL,
+  `modify_time` int(10) NOT NULL default '0',
+  `isApproved` int(1) NOT NULL default '1',
+  `isSpam` int(1) NOT NULL default '0',
   PRIMARY KEY (`post_id`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 
 DROP TABLE IF EXISTS `{$db_prefix}tos`;
 
 CREATE TABLE `{$db_prefix}tos` (
-  `tos_lang` VARCHAR(255) NOT NULL,
-  `body` TEXT NOT NULL,
+  `tos_lang` varchar(255) NOT NULL,
+  `body` text NOT NULL,
   PRIMARY KEY (`tos_lang`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 
@@ -258,4 +258,12 @@ CREATE TABLE `{$db_prefix}pms` (
   `deleted_to` INT(1) NOT NULL default '0',
   `deleted_from` INT(1) NOT NULL default '0',
   PRIMARY KEY  (`pm_id`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+
+DROP TABLE IF EXISTS `{$db_prefix}banned_ips`;
+
+CREATE TABLE `{$db_prefix}banned_ips` (
+  `ip` varchar(15) NOT NULL,
+  `reason` text NOT NULL,
+  PRIMARY KEY (`ip`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;

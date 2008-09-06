@@ -71,6 +71,8 @@ global $l, $cmsurl;
   $options[] = 'email';
   $options[] = 'news';
   $options[] = 'tos';
+  if (can('ban_ips') || can('unban_ips'))
+    $options[] = 'ips';
   
   $odd = true;
   foreach ($options as $option) {

@@ -196,7 +196,7 @@ global $l, $settings, $user, $cmsurl;
       <tr><td colspan="2"><br /></td></tr>
       ';
   
-  if (can('ban_ips') || can('unban_ips'))
+  if (can('manage_ips_ban') || can('manage_ips_unban'))
     echo '<tr><th style="text-align: left">'.$l['managemembers_moderate_registration_ip'].':</th><td>'.$member['reg_ip'].'</td></tr>
       <tr><th style="text-align: left">'.$l['managemembers_moderate_last_ip'].':</th><td>'.$last_ip.'</td></tr>
       <tr><td colspan="2"><a href="index.php?action=admin;sa=members;ssa=ips;u='.$member['id'].'">'.$l['managemembers_moderate_ips'].'</a></td></tr>
