@@ -17,7 +17,7 @@ global $l, $db_prefix, $settings, $cmsurl, $theme_url;
     ';
   
   if (@$_SESSION['error'])
-	  echo '<p>'.$_SESSION['error'].'</p>';
+    echo '<p><b>'.$l['main_error'].':</b> '.$_SESSION['error'].'</p>';
   
   $first_member = $settings['page']['first_member'];
   $last_member = $settings['page']['last_member'];

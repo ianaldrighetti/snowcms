@@ -14,19 +14,30 @@ if(!defined("Snow"))
   die("Hacking Attempt...");
 
 function ManageIPs() {
-global $l, $settings, $db_prefix;
+global $l, $settings, $db_prefix, $cmsurl;
   
   // To do: check if permissions allow IP (un)banning
   
   // Change IPs' details
   if (@$_REQUEST['change_ips']) {
+    // Check if the IPs are valid
+    foreach ($_REQUEST as $key => $value)
+      if (substr($key,0,6) == 'ip_ip_') {
+        $ip = clean(substr($key,6,strlen($key)));
+        $new_ip = clean(@$_REQUEST['ip_ip_'.$ip]);
+        if (!preg_match('/^[12]?[0-9]{1,2}\.[12]?[0-9]{1,2}\.[12]?[0-9]{1,2}\.[12]?[0-9]{1,2}$/',$new_ip) &&
+            !preg_match('/^[12]?[0-9]{1,2}\.[12]?[0-9]{1,2}\.[12]?[0-9]{1,2}\.$/',$new_ip)) {
+          $_SESSION['error'] = $l['manageips_error_invalid'];
+          redirect('index.php?action=admin;sa=ips');
+        }
+      }
     // Save changes to current banned IPs
     foreach ($_REQUEST as $key => $value)
-      if (substr($key,0,3) == 'ip_') {
-        $ip = clean(substr($key,3,strlen($key)));
-        $new_ip = clean(@$_REQUEST['ip_'.$ip]);
-        $reason = clean(@$_REQUEST['ip_'.$ip.'_reason']);
-        // To do: check if IP is valid
+      if (substr($key,0,6) == 'ip_ip_') {
+        $ip = clean(substr($key,6,strlen($key)));
+        $new_ip = clean(@$_REQUEST['ip_ip_'.$ip]);
+        $reason = clean(@$_REQUEST['ip_reason_'.$ip]);
+        $ip = str_replace('_','.',$ip);
         sql_query("
         UPDATE {$db_prefix}banned_ips
         SET
@@ -34,7 +45,7 @@ global $l, $settings, $db_prefix;
           `reason` = '$reason'
         WHERE
           `ip` = '$ip'
-        ") or die(mysql_error());
+        ");
       }
     // Ban new IP
     if (@$_REQUEST['new_ip']) {

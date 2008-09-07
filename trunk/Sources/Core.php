@@ -811,4 +811,16 @@ function hideEmail($email) {
   
   return $return;
 }
+
+// Check if their IP has been banned
+function checkIP() {
+global $l, $settings, $db_prefix;
+  $ip = @$_SERVER['HTTP_X_FORWARDED_FOR'] ? $_SERVER['HTTP_X_FORWARDED_FOR'] : $_SERVER['REMOTE_ADDR'];
+  $ip_range = preg_replace('/^([12]?[0-9]{1,2}\.[12]?[0-9]{1,2}\.[12]?[0-9]{1,2}\.)[12]?[0-9]{1,2}/','$1',$ip);
+  if (mysql_fetch_assoc(sql_query("SELECT * FROM {$db_prefix}banned_ips WHERE `ip` = '$ip'")) ||
+      mysql_fetch_assoc(sql_query("SELECT * FROM {$db_prefix}banned_ips WHERE `ip` = '$ip_range'"))) {
+    echo 'Your IP address is banned.';
+    exit;
+  }
+}
 ?>

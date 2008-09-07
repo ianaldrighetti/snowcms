@@ -11,8 +11,12 @@ global $cmsurl, $settings, $l, $user, $cmsurl, $theme_url;
   
   echo '
     <h1>'.$l['manageips_header'].'</h1>
-    
-    <p>'.$l['manageips_desc'].'</p>
+    ';
+  
+  if (@$_SESSION['error'])
+    echo '<p><b>'.$l['main_error'].':</b> '.$_SESSION['error'].'</p>';
+  
+  echo '<p>'.$l['manageips_desc'].'</p>
     
     <form action="'.$cmsurl.'index.php?action=admin;sa=ips" method="post" style="display: inline">
     
@@ -27,8 +31,8 @@ global $cmsurl, $settings, $l, $user, $cmsurl, $theme_url;
     foreach($ips as $ip) {
       echo '
       <tr>
-        <td><input name="ip_'.$ip['ip'].'" value="'.$ip['ip'].'" /></td>
-        <td><input name="ip_'.$ip['ip'].'_reason" value="'.$ip['reason'].'" /></td>
+        <td><input name="ip_ip_'.$ip['ip'].'" value="'.$ip['ip'].'" /></td>
+        <td><input name="ip_reason_'.$ip['ip'].'" value="'.$ip['reason'].'" /></td>
         <td><a href="'.$cmsurl.'index.php?action=admin;sa=ips;uip='.$ip['ip'].'"><img src="'.$theme_url.'/'.$settings['theme'].'/images/delete.png" alt="'.$l['manageips_unban'].'" width="15" height="15" style="border: 0" /></a></td>
       </tr>';
     }
