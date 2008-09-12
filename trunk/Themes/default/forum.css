@@ -10,6 +10,11 @@ body {
 img {
   border: 0px;
 }
+.quote-title {
+  font-weight: bold;
+  padding: 0px;
+  margin: 0px;
+}
 blockquote {
   border-style: solid;
   border-width: 1px;

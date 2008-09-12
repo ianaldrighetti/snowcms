@@ -39,6 +39,19 @@ $l['main_month_9'] = 'September';
 $l['main_month_10'] = 'October';
 $l['main_month_11'] = 'November';
 $l['main_month_12'] = 'December';
+$l['main_quote'] = 'Quote';
+$l['main_quote_from'] = 'Quote from %user%';
+$l['main_code'] = 'Code';
+
+// BBCode
+$l['bbcode_bold'] = 'Bold';
+$l['bbcode_italic'] = 'Italic';
+$l['bbcode_underline'] = 'Underline';
+$l['bbcode_strikethrough'] = 'Strikethrough';
+$l['bbcode_image'] = 'Image';
+$l['bbcode_link'] = 'Hyperlink';
+$l['bbcode_code'] = 'Code';
+$l['bbcode_quote'] = 'Quote';
 
 // Login.template.php stuff
 $l['login_title'] = 'Login';
@@ -620,14 +633,6 @@ $l['manageboards_edit_button'] = 'Update Board';
 
 // Post.template.php
 $l['forum_startnew'] = 'Post New Topic';
-$l['forum_post_bold'] = 'Bold';
-$l['forum_post_italic'] = 'Italic';
-$l['forum_post_underline'] = 'Underline';
-$l['forum_post_strikethrough'] = 'Strikethrough';
-$l['forum_post_image'] = 'Image';
-$l['forum_post_link'] = 'Hyperlink';
-$l['forum_post_code'] = 'Code';
-$l['forum_post_quote'] = 'Quote';
 
 // Search.template.php
 $l['forum_search_title'] = 'Search';
@@ -711,6 +716,9 @@ $l['pm_inbox_title'] = 'Personal Messages';
 $l['pm_inbox_header'] = 'Inbox';
 $l['pm_inbox_desc'] = 'Here are the messages that other members have sent you.';
 $l['pm_inbox_subject'] = 'Subject';
+$l['pm_inbox_empty_title'] = 'Personal Messages';
+$l['pm_inbox_empty_header'] = 'Inbox';
+$l['pm_inbox_empty_desc'] = 'No members have sent you personal messages.';
 $l['pm_inbox_from'] = 'From';
 $l['pm_inbox_received'] = 'Received';
 $l['pm_inbox_admin_title'] = 'Personal Messages';
@@ -735,9 +743,15 @@ $l['pm_message_admin_received'] = 'Received';
 $l['pm_outbox_title'] = 'Personal Messages';
 $l['pm_outbox_header'] = 'Sent Messages';
 $l['pm_outbox_desc'] = 'Here are the messages that you have sent to other members.';
+$l['pm_outbox_empty_title'] = 'Personal Messages';
+$l['pm_outbox_empty_header'] = 'Sent Messages';
+$l['pm_outbox_empty_desc'] = 'You have not sent any personal messages yet.';
 $l['pm_compile_title'] = 'Personal Messages';
 $l['pm_compile_header'] = 'Send a Message';
 $l['pm_compile_desc'] = 'Here you can send other members personal messages.';
+$l['pm_compile_to'] = 'To';
+$l['pm_compile_subject'] = 'Subject';
+$l['pm_compile_submit'] = 'Send Message';
 
 // ManageIPs.template.php
 $l['manageips_title'] = 'Manage IPs';

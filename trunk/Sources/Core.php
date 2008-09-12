@@ -412,7 +412,7 @@ global $settings;
 * Also features insanely complicated regex to ignore BBCode inside code tags courtesy of Myles
 */
 function bbc($str, $code_tags = true) {
-global $theme_dir, $theme_url, $settings;
+global $l, $settings, $theme_dir, $theme_url;
   
   // Keep the original product incase we need it later
   $str_start = $str;
@@ -424,19 +424,22 @@ global $theme_dir, $theme_url, $settings;
   $str = '[/code]'.$str.'[code]';
   
   // These three characters will have special meanings later, so wee need to encode them
-  $str = str_replace('!','&#33;',$str);
-  $str = str_replace('%','&#37;',$str);
-  $str = str_replace('|','&#124;',$str);
+  $str = str_replace('$','&$43;',$str);
+  $str = str_replace('!','&$33;',$str);
+  $str = str_replace('#','&$35;',$str);
+  $str = str_replace('%','&$37;',$str);
+  $str = str_replace('|','&$124;',$str);
   
-  // [code] will now be known as | and [/code] as \r
+  
+  // [code] will now be known as | and [/code] as #
   // This is needed because regex can't do things with groups of characters, so they need to be represented as single characters
   $str = str_replace('[code]','|',$str);
-  $str = str_replace('[/code]','\r',$str);
+  $str = str_replace('[/code]','#',$str);
   
   // This is for any span of characters
-  $all_chars = '^\r\|%';
+  $all_chars = '^#\|%';
   // This is for any span of characters, without whitespace, for use it URLs
-  $link_chars = '^ \n\r\|%';
+  $link_chars = '^ \n#\|%';
   
   // If the string is the same as the previous loop, stop looping
   $str_prev = '';
@@ -445,85 +448,159 @@ global $theme_dir, $theme_url, $settings;
     
     // These regex are complicated because they make sure they aren't inside code tags
     // [b]...[/b]
-    $str = preg_replace('/(\\\r['.$all_chars.']*)\[b\](['.$all_chars.']*)\[\/b\](['.$all_chars.']*\|)/is','$1<b>$2</b>$3',$str);
+    $str = preg_replace('/(#['.$all_chars.']*)\[b\](['.$all_chars.']*)\[\/b\](['.$all_chars.']*\|)/is','$1<b>$2</b>$3',$str);
     // [i]...[/i]
-    $str = preg_replace('/(\\\r['.$all_chars.']*)\[i\](['.$all_chars.']*)\[\/i\](['.$all_chars.']*\|)/is','$1<i>$2</i>$3',$str);
+    $str = preg_replace('/(#['.$all_chars.']*)\[i\](['.$all_chars.']*)\[\/i\](['.$all_chars.']*\|)/is','$1<i>$2</i>$3',$str);
     // [u]...[/u]
-    $str = preg_replace('/(\\\r['.$all_chars.']*)\[u\](['.$all_chars.']*)\[\/u\](['.$all_chars.']*\|)/is','$1<u>$2</u>$3',$str);
+    $str = preg_replace('/(#['.$all_chars.']*)\[u\](['.$all_chars.']*)\[\/u\](['.$all_chars.']*\|)/is','$1<u>$2</u>$3',$str);
     // [s]...[/s]
-    $str = preg_replace('/(\\\r['.$all_chars.']*)\[s\](['.$all_chars.']*)\[\/s\](['.$all_chars.']*\|)/is','$1<s>$2</s>$3',$str);
+    $str = preg_replace('/(#['.$all_chars.']*)\[s\](['.$all_chars.']*)\[\/s\](['.$all_chars.']*\|)/is','$1<s>$2</s>$3',$str);
+    
     // [tt]...[/tt]
-    $str = preg_replace('/(\\\r['.$all_chars.']*)\[tt\](['.$all_chars.']*)\[\/tt\](['.$all_chars.']*\|)/is','$1<tt>$2</tt>$3',$str);
+    $str = preg_replace('/(#['.$all_chars.']*)\[tt\](['.$all_chars.']*)\[\/tt\](['.$all_chars.']*\|)/is','$1<tt>$2</tt>$3',$str);
+    // [sup]...[/sup]
+    $str = preg_replace('/(#['.$all_chars.']*)\[sup\](['.$all_chars.']*)\[\/sup\](['.$all_chars.']*\|)/is','$1<sup>$2</sup>$3',$str);
+    // [sup]...[/sup]
+    $str = preg_replace('/(#['.$all_chars.']*)\[sub\](['.$all_chars.']*)\[\/sub\](['.$all_chars.']*\|)/is','$1<sub>$2</sub>$3',$str);
     
     // [url=http://...]...[/url]
-    $str = preg_replace('/(\\\r['.$all_chars.']*)\[url=(http:\/\/['.$link_chars.']*)\](['.$all_chars.']*\|)\[\/url\](['.$all_chars.']*)/is','$1<a href="$2">$3</a>$4',$str);
+    $str = preg_replace('/(#['.$all_chars.']*)\[url=(http:\/\/['.$link_chars.']*)\](['.$all_chars.'\[]*)\[\/url\](['.$all_chars.']*\|)/is','$1<a href="$2">$3</a>$4',$str);
     // [url=https://...]...[/url]
-    $str = preg_replace('/(\\\r['.$all_chars.']*)\[url=(https:\/\/['.$link_chars.']*)\](['.$all_chars.']*\|)\[\/url\](['.$all_chars.']*)/is','$1<a href="$2">$3</a>$4',$str);
+    $str = preg_replace('/(#['.$all_chars.']*)\[url=(https:\/\/['.$link_chars.']*)\](['.$all_chars.'\[]*)\[\/url\](['.$all_chars.']*\|)/is','$1<a href="$2">$3</a>$4',$str);
     // [url=ftp://...]...[/url]
-    $str = preg_replace('/(\\\r['.$all_chars.']*)\[url=(ftp:\/\/['.$link_chars.']*)\](['.$all_chars.']*\|)\[\/url\](['.$all_chars.']*)/is','$1<a href="$2">$3</a>$4',$str);
+    $str = preg_replace('/(#['.$all_chars.']*)\[url=(ftp:\/\/['.$link_chars.']*)\](['.$all_chars.'\[]*)\[\/url\](['.$all_chars.']*\|)/is','$1<a href="$2">$3</a>$4',$str);
     // [url=ftps://...]...[/url]
-    $str = preg_replace('/(\\\r['.$all_chars.']*)\[url=(ftps:\/\/['.$link_chars.']*)\](['.$all_chars.']*\|)\[\/url\](['.$all_chars.']*)/is','$1<a href="$2">$3</a>$4',$str);
+    $str = preg_replace('/(#['.$all_chars.']*)\[url=(ftps:\/\/['.$link_chars.']*)\](['.$all_chars.'\[]*)\[\/url\](['.$all_chars.']*\|)/is','$1<a href="$2">$3</a>$4',$str);
+    // [url=mailto:...]...[/url]
+    $str = preg_replace('/(#['.$all_chars.']*)\[url=(mailto:['.$link_chars.']*)\](['.$all_chars.'\[]*)\[\/url\](['.$all_chars.']*\|)/is','$1<a href="$2">$3</a>$4',$str);
     // [url=...]...[/url]
-    $str = preg_replace('/(\\\r['.$all_chars.']*)\[url=(['.$link_chars.']*)\](['.$all_chars.']*)\[\/url\](['.$all_chars.']*\|)/is','$1<a href="http://$2">$3</a>$4',$str);
+    $str = preg_replace('/(#['.$all_chars.']*)\[url=(['.$link_chars.']*)\](['.$all_chars.'\[]*)\[\/url\](['.$all_chars.']*\|)/is','$1<a href="http://$2">$3</a>$4',$str);
     
-    // www....
-    $str = preg_replace('/(\\\r['.$all_chars.']*) (http:\/\/['.$link_chars.']*) (['.$all_chars.']*\|)/is','$1 <a href="$2">$2</a> $3',$str);
     // http://...
-    $str = preg_replace('/(\\\r['.$all_chars.']*) (https:\/\/['.$link_chars.']*) (['.$all_chars.']*\|)/is','$1 <a href="$2">$2</a> $3',$str);
+    $str = preg_replace('/(#['.$all_chars.']*) (http:\/\/['.$link_chars.']*) (['.$all_chars.']*\|)/is','$1 <a href="$2">$2</a> $3',$str);
     // https://...
-    $str = preg_replace('/(\\\r['.$all_chars.']*) (ftp:\/\/['.$link_chars.']*) (['.$all_chars.']*\|)/is','$1 <a href="$2">$2</a> $3',$str);
+    $str = preg_replace('/(#['.$all_chars.']*) (https:\/\/['.$link_chars.']*) (['.$all_chars.']*\|)/is','$1 <a href="$2">$2</a> $3',$str);
     // ftp://...
-    $str = preg_replace('/(\\\r['.$all_chars.']*) (ftps:\/\/['.$link_chars.']*) (['.$all_chars.']*\|)/is','$1 <a href="$2">$2</a> $3',$str);
+    $str = preg_replace('/(#['.$all_chars.']*) (ftp:\/\/['.$link_chars.']*) (['.$all_chars.']*\|)/is','$1 <a href="$2">$2</a> $3',$str);
     // ftps://...
-    $str = preg_replace('/(\\\r['.$all_chars.']*) (www\.['.$link_chars.']*) (['.$all_chars.']*\|)/is','$1 <a href="http://$2">$2</a> $3',$str);
+    $str = preg_replace('/(#['.$all_chars.']*) (ftps:\/\/['.$link_chars.']*) (['.$all_chars.']*\|)/is','$1 <a href="$2">$2</a> $3',$str);
+    // mailto:...
+    $str = preg_replace('/(#['.$all_chars.']*) (mailto:['.$link_chars.']*) (['.$all_chars.']*\|)/is','$1 <a href="http://$2">$2</a> $3',$str);
+    // www....
+    $str = preg_replace('/(#['.$all_chars.']*) (www\.['.$link_chars.']*) (['.$all_chars.']*\|)/is','$1 <a href="http://$2">$2</a> $3',$str);
+    // ...@...
+    $str = preg_replace('/(#['.$all_chars.']*) ([a-z0-9._-]*\@[a-z0-9.-]*) (['.$all_chars.']*\|)/is','$1 <a href="mailto:$2">$2</a> $3',$str);
     
     // [url]http://...[/url]
-    $str = preg_replace('/(\\\r['.$all_chars.']*)\[url\](http:\/\/['.$link_chars.']*)\[\/url\](['.$all_chars.']*\|)/is','$1 <a href="$2">$2</a> $3',$str);
+    $str = preg_replace('/(#['.$all_chars.']*)\[url\](http:\/\/['.$link_chars.']*)\[\/url\](['.$all_chars.']*\|)/is','$1 <a href="$2">$2</a> $3',$str);
     // [url]https://...[/url]
-    $str = preg_replace('/(\\\r['.$all_chars.']*)\[url\](https:\/\/['.$link_chars.']*)\[\/url\](['.$all_chars.']*\|)/is','$1 <a href="$2">$2</a> $3',$str);
+    $str = preg_replace('/(#['.$all_chars.']*)\[url\](https:\/\/['.$link_chars.']*)\[\/url\](['.$all_chars.']*\|)/is','$1 <a href="$2">$2</a> $3',$str);
     // [url]ftp://...[/url]
-    $str = preg_replace('/(\\\r['.$all_chars.']*)\[url\](ftp:\/\/['.$link_chars.']*)\[\/url\](['.$all_chars.']*\|)/is','$1 <a href="$2">$2</a> $3',$str);
+    $str = preg_replace('/(#['.$all_chars.']*)\[url\](ftp:\/\/['.$link_chars.']*)\[\/url\](['.$all_chars.']*\|)/is','$1 <a href="$2">$2</a> $3',$str);
     // [url]ftps://...[/url]
-    $str = preg_replace('/(\\\r['.$all_chars.']*)\[url\](ftps:\/\/['.$link_chars.']*)\[\/url\](['.$all_chars.']*\|)/is','$1 <a href="$2">$2</a> $3',$str);
+    $str = preg_replace('/(#['.$all_chars.']*)\[url\](ftps:\/\/['.$link_chars.']*)\[\/url\](['.$all_chars.']*\|)/is','$1 <a href="$2">$2</a> $3',$str);
+    // [url]mailto:...[/url]
+    $str = preg_replace('/(#['.$all_chars.']*)\[url\](mailto:['.$link_chars.']*)\[\/url\](['.$all_chars.']*\|)/is','$1 <a href="$2">$2</a> $3',$str);
     // [url]...[/url]
-    $str = preg_replace('/(\\\r['.$all_chars.']*)\[url\](['.$link_chars.']*)\[\/url\](['.$all_chars.']*\|)/is','$1 <a href="http://$2">$2</a> $3',$str);
+    $str = preg_replace('/(#['.$all_chars.']*)\[url\](['.$link_chars.']*)\[\/url\](['.$all_chars.']*\|)/is','$1 <a href="http://$2">$2</a> $3',$str);
+    
+    // [email=mailto:...]...[/email]
+    $str = preg_replace('/(#['.$all_chars.']*)\[email=(mailto:['.$link_chars.']*)\](['.$all_chars.'\[]*)\[\/email\](['.$all_chars.']*\|)/is','$1<a href="$2">$3</a>$4',$str);
+    // [email=...]...[/email]
+    $str = preg_replace('/(#['.$all_chars.']*)\[email=(['.$link_chars.']*)\](['.$all_chars.'\[]*)\[\/email\](['.$all_chars.']*\|)/is','$1<a href="mailto:$2">$3</a>$4',$str);
+    
+    // [email]mailto:...[/email]
+    $str = preg_replace('/(#['.$all_chars.']*)\[email\](mailto:['.$link_chars.']*)\[\/email\](['.$all_chars.']*\|)/is','$1 <a href="$2">$2</a> $3',$str);
+    // [email]...[/email]
+    $str = preg_replace('/(#['.$all_chars.']*)\[email\](['.$link_chars.']*)\[\/email\](['.$all_chars.']*\|)/is','$1 <a href="mailto:$2">$2</a> $3',$str);
+    
+    // [size=...pt]...[/size]
+    $str = preg_replace('/(#['.$all_chars.']*)\[size=([0-9]*pt)\](['.$all_chars.'\[]*)\[\/size\](['.$all_chars.']*\|)/is','$1<span style="font-size: $2">$3</span>$4',$str);
+    // [size=...px]...[/size]
+    $str = preg_replace('/(#['.$all_chars.']*)\[size=([0-9]*px)\](['.$all_chars.'\[]*)\[\/size\](['.$all_chars.']*\|)/is','$1<span style="font-size: $2">$3</span>$4',$str);
+    // [size=1]...[/size]
+    $str = preg_replace('/(#['.$all_chars.']*)\[size=1\](['.$all_chars.'\[]*)\[\/size\](['.$all_chars.']*\|)/is','$1<span style="font-size: xx-small">$2</span>$3',$str);
+    // [size=2]...[/size]
+    $str = preg_replace('/(#['.$all_chars.']*)\[size=2\](['.$all_chars.'\[]*)\[\/size\](['.$all_chars.']*\|)/is','$1<span style="font-size: x-small">$2</span>$3',$str);
+    // [size=3]...[/size]
+    $str = preg_replace('/(#['.$all_chars.']*)\[size=3\](['.$all_chars.'\[]*)\[\/size\](['.$all_chars.']*\|)/is','$1<span style="font-size: small">$2</span>$3',$str);
+    // [size=4]...[/size]
+    $str = preg_replace('/(#['.$all_chars.']*)\[size=4\](['.$all_chars.'\[]*)\[\/size\](['.$all_chars.']*\|)/is','$1<span style="font-size: medium">$2</span>$3',$str);
+    // [size=5]...[/size]
+    $str = preg_replace('/(#['.$all_chars.']*)\[size=5\](['.$all_chars.'\[]*)\[\/size\](['.$all_chars.']*\|)/is','$1<span style="font-size: large">$2</span>$3',$str);
+    // [size=6]...[/size]
+    $str = preg_replace('/(#['.$all_chars.']*)\[size=6\](['.$all_chars.'\[]*)\[\/size\](['.$all_chars.']*\|)/is','$1<span style="font-size: x-large">$2</span>$3',$str);
+    // [size=7]...[/size]
+    $str = preg_replace('/(#['.$all_chars.']*)\[size=7\](['.$all_chars.'\[]*)\[\/size\](['.$all_chars.']*\|)/is','$1<span style="font-size: xx-large">$2</span>$3',$str);
+    // [size=xx-small]...[/size]
+    $str = preg_replace('/(#['.$all_chars.']*)\[size=xx-small\](['.$all_chars.'\[]*)\[\/size\](['.$all_chars.']*\|)/is','$1<span style="font-size: xx-small">$2</span>$3',$str);
+    // [size=x-small]...[/size]
+    $str = preg_replace('/(#['.$all_chars.']*)\[size=x-small\](['.$all_chars.'\[]*)\[\/size\](['.$all_chars.']*\|)/is','$1<span style="font-size: x-small">$2</span>$3',$str);
+    // [size=small]...[/size]
+    $str = preg_replace('/(#['.$all_chars.']*)\[size=small\](['.$all_chars.'\[]*)\[\/size\](['.$all_chars.']*\|)/is','$1<span style="font-size: small">$2</span>$3',$str);
+    // [size=medium]...[/size]
+    $str = preg_replace('/(#['.$all_chars.']*)\[size=medium\](['.$all_chars.'\[]*)\[\/size\](['.$all_chars.']*\|)/is','$1<span style="font-size: medium">$2</span>$3',$str);
+    // [size=large]...[/size]
+    $str = preg_replace('/(#['.$all_chars.']*)\[size=large\](['.$all_chars.'\[]*)\[\/size\](['.$all_chars.']*\|)/is','$1<span style="font-size: large">$2</span>$3',$str);
+    // [size=x-large]...[/size]
+    $str = preg_replace('/(#['.$all_chars.']*)\[size=x-large\](['.$all_chars.'\[]*)\[\/size\](['.$all_chars.']*\|)/is','$1<span style="font-size: x-large">$2</span>$3',$str);
+    // [size=xx-large]...[/size]
+    $str = preg_replace('/(#['.$all_chars.']*)\[size=xx-large\](['.$all_chars.'\[]*)\[\/size\](['.$all_chars.']*\|)/is','$1<span style="font-size: xx-large">$2</span>$3',$str);
+    
+    // [font=...]...[/font]
+    $str = preg_replace('/(#['.$all_chars.']*)\[font=([a-z ]*)\](['.$all_chars.'\[]*)\[\/font\](['.$all_chars.']*\|)/is','$1<span style="font-family: \'$2\'">$3</span>$4',$str);
+    
+    // [color=...]...[/color]
+    $str = preg_replace('/(#['.$all_chars.']*)\[color=([a-z]*)\](['.$all_chars.'\[]*)\[\/color\](['.$all_chars.']*\|)/is','$1<span style="color: $2">$3</span>$4',$str);
+    // [color=#...]...[/color] - Six digits
+    $str = preg_replace('/(#['.$all_chars.']*)\[color=&\$35;([0-9a-f]{6})\](['.$all_chars.'\[]*)\[\/color\](['.$all_chars.']*\|)/is','$1<span style="color: $$2">$3</span>$4',$str);
+    // [color=#...]...[/color] - Three digits
+    $str = preg_replace('/(#['.$all_chars.']*)\[color=&\$35;([0-9a-f]{3})\](['.$all_chars.'\[]*)\[\/color\](['.$all_chars.']*\|)/is','$1<span style="color: $$2">$3</span>$4',$str);
+    
+    // [left]...[/left]
+    $str = preg_replace('/(#['.$all_chars.']*)\[left\](['.$all_chars.']*)\[\/left\](['.$all_chars.']*\|)/is','$1<p style="text-align: left">$2</p>$3',$str);
+    // [center]...[/center]
+    $str = preg_replace('/(#['.$all_chars.']*)\[center\](['.$all_chars.']*)\[\/center\](['.$all_chars.']*\|)/is','$1<p style="text-align: center">$2</p>$3',$str);
+    // [right]...[/right]
+    $str = preg_replace('/(#['.$all_chars.']*)\[right\](['.$all_chars.']*)\[\/right\](['.$all_chars.']*\|)/is','$1<p style="text-align: right">$2</p>$3',$str);
     
     // [quote]\n
-    $str = preg_replace('/(\\\r['.$all_chars.']*)\[quote\]\n?(['.$all_chars.']*\|)/is','$1<p style="font-weight: bold; padding: 0px; margin: 0px;">Quote:</p><blockquote style="padding: 5px; margin: 0px;">$2',$str);
+    $str = preg_replace('/(#['.$all_chars.']*)\[quote\]\n?(['.$all_chars.']*\|)/is','$1<p class="quote-title">'.$l['main_quote'].':</p><blockquote style="padding: 5px; margin: 0px;">$2',$str);
     // [quote=...]\n
-    $str = preg_replace('/(\\\r['.$all_chars.']*)\[quote=(['.$all_chars.']*)\]\n?(['.$all_chars.']*\|)/is','$1<p style="font-weight: bold; padding: 0px; margin: 0px;">Quote from $2:</p><blockquote style="padding: 5px; margin: 0px;">$3',$str);
+    $str = preg_replace('/(#['.$all_chars.']*)\[quote=(['.$link_chars.']*)\]\n?(['.$all_chars.']*\|)/is','$1<p class="quote-title">'.str_replace('%user%','$2',$l['main_quote_from']).':</p><blockquote style="padding: 5px; margin: 0px;">$3',$str);
     // [quote by=...]\n
-    $str = preg_replace('/(\\\r['.$all_chars.']*)\[quote by=(['.$link_chars.']*)\]\n?(['.$all_chars.']*\|)/is','$1<p style="font-weight: bold; padding: 0px; margin: 0px;">Quote from $2:</p><blockquote style="padding: 5px; margin: 0px;">$3',$str);
+    $str = preg_replace('/(#['.$all_chars.']*)\[quote by=(['.$link_chars.']*)\]\n?(['.$all_chars.']*\|)/is','$1<p class="quote-title">'.str_replace('%user%','$2',$l['main_quote_from']).':</p><blockquote style="padding: 5px; margin: 0px;">$3',$str);
+    // [/quote]\n
+    $str = preg_replace('/(#['.$all_chars.']*)\[\/quote\]\n(['.$all_chars.']*\|)/is','$1</blockquote>$2',$str);
     // [/quote]
-    $str = preg_replace('/(\\\r['.$all_chars.']*)\[\/quote\](['.$all_chars.']*\|)/is','$1</blockquote>$2',$str);
+    $str = preg_replace('/(#['.$all_chars.']*)\[\/quote\](['.$all_chars.']*\|)/is','$1</blockquote>$2',$str);
     
     // [br]
-    $str = preg_replace('/(\\\r['.$all_chars.']*)\[br\](['.$all_chars.']*\|)/is','$1<br />$2',$str);
-    
+    $str = preg_replace('/(#['.$all_chars.']*)\[br\](['.$all_chars.']*\|)/is','$1<br />$2',$str);
     // [hr]
-    $str = preg_replace('/(\\\r['.$all_chars.']*)\[hr\](['.$all_chars.']*\|)/is','$1<hr />$2',$str);
+    $str = preg_replace('/(#['.$all_chars.']*)\[hr\](['.$all_chars.']*\|)/is','$1<hr />$2',$str);
     
     // [img]http://...[/img]
-    $str = preg_replace('/(\\\r['.$all_chars.']*)\[img\](http:\/\/['.$link_chars.']*)\[\/img\](['.$all_chars.']*\|)/is','$1 <img src="$2" alt="" /> $3',$str);
+    $str = preg_replace('/(#['.$all_chars.']*)\[img\](http:\/\/['.$link_chars.']*)\[\/img\](['.$all_chars.']*\|)/is','$1 <img src="$2" alt="" /> $3',$str);
     // [img]https://...[/img]
-    $str = preg_replace('/(\\\r['.$all_chars.']*)\[img\](https:\/\/['.$link_chars.']*)\[\/img\](['.$all_chars.']*\|)/is','$1 <img src="$2" alt="" /> $3',$str);
+    $str = preg_replace('/(#['.$all_chars.']*)\[img\](https:\/\/['.$link_chars.']*)\[\/img\](['.$all_chars.']*\|)/is','$1 <img src="$2" alt="" /> $3',$str);
     // [img]ftp://...[/img]
-    $str = preg_replace('/(\\\r['.$all_chars.']*)\[img\](ftp:\/\/['.$link_chars.']*)\[\/img\](['.$all_chars.']*\|)/is','$1 <img src="$2" alt="" /> $3',$str);
+    $str = preg_replace('/(#['.$all_chars.']*)\[img\](ftp:\/\/['.$link_chars.']*)\[\/img\](['.$all_chars.']*\|)/is','$1 <img src="$2" alt="" /> $3',$str);
     // [img]ftps://...[/img]
-    $str = preg_replace('/(\\\r['.$all_chars.']*)\[img\](ftps:\/\/['.$link_chars.']*)\[\/img\](['.$all_chars.']*\|)/is','$1 <img src="$2" alt="" /> $3',$str);
+    $str = preg_replace('/(#['.$all_chars.']*)\[img\](ftps:\/\/['.$link_chars.']*)\[\/img\](['.$all_chars.']*\|)/is','$1 <img src="$2" alt="" /> $3',$str);
     // [img]...[/img]
-    $str = preg_replace('/(\\\r['.$all_chars.']*)\[img\](['.$link_chars.']*)\[\/img\](['.$all_chars.']*\|)/is','$1 <img src="http://$2" alt="" /> $3',$str);
+    $str = preg_replace('/(#['.$all_chars.']*)\[img\](['.$link_chars.']*)\[\/img\](['.$all_chars.']*\|)/is','$1 <img src="http://$2" alt="" /> $3',$str);
     
     // [img=http://...]...[/img]
-    $str = preg_replace('/(\\\r['.$all_chars.']*)\[img=(http:\/\/['.$link_chars.']*)\](['.$all_chars.']*)\[\/img\](['.$all_chars.']*\|)/is','$1<img src="$2" alt="$3" />$4',$str);
+    $str = preg_replace('/(#['.$all_chars.']*)\[img=(http:\/\/['.$link_chars.']*)\](['.$all_chars.']*)\[\/img\](['.$all_chars.']*\|)/is','$1<img src="$2" alt="$3" />$4',$str);
     // [img=https://...]...[/img]
-    $str = preg_replace('/(\\\r['.$all_chars.']*)\[img=(https:\/\/['.$link_chars.']*)\](['.$all_chars.']*)\[\/img\](['.$all_chars.']*\|)/is','$1<img src="$2" alt="$3" />$4',$str);
+    $str = preg_replace('/(#['.$all_chars.']*)\[img=(https:\/\/['.$link_chars.']*)\](['.$all_chars.']*)\[\/img\](['.$all_chars.']*\|)/is','$1<img src="$2" alt="$3" />$4',$str);
     // [img=ftp://...]...[/img]
-    $str = preg_replace('/(\\\r['.$all_chars.']*)\[img=(ftp:\/\/['.$link_chars.']*)\](['.$all_chars.']*)\[\/img\](['.$all_chars.']*\|)/is','$1<img src="$2" alt="$3" />$4',$str);
+    $str = preg_replace('/(#['.$all_chars.']*)\[img=(ftp:\/\/['.$link_chars.']*)\](['.$all_chars.']*)\[\/img\](['.$all_chars.']*\|)/is','$1<img src="$2" alt="$3" />$4',$str);
     // [img=ftps://...]...[/img]
-    $str = preg_replace('/(\\\r['.$all_chars.']*)\[img=(ftps:\/\/['.$link_chars.']*)\](['.$all_chars.']*)\[\/img\](['.$all_chars.']*\|)/is','$1<img src="$2" alt="$3" />$4',$str);
+    $str = preg_replace('/(#['.$all_chars.']*)\[img=(ftps:\/\/['.$link_chars.']*)\](['.$all_chars.']*)\[\/img\](['.$all_chars.']*\|)/is','$1<img src="$2" alt="$3" />$4',$str);
     // [img=...]...[/img]
-    $str = preg_replace('/(\\\r['.$all_chars.']*)\[img=(['.$link_chars.']*)\](['.$all_chars.']*)\[\/img\](['.$all_chars.']*\|)/is','$1<img src="http://$2" alt="$3" />$4',$str);
+    $str = preg_replace('/(#['.$all_chars.']*)\[img=(['.$link_chars.']*)\](['.$all_chars.']*)\[\/img\](['.$all_chars.']*\|)/is','$1<img src="http://$2" alt="$3" />$4',$str);
   }
   
   // Process emoticons
@@ -533,67 +610,74 @@ global $theme_dir, $theme_url, $settings;
   $sm_replace = array();
   foreach($smileys as $smiley => $file) {
     // Escape metacharacters, so they don't mess up the followeing regexes
-    $smiley = str_replace(array('[','^','$','.','|','?','*','+','(',')'),array('\[','\^','\$','\.','\|','\?','\*','\+','\(','\)'),$smiley);
+    $smiley = str_replace(array('[','^','$','.','|','?','*','+','(',')'),array('\[','\^','\$','\.','\|','\?','\*','#','\(','\)'),$smiley);
     // <space>:)<space>
-    $sm_search[] = '/(\\\r['.$all_chars.']*) '.$smiley.' (['.$all_chars.']*\|)/';
+    $sm_search[] = '/(#['.$all_chars.']*) '.$smiley.' (['.$all_chars.']*\|)/';
     $sm_replace[] = '$1 <img src="'.$theme_url.'/'.$settings['theme'].'/emoticons/'.$file.'" alt="'.$smiley.'" class="emoticon" /> $2';
     // <newline>:)<newline>
-    $sm_search[] = '/(\\\r['.$all_chars.']*)'."\n".$smiley."\n".'(['.$all_chars.']*\|)/';
+    $sm_search[] = '/(#['.$all_chars.']*)'."\n".$smiley."\n".'(['.$all_chars.']*\|)/';
     $sm_replace[] = '$1'."\n".'<img src="'.$theme_url.'/'.$settings['theme'].'/emoticons/'.$file.'" alt="'.$smiley.'" class="emoticon" />'."\n".'$2';
     // <space>:)<newline>
-    $sm_search[] = '/(\\\r['.$all_chars.']*) '.$smiley."\n".'(['.$all_chars.']*\|)/';
+    $sm_search[] = '/(#['.$all_chars.']*) '.$smiley."\n".'(['.$all_chars.']*\|)/';
     $sm_replace[] = '$1 <img src="'.$theme_url.'/'.$settings['theme'].'/emoticons/'.$file.'" alt="'.$smiley.'" class="emoticon" />'."\n".'$2';
     // <newline>:)<space>
-    $sm_search[] = '/(\\\r['.$all_chars.']*)'."\n".$smiley.' (['.$all_chars.']*\|)/';
+    $sm_search[] = '/(#['.$all_chars.']*)'."\n".$smiley.' (['.$all_chars.']*\|)/';
     $sm_replace[] = '$1'."\n".'<img src="'.$theme_url.'/'.$settings['theme'].'/emoticons/'.$file.'" alt="'.$smiley.'" class="emoticon" /> $2';
     // <start>:)<space>
-    $sm_search[] = '/(\\\r)'.$smiley.' (['.$all_chars.']*\|)/';
+    $sm_search[] = '/(#)'.$smiley.' (['.$all_chars.']*\|)/';
     $sm_replace[] = '$1<img src="'.$theme_url.'/'.$settings['theme'].'/emoticons/'.$file.'" alt="'.$smiley.'" class="emoticon" /> $2';
     // <start>:)<newline>
-    $sm_search[] = '/(\\\r)'.$smiley."\n".'(['.$all_chars.']*\|)/';
+    $sm_search[] = '/(#)'.$smiley."\n".'(['.$all_chars.']*\|)/';
     $sm_replace[] = '$1<img src="'.$theme_url.'/'.$settings['theme'].'/emoticons/'.$file.'" alt="'.$smiley.'" class="emoticon" />'."\n".'$2';
     // <space>:)</end>
-    $sm_search[] = '/(\\\r['.$all_chars.']*) '.$smiley.'(\|)/';
+    $sm_search[] = '/(#['.$all_chars.']*) '.$smiley.'(\|)/';
     $sm_replace[] = '$1 <img src="'.$theme_url.'/'.$settings['theme'].'/emoticons/'.$file.'" alt="'.$smiley.'" class="emoticon" />$2';
     // <newline>:)</end>
-    $sm_search[] = '/(\\\r['.$all_chars.']*)'."\n".$smiley.'(\|)/';
+    $sm_search[] = '/(#['.$all_chars.']*)'."\n".$smiley.'(\|)/';
     $sm_replace[] = '$1'."\n".'<img src="'.$theme_url.'/'.$settings['theme'].'/emoticons/'.$file.'" alt="'.$smiley.'" class="emoticon" />$2';
   }
-  // Now put all those emoticon regexes into action
-  $str = preg_replace($sm_search, $sm_replace, $str);
+  $str_prev = '';
+  while ($str_prev != $str) {
+    $str_prev = $str;
+    // Now put all those emoticon regexes into action
+    $str = preg_replace($sm_search, $sm_replace, $str);
+  }
   
   // Time to process the code tags. But not if the second attribute is false, why? Explained in a sec
   if ($code_tags) {
-    $str_prev = '';
-    while ($str_prev != $str) {
-      $str_prev = $str;
-      
-      // [code]\n
-      $str = preg_replace('/([\\\r|!]['.$all_chars.']*)\|\n?(['.$all_chars.']*\|)/is','$1<p style="font-weight: bold; padding: 0px; margin: 0px;">Code:</p><div class="code-outer"><div class="code-inner">$2',$str);
-      // [/code]\n - You may notice we added % and ! they stop code tags from being embedded inside each other
-      $str = preg_replace('/([\\\r|!]['.$all_chars.']*)\\\r(['.$all_chars.']*\|)/is','$1%</div></div>!$2',$str);
-    }
+    // [code]\n
+    $str = preg_replace('/(['.$all_chars.']*)\|\n(['.$all_chars.']*#)/is','$1<p style="font-weight: bold; padding: 0px; margin: 0px;">'.$l['main_code'].':</p><div class="code-outer"><div class="code-inner">$2',$str);
+    // [code]
+    $str = preg_replace('/(['.$all_chars.']*)\|(['.$all_chars.']*#)/is','$1<p style="font-weight: bold; padding: 0px; margin: 0px;">'.$l['main_code'].':</p><div class="code-outer"><div class="code-inner">$2',$str);
+    
+    // [/code]\n
+    $str = preg_replace('/(['.$all_chars.']+)#\n/is','$1</div></div>',$str);
+    // [/code]
+    $str = preg_replace('/(['.$all_chars.']+)#/is','$1</div></div>',$str);
   }
   
   // Time to remove those special characters, don't worry about the ones entered by members, they are safe and encoded
   $str = str_replace('%','',$str);
   $str = str_replace('!','',$str);
   
-  // Time to convert | back to [code] and \r back to [/code]
+  // Time to convert | back to [code] and # back to [/code]
   $str = str_replace('|','[code]',$str);
-  $str = str_replace('\r','[/code]',$str);
+  $str = str_replace('#','[/code]',$str);
   
   // Time to remove the [/code] from the start and [code] from the end
   $str = substr($str,7,strlen($str)-13);
   
   // Count the amount of times code tags appear
-  $code_starts = substr_count($str,'<p style="font-weight: bold; padding: 0px; margin: 0px;">Code:</p><div class="code-outer"><div class="code-inner">');
+  $code_starts = substr_count($str,'<p style="font-weight: bold; padding: 0px; margin: 0px;">'.$l['main_code'].':</p><div class="code-outer"><div class="code-inner">');
   $code_ends = substr_count($str,'</div></div>');
   
   // If they are not code tags don't start and end the same amount of times then we need to ignore them
   if ($code_starts != $code_ends && $code_tags)
     // So we start the entire process again, the second argument being false, makes it ignore code tags
     $str = bbc($str_start,false);
+  
+  // - was used in place of #, because # had a different meaning
+  $str = str_replace('$','#',$str);
   
   // Process newlines
   $str = strtr($str, array("\n" => "<br />"));

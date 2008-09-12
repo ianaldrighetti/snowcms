@@ -19,15 +19,15 @@ echo '
   </tr>
   <tr align="center" valign="middle">
     <td colspan="3">
-	    <a href="javascript:void(0);" title="Bold"      onClick="add_bbcode(\'body\',\'[b]\',\'[/b]\');"><img src="'.$theme_url.'/'.$settings['theme'].'/images/bbc_bold.png" alt="'.$l['forum_post_bold'].'" /></a>
-	    <a href="javascript:void(0);" title="Italic"    onClick="add_bbcode(\'body\',\'[i]\',\'[/i]\');"><img src="'.$theme_url.'/'.$settings['theme'].'/images/bbc_italic.png" alt="'.$l['forum_post_italic'].'" /></a>
-	    <a href="javascript:void(0);" title="Underline" onClick="add_bbcode(\'body\',\'[u]\',\'[/u]\');"><img src="'.$theme_url.'/'.$settings['theme'].'/images/bbc_underline.png" alt="'.$l['forum_post_underline'].'" /></a>
-	    <a href="javascript:void(0);" title="Strikeout" onClick="add_bbcode(\'body\',\'[s]\',\'[/s]\');"><img src="'.$theme_url.'/'.$settings['theme'].'/images/bbc_strikethrough.png" alt="'.$l['forum_post_strikethrough'].'" /></a>
-	    <a href="javascript:void(0);" title="Image"     onClick="add_bbcode(\'body\',\'[img]\',\'[/img]\');"><img src="'.$theme_url.'/'.$settings['theme'].'/images/bbc_image.png" alt="'.$l['forum_post_image'].'" /></a>
-	    <a href="javascript:void(0);" title="Link"      onClick="add_bbcode(\'body\',\'[url]\',\'[/url]\');"><img src="'.$theme_url.'/'.$settings['theme'].'/images/bbc_link.png" alt="'.$l['forum_post_link'].'" /></a>
-	    <a href="javascript:void(0);" title="Code"      onClick="add_bbcode(\'body\',\'[code]\',\'[/code]\');"><img src="'.$theme_url.'/'.$settings['theme'].'/images/bbc_code.png" alt="'.$l['forum_post_code'].'" /></a>
-	    <a href="javascript:void(0);" title="Quote"     onClick="add_bbcode(\'body\',\'[quote]\',\'[/quote]\');"><img src="'.$theme_url.'/'.$settings['theme'].'/images/bbc_quote.png" alt="'.$l['forum_post_quote'].'" /></a>
-	  </td>	
+	    <a href="javascript:void(0);" onClick="add_bbcode(\'body\',\'[b]\',\'[/b]\');"><img src="'.$theme_url.'/'.$settings['theme'].'/images/bbc_bold.png" alt="'.$l['bbcode_bold'].'" /></a>
+	    <a href="javascript:void(0);" onClick="add_bbcode(\'body\',\'[i]\',\'[/i]\');"><img src="'.$theme_url.'/'.$settings['theme'].'/images/bbc_italic.png" alt="'.$l['bbcode_italic'].'" /></a>
+	    <a href="javascript:void(0);" onClick="add_bbcode(\'body\',\'[u]\',\'[/u]\');"><img src="'.$theme_url.'/'.$settings['theme'].'/images/bbc_underline.png" alt="'.$l['bbcode_underline'].'" /></a>
+	    <a href="javascript:void(0);" onClick="add_bbcode(\'body\',\'[s]\',\'[/s]\');"><img src="'.$theme_url.'/'.$settings['theme'].'/images/bbc_strikethrough.png" alt="'.$l['bbcode_strikethrough'].'" /></a>
+	    <a href="javascript:void(0);" onClick="add_bbcode(\'body\',\'[img]\',\'[/img]\');"><img src="'.$theme_url.'/'.$settings['theme'].'/images/bbc_image.png" alt="'.$l['bbcode_image'].'" /></a>
+	    <a href="javascript:void(0);" onClick="add_bbcode(\'body\',\'[url]\',\'[/url]\');"><img src="'.$theme_url.'/'.$settings['theme'].'/images/bbc_link.png" alt="'.$l['bbcode_link'].'" /></a>
+	    <a href="javascript:void(0);" onClick="add_bbcode(\'body\',\'[code]\',\'[/code]\');"><img src="'.$theme_url.'/'.$settings['theme'].'/images/bbc_code.png" alt="'.$l['bbcode_code'].'" /></a>
+	    <a href="javascript:void(0);" onClick="add_bbcode(\'body\',\'[quote]\',\'[/quote]\');"><img src="'.$theme_url.'/'.$settings['theme'].'/images/bbc_quote.png" alt="'.$l['bbcode_quote'].'" /></a>
+	  </td>
   </tr>
   <tr align="center" valign="middle">
   	<td colspan="3">  
@@ -38,7 +38,7 @@ echo '
 	foreach ($smileys as $key => $value) {
 	  echo '
 	    <a href="javascript:void(0);" onClick="add_bbcode(\'body\',\' '.$key.' \',\'\');">
-	    <img src="'.$theme_url.'/'.$settings['theme'].'/emoticons/'.$value.'" title="'.(($key==':P')?"Mr. Yucky-Poo":str_replace(".png","",$value)).'" alt="'.$key.'"></a>';
+	    <img src="'.$theme_url.'/'.$settings['theme'].'/emoticons/'.$value.'" title="'.(($key==':P')?'Mr. Yucky-Poo':strtoupper(substr($value,0,1)).str_replace(".bmp","",str_replace(".png","",str_replace(".gif","",str_replace(".jpg","",str_replace(".jpeg","",substr($value,1,strlen($value)))))))).'" alt="'.$key.'"></a>';
 	}
 	
 	echo '
@@ -91,15 +91,15 @@ echo '
   </tr>
  <tr align="center" valign="middle">
     <td colspan="3">
-	    <a href="javascript:void(0);" title="Bold"      onClick="add_bbcode(\'body\',\'[b]\',\'[/b]\');"><img src="'.$theme_url.'/'.$settings['theme'].'/images/bbc_bold.png" alt="'.$l['forum_post_bold'].'" /></a>
-	    <a href="javascript:void(0);" title="Italic"    onClick="add_bbcode(\'body\',\'[i]\',\'[/i]\');"><img src="'.$theme_url.'/'.$settings['theme'].'/images/bbc_italic.png" alt="'.$l['forum_post_italic'].'" /></a>
-	    <a href="javascript:void(0);" title="Underline" onClick="add_bbcode(\'body\',\'[u]\',\'[/u]\');"><img src="'.$theme_url.'/'.$settings['theme'].'/images/bbc_underline.png" alt="'.$l['forum_post_underline'].'" /></a>
-	    <a href="javascript:void(0);" title="Strikeout" onClick="add_bbcode(\'body\',\'[s]\',\'[/s]\');"><img src="'.$theme_url.'/'.$settings['theme'].'/images/bbc_strikethrough.png" alt="'.$l['forum_post_strikethrough'].'" /></a>
-	    <a href="javascript:void(0);" title="Image"     onClick="add_bbcode(\'body\',\'[img]\',\'[/img]\');"><img src="'.$theme_url.'/'.$settings['theme'].'/images/bbc_image.png" alt="'.$l['forum_post_image'].'" /></a>
-	    <a href="javascript:void(0);" title="Link"      onClick="add_bbcode(\'body\',\'[url]\',\'[/url]\');"><img src="'.$theme_url.'/'.$settings['theme'].'/images/bbc_link.png" alt="'.$l['forum_post_link'].'" /></a>
-	    <a href="javascript:void(0);" title="Code"      onClick="add_bbcode(\'body\',\'[code]\',\'[/code]\');"><img src="'.$theme_url.'/'.$settings['theme'].'/images/bbc_code.png" alt="'.$l['forum_post_code'].'" /></a>
-	    <a href="javascript:void(0);" title="Quote"     onClick="add_bbcode(\'body\',\'[quote]\',\'[/quote]\');"><img src="'.$theme_url.'/'.$settings['theme'].'/images/bbc_quote.png" alt="'.$l['forum_post_quote'].'" /></a>
-	  </td>	
+	    <a href="javascript:void(0);" onClick="add_bbcode(\'body\',\'[b]\',\'[/b]\');"><img src="'.$theme_url.'/'.$settings['theme'].'/images/bbc_bold.png" alt="'.$l['bbcode_bold'].'" /></a>
+	    <a href="javascript:void(0);" onClick="add_bbcode(\'body\',\'[i]\',\'[/i]\');"><img src="'.$theme_url.'/'.$settings['theme'].'/images/bbc_italic.png" alt="'.$l['bbcode_italic'].'" /></a>
+	    <a href="javascript:void(0);" onClick="add_bbcode(\'body\',\'[u]\',\'[/u]\');"><img src="'.$theme_url.'/'.$settings['theme'].'/images/bbc_underline.png" alt="'.$l['bbcode_underline'].'" /></a>
+	    <a href="javascript:void(0);" onClick="add_bbcode(\'body\',\'[s]\',\'[/s]\');"><img src="'.$theme_url.'/'.$settings['theme'].'/images/bbc_strikethrough.png" alt="'.$l['bbcode_strikethrough'].'" /></a>
+	    <a href="javascript:void(0);" onClick="add_bbcode(\'body\',\'[img]\',\'[/img]\');"><img src="'.$theme_url.'/'.$settings['theme'].'/images/bbc_image.png" alt="'.$l['bbcode_image'].'" /></a>
+	    <a href="javascript:void(0);" onClick="add_bbcode(\'body\',\'[url]\',\'[/url]\');"><img src="'.$theme_url.'/'.$settings['theme'].'/images/bbc_link.png" alt="'.$l['bbcode_link'].'" /></a>
+	    <a href="javascript:void(0);" onClick="add_bbcode(\'body\',\'[code]\',\'[/code]\');"><img src="'.$theme_url.'/'.$settings['theme'].'/images/bbc_code.png" alt="'.$l['bbcode_code'].'" /></a>
+	    <a href="javascript:void(0);" onClick="add_bbcode(\'body\',\'[quote]\',\'[/quote]\');"><img src="'.$theme_url.'/'.$settings['theme'].'/images/bbc_quote.png" alt="'.$l['bbcode_quote'].'" /></a>
+	  </td>
   </tr>
   <tr align="center" valign="middle">
   	<td colspan="3">';
@@ -109,7 +109,7 @@ echo '
 	foreach ($smileys as $key => $value) {
 	  echo '
 	    <a href="javascript:void(0);" onClick="add_bbcode(\'body\',\' '.$key.' \',\'\');">
-	    <img src="'.$theme_url.'/'.$settings['theme'].'/emoticons/'.$value.'" title="'.(($key==':P')?"Mr. Yucky-Poo":str_replace(".png","",$value)).'" alt="'.$key.'"></a>';
+	    <img src="'.$theme_url.'/'.$settings['theme'].'/emoticons/'.$value.'" title="'.(($key==':P')?'Mr. Yucky-Poo':strtoupper(substr($value,0,1)).str_replace(".bmp","",str_replace(".png","",str_replace(".gif","",str_replace(".jpg","",str_replace(".jpeg","",substr($value,1,strlen($value)))))))).'" alt="'.$key.'"></a>';
 	}
 	
 	echo '</td>

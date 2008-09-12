@@ -72,8 +72,16 @@ global $l, $settings, $user, $db_prefix;
   // Load the theme
   if ($uid == $user['id']) {
     // They are viewing their own inbox
-    $settings['page']['title'] = $l['pm_inbox_title'];
-    loadForum('PersonalMessages','Inbox');
+    if ($settings['page']['messages']) {
+      // It is empty
+      $settings['page']['title'] = $l['pm_inbox_title'];
+      loadForum('PersonalMessages','InboxEmpty');
+    }
+    else {
+      // It is not empty
+      $settings['page']['title'] = $l['pm_inbox_empty_title'];
+      loadForum('PersonalMessages','InboxEmpty');
+    }
   }
   else {
     // An admin is viewing someone else's inbox
@@ -143,6 +151,8 @@ global $l, $settings;
 function PMCompile() {
 global $l, $settings;
   
+  $settings['page']['to'] = str_replace('+',' ',str_replace('%20',' ',clean(@$_REQUEST['to'])));
+  $settings['page']['subject'] = str_replace('+',' ',str_replace('%20',' ',clean(@$_REQUEST['subject'])));
   $settings['page']['title'] = $l['pm_compile_title'];
   loadForum('PersonalMessages','Compile');
 }

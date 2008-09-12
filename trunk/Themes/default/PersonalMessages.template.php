@@ -39,6 +39,21 @@ global $l, $settings, $cmsurl;
   </td></tr></table>';
 }
 
+function InboxEmpty() {
+global $l, $settings, $cmsurl;
+  
+  echo '
+  <table class="pm"><tr><td>
+  
+  <h1>'.$l['pm_inbox_empty_header'].'</h1>
+  
+  '.PMBar().'
+  
+  <p>'.$l['pm_inbox_empty_desc'].'</p>
+  
+  </td></tr></table>';
+}
+
 function InboxAdmin() {
 global $l, $settings, $cmsurl;
   
@@ -159,7 +174,7 @@ global $l, $cmsurl;
 }
 
 function Compile() {
-global $l, $cmsurl;
+global $l, $settings, $cmsurl, $theme_dir, $theme_url;
   
   echo '
   <table class="pm"><tr><td>
@@ -169,6 +184,60 @@ global $l, $cmsurl;
   '.PMBar().'
   
   <p>'.$l['pm_compile_desc'].'</p>
+  
+  <form action="'.$cmsurl.'forum.php?action=pm;sa=compile" method="post">
+    <table id="post" border="0px">
+      <tr cellspacing="0px" cellpadding="0px">
+        <td class="title" colspan="3">'.$l['pm_compile_header'].'</td>
+      </tr>
+      <tr>
+        <td width="20%" style="text-align: right; padding-right: 5px">'.$l['pm_compile_to'].':</td>
+        <td><input name="to" value="'.$settings['page']['to'].'" />
+        <td width="20%"></td>
+      </tr>
+      <tr>
+        <td width="20%" style="text-align: right; padding-right: 5px">'.$l['pm_compile_subject'].':</td>
+        <td style="text-align: center"><input name="subject" value="'.$settings['page']['subject'].'" size="78" />
+        <td width="20%"></td>
+      </tr>
+      <tr align="center" valign="middle">
+        <td colspan="3">
+	        <a href="javascript:void(0);" onClick="add_bbcode(\'body\',\'[b]\',\'[/b]\');"><img src="'.$theme_url.'/'.$settings['theme'].'/images/bbc_bold.png" alt="'.$l['bbcode_bold'].'" /></a>
+    	    <a href="javascript:void(0);" onClick="add_bbcode(\'body\',\'[i]\',\'[/i]\');"><img src="'.$theme_url.'/'.$settings['theme'].'/images/bbc_italic.png" alt="'.$l['bbcode_italic'].'" /></a>
+	        <a href="javascript:void(0);" onClick="add_bbcode(\'body\',\'[u]\',\'[/u]\');"><img src="'.$theme_url.'/'.$settings['theme'].'/images/bbc_underline.png" alt="'.$l['bbcode_underline'].'" /></a>
+  	      <a href="javascript:void(0);" onClick="add_bbcode(\'body\',\'[s]\',\'[/s]\');"><img src="'.$theme_url.'/'.$settings['theme'].'/images/bbc_strikethrough.png" alt="'.$l['bbcode_strikethrough'].'" /></a>
+	        <a href="javascript:void(0);" onClick="add_bbcode(\'body\',\'[img]\',\'[/img]\');"><img src="'.$theme_url.'/'.$settings['theme'].'/images/bbc_image.png" alt="'.$l['bbcode_image'].'" /></a>
+    	    <a href="javascript:void(0);" onClick="add_bbcode(\'body\',\'[url]\',\'[/url]\');"><img src="'.$theme_url.'/'.$settings['theme'].'/images/bbc_link.png" alt="'.$l['bbcode_link'].'" /></a>
+	        <a href="javascript:void(0);" onClick="add_bbcode(\'body\',\'[code]\',\'[/code]\');"><img src="'.$theme_url.'/'.$settings['theme'].'/images/bbc_code.png" alt="'.$l['bbcode_code'].'" /></a>
+  	      <a href="javascript:void(0);" onClick="add_bbcode(\'body\',\'[quote]\',\'[/quote]\');"><img src="'.$theme_url.'/'.$settings['theme'].'/images/bbc_quote.png" alt="'.$l['bbcode_quote'].'" /></a>
+	      </td>
+      </tr>
+      <tr align="center" valign="middle">
+      	<td colspan="3">  
+    	    ';
+    	
+	    include_once $theme_dir.'/'.$settings['theme'].'/emoticons/emoticons.php';
+    	
+	    foreach ($smileys as $key => $value) {
+	      echo '
+	        <a href="javascript:void(0);" onClick="add_bbcode(\'body\',\' '.$key.' \',\'\');">
+	        <img src="'.$theme_url.'/'.$settings['theme'].'/emoticons/'.$value.'" title="'.(($key==':P')?'Mr. Yucky-Poo':strtoupper(substr($value,0,1)).str_replace(".bmp","",str_replace(".png","",str_replace(".gif","",str_replace(".jpg","",str_replace(".jpeg","",substr($value,1,strlen($value)))))))).'" alt="'.$key.'"></a>';
+	    }
+      
+	    echo '
+	      </td>
+      </tr>
+      <tr align="center">
+        <td colspan="3"><textarea id="body" name="body" rows="12" cols="60" onclick="if(document.selection){this.selection = document.selection.createRange()}" onkeyup="if(document.selection){this.selection = document.selection.createRange()}" onchange="if(document.selection){this.selection = document.selection.createRange().duplicate()}" onfocus="if(document.selection){this.selection = document.selection.createRange().duplicate()}"></textarea></td>
+      </tr>
+      <tr align="center">
+        <td colspan="3"><input name="make_topic" type="submit" value="'.$l['pm_compile_submit'].'"/></td>
+      </tr>
+    </table>
+  </form>
+  <script type="text/javascript">
+    document.getElementById(\'body\').focus();
+  </script>
   
   </td></tr></table>';
 }
