@@ -14,28 +14,26 @@ global $l, $settings, $cmsurl;
   '.PMBar().'
   
   <p>'.$l['pm_inbox_desc'].'</p>
-  ';
   
-  if (count($settings['page']['messages'])) {
-    echo '<table width="100%" style="text-align: center">
-      <tr>
-        <th style="border-style: solid; border-width: 1px; width: 45%">'.$l['pm_inbox_subject'].'</th>
-        <th style="border-style: solid; border-width: 1px; width: 15%">'.$l['pm_inbox_from'].'</th>
-        <th style="border-style: solid; border-width: 1px; width: 40%">'.$l['pm_inbox_received'].'</th>
-      </tr>';
-    foreach ($settings['page']['messages'] as $message) {
-      echo '
-      <tr>
-        <td><a href="'.$cmsurl.'forum.php?action=pm;msg='.$message['id'].'">'.$message['subject'].'</a></td>
-        <td><a href="'.$cmsurl.'index.php?action=profile;u='.$message['from_id'].'">'.$message['from'].'</a></td>
-        <td>'.$message['time'].'</td>
-      </tr>
-      ';
-    }
-    echo '</table>';
+  <table width="100%" style="text-align: center">
+    <tr>
+      <th style="border-style: solid; border-width: 1px; width: 45%">'.$l['pm_inbox_subject'].'</th>
+      <th style="border-style: solid; border-width: 1px; width: 15%">'.$l['pm_inbox_from'].'</th>
+      <th style="border-style: solid; border-width: 1px; width: 40%">'.$l['pm_inbox_received'].'</th>
+    </tr>';
+  
+  foreach ($settings['page']['messages'] as $message) {
+    echo '
+    <tr>
+      <td><a href="'.$cmsurl.'forum.php?action=pm;msg='.$message['id'].'">'.$message['subject'].'</a></td>
+      <td><a href="'.$cmsurl.'index.php?action=profile;u='.$message['from_id'].'">'.$message['from'].'</a></td>
+      <td>'.$message['time'].'</td>
+    </tr>
+    ';
   }
   
-  echo '
+  echo '</table>
+  
   </td></tr></table>';
 }
 
@@ -159,7 +157,7 @@ global $l, $settings, $cmsurl;
 }
 
 function Outbox() {
-global $l, $cmsurl;
+global $l, $cmsurl, $settings;
   
   echo '
   <table class="pm"><tr><td>
@@ -169,6 +167,25 @@ global $l, $cmsurl;
   '.PMBar().'
   
   <p>'.$l['pm_outbox_desc'].'</p>
+  
+  <table width="100%" style="text-align: center">
+    <tr>
+      <th style="border-style: solid; border-width: 1px; width: 45%">'.$l['pm_outbox_subject'].'</th>
+      <th style="border-style: solid; border-width: 1px; width: 15%">'.$l['pm_outbox_to'].'</th>
+      <th style="border-style: solid; border-width: 1px; width: 40%">'.$l['pm_outbox_sent'].'</th>
+    </tr>';
+  
+  foreach ($settings['page']['messages'] as $message) {
+    echo '
+    <tr>
+      <td><a href="'.$cmsurl.'forum.php?action=pm;msg='.$message['id'].'">'.$message['subject'].'</a></td>
+      <td><a href="'.$cmsurl.'index.php?action=profile;u='.$message['from_id'].'">'.$message['to'].'</a></td>
+      <td>'.$message['time'].'</td>
+    </tr>
+    ';
+  }
+  
+  echo '</table>
   
   </td></tr></table>';
 }
@@ -181,9 +198,14 @@ global $l, $settings, $cmsurl, $theme_dir, $theme_url;
   
   <h1>'.$l['pm_compile_header'].'</h1>
   
-  '.PMBar().'
+  '.PMBar();
   
-  <p>'.$l['pm_compile_desc'].'</p>
+  if (@$_SESSION['error'])
+	 echo '<p><b>'.$l['main_error'].':</b> '.$_SESSION['error'].'</p>';
+  else
+    echo '<p>'.$l['pm_compile_desc'].'</p>';
+  
+  echo '
   
   <form action="'.$cmsurl.'forum.php?action=pm;sa=compile" method="post">
     <table id="post" border="0px">

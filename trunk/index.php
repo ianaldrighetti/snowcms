@@ -77,7 +77,7 @@ require_once($source_dir.'/Core.php');
       require_once($source_dir.'/'.$actions[$_REQUEST['action']][0]);
         $actions[$_REQUEST['action']][1]();
     }
-  }  
+  }
   // Remove any error messages so they aren't displayed again
   unset($_SESSION['error']);
   // Remove the fact that they have completed the CAPTCHA
