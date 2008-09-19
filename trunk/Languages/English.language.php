@@ -436,6 +436,7 @@ $l['permissions_perm_manage_forum_perms'] = 'Allow them to manage forum permissi
 $l['permissions_perm_manage_ips_ban'] = 'Allow them to ban IP addresses';
 $l['permissions_perm_manage_ips_unban'] = 'Allow them to unban IP addresses';
 $l['permissions_perm_manage_mail_settings'] = 'Allow them to manage mail settings';
+$l['permissions_perm_manage_tos'] = 'Allow them to manage the TOS';
 $l['permissions_perm_moderate_username'] = 'Allow them to change members\' usernames.';
 $l['permissions_perm_moderate_display_name'] = 'Allow them to change members\' display names.';
 $l['permissions_perm_moderate_email'] = 'Allow them to change members\' email addresses.';
@@ -712,6 +713,7 @@ $l['tos_disable'] = 'Disable TOS';
 $l['tos_change'] = 'Change TOS';
 $l['tos_change_submit'] = 'Save Changes';
 $l['tos_onelanguage_submit'] = 'Save Changes';
+$l['tos_cancel'] = 'Cancel';
 $l['tos_notos'] = 'There is no TOS written in this language.';
 
 // PersonalMessages.template.php

@@ -41,6 +41,13 @@ global $l, $settings, $cmsurl;
   echo '
     </p>
   </form>
+  
+  <form action="'.$cmsurl.'index.php?action=admin;sa=pages" method="post" style="display: inline">
+    <p style="display: inline">
+      <input type="hidden" name="redirect" value="true" />
+      <input type="submit" value="'.$l['tos_cancel'].'" />
+    </p>
+  </form>
   ';
 }
 
@@ -89,6 +96,13 @@ global $l, $settings, $cmsurl;
       <input type="submit" value="'.$l['tos_change_submit'].'" />
     </p>
   </form>
+  
+  <form action="'.$cmsurl.'index.php?action=admin;sa=pages" method="post" style="display: inline">
+    <p style="display: inline">
+      <input type="hidden" name="redirect" value="true" />
+      <input type="submit" value="'.$l['tos_cancel'].'" />
+    </p>
+  </form>
   ';
 }
 
@@ -122,6 +136,13 @@ global $l, $settings, $cmsurl;
   echo '</p>
     <p>
       <input type="submit" value="'.$l['tos_onelanguage_submit'].'" />
+    </p>
+  </form>
+  
+  <form action="'.$cmsurl.'index.php?action=admin;sa=pages" method="post" style="display: inline">
+    <p style="display: inline">
+      <input type="hidden" name="redirect" value="true" />
+      <input type="submit" value="'.$l['tos_cancel'].'" />
     </p>
   </form>
   ';

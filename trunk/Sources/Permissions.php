@@ -50,6 +50,7 @@ $settings['permissions']['group'] = array(
   'manage_forum_perms' => false,
   'manage_ips_ban' => false,
   'manage_ips_unban' => false,
+  'manage_tos' => false,
   'moderate_username' => false,
   'moderate_display_name' => false,
   'moderate_email' => false,

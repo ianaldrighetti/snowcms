@@ -56,13 +56,14 @@ global $cmsurl, $db_prefix, $l, $settings, $user;
   // If a page is set then we should be editing a page, not listing them
   if ($page) {
     // Are they allowed to modify pages?
-    if (can('manage_pages_modify_html') || can('manage_pages_modify_bbcode'))
+    if (can('manage_pages_modify_html') || can('manage_pages_modify_bbcode')) {
       // Are they modifing the homepage and if so, are they allowed to?
       if ($page != $settings['homepage'] || can('manage_pages_home'))
         EditPage();
       else {
       $_SESSION['error'] = $l['managepages_error_notallowed_homepage'];
       redirect('index.php?action=admin;sa=pages');
+      }
     }
     else {
       $_SESSION['error'] = $l['managepages_error_notallowed_modify'];

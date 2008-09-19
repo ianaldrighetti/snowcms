@@ -70,7 +70,8 @@ global $l, $cmsurl;
   $options[] = 'forum';
   $options[] = 'email';
   $options[] = 'news';
-  $options[] = 'tos';
+  if (can('manage_tos'))
+    $options[] = 'tos';
   if (can('ban_ips') || can('unban_ips'))
     $options[] = 'ips';
   
