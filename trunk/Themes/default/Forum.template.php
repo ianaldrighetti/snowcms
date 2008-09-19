@@ -30,7 +30,7 @@ echo '
       echo '<li><a href="'.$cmsurl.'index.php?action=profile">'.$l['forum_link_profile'].'</a></li>';
     if(can('view_mlist')) 
       echo '<li><a href="'.$cmsurl.'forum.php?action=members">'.$l['forum_link_members'].'</a></li>';
-    if($user['is_logged'])
+    if($user['is_logged'] && can('pm_view'))
       echo '<li><a href="'.$cmsurl.'forum.php?action=pm">'.$l['forum_link_pm'].'</a></li>';
     if(!$user['is_logged'])
       echo '
