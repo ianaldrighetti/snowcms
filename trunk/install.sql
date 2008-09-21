@@ -204,7 +204,8 @@ CREATE TABLE `{$db_prefix}news` (
   `body` text NOT NULL,
   `post_time` int(10) NOT NULL,
   `modify_time` int(10) NOT NULL default '0',
-  `numViews` int(11) NOT NULL default '0',
+  `num_comments` int(11) NOT NULL default '0',
+  `num_views` int(11) NOT NULL default '0',
   `allow_comments` int(1) NOT NULL default '1',
   PRIMARY KEY(`news_id`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;

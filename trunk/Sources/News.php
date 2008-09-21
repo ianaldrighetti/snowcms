@@ -31,7 +31,9 @@ global $cmsurl, $db_prefix, $l, $settings, $user;
     $subject = clean(@$_REQUEST['subject']); // Subject
     $body = clean(@$_REQUEST['body']); // Body text
     
-    // Process SQL query
+    // Update the amount total of comments for the news article
+    sql_query("UPDATE {$db_prefix}news SET `num_comments` = `num_comments` + 1");
+    // Insert comment into database
     sql_query("INSERT {$db_prefix}news_comments (`nid`, `poster_id`, `poster_name`, `subject`, `body`, `post_time`) VALUES ('$nid','{$user['id']}','{$user['name']}','$subject','$body', '".time()."')");
     
     // Redirect the page to the main manage news page
@@ -64,7 +66,6 @@ global $cmsurl, $db_prefix, $l, $settings, $user;
     // Is there even any news? :O
     if (mysql_num_rows($result)) {
       while ($row = mysql_fetch_assoc($result)) {
-        $comments = mysql_fetch_assoc(sql_query("SELECT COUNT(*) FROM {$db_prefix}news_comments WHERE `nid` = '{$row['news_id']}' GROUP BY `nid`"));
         $category = mysql_fetch_assoc(sql_query("SELECT * FROM {$db_prefix}news_categories WHERE `cat_id` = '{$row['cat_id']}'"));
         $news[] = array(
           'id' => $row['news_id'],
@@ -77,8 +78,8 @@ global $cmsurl, $db_prefix, $l, $settings, $user;
           'user_id' => $row['id'],
           'username' => $row['username'],
           'post_date' => formattime($row['post_time'],2),
-          'numViews' => $row['numViews'],
-          'numComments' => (int)$comments['COUNT(*)'],
+          'num_views' => $row['num_views'],
+          'num_comments' => (int)$row['num_comments'],
           'allow_comments' => $row['allow_comments']
         );
       }
@@ -162,7 +163,7 @@ global $cmsurl, $db_prefix, $l, $settings, $user;
           'user_id' => $row['id'],
           'username' => $row['username'],
           'post_date' => formattime($row['post_time'],2),
-          'numViews' => $row['numViews'],
+          'num_views' => $row['num_views'],
           'allow_comments' => $row['allow_comments']
         );
       }
@@ -227,7 +228,7 @@ global $cmsurl, $db_prefix, $l, $settings, $user;
       // No news ID, and no $na action that exists
       $result = sql_query("
         SELECT
-          n.news_id, n.poster_id, n.poster_name, n.cat_id, n.subject, n.post_time, n.numViews, n.allow_comments,
+          n.news_id, n.poster_id, n.poster_name, n.cat_id, n.subject, n.post_time, n.num_views, n.num_comments, n.allow_comments,
           nc.cat_id, nc.cat_name, m.id, m.display_name AS username, IFNULL(m.display_name, m.username) AS username
         FROM {$db_prefix}news AS n
           LEFT JOIN {$db_prefix}news_categories AS nc ON nc.cat_id = n.cat_id
@@ -245,7 +246,7 @@ global $cmsurl, $db_prefix, $l, $settings, $user;
           'cat_name' => $row['cat_name'],
           'subject' => $row['subject'],
           'time' => formattime($row['post_time']),
-          'numViews' => $row['numViews'],
+          'num_views' => $row['num_views'],
           'allow_comments' => $row['allow_comments']
         );
       }

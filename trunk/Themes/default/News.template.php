@@ -36,7 +36,7 @@ global $cmsurl, $db_prefix, $l, $settings, $user;
     <p>'.bbc($news['body']).'</p>
     ';
     if ($news['allow_comments'])
-      echo '<p>'.str_replace('%num%','<a href="'.$cmsurl.'index.php?action=news;id='.$news['id'].'">'.$news['numComments'].'</a>',$l['news_comments']).'</p>
+      echo '<p>'.str_replace('%num%','<a href="'.$cmsurl.'index.php?action=news;id='.$news['id'].'">'.$news['num_comments'].'</a>',$l['news_comments']).'</p>
     ';
     $i += 1;
   }
