@@ -16,6 +16,7 @@ if(!defined("Snow"))
   
 function BasicSettings() {
 global $cmsurl, $db_prefix, $l, $settings, $user, $language_dir, $theme_dir, $theme_name;
+  
   if (can('manage_basic-settings')) {
     // An array of all the settings that can be set on this page...
     //  A  = text of any length
@@ -219,6 +220,7 @@ global $cmsurl, $db_prefix, $l, $settings, $user, $language_dir, $theme_dir, $th
 
 function MailSettings() {
 global $cmsurl, $db_prefix, $l, $settings;
+  
   // Do they have permission?
   if(can('manage_mail_settings')) {
     // Are they changing settings?
@@ -267,5 +269,8 @@ global $cmsurl, $db_prefix, $l, $settings;
     $settings['page']['title'] = $l['mailsettings_title'];
     loadTheme('Settings','ManageMailSettings');
   }
+  // They don't have permission, so redrect them to the main control panel
+  else
+    redirect('index.php?action=admin');
 }
 ?>

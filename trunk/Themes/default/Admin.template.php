@@ -64,12 +64,15 @@ global $l, $cmsurl;
     $options[] = 'pages';
   if (can('manage_basic-settings'))
     $options[] = 'basic-settings';
-  $options[] = 'members';
+  if (can('manage_members'))
+    $options[] = 'members';
   $options[] = 'permissions';
   $options[] = 'menus';
   $options[] = 'forum';
-  $options[] = 'email';
-  $options[] = 'news';
+  if (can('manage_mail_settings'))
+    $options[] = 'mail-settings';
+  if (can('manage_news'))
+    $options[] = 'news';
   if (can('manage_tos'))
     $options[] = 'tos';
   if (can('ban_ips') || can('unban_ips'))

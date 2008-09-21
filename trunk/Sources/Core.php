@@ -318,7 +318,8 @@ global $perms, $user;
   $groups = array(
     'change_settings' => array('change_displayname','change_email','change_birthdate','change_avatar','change_signature','change_profile',
                                'change_password'),
-    'manage_pages' => array('manage_pages_modify_html','manage_pages_modify_bbcode','manage_pages_create','manage_pages_delete','manage_pages_home')
+    'manage_pages' => array('manage_pages_modify_html','manage_pages_modify_bbcode','manage_pages_create','manage_pages_delete','manage_pages_home'),
+    'manage_members' => array('moderate_username','moderate_display_name','moderate_email','moderate_password','moderate_birthdate','moderate_avatar','moderate_group','moderate_signature','moderate_profile','moderate_activate','moderate_suspend','moderate_unsuspend','moderate_ban','moderate_unban')
   );
   
   // Check if they are allowed to perform any action in the group
