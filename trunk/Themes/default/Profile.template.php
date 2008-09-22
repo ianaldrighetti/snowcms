@@ -177,7 +177,7 @@ global $l, $settings, $cmsurl, $user;
   else
     echo '<tr style="display: none"><td colspan="2"><input type="hidden" name="signature" value="'.$profile['signature'].'" /></td></tr>';
   
-  if (can('change_proile'))
+  if (can('change_profile'))
     echo '<tr><th style="text-align: left">'.$l['profile_edit_profile'].'</th><td><textarea name="profile" cols="45" rows="4">'.$profile['text'].'</textarea></td></tr>
         ';
   else
