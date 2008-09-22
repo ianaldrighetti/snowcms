@@ -680,6 +680,9 @@ global $l, $settings, $theme_dir, $theme_url;
   // - was used in place of #, because # had a different meaning
   $str = str_replace('$','#',$str);
   
+  // convert ' to work properly
+  $str = str_replace('&&#35;39;','&#39;',$str);
+  
   // Process newlines
   $str = strtr($str, array("\n" => "<br />"));
   
