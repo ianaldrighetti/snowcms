@@ -1,4 +1,6 @@
 <?php
+@session_start();
+
 /*
    This is the installer file for SnowCMS (http://www.snowcms.com/)
    Access this file in your browser to install your SnowCMS Setup
@@ -13,148 +15,282 @@ if ($scms_installed)
 $files = array(
   './Languages',
   './Languages/English.language.php',
-  './Sources',
+  './Sources/Admin.php',
+  './Sources/Board.php',
+  './Sources/BoardIndex.php',
+  './Sources/Captcha.php',
+  './Sources/Core.php',
+  './Sources/IPs.php',
+  './Sources/Login.php',
+  './Sources/Mail.php',
+  './Sources/Main.php',
+  './Sources/ManageForum.php',
+  './Sources/Members.php',
+  './Sources/Menus.php',
+  './Sources/News.php',
+  './Sources/Online.php',
+  './Sources/Page.php',
+  './Sources/Permissions.php',
+  './Sources/PersonalMessages.php',
+  './Sources/PHPMailer.php',
+  './Sources/Post.php',
+  './Sources/Profile.php',
+  './Sources/Register.php',
+  './Sources/Search.php',
+  './Sources/Settings.php',
+  './Sources/SMTP.php',
+  './Sources/Topic.php',
+  './Sources/TOS.php',
+  './Sources/fonts',
+  './Sources/fonts/Vera.ttf',
+  './Sources/fonts/VeraBd.ttf',
+  './Sources/fonts/VeraIt.ttf',
   './Themes',
   './Themes/default',
+  './Themes/default/info.php',
+  './Themes/default/Main.template.php',
+  './Themes/default/Admin.template.php',
+  './Themes/default/BoardIndex.template.php',
+  './Themes/default/Error.template.php',
+  './Themes/default/Forum.template.php',
+  './Themes/default/Login.template.php',
+  './Themes/default/ManageForum.template.php',
+  './Themes/default/ManageIPs.template.php',
+  './Themes/default/ManageMembers.template.php',
+  './Themes/default/ManageMenus.template.php',
+  './Themes/default/ManagePages.template.php',
+  './Themes/default/MemberList.template.php',
+  './Themes/default/MessageIndex.template.php',
+  './Themes/default/News.template.php',
+  './Themes/default/Online.template.php',
+  './Themes/default/Page.template.php',
+  './Themes/default/Permissions.template.php',
+  './Themes/default/PersonalMessages.template.php',
+  './Themes/default/Post.template.php',
+  './Themes/default/Profile.template.php',
+  './Themes/default/Register.template.php',
+  './Themes/default/Search.template.php',
+  './Themes/default/Settings.template.php',
+  './Themes/default/Topic.template.php',
+  './Themes/default/TOS.template.php',
+  './Themes/default/style.css',
+  './Themes/default/forum.css',
+  './Themes/default/iefix.css',
+  './Themes/default/images',
+  './Themes/default/images/bbc_bold.png',
+  './Themes/default/images/bbc_code.png',
+  './Themes/default/images/bbc_image.png',
+  './Themes/default/images/bbc_italic.png',
+  './Themes/default/images/bbc_link.png',
+  './Themes/default/images/bbc_quote.png',
+  './Themes/default/images/bbc_strikethrough.png',
+  './Themes/default/images/bbc_underline.png',
+  './Themes/default/images/containerbg.png',
+  './Themes/default/images/delete.png',
+  './Themes/default/images/edit_post.png',
+  './Themes/default/images/email.png',
+  './Themes/default/images/female.png',
+  './Themes/default/images/headbar.png',
+  './Themes/default/images/infobg.png',
+  './Themes/default/images/infobg2.png',
+  './Themes/default/images/male.png',
+  './Themes/default/images/modify.png',
+  './Themes/default/images/navbg.png',
+  './Themes/default/images/off.gif',
+  './Themes/default/images/on.gif',
+  './Themes/default/images/quote.png',
+  './Themes/default/images/sidebg.png',
+  './Themes/default/images/split.png',
+  './Themes/default/images/star.png',
+  './Themes/default/images/status_offline.png',
+  './Themes/default/images/status_online.png',
+  './Themes/default/images/title.png',
+  './Themes/default/images/topic_locked.png',
+  './Themes/default/images/topic_new.png',
+  './Themes/default/images/topic_old.png',
+  './Themes/default/images/topic_own_new.png',
+  './Themes/default/images/topic_own_old.png',
+  './Themes/default/images/www.png',
+  './Themes/default/emoticons',
+  './Themes/default/emoticons/emoticons.php',
+  './Themes/default/scripts',
+  './Themes/default/scripts/bbcode.js',
+  './Themes/default/scripts/bbcode_mini.js',
+  './Themes/default/scripts/jquery.js',
+  './Themes/default/scripts/jquery-pstrength.js',
   './config.php',
   './image.php',
   './index.php',
   './install.sql'
 );
+// Because HTML is sent before the script finishes, we need to buffer the output (It will be sent later)
+ob_start();
 ?>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
   "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
 <head>
-	<title>SnowCMS - SnowCMS Install</title>
-	<meta http-equiv="content-type" content="text/html;charset=utf-8" />
-	<meta name="generator" content="SnowCMS 0.7" />
-	<link rel="stylesheet" href="Themes/default/style.css" type="text/css" media="screen" />
-	<!--[if lte IE 6]><link rel="stylesheet" href="Themes//default/iefix.css" type="text/css" media="screen" /><![endif]-->
-	<!--[if lte IE 7]><style type="text/css">#content {padding-left: 6px !important;}</style><![endif]-->
+  <title>Install - SnowCMS</title>
+  <meta http-equiv="content-type" content="text/html; charset=utf-8" />
+  <meta name="powered-by" content="SnowCMS 0.7" />
+  <link rel="stylesheet" href="Themes/default/style.css" type="text/css" media="screen" />
+  <!--[if lte IE 6]><link rel="stylesheet" href="Themes/default/iefix.css" type="text/css" media="screen" /><![endif]-->
+  <!--[if lte IE 7]><style type="text/css">#content {padding-left: 6px !important;}</style><![endif]-->
 </head>
 <body>
 <div id="container">
-	<div id="header">
-		<div id="headerimg">
-			<a class="headerlink" href="http://www.snowcms.com/" title="SnowCMS"><img class="headerimg" src="Themes/default/images/title.png" alt="SnowCMS" /></a>
-		</div>
-	</div>
-	<div id="sidebar">
-	<ul>
-	  <li><a href="http://www.snowcms.com/" >SnowCMS Support</a></li>
-	  <li><a href="http://code.google.com/p/snowcms/">Google Code</a></li>
-    <li><a href="http://www.snowcms.com/forum/index.php?board=3.0">Dev Blogs</a></li>
-	</ul>
-	</div>
-	<div id="content">
-  <?php
-  $step = $_REQUEST['step'] ? $_REQUEST['step'] : 0;
-  // Check to see if some main files/directories are there...
+  <div id="header">
+    <div id="headerimg">
+      <a class="headerlink" href="http://www.snowcms.com/" title="SnowCMS">
+        <img class="headerimg" src="Themes/default/images/title.png" alt="SnowCMS" />
+      </a>
+    </div>
+  </div>
+  <div id="sidebar">
+  <ul>
+    <li><a href="http://www.snowcms.com/">SnowCMS.com</a></li>
+    <li><a href="http://snowcms.google.com/">Google Code</a></li>
+    <li><a href="http://www.snowcms.com/forum.php">Support Forum</a></li>
+    <li><a href="http://www.snowcms.com/forum.php?board=4">Developer Blogs</a></li>
+  </ul>
+  </div>
+  <div id="content">
+    <?php
+  $step = $_REQUEST['step'] ? $_REQUEST['step'] : 1;
+  // Check to see if all default files and directories exist
   $nofile = array();
-  foreach($files as $file) {
-    if(!file_exists($file)) {
+  foreach ($files as $file) {
+    if (!file_exists($file)) {
       $nofile[] = $file;
     }
   }
-  if(count($nofile)>0) {
-    echo '<p>The Following files/directories do not exist. Please make sure they are uploaded...</p>
-    <p>';
+  if (count($nofile) > 0) {
+    echo '<p>The following files and directories do not exist. Please upload them before continuing:</p>
+    <ul>
+    ';
     foreach($nofile as $file)
-      echo $file.'<br />';
-    echo '</p>';
+      echo '  <li>'.$file.'</li>
+    ';
+    echo '</ul>';
   }
   else {
-    if($step==0) {
-      echo '
-      <h1>Welcome!</h1>
-      <p>Welcome to the SnowCMS Installer! Here is where you install your version of SnowCMS, which is quick, and easy! If you have any support questions, you can ask us at the <a href="http://www.snowcms.com/" target="_blank">SnowCMS</a> site.</p>
-      <div align="center">  
-        <form action="install.php?step=1" method="post">
+    if ($step == 1) {
+      if (!@$_SESSION['error'])
+        echo '<h1>Welcome!</h1>
+      <p>Welcome to the SnowCMS installer! Here is where you install your version of SnowCMS, which is quick, and easy. If you have any support questions, you can ask us at the <a href="http://www.snowcms.com/" target="_blank">SnowCMS</a> site.</p>
+      <div align="center">
+        <form action="install.php?step=2" method="post">
           <table>
             <tr>
-              <td>MySQL Host:</td><td><input name="mysql_host" type="text" value="localhost"/></td>
+              <td>MySQL Host:</td><td><input name="mysql_host" value="localhost" /></td>
             </tr>
             <tr>
-              <td>MySQL Username:</td><td><input name="mysql_user" type="text" value=""/></td>
+              <td>MySQL Username:</td><td><input name="mysql_user" /></td>
             </tr>
             <tr>
-              <td>MySQL Password:</td><td><input name="mysql_pass" type="password" value=""/></td>
+              <td>MySQL Password:</td><td><input type="password" name="mysql_pass" /></td>
             </tr>            
             <tr>
-              <td>MySQL Database:</td><td><input name="mysql_db" type="text" value=""/></td>
+              <td>MySQL Database:</td><td><input name="mysql_db" /></td>
             </tr>
             <tr>
-              <td>MySQL Prefix:</td><td><input name="mysql_prefix" type="text" value="scms_"/></td>
+              <td>MySQL Prefix:</td><td><input name="mysql_prefix" value="scms_" /></td>
             </tr>
             <tr>
-              <td colspan="2"><input name="install" type="submit" value="Install!"/></td>
+              <td colspan="2" style="text-align: center">
+                <br />
+                <input type="submit" value="Install" />
+              </td>
+            </tr>
+          </table>
+        </form>
+      </div>';
+      else
+        echo '<h1>Step 1</h1>
+      <p>We were unable to connect to your MySQL database. Your database information may have been incorrect, please re-enter it.</p>
+      <p><b>Technical information:</b> '.$_SESSION['error'].'</p>
+      <div align="center">
+        <form action="install.php?step=2" method="post">
+          <table>
+            <tr>
+              <td>MySQL Host:</td><td><input name="mysql_host" value="localhost" /></td>
+            </tr>
+            <tr>
+              <td>MySQL Username:</td><td><input name="mysql_user" /></td>
+            </tr>
+            <tr>
+              <td>MySQL Password:</td><td><input type="password" name="mysql_pass" /></td>
+            </tr>            
+            <tr>
+              <td>MySQL Database:</td><td><input name="mysql_db" /></td>
+            </tr>
+            <tr>
+              <td>MySQL Prefix:</td><td><input name="mysql_prefix" value="scms_" /></td>
+            </tr>
+            <tr>
+              <td colspan="2" style="text-align: center">
+                <br />
+                <input type="submit" value="Install" />
+              </td>
             </tr>
           </table>
         </form>
       </div>';
     }
-    elseif($step==1) {
+    elseif ($step == 2) {
       // Can we even connect to MySQL? ._.
-      $mysql_connect = @mysql_connect(@$_REQUEST['mysql_host'], @$_REQUEST['mysql_user'], @$_REQUEST['mysql_pass']);
-      if(!$mysql_connect) {
-        echo '
-        <h1>Step 1</h1>
-        <p>We were unable to connect to your MySQL server. Here is the error message: '.mysql_error().'<br />
-        <a href="install.php">Go Back</a></p>';
+      if ($mysql_connect = @mysql_connect(@$_REQUEST['mysql_host'], @$_REQUEST['mysql_user'], @$_REQUEST['mysql_pass']))
+        $mysql_connect = @mysql_select_db($_REQUEST['mysql_db']);
+      // We can't connect to the database
+      if (!$mysql_connect) {
+        $_SESSION['error'] = mysql_error();
+        header('location: install.php');
+        exit;
       }
+      // We can connect to the database
       else {
-        // Sure we don't actually use mysql_select_db, but lets just check if they are allowed to access it ;)
-        $mysql_select_db = @mysql_select_db($_REQUEST['mysql_db']);
-        // We couldn't select that database, usually means that the MySQL Username is not assign to that database :S
-        if(!$mysql_select_db) {
-        echo '
-        <h1>Step 1</h1>
-        <p>We were unable to connect to your MySQL Database. Here is the error message: '.mysql_error().'<br />
-        <a href="install.php">Go Back</a></p>';        
+        unset($_SESSION['error']);
+        // Get the MySQL Queries from the SQL file :D
+        $db_prefix = $_REQUEST['mysql_prefix'];
+        $sqls = file_get_contents('./install.sql');
+        // Replace a couple things so it is done right
+        $sqls = str_replace('%current_time%',time(),str_replace('{$db_prefix}', $db_prefix, $sqls));
+        // Separate the Queries the easy way xD
+        $mysql_queries = explode(";", $sqls);
+        // MySQL Errors? No thanks!
+        $mysql_errors = array();
+        $num_queries = count($mysql_queries);
+        foreach($mysql_queries as $query) {
+          $i++;
+          if($i!=$num_queries) {
+            $check = mysql_query($query);
+            if(!$check)
+              $mysql_errors[] = mysql_error();
+          }
+        }
+        if(count($mysql_errors)>0) {
+          echo '
+          <h1>Step 1</h1>
+          <p>The following MySQL errors occurred:<br />';
+          foreach($mysql_errors as $error) {
+            echo $error.'<br />';
+          }
+          echo '</p>';
         }
         else {
-          // Get the MySQL Queries from the SQL file :D
-          $db_prefix = $_REQUEST['mysql_prefix'];
-          $sqls = file_get_contents('./install.sql');
-          // Replace a couple things so it is done right
-          $sqls = str_replace('%current_time%',time(),str_replace('{$db_prefix}', $db_prefix, $sqls));
-          // Separate the Queries the easy way xD
-          $mysql_queries = explode(";", $sqls);
-          // MySQL Errors? No thanks!
-          $mysql_errors = array();
-          $num_queries = count($mysql_queries);
-          foreach($mysql_queries as $query) {
-            $i++;
-            if($i!=$num_queries) {
-              $check = mysql_query($query);
-              if(!$check)
-                $mysql_errors[] = mysql_error();
-            }
-          }
-          if(count($mysql_errors)>0) {
-            echo '
-            <h1>Step 1</h1>
-            <p>The following MySQL errors occurred:<br />';
-            foreach($mysql_errors as $error) {
-              echo $error.'<br />';
-            }
-            echo '</p>';
-          }
-          else {
-            // Get the current directory for settings
-            $currentdir = dirname(__FILE__);
-            $iurl = explode('/', $_SERVER['SERVER_NAME'].$_SERVER['REQUEST_URI']);
-			unset($iurl[count($iurl)-1]);
-			$iurl = implode('/', $iurl);
-			$installpath = 'http://'.$iurl.'/';
-            // Now get details, such as directory paths, and administrative details
-            echo '<h1>You\'re almost done!</h1>
-            <p>Your MySQL database has been populated with the initial data. Now you need to create your administrator account and a few other settings.</p>';
-            echo '
-            <div align="center">
-            <form action="install.php?step=2" method="post">
-              <table>
+          // Get the current directory for settings
+          $currentdir = dirname(__FILE__);
+          $iurl = explode('/', $_SERVER['SERVER_NAME'].$_SERVER['REQUEST_URI']);
+			    unset($iurl[count($iurl)-1]);
+			    $iurl = implode('/', $iurl);
+			    $installpath = 'http://'.$iurl.'/';
+          // Now get details, such as directory paths, and administrative details
+          echo '<h1>Step 2</h1>
+          <p>Your MySQL database has been populated with the initial data. Now you need to create your administrator account and a few other settings.</p>';
+          echo '
+          <div align="center">
+          <form action="install.php?step=3" method="post">
+            <table>
                 <tr>
                   <td>Path to Source Directory</td><td><input name="source_dir" type="text" value="'.$currentdir.'/Sources"/></td>
                 </tr>
@@ -186,7 +322,7 @@ $files = array(
                   <td>Admin Email:</td><td><input name="admin_email" type="text" value=""/></td>
                 </tr>
                 <tr>
-                  <td colspan="2"><input name="step2" type="submit" value="Go to Step 2"/>
+                  <td colspan="2"><input name="step3" type="submit" value="Go to Step 3"/>
                 </tr>
               </table>
               <input name="mysql_host" type="hidden" value="'.$_REQUEST['mysql_host'].'"/>
@@ -198,11 +334,10 @@ $files = array(
             </div>';
             
             //shouldn't store mysql user/pass in the form? security risk almost? encryption?
-          }
         }
       }
     }
-    elseif($step==2) {
+    elseif ($step == 3) {
     // Create the config.php file which holds details about MySQL and paths we will need all the time
 $config = '<?php
 //                 SnowCMS
@@ -287,10 +422,16 @@ $scms_installed = true;
     }
   }
   ?>
-	</div>
-	<div id="footer">
-	  <p>Powered by <a href="http://www.snowcms.com/" onClick="window.open(this.href); return false;">SnowCMS</a> 0.7 | Theme by <a href="http://www.snowcms.com/" onclick="window.open(this.href); return false;">the SnowCMS team</a></p>
-	</div>
+
+  </div>
+  <div id="footer">
+    <p>Powered by <a href="http://www.snowcms.com/" onClick="window.open(this.href); return false;">SnowCMS 0.7</a>
+       | Theme by <a href="http://www.snowcms.com/" onclick="window.open(this.href); return false;">The SnowCMS team</a></p>
+  </div>
 </div>
 </body>
 </html>
+<?php
+// Send the output that was buffered
+ob_end_flush();
+?>
