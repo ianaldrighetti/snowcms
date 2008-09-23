@@ -19,7 +19,7 @@ DROP TABLE IF EXISTS `{$db_prefix}board_permissions`;
 CREATE TABLE `{$db_prefix}board_permissions` (
   `bid` int(11) NOT NULL default '0',
   `group_id` int(11) NOT NULL default '0',
-  `what` VARCHAR(50) NOT NULL,
+  `what` varchar(50) NOT NULL,
   `can` int(1) NOT NULL default '1',
   PRIMARY KEY (`bid`,`group_id`,`what`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
@@ -86,6 +86,7 @@ CREATE TABLE `{$db_prefix}members` (
   `suspension` int(10) NOT NULL default '0',
   `banned` int(1) NOT NULL default '0',
   `language` text NOT NULL,
+  `unread_pms` int(11) NOT NULL default '0',
   `acode` text NOT NULL,
   `sc` varchar(50) NOT NULL default '',
   PRIMARY KEY  (`id`)

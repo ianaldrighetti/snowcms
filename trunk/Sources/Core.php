@@ -88,6 +88,7 @@ global $db_prefix, $user, $cookie_prefix;
             'email' => $row['email'],
             'language' => $row['language'],
             'board_query' => "FIND_IN_SET(',{$row['group']},', b.who_view) OR b.who_view = ',{$row['group']},'",
+            'unread_pms' => $row['unread_pms'],
             'ip' => @$_SERVER['HTTP_X_FORWARDED_FOR'] ? $_SERVER['HTTP_X_FORWARDED_FOR'] : $_SERVER['REMOTE_ADDR'],
             'sc' => create_sid()
           );
@@ -408,10 +409,6 @@ global $settings;
   }
 }
 
-/*
-* Features super-hackish but functional BBCODE Quote Hack courtesy of Antimatter15
-* Also features insanely complicated regex to ignore BBCode inside code tags courtesy of Myles
-*/
 function bbc($str, $code_tags = true) {
 global $l, $settings, $theme_dir, $theme_url;
   
@@ -689,7 +686,6 @@ global $l, $settings, $theme_dir, $theme_url;
   // Finally, finally we are done
   return $str;
 }
-
 
 // Our Version of mysql_query(), this function looks sad right now, but will be improved sooner or later...
 function sql_query($query) {

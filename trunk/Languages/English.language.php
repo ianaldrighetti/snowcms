@@ -299,6 +299,7 @@ $l['forum_link_admin'] = 'Admin';
 $l['forum_link_profile'] = 'Profile';
 $l['forum_link_members'] = 'Members';
 $l['forum_link_pm'] = 'Personal Messages';
+$l['forum_link_pm_unread'] = 'Personal Messages [%unread%]';
 $l['forum_link_register'] = 'Register';
 $l['forum_link_login'] = 'Login';
 

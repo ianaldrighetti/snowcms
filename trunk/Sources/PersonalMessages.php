@@ -101,6 +101,10 @@ global $l, $user, $db_prefix;
 function PMInbox() {
 global $l, $settings, $user, $db_prefix;
   
+  // Make member's unread PMs none, because they have noticed there are new ones
+  sql_query("UPDATE {$db_prefix}members SET `unread_pms` = '0' WHERE `id` = '{$user['id']}'");
+  $user['unread_pms'] = 0;
+  
   // Get the PMs
   $settings['page']['messages'] = array();
   $result = sql_query("
@@ -266,9 +270,14 @@ global $l, $settings, $db_prefix, $user;
         // Send PM
         sql_query("INSERT INTO {$db_prefix}pms (`uid_to`, `uid_from`, `subject`, `sent_time`, `name_from`, `email_from`, `ip`, `body`)
                    VALUES ('{$to['id']}', '{$user['id']}', '$subject', '".time()."', '{$user['name']}', 'N/A', 'N/A', '$body')");
+        // Update recipient's total unread messages
+        sql_query("UPDATE {$db_prefix}members SET `unread_pms` = `unread_pms` + 1 WHERE `id` = '{$to['id']}'");
+        // Redirect them
+        redirect('forum.php?action=pm');
       }
-      // Redirect them
-      redirect('forum.php?action=pm');
+      else
+       // There was an error, redirect and inform them
+       redirect('forum.php?action=pm;sa=compile');
     }
     
     $settings['page']['to'] = str_replace('+',' ',str_replace('%20',' ',clean(@$_REQUEST['to'])));

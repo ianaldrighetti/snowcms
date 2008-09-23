@@ -31,7 +31,9 @@ echo '
     if(can('view_mlist')) 
       echo '<li><a href="'.$cmsurl.'forum.php?action=members">'.$l['forum_link_members'].'</a></li>';
     if($user['is_logged'] && can('pm_view'))
-      echo '<li><a href="'.$cmsurl.'forum.php?action=pm">'.$l['forum_link_pm'].'</a></li>';
+      echo '<li><a href="'.$cmsurl.'forum.php?action=pm">'.($user['unread_pms']
+                                                          ? str_replace('%unread%',$user['unread_pms'],$l['forum_link_pm_unread'])
+                                                          : $l['forum_link_pm']).'</a></li>';
     if(!$user['is_logged'])
       echo '
       <li><a href="'.$cmsurl.'index.php?action=register">'.$l['forum_link_register'].'</a></li>
