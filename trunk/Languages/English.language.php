@@ -5,7 +5,7 @@
 // Language's name
 $l['language_name'] = 'English';
 
-// Main.template.php
+// Main
 $l['main_language_go'] = 'Go';
 $l['main_sidebar_login'] = 'Login';
 $l['main_sidebar_logout'] = 'Logout';
@@ -43,6 +43,14 @@ $l['main_quote'] = 'Quote';
 $l['main_quote_from'] = 'Quote from %user%';
 $l['main_code'] = 'Code';
 
+// Email
+$l['mail_smtp_fail'] = 'Sending email failed! Error: %error%';
+$l['mail_smtp_success'] = 'Email sent successfully!';
+$l['mail_mail_fail'] = 'Sending email failed!';
+$l['mail_mail_success'] = 'Email sent successfully!';
+$l['email_register_subject'] = 'Activate your account at '.$settings['site_name'].'.';
+$l['email_register_tpl'] = "Hello %username%!\r\n Someone has requested an account at {$settings['site_name']} If you didn't request an account at this site, ignore this email.\r\nIf you did request this, click on the link below to activate your account\r\n%alink%\r\n \r\nRegards,\r\nThe {$settings['site_name']} Team";
+
 // BBCode
 $l['bbcode_bold'] = 'Bold';
 $l['bbcode_italic'] = 'Italic';
@@ -53,7 +61,7 @@ $l['bbcode_link'] = 'Hyperlink';
 $l['bbcode_code'] = 'Code';
 $l['bbcode_quote'] = 'Quote';
 
-// Login.template.php stuff
+// Login.template.php
 $l['login_title'] = 'Login';
 $l['login_header'] = 'Login';
 $l['login_details'] = 'Here you can login to your '.$settings['site_name'].' account. If you do not have an account you can register one <a href="'.$cmsurl.'index.php?action=register">here</a>';
@@ -67,12 +75,12 @@ $l['login_day'] = 'A Day';
 $l['login_week'] = 'A Week';
 $l['login_month'] = 'A Month';
 $l['login_forever'] = 'Forever';
-// Sub stuff for logging out in this template...
+// Login.template.php - Logout
 $l['logout_error_title'] = 'Logout Error';
 $l['logout_error_header'] = 'Error';
 $l['logout_error_desc'] = 'Session Verification Failed! Try Clicking on the logout link again.';
 
-// Register.template.php stuff
+// Register.template.php
 $l['register_title'] = 'Register';
 $l['register_header'] = 'Register';
 $l['register_details'] = 'You can register for an account on '.$settings['site_name'].' here';
@@ -89,7 +97,8 @@ $l['register_resend'] = 'Resend';
 $l['register_successbut2'] = 'Thanks for registering! The administrators require themselves to activate accounts; you will recieve an email once your account is activated.';
 $l['register_failed'] = 'Registration failed!';
 $l['register_tos'] = 'I have read, I understand and I accept the %site% %link%terms of service%/link%.';
-// For Account Activation...
+$l['register_button'] = 'Register';
+// Register.template.php - Activate account
 $l['activate_title'] = 'Activate your Account';
 $l['activate_acode_no_match'] = 'Wrong Activation Code';
 $l['activate_account_already_activated'] = 'That account is already activated';
@@ -98,8 +107,7 @@ $l['activate_header'] = 'Account Activation';
 $l['activate_desc'] = 'Here you can activate your account by entering your username and activation code';
 $l['activate_button'] = 'Activate Account';
 $l['activate_account_activated'] = 'Your account has been successfully activated! You may now <a href="'. $cmsurl. 'index.php?action=login">login</a>.';
-
-// Error Stuff for Register.template.php
+// Register.template.php - Errors
 $l['register_error_user_taken'] = 'That username is already in use.';
 $l['register_error_username_to_short'] = 'The username must be 3 characters or longer.';
 $l['register_error_passwords'] = 'Those passwords don\'t match!';
@@ -109,7 +117,6 @@ $l['register_error_captcha'] = 'You failed the CAPTCHA test! Please try again.';
 $l['register_error_tos'] = 'You must accept our TOS.';
 $l['register_error_activation_email'] = 'There was an error sending your activation email. Please wait for an administrator to manually register your account.';
 $l['register_error_unknown'] = 'An unknown error has disabled us from registering your account. Please try again later.';
-$l['register_button'] = 'Register';
 
 // Page.template.php
 $l['page_error_title'] = $settings['site_name'].' - Error';
@@ -138,6 +145,7 @@ $l['admin_snowcms_current_version'] = 'Latest SnowCMS Version:';
 $l['admin_version_unavailable'] = 'N/A';
 $l['admin_error_header'] = 'Error';
 $l['admin_error_reason'] = 'You don\'t have sufficient permission to access the Admin CP!';
+// Admin.template.php - Menu options
 $l['admin_menu_pages'] = 'Manage Pages';
 $l['admin_menu_pages_desc'] = 'You can create, edit and delete pages in your database';
 $l['admin_menu_basic-settings'] = 'Basic Settings';
@@ -186,6 +194,7 @@ $l['basicsettings_value_bbcode'] = 'BBCode';
 $l['basicsettings_value_no_activation'] = 'No activation';
 $l['basicsettings_value_email_activation'] = 'Email activation';
 $l['basicsettings_value_admin_activation'] = 'Admin activation';
+// Settings.template.php - Errors
 $l['basicsettings_error_site_name_short'] = 'You didn\'t enter a site name.';
 $l['basicsettings_error_language_invalid'] = 'That language is invalid.';
 $l['basicsettings_error_theme_invalid'] = 'That theme is invalid.';
@@ -234,6 +243,7 @@ $l['managepages_cancel'] = 'Back';
 $l['managepages_no_page_title'] = 'That page doesn\'t exist!';
 $l['managepages_no_page_header'] = 'That page doesn\'t exist!';
 $l['managepages_no_page_desc'] = 'The page you have requested to edit does not exist.';
+// ManagePages.template.php - Edit page
 $l['managepages_edit_title'] = 'Editing %title%';
 $l['managepages_edit_header'] = 'Editing %title%';
 $l['managepages_edit_desc'] = 'You are currently editing a page; you can edit the content and the title of the page, and you use can use HTML in the content of the page.';
@@ -246,6 +256,7 @@ $l['managepages_edit_button'] = 'Update Page';
 $l['managepages_edit_cancel'] = 'Cancel';
 $l['managepages_edit_insert_link'] = 'Insert Link';
 $l['managepages_edit_show_info'] = 'Show extra page info';
+// ManagePages.template.php - Errors
 $l['managepages_error_invalid_session'] = 'Your session verification failed. Please try again.';
 $l['managepages_error_invalid_homepage'] = 'That is an invalid page.';
 $l['managepages_error_delete_homepage'] = 'You cannot delete the homepage.';
@@ -254,25 +265,22 @@ $l['managepages_error_notallowed_create'] = 'You are not allowed to create pages
 $l['managepages_error_notallowed_delete'] = 'You are not allowed to delete pages.';
 $l['managepages_error_notallowed_homepage'] = 'You are not allowed to change the homepage.';
 
-// Some Email stuff, for Email Activation, etc.
-$l['mail_smtp_fail'] = 'Sending email failed! Error: %error%';
-$l['mail_smtp_success'] = 'Email sent successfully!';
-$l['mail_mail_fail'] = 'Sending email failed!';
-$l['mail_mail_success'] = 'Email sent successfully!';
-$l['email_register_subject'] = 'Activate your account at '.$settings['site_name'].'.';
-$l['email_register_tpl'] = "Hello %username%!\r\n Someone has requested an account at {$settings['site_name']} If you didn't request an account at this site, ignore this email.\r\nIf you did request this, click on the link below to activate your account\r\n%alink%\r\n \r\nRegards,\r\nThe {$settings['site_name']} Team";
-
-// List pages
-$l['listpage_header'] = 'Page List';
-$l['listepage_desc'] = 'This page shows all the pages that was writen in the CMS.';
-
 // Forum.template.php
 $l['forum_title'] = $settings['site_name'].' - Index';
 $l['forum_new_topic'] = 'New Topic';
-$l['forum_error_title'] = $settings['site_name'].' - Error';
-$l['forum_error_header'] = 'Error';
-$l['forum_error_message'] = 'Sorry, but you aren\'t allowed to view the '.$settings['site_name'].' board, if you have not yet tried, maybe <a href="'.$cmsurl.'index.php?action=register">registering</a> and <a href="'.$cmsurl.'index.php?action=login">logging</a> will allow you to view the forum';
 $l['forum_last_post'] = 'Last post by %user% in %msg%';
+// Forum.template.php - Links
+$l['forum_link_home'] = 'Home';
+$l['forum_link_forumindex'] = 'Forum Index';
+$l['forum_link_search'] = 'Search';
+$l['forum_link_admin'] = 'Admin';
+$l['forum_link_profile'] = 'Profile';
+$l['forum_link_members'] = 'Members';
+$l['forum_link_pm'] = 'Personal Messages';
+$l['forum_link_pm_unread'] = 'New Messages [%unread%]';
+$l['forum_link_register'] = 'Register';
+$l['forum_link_login'] = 'Login';
+// Forum.template.php - Board
 $l['forum_board_stats'] = '%posts% posts in %topics% topics';
 $l['forum_board_new'] = 'New posts';
 $l['forum_board_old'] = 'No new posts';
@@ -287,21 +295,13 @@ $l['forum_topic_own_new'] = 'New replies';
 $l['forum_topic_new'] = 'New replies';
 $l['forum_topic_own_old'] = 'No new replies';
 $l['forum_topic_old'] = 'No new replies';
+$l['forum_quickreply'] = "Quick Reply";
+// Forum.template.php - Errors
+$l['forum_error_title'] = $settings['site_name'].' - Error';
+$l['forum_error_header'] = 'Error';
+$l['forum_error_message'] = 'Sorry, but you aren\'t allowed to view the '.$settings['site_name'].' forum.';
 $l['forum_error_cantviewb_message'] = 'Sorry, you are not allowed to view or access this board';
 $l['forum_error_noboard_message'] = 'The Board ID you have requested does not exist!';
-$l['forum_quickreply'] = "Quick Reply";
-
-// Links for Forum.template.php
-$l['forum_link_home'] = 'Home';
-$l['forum_link_forumindex'] = 'Forum Index';
-$l['forum_link_search'] = 'Search';
-$l['forum_link_admin'] = 'Admin';
-$l['forum_link_profile'] = 'Profile';
-$l['forum_link_members'] = 'Members';
-$l['forum_link_pm'] = 'Personal Messages';
-$l['forum_link_pm_unread'] = 'Personal Messages [%unread%]';
-$l['forum_link_register'] = 'Register';
-$l['forum_link_login'] = 'Login';
 
 // Topic.template.php
 $l['topic_pages'] = 'Pages:';
@@ -346,6 +346,7 @@ $l['profile_birthdate'] = 'Birthdate:';
 $l['profile_birthdate_unknown'] = 'Unknown';
 $l['profile_posts'] = 'Total Posts:';
 $l['profile_email'] = 'Email:';
+// Profile.template.php - Edit settings
 $l['profile_edit_link'] = 'Change Settings';
 $l['profile_edit_title'] = 'Change Settings';
 $l['profile_edit_header'] = 'Change Settings';
@@ -364,15 +365,13 @@ $l['profile_edit_cancel'] = 'Cancel';
 $l['profile_edit_notallowed_title'] = 'Change Settings';
 $l['profile_edit_notallowed_header'] = 'Change Settings';
 $l['profile_edit_notallowed_desc'] = 'You do not have permission to change your settings.';
+// Profile.template.php - Email CAPTCHA
 $l['profile_showemail_title'] = 'Profile of %user%';
 $l['profile_showemail_header'] = 'Show Email';
 $l['profile_showemail_desc'] = 'To see this member\'s email address you must complete a CAPTCHA test. This is to prevent spam bots from spamming this member\'s email account. Please enter the characters in the scrambled image.';
 $l['profile_showemail_submit'] = 'Show Email';
 $l['profile_showemail_error_captcha'] = 'You entered the characters incorrectly, please try again.';
-$l['profile_notallowed_title'] = 'Profile';
-$l['profile_notallowed_header'] = 'Profile';
-$l['profile_notallowed_desc'] = 'You do not have permission to view this member\'s profile.';
-$l['profile_notallowed_desc_loggedout'] = 'Sorry but you may only view this profile if you are <a href="'.$cmsurl.'index.php?action=login">logged in</a>. If you have not yet done so, why not <a href="'.$cmsurl.'index.php?action=register">register</a> or <a href="'.$cmsurl.'index.php?action=login">login</a>.';
+// Profile.template.php - Errors
 $l['profile_noprofile_title'] = 'Invalid Profile';
 $l['profile_noprofile_header'] = 'Invalid Profile';
 $l['profile_noprofile_desc'] = 'This is an invalid profile.';
@@ -389,6 +388,10 @@ $l['profile_error_notallowed_avatar'] = 'You are not allowed to change your avat
 $l['profile_error_notallowed_signature'] = 'You are not allowed to change your signature.';
 $l['profile_error_notallowed_profile'] = 'You are not allowed to change your profile text.';
 $l['profile_error_notallowed_password'] = 'You are not allowed to change your password.';
+$l['profile_notallowed_title'] = 'Profile';
+$l['profile_notallowed_header'] = 'Profile';
+$l['profile_notallowed_desc'] = 'You do not have permission to view this member\'s profile.';
+$l['profile_notallowed_desc_loggedout'] = 'Sorry but you may only view this profile if you are <a href="'.$cmsurl.'index.php?action=login">logged in</a>. If you have not yet done so, why not <a href="'.$cmsurl.'index.php?action=register">register</a> or <a href="'.$cmsurl.'index.php?action=login">login</a>.';
 
 // Permissions.template.php
 $l['permissions_title'] = 'Manage Permissions';
@@ -407,6 +410,7 @@ $l['permissions_nogroup_desc'] = 'The member group you have requested does not e
 $l['permissions_edit_header'] = 'Edit Permissions';
 $l['permissions_edit_desc'] = 'Here you can edit the permissions for this specific group, which allows you to choose what they can and cannot do.';
 $l['permissions_edit_save'] = 'Save';
+// Permissions.template.php - Permissions
 $l['permissions_perm_all'] = 'Allow them to do everything';
 $l['permissions_perm_view_forum'] = 'Allow them to view the forum';
 $l['permissions_perm_view_online'] = 'Allow them to view who is online';
@@ -454,6 +458,7 @@ $l['permissions_perm_moderate_ban'] = 'Allow them to ban members.';
 $l['permissions_perm_moderate_unban'] = 'Allow them to unban members.';
 $l['permissions_perm_manage_groups'] = 'Allow them to manage member groups';
 $l['permissions_perm_manage_forum'] = 'Allow them to manage the Forum';
+// Permissions.template.php - Errors
 $l['permissions_error_change'] = 'Changing member groups failed.';
 $l['permissions_error_new'] = 'Adding member group failed.';
 $l['permissions_error_default_guest'] = 'Cannot make guest group default.';
@@ -461,7 +466,7 @@ $l['permissions_error_delete'] = 'Deleting member group failed.';
 $l['permissions_error_delete_admin'] = 'Cannot delete administrative group.';
 $l['permissions_error_delete_guest'] = 'Cannot delete guest group.';
 $l['permissions_error_delete_default'] = 'Cannot delete default group.';
-// Sub part for Board Permissions
+// Permissions.template.php - Board permissions
 $l['mf_perms_title'] = 'Manage Board Permissions';
 $l['mf_perms_header'] = 'Board Permissions';
 $l['mf_perms_desc'] = 'Choose a board below, and from there, you can choose a member group to edit permissions for that are allowed access to that board.';
@@ -505,6 +510,7 @@ $l['managemembers_filter_activated'] = 'Activated';
 $l['managemembers_filter_unactivated'] = 'Unactivated';
 $l['managemembers_filter_suspended'] = 'Suspended';
 $l['managemembers_filter_banned'] = 'Banned';
+// ManageMembers.template.php - Moderate
 $l['managemembers_moderate_button'] = 'Moderate';
 $l['managemembers_moderate_title'] = 'Moderate %name%';
 $l['managemembers_moderate_header'] = 'Moderate %name%';
@@ -537,6 +543,7 @@ $l['managemembers_moderate_renew_remove_suspension'] = '%renew% for %input% hour
 $l['managemembers_moderate_renew_suspension_button'] = 'Renew Suspension';
 $l['managemembers_moderate_ban'] = 'Ban Permanently';
 $l['managemembers_moderate_unban'] = 'Remove Ban';
+// ManageMembers.template.php - Errors
 $l['managemembers_error_username_none'] = 'You didn\'t enter a username.';
 $l['managemembers_error_username_already_used'] = 'That username is already in use.';
 $l['managemembers_error_display_name_already_used'] = 'That display name is already in use.';
@@ -595,7 +602,7 @@ $l['managemenus_save_changes'] = 'Save Changes';
 $l['manageforum_title'] = 'Manage Forum';
 $l['manageforum_header'] = 'Manage Forum';
 $l['manageforum_desc'] = 'Click on one of the links below to manage your <a href="'. $cmsurl. 'forum.php">forum</a>';
-// Links
+// // ManageForum.template.php - Options
 $l['mf_link_cats'] = 'Manage Categories';
 $l['mf_link_cats_desc'] = 'Create, Edit, and Delete forum categories';
 $l['mf_link_boards'] = 'Manage Boards';
@@ -603,7 +610,7 @@ $l['mf_link_boards_desc'] = 'You can create, edit and delete your boards in your
 $l['managecats_title'] = 'Manage Categories';
 $l['mf_link_perms'] = 'Forum Permissions';
 $l['mf_link_perms_desc'] = 'Here is where you can edit permissions for each board and each member group';
-// Manage Categories
+// // ManageForum.template.php - Categories
 $l['mf_new_category'] = 'New Category';
 $l['managecats_add_header'] = 'Add Category';
 $l['managecats_addbutton'] = 'Add Category';
@@ -615,7 +622,7 @@ $l['managecats_update'] = 'Update';
 $l['managecats_are_you_sure'] = 'Are you sure you want to delete this Category?';
 $l['managecats_catname'] = 'Category Name:';
 $l['managecats_order'] = 'Order:';
-// Manage Boards
+// // ManageForum.template.php - Boards
 $l['manageboards_title'] = 'Manage Boards';
 $l['manageboards_header'] = 'Manage Boards';
 $l['manageboards_desc'] = 'You can edit, add, and delete boards in your forum, be sure that you have <a href="'. $cmsurl. 'index.php?action=admin;sa=forum;fa=categories">categories</a> created already';
@@ -624,7 +631,7 @@ $l['manageboards_are_you_sure_del'] = 'Are you sure you want to delete this boar
 $l['manageboards_edit'] = 'Edit';
 $l['manageboards_delete'] = 'Delete';
 $l['manageboards_modify'] = 'Modify';
-// Add Boards
+// ManageForum.template.php - Add board
 $l['manageboards_add_title'] = 'Add Board';
 $l['manageboards_add_header'] = 'Add Board';
 $l['manageboards_add_category'] = 'Category';
@@ -634,7 +641,7 @@ $l['manageboards_add_whoview'] = 'Allowed Groups';
 $l['manageboards_add_button'] = 'Add Board';
 $l['manageboards_add_guests'] = 'Guests';
 $l['manageboards_add_update'] = 'Update Boards';
-// Edit Boards
+// ManageForum.template.php - Edit board
 $l['manageboards_edit_title'] = 'Edit Board';
 $l['manageboards_edit_header'] = 'Edit Board';
 $l['manageboards_edit_button'] = 'Update Board';
@@ -667,6 +674,7 @@ $l['news_comment_submit'] = 'Add Comment';
 $l['news_category_change'] = 'Change';
 $l['news_previous_page'] = 'Previous Page';
 $l['news_next_page'] = 'Next Page';
+// News.template.php - Manage
 $l['news_manage_title'] = 'Manage News';
 $l['news_manage_header'] = 'Manage News';
 $l['news_manage_desc'] = 'Here you can add, modify and delete news posts.';
@@ -674,12 +682,14 @@ $l['news_manage_add'] = 'Add News';
 $l['news_manage_add_desc'] = 'You can add a news post here.';
 $l['news_manage_categories'] = 'Manage Categories';
 $l['news_manage_categories_desc'] = 'You can add, delete and modify news categories here.';
+// News.template.php - Add
 $l['news_add_title'] = 'Manage News';
 $l['news_add_header'] = 'Add News';
 $l['news_add_category'] = 'Category:';
 $l['news_add_subject'] = 'Subject:';
 $l['news_add_allow_comments'] = 'Allow Comments';
 $l['news_add_submit'] = 'Add Post';
+// News.template.php - Categories
 $l['news_cats_title'] = 'Manage News';
 $l['news_cats_header'] = 'News Categories';
 $l['news_cats_desc'] = 'Here you can add, delete and modify news categories.';
@@ -690,6 +700,7 @@ $l['news_cats_update'] = 'Rename Categories';
 $l['news_cats_add'] = 'New Category';
 $l['news_cats_add_name'] = 'Category Name';
 $l['news_cats_add_submit'] = 'Add Category';
+// News.template.php - Errors
 $l['news_nonews_title'] = 'News';
 $l['news_nonews_header'] = 'News';
 $l['news_nonews_desc'] = 'There is no news in this category.';
@@ -721,6 +732,7 @@ $l['tos_notos'] = 'There is no TOS written in this language.';
 $l['pm_button_inbox'] = 'Inbox';
 $l['pm_button_outbox'] = 'Outbox';
 $l['pm_button_compile'] = 'Compile New';
+// PersonalMessages.template.php - Inbox
 $l['pm_inbox_title'] = 'Personal Messages';
 $l['pm_inbox_header'] = 'Inbox';
 $l['pm_inbox_desc'] = 'Here are the messages that other members have sent you.';
@@ -732,6 +744,7 @@ $l['pm_inbox_from'] = 'From';
 $l['pm_inbox_received'] = 'Received';
 $l['pm_inbox_delete'] = 'Delete';
 $l['pm_inbox_delete_areyousure'] = 'Are you sure you want to delete this page?\nYou cannot undo this action.';
+// PersonalMessages.template.php - View message
 $l['pm_message_title'] = 'Personal Messages';
 $l['pm_message_header'] = 'Message';
 $l['pm_message_desc'] = '';
@@ -739,6 +752,7 @@ $l['pm_message_heading'] = '%subject% by %from% at %time%';
 $l['pm_message_subject'] = 'Subject';
 $l['pm_message_from'] = 'From';
 $l['pm_message_received'] = 'Received';
+// PersonalMessages.template.php - Outbox
 $l['pm_outbox_title'] = 'Personal Messages';
 $l['pm_outbox_header'] = 'Sent Messages';
 $l['pm_outbox_desc'] = 'Here are the messages that you have sent to other members.';
@@ -748,6 +762,7 @@ $l['pm_outbox_empty_desc'] = 'You have not sent any personal messages yet.';
 $l['pm_outbox_subject'] = 'Subject';
 $l['pm_outbox_to'] = 'To';
 $l['pm_outbox_sent'] = 'Sent';
+// PersonalMessages.template.php - Compile
 $l['pm_compile_title'] = 'Personal Messages';
 $l['pm_compile_header'] = 'Send a Message';
 $l['pm_compile_desc'] = 'Here you can send other members personal messages.';
@@ -757,6 +772,7 @@ $l['pm_compile_submit'] = 'Send Message';
 $l['pm_compile_notallowed_title'] = 'Personal Messages';
 $l['pm_compile_notallowed_header'] = 'Send a Message';
 $l['pm_compile_notallowed_desc'] = 'You are not allowed to send other members personal messages.';
+// PersonalMessages.template.php - Errors
 $l['pm_notallowed_title'] = 'Personal Messages';
 $l['pm_notallowed_header'] = 'Personal Messages';
 $l['pm_notallowed_desc'] = 'You are not allowed to view personal messages.';
