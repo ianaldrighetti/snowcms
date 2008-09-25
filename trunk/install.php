@@ -426,7 +426,7 @@ $scms_installed = true;
   </div>
   <div id="footer">
     <p>Powered by <a href="http://www.snowcms.com/" onClick="window.open(this.href); return false;">SnowCMS 0.7</a>
-       | Theme by <a href="http://www.snowcms.com/" onclick="window.open(this.href); return false;">The SnowCMS team</a></p>
+       | Theme by <a href="http://www.snowcms.com/" onclick="window.open(this.href); return false;">The SnowCMS Team</a></p>
   </div>
 </div>
 </body>
