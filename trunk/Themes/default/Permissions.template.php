@@ -1,5 +1,7 @@
 <?php
-// default/Permissions.template.php by SnowCMS Dev's
+//              Snowy Theme
+// By The SnowCMS Team (www.snowcms.com)
+//        Permissions.template.php
 
 if(!defined('Snow'))
   die("Hacking Attempt...");

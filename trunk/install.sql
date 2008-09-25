@@ -1,3 +1,14 @@
+--                      SnowCMS
+--     Founded by soren121 & co-founded by aldo
+-- Developed by Myles, aldo, antimatter15 & soren121
+--              http://www.snowcms.com/
+--
+--   SnowCMS is released under the GPL v3 License
+--       which means you are free to edit and
+--          redistribute it as your wish!
+--
+--                  install.sql file
+
 DROP TABLE IF EXISTS `{$db_prefix}topic_logs`;
 
 CREATE TABLE `{$db_prefix}topic_logs` (

@@ -1,5 +1,7 @@
 <?php
-// MessageIndex.template.php by the SnowCMS Dev's
+//              Snowy Theme
+// By The SnowCMS Team (www.snowcms.com)
+//           Board.template.php
 
 if(!defined('Snow')) 
   die('Hacking Attempt...');

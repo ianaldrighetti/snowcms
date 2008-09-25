@@ -1,14 +1,14 @@
 <?php
-//                 SnowCMS
-//           By aldo and soren121
-//  Founded by soren121 & co-founded by aldo
-//    http://snowcms.northsalemcrew.net
+//                      SnowCMS
+//     Founded by soren121 & co-founded by aldo
+// Developed by Myles, aldo, antimatter15 & soren121
+//              http://www.snowcms.com/
 //
-// SnowCMS is released under the GPL v3 License
-// Which means you are free to edit it and then
-//       redistribute it as your wish!
-// 
-//              Board.php file 
+//   SnowCMS is released under the GPL v3 License
+//       which means you are free to edit and
+//          redistribute it as your wish!
+//
+//                  Board.php file
 
 
 if(!defined("Snow"))
@@ -27,7 +27,7 @@ global $cmsurl, $db_prefix, $l, $settings, $user;
   if(can('view_forum')) {
     // Get the Board ID
     $board_id = (int)$_REQUEST['board'];
-    // Query! This is just kind of a Query to see if they can view this board or not ;)
+    // Query! This is just kind of a query to see if they can view this board or not ;)
     $result = sql_query("
       SELECT
         b.bid, b.name, b.who_view
@@ -102,7 +102,7 @@ global $cmsurl, $db_prefix, $l, $settings, $user;
         $settings['page']['page_last'] = 1;
         $settings['topics'] = $topics;
         $settings['page']['title'] = $settings['site_name'].' - '.$board['name'];
-        loadForum('MessageIndex');    
+        loadForum('Board');    
     }
     else {
       // No board has been found

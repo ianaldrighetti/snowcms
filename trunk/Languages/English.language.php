@@ -147,25 +147,27 @@ $l['admin_error_header'] = 'Error';
 $l['admin_error_reason'] = 'You don\'t have sufficient permission to access the Admin CP!';
 // Admin.template.php - Menu options
 $l['admin_menu_pages'] = 'Manage Pages';
-$l['admin_menu_pages_desc'] = 'You can create, edit and delete pages in your database';
+$l['admin_menu_pages_desc'] = 'You can create, edit and delete pages in your database here.';
 $l['admin_menu_basic-settings'] = 'Basic Settings';
-$l['admin_menu_basic-settings_desc'] = 'Edit simple settings such as site name, slogan, time format, etc.';
+$l['admin_menu_basic-settings_desc'] = 'You can edit simple settings such as the site name, slogan, time format, etc. here.';
 $l['admin_menu_members'] = 'Manage Members';
-$l['admin_menu_members_desc'] = 'Manage your members, such as changing their member group, anything in their profile';
+$l['admin_menu_members_desc'] = 'You can manage members here, such as changing their profile settings or banning/suspending them.';
 $l['admin_menu_permissions'] = 'Group Permissions';
-$l['admin_menu_permissions_desc'] = 'This is where you can choose what a member group can and cannot do on your site';
+$l['admin_menu_permissions_desc'] = 'You can manage member groups here and decide what they are allowed to do.';
 $l['admin_menu_menus'] = 'Manage Menus';
 $l['admin_menu_menus_desc'] = 'You can edit the links on the sidebar and main menu here.';
 $l['admin_menu_forum'] = 'Manage Forum';
 $l['admin_menu_forum_desc'] = 'You can manage your forum setup here, such as categories and board management.';
 $l['admin_menu_mail-settings'] = 'Mail Settings';
-$l['admin_menu_mail-settings_desc'] = 'You can change mail settings here, like whether SMTP or Sendmail are used.';
+$l['admin_menu_mail-settings_desc'] = 'You can change mail settings here, such as whether SMTP or Sendmail is used.';
 $l['admin_menu_news'] = 'Manage News';
 $l['admin_menu_news_desc'] = 'You can add, modify and delete news posts here.';
 $l['admin_menu_tos'] = 'Terms of Service';
 $l['admin_menu_tos_desc'] = 'You can turn on or off and modify your site\'s terms of service here.';
 $l['admin_menu_ips'] = 'Manage Banned IPs';
 $l['admin_menu_ips_desc'] = 'You can ban and unban IPs and IP ranges here.';
+$l['admin_menu_pms'] = 'Moderate PMs';
+$l['admin_menu_pms_desc'] = 'You can moderate members\' personal messages here.';
 
 // Settings.template.php
 $l['basicsettings_title'] = 'Basic Settings';

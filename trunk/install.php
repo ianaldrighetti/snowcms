@@ -1,11 +1,23 @@
 <?php
-@session_start();
+//                      SnowCMS
+//     Founded by soren121 & co-founded by aldo
+// Developed by Myles, aldo, antimatter15 & soren121
+//              http://www.snowcms.com/
+//
+//   SnowCMS is released under the GPL v3 License
+//       which means you are free to edit and
+//          redistribute it as your wish!
+//
+//                  install.php file
 
 /*
-   This is the installer file for SnowCMS (http://www.snowcms.com/)
-   Access this file in your browser to install your SnowCMS Setup
-   Once you are done, make sure you delete this file IMMEDIATELY!
-*/
+ *  This is the installer file for SnowCMS (http://www.snowcms.com/)
+ *  Access this file in your browser to install SnowCMS
+ *  Once you are done, make sure you delete this file immediately
+ */
+
+@session_start();
+
 // Check if already installed
 define("Snow", true);
 require_once('./config.php');
@@ -340,16 +352,16 @@ ob_start();
     elseif ($step == 3) {
     // Create the config.php file which holds details about MySQL and paths we will need all the time
 $config = '<?php
-//                 SnowCMS
-//           By aldo and soren121
-//  Founded by soren121 & co-founded by aldo
-//    http://snowcms.northsalemcrew.net
+//                      SnowCMS
+//     Founded by soren121 & co-founded by aldo
+// Developed by Myles, aldo, antimatter15 & soren121
+//              http://www.snowcms.com/
 //
-// SnowCMS is released under the GPL v3 License
-// Which means you are free to edit it and then
-//       redistribute it as your wish!
-// 
-//            config.php file 
+//   SnowCMS is released under the GPL v3 License
+//       which means you are free to edit and
+//          redistribute it as your wish!
+//
+//                  config.php file
 
 
 if(!defined("Snow"))

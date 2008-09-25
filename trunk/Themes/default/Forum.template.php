@@ -1,5 +1,5 @@
 <?php
-// Forum.template.php by SnowCMS Dev's
+// Forum.template.php by The SnowCMS Team
 
 if(!defined('Snow')) 
   die('Hacking Attempt...');

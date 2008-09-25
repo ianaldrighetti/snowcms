@@ -1,5 +1,8 @@
 <?php
-// default/Admin.template.php by SnowCMS Dev's
+//              Snowy Theme
+// By The SnowCMS Team (www.snowcms.com)
+//           Admin.template.php
+
 if(!defined('Snow'))
   die("Hacking Attempt...");
 
@@ -77,6 +80,8 @@ global $l, $cmsurl;
     $options[] = 'tos';
   if (can('ban_ips') || can('unban_ips'))
     $options[] = 'ips';
+  if (can('manage_pms'))
+    $options[] = 'pms';
   
   $odd = true;
   foreach ($options as $option) {

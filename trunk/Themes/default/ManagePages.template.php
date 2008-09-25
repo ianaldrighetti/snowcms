@@ -1,5 +1,7 @@
 <?php
-// default/ManagePages.template.php by SnowCMS Dev's
+//              Snowy Theme
+// By The SnowCMS Team (www.snowcms.com)
+//        ManagePages.template.php
 
 if(!defined('Snow'))
   die("Hacking Attempt...");

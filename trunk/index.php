@@ -1,16 +1,17 @@
 <?php
+//                      SnowCMS
+//     Founded by soren121 & co-founded by aldo
+// Developed by Myles, aldo, antimatter15 & soren121
+//              http://www.snowcms.com/
+//
+//   SnowCMS is released under the GPL v3 License
+//       which means you are free to edit and
+//          redistribute it as your wish!
+//
+//                  index.php file
+
 session_start();
 error_reporting(E_ALL);
-//                 SnowCMS
-//           By aldo and soren121
-//  Founded by soren121 & co-founded by aldo
-//    http://snowcms.northsalemcrew.net
-//
-// SnowCMS is released under the GPL v3 License
-// Which means you are free to edit it and then
-//       redistribute it as your wish!
-// 
-//            index.php file 
 
 // Stops people from trying to access files in other directories
 define("Snow", true);

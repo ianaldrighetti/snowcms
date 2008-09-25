@@ -1,5 +1,7 @@
 <?php
-// default/info.php by SnowCMS Dev's
+//              Snowy Theme
+// By The SnowCMS Team (www.snowcms.com)
+//               info.php
 
 global $user, $settings, $theme_name, $cookie_prefix;
 

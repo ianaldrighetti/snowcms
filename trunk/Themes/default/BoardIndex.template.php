@@ -1,5 +1,7 @@
 <?php
-// BoardIndex.template.php by SnowCMS Dev's
+//              Snowy Theme
+// By The SnowCMS Team (www.snowcms.com)
+//         BoardIndex.template.php
 
 if(!defined('Snow'))
   die('Hacking Attempt...');
@@ -24,10 +26,11 @@ global $cmsurl, $theme_url, $l, $settings, $user;
                   '.$board['desc'].'</p>
               </td>
               <td width="16%">'.str_replace('%posts%',$board['posts'],str_replace('%topics%',$board['topics'],$l['forum_board_stats'])).'</td>
-              <td valign="middle" width="20%">'.str_replace(
-         '%msg%','<a href="'.$cmsurl.'forum.php?topic='.$board['last_post']['tid'].';msg='.$board['last_post']['mid'].'">'.$board['last_post']['subject'].'</a>',
-         str_replace('%user%','<a href="'.$cmsurl.'index.php?action=profile;u='.$board['last_post']['uid'].'">'.$board['last_post']['username'].'</a>',
-         $l['forum_last_post'])).'</td>
+              <td valign="middle" width="20%">'.
+              ($board['last_post']['tid'] ? str_replace(
+               '%msg%','<a href="'.$cmsurl.'forum.php?topic='.$board['last_post']['tid'].';msg='.$board['last_post']['mid'].'">'.$board['last_post']['subject'].'</a>',
+               str_replace('%user%','<a href="'.$cmsurl.'index.php?action=profile;u='.$board['last_post']['uid'].'">'.$board['last_post']['username'].'</a>',$l['forum_last_post'])) : '')
+           .'</td>
             </tr>
           </table>
         </div>';

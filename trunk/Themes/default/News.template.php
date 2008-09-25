@@ -1,5 +1,8 @@
 <?php
-// ManageForum.template.php by the SnowCMS Team
+//              Snowy Theme
+// By The SnowCMS Team (www.snowcms.com)
+//           News.template.php
+
 if(!defined('Snow'))
   die("Hacking Attempt..");
 

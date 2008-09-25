@@ -1,14 +1,14 @@
 <?php
-//                 SnowCMS
-//           By aldo and soren121
-//  Founded by soren121 & co-founded by aldo
-//    http://snowcms.northsalemcrew.net
+//                      SnowCMS
+//     Founded by soren121 & co-founded by aldo
+// Developed by Myles, aldo, antimatter15 & soren121
+//              http://www.snowcms.com/
 //
-// SnowCMS is released under the GPL v3 License
-// Which means you are free to edit it and then
-//       redistribute it as your wish!
-// 
-//              Admin.php file 
+//   SnowCMS is released under the GPL v3 License
+//       which means you are free to edit and
+//          redistribute it as your wish!
+//
+//                  Admin.php file
 
 
 if(!defined("Snow"))
@@ -48,7 +48,8 @@ global $cmsurl, $db_prefix, $l, $settings, $source_dir, $user;
         'news' => array('News.php','ManageNews'),
         'mail-settings' => array('Settings.php','MailSettings'),
         'tos' => array('TOS.php','ManageTOS'),
-        'ips' => array('IPs.php','ManageIPs')
+        'ips' => array('IPs.php','ManageIPs'),
+        'pms' => array('PersonalMessages.php','ModeratePMs')
       );
       // Is the sa= in the $sa array? If so do it :D
       if(is_array(@$sa[$_REQUEST['sa']])) {
