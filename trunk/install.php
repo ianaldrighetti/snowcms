@@ -86,7 +86,6 @@ $files = array(
   './Themes/default/Topic.template.php',
   './Themes/default/TOS.template.php',
   './Themes/default/style.css',
-  './Themes/default/forum.css',
   './Themes/default/iefix.css',
   './Themes/default/images',
   './Themes/default/images/bbc_bold.png',

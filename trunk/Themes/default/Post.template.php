@@ -12,11 +12,11 @@ echo '
 <form action="', $cmsurl, 'forum.php?action=post2;board=', $settings['board'], '" method="post"  class="write">
 <table id="post" border="0px">
   <tr cellspacing="0px" cellpadding="0px">
-    <td class="title" colspan="3">', $l['post_newtopic'], '</td>
+    <td class="title" colspan="3"><h1>'.$l['post_newtopic'].'</h1></td>
   </tr>
   <tr align="center">
     <td width="20%">', $l['topic_subject'], '</td>
-    <td><input name="subject" type="text" size="78" value="', $settings['subject'], '" />
+    <td><input name="subject" type="text" size="50" value="', $settings['subject'], '" />
     <td width="20%"></td>
   </tr>
   <tr align="center" valign="middle">
@@ -84,7 +84,7 @@ echo '
 <p><input type="hidden" name="edit" value="'.$settings['edit'].'" /></p>
 <table id="post" border="0px">
   <tr cellspacing="0px" cellpadding="0px">
-    <td class="title" colspan="3">', $l['post_postreply'], '</td>
+    <td class="title" colspan="3"><h1>'.$l['post_postreply'].'</h1></td>
   </tr>
   <tr align="center">
     <td width="20%">', $l['topic_subject'], '</td>

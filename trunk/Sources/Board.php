@@ -14,7 +14,6 @@
 if(!defined("Snow"))
   die("Hacking Attempt...");
 
-
 /*
    loadBoard() loads the board for your forum, it loads the specified board through forum.php?board=BOARD_ID
    It also handles if this board is new or not, however it will only log that if you are a registered and 
@@ -22,6 +21,7 @@ if(!defined("Snow"))
    
    Of course, this also makes sure you can view the board via the super useful SQL Function FIND_IN_SET
 */
+
 function loadBoard() {
 global $cmsurl, $db_prefix, $l, $settings, $user;
   if(can('view_forum')) {
@@ -100,8 +100,9 @@ global $cmsurl, $db_prefix, $l, $settings, $user;
         $total_topics = mysql_num_rows(sql_query("SELECT * FROM {$db_prefix}topics WHERE `bid` = '$board_id'"));
         $settings['page']['page_last'] = $total_topics / $settings['num_topics'];
         $settings['page']['page_last'] = 1;
+        $settings['page']['board-name'] = $board['name'];
         $settings['topics'] = $topics;
-        $settings['page']['title'] = $settings['site_name'].' - '.$board['name'];
+        $settings['page']['title'] = $board['name'].' - '.$settings['site_name'];
         loadForum('Board');    
     }
     else {

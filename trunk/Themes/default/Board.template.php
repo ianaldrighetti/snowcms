@@ -9,52 +9,53 @@ if(!defined('Snow'))
 function Main() {
 global $bperms, $cmsurl, $l, $settings, $user, $theme_url;
 echo '
-<table id="messageindex_panel">
+<h1>'.$settings['page']['board-name'].'</h1>
+
+<table class="messageindex_panel" width="100%">
   <tr>
     <td style="text-align: left;">', pagination($settings['page']['page'],$settings['page']['page_last'],'forum.php?board='.$_REQUEST['board']), '</td>
     <td style="text-align: right;">'; if(canforum('post_new', $_REQUEST['board'])) { echo '<a href="'. $cmsurl. 'forum.php?action=post;board='. $_REQUEST['board']. '">'.$l['forum_new_topic'].'</a>'; } echo '</td>
   </tr>
 </table>
-<div id="messageindex">
-  <table width="800px">
-    <tr id="title">
-      <td width="5%" style="padding: 5px;">&nbsp;</td>
-      <td width="50%" style="padding: 5px;">'.$l['forum_board_subject'].'</td>
-      <td width="15%" style="padding: 5px;">'.$l['forum_board_creator'].'</td>
-      <td width="5%" style="padding: 5px;">'.$l['forum_board_replies'].'</td>
-      <td width="5%" style="padding: 5px;">'.$l['forum_board_views'].'</td>
-      <td width="20%" style="padding: 5px;">'.$l['forum_board_last_post_title'].'</td>
-    </tr>';
-  if(count($settings['topics'])>0) {
-    foreach($settings['topics'] as $topic) {
-       echo '
-       <tr class="indexcontent">
-         <td style="text-align: center; padding: 5px;"><img src="'.$theme_url.'/'.$settings['theme'].'/images/';
-         
-         if ($topic['is_new'] && $topic['is_own'])
-           echo 'topic_own_new.png" alt="'.$l['forum_topic_own_new'].'"';
-         else if ($topic['is_new'])
-           echo 'topic_new.png" alt="'.$l['forum_topic_new'].'"';
-         else if ($topic['is_own'])
-           echo 'topic_own_old.png" alt="'.$l['forum_topic_own_old'].'"';
-         else
-           echo 'topic_old.png" alt="'.$l['forum_topic_old'].'"';
-         
-  echo '/></td>
-         <td style="padding: 5px;">
-           ';
-  if ($topic['locked'])
-  echo '<img src="'.$theme_url.'/'.$settings['theme'].'/images/topic_locked.png" style="float: right" />';
-  echo '<a href="'. $cmsurl. 'forum.php?topic='. $topic['tid']. '">'. $topic['subject']. '</a>
-         </td>
-         <td style="text-align: center; padding: 5px;"><a href="'. $cmsurl. 'index.php?action=profile;u='. $topic['starter_id']. '">'.$topic['username']. '</a></td>
-         <td style="text-align: center; padding: 5px;">'. $topic['numReplies']. '</td>
-         <td style="text-align: center; padding: 5px;">'. $topic['numViews']. '</td>
-         <td style="padding: 5px;">'.str_replace(
-         '%msg%','<a href="'.$cmsurl.'forum.php?topic='.$topic['tid'].';msg='.$topic['last_post']['mid'].'">'.$topic['last_post']['subject'].'</a>',
-         str_replace('%user%','<a href="'.$cmsurl.'index.php?action=profile;u='.$topic['last_post']['uid'].'">'.$topic['last_post']['username'].'</a>',
-         $l['forum_board_last_post'])).'</td>
-       </tr>';
+<table width="100%">
+  <tr class="title">
+    <th width="5%" class="no-border"></th>
+    <th width="50%">'.$l['forum_board_subject'].'</th>
+    <th width="15%">'.$l['forum_board_creator'].'</th>
+    <th width="5%">'.$l['forum_board_replies'].'</th>
+    <th width="5%">'.$l['forum_board_views'].'</th>
+    <th width="20%">'.$l['forum_board_last_post_title'].'</th>
+  </tr>';
+if(count($settings['topics'])>0) {
+  foreach($settings['topics'] as $topic) {
+     echo '
+     <tr class="indexcontent">
+       <td style="text-align: center; padding: 5px;"><img src="'.$theme_url.'/'.$settings['theme'].'/images/';
+       
+       if ($topic['is_new'] && $topic['is_own'])
+         echo 'topic_own_new.png" alt="'.$l['forum_topic_own_new'].'"';
+       else if ($topic['is_new'])
+         echo 'topic_new.png" alt="'.$l['forum_topic_new'].'"';
+       else if ($topic['is_own'])
+         echo 'topic_own_old.png" alt="'.$l['forum_topic_own_old'].'"';
+       else
+         echo 'topic_old.png" alt="'.$l['forum_topic_old'].'"';
+       
+       echo '/></td>
+       <td style="padding: 5px;">
+         ';
+       if ($topic['locked'])
+         echo '<img src="'.$theme_url.'/'.$settings['theme'].'/images/topic_locked.png" style="float: right" />';
+       echo '<a href="'. $cmsurl. 'forum.php?topic='. $topic['tid']. '">'. $topic['subject']. '</a>
+       </td>
+       <td style="text-align: center; padding: 5px;"><a href="'. $cmsurl. 'index.php?action=profile;u='. $topic['starter_id']. '">'.$topic['username']. '</a></td>
+       <td style="text-align: center; padding: 5px;">'. $topic['numReplies']. '</td>
+       <td style="text-align: center; padding: 5px;">'. $topic['numViews']. '</td>
+       <td style="padding: 5px;">'.str_replace(
+       '%msg%','<a href="'.$cmsurl.'forum.php?topic='.$topic['tid'].';msg='.$topic['last_post']['mid'].'">'.$topic['last_post']['subject'].'</a>',
+       str_replace('%user%','<a href="'.$cmsurl.'index.php?action=profile;u='.$topic['last_post']['uid'].'">'.$topic['last_post']['username'].'</a>',
+       $l['forum_board_last_post'])).'</td>
+     </tr>';
     }
   }
   else {
@@ -64,9 +65,8 @@ echo '
       </tr>';
   }
 echo '
-  </table>
-</div>
-<table id="messageindex_panel">
+</table>
+<table class="messageindex_panel" width="100%">
   <tr>
     <td style="text-align: left;">', pagination($settings['page']['page'],$settings['page']['page_last'],'forum.php?board='.$_REQUEST['board']), '</td>
     <td style="text-align: right;">'; if(canforum('post_new', $_REQUEST['board'])) { echo '<a href="'. $cmsurl. 'forum.php?action=post;board='. $_REQUEST['board']. '">'.$l['forum_new_topic'].'</a>'; } echo '</td>

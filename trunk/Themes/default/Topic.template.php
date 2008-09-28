@@ -9,6 +9,8 @@ if(!defined('Snow'))
 function Main() {
 global $cmsurl, $theme_url, $l, $settings, $user;
 echo '
+<h1>'.$settings['page']['topic-name'].'</h1>
+
 <table id="topic_panel">
   <tr>
     <td style="text-align: left;">', pagination($settings['page']['page'],$settings['page']['page_last'],'forum.php?topic='.$settings['topic']), '</td>
@@ -61,18 +63,17 @@ echo '<br />
       </td></tr>
     </table>
   </div>
+  <div id="post-info">
+    <p style="float: left;">'.str_replace('%subject%','<a href="'.$cmsurl.'forum.php?topic='.$post['tid'].';msg='.$post['mid'].'">'.$post['subject'].'</a>',str_replace('%time%',$post['post_time'],$l['topic_header'])).'</p><p style="float: right;">', $user['is_logged'] ? '<a href="'. $cmsurl. 'forum.php?action=post;topic='. $post['tid']. ';quote='. $post['mid']. '" title="'. $l['topic_quote']. '"><img src="'. $theme_url.'/'.$settings['theme'].'/images/quote.png" alt="'. $l['topic_quote']. '"/></a>' : '', ' ', $post['can']['edit'] ? '<a href="'. $cmsurl. 'forum.php?action=post;topic='.$post['tid'].';edit='. $post['mid']. '" title="'. $l['topic_editpost']. '"><img src="'. $theme_url.'/'.$settings['theme'].'/images/edit_post.png" alt="'. $l['topic_editpost'] .'"/></a>' : '', ' ', $post['can']['del'] ? '<a href="'. $cmsurl. 'forum.php?action=delete;topic='.$post['tid'].';msg='. $post['mid']. ';sc='.$user['sc'].'" onClick="return confirm(\''. $l['topic_delconfirm']. '\')" title="'. $l['topic_deletemsg']. '"><img src="'. $theme_url. '/'. $settings['theme']. '/images/delete.png" alt="'. $l['topic_deletemsg']. '"/></a>' : '', ' ', $post['can']['split'] ? '<a href="'. $cmsurl. 'forum.php?action=split;msg='. $post['mid']. ';sc='. $user['sc']. '" title="'. $l['topic_split']. '"><img src="'. $theme_url. '/'.$settings['theme'].'/images/split.png" alt="'. $l['topic_split']. '"/></a>' : '', '</p>
+  </div>
   <div id="post-right">
-    <div id="post-info">
-      <p style="float: left;">'.str_replace('%subject%','<a href="'.$cmsurl.'forum.php?topic='.$post['tid'].';msg='.$post['mid'].'">'.$post['subject'].'</a>',str_replace('%time%',$post['post_time'],$l['topic_header'])).'</p><p style="float: right;">', $user['is_logged'] ? '<a href="'. $cmsurl. 'forum.php?action=post;topic='. $post['tid']. ';quote='. $post['mid']. '" title="'. $l['topic_quote']. '"><img src="'. $theme_url.'/'.$settings['theme'].'/images/quote.png" alt="'. $l['topic_quote']. '"/></a>' : '', ' ', $post['can']['edit'] ? '<a href="'. $cmsurl. 'forum.php?action=post;topic='.$post['tid'].';edit='. $post['mid']. '" title="'. $l['topic_editpost']. '"><img src="'. $theme_url.'/'.$settings['theme'].'/images/edit_post.png" alt="'. $l['topic_editpost'] .'"/></a>' : '', ' ', $post['can']['del'] ? '<a href="'. $cmsurl. 'forum.php?action=delete;topic='.$post['tid'].';msg='. $post['mid']. ';sc='.$user['sc'].'" onClick="return confirm(\''. $l['topic_delconfirm']. '\')" title="'. $l['topic_deletemsg']. '"><img src="'. $theme_url. '/'. $settings['theme']. '/images/delete.png" alt="'. $l['topic_deletemsg']. '"/></a>' : '', ' ', $post['can']['split'] ? '<a href="'. $cmsurl. 'forum.php?action=split;msg='. $post['mid']. ';sc='. $user['sc']. '" title="'. $l['topic_split']. '"><img src="'. $theme_url. '/'.$settings['theme'].'/images/split.png" alt="'. $l['topic_split']. '"/></a>' : '', '</p>
-      <div class="break">
-      </div>
-    </div>
     <div id="post-content">
       <p>'.$post['body'].'</p>
     </div>';
     if(!is_null($post['signature']))
     echo '
     <div id="user-sig">
+      <hr />
       <p>'.$post['signature'].'</p>
     </div>';
 echo '
@@ -82,6 +83,8 @@ echo '
 </div>';
 }
 echo '
+<div class="topic-page-end">
+</div>
 <table id="topic_panel">
   <tr>
     <td style="text-align: left;">', pagination($settings['page']['page'],$settings['page']['page_last'],'forum.php?topic='.$settings['topic']), '</td>
@@ -109,19 +112,10 @@ echo '</td>
 <br />
 ';
 echo '
-<div id="post-container">
-<div id="post-left">
-'.$l['forum_quickreply'].'
-</div>
-<div id="post-right">
 <form action="', $cmsurl, 'forum.php?action=post2;topic=', $settings['topic'], '" method="post" class="write">
-<textarea class="quickreply" name="body"></textarea>
-<input type="submit" value="'. $l['topic_post_button'].'">
+<p><textarea class="quickreply" name="body"></textarea></p>
+<p style="text-align: center"><input type="submit" value="'.$l['topic_post_button'].'" /></p>
 </form>
-</div>
-  <div class="break">
-  </div>
-</div>
 ';
 }
 

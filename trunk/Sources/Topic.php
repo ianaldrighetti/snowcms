@@ -16,7 +16,7 @@ if(!defined("Snow"))
   
 function loadTopic() {
 global $cmsurl, $db_prefix, $l, $settings, $user;
-  if(can('view_forum')) {
+  if (can('view_forum')) {
     $Topic_ID = (int)$_REQUEST['topic'];
     $result = sql_query("
       SELECT 
@@ -25,11 +25,11 @@ global $cmsurl, $db_prefix, $l, $settings, $user;
         LEFT JOIN {$db_prefix}boards AS b ON b.bid = t.bid
       WHERE t.tid = '$Topic_ID' AND {$user['board_query']}");
     // Can they even view this topic? As in, is this in a board they aren't allowed to view?
-    if(mysql_num_rows($result)) {
+    if (mysql_num_rows($result)) {
       // Log that this member has viewed this topic
       if ($user['is_logged']) {
         $result = sql_query("SELECT * FROM {$db_prefix}topic_logs WHERE `tid` = '$Topic_ID' AND `uid` = '{$user['id']}'");
-        if(mysql_num_rows($result)==0) {
+        if (!mysql_num_rows($result)) {
           sql_query("
             REPLACE INTO {$db_prefix}topic_logs
 				      (`tid`,`uid`)
@@ -41,7 +41,7 @@ global $cmsurl, $db_prefix, $l, $settings, $user;
       $numviews = $row['numviews'] + 1;
       sql_query("UPDATE {$db_prefix}topics SET `numviews` = '$numviews' WHERE `tid` = '$Topic_ID'");
       
-      if(!empty($_REQUEST['msg'])) {
+      if (!empty($_REQUEST['msg'])) {
         // The fun part! WEEEEEEEEEE!
         // We need to redirect ?topic=topic_id;msg=msg_id to the right paginated page...
         $msg_id = (int)$_REQUEST['msg'];
@@ -55,16 +55,16 @@ global $cmsurl, $db_prefix, $l, $settings, $user;
         // How many messages are there? :o
         $num_msg = mysql_num_rows($result)-1;
         // If the number of messages is less then $settings['num_posts'], no need to do anything fancy :]
-        if($num_msg<$settings['num_posts']) {
+        if ($num_msg < $settings['num_posts']) {
           redirect("forum.php?topic={$topic_id}#mid{$msg_id}");
         }
         else {
           $num_pages = ceil($num_msg/$settings['num_posts']);
           $mids = array();
-          while($row = mysql_fetch_assoc($result))
+          while ($row = mysql_fetch_assoc($result))
             $mids[] = $row['mid'];
           // If $mid_page is not 0, then we found the page =D!
-          if(in_array($msg_id, $mids)) {
+          if (in_array($msg_id, $mids)) {
             $msgs = 0;
             $page = 1;
             $mid_page = 0;
@@ -78,8 +78,8 @@ global $cmsurl, $db_prefix, $l, $settings, $user;
                 $page++;
               }
             }
-            // !!! $page_id != 1 BAD!
-            if($mid_page!=1)
+            // $page_id != 1 BAD!
+            if ($mid_page!=1)
               redirect("forum.php?topic={$topic_id};page={$mid_page}#mid{$msg_id}");
             else
               redirect("forum.php?topic={$topic_id}#mid{$msg_id}");
@@ -90,7 +90,7 @@ global $cmsurl, $db_prefix, $l, $settings, $user;
           }
         }
       }
-      $start = (int)@$_REQUEST['pg'];
+      $start = (int)@$_REQUEST['pg'] * $settings['num_posts'];
       $result = sql_query("
         SELECT
           t.tid, t.first_msg, msg.subject, msg.mid
@@ -98,7 +98,7 @@ global $cmsurl, $db_prefix, $l, $settings, $user;
           LEFT JOIN {$db_prefix}messages AS msg ON msg.mid = t.first_msg
         WHERE t.tid = $Topic_ID");
       while($row = mysql_fetch_assoc($result))
-        $title = $row['subject'];
+        $topic_name = $row['subject'];
       $result = sql_query("
         SELECT
           t.tid, t.sticky, t.locked, t.bid, t.first_msg, grp.group_id, grp.groupname,
@@ -112,8 +112,8 @@ global $cmsurl, $db_prefix, $l, $settings, $user;
           LEFT JOIN {$db_prefix}online AS ol ON ol.user_id = mem.id
         WHERE t.tid = '$Topic_ID'
         ORDER BY msg.mid ASC LIMIT $start, {$settings['num_posts']}");
-        while($row = mysql_fetch_assoc($result)) {
-          if($row['display_name']!=null)
+        while ($row = mysql_fetch_assoc($result)) {
+          if ($row['display_name'] != null)
             $row['username'] = $row['display_name'];
           $posts[] = array(
             'tid' => $row['tid'],
@@ -140,9 +140,10 @@ global $cmsurl, $db_prefix, $l, $settings, $user;
           $bid = $row['bid'];
         }
         $settings['page']['page'] = (int)@$_REQUEST['pg'];
-        $total_posts = mysql_num_rows(sql_query("SELECT * FROM {$db_prefix}topics WHERE `tid` = '$Topic_ID'"));
+        $total_posts = mysql_num_rows(sql_query("SELECT * FROM {$db_prefix}messages WHERE `tid` = '$Topic_ID'"));
         $settings['page']['page_last'] = $total_posts / $settings['num_posts'];
-        $settings['page']['title'] = $title;
+        $settings['page']['title'] = $topic_name;
+        $settings['page']['topic-name'] = $topic_name;
         $settings['posts'] = $posts;
         $settings['topic'] = (int)$_REQUEST['topic'];
         $settings['sticky'] = $posts[0]['sticky'];

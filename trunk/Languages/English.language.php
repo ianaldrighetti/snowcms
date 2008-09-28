@@ -268,7 +268,8 @@ $l['managepages_error_notallowed_delete'] = 'You are not allowed to delete pages
 $l['managepages_error_notallowed_homepage'] = 'You are not allowed to change the homepage.';
 
 // Forum.template.php
-$l['forum_title'] = $settings['site_name'].' - Index';
+$l['forum_title'] = 'Forum Index';
+$l['forum_header'] = 'Forum Index';
 $l['forum_new_topic'] = 'New Topic';
 $l['forum_last_post'] = 'Last post by %user% in %msg%';
 // Forum.template.php - Links
@@ -297,7 +298,6 @@ $l['forum_topic_own_new'] = 'New replies';
 $l['forum_topic_new'] = 'New replies';
 $l['forum_topic_own_old'] = 'No new replies';
 $l['forum_topic_old'] = 'No new replies';
-$l['forum_quickreply'] = "Quick Reply";
 // Forum.template.php - Errors
 $l['forum_error_title'] = $settings['site_name'].' - Error';
 $l['forum_error_header'] = 'Error';
