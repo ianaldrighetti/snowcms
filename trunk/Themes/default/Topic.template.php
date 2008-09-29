@@ -11,7 +11,7 @@ global $cmsurl, $theme_url, $l, $settings, $user;
 echo '
 <h1>'.$settings['page']['topic-name'].'</h1>
 
-<table id="topic_panel">
+<table class="topic_panel">
   <tr>
     <td style="text-align: left;">', pagination($settings['page']['page'],$settings['page']['page_last'],'forum.php?topic='.$settings['topic']), '</td>
     <td style="text-align: right;">';
@@ -85,7 +85,7 @@ echo '
 echo '
 <div class="topic-page-end">
 </div>
-<table id="topic_panel">
+<table class="topic_panel">
   <tr>
     <td style="text-align: left;">', pagination($settings['page']['page'],$settings['page']['page_last'],'forum.php?topic='.$settings['topic']), '</td>
     <td style="text-align: right;">';
