@@ -13,7 +13,7 @@
 
 if(!defined("Snow"))
   die("Hacking Attempt...");
-  
+
 function ManageMembers() {
 global $cmsurl, $db_prefix, $l, $settings, $user;
   if(can('manage_members')) {
@@ -75,7 +75,7 @@ global $l, $settings, $db_prefix, $cmsurl;
       redirect('forum.php?action=members;s='.$_POST['s']);
   }
   
-  // Set some variables' defaults incase they don't get set in the following switch statement
+  // Set some variables' defaults encase they don't get set in the following switch statement
   $settings['manage_members']['id_desc'] = '';
   $settings['manage_members']['username_desc'] = '';
   $settings['manage_members']['group_desc'] = '';

@@ -60,8 +60,9 @@ global $l, $db_prefix, $settings, $cmsurl, $theme_url;
     foreach ($members as $member) {
       echo '<tr>
         <td>'.$member['id'].'</td>
-        <td><a href="'.$cmsurl.'index.php?action=profile;u='.$member['id'].'">'.($member['display_name'] ? $member['display_name'] : $member['username']).'</a></td>
-        <td>'.$member['groupname'].'</td><td>'.date($settings['dateformat'],$member['reg_date']).'</td>
+        <td><a href="'.$cmsurl.'index.php?action=profile;u='.$member['id'].'">'.$member['display_name'].'</a></td>
+        <td>'.$member['groupname'].'</td>
+        <td>'.formattime($member['reg_date']).'</td>
         <td><a href="'.$cmsurl.'index.php?action=admin;sa=members;u='.$member['id'].'">
             <img src="'.$theme_url.'/'.$settings['theme'].'/images/modify.png" alt="'.$l['managemembers_moderate_button'].'" width="15" height="15" />
             </a></td>
