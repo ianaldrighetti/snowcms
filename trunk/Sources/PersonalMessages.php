@@ -87,7 +87,7 @@ global $l, $user, $db_prefix;
     else
       switch (@$_REQUEST['sa']) {
         case 'outbox': PMOutbox(); break;
-        case 'compile': PMCompile(); break; //////
+        case 'compile': PMCompile(); break;
         default: PMInbox();
       }
   }
@@ -297,15 +297,15 @@ global $cmsurl, $db_prefix, $l, $settings, $user;
   if(can('manage_members')) {
     // So they can, yippe for you! :P
     // Are they just viewing the list, or managing a member, or something else perhaps?
-    if (!@$_REQUEST['u'] && !@$_REQUEST['ssa']) {
+    if (!@$_REQUEST['pm'] && !@$_REQUEST['ssa']) {
       // K, just load the list of members
       loadPMlist();
     }
-    elseif (@$_REQUEST['u'] && !@$_REQUEST['ssa']) {
+    elseif (@$_REQUEST['pm'] && !@$_REQUEST['ssa']) {
       // :o They are moderating/viewing someone's profile
       loadProf();
     }
-    elseif (@$_REQUEST['u'] && @$_REQUEST['ssa']) {
+    elseif (@$_REQUEST['pm'] && @$_REQUEST['ssa']) {
       // A Super Sub Action :D!
       switch ($_REQUEST['ssa']) {
         case 'process-moderate': processModeration(); break; // An admin/mod wants to change someone's member data
@@ -429,7 +429,7 @@ global $l, $settings, $db_prefix, $cmsurl;
   // Get the member records of this page out of the database
   $members = sql_query("
                SELECT
-                 `uid_to` AS `to_id`, `uid_from` AS `from_id`, `to_member`.`display_name` AS `to`,
+                 *, `uid_to` AS `to_id`, `uid_from` AS `from_id`, `to_member`.`display_name` AS `to`,
                  `from_member`.`display_name` AS `from`, `subject`, `pm_id` AS `id`, `sent_time` AS `date_sent`
                FROM {$db_prefix}pms
                LEFT JOIN {$db_prefix}members AS `to_member` ON `uid_to` = `to_member`.`id`
@@ -481,14 +481,20 @@ function loadProf() {
 global $l, $settings, $db_prefix;
   
   // Load member data
-  $result = sql_query("SELECT * FROM {$db_prefix}members LEFT JOIN {$db_prefix}membergroups ON `group` = `group_id` WHERE id = ".@$_REQUEST['u']);
+  $result = sql_query("
+               SELECT
+                 *, `uid_to` AS `to_id`, `uid_from` AS `from_id`, `to_member`.`display_name` AS `to`,
+                 `from_member`.`display_name` AS `from`, `subject`, `pm_id` AS `id`, `sent_time` AS `date_sent`
+               FROM {$db_prefix}pms
+               LEFT JOIN {$db_prefix}members AS `to_member` ON `uid_to` = `to_member`.`id`
+               LEFT JOIN {$db_prefix}members AS `from_member` ON `uid_from` = `from_member`.`id`
+               WHERE
+                 `pm_id` = '".(int)$_REQUEST['pm']."'") or die(mysql_error());
   $row = mysql_fetch_assoc($result);
-  $settings['page']['title'] = str_replace("%name%",$row['display_name'] ? $row['display_name'] : $row['username'],$l['moderatepms_moderate_title']);
+  $settings['page']['title'] = str_replace("%subject%",$row['subject'],$l['moderatepms_moderate_title']);
   $settings['page']['member'] = $row;
-  
-  $settings['page']['member']['birthdate_day'] = ($row['birthdate']) ? date('j',$row['birthdate']) : '';
-  $settings['page']['member']['birthdate_month'] = ($row['birthdate']) ? date('n',$row['birthdate']) : '';
-  $settings['page']['member']['birthdate_year'] = ($row['birthdate']) ? date('Y',$row['birthdate']) : '';
+  $settings['page']['member']['body'] = bbc($row['body']);
+  $settings['page']['member']['body_bbc'] = $row['body'];
   
   // Load groups
   $result = sql_query("SELECT * FROM {$db_prefix}membergroups");
