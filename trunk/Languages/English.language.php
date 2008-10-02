@@ -807,9 +807,13 @@ $l['moderatepms_filter_activated'] = 'Activated';
 $l['moderatepms_filter_unactivated'] = 'Unactivated';
 $l['moderatepms_filter_suspended'] = 'Suspended';
 $l['moderatepms_filter_banned'] = 'Banned';
-// ModeratePMs.template.php - Moderate
-$l['moderatepms_moderate_title'] = '%subject%';
-$l['moderatepms_moderate_header'] = '%subject%';
+// ModeratePMs.template.php - Single message
+$l['moderatepms_message_title'] = '%subject%';
+$l['moderatepms_message_header'] = '%subject%';
+$l['moderatepms_message_heading'] = 'From %from% to %to% at %time%';
+$l['moderatepms_message_delete'] = 'Delete';
+$l['moderatepms_message_cancel'] = 'Cancel';
+$l['moderatepms_message_delete_areyousure'] = 'Are you sure you want to delete this PM?\nYou cannot undo this action.';
 // ModeratePMs.template.php - Errors
 $l['managemembers_error_username_none'] = 'You didn\'t enter a username.';
 $l['managemembers_error_username_already_used'] = 'That username is already in use.';

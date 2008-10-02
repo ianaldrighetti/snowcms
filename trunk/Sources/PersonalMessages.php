@@ -294,16 +294,17 @@ global $l, $settings, $db_prefix, $user;
 
 function ModeratePMs() {
 global $cmsurl, $db_prefix, $l, $settings, $user;
-  if(can('manage_members')) {
-    // So they can, yippe for you! :P
-    // Are they just viewing the list, or managing a member, or something else perhaps?
+  
+  // Are they alloed to moderate PMs?
+  if (can('moderate_pms')) {
+    // Are they just viewing the list, a message or something else?
     if (!@$_REQUEST['pm'] && !@$_REQUEST['ssa']) {
-      // K, just load the list of members
+      // K, just load the list of messages
       loadPMlist();
     }
     elseif (@$_REQUEST['pm'] && !@$_REQUEST['ssa']) {
-      // :o They are moderating/viewing someone's profile
-      loadProf();
+      // They are moderating/viewing a message
+      loadMessage();
     }
     elseif (@$_REQUEST['pm'] && @$_REQUEST['ssa']) {
       // A Super Sub Action :D!
@@ -326,6 +327,10 @@ global $cmsurl, $db_prefix, $l, $settings, $user;
 
 function loadPMlist() {
 global $l, $settings, $db_prefix, $cmsurl;
+  
+  // Redirect to remove post data
+  if (@$_REQUEST['redirect'])
+    redirect('index.php?action=admin;sa=pms');
   
   // Redirect post data into get data
   if (@$_POST['f'] == 'all' && @$_POST['s'])
@@ -477,8 +482,21 @@ global $l, $settings, $db_prefix, $cmsurl;
     loadTheme('ModeratePMs','NoMembers');
 }
 
-function loadProf() {
+function loadMessage() {
 global $l, $settings, $db_prefix;
+  
+  // Check if a message is being deleted
+  if (@$_REQUEST['delete']) {
+    $pm = (int)@$_REQUEST['pm'];
+    $row = mysql_fetch_assoc(sql_query("SELECT * FROM {$db_prefix}pms LEFT JOIN {$db_prefix}members ON `uid_from` = `id` WHERE `pm_id` = '$pm'"));
+    // Check if still considered unread, if so, stop considering it as such :P
+    if ($row['unread_pms'] && $row['date_sent'] < $row['pms_lastread'])
+      sql_query("UPDATE {$db_prefix}members SET `unread_pms` = `unread_pms` - 1 WHERE `id` = '{$row['id']}'");
+    // Delete message
+    sql_query("DELETE FROM {$db_prefix}pms WHERE `pm_id` = '$pm'");
+    // Redirect back to PM list
+    redirect('index.php?action=admin;sa=pms');
+  }
   
   // Load member data
   $result = sql_query("
@@ -491,7 +509,7 @@ global $l, $settings, $db_prefix;
                WHERE
                  `pm_id` = '".(int)$_REQUEST['pm']."'") or die(mysql_error());
   $row = mysql_fetch_assoc($result);
-  $settings['page']['title'] = str_replace("%subject%",$row['subject'],$l['moderatepms_moderate_title']);
+  $settings['page']['title'] = str_replace("%subject%",$row['subject'],$l['moderatepms_message_title']);
   $settings['page']['member'] = $row;
   $settings['page']['member']['body'] = bbc($row['body']);
   $settings['page']['member']['body_bbc'] = $row['body'];
@@ -504,126 +522,6 @@ global $l, $settings, $db_prefix;
   }
   
   loadTheme('ModeratePMs','Moderate');
-}
-
-function processModeration() {
-global $l, $db_prefix, $user, $settings, $cookie_prefix;
-  
-  // Note: Error handling needs work
-  if (!ValidateSession(@$_REQUEST['sc']) || !@$_REQUEST['u'])
-    die("Hacking Attempt...");
-  
-  // Note: If own group is edited glitches could occur
-  
-  // Check if someone else is using that username or display name
-  $result = sql_query("SELECT * FROM {$db_prefix}members") or die(mysql_error());
-  if (mysql_num_rows($result))
-    while ($row = mysql_fetch_assoc($result)) {
-      if ($_REQUEST['u'] != $row['id'] && ($_REQUEST['user_name'] == $row['username'] || $_REQUEST['user_name'] == $row['display_name']))
-        $settings['error'] = $l['moderatepms_error_username_already_used'];
-      if ($_REQUEST['u'] != $row['id'] && $_REQUEST['display_name'] != '' && ($_REQUEST['display_name'] == $row['username'] || $_REQUEST['display_name'] == $row['display_name']))
-        $settings['error'] = $l['moderatepms_error_display_name_already_used'];
-    }
-  
-  // Clean the user ID
-  $u = clean($_REQUEST['u']);
-  // Clean the username
-  $username = clean($_REQUEST['user_name']);
-  // Clean the display name
-  $display_name = clean($_REQUEST['display_name']) ? clean($_REQUEST['display_name']) : $username;
-  // Clean the email address
-  $email = clean($_REQUEST['email']);
-  // Clean the member group
-  $group = clean($_REQUEST['group']);
-  // Clean the birthdate
-  $day = (int)@$_REQUEST['day'];
-  $month = (int)@$_REQUEST['month'];
-  $year = (int)@$_REQUEST['year'];
-  if ($day && $year)
-    $birthdate = strtotime($year.'-'.$month.'-'.$day);
-  else
-    $birthdate = 0;
-  // Clean the avatar
-  $avatar = clean(@$_REQUEST['avatar']);
-  if (substr($avatar,0,7) != 'http://' && substr($avatar,0,8) != 'https://' && substr($avatar,0,6) != 'ftp://' && substr($avatar,0,7) != 'ftps://' && $avatar != '')
-    $avatar = 'http://'.$avatar;
-  // Clean the signature
-  $signature = clean($_REQUEST['signature']);
-  // Clean the profile text
-  $profile = clean($_REQUEST['profile']);
-  // Clean the password
-  $password_new = clean($_REQUEST['password-new']);
-  $password_verify = clean($_REQUEST['password-verify']);
-  
-  // Check for errors in data
-  if (!$username)
-    $_SESSION['error'] = $l['moderatepms_error_username_none'];
-  if (!$email)
-    $_SESSION['error'] = $l['moderatepms_error_email_none'];
-  if(!preg_match("/^([a-z0-9._-](\+[a-z0-9])*)+@[a-z0-9.-]+\.[a-z]{2,6}$/i", @$_REQUEST['email']))
-    $_SESSION['error'] = $l['moderatepms_error_email_invalid'];
-  if (strlen($password_new) < 5 && $password_new)
-    $_SESSION['error'] = $l['moderatepms_error_password_too_short'];
-  if ($password_new != $password_verify && $password_new)
-    $_SESSION['error'] = $l['moderatepms_error_password_failed_verification'];
-  if (!@$_REQUEST['group'])
-    $_SESSION['error'] = $l['moderatepms_error_group_invalid'];
-  
-  $password_new = md5($password_new);
-  
-  // Get current member information, so that it can replace any data this member isn't allowed to modify
-  $result = sql_query("SELECT * FROM {$db_prefix}members WHERE `id` = '$u'");
-  if (!mysql_num_rows($result))
-    die('Internal error');
-  $row = mysql_fetch_assoc($result);
-  
-  // Are they trying to change their username and are they allowed to?
-  if (!can('moderate_usrname') && $username != $row['username'])
-    $_SESSION['error'] = $l['moderatepms_error_notallowed_username'];
-  // Are they trying to change their display name and are they allowed to?
-  if (!can('moderate_display_name') && $display_name != $row['display_name'])
-    $_SESSION['error'] = $l['moderatepms_error_notallowed_displayname'];
-  // Are they trying to change their email address and are they allowed to?
-  elseif (!can('moderate_email') && $email != $row['email'])
-    $_SESSION['error'] = $l['moderatepms_error_notallowed_email'];
-  // Are they trying to change their username and are they allowed to?
-  if (!can('moderate_group') && $group != $row['group'])
-    $_SESSION['error'] = $l['moderatepms_error_notallowed_group'];
-  // Are they trying to change their birthdate and are they allowed to?
-  elseif (!can('moderate_birthdate') && $birthdate != $row['birthdate'])
-    $_SESSION['error'] = $l['moderatepms_error_notallowed_birthdate'];
-  // Are they trying to change their avatar and are they allowed to?
-  elseif (!can('moderate_avatar') && $avatar != $row['avatar'])
-    $_SESSION['error'] = $l['moderatepms_error_notallowed_avatar'];
-  // Are they trying to change their signature and are they allowed to?
-  elseif (!can('moderate_signature') && $signature != $row['signature'])
-    $_SESSION['error'] = $l['moderatepms_error_notallowed_signature'];
-  // Are they trying to change their profile text and are they allowed to?
-  elseif (!can('moderate_profile') && $profile != $row['profile'])
-    $_SESSION['error'] = $l['moderatepms_error_notallowed_profile'];
-  // Are they trying to change their password and are they allowed to?
-  elseif (!can('moderate_password') && $password_new != $row['password'] && @$_REQUEST['password-new'] != '')
-    $_SESSION['error'] = $l['moderatepms_error_notallowed_password'];
-  
-  if (!@$_SESSION['error']) {
-  // Update member's data
-  if ($_REQUEST['password-new']) // And change password
-    sql_query("UPDATE {$db_prefix}members SET `username` = '$username', `display_name` = '$display_name', `email` = '$email', `birthdate` = '$birthdate', `avatar` = '$avatar', `password` = '$password_new', `group` = '$group', `signature` = '$signature', `profile` = '$profile' WHERE `id` = '{$_REQUEST['u']}'") or die('Internal error');
-  else // And don't change password
-    sql_query("UPDATE {$db_prefix}members SET `username` = '$username', `display_name` = '$display_name', `email` = '$email', `birthdate` = '$birthdate', `avatar` = '$avatar', `group` = '$group', `signature` = '$signature', `profile` = '$profile' WHERE `id` = '$u'") or die('Internal error');
-  
-    // If they changed their own username change settings to keep 'em logged in
-    if ($_REQUEST['u'] == $user['id']) {
-      setcookie($cookie_prefix.'username',$_REQUEST['user_name']);
-      // More settings if they changed their p[assword
-      if ($_REQUEST['password-new']) {
-        setcookie($cookie_prefix."password", $password_new);
-        $_SESSION['pass'] = $password_new;
-      }
-    }
-  }
-  
-  redirect('index.php?action=admin;sa=pms;u='.clean_header($_REQUEST['u']));
 }
 
 ?>

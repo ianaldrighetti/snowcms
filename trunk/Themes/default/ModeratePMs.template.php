@@ -115,9 +115,30 @@ global $l, $settings, $user, $cmsurl;
   $last_login = $member['last_login'] ? date($settings['timeformat'].', '.$settings['dateformat'],$member['last_login']) : $l['moderatepms_moderate_never'];
   
   echo '
-      <h1>'.str_replace('%subject%',$member['subject'],$l['moderatepms_moderate_header']).'</h1>
+      <h1>'.str_replace('%subject%',$member['subject'],$l['moderatepms_message_header']).'</h1>
+      
+      <p>'.
+      str_replace('%from%','<a href="'.$cmsurl.'index.php?action=profile;u='.$member['from_id'].'">'.$member['from'].'</a>',
+      str_replace('%to%','<a href="'.$cmsurl.'index.php?action=profile;u='.$member['to_id'].'">'.$member['to'].'</a>',
+      str_replace('%time%','<b>'.formattime($member['date_sent'],2).'</b>',
+      $l['moderatepms_message_heading'])))
+      .'</p>
       
       <p>'.$member['body'].'</p>
+      
+      <form action="" method="post" style="display: inline">
+        <p style="display: inline">
+          <input type="hidden" name="delete" value="true" />
+          <input type="submit" value="'.$l['moderatepms_message_delete'].'"
+           onclick="return confirm(\''.$l['moderatepms_message_delete_areyousure'].'\')" />
+        </p>
+      </form>
+      <form action="'.$cmsurl.'index.php?action=admin;sa=pms" method="post" style="display: inline">
+        <p style="display: inline">
+          <input type="hidden" name="redirect" value="true" />
+          <input type="submit" value="'.$l['moderatepms_message_cancel'].'" .>
+        </p>
+      </form>
       ';
 }
 

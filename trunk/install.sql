@@ -98,6 +98,7 @@ CREATE TABLE `{$db_prefix}members` (
   `banned` int(1) NOT NULL default '0',
   `language` text NOT NULL,
   `unread_pms` int(11) NOT NULL default '0',
+  `pms_lastread` int(10) NOT NULL default '0',
   `acode` text NOT NULL,
   `sc` varchar(50) NOT NULL default '',
   PRIMARY KEY  (`id`)

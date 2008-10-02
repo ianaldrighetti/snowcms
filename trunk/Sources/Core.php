@@ -241,7 +241,7 @@ global $bperms, $db_prefix, $user, $forumperms;
 
 // Load all the menus, both the Sidebar menu (if their is one) and the Main one (If their is one :P)
 function loadMenus() {
-global $db_prefix, $settings;
+global $db_prefix, $settings, $user;
   $menu = array();
   $menu['main'] = array();
   $menu['side'] = array();
@@ -253,7 +253,7 @@ global $db_prefix, $settings;
         $menu['main'][] = array(
           'id' => $row['link_id'],
           'order' => $row['order'],
-          'name' => $row['link_name'],
+          'name' => str_replace('%unread_pms%',$user['unread_pms'],$row['link_name']),
           'href' => $row['href'],
           'target' => $row['target'] ? 'target="_blank"' : '',
           'menu' => $row['menu']
@@ -264,7 +264,7 @@ global $db_prefix, $settings;
         $menu['side'][] = array(
           'id' => $row['link_id'],
           'order' => $row['order'],
-          'name' => $row['link_name'],
+          'name' => str_replace('%unread_pms%',$user['unread_pms'],$row['link_name']),
           'href' => $row['href'],
           'target' => $row['target'] ? 'target="_blank"' : '',
           'menu' => $row['menu']
