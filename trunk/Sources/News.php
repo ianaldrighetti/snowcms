@@ -32,7 +32,7 @@ global $cmsurl, $db_prefix, $l, $settings, $user;
     $body = clean(@$_REQUEST['body']); // Body text
     
     // Update the amount total of comments for the news article
-    sql_query("UPDATE {$db_prefix}news SET `num_comments` = `num_comments` + 1");
+    sql_query("UPDATE {$db_prefix}news SET `num_comments` = `num_comments` + 1 WHERE `news_id` = '$nid'");
     // Insert comment into database
     sql_query("INSERT {$db_prefix}news_comments (`nid`, `poster_id`, `poster_name`, `subject`, `body`, `post_time`) VALUES ('$nid','{$user['id']}','{$user['name']}','$subject','$body', '".time()."')");
     
