@@ -452,7 +452,7 @@ global $l, $settings, $theme_dir, $theme_url;
   // This is for any span of characters
   $all_chars = '^#\|%';
   // This is for any span of characters, without whitespace, for use it URLs
-  $link_chars = '^ \n#\|%';
+  $link_chars = '^ \n#\|%\[\]';
   
   // If the string is the same as the previous loop, stop looping
   $str_prev = '';
