@@ -102,8 +102,10 @@ function PMInbox() {
 global $l, $settings, $user, $db_prefix;
   
   // Make member's unread PMs none, because they have noticed there are new ones
-  sql_query("UPDATE {$db_prefix}members SET `unread_pms` = '0' WHERE `id` = '{$user['id']}'");
+  sql_query("UPDATE {$db_prefix}members SET `unread_pms` = '0', `pms_lastread` = '".time()."' WHERE `id` = '{$user['id']}'");
   $user['unread_pms'] = 0;
+  // Reload menus to reflect the change
+  loadMenus();
   
   // Get the PMs
   $settings['page']['messages'] = array();
@@ -488,9 +490,9 @@ global $l, $settings, $db_prefix;
   // Check if a message is being deleted
   if (@$_REQUEST['delete']) {
     $pm = (int)@$_REQUEST['pm'];
-    $row = mysql_fetch_assoc(sql_query("SELECT * FROM {$db_prefix}pms LEFT JOIN {$db_prefix}members ON `uid_from` = `id` WHERE `pm_id` = '$pm'"));
+    $row = mysql_fetch_assoc(sql_query("SELECT * FROM {$db_prefix}pms LEFT JOIN {$db_prefix}members ON `uid_to` = `id` WHERE `pm_id` = '$pm'"));
     // Check if still considered unread, if so, stop considering it as such :P
-    if ($row['unread_pms'] && $row['date_sent'] < $row['pms_lastread'])
+    if ((int)$row['unread_pms'] && $row['sent_time'] > $row['pms_lastread'])
       sql_query("UPDATE {$db_prefix}members SET `unread_pms` = `unread_pms` - 1 WHERE `id` = '{$row['id']}'");
     // Delete message
     sql_query("DELETE FROM {$db_prefix}pms WHERE `pm_id` = '$pm'");

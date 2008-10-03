@@ -10,8 +10,6 @@ function Inbox() {
 global $l, $settings, $user, $cmsurl, $theme_url;
   
   echo '
-  <table class="pm"><tr><td>
-  
   <h1>'.$l['pm_inbox_header'].'</h1>
   
   '.PMBar();
@@ -47,17 +45,13 @@ global $l, $settings, $user, $cmsurl, $theme_url;
     ';
   }
   
-  echo '</table>
-  
-  </td></tr></table>';
+  echo '</table>';
 }
 
 function InboxEmpty() {
 global $l, $settings, $cmsurl;
   
   echo '
-  <table class="pm"><tr><td>
-  
   <h1>'.$l['pm_inbox_empty_header'].'</h1>
   
   '.PMBar();
@@ -66,10 +60,6 @@ global $l, $settings, $cmsurl;
 	 echo '<p><b>'.$l['main_error'].':</b> '.$_SESSION['error'].'</p>';
   else
     echo '<p>'.$l['pm_inbox_empty_desc'].'</p>';
-  
-  echo '
-  
-  </td></tr></table>';
 }
 
 function Message() {
@@ -78,8 +68,6 @@ global $l, $settings, $cmsurl;
   $message = $settings['page']['message'];
   
   echo '
-  <table class="pm"><tr><td>
-  
   <h1>'.$l['pm_message_header'].'</h1>
   
   '.PMBar();
@@ -107,9 +95,7 @@ global $l, $settings, $cmsurl;
       '.$message['body'].'
       </td>
     </tr>
-  </table>
-  
-  </td></tr></table>';
+  </table>';
   
 }
 
@@ -117,8 +103,6 @@ function Outbox() {
 global $l, $cmsurl, $settings, $user, $theme_url;
   
   echo '
-  <table class="pm"><tr><td>
-  
   <h1>'.$l['pm_outbox_header'].'</h1>
   
   '.PMBar();
@@ -154,9 +138,7 @@ global $l, $cmsurl, $settings, $user, $theme_url;
     ';
   }
   
-  echo '</table>
-  
-  </td></tr></table>';
+  echo '</table>';
 }
 
 function OutboxEmpty() {
@@ -167,8 +149,6 @@ function Compile() {
 global $l, $settings, $cmsurl, $theme_dir, $theme_url;
   
   echo '
-  <table class="pm"><tr><td>
-  
   <h1>'.$l['pm_compile_header'].'</h1>
   
   '.PMBar();
@@ -232,39 +212,29 @@ global $l, $settings, $cmsurl, $theme_dir, $theme_url;
   </form>
   <script type="text/javascript">
     document.getElementById(\'body\').focus();
-  </script>
-  
-  </td></tr></table>';
+  </script>';
 }
 
 function NotAllowed() {
 global $l, $cmsurl;
   
   echo '
-  <table class="pm"><tr><td>
-  
   <h1>'.$l['pm_notallowed_header'].'</h1>
   
   '.PMBar().'
   
-  <p>'.$l['pm_notallowed_desc'].'</p>
-  
-  </td></tr></table>';
+  <p>'.$l['pm_notallowed_desc'].'</p>';
 }
 
 function CompileNotAllowed() {
 global $l, $cmsurl;
   
   echo '
-  <table class="pm"><tr><td>
-  
   <h1>'.$l['pm_compile_notallowed_header'].'</h1>
   
   '.PMBar().'
   
-  <p>'.$l['pm_compile_notallowed_desc'].'</p>
-  
-  </td></tr></table>';
+  <p>'.$l['pm_compile_notallowed_desc'].'</p>';
 }
 
 function PMBar() {
