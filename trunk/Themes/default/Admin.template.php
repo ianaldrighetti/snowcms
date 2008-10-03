@@ -60,29 +60,9 @@ global $cmsurl, $settings, $l, $user, $theme_url;
 }
 
 function AdminOptions() {
-global $l, $cmsurl;
+global $l, $settings, $cmsurl;
   
-  $options = array();
-  if (can('manage_pages'))
-    $options[] = 'pages';
-  if (can('manage_basic-settings'))
-    $options[] = 'basic-settings';
-  if (can('manage_members'))
-    $options[] = 'members';
-  $options[] = 'permissions';
-  if (can('manage_menus'))
-    $options[] = 'menus';
-  $options[] = 'forum';
-  if (can('manage_mail_settings'))
-    $options[] = 'mail-settings';
-  if (can('manage_news'))
-    $options[] = 'news';
-  if (can('manage_tos'))
-    $options[] = 'tos';
-  if (can('ban_ips') || can('unban_ips'))
-    $options[] = 'ips';
-  if (can('manage_pms'))
-    $options[] = 'pms';
+  $options = $settings['page']['options'];
   
   $odd = true;
   foreach ($options as $option) {

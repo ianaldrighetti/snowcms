@@ -35,7 +35,10 @@ $settings['permissions']['group'] = array(
   'change_password' => true,
   'admin' => false,
   'manage_basic-settings' => false,
-  'manage_forum' => false,
+  'manage_forum_edit' => false,
+  'manage_forum_create' => false,
+  'manage_forum_delete' => false,
+  'manage_forum_perms' => false,
   'manage_groups' => false,
   'manage_mail_settings' => false,
   'manage_members' => false,
@@ -47,7 +50,6 @@ $settings['permissions']['group'] = array(
   'manage_pages_delete' => false,
   'manage_pages_home' => false,
   'manage_permissions' => false,
-  'manage_forum_perms' => false,
   'manage_ips_ban' => false,
   'manage_ips_unban' => false,
   'manage_tos' => false,
@@ -81,16 +83,16 @@ $settings['permissions']['forum'] = array(
 
 function GroupPermissions() {
 global $cmsurl, $db_prefix, $l, $settings, $user;
-  if(can('manage_permissions')) {
+  if (can('manage_permissions')) {
     // Editing a Member Group already? Maybe just maybe we should load that...
-    if((empty($_REQUEST['mid'])) && (empty($_REQUEST['me']))) {
+    if (empty($_REQUEST['mid']) && empty($_REQUEST['me'])) {
       // Hmmm, updating being done? :O
-      if(!empty($_REQUEST['update_perms'])) {
+      if (!empty($_REQUEST['update_perms'])) {
         // What member group are they setting these for?
         $membergroup = (int)addslashes(mysql_real_escape_string($_REQUEST['membergroup']));
         // Check if this group exists
         $result = mysql_query("SELECT * FROM {$db_prefix}membergroups WHERE `group_id` = '{$membergroup}'");
-        if(mysql_num_rows($result)>0) {
+        if (mysql_num_rows($result)>0) {
           // Ok, the member group does exist! dang, :P
             foreach($settings['permissions']['group'] as $perm => $value) {
               if(!empty($_POST[$perm]) || !empty($_POST['all'])) 
@@ -157,7 +159,7 @@ global $cmsurl, $db_prefix, $l, $settings, $user;
           grp.group_id AS id, grp.groupname AS name
         FROM {$db_prefix}membergroups AS grp 
         ORDER BY grp.group_id ASC");
-      while($row = mysql_fetch_assoc($result)) {
+      while ($row = mysql_fetch_assoc($result)) {
         $groups[$row['id']] = array(
                                 'id' => $row['id'],
                                 'name' => $row['name'],
@@ -166,11 +168,11 @@ global $cmsurl, $db_prefix, $l, $settings, $user;
                               );
       }
       $result = sql_query("SELECT `group`, COUNT(*) FROM {$db_prefix}members GROUP BY `group`");
-        while($row = mysql_fetch_assoc($result)) {
+        while ($row = mysql_fetch_assoc($result)) {
           $groups[$row['group']]['numusers'] = $row['COUNT(*)']; 
         }
       $result = sql_query("SELECT `group_id`, COUNT(*) FROM {$db_prefix}permissions WHERE `can` = '1' GROUP BY `group_id`");
-        while($row = mysql_fetch_assoc($result)) {
+        while ($row = mysql_fetch_assoc($result)) {
           $groups[$row['group_id']]['numperms'] = $row['COUNT(*)']; 
         }
       $settings['page']['total_permissions'] = count($settings['permissions']['group']);
@@ -178,20 +180,19 @@ global $cmsurl, $db_prefix, $l, $settings, $user;
       $settings['groups'] = $groups;
       loadTheme('Permissions');
     }
-    elseif((!empty($_REQUEST['me'])) && (empty($_REQUEST['mid']))) {
+    elseif (!empty($_REQUEST['me']) && empty($_REQUEST['mid'])) {
       // They want to edit a member group...
       loadME();
       // And no, we aren't loading Microsoft Windows ME, lol.
     }
     else {
-      // Now they are actually in the place where the check and uncheck things member groups can and cant do
+      // Now they are actually in the place where the check and uncheck things member groups can and can't do
       loadMID();
     }
   }
-  else {
-    $settings['page']['title'] = $l['permissions_error_title'];
-    loadTheme('Admin','Error');
-  }
+  // They don't have permission, so redrect them to the main control panel
+  else
+    redirect('index.php?action=admin');
 }
 
 function ForumPermissions() {
@@ -235,9 +236,9 @@ global $cmsurl, $db_prefix, $l, $settings, $permissions, $user;
 
 function ForumPerms() {
 global $cmsurl, $db_prefix, $forumperms, $l, $settings, $user;
-  if(can('manage_forum_perms')) {
+  if (can('manage_forum_perms')) {
     // Are they editing a groups board permission right now?
-    if(!empty($_REQUEST['bid']) && !empty($_REQUEST['gid'])) {
+    if (!empty($_REQUEST['bid']) && !empty($_REQUEST['gid'])) {
       // Get some data from the URL
       $board_id = (int)$_REQUEST['bid'];
       $group_id = (int)$_REQUEST['gid'];
@@ -285,21 +286,21 @@ global $cmsurl, $db_prefix, $forumperms, $l, $settings, $user;
       $l['mf_gp_board_desc'] = str_replace(array_keys($replace), array_values($replace), $l['mf_gp_board_desc']);
       loadTheme('Permissions','BoardEdit');
     }
-    elseif(!empty($_REQUEST['bid'])) {
+    elseif (!empty($_REQUEST['bid'])) {
       // Choosing a group they want to edit :o
       $board_id = (int)$_REQUEST['bid'];
       // We need to do some updating for you?
-      if(!empty($_REQUEST['update_perms'])) {
+      if (!empty($_REQUEST['update_perms'])) {
         // What group id are we editing?
         $group_id = (int)$_REQUEST['group_id'];
-        if(count($_REQUEST['perms'])) {
+        if (count($_REQUEST['perms'])) {
           $perms = array();
           // Go through all the permissions setable and set them ;)
-          foreach($forumperms as $perm => $default) {
+          foreach ($forumperms as $perm => $default) {
             // Can they or can't they? If it isn't set, they can't :P
             $can = isset($_REQUEST['perms'][$perm]) ? 1 : 0;
             // Guests Shouldn't be able to post... Hopefully we will actually make this work later on in SnowCMS
-            if($group_id==-1)
+            if ($group_id==-1)
               $can = 0;
             $perms[] = "'$board_id','$group_id','$perm','$can'";
           }
@@ -317,7 +318,7 @@ global $cmsurl, $db_prefix, $forumperms, $l, $settings, $user;
         FROM {$db_prefix}boards AS b
           LEFT JOIN {$db_prefix}categories AS c ON c.cid = b.cid
         WHERE b.bid = $board_id");
-      if(mysql_num_rows($result)) {
+      if (mysql_num_rows($result)) {
         // Ok. It exists, now we need to get the allowed groups ;)
         $row = mysql_fetch_assoc($result);
         $result = sql_query("
@@ -356,7 +357,7 @@ global $cmsurl, $db_prefix, $forumperms, $l, $settings, $user;
       }
       else {
         $cats = array();
-        while($row = mysql_fetch_assoc($result)) {
+        while ($row = mysql_fetch_assoc($result)) {
           $cats[$row['cid']] = array(
             'id' => $row['cid'],
             'name' => $row['cname'],
@@ -368,7 +369,7 @@ global $cmsurl, $db_prefix, $forumperms, $l, $settings, $user;
             b.bid, b.name, b.cid, b.border
           FROM {$db_prefix}boards AS b
           ORDER BY b.border ASC");
-        while($row = mysql_fetch_assoc($result)) {
+        while ($row = mysql_fetch_assoc($result)) {
           $cats[$row['cid']]['boards'][] = array(
             'id' => $row['bid'],
             'name' => $row['name']
@@ -380,9 +381,8 @@ global $cmsurl, $db_prefix, $forumperms, $l, $settings, $user;
       }
     }
   }
-  else {
-    $settings['page']['title'] = $l['permissions_error_title'];
-    loadTheme('Admin','Error');
-  }
+  // They don't have permission, so redrect them to the main forum management
+  else
+    redirect('index.php?action=admin;sa=forum');
 }
 ?>

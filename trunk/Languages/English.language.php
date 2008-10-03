@@ -7,11 +7,6 @@ $l['language_name'] = 'English';
 
 // Main
 $l['main_language_go'] = 'Go';
-$l['main_sidebar_login'] = 'Login';
-$l['main_sidebar_logout'] = 'Logout';
-$l['main_sidebar_register'] = 'Register';
-$l['main_sidebar_profile'] = 'Profile';
-$l['main_sidebar_control_panel'] = 'Control Panel';
 $l['main_powered_by'] = 'Powered by %snowcms%';
 $l['main_theme_by'] = 'Theme by %whom%';
 $l['main_error'] = 'Error';
@@ -447,7 +442,6 @@ $l['permissions_perm_manage_pages_create'] = 'Allow them to create new pages';
 $l['permissions_perm_manage_pages_delete'] = 'Allow them to delete pages';
 $l['permissions_perm_manage_pages_home'] = 'Allow them to modify the homepage';
 $l['permissions_perm_manage_permissions'] = 'Allow them to manage permissions';
-$l['permissions_perm_manage_forum_perms'] = 'Allow them to manage forum permissions';
 $l['permissions_perm_manage_ips_ban'] = 'Allow them to ban IP addresses';
 $l['permissions_perm_manage_ips_unban'] = 'Allow them to unban IP addresses';
 $l['permissions_perm_manage_mail_settings'] = 'Allow them to manage mail settings';
@@ -467,7 +461,10 @@ $l['permissions_perm_moderate_unsuspend'] = 'Allow them to unsuspend members.';
 $l['permissions_perm_moderate_ban'] = 'Allow them to ban members.';
 $l['permissions_perm_moderate_unban'] = 'Allow them to unban members.';
 $l['permissions_perm_manage_groups'] = 'Allow them to manage member groups';
-$l['permissions_perm_manage_forum'] = 'Allow them to manage the Forum';
+$l['permissions_perm_manage_forum_edit'] = 'Allow them to edit the categories and boards';
+$l['permissions_perm_manage_forum_create'] = 'Allow them to create new categories and boards';
+$l['permissions_perm_manage_forum_delete'] = 'Allow them to delete categories and boards';
+$l['permissions_perm_manage_forum_perms'] = 'Allow them to manage forum permissions';
 // Permissions.template.php - Errors
 $l['permissions_error_change'] = 'Changing member groups failed.';
 $l['permissions_error_new'] = 'Adding member group failed.';
@@ -610,13 +607,13 @@ $l['manageforum_title'] = 'Manage Forum';
 $l['manageforum_header'] = 'Manage Forum';
 $l['manageforum_desc'] = 'Click on one of the links below to manage your <a href="'. $cmsurl. 'forum.php">forum</a>';
 // // ManageForum.template.php - Options
-$l['mf_link_cats'] = 'Manage Categories';
-$l['mf_link_cats_desc'] = 'Create, Edit, and Delete forum categories';
+$l['mf_link_categories'] = 'Manage Categories';
+$l['mf_link_categories_desc'] = 'Create, Edit, and Delete forum categories';
 $l['mf_link_boards'] = 'Manage Boards';
 $l['mf_link_boards_desc'] = 'You can create, edit and delete your boards in your forum here';
 $l['managecats_title'] = 'Manage Categories';
-$l['mf_link_perms'] = 'Forum Permissions';
-$l['mf_link_perms_desc'] = 'Here is where you can edit permissions for each board and each member group';
+$l['mf_link_permissions'] = 'Forum Permissions';
+$l['mf_link_permissions_desc'] = 'Here is where you can edit permissions for each board and each member group';
 // // ManageForum.template.php - Categories
 $l['mf_new_category'] = 'New Category';
 $l['managecats_add_header'] = 'Add Category';
@@ -629,6 +626,10 @@ $l['managecats_update'] = 'Update';
 $l['managecats_are_you_sure'] = 'Are you sure you want to delete this Category?';
 $l['managecats_catname'] = 'Category Name:';
 $l['managecats_order'] = 'Order:';
+$l['managecats_error_edit_notallowed'] = 'You are not allowed to update forum categories.';
+$l['managecats_error_delete_notallowed'] = 'You are not allowed to delete forum categories.';
+$l['managecats_error_delete_invalidsession'] = 'Your session verification failed. Try deleting that category again.';
+$l['managecats_error_create_notallowed'] = 'You are not allowed to create new forum categories.';
 // // ManageForum.template.php - Boards
 $l['manageboards_title'] = 'Manage Boards';
 $l['manageboards_header'] = 'Manage Boards';

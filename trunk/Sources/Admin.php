@@ -75,6 +75,34 @@ global $cmsurl, $db_prefix, $l, $settings, $source_dir, $user;
 
 function AdminHome() {
 global $cmsurl, $db_prefix, $l, $settings, $source_dir, $user;
+  
+  // Get the control panel menu options
+  $options = array();
+  if (can('manage_pages'))
+    $options[] = 'pages';
+  if (can('manage_basic-settings'))
+    $options[] = 'basic-settings';
+  if (can('manage_members'))
+    $options[] = 'members';
+  if (can('manage_permissions'))
+    $options[] = 'permissions';
+  if (can('manage_menus'))
+    $options[] = 'menus';
+  if (can('manage_forum'))
+    $options[] = 'forum';
+  if (can('manage_mail_settings'))
+    $options[] = 'mail-settings';
+  if (can('manage_news'))
+    $options[] = 'news';
+  if (can('manage_tos'))
+    $options[] = 'tos';
+  if (can('ban_ips') || can('unban_ips'))
+    $options[] = 'ips';
+  if (can('manage_pms'))
+    $options[] = 'pms';
+  
+  $settings['page']['options'] = $options;
+  
   // With cURL (If the curl_init function exists) get the latest version of SnowCMS and Latest News
   $settings['page']['news'] = null;
   if(function_exists('curl_init')) {
