@@ -258,7 +258,7 @@ global $db_prefix, $settings, $user;
       if ($row['permission'] == 1 || // Everyone
          ($row['permission'] == 2 && $user['is_guest']) || // Guests only
          ($row['permission'] == 3 && !$user['is_guest']) || // Members only
-         ($row['permission'] == 4 && $user['is_admin']) || // Admin only
+         ($row['permission'] == 4 && can('admin')) || // Admin only
          ($row['permission'] == 5 && !$user['is_guest'] && !$user['unread_pms']) || // No new messages
          ($row['permission'] == 6 && !$user['is_guest'] && $user['unread_pms'])) { // New messages
         if ($row['menu'] == 1 || $row['menu'] == 3) {

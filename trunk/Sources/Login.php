@@ -8,23 +8,33 @@
 //       which means you are free to edit and
 //          redistribute it as your wish!
 //
-//                  Login.php file
+//                   Login.php file
 
 
 if(!defined("Snow"))
   die("Hacking Attempt...");
 
-// This function prepares to show the login page  
+// Prepares to show the login page  
 function Login() {
 global $cmsurl, $db_prefix, $l, $settings, $user;
-  // Set the Page title, load Login.template.php
-  $settings['page']['title'] = $l['login_title'];  
-  loadTheme('Login');
+  
+  // Check if they are not logged in
+  if ($user['is_guest']) {
+    // They are not logged in, so let them
+    $settings['page']['title'] = $l['login_title'];
+    loadTheme('Login');
+  }
+  else {
+    // They are logged in, so inform them
+    $settings['page']['title'] = $l['login_loggedin_title'];
+    loadTheme('Login','LoggedIn');
+  }
 }
 
 // This processes the login form
 function Login2() {
 global $cmsurl, $db_prefix, $l, $settings, $user, $cookie_prefix;
+  
   // Get and sanitize the username and encrypt the password
   $username = @clean($_REQUEST['username']);
   $password = @md5($_REQUEST['password']);
@@ -90,6 +100,7 @@ global $cmsurl, $db_prefix, $l, $settings, $user, $cookie_prefix;
 // Logout, need I explain? :P
 function Logout() {
 global $cmsurl, $db_prefix, $l, $settings, $user, $cookie_prefix;
+  
   if(ValidateSession(@$_REQUEST['sc'])) {
     // Are they even logged in? Lol.
     if($user['is_logged']) {

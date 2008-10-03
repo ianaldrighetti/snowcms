@@ -64,7 +64,7 @@ $l['bbcode_quote'] = 'Quote';
 // Login.template.php
 $l['login_title'] = 'Login';
 $l['login_header'] = 'Login';
-$l['login_details'] = 'Here you can login to your '.$settings['site_name'].' account. If you do not have an account you can register one <a href="'.$cmsurl.'index.php?action=register">here</a>';
+$l['login_desc'] = 'Here you can login to your account. If you do not have an account you can register one <a href="'.$cmsurl.'index.php?action=register">here</a>';
 $l['login_user'] = 'Username:';
 $l['login_pass'] = 'Password:';
 $l['login_button'] = 'Login!';
@@ -75,10 +75,14 @@ $l['login_day'] = 'A Day';
 $l['login_week'] = 'A Week';
 $l['login_month'] = 'A Month';
 $l['login_forever'] = 'Forever';
+// Login.template.php - Already logged in
+$l['login_loggedin_title'] = 'Login';
+$l['login_loggedin_header'] = 'Login';
+$l['login_loggedin_desc'] = 'You are already logged in as %username%. If you wish to login as someone else, please logout first.';
 // Login.template.php - Logout
 $l['logout_error_title'] = 'Logout Error';
 $l['logout_error_header'] = 'Error';
-$l['logout_error_desc'] = 'Session Verification Failed! Try Clicking on the logout link again.';
+$l['logout_error_desc'] = 'Session verification failed! Try logging out again.';
 
 // Register.template.php
 $l['register_title'] = 'Register';
@@ -98,6 +102,10 @@ $l['register_successbut2'] = 'Thanks for registering! The administrators require
 $l['register_failed'] = 'Registration failed!';
 $l['register_tos'] = 'I have read, I understand and I accept the %site% %link%terms of service%/link%.';
 $l['register_button'] = 'Register';
+// Register.template.php - Already logged in
+$l['register_loggedin_title'] = 'Register';
+$l['register_loggedin_header'] = 'Register';
+$l['register_loggedin_desc'] = 'You are already logged in as %username%. If you wish to register a new account, please logout first.';
 // Register.template.php - Activate account
 $l['activate_title'] = 'Activate your Account';
 $l['activate_acode_no_match'] = 'Wrong Activation Code';
@@ -590,7 +598,7 @@ $l['managemenus_title'] = 'Manage Menus';
 $l['managemenus_header'] = 'Manage Menus';
 $l['managemenus_name'] = 'Name';
 $l['managemenus_url'] = 'URL';
-$l['managemenus_new_window'] = '<div style="font-size: 60%">New<br />Window</div>';
+$l['managemenus_new_window'] = 'New Window';
 $l['managemenus_menu'] = 'Menu';
 $l['managemenus_permission'] = 'Perm';
 $l['managemenus_order'] = 'Order';

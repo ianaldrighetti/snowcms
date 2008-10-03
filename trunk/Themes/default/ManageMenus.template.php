@@ -22,7 +22,7 @@ global $cmsurl, $settings, $l, $user, $cmsurl, $theme_url;
       <tr>
         <th style="border-style: solid; border-width: 1px">'.$l['managemenus_name'].'</th>
         <th style="border-style: solid; border-width: 1px">'.$l['managemenus_url'].'</th>
-        <th style="border-style: solid; border-width: 1px">'.$l['managemenus_new_window'].'</th>
+        <th style="border-style: solid; border-width: 1px; font-size: 60%; width: 32px">'.$l['managemenus_new_window'].'</th>
         <th style="border-style: solid; border-width: 1px">'.$l['managemenus_menu'].'</th>
         <th style="border-style: solid; border-width: 1px">'.$l['managemenus_permission'].'</th>
         <th style="border-style: solid; border-width: 1px">'.$l['managemenus_order'].'</th>

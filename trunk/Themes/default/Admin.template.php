@@ -70,7 +70,8 @@ global $l, $cmsurl;
   if (can('manage_members'))
     $options[] = 'members';
   $options[] = 'permissions';
-  $options[] = 'menus';
+  if (can('manage_menus'))
+    $options[] = 'menus';
   $options[] = 'forum';
   if (can('manage_mail_settings'))
     $options[] = 'mail-settings';

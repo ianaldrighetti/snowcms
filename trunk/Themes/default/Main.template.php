@@ -40,12 +40,13 @@ echo '<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
   ';
 }
 
-// Call on by either theme_menu('main'); or theme_menu('side')
+// Call on by either theme_menu('main') or theme_menu('side')
 function theme_menu($which) {
 global $l, $cmsurl, $settings, $user;
+  
   // Are there even any links? Lol.
-  if(count($settings['menu'][$which])>0) {
-    foreach($settings['menu'][$which] as $link) {
+  if (count($settings['menu'][$which])>0) {
+    foreach ($settings['menu'][$which] as $link) {
       echo '<li><a href="'.$link['href'].'" '.$link['target'].'>'.$link['name'].'</a></li>';
     }
   }
@@ -61,7 +62,7 @@ echo '
     <div style="clear: both"></div>
   </div>
   <div class="footer">
-    <p>'.str_replace('%snowcms%','<a href="http://www.snowcms.com/" onClick="window.open(this.href); return false;">SnowCMS '.$settings['version'].'</a>',$l['main_powered_by']).' | '.str_replace('%whom%','<a href="http://snowcms.googlecode.com/" onclick="window.open(this.href); return false;">The SnowCMS Team</a>',$l['main_theme_by']).'</p>
+    <p>'.str_replace('%snowcms%','<a href="http://www.snowcms.com/" onClick="window.open(this.href); return false;">SnowCMS '.$settings['version'].'</a>',$l['main_powered_by']).' | '.str_replace('%whom%','<a href="http://www.snowcms.com/" onclick="window.open(this.href); return false;">The SnowCMS Team</a>',$l['main_theme_by']).'</p>
   </div>
 </div>
 </body>

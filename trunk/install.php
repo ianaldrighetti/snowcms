@@ -73,6 +73,7 @@ $files = array(
   './Themes/default/ManageMenus.template.php',
   './Themes/default/ManagePages.template.php',
   './Themes/default/MemberList.template.php',
+  './Themes/default/ModeratePMs.template.php',
   './Themes/default/News.template.php',
   './Themes/default/Online.template.php',
   './Themes/default/Page.template.php',
@@ -406,7 +407,7 @@ $scms_installed = true;
     }else{
         die("<p>Error! You'r password and/or username can not be blank!</p>");
     }
-    // Oh noes! the config.php file was NOT writeable, so we will let them copy it and paste it without having to start all over again :)
+    // Oh noes! the config.php file was NOT writable, so we will let them copy it and paste it without having to start all over again :)
     if(!is_writeable('./config.php')) {
       echo '
       <p>Your config.php file was not writeable. To make your SnowCMS installation work, please open up your config.php file and put this in it:</p><br />

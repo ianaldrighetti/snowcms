@@ -8,27 +8,26 @@ if(!defined('Snow'))
   
 function Main() {
 global $cmsurl, $settings, $l, $user;
+  
   echo '
   <h1>'.$l['register_header'].'</h1>
   
   <p>'.$l['register_details'].'</p>
+  
   <script type="text/javascript" src="scripts/jquery.js"></script>
   <script type="text/javascript" src="scripts/jquery-pstrength.js"></script>
-  <script type="text/javascript">$(function() {$(".password").pstrength();});</script>'
-  /*
-  This causes a notice to appear.
-  */ .
-  '<form action="'.$cmsurl.'index.php?action=register" method="post">
+  <script type="text/javascript">$(function() {$(".password").pstrength();});</script>
+  
+  <form action="'.$cmsurl.'index.php?action=register" method="post">
     <p><input type="hidden" name="register" value="true" /></p>
     <fieldset>
       <table>';
-      if(count($settings['page']['error'])>0) {
+      if (count($settings['page']['error']) > 0) {
       echo '
       <tr>
         <td><p class="error">';  
-        foreach($settings['page']['error'] as $error) {
+        foreach ($settings['page']['error'] as $error)
           echo $error.'<br />';
-        }
       echo '
         </p></td>
       </tr>';
@@ -138,18 +137,30 @@ global $cmsurl, $settings, $l, $user;
   </form>';
 }
 
+// Email Activation was a Success!
 function ASuccess() {
 global $cmsurl, $settings, $l, $user;
-  // Email Activation was a Success!
+  
   echo '
   <h1>'.$l['register_header'].'</h1>
   
   <p>', $l['activate_account_activated'], '</p>';
 }
 
+// Already logged in
+function LoggedIn() {
+global $l, $user;
+  
+  echo '
+  <h1>'.$l['register_loggedin_header'].'</h1>
+  
+  <p>'.str_replace('%username%','<b>'.$user['name'].'</b>',$l['register_loggedin_desc']).'</p>';
+}
+
+// Dang, it failed =[
 function Failure() {
 global $l;
-  // Dang, it failed =[
+  
   echo '
   <h1>'.$l['register_header'].'</h1>
   

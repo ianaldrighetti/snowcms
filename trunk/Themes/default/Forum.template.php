@@ -42,25 +42,16 @@ echo '<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
   '.link_tree();
 }
 
-// Call on by either theme_menu('main'); or theme_menu('side')
+// Call on by either theme_menu('main') or theme_menu('side')
 function theme_menu($which) {
 global $l, $cmsurl, $settings, $user;
+  
   // Are there even any links? Lol.
-  if(count($settings['menu'][$which])>0) {
-    foreach($settings['menu'][$which] as $link) {
+  if (count($settings['menu'][$which])>0) {
+    foreach ($settings['menu'][$which] as $link) {
       echo '<li><a href="'.$link['href'].'" '.$link['target'].'>'.$link['name'].'</a></li>';
     }
   }
-  if($which=='side') {
-    if(!$user['is_logged'])
-      echo '<li><a href="'.$cmsurl.'index.php?action=login">'.$l['main_sidebar_login'].'</a></li>
-            <li><a href="'.$cmsurl.'index.php?action=register">'.$l['main_sidebar_register'].'</a></li>';
-    else
-      echo '<li><a href="'.$cmsurl.'index.php?action=profile">'.$l['main_sidebar_profile'].'</a></li>
-            <li><a href="'.$cmsurl.'index.php?action=logout;sc=', $user['sc'], '">'.$l['main_sidebar_logout'].'</a></li>';      
-    if(can('admin'))
-      echo '<li><a href="'.$cmsurl.'index.php?action=admin">'.$l['main_sidebar_control_panel'].'</a></li>';
-  }  
 }
 
 // This constructs the link tree that is gotten from the linktree array in $settings
@@ -79,7 +70,7 @@ global $l, $cmsurl, $theme_url, $settings, $user;
 echo link_tree().'
   </div>
   <div class="footer">
-    <p>'.str_replace('%snowcms%','<a href="http://www.snowcms.com/" onClick="window.open(this.href); return false;">SnowCMS '.$settings['version'].'</a>',$l['main_powered_by']).' | '.str_replace('%whom%','<a href="http://snowcms.googlecode.com/" onclick="window.open(this.href); return false;">The SnowCMS Team</a>',$l['main_theme_by']).'</p>
+    <p>'.str_replace('%snowcms%','<a href="http://www.snowcms.com/" onClick="window.open(this.href); return false;">SnowCMS '.$settings['version'].'</a>',$l['main_powered_by']).' | '.str_replace('%whom%','<a href="http://www.snowcms.com/" onclick="window.open(this.href); return false;">The SnowCMS Team</a>',$l['main_theme_by']).'</p>
   </div>
 </div>
 </body>

@@ -43,7 +43,7 @@ global $cmsurl, $db_prefix, $l, $settings, $user;
   }
 }
 
-// An Admin Function to Make/Manage Pages
+// An admin function to manage pages
 function ManagePages() {
 global $cmsurl, $db_prefix, $l, $settings, $user;
   
