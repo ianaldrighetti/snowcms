@@ -54,8 +54,8 @@ global $cmsurl, $settings, $l, $user, $cmsurl, $theme_url;
             <option value="2"'.($menu['permission'] == 2 ? ' selected="selected"':'').'>Guests</option>
             <option value="3"'.($menu['permission'] == 3 ? ' selected="selected"':'').'>Members</option>
             <option value="4"'.($menu['permission'] == 4 ? ' selected="selected"':'').'>Admin</option>
-            <option value="5"'.($menu['permission'] == 5 ? ' selected="selected"':'').'>New Msg</option>
-            <option value="6"'.($menu['permission'] == 6 ? ' selected="selected"':'').'>Old Msg</option>
+            <option value="5"'.($menu['permission'] == 5 ? ' selected="selected"':'').'>Old Msg</option>
+            <option value="6"'.($menu['permission'] == 6 ? ' selected="selected"':'').'>New Msg</option>
           </select>
         </td>
         <td><input name="link_order_'.$menu['id'].'" value="'.$menu['order'].'" size="1" style="text-align: center" /></td>
@@ -72,15 +72,15 @@ global $cmsurl, $settings, $l, $user, $cmsurl, $theme_url;
         <td><input name="new_link_name" value="" /></td>
         <td><input name="new_link_url" value="" /></td>
         <td><input type="checkbox" name="new_link_new_window" /></td>
-        <td><input type="checkbox" name="new_link_main" /><input type="checkbox" name="new_link_sidebar" /></td>
+        <td><input type="checkbox" name="new_link_main" checked="checked" /><input type="checkbox" name="new_link_sidebar"checked="checked" /></td>
         <td>
           <select name="new_link_perm" style="width: 82px">
             <option value="1">All</option>
             <option value="2">Guests</option>
             <option value="3">Members</option>
             <option value="4">Admin</option>
-            <option value="5">New Msg</option>
-            <option value="6">Old Msg</option>
+            <option value="5">Old Msg</option>
+            <option value="6">New Msg</option>
           </select>
         </td>
         <td><input name="new_link_order" value="'.$new_order.'" size="1" style="text-align: center" /></td>
@@ -124,8 +124,8 @@ global $l, $settings, $cmsurl;
             <option value="2">Guests</option>
             <option value="3">Members</option>
             <option value="4">Admin</option>
-            <option value="5">New Msg</option>
-            <option value="6">Old Msg</option>
+            <option value="5">Old Msg</option>
+            <option value="6">New Msg</option>
           </select>
         </td>
         <td><input name="new_link_order" value="1" size="1" style="text-align: center" /></td>
