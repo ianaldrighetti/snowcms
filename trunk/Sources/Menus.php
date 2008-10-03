@@ -28,7 +28,8 @@ global $l, $settings, $db_prefix;
         $link_main = @$_REQUEST['link_main_'.$link_id] == true;
         $link_sidebar = (@$_REQUEST['link_sidebar_'.$link_id] == true) * 2;
         $link_menu = $link_main + $link_sidebar;
-        $link_order = clean(@$_REQUEST['link_order_'.$link_id]);
+        $link_perm = (int)@$_REQUEST['link_perm_'.$link_id];
+        $link_order = (int)@$_REQUEST['link_order_'.$link_id];
         sql_query("
         UPDATE {$db_prefix}menus
         SET
@@ -36,6 +37,7 @@ global $l, $settings, $db_prefix;
           `href` = '$link_url',
           `target` = '$link_new_window',
           `menu` = '$link_menu',
+          `permission` = '$link_perm',
           `order` = '$link_order'
         WHERE
           `link_id` = '$link_id'
@@ -49,6 +51,7 @@ global $l, $settings, $db_prefix;
       $link_main = @$_REQUEST['new_link_main'] == true;
       $link_sidebar = (@$_REQUEST['new_link_sidebar'] == true) * 2;
       $link_menu = (int)$link_main + $link_sidebar;
+      $link_perm = (int)@$_REQUEST['new_link_perm'];
       $link_order = clean(@$_REQUEST['new_link_order']);
       // Now the Query for the new link :-D
       sql_query("
@@ -58,6 +61,7 @@ global $l, $settings, $db_prefix;
         `href`,
         `target`,
         `menu`,
+        `permission`,
         `order`
       )
       VALUES (
@@ -65,6 +69,7 @@ global $l, $settings, $db_prefix;
         '$link_url',
         '$link_new_window',
         '$link_menu',
+        '$link_perm',
         '$link_order'
       )
       ");
@@ -90,7 +95,8 @@ global $l, $settings, $db_prefix;
             'name' => $row['link_name'],
             'url' => $row['href'],
             'target' => $row['target'],
-            'menu' => $row['menu']
+            'menu' => $row['menu'],
+            'permission' => $row['permission']
           );
     }
     // We need to reload the menus, so they are up to date

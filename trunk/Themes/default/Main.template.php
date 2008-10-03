@@ -49,16 +49,6 @@ global $l, $cmsurl, $settings, $user;
       echo '<li><a href="'.$link['href'].'" '.$link['target'].'>'.$link['name'].'</a></li>';
     }
   }
-  if($which=='side') {
-    if(!$user['is_logged'])
-      echo '<li><a href="'.$cmsurl.'index.php?action=login">'.$l['main_sidebar_login'].'</a></li>
-            <li><a href="'.$cmsurl.'index.php?action=register">'.$l['main_sidebar_register'].'</a></li>';
-    else
-      echo '<li><a href="'.$cmsurl.'index.php?action=profile">'.$l['main_sidebar_profile'].'</a></li>
-            <li><a href="'.$cmsurl.'index.php?action=logout;sc=', $user['sc'], '">'.$l['main_sidebar_logout'].'</a></li>';      
-    if(can('admin'))
-      echo '<li><a href="'.$cmsurl.'index.php?action=admin">'.$l['main_sidebar_control_panel'].'</a></li>';
-  }  
 }
 
 // The footer of your site!

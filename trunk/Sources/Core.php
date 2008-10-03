@@ -17,6 +17,7 @@ if(!defined("Snow"))
 // This loads all the settings in the {db_prefix}settings table, also loads usernames into the settings array
 function loadSettings() {
 global $db_prefix, $settings;
+  
   $result = sql_query("SELECT * FROM {$db_prefix}settings");
     while($row = mysql_fetch_assoc($result)) 
       $settings[$row['variable']] = $row['value'];
@@ -52,6 +53,7 @@ function clean_header($str) {
 // It will also revive their session if they left, but had remember me on
 function loadUser() {
 global $db_prefix, $user, $cookie_prefix;
+  
   $user = array();
   // Set some default info, incase they are guests
   $user['id'] = 0;
@@ -64,6 +66,7 @@ global $db_prefix, $user, $cookie_prefix;
   $user['language'] = false;
   $user['sc'] = 'guest';
   $user['board_query'] = 'FIND_IN_SET('. $user['group']. ', b.who_view)';
+  $user['unread_pms'] = 0;
   // Make sure we get their real IP :)
   $user['ip'] = @isset($_SERVER['HTTP_X_FORWARDED_FOR']) ? $_SERVER['HTTP_X_FORWARDED_FOR'] : $_SERVER['REMOTE_ADDR'];
   if(empty($_SESSION['id'])) {
@@ -150,6 +153,7 @@ function merge_languages($array) {
 // This function loads the Theme file requested in a Source File, More comment inside :P
 function loadTheme($file, $function = 'Main') {
 global $cmsurl, $l, $theme_dir, $settings;
+  
   // We have no Loading Error, yet...
   $loadError = false;
   
@@ -217,6 +221,7 @@ global $cmsurl, $l, $theme_dir, $settings;
 // Loads up the permissions into an array, so we can know what you can and can't do :)
 function loadPerms() {
 global $db_prefix, $perms, $user, $forumperms;
+  
   $perms = array();
   $perms[$user['group']] = array();
   $result = sql_query("SELECT * FROM {$db_prefix}permissions") or die(mysql_error());
@@ -230,6 +235,7 @@ global $db_prefix, $perms, $user, $forumperms;
 // So we can make sure you are allowed to edit/delete/move/etc
 function loadBPerms() {
 global $bperms, $db_prefix, $user, $forumperms;
+  
   $bperms = array();
   $bperms[$user['group']] = array();
   $result = sql_query("SELECT * FROM {$db_prefix}board_permissions") or die(mysql_error());
@@ -239,36 +245,44 @@ global $bperms, $db_prefix, $user, $forumperms;
   return $bperms;
 }
 
-// Load all the menus, both the Sidebar menu (if their is one) and the Main one (If their is one :P)
+// Load all the menus, both the sidebar menu (if there is one) and the main one (If there is one :P)
 function loadMenus() {
 global $db_prefix, $settings, $user;
+  
   $menu = array();
   $menu['main'] = array();
   $menu['side'] = array();
   $result = sql_query("SELECT * FROM {$db_prefix}menus ORDER BY `order` ASC") or die(mysql_error());
   if (mysql_num_rows($result)) {  
     while ($row = mysql_fetch_assoc($result)) {
-      if ($row['menu'] == 1 || $row['menu'] == 3) {
-        // This one goes on the main menu...
-        $menu['main'][] = array(
-          'id' => $row['link_id'],
-          'order' => $row['order'],
-          'name' => str_replace('%unread_pms%',$user['unread_pms'],$row['link_name']),
-          'href' => $row['href'],
-          'target' => $row['target'] ? 'target="_blank"' : '',
-          'menu' => $row['menu']
-        );
-      }
-      if ($row['menu'] == 2 || $row['menu'] == 3) {
-        // And this little piggy goes on the sidebar menu
-        $menu['side'][] = array(
-          'id' => $row['link_id'],
-          'order' => $row['order'],
-          'name' => str_replace('%unread_pms%',$user['unread_pms'],$row['link_name']),
-          'href' => $row['href'],
-          'target' => $row['target'] ? 'target="_blank"' : '',
-          'menu' => $row['menu']
-        );        
+      if ($row['permission'] == 1 || // Everyone
+         ($row['permission'] == 2 && $user['is_guest']) || // Guests only
+         ($row['permission'] == 3 && !$user['is_guest']) || // Members only
+         ($row['permission'] == 4 && $user['is_admin']) || // Admin only
+         ($row['permission'] == 5 && !$user['is_guest'] && !$user['unread_pms']) || // No new messages
+         ($row['permission'] == 6 && !$user['is_guest'] && $user['unread_pms'])) { // New messages
+        if ($row['menu'] == 1 || $row['menu'] == 3) {
+          // This one goes on the main menu...
+          $menu['main'][] = array(
+            'id' => $row['link_id'],
+            'order' => $row['order'],
+            'name' => str_replace('%unread_pms%',$user['unread_pms'],$row['link_name']),
+            'href' => str_replace('%sc%',$user['sc'],$row['href']),
+            'target' => $row['target'] ? 'target="_blank"' : '',
+            'menu' => $row['menu']
+          );
+        }
+        if ($row['menu'] == 2 || $row['menu'] == 3) {
+          // And this little piggy goes on the sidebar menu
+          $menu['side'][] = array(
+            'id' => $row['link_id'],
+            'order' => $row['order'],
+            'name' => str_replace('%unread_pms%',$user['unread_pms'],$row['link_name']),
+            'href' => str_replace('%sc%',$user['sc'],$row['href']),
+            'target' => $row['target'] ? 'target="_blank"' : '',
+            'menu' => $row['menu']
+          );        
+        }
       }
     }
   }
@@ -278,6 +292,7 @@ global $db_prefix, $settings, $user;
 // Writes the user or guest online, also deletes old ones expired guests/users
 function WriteOnline() {
 global $db_prefix, $settings, $user;
+  
   if(!empty($_REQUEST['action']))
     $action_or_page = 'action:'. clean($_REQUEST['action']);
   elseif(!empty($_REQUEST['page']))

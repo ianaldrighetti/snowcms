@@ -113,13 +113,21 @@ CREATE TABLE `{$db_prefix}menus` (
   `href` text NOT NULL,
   `target` int(1) NOT NULL default '0',
   `menu` int(1) NOT NULL default '0',
+  `permission` int(1) NOT NULL default '0',
   PRIMARY KEY  (`link_id`)
 ) ENGINE=MyISAM AUTO_INCREMENT=5 DEFAULT CHARSET=utf8;
 
-INSERT INTO `{$db_prefix}menus` VALUES ('1','1','Home','index.php','0','3');
-INSERT INTO `{$db_prefix}menus` VALUES ('2','1','News','index.php?action=news','0','3');
-INSERT INTO `{$db_prefix}menus` VALUES ('3','2','Forum','forum.php','0','3');
-INSERT INTO `{$db_prefix}menus` VALUES ('4','3','SnowCMS','http://www.snowcms.com/','1','2');
+INSERT INTO `{$db_prefix}menus` VALUES ('1','1','Home','index.php','0','3','1');
+INSERT INTO `{$db_prefix}menus` VALUES ('2','2','News','index.php?action=news','0','3','1');
+INSERT INTO `{$db_prefix}menus` VALUES ('3','3','Forum','forum.php','0','3','1');
+INSERT INTO `{$db_prefix}menus` VALUES ('4','4','Profile','index.php?action=profile','0','3','3');
+INSERT INTO `{$db_prefix}menus` VALUES ('5','5','Messages','forum.php?action=pm','0','3','5');
+INSERT INTO `{$db_prefix}menus` VALUES ('6','6','Messages [%unread_pms%]','forum.php?action=pm','0','3','6');
+INSERT INTO `{$db_prefix}menus` VALUES ('7','7','SnowCMS','http://www.snowcms.com/','1','2','1');
+INSERT INTO `{$db_prefix}menus` VALUES ('8','8','Logout','index.php?action=logout%semicolon%sc=%sc%','0','3','3');
+INSERT INTO `{$db_prefix}menus` VALUES ('9','9','Login','index.php?action=login','0','3','2');
+INSERT INTO `{$db_prefix}menus` VALUES ('10','10','Register','index.php?action=register','0','3','2');
+INSERT INTO `{$db_prefix}menus` VALUES ('11','11','Control Panel','index.php?action=admin','0','3','4');
 
 DROP TABLE IF EXISTS `{$db_prefix}messages`;
 

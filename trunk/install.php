@@ -264,6 +264,9 @@ ob_start();
         $sqls = str_replace('%current_time%',time(),str_replace('{$db_prefix}', $db_prefix, $sqls));
         // Separate the Queries the easy way xD
         $mysql_queries = explode(";", $sqls);
+        // %semicolon% is used in place of semi colons to prevent them being exploded, so let's convert them now
+        foreach ($mysql_queries as $key => $value)
+          $mysql_queries[$key] = str_replace('%semicolon%',';',$value);
         // MySQL Errors? No thanks!
         $mysql_errors = array();
         $num_queries = count($mysql_queries);
