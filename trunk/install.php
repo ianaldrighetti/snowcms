@@ -102,15 +102,11 @@ $files = array(
   './Themes/default/images/email.png',
   './Themes/default/images/female.png',
   './Themes/default/images/headbar.png',
-  './Themes/default/images/infobg.png',
-  './Themes/default/images/infobg2.png',
   './Themes/default/images/male.png',
   './Themes/default/images/modify.png',
-  './Themes/default/images/navbg.png',
   './Themes/default/images/off.gif',
   './Themes/default/images/on.gif',
   './Themes/default/images/quote.png',
-  './Themes/default/images/sidebg.png',
   './Themes/default/images/split.png',
   './Themes/default/images/star.png',
   './Themes/default/images/status_offline.png',
@@ -149,15 +145,15 @@ ob_start();
   <!--[if lte IE 7]><style type="text/css">#content {padding-left: 6px !important;}</style><![endif]-->
 </head>
 <body>
-<div id="container">
-  <div id="header">
-    <div id="headerimg">
+<div class="container">
+  <div class="header">
+    <div class="headerimg">
       <a class="headerlink" href="http://www.snowcms.com/" title="SnowCMS">
         <img class="headerimg" src="Themes/default/images/title.png" alt="SnowCMS" />
       </a>
     </div>
   </div>
-  <div id="sidebar">
+  <div class="sidebar">
   <ul>
     <li><a href="http://www.snowcms.com/">SnowCMS.com</a></li>
     <li><a href="http://snowcms.google.com/">Google Code</a></li>
@@ -165,7 +161,7 @@ ob_start();
     <li><a href="http://www.snowcms.com/forum.php?board=4">Developer Blogs</a></li>
   </ul>
   </div>
-  <div id="content">
+  <div class="content">
     <?php
   $step = $_REQUEST['step'] ? $_REQUEST['step'] : 1;
   // Check to see if all default files and directories exist
@@ -435,7 +431,7 @@ $scms_installed = true;
   ?>
 
   </div>
-  <div id="footer">
+  <div class="footer">
     <p>Powered by <a href="http://www.snowcms.com/" onClick="window.open(this.href); return false;">SnowCMS 0.7</a>
        | Theme by <a href="http://www.snowcms.com/" onclick="window.open(this.href); return false;">The SnowCMS Team</a></p>
   </div>
