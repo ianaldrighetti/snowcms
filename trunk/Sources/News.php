@@ -220,10 +220,16 @@ global $cmsurl, $db_prefix, $l, $settings, $user;
 // This is for the Admin CP, to manage the news
 function ManageNews() {
 global $cmsurl, $db_prefix, $l, $settings, $user;
-  if(can('manage_news')) {
+  
+  // This variable will be set if redirection is required to remove post data
+  if (@$_REQUEST['redirect'])
+    redirect('index.php?action=admin;sa=pages');
+  
+  // Are they allowed to manage news?
+  if (can('manage_news')) {
     // Dang, they can do this, now I have to code it :(
     // Some actions they can do...
-    $ssa = array('add','categories');
+    $ssa = array('add','categories','manage');
     if(empty($_REQUEST['id']) && (!in_array(@$_REQUEST['ssa'], $ssa))) {
       // No news ID, and no $na action that exists
       $result = sql_query("
@@ -250,11 +256,20 @@ global $cmsurl, $db_prefix, $l, $settings, $user;
           'allow_comments' => $row['allow_comments']
         );
       }
-      mysql_free_result($result);
-      $settings['page']['title'] = $l['news_manage_title'];
-      loadTheme('News','Manage');
+      // Get the control panel menu options
+    $options = array();
+    //if (can('manage_permissions'))
+      $options[] = 'add';
+    //if (can('manage_permissions'))
+      $options[] = 'categories';
+    //if (can('manage_permissions'))
+      $options[] = 'manage';
+    $settings['page']['options'] = $options;
+      // Load the theme
+      $settings['page']['title'] = $l['managenews_title'];
+      loadTheme('ManageNews');
     }
-    elseif (empty($_REQUEST['id']) && $_REQUEST['ssa']=='add') {
+    elseif (empty($_REQUEST['id']) && $_REQUEST['ssa'] == 'add') {
       // Adding news =D
       if (@$_REQUEST['add-news']) {
         // Clean the data of dirty injections
@@ -279,28 +294,28 @@ global $cmsurl, $db_prefix, $l, $settings, $user;
       }
       
       $settings['page']['categories'] = @$categories;
-      
-      $settings['page']['title'] = $l['news_add_title'];
-      loadTheme('News','Add');
+      // Load the theme
+      $settings['page']['title'] = $l['managenews_add_title'];
+      loadTheme('ManageNews','Add');
     }
-    elseif (empty($_REQUEST['id']) && $_REQUEST['ssa']=='categories') {
+    elseif (empty($_REQUEST['id']) && $_REQUEST['ssa'] == 'categories') {
       // Managing categories
       ManageCats();
     }
-    else {
+    elseif (empty($_REQUEST['id']) && $_REQUEST['ssa'] == 'manage') {
       // Editing news... =D
+      NewsList();
     }
   }
-  else {
-    // Go away! You cant touch this, nah nah nah nah nah nah, cant touch this =D
-    $settings['page']['title'] = $l['admin_error_title'];
-    loadTheme('Admin','Error');
-  }
+  // Go away! You cant touch this, nah nah nah nah nah nah, cant touch this =D
+  else
+    redirect('index.php?action=admin');
 }
 
 // Manage news categories
 function ManageCats() {
 global $cmsurl, $db_prefix, $l, $settings, $user;
+  
   // Rename categories
   if(!empty($_REQUEST['update_cats'])) {  
     $rows = array();
@@ -338,7 +353,149 @@ global $cmsurl, $db_prefix, $l, $settings, $user;
     );
   }
   $settings['cats'] = $cats;
-  $settings['page']['title'] = $l['news_cats_title'];
-  loadTheme('News','ShowCats');
+  $settings['page']['title'] = $l['managenews_cats_title'];
+  loadTheme('ManageNews','ShowCats');
 }
+
+function NewsList() {
+global $cmsurl, $db_prefix, $l, $settings, $user;
+  // This prepares the news for display...
+  
+  // Redirect post data into get data
+  if (@$_POST['cat'] == 'all')
+    redirect('index.php?action=admin;sa=news;ssa=manage');
+  elseif (@$_POST['cat'])
+    redirect('index.php?action=admin;sa=news;ssa=manage;cat='.$_POST['cat']);
+  
+  // Are they deleting news?
+  if ($did = (int)@$_REQUEST['did']) {
+    // Are they allowed to delete news?
+    if (can('manage_news_delete')) {
+      // Is there session verification valid?
+      if (@$_REQUEST['sc'] == $user['sc']) {
+        // Delete the news
+        sql_query("DELETE FROM {$db_prefix}news WHERE `news_id` = '$did'");
+      }
+      // Their session verification is invalid
+      else
+        $_SESSION['error'] = $l['managenews_error_manage_delete_invalidsession'];
+    }
+    // They are not allowed to delete news
+    else
+      $_SESSION['error'] = $l['managenews_error_manage_delete_notallowed'];
+    redirect('index.php?action=admin;sa=news;ssa=manage');
+  }
+  // Are they adding a comment?
+  elseif (@$_REQUEST['add-comment']) {
+    // Clean the data of dirty injections
+    $nid = clean(@$_REQUEST['nid']); // News ID
+    $subject = clean(@$_REQUEST['subject']); // Subject
+    $body = clean(@$_REQUEST['body']); // Body text
+    
+    // Update the amount total of comments for the news article
+    sql_query("UPDATE {$db_prefix}news SET `num_comments` = `num_comments` + 1 WHERE `news_id` = '$nid'");
+    // Insert comment into database
+    sql_query("INSERT {$db_prefix}news_comments (`nid`, `poster_id`, `poster_name`, `subject`, `body`, `post_time`) VALUES ('$nid','{$user['id']}','{$user['name']}','$subject','$body', '".time()."')");
+    
+    // Redirect the page to the main manage news page
+    redirect('index.php?action=news;id='.clean_header(@$_GET['id']));
+  }
+  
+  // The current page number
+  $page = @$_REQUEST['pg'];
+  
+  // The first news article number of this page
+  $start = $page * $settings['num_news_items'];
+  
+  // Setup category SQL
+  if ($cat = (int)@$_REQUEST['cat'])
+    $cat = "WHERE `cat_id` = '$cat'";
+  else
+    $cat = "";
+  
+  $result = sql_query("
+    SELECT
+      *, mem.display_name AS username, IFNULL(mem.display_name, mem.username) AS username
+    FROM {$db_prefix}news AS n
+      LEFT JOIN {$db_prefix}members AS mem ON mem.id = n.poster_id
+    $cat
+    ORDER BY n.post_time DESC
+    LIMIT $start, {$settings['num_news_items']}");
+  $news = array();
+  // Is there even any news? :O
+  if (mysql_num_rows($result)) {
+    while ($row = mysql_fetch_assoc($result)) {
+      $category = mysql_fetch_assoc(sql_query("SELECT * FROM {$db_prefix}news_categories WHERE `cat_id` = '{$row['cat_id']}'"));
+      $news[] = array(
+        'id' => $row['news_id'],
+        'poster_id' => $row['poster_id'],
+        'poster_name' => $row['username'],
+        'subject' => $row['subject'],
+        'cat_id' => $category['cat_id'],
+        'cat_name' => $category['cat_name'],
+        'body' => stripslashes($row['body']),
+        'user_id' => $row['id'],
+        'username' => $row['username'],
+        'post_date' => formattime($row['post_time'],2),
+        'num_views' => $row['num_views'],
+        'num_comments' => (int)$row['num_comments'],
+        'allow_comments' => $row['allow_comments']
+      );
+    }
+    
+    // Total amount of news articles
+    $news_count = sql_query("SELECT * FROM {$db_prefix}news $cat");
+    $total_news = 0;
+    while (mysql_fetch_assoc($news_count)) {
+      $total_news += 1;
+    }
+    // The current page number
+    $settings['page']['page'] = $page;
+    // The last page number
+    $settings['page']['page_last'] = $total_news / $settings['num_news_items'];
+    
+    // The current category
+    $settings['page']['cat'] = @$_REQUEST['cat'];
+    
+    // Load news categories
+    $result = sql_query("SELECT * FROM {$db_prefix}news_categories");
+    while ($row = mysql_fetch_array($result))
+      $settings['page']['categories'][] = $row;
+    
+    // Load it up :D (the theme thingy)
+    $settings['page']['title'] = $l['managenews_manage_title'];
+    $settings['news'] = $news;
+    unset($news);
+    loadTheme('ManageNews','ShowNews');
+  }
+  else {
+    // No news? :O
+    
+    // The previous page number
+    $settings['page']['previous_page'] = $page - 1;
+    // The current page number
+    $settings['page']['current_page'] = $page;
+    // The next page number
+    $settings['page']['next_page'] = $page + 1;
+    // Total amount of news articles
+    $news_count = sql_query("SELECT * FROM {$db_prefix}news $cat");
+    $settings['page']['total_news'] = 0;
+    while (mysql_fetch_assoc($news_count)) {
+      $settings['page']['total_news'] += 1;
+    }
+    
+    // The current category
+    $settings['page']['cat'] = @$_REQUEST['cat'];
+    
+    // Load news categories
+    $result = sql_query("SELECT * FROM {$db_prefix}news_categories");
+    while ($row = mysql_fetch_array($result))
+      $settings['page']['categories'][] = $row;
+    
+    // Load the them
+    $settings['page']['title'] = $l['news_nonews_title'];
+    loadTheme('ManageNews','Nonews');
+  }
+}
+
 ?>

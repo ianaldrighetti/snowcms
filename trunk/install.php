@@ -71,6 +71,7 @@ $files = array(
   './Themes/default/ManageIPs.template.php',
   './Themes/default/ManageMembers.template.php',
   './Themes/default/ManageMenus.template.php',
+  './Themes/default/ManageNews.template.php',
   './Themes/default/ManagePages.template.php',
   './Themes/default/MemberList.template.php',
   './Themes/default/ModeratePMs.template.php',

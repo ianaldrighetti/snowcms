@@ -37,6 +37,8 @@ $l['main_month_12'] = 'December';
 $l['main_quote'] = 'Quote';
 $l['main_quote_from'] = 'Quote from %user%';
 $l['main_code'] = 'Code';
+$l['main_back'] = 'Back';
+$l['main_cancel'] = 'Cancel';
 
 // Email
 $l['mail_smtp_fail'] = 'Sending email failed! Error: %error%';
@@ -435,7 +437,11 @@ $l['permissions_perm_admin'] = 'Allow them to administrate the site';
 $l['permissions_perm_manage_basic-settings'] = 'Allow them to manage basic settings';
 $l['permissions_perm_manage_members'] = 'Allow them to manage members';
 $l['permissions_perm_manage_menus'] = 'Allow them to manage menus';
-$l['permissions_perm_manage_news'] = 'Allow them to manage news';
+$l['permissions_perm_manage_news'] = 'Allow them to manage news *TBD*';
+$l['permissions_perm_manage_news_create'] = 'Allow them to create news';
+$l['permissions_perm_manage_news_edit'] = 'Allow them to edit news';
+$l['permissions_perm_manage_news_delete'] = 'Allow them to delete news';
+$l['permissions_perm_manage_news_cats'] = 'Allow them to manage news categories';
 $l['permissions_perm_manage_pages_modify_html'] = 'Allow them to modify HTML pages';
 $l['permissions_perm_manage_pages_modify_bbcode'] = 'Allow them to modify BBCode pages';
 $l['permissions_perm_manage_pages_create'] = 'Allow them to create new pages';
@@ -680,32 +686,6 @@ $l['news_comments'] = 'Comments: %num%';
 $l['news_comment_subject'] = 'Subject:';
 $l['news_comment_submit'] = 'Add Comment';
 $l['news_category_change'] = 'Change';
-// News.template.php - Manage
-$l['news_manage_title'] = 'Manage News';
-$l['news_manage_header'] = 'Manage News';
-$l['news_manage_desc'] = 'Here you can add, modify and delete news posts.';
-$l['news_manage_add'] = 'Add News';
-$l['news_manage_add_desc'] = 'You can add a news post here.';
-$l['news_manage_categories'] = 'Manage Categories';
-$l['news_manage_categories_desc'] = 'You can add, delete and modify news categories here.';
-// News.template.php - Add
-$l['news_add_title'] = 'Manage News';
-$l['news_add_header'] = 'Add News';
-$l['news_add_category'] = 'Category:';
-$l['news_add_subject'] = 'Subject:';
-$l['news_add_allow_comments'] = 'Allow Comments';
-$l['news_add_submit'] = 'Add Post';
-// News.template.php - Categories
-$l['news_cats_title'] = 'Manage News';
-$l['news_cats_header'] = 'News Categories';
-$l['news_cats_desc'] = 'Here you can add, delete and modify news categories.';
-$l['news_cats_name'] = 'Category Name';
-$l['news_cats_areyousure'] = 'Are you sure you want to delete this news category?';
-$l['news_cats_delete'] = 'Delete';
-$l['news_cats_update'] = 'Rename Categories';
-$l['news_cats_add'] = 'New Category';
-$l['news_cats_add_name'] = 'Category Name';
-$l['news_cats_add_submit'] = 'Add Category';
 // News.template.php - Errors
 $l['news_nonews_title'] = 'News';
 $l['news_nonews_header'] = 'News';
@@ -713,6 +693,45 @@ $l['news_nonews_desc'] = 'There is no news in this category.';
 $l['news_doesntexist_title'] = 'News';
 $l['news_doesntexist_header'] = 'News';
 $l['news_doesntexist_desc'] = 'There is no news article with this ID.';
+
+// ManageNews.template.php
+$l['managenews_title'] = 'Manage News';
+$l['managenews_header'] = 'Manage News';
+$l['managenews_desc'] = 'Here you can add, modify and delete news posts.';
+$l['managenews_menu_add'] = 'Add News';
+$l['managenews_menu_add_desc'] = 'You can add a news post here.';
+$l['managenews_menu_categories'] = 'Manage Categories';
+$l['managenews_menu_categories_desc'] = 'You can add, delete and modify news categories here.';
+$l['managenews_menu_manage'] = 'Manage News';
+$l['managenews_menu_manage_desc'] = 'You can modify and delete news posts here.';
+// ManageNews.template.php - Add
+$l['managenews_add_title'] = 'Manage News';
+$l['managenews_add_header'] = 'Add News';
+$l['managenews_add_desc'] = 'Here you can create a news post in any of your news categories.';
+$l['managenews_add_category'] = 'Category:';
+$l['managenews_add_subject'] = 'Subject:';
+$l['managenews_add_allowcomments'] = 'Allow Comments';
+$l['managenews_add_submit'] = 'Add Post';
+// ManageNews.template.php - Categories
+$l['managenews_cats_title'] = 'Manage News';
+$l['managenews_cats_header'] = 'News Categories';
+$l['managenews_cats_desc'] = 'Here you can add, delete and modify news categories.';
+$l['managenews_cats_name'] = 'Category Name';
+$l['managenews_cats_areyousure'] = 'Are you sure you want to delete this news category?\nThis action cannot be undone.';
+$l['managenews_cats_delete'] = 'Delete';
+$l['managenews_cats_update'] = 'Rename Categories';
+$l['managenews_cats_add'] = 'New Category';
+$l['managenews_cats_add_name'] = 'Category Name';
+$l['managenews_cats_add_submit'] = 'Add Category';
+// ManageNews.template.php - News list
+$l['managenews_manage_title'] = 'Manage News';
+$l['managenews_manage_header'] = 'News List';
+$l['managenews_manage_desc'] = 'Here you can modify and delete news posts.';
+$l['managenews_manage_edit'] = 'Edit';
+$l['managenews_manage_delete'] = 'Delete';
+// ManageNews.template.php - Errors
+$l['managenews_error_manage_delete_notallowed'] = 'You are not allowed to delete news.';
+$l['managenews_error_manage_delete_invalidsession'] = 'Your session verification failed. Try deleting that news again.';
 
 // TOS.template.php
 $l['tos_title'] = 'Terms of Service';

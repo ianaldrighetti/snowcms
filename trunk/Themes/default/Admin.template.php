@@ -53,7 +53,6 @@ global $cmsurl, $settings, $l, $user, $theme_url;
   <iframe style="overflow: auto; width: 475px; height: 100px;" src="'.$settings['page']['news_url'].'?stylesheet='.$theme_url.'/'.$settings['theme'].'/news.css"></iframe>
 	
   <h2>'.$l['admin_options'].'</h2>
-  
   ';
   
   AdminOptions();

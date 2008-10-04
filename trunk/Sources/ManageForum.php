@@ -44,7 +44,7 @@ global $cmsurl, $db_prefix, $l, $settings, $source_dir, $user;
 function ForumHome() {
 global $cmsurl, $db_prefix, $l, $settings, $user;
   
-  // Get the control panel menu options
+  // Get the forum management control panel menu options
   $options = array();
   if (can('manage_forum_edit') || can('manage_forum_create') || can('manage_forum_delete'))
     $options[] = 'categories';

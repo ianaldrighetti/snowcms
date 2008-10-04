@@ -47,7 +47,7 @@ global $cmsurl, $db_prefix, $l, $settings, $user;
 function ManagePages() {
 global $cmsurl, $db_prefix, $l, $settings, $user;
   
-  // This variable will be set if redirection is required to stop IE showing an alert if refreshed
+  // This variable will be set if redirection is required to remove post data
   if (@$_REQUEST['redirect'])
     redirect('index.php?action=admin;sa=pages');
   
