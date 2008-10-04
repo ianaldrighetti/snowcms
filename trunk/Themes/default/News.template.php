@@ -104,14 +104,14 @@ global $cmsurl, $db_prefix, $l, $settings, $user, $theme_url;
     if (can('manage_comments_edit'))
       echo '<a href="'.$cmsurl.'index.php?action=news;id='.$comments[$i]['id'].'">
         <img src="'.$theme_url.'/'.$settings['theme'].'/images/modify.png" alt="'.$l['managenews_manage_edit'].'" width="15" height="15" />
-      </a>'
+      </a>';
     if (can('manage_comments_edit') && can('manage_comments_delete'))
       echo '
       ';
     if (can('manage_comments_delete'))
       echo '<a href="'.$cmsurl.'index.php?action=news;id='.$news['id'].';did='.$comments[$i]['id'].';sc='.$user['sc'].'">
         <img src="'.$theme_url.'/'.$settings['theme'].'/images/delete.png" alt="'.$l['managenews_manage_delete'].'" width="15" height="15" />
-      </a>'
+      </a>';
     echo '
     </p>
     <p>'.bbc($comments[$i]['body']).'</p>
