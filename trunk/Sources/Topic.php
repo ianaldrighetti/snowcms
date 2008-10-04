@@ -66,23 +66,22 @@ global $cmsurl, $db_prefix, $l, $settings, $user;
           // If $mid_page is not 0, then we found the page =D!
           if (in_array($msg_id, $mids)) {
             $msgs = 0;
-            $page = 1;
+            $page = 0;
             $mid_page = 0;
-            foreach($mids as $i => $mid_val) {
+            foreach ($mids as $i => $mid_val) {
               $msgs++;
-              if($mids[$i]==$msg_id) {
+              if($mids[$i] == $msg_id) {
                $mid_page = $page;
               }
-              if($msgs==$settings['num_posts']) {
+              if ($msgs == $settings['num_posts']) {
                 $msgs = 1;
                 $page++;
               }
             }
-            // $page_id != 1 BAD!
-            if ($mid_page!=1)
-              redirect("forum.php?topic={$topic_id};page={$mid_page}#mid{$msg_id}");
+            if ($mid_page == 0)
+              redirect("forum.php?topic=$topic_id#mid$msg_id");
             else
-              redirect("forum.php?topic={$topic_id}#mid{$msg_id}");
+              redirect("forum.php?topic=$topic_id;pg=$mid_page#mid$msg_id");
           }
           else {
             // Sorry bub, we didn't find that Message ID...
@@ -99,6 +98,7 @@ global $cmsurl, $db_prefix, $l, $settings, $user;
         WHERE t.tid = $Topic_ID");
       while($row = mysql_fetch_assoc($result))
         $topic_name = $row['subject'];
+      $posts = array();
       $result = sql_query("
         SELECT
           t.tid, t.sticky, t.locked, t.bid, t.first_msg, grp.group_id, grp.groupname,
@@ -145,10 +145,10 @@ global $cmsurl, $db_prefix, $l, $settings, $user;
         $settings['page']['title'] = $topic_name;
         $settings['page']['topic-name'] = $topic_name;
         $settings['posts'] = $posts;
-        $settings['topic'] = (int)$_REQUEST['topic'];
-        $settings['sticky'] = $posts[0]['sticky'];
-        $settings['locked'] = $posts[0]['locked'];
-        $settings['bid'] = (int)$bid;
+        $settings['topic'] = (int)@$_REQUEST['topic'];
+        $settings['sticky'] = @$posts[0]['sticky'];
+        $settings['locked'] = @$posts[0]['locked'];
+        $settings['bid'] = (int)@$bid;
         loadForum('Topic');
     }
     else {
