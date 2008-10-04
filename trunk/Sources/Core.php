@@ -446,9 +446,9 @@ global $l, $settings, $theme_dir, $theme_url;
   $str = '[/code]'.$str.'[code]';
   
   // These three characters will have special meanings later, so wee need to encode them
-  $str = str_replace('$','&$43;',$str);
   $str = str_replace('!','&$33;',$str);
   $str = str_replace('#','&$35;',$str);
+  $str = str_replace('$','&$36;',$str);
   $str = str_replace('%','&$37;',$str);
   $str = str_replace('|','&$124;',$str);
   
@@ -511,7 +511,7 @@ global $l, $settings, $theme_dir, $theme_url;
     // www....
     $str = preg_replace('/(#['.$all_chars.']*) (www\.['.$link_chars.']*) (['.$all_chars.']*\|)/is','$1 <a href="http://$2">$2</a> $3',$str);
     // ...@...
-    $str = preg_replace('/(#['.$all_chars.']*) ([a-z0-9._-]*\@[a-z0-9.-]*) (['.$all_chars.']*\|)/is','$1 <a href="mailto:$2">$2</a> $3',$str);
+    $str = preg_replace('/(#['.$all_chars.']*) ([a-z0-9._-]+\@[a-z0-9.-]+) (['.$all_chars.']*\|)/is','$1 <a href="mailto:$2">$2</a> $3',$str);
     
     // [url]http://...[/url]
     $str = preg_replace('/(#['.$all_chars.']*)\[url\](http:\/\/['.$link_chars.']*)\[\/url\](['.$all_chars.']*\|)/is','$1 <a href="$2">$2</a> $3',$str);
