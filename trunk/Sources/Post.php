@@ -32,11 +32,11 @@ global $cmsurl, $db_prefix, $l, $settings, $user;
     $row = mysql_fetch_assoc($result);
     if (canforum('post_reply', $row['bid']) || (canforum('edit_own', $row['bid']) && @$_REQUEST['edit'] && postOwner(@$_REQUEST['edit']) == $user['id']) || (canforum('edit_any', $row['bid']) && @$_REQUEST['edit'])) {
       // But does it exist? D:!
-      if(mysql_num_rows($result)>0) {
+      if (mysql_num_rows($result) > 0) {
         // The topic DOES exist, now we can check if they are allowed to see it
         //while($row = mysql_fetch_assoc($result))
-          $who_view = @explode(",", $row['who_view']);
-        if((in_array($user['group'], $who_view)) || ($user['is_admin'])) {
+          $who_view = @explode(",",$row['who_view']);
+        if (in_array($user['group'],$who_view) || $user['is_admin']) {
           // Are they editing a post?
           if ($edit = clean(@$_REQUEST['edit'])) {
             $edit = mysql_fetch_assoc(sql_query("SELECT * FROM {$db_prefix}messages WHERE `mid` = '$edit'"));
@@ -63,8 +63,10 @@ global $cmsurl, $db_prefix, $l, $settings, $user;
           $settings['topic'] = $row['tid'];
           // Load the preview of the topic ;)
           loadPreview();
-          //loadQuote(); Note: This is not coded yet
-          loadForum('Post','Reply');
+          if ($edit)
+            loadForum('Post','Edit');
+          else
+            loadForum('Post','Reply');
           // Undelete a few things ;)
           unset($_SESSION['subject'], $_SESSION['body'], $_SESSION['sticky'], $_SESSION['locked'], $_SESSION['board']);
         }
@@ -232,7 +234,7 @@ global $cmsurl, $db_prefix, $l, $settings, $user;
         }
         
         // Is a message being edited and are they allowed to do it?
-        if (($edit = clean(@$_REQUEST['edit']))) {
+        if ($edit = clean(@$_REQUEST['edit'])) {
           if ((canforum('edit_own', BoardFromTopic($Topic_ID)) && postOwner(@$_REQUEST['edit']) == $user['id']) || (canforum('edit_any', BoardFromTopic($Topic_ID)))) {
             // Yep!
             sql_query("UPDATE {$db_prefix}messages SET `subject` = '$subject', `body` = '$body' WHERE `mid` = '$edit'");

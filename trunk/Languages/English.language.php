@@ -299,6 +299,7 @@ $l['forum_board_replies'] = 'Replies';
 $l['forum_board_views'] = 'Views';
 $l['forum_board_last_post_title'] = 'Last Post';
 $l['forum_board_last_post'] = '%msg% by %user%';
+$l['forum_board_sticky'] = 'Sticky';
 $l['forum_no_posts'] = 'No Posts';
 $l['forum_topic_own_new'] = 'New replies';
 $l['forum_topic_new'] = 'New replies';
@@ -666,6 +667,7 @@ $l['manageboards_edit_button'] = 'Update Board';
 
 // Post.template.php
 $l['forum_startnew'] = 'Post New Topic';
+$l['forum_post_edit_submit'] = 'Save Changes';
 
 // Search.template.php
 $l['forum_search_title'] = 'Search';
