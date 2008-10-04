@@ -77,9 +77,7 @@ global $l, $settings, $cmsurl;
       <input type="hidden" name="redirect1" value="true" />
       <input type="submit" value="'.$l['main_cancel'].'" />
     </p>
-  </form>
-  
-  ';
+  </form>';
 }
 
 function EditNews() {

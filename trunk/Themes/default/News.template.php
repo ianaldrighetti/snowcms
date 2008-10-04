@@ -102,7 +102,7 @@ global $cmsurl, $db_prefix, $l, $settings, $user, $theme_url;
           str_replace('%date%',$comments[$i]['post_date'],$l['news_comment_heading']))).'
       </b>';
     if (can('manage_comments_edit'))
-      echo '<a href="'.$cmsurl.'index.php?action=news;id='.$comments[$i]['id'].'">
+      echo '<a href="'.$cmsurl.'index.php?action=news;id='.$news['id'].';edit='.$comments[$i]['id'].'">
         <img src="'.$theme_url.'/'.$settings['theme'].'/images/modify.png" alt="'.$l['managenews_manage_edit'].'" width="15" height="15" />
       </a>';
     if (can('manage_comments_edit') && can('manage_comments_delete'))
@@ -126,18 +126,62 @@ global $cmsurl, $db_prefix, $l, $settings, $user, $theme_url;
   <form action="'.$cmsurl.'index.php?action=news;id='.$news['id'].'" method="post">
   
   <p>
-  <input type="hidden" name="add-comment" value="true" />
-  <input type="hidden" name="nid" value="'.$news['id'].'" />
+    <input type="hidden" name="add-comment" value="true" />
+    <input type="hidden" name="nid" value="'.$news['id'].'" />
   </p>
   
   <table>
-  <tr><td>'.$l['news_comment_subject'].'</td><td><input name="subject" value="Re: '.$news['subject'].'" /></td></tr>
+    <tr><td>'.$l['news_comment_subject'].'</td><td><input name="subject" value="Re: '.$news['subject'].'" /></td></tr>
   </table>
   
   <p><textarea name="body" cols="60" rows="8"></textarea></p>
   
   <p><input type="submit" value="'.$l['news_comment_submit'].'"></p>
   
+  </form>
+  ';
+}
+
+function EditComment() {
+global $cmsurl, $db_prefix, $l, $settings, $user;
+  
+  echo '
+  <h1>'.$l['news_editcomment_header'].'</h1>
+  
+  ';
+  
+  if (@$_SESSION['error'])
+    echo '<p><b>'.$l['main_error'].':</b> '.$_SESSION['error'].'</p>';
+  else
+   echo '<p>'.$l['news_editcomment_desc'].'</p>';
+  
+  $comment = $settings['page']['comment'];
+  
+  echo '
+  
+  <form action="'.$cmsurl.'index.php?action=news;id='.$comment['nid'].';edit='.$comment['post_id'].'" method="post" style="display: inline">
+  
+  <p>
+    <input type="hidden" name="edit-comment" value="true" />
+  </p>
+  
+  <table>
+  <tr><td>'.$l['news_editcomment_subject'].'</td><td><input name="subject" value="'.$comment['subject'].'" /></td></tr>
+  </table>
+  
+  <p>
+    <textarea name="body" cols="60" rows="8">'.$comment['body'].'</textarea>
+  </p>
+  
+  <p style="display: inline"><input type="submit" value="'.$l['news_editcomment_submit'].'"></p>
+  
+  </form>
+  
+  <form action="'.$cmsurl.'index.php?action=news;id='.$comment['nid'].'" method="post" style="display: inline">
+    <p style="display: inline">
+      <input type="hidden" name="redirect" value="true" />
+      <input type="submit" value="'.$l['main_cancel'].'" />
+    </p>
   </form>
   ';
 }

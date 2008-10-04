@@ -686,6 +686,12 @@ $l['news_comments'] = 'Comments: %num%';
 $l['news_comment_subject'] = 'Subject:';
 $l['news_comment_submit'] = 'Add Comment';
 $l['news_category_change'] = 'Change';
+// News.template.php - Edit comment
+$l['news_editcomment_title'] = 'News';
+$l['news_editcomment_header'] = 'Edit Comment';
+$l['news_editcomment_desc'] = 'You are currently editing a member\'s comment on a news post.';
+$l['news_editcomment_subject'] = 'Subject';
+$l['news_editcomment_submit'] = 'Save Changes';
 // News.template.php - Errors
 $l['news_nonews_title'] = 'News';
 $l['news_nonews_header'] = 'News';

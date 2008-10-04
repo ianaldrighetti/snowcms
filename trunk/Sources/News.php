@@ -141,7 +141,7 @@ global $cmsurl, $db_prefix, $l, $settings, $user;
   else {
     // What news do they want?
     $news_id = (int)$_REQUEST['id'];
-    // Are they deleting news?
+    // Are they deleting a comment?
     if ($did = (int)@$_REQUEST['did']) {
       // Are they allowed to delete comments?
       if (can('manage_comments_delete')) {
@@ -159,79 +159,104 @@ global $cmsurl, $db_prefix, $l, $settings, $user;
         $_SESSION['error'] = $l['news_error_delete_notallowed'];
       redirect('index.php?action=news;id='.$news_id);
     }
-    $result = sql_query("
-      SELECT
-        *, mem.display_name AS username, IFNULL(mem.display_name, mem.username) AS username
-      FROM {$db_prefix}news AS n
-        LEFT JOIN {$db_prefix}members AS mem ON mem.id = n.poster_id
-      WHERE n.news_id = $news_id");
-    $news = array();
-    // Is there even any news? :O
-    if (mysql_num_rows($result)) {
-      while ($row = mysql_fetch_assoc($result)) {
-        $category = mysql_fetch_assoc(sql_query("SELECT * FROM {$db_prefix}news_categories WHERE `cat_id` = '{$row['cat_id']}'"));
-        $news = array(
-          'id' => $row['news_id'],
-          'poster_id' => $row['poster_id'],
-          'poster_name' => $row['username'],
-          'subject' => $row['subject'],
-          'cat_id' => $category['cat_id'],
-          'cat_name' => $category['cat_name'],
-          'body' => stripslashes($row['body']),
-          'user_id' => $row['id'],
-          'username' => $row['username'],
-          'post_date' => formattime($row['post_time'],2),
-          'num_views' => $row['num_views'],
-          'allow_comments' => $row['allow_comments']
-        );
+    // Are they editing a comment?
+    if ($edit = (int)@$_REQUEST['edit']) {
+      // Are they allowed to edit comments?
+      if (can('manage_comments_edit')) {
+        // Have they already edited a comment and we're suppose to be just processing it?
+        if (!empty($_REQUEST['edit-comment'])) {
+          $subject = clean(@$_REQUEST['subject']);
+          $body = clean(@$_REQUEST['body']);
+          sql_query("UPDATE {$db_prefix}news_comments SET `subject` = '$subject', `body` = '$body' WHERE `post_id` = '$edit'");
+          redirect('index.php?action=news;id='.$news_id);
+        }
+        else {
+          // Load the comment data
+          $settings['page']['comment'] = mysql_fetch_assoc(sql_query("SELECT * FROM {$db_prefix}news_comments WHERE `post_id` = '$edit'"));
+          // Load the theme
+          $settings['page']['title'] = $l['news_editcomment_title'];
+          loadTheme('News','EditComment');
+        }
       }
-      // We need to do comments too! Awww :[ Only if comments are allowed :D!
-      $comments = array();
-      if($news['allow_comments']) {
-        $result = sql_query("
-          SELECT
-            c.post_id, c.nid, c.poster_id, c.poster_name, c.subject, c.body,
-            c.post_time, c.isApproved, c.isSpam, mem.id,
-            mem.display_name AS username, IFNULL(mem.display_name, mem.username) AS username
-          FROM {$db_prefix}news_comments AS c
-            LEFT JOIN {$db_prefix}members AS mem ON mem.id = c.poster_id
-          WHERE 
-            c.nid = $news_id AND isApproved = 1 AND isSpam = 0
-          ORDER BY c.post_time DESC");
-        // Load up the comments into an array
+      // They are not allowed to edit comments
+      else
+        redirect('index.php?action=news;id='.$news_id);
+    }
+    else {
+      $result = sql_query("
+        SELECT
+          *, mem.display_name AS username, IFNULL(mem.display_name, mem.username) AS username
+        FROM {$db_prefix}news AS n
+          LEFT JOIN {$db_prefix}members AS mem ON mem.id = n.poster_id
+        WHERE n.news_id = $news_id");
+      $news = array();
+      // Is there even any news? :O
+      if (mysql_num_rows($result)) {
         while ($row = mysql_fetch_assoc($result)) {
-          $comments[] = array(
-            'id' => $row['post_id'],
-            'news_id' => $row['nid'],
+          $category = mysql_fetch_assoc(sql_query("SELECT * FROM {$db_prefix}news_categories WHERE `cat_id` = '{$row['cat_id']}'"));
+          $news = array(
+            'id' => $row['news_id'],
             'poster_id' => $row['poster_id'],
             'poster_name' => $row['username'],
-            'subject' => $row['subject'] ? $row['subject'] : NULL,
-            'body' => bbc($row['body']),
+            'subject' => $row['subject'],
+            'cat_id' => $category['cat_id'],
+            'cat_name' => $category['cat_name'],
+            'body' => stripslashes($row['body']),
             'user_id' => $row['id'],
             'username' => $row['username'],
             'post_date' => formattime($row['post_time'],2),
-            'isApproved' => $row['isApproved'],
-            'isSpam' => $row['isSpam']
+            'num_views' => $row['num_views'],
+            'allow_comments' => $row['allow_comments']
           );
         }
-        // Free! IT'S FREE!
-        mysql_free_result($result);
+        // We need to do comments too! Awww :[ Only if comments are allowed :D!
+        $comments = array();
+        if($news['allow_comments']) {
+          $result = sql_query("
+            SELECT
+              c.post_id, c.nid, c.poster_id, c.poster_name, c.subject, c.body,
+              c.post_time, c.isApproved, c.isSpam, mem.id,
+              mem.display_name AS username, IFNULL(mem.display_name, mem.username) AS username
+            FROM {$db_prefix}news_comments AS c
+              LEFT JOIN {$db_prefix}members AS mem ON mem.id = c.poster_id
+            WHERE 
+              c.nid = $news_id AND isApproved = 1 AND isSpam = 0
+            ORDER BY c.post_time DESC");
+          // Load up the comments into an array
+          while ($row = mysql_fetch_assoc($result)) {
+            $comments[] = array(
+              'id' => $row['post_id'],
+              'news_id' => $row['nid'],
+              'poster_id' => $row['poster_id'],
+              'poster_name' => $row['username'],
+              'subject' => $row['subject'] ? $row['subject'] : NULL,
+              'body' => bbc($row['body']),
+              'user_id' => $row['id'],
+              'username' => $row['username'],
+              'post_date' => formattime($row['post_time'],2),
+              'isApproved' => $row['isApproved'],
+              'isSpam' => $row['isSpam']
+            );
+          }
+          // Free! IT'S FREE!
+          mysql_free_result($result);
+        }
+        // Load it up :D (The theme thingy)
+        $settings['page']['title'] = $news['subject'];
+        $settings['news'] = $news;
+        $settings['comments'] = $comments;
+        unset($news);
+        if ($settings['news']['allow_comments'])
+          loadTheme('News','SingleComments');
+        else
+          loadTheme('News','Single');
       }
-      // Load it up :D (The theme thingy)
-      $settings['page']['title'] = $news['subject'];
-      $settings['news'] = $news;
-      $settings['comments'] = $comments;
-      unset($news);
-      if ($settings['news']['allow_comments'])
-        loadTheme('News','SingleComments');
-      else
-        loadTheme('News','Single');
+      else {
+        // It doesn't exist? :O
+        $settings['page']['title'] = $l['news_doesntexist_title'];
+        loadTheme('News','DoesntExist');
+      }
     }
-    else {
-      // It doesn't exist? :O
-      $settings['page']['title'] = $l['news_doesntexist_title'];
-      loadTheme('News','DoesntExist');
-    }  
   }
 }
 
