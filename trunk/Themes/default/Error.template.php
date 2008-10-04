@@ -5,35 +5,35 @@
 
 if(!defined('Snow'))
   die("Hacking Attempt...");
-  
+
 function BNotAllowed() {
 global $cmsurl, $l, $settings, $user;
   
   echo '
-  <div id="error">
-    <p class="title">'.$l['forum_error_header'].'</p>
-    <p class="message">'.$l['forum_error_message'].'</p>
-  </div>';
+  <h1>'.$l['forum_error_header'].'</h1>
+  
+  <p>'.$l['forum_error_message'].'</p>
+  ';
 }
 
 function CantViewB() {
 global $cmsurl, $l, $settings, $user;
   
   echo '
-  <div id="error">
-    <p class="title">'.$l['forum_error_header'].'</p>
-    <p class="message">'.$l['forum_error_cantviewb_message'].'</p>
-  </div>';
+  <h1>'.$l['forum_error_header'].'</h1>
+  
+  <p>'.$l['forum_error_cantviewb_message'].'</p>
+  ';
 }
 
 function NoBoard() {
 global $cmsurl, $l, $settings, $user;
   
   echo '
-  <div id="error">
-    <p class="title">'.$l['forum_error_header'].'</p>
-    <p class="message">'.$l['forum_error_noboard_message'].'</p>
-  </div>';
+  <h1>'.$l['forum_error_header'].'</h1>
+  
+  <p>'.$l['forum_error_noboard_message'].'</p>
+  ';
 }
 
 function ThemeError() {

@@ -119,6 +119,16 @@ echo '
 ';
 }
 
+function DoesntExist() {
+global $cmsurl, $l, $settings, $user;
+  
+  echo '
+  <h1>'.$l['forum_error_topic_doesntexist_header'].'</h1>
+  
+  <p>'.$l['forum_error_topic_doesntexist_desc'].'</p>
+  ';
+}
+
 function pagination($page, $last, $url) {
 global $l, $cmsurl;
   

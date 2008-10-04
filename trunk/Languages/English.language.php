@@ -305,11 +305,14 @@ $l['forum_topic_new'] = 'New replies';
 $l['forum_topic_own_old'] = 'No new replies';
 $l['forum_topic_old'] = 'No new replies';
 // Forum.template.php - Errors
-$l['forum_error_title'] = $settings['site_name'].' - Error';
+$l['forum_error_title'] = 'Error';
 $l['forum_error_header'] = 'Error';
 $l['forum_error_message'] = 'Sorry, but you aren\'t allowed to view the '.$settings['site_name'].' forum.';
 $l['forum_error_cantviewb_message'] = 'Sorry, you are not allowed to view or access this board';
 $l['forum_error_noboard_message'] = 'The Board ID you have requested does not exist!';
+$l['forum_error_topic_doesntexist_title'] = 'Error';
+$l['forum_error_topic_doesntexist_header'] = 'Error';
+$l['forum_error_topic_doesntexist_desc'] = 'This topic doesn\'t exist. It may have been deleted or it may never have existed.';
 
 // Topic.template.php
 $l['topic_pages'] = 'Pages:';

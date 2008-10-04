@@ -153,8 +153,8 @@ global $cmsurl, $db_prefix, $l, $settings, $user;
     }
     else {
       // Sneaky one aren't you? Trying to access a topic in a board you can't access :P Well we won't have it! ^_^
-      $settings['page']['title'] = $l['forum_error_title'];    
-      loadForum('Error','TNotAllowed');
+      $settings['page']['title'] = $l['forum_error_topic_doesntexist_title'];    
+      loadForum('Topic','DoesntExist');
     }
   }
   else {
