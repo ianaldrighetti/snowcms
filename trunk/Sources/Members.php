@@ -219,7 +219,7 @@ global $l, $settings, $db_prefix;
   // Load member data
   $result = sql_query("SELECT * FROM {$db_prefix}members LEFT JOIN {$db_prefix}membergroups ON `group` = `group_id` WHERE id = ".@$_REQUEST['u']);
   $row = mysql_fetch_assoc($result);
-  $settings['page']['title'] = str_replace("%name%",$row['display_name'] ? $row['display_name'] : $row['username'],$l['managemembers_moderate_title']);
+  $settings['page']['title'] = str_replace("%name%",$row['display_name'],$l['managemembers_moderate_title']);
   $settings['page']['member'] = $row;
   
   $settings['page']['member']['birthdate_day'] = ($row['birthdate']) ? date('j',$row['birthdate']) : '';
@@ -249,22 +249,22 @@ global $l, $db_prefix, $user, $settings, $cookie_prefix;
   $result = sql_query("SELECT * FROM {$db_prefix}members") or die(mysql_error());
   if (mysql_num_rows($result))
     while ($row = mysql_fetch_assoc($result)) {
-      if ($_REQUEST['u'] != $row['id'] && ($_REQUEST['user_name'] == $row['username'] || $_REQUEST['user_name'] == $row['display_name']))
+      if ($_REQUEST['u'] != $row['id'] && (@$_REQUEST['user_name'] == $row['username'] || @$_REQUEST['user_name'] == $row['display_name']))
         $settings['error'] = $l['managemembers_error_username_already_used'];
-      if ($_REQUEST['u'] != $row['id'] && $_REQUEST['display_name'] != '' && ($_REQUEST['display_name'] == $row['username'] || $_REQUEST['display_name'] == $row['display_name']))
+      if ($_REQUEST['u'] != $row['id'] && @$_REQUEST['display_name'] != '' && (@$_REQUEST['display_name'] == $row['username'] || $_REQUEST['display_name'] == $row['display_name']))
         $settings['error'] = $l['managemembers_error_display_name_already_used'];
     }
   
   // Clean the user ID
-  $u = clean($_REQUEST['u']);
+  $u = clean(@$_REQUEST['u']);
   // Clean the username
-  $username = clean($_REQUEST['user_name']);
+  $username = clean(@$_REQUEST['username']);
   // Clean the display name
-  $display_name = clean($_REQUEST['display_name']) ? clean($_REQUEST['display_name']) : $username;
+  $display_name = clean(@$_REQUEST['display_name']) ? clean(@$_REQUEST['display_name']) : $username;
   // Clean the email address
-  $email = clean($_REQUEST['email']);
+  $email = clean(@$_REQUEST['email']);
   // Clean the member group
-  $group = clean($_REQUEST['group']);
+  $group = (int)@$_REQUEST['membergroup'];
   // Clean the birthdate
   $day = (int)@$_REQUEST['day'];
   $month = (int)@$_REQUEST['month'];
@@ -278,12 +278,12 @@ global $l, $db_prefix, $user, $settings, $cookie_prefix;
   if (substr($avatar,0,7) != 'http://' && substr($avatar,0,8) != 'https://' && substr($avatar,0,6) != 'ftp://' && substr($avatar,0,7) != 'ftps://' && $avatar != '')
     $avatar = 'http://'.$avatar;
   // Clean the signature
-  $signature = clean($_REQUEST['signature']);
+  $signature = clean(@$_REQUEST['signature']);
   // Clean the profile text
-  $profile = clean($_REQUEST['profile']);
+  $profile = clean(@$_REQUEST['profile']);
   // Clean the password
-  $password_new = clean($_REQUEST['password-new']);
-  $password_verify = clean($_REQUEST['password-verify']);
+  $password_new = clean(@$_REQUEST['password-new']);
+  $password_verify = clean(@$_REQUEST['password-verify']);
   
   // Check for errors in data
   if (!$username)
@@ -296,7 +296,7 @@ global $l, $db_prefix, $user, $settings, $cookie_prefix;
     $_SESSION['error'] = $l['managemembers_error_password_too_short'];
   if ($password_new != $password_verify && $password_new)
     $_SESSION['error'] = $l['managemembers_error_password_failed_verification'];
-  if (!@$_REQUEST['group'])
+  if (!$group)
     $_SESSION['error'] = $l['managemembers_error_group_invalid'];
   
   $password_new = md5($password_new);
@@ -337,17 +337,17 @@ global $l, $db_prefix, $user, $settings, $cookie_prefix;
   
   if (!@$_SESSION['error']) {
   // Update member's data
-  if ($_REQUEST['password-new']) // And change password
-    sql_query("UPDATE {$db_prefix}members SET `username` = '$username', `display_name` = '$display_name', `email` = '$email', `birthdate` = '$birthdate', `avatar` = '$avatar', `password` = '$password_new', `group` = '$group', `signature` = '$signature', `profile` = '$profile' WHERE `id` = '{$_REQUEST['u']}'") or die('Internal error');
+  if (@$_REQUEST['password-new']) // And change password
+    sql_query("UPDATE {$db_prefix}members SET `username` = '$username', `display_name` = '$display_name', `email` = '$email', `birthdate` = '$birthdate', `avatar` = '$avatar', `password` = '$password_new', `group` = '$group', `signature` = '$signature', `profile` = '$profile' WHERE `id` = '{$_REQUEST['u']}'");
   else // And don't change password
-    sql_query("UPDATE {$db_prefix}members SET `username` = '$username', `display_name` = '$display_name', `email` = '$email', `birthdate` = '$birthdate', `avatar` = '$avatar', `group` = '$group', `signature` = '$signature', `profile` = '$profile' WHERE `id` = '$u'") or die('Internal error');
+    sql_query("UPDATE {$db_prefix}members SET `username` = '$username', `display_name` = '$display_name', `email` = '$email', `birthdate` = '$birthdate', `avatar` = '$avatar', `group` = '$group', `signature` = '$signature', `profile` = '$profile' WHERE `id` = '$u'");
   
     // If they changed their own username change settings to keep 'em logged in
     if ($_REQUEST['u'] == $user['id']) {
-      setcookie($cookie_prefix.'username',$_REQUEST['user_name']);
-      // More settings if they changed their p[assword
-      if ($_REQUEST['password-new']) {
-        setcookie($cookie_prefix."password", $password_new);
+      setcookie($cookie_prefix.'username',$username);
+      // More settings if they changed their password
+      if (@$_REQUEST['password-new']) {
+        setcookie($cookie_prefix."password",$password_new);
         $_SESSION['pass'] = $password_new;
       }
     }

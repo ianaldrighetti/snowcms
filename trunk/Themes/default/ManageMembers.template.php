@@ -133,18 +133,39 @@ global $l, $settings, $user, $cmsurl;
         </p>
         
         <table style="width: 100%" class="padding">
-        <tr><th style="text-align: left; width: 30%">'.$l['managemembers_moderate_id'].':</th><td>'.$member['id'].'</td></tr>';
+        <tr><th style="text-align: left; width: 30%">'.$l['managemembers_moderate_id'].':</th><td>'.$member['id'].'</td></tr>
+        ';
    
   if (can('moderate_username'))
-    echo '<tr><th style="text-align: left">'.$l['managemembers_moderate_username'].':</th><td><input name="user_name" value="'.$member['username'].'" /></td></tr>';
+    echo '<tr><th style="text-align: left">'.$l['managemembers_moderate_username'].':</th><td><input name="username" value="'.$member['username'].'" /></td></tr>
+        ';
+  else
+    echo '<tr><th style="text-align: left">'.$l['managemembers_moderate_username'].':</th><td>
+          '.$member['username'].'
+          <input type="hidden" name="username" value="'.$member['username'].'" />
+        </td></tr>';
+  
   if (can('moderate_display_name'))
     echo '<tr><th style="text-align: left">'.$l['managemembers_moderate_display_name'].':</th><td><input name="display_name" value="'.$member['display_name'].'" /></td></tr>';
+  else
+    echo '<tr><th style="text-align: left">'.$l['managemembers_moderate_display_name'].':</th><td>
+          '.$member['display_name'].'
+          <input type="hidden" name="display_name" value="'.$member['display_name'].'" />
+        </td></tr>';
+  
   if (can('moderate_email'))
     echo '<tr><th style="text-align: left">'.$l['managemembers_moderate_email'].':</th><td><input name="email" value="'.$member['email'].'" /></td></tr>';
+  else
+    echo '<tr><th style="text-align: left">'.$l['managemembers_moderate_email'].':</th><td>
+          <a href="mailto:'.$member['email'].'">'.$member['email'].'</a>
+          <input type="hidden" name="email" value="'.$member['email'].'" />
+        </td></tr>';
+  
   if (can('moderate_group')) {
       echo '<tr><th style="text-align: left">'.$l['managemembers_moderate_group'].':</th><td>
-          <select name="group">
+          <select name="membergroup">
           ';
+  
     foreach ($settings['page']['groups'] as $row) {
       if ($member['group'] == $row['group_id'])
         echo '<option value="'.$row['group_id'].'" selected="selected">'.$row['groupname'].'</option>'."\n";
@@ -154,6 +175,12 @@ global $l, $settings, $user, $cmsurl;
     echo '</select>
     ';
   }
+  else
+    echo '<tr><th style="text-align: left">'.$l['managemembers_moderate_group'].':</th><td>
+          '.$member['groupname'].'
+          <input type="hidden" name="membergroup" value="'.$member['group'].'" />
+        </td></tr>';
+  
   if (can('moderate_birthdate')) {
     echo '<tr><th style="text-align: left">'.$l['managemembers_moderate_birthdate'].'</th><td>
           <input name="day" value="'.$member['birthdate_day'].'" style="width: 30px" />
@@ -178,8 +205,21 @@ global $l, $settings, $user, $cmsurl;
         </td></tr>
         ';
   }
+  else
+    echo '<tr><th style="text-align: left">'.$l['managemembers_moderate_birthdate'].':</th><td>
+          '.$member['birthdate'].'
+          <input type="hidden" name="day" value="'.$member['birthdate_day'].'" />
+          <input type="hidden" name="month" value="'.$member['birthdate_month'].'" />
+          <input type="hidden" name="year" value="'.$member['birthdate_year'].'" />
+        </td></tr>';
+  
   if (can('moderate_avatar'))
     echo '<tr><th style="text-align: left">'.$l['managemembers_moderate_avatar'].':</th><td><input name="avatar" value="'.$member['avatar'].'" /></td></tr>';
+  else
+    echo '<tr><th style="text-align: left">'.$l['managemembers_moderate_avatar'].':</th><td>
+          '.$member['avatar'].'
+          <input type="hidden" name="group" value="'.$member['avatar'].'" />
+        </td></tr>';
   
   if (can('moderate_password'))
     echo '<tr><td colspan="2"><br /></td></tr>
@@ -207,8 +247,19 @@ global $l, $settings, $user, $cmsurl;
   
   if (can('moderate_signature'))
     echo '<tr><th style="text-align: left">'.$l['managemembers_moderate_signature'].':</th><td><textarea name="signature" cols="45" rows="4">'.$member['signature'].'</textarea></td></tr>';
+  else
+    echo '<tr><th style="text-align: left">'.$l['managemembers_moderate_signature'].':</th><td>
+          '.$member['signature'].'
+          <input type="hidden" name="signature" value="'.$member['signature'].'" />
+        </td></tr>';
+  
   if (can('moderate_profile'))
     echo '<tr><th style="text-align: left">'.$l['managemembers_moderate_profile_text'].':</th><td><textarea name="profile" cols="45" rows="4">'.$member['profile'].'</textarea></td></tr>';
+  else
+    echo '<tr><th style="text-align: left">'.$l['managemembers_moderate_profile'].':</th><td>
+          '.$member['profile'].'
+          <input type="hidden" name="group" value="'.$member['profile'].'" />
+        </td></tr>';
   
   echo '</table>
         

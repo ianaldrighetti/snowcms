@@ -573,15 +573,15 @@ $l['managemembers_error_suspension'] = 'Failed to suspend member.';
 $l['managemembers_error_unsuspend'] = 'Failed to unsuspend member.';
 $l['managemembers_error_ban'] = 'Failed to ban member.';
 $l['managemembers_error_unban'] = 'Failed to unban member.';
-$l['profile_error_notallowed_username'] = 'You are not allowed to change usernames.';
-$l['profile_error_notallowed_displayname'] = 'You are not allowed to change display names.';
-$l['profile_error_notallowed_email'] = 'You are not allowed to change email addresses.';
-$l['profile_error_notallowed_group'] = 'You are not allowed to change member groups.';
-$l['profile_error_notallowed_birthdate'] = 'You are not allowed to change birthdates.';
-$l['profile_error_notallowed_avatar'] = 'You are not allowed to change avatars.';
-$l['profile_error_notallowed_signature'] = 'You are not allowed to change signatures.';
-$l['profile_error_notallowed_profile'] = 'You are not allowed to change profile text.';
-$l['profile_error_notallowed_password'] = 'You are not allowed to change passwords.';
+$l['managemembers_error_notallowed_username'] = 'You are not allowed to change usernames.';
+$l['managemembers_error_notallowed_displayname'] = 'You are not allowed to change display names.';
+$l['managemembers_error_notallowed_email'] = 'You are not allowed to change email addresses.';
+$l['managemembers_error_notallowed_group'] = 'You are not allowed to change member groups.';
+$l['managemembers_error_notallowed_birthdate'] = 'You are not allowed to change birthdates.';
+$l['managemembers_error_notallowed_avatar'] = 'You are not allowed to change avatars.';
+$l['managemembers_error_notallowed_signature'] = 'You are not allowed to change signatures.';
+$l['managemembers_error_notallowed_profile'] = 'You are not allowed to change profile text.';
+$l['managemembers_error_notallowed_password'] = 'You are not allowed to change passwords.';
 
 // MemberList.template.php
 $l['memberlist_title'] = 'Member List';
