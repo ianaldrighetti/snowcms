@@ -19,10 +19,10 @@ global $l, $db_prefix, $settings, $cmsurl, $theme_url;
   if (@$_SESSION['error'])
     echo '<p><b>'.$l['main_error'].':</b> '.$_SESSION['error'].'</p>';
   
-  $first_member = $settings['page']['first_member'];
-  $last_member = $settings['page']['last_member'];
-  $members = $settings['page']['members'];
-  $total_members = $settings['page']['total_members'];
+  $first_pm = $settings['page']['first_pm'];
+  $last_pm = $settings['page']['last_pm'];
+  $pms = $settings['page']['pms'];
+  $total_pms = $settings['page']['total_pms'];
   if ($page_get = $settings['page']['page_get'])
     $page_get = ';pg='.$page_get;
   if ($page_get = $settings['page']['page_get'])
@@ -32,12 +32,12 @@ global $l, $db_prefix, $settings, $cmsurl, $theme_url;
   if ($sort_get = $settings['page']['sort_get'])
     $sort_get = ';s='.$sort_get;
   
-  if ($first_member != $last_member)
-    echo '<p>'.str_replace("%from%",$first_member,str_replace("%to%",$last_member,$l['moderatepms_showing'])).'</p>';
+  if ($first_pm != $last_pm)
+    echo '<p>'.str_replace("%from%",$first_pm,str_replace("%to%",$last_pm,$l['moderatepms_showing'])).'</p>';
   else
-    echo '<p>'.str_replace("%number%",$first_member,$l['moderatepms_showing_one']).'</p>';
+    echo '<p>'.str_replace("%number%",$first_pm,$l['moderatepms_showing_one']).'</p>';
   
-  if ($total_members) {
+  if ($total_pms) {
     // Show filter
     echo '<form action="'.$cmsurl.'index.php?action=admin;sa=pms" method="post" style="text-align: right; margin-bottom: 0"><p style="display: inline">
        '.$settings['page']['filter'].'
@@ -49,19 +49,19 @@ global $l, $db_prefix, $settings, $cmsurl, $theme_url;
     // Show member list header
     echo '<table style="width: 100%; text-align: center">
           <tr>
-            <th style="border-style: solid; border-width: 1px; width: 20%"><a href="'.$cmsurl.'index.php?action=admin;sa=pms'.$page_get.$filter_get.';s=id'.$settings['page']['id_desc'].'">'.$l['moderatepms_to'].'</a></th>
-            <th style="border-style: solid; border-width: 1px; width: 20%"><a href="'.$cmsurl.'index.php?action=admin;sa=pms'.$page_get.$filter_get.';s=username'.$settings['page']['username_desc'].'">'.$l['moderatepms_from'].'</a></th>
-            <th style="border-style: solid; border-width: 1px; width: 33%"><a href="'.$cmsurl.'index.php?action=admin;sa=pms'.$page_get.$filter_get.';s=group'.$settings['page']['group_desc'].'">'.$l['moderatepms_subject'].'</a></th>
-            <th style="border-style: solid; border-width: 1px; width: 27%"><a href="'.$cmsurl.'index.php?action=admin;sa=pms'.$page_get.$filter_get.';s=joindate'.$settings['page']['joindate_desc'].'">'.$l['moderatepms_date_sent'].'</a></th>
+            <th style="border-style: solid; border-width: 1px; width: 20%"><a href="'.$cmsurl.'index.php?action=admin;sa=pms'.$page_get.$filter_get.';s=to'.$settings['page']['to_desc'].'">'.$l['moderatepms_to'].'</a></th>
+            <th style="border-style: solid; border-width: 1px; width: 20%"><a href="'.$cmsurl.'index.php?action=admin;sa=pms'.$page_get.$filter_get.';s=from'.$settings['page']['from_desc'].'">'.$l['moderatepms_from'].'</a></th>
+            <th style="border-style: solid; border-width: 1px; width: 33%"><a href="'.$cmsurl.'index.php?action=admin;sa=pms'.$page_get.$filter_get.';s=subject'.$settings['page']['subject_desc'].'">'.$l['moderatepms_subject'].'</a></th>
+            <th style="border-style: solid; border-width: 1px; width: 27%"><a href="'.$cmsurl.'index.php?action=admin;sa=pms'.$page_get.$filter_get.';s=sentdate'.$settings['page']['sentdate_desc'].'">'.$l['moderatepms_date_sent'].'</a></th>
           </tr>';
     
     // Show members on this page
-    foreach ($members as $member) {
+    foreach ($pms as $pm) {
       echo '<tr>
-        <td><a href="'.$cmsurl.'index.php?action=profile;u='.$member['to_id'].'">'.$member['to'].'</a></td>
-        <td><a href="'.$cmsurl.'index.php?action=profile;u='.$member['from_id'].'">'.$member['from'].'</a></td>
-        <td><a href="'.$cmsurl.'index.php?action=admin;sa=pms;pm='.$member['id'].'">'.$member['subject'].'</a></td>
-        <td>'.formattime($member['date_sent']).'</td>
+        <td><a href="'.$cmsurl.'index.php?action=profile;u='.$pm['to_id'].'">'.$pm['to'].'</a></td>
+        <td><a href="'.$cmsurl.'index.php?action=profile;u='.$pm['from_id'].'">'.$pm['from'].'</a></td>
+        <td><a href="'.$cmsurl.'index.php?action=admin;sa=pms;pm='.$pm['id'].'">'.$pm['subject'].'</a></td>
+        <td>'.formattime($pm['date_sent']).'</td>
       </tr>';
     }
     

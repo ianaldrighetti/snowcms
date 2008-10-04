@@ -387,52 +387,52 @@ global $l, $settings, $db_prefix, $cmsurl;
     redirect('index.php?action=admin;sa=pms;s='.$_POST['s']);
   
   // Set some variables' defaults encase they don't get set in the following switch statement
-  $settings['page']['id_desc'] = '';
-  $settings['page']['username_desc'] = '';
-  $settings['page']['group_desc'] = '';
-  $settings['page']['joindate_desc'] = '';
+  $settings['page']['to_desc'] = '';
+  $settings['page']['from_desc'] = '';
+  $settings['page']['subject_desc'] = '';
+  $settings['page']['sentdate_desc'] = '';
   
   // Get the sort SQL ready for use in following SQL query
   switch (@$_REQUEST['s']) {
     // Sort by ID number
-    case 'id':
-      $sort = 'ORDER BY `id`, `reg_date`';
-      $settings['page']['id_desc'] = '_desc';
+    case 'to':
+      $sort = 'ORDER BY `to_member`.`display_name`, `sent_time`';
+      $settings['page']['to_desc'] = '_desc';
       break;
     // Sort by ID number, descending
-    case 'id_desc':
-      $sort = 'ORDER BY `id` DESC, `reg_date`';
+    case 'to_desc':
+      $sort = 'ORDER BY `to_member`.`display_name` DESC, `sent_time`';
       break;
     // Sort by display name
-    case 'username':
-      $sort = 'ORDER BY `display_name`, `reg_date`';
-      $settings['page']['username_desc'] = '_desc';
+    case 'from':
+      $sort = 'ORDER BY `from_member`.`display_name`, `sent_time`';
+      $settings['page']['from_desc'] = '_desc';
       break;
     // Sort by display name, descending
-    case 'username_desc':
-      $sort = 'ORDER BY `display_name` DESC, `reg_date`';
+    case 'from_desc':
+      $sort = 'ORDER BY `from_member`.`display_name` DESC, `sent_time`';
       break;
     // Sort by group name
-    case 'group':
-      $sort = 'ORDER BY `groupname`, `reg_date`';
-      $settings['page']['group_desc'] = '_desc';
+    case 'subject':
+      $sort = 'ORDER BY `subject`, `sent_time`';
+      $settings['page']['subject_desc'] = '_desc';
       break;
     // Sort by group name descending
-    case 'group_desc':
-      $sort = 'ORDER BY `groupname` DESC, `reg_date`';
+    case 'subject_desc':
+      $sort = 'ORDER BY `subject` DESC, `sent_time`';
       break;
     // Sort by date joined
-    case 'joindate':
-      $sort = 'ORDER BY `reg_date`';
-      $settings['page']['joindate_desc'] = '_desc';
+    case 'sentdate':
+      $sort = 'ORDER BY `sent_time`';
+      $settings['page']['sentdate_desc'] = '_desc';
       break;
     // Sort by date joined, descending
-    case 'joindate_desc':
-      $sort = 'ORDER BY `reg_date` DESC';
+    case 'sentdate_desc':
+      $sort = 'ORDER BY `sent_time` DESC';
       break;
     // No sort specified, so sort by date joined
     default:
-      $sort = 'ORDER BY `reg_date`';
+      $sort = 'ORDER BY `sent_time`';
   }
   
   // Get the filter SQL ready for use in a following SQL query
@@ -454,9 +454,9 @@ global $l, $settings, $db_prefix, $cmsurl;
   }
   
   // Get the member records of all members out of the database
-  $all_members = sql_query("SELECT * FROM {$db_prefix}members LEFT JOIN {$db_prefix}membergroups ON `group` = `group_id` $filter $sort");
+  $all_pms = sql_query("SELECT * FROM {$db_prefix}pms $filter");
   // The total amount of members
-  $settings['page']['total_members'] = @mysql_num_rows($all_members);
+  $settings['page']['total_pms'] = @mysql_num_rows($all_pms);
   
   // The current page number
   $page = @$_REQUEST['pg'];
@@ -464,33 +464,34 @@ global $l, $settings, $db_prefix, $cmsurl;
   if ($page < 0)
     $page = 0;
   // If page number is higher then maximum, lower it until it isn't
-  while ($settings['num_members'] * $page >= $settings['page']['total_members'] && $page > 0)
+  while ($settings['num_pms'] * $page >= $settings['page']['total_pms'] && $page > 0)
     $page -= 1;
   
   // The first member number of this page
-  $settings['page']['first_member'] = 1 + $start = $page * $settings['num_members'];
+  $settings['page']['first_pm'] = 1 + $start = $page * $settings['num_pms'];
   // The last member number of this page
-  $settings['page']['last_member'] = $settings['page']['total_members'] < $start + $settings['num_members']
-                                   ? $settings['page']['total_members']
-                                   : $start + $settings['num_members'];
+  $settings['page']['last_pm'] = $settings['page']['total_pms'] < $start + $settings['num_pms']
+                                   ? $settings['page']['total_pms']
+                                   : $start + $settings['num_pms'];
   // Get the member records of this page out of the database
-  $members = sql_query("
+  $pms = sql_query("
                SELECT
                  *, `uid_to` AS `to_id`, `uid_from` AS `from_id`, `to_member`.`display_name` AS `to`,
                  `from_member`.`display_name` AS `from`, `subject`, `pm_id` AS `id`, `sent_time` AS `date_sent`
                FROM {$db_prefix}pms
                LEFT JOIN {$db_prefix}members AS `to_member` ON `uid_to` = `to_member`.`id`
                LEFT JOIN {$db_prefix}members AS `from_member` ON `uid_from` = `from_member`.`id`
-               LIMIT $start, ".$settings['num_members']);
+               $sort
+               LIMIT $start, {$settings['num_pms']}");
   // Convert the members from an SQL result resource into a multi-demensional array
-  while ($row = mysql_fetch_assoc($members)) {
-    $settings['page']['members'][] = $row;
+  while ($row = mysql_fetch_assoc($pms)) {
+    $settings['page']['pms'][] = $row;
   }
   
   // The current page number
   $settings['page']['page'] = $page;
   // The last page number
-  $settings['page']['page_last'] = ceil($settings['page']['total_members'] / $settings['num_members']);
+  $settings['page']['page_last'] = ceil($settings['page']['total_pms'] / $settings['num_pms']);
   
   // Get the page number from the query string
   if (@$_REQUEST['pg'])
@@ -516,7 +517,7 @@ global $l, $settings, $db_prefix, $cmsurl;
   }
   
   // Load theme to show member lsit
-  if (mysql_num_rows($members)) {
+  if (mysql_num_rows($pms)) {
     $settings['page']['title'] = $l['moderatepms_title'];
     loadTheme('ModeratePMs');
   }
