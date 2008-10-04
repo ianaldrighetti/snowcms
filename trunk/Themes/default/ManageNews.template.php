@@ -32,7 +32,7 @@ global $l, $cmsurl;
   ';
 }
 
-function Add() {
+function AddNews() {
 global $l, $settings, $cmsurl;
   
   echo '
@@ -51,7 +51,7 @@ global $l, $settings, $cmsurl;
   <p><input type="hidden" name="add-news" value="true" /></p>
   
   <table>
-  <tr><td>'.$l['managenews_add_category'].'</td><td><select name="cat_id">
+  <tr><td>'.$l['managenews_add_category'].':</td><td><select name="cat_id">
     ';
   
   $categories = $settings['page']['categories'];
@@ -61,7 +61,7 @@ global $l, $settings, $cmsurl;
   }
   
   echo '</select></td></tr>
-  <tr><td>'.$l['managenews_add_subject'].'</td><td><input name="subject" /></td></tr>
+  <tr><td>'.$l['managenews_add_subject'].':</td><td><input name="subject" /></td></tr>
   </table>
   
   <p><textarea name="body" cols="70" rows="12"></textarea></p>
@@ -73,6 +73,60 @@ global $l, $settings, $cmsurl;
   </form>
   
   <form action="'.$cmsurl.'index.php?action=admin;sa=news" method="post" style="display: inline">
+    <p style="display: inline">
+      <input type="hidden" name="redirect1" value="true" />
+      <input type="submit" value="'.$l['main_cancel'].'" />
+    </p>
+  </form>
+  
+  ';
+}
+
+function EditNews() {
+global $l, $settings, $cmsurl;
+  
+  echo '
+  <h1>'.$l['managenews_edit_header'].'</h1>
+  ';
+  
+  if (@$_SESSION['error'])
+	  echo '<p><b>'.$l['main_error'].':</b> '.$_SESSION['error'].'</p>';
+	else
+    echo '<p>', $l['managenews_edit_desc'], '</p>';
+  
+  $news = $settings['page']['news'];
+  
+  echo
+  '
+  <form action="'.$cmsurl.'index.php?action=admin;sa=news;ssa=manage;id='.$news['news_id'].'" method="post" style="display: inline">
+  
+  <p><input type="hidden" name="edit-news" value="true" /></p>
+  
+  <table>
+  <tr><td>'.$l['managenews_edit_category'].':</td><td><select name="cat_id">
+    ';
+  
+  $categories = $settings['page']['categories'];
+  foreach ($categories as $value) {
+    echo '<option value="'.$value['id'].'">'.$value['name'].'</option>
+    ';
+  }
+  
+  echo '</select></td></tr>
+  <tr><td>'.$l['managenews_edit_subject'].':</td><td><input name="subject" value="'.$news['subject'].'" /></td></tr>
+  </table>
+  
+  <p>
+    <textarea name="body" cols="70" rows="12">'.$news['body'].'</textarea>
+  </p>
+  
+  <p><input type="checkbox" name="allow_comments" id="allow_comments"'.($news['allow_comments'] ? ' checked="checked"' : '').' /> <label for="allow_comments">'.$l['managenews_edit_allowcomments'].'</label></p>
+  
+  <p style="display: inline"><input type="submit" value="'.$l['managenews_edit_submit'].'"></p>
+  
+  </form>
+  
+  <form action="'.$cmsurl.'index.php?action=admin;sa=news;ssa=manage" method="post" style="display: inline">
     <p style="display: inline">
       <input type="hidden" name="redirect1" value="true" />
       <input type="submit" value="'.$l['main_cancel'].'" />
@@ -197,23 +251,6 @@ global $cmsurl, $db_prefix, $l, $settings, $user, $theme_url;
       <input type="submit" value="'.$l['main_cancel'].'" />
     </p>
   </form>';
-}
-
-function EditNews() {
-global $cmsurl, $db_prefix, $l, $settings, $user;
-  
-  echo '
-  <h1>', $l['news_header'], '</h1>';
-  
-  // Show news
-  $news = $settings['news'];
-  echo '
-    <p><b>'.str_replace('%subject%','<a href="'.$cmsurl.'index.php?action=news;id='.$news['id'].'">'.$news['subject'].'</a>',
-         str_replace('%category%','<a href="'.$cmsurl.'index.php?action=news;cat='.$news['cat_id'].'">'.$news['cat_name'].'</a>',
-         str_replace('%name%','<a href="'.$cmsurl.'index.php?action=profile;u='.$news['user_id'].'">'.$news['username'].'</a>',
-         str_replace('%date%',$news['post_date'],$l['news_heading'])))).'</b></p>
-    <p>'.bbc($news['body']).'</p>
-    ';
 }
 
 function NoNews() {

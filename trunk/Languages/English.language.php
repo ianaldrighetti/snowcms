@@ -708,8 +708,8 @@ $l['managenews_menu_manage_desc'] = 'You can modify and delete news posts here.'
 $l['managenews_add_title'] = 'Manage News';
 $l['managenews_add_header'] = 'Add News';
 $l['managenews_add_desc'] = 'Here you can create a news post in any of your news categories.';
-$l['managenews_add_category'] = 'Category:';
-$l['managenews_add_subject'] = 'Subject:';
+$l['managenews_add_category'] = 'Category';
+$l['managenews_add_subject'] = 'Subject';
 $l['managenews_add_allowcomments'] = 'Allow Comments';
 $l['managenews_add_submit'] = 'Add Post';
 // ManageNews.template.php - Categories
@@ -729,6 +729,14 @@ $l['managenews_manage_header'] = 'News List';
 $l['managenews_manage_desc'] = 'Here you can modify and delete news posts.';
 $l['managenews_manage_edit'] = 'Edit';
 $l['managenews_manage_delete'] = 'Delete';
+// ManageNews.template.php - Add
+$l['managenews_edit_title'] = 'Manage News';
+$l['managenews_edit_header'] = 'Edit News';
+$l['managenews_edit_desc'] = 'You are currently editing a news post.';
+$l['managenews_edit_category'] = 'Category';
+$l['managenews_edit_subject'] = 'Subject';
+$l['managenews_edit_allowcomments'] = 'Allow Comments';
+$l['managenews_edit_submit'] = 'Save Changes';
 // ManageNews.template.php - Errors
 $l['managenews_error_manage_delete_notallowed'] = 'You are not allowed to delete news.';
 $l['managenews_error_manage_delete_invalidsession'] = 'Your session verification failed. Try deleting that news again.';

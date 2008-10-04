@@ -230,7 +230,7 @@ global $cmsurl, $db_prefix, $l, $settings, $user;
     // Dang, they can do this, now I have to code it :(
     // Some actions they can do...
     $ssa = array('add','categories','manage');
-    if(empty($_REQUEST['id']) && (!in_array(@$_REQUEST['ssa'], $ssa))) {
+    if (!in_array(@$_REQUEST['ssa'], $ssa)) {
       // No news ID, and no $na action that exists
       $result = sql_query("
         SELECT
@@ -243,7 +243,7 @@ global $cmsurl, $db_prefix, $l, $settings, $user;
       $comments = mysql_fetch_array(sql_query("SELECT COUNT(*) FROM {$db_prefix}news_comments GROUP BY nid"));
       $comments = $comments['COUNT(*)'];
       $settings['news'] = array();
-      while($row = mysql_fetch_assoc($result)) {
+      while ($row = mysql_fetch_assoc($result)) {
         $settings['news'][] = array(
           'id' => $row['id'],
           'poster_id' => $row['poster_id'],
@@ -269,7 +269,7 @@ global $cmsurl, $db_prefix, $l, $settings, $user;
       $settings['page']['title'] = $l['managenews_title'];
       loadTheme('ManageNews');
     }
-    elseif (empty($_REQUEST['id']) && $_REQUEST['ssa'] == 'add') {
+    elseif ($_REQUEST['ssa'] == 'add') {
       // Adding news =D
       if (@$_REQUEST['add-news']) {
         // Clean the data of dirty injections
@@ -296,13 +296,13 @@ global $cmsurl, $db_prefix, $l, $settings, $user;
       $settings['page']['categories'] = @$categories;
       // Load the theme
       $settings['page']['title'] = $l['managenews_add_title'];
-      loadTheme('ManageNews','Add');
+      loadTheme('ManageNews','AddNews');
     }
-    elseif (empty($_REQUEST['id']) && $_REQUEST['ssa'] == 'categories') {
+    elseif ($_REQUEST['ssa'] == 'categories') {
       // Managing categories
       ManageCats();
     }
-    elseif (empty($_REQUEST['id']) && $_REQUEST['ssa'] == 'manage') {
+    elseif ($_REQUEST['ssa'] == 'manage') {
       // Editing news... =D
       NewsList();
     }
@@ -385,116 +385,140 @@ global $cmsurl, $db_prefix, $l, $settings, $user;
       $_SESSION['error'] = $l['managenews_error_manage_delete_notallowed'];
     redirect('index.php?action=admin;sa=news;ssa=manage');
   }
-  // Are they adding a comment?
-  elseif (@$_REQUEST['add-comment']) {
-    // Clean the data of dirty injections
-    $nid = clean(@$_REQUEST['nid']); // News ID
-    $subject = clean(@$_REQUEST['subject']); // Subject
-    $body = clean(@$_REQUEST['body']); // Body text
-    
-    // Update the amount total of comments for the news article
-    sql_query("UPDATE {$db_prefix}news SET `num_comments` = `num_comments` + 1 WHERE `news_id` = '$nid'");
-    // Insert comment into database
-    sql_query("INSERT {$db_prefix}news_comments (`nid`, `poster_id`, `poster_name`, `subject`, `body`, `post_time`) VALUES ('$nid','{$user['id']}','{$user['name']}','$subject','$body', '".time()."')");
-    
-    // Redirect the page to the main manage news page
-    redirect('index.php?action=news;id='.clean_header(@$_GET['id']));
-  }
-  
-  // The current page number
-  $page = @$_REQUEST['pg'];
-  
-  // The first news article number of this page
-  $start = $page * $settings['num_news_items'];
-  
-  // Setup category SQL
-  if ($cat = (int)@$_REQUEST['cat'])
-    $cat = "WHERE `cat_id` = '$cat'";
-  else
-    $cat = "";
-  
-  $result = sql_query("
-    SELECT
-      *, mem.display_name AS username, IFNULL(mem.display_name, mem.username) AS username
-    FROM {$db_prefix}news AS n
-      LEFT JOIN {$db_prefix}members AS mem ON mem.id = n.poster_id
-    $cat
-    ORDER BY n.post_time DESC
-    LIMIT $start, {$settings['num_news_items']}");
-  $news = array();
-  // Is there even any news? :O
-  if (mysql_num_rows($result)) {
-    while ($row = mysql_fetch_assoc($result)) {
-      $category = mysql_fetch_assoc(sql_query("SELECT * FROM {$db_prefix}news_categories WHERE `cat_id` = '{$row['cat_id']}'"));
-      $news[] = array(
-        'id' => $row['news_id'],
-        'poster_id' => $row['poster_id'],
-        'poster_name' => $row['username'],
-        'subject' => $row['subject'],
-        'cat_id' => $category['cat_id'],
-        'cat_name' => $category['cat_name'],
-        'body' => stripslashes($row['body']),
-        'user_id' => $row['id'],
-        'username' => $row['username'],
-        'post_date' => formattime($row['post_time'],2),
-        'num_views' => $row['num_views'],
-        'num_comments' => (int)$row['num_comments'],
-        'allow_comments' => $row['allow_comments']
-      );
+  // Are they editing news?
+  if ($nid = (int)@$_REQUEST['id']) {
+    // Have they already edited it and we are just suppose to be processing it?
+    if (@$_REQUEST['edit-news']) {
+      // Clean the data of dirty injections
+      $cat_id = clean(@$_REQUEST['cat_id']); // Category ID
+      $subject = clean(@$_REQUEST['subject']); // Subject
+      $body = clean(@$_REQUEST['body']); // Body text
+      $allow_comments = @$_REQUEST['allow_comments'] == true; // Are comments for this post allowed
+      // Process SQL query
+      if ($allow_comments)
+        sql_query("UPDATE {$db_prefix}news SET `poster_id` = '{$user['id']}', `cat_id` = '$cat_id', `poster_name` = '{$user['name']}', `subject` = '$subject', `body` = '$body', `modify_time` = '".time()."', `allow_comments` = '$allow_comments' WHERE `news_id` = '$nid'");
+      else {
+        // Delete all comments as well
+        sql_query("UPDATE {$db_prefix}news SET `poster_id` = '{$user['id']}', `cat_id` = '$cat_id', `poster_name` = '{$user['name']}', `subject` = '$subject', `body` = '$body', `modify_time` = '".time()."', `allow_comments` = '$allow_comments', `num_comments` = '0' WHERE `news_id` = '$nid'");
+        sql_query("DELETE FROM {$db_prefix}news_comments WHERE `nid` = '$nid'");
+      }
+      // Redirect the page to the main manage news page
+      redirect('index.php?action=admin;sa=news;ssa=manage');
     }
     
-    // Total amount of news articles
-    $news_count = sql_query("SELECT * FROM {$db_prefix}news $cat");
-    $total_news = 0;
-    while (mysql_fetch_assoc($news_count)) {
-      $total_news += 1;
-    }
-    // The current page number
-    $settings['page']['page'] = $page;
-    // The last page number
-    $settings['page']['page_last'] = $total_news / $settings['num_news_items'];
-    
-    // The current category
-    $settings['page']['cat'] = @$_REQUEST['cat'];
-    
-    // Load news categories
+    // Get categories
     $result = sql_query("SELECT * FROM {$db_prefix}news_categories");
-    while ($row = mysql_fetch_array($result))
-      $settings['page']['categories'][] = $row;
+    $i = 0;
+    while ($row = mysql_fetch_assoc($result)) {
+      $categories[$i]['id'] = $row['cat_id'];
+      $categories[$i]['name'] = $row['cat_name'];
+      $i += 1;
+    }
+    $settings['page']['categories'] = @$categories;
     
-    // Load it up :D (the theme thingy)
-    $settings['page']['title'] = $l['managenews_manage_title'];
-    $settings['news'] = $news;
-    unset($news);
-    loadTheme('ManageNews','ShowNews');
+    // Get the news post data
+    $settings['page']['news'] = mysql_fetch_assoc(sql_query("SELECT * FROM {$db_prefix}news WHERE `news_id` = '$nid'"));
+    
+    // Load the theme
+    $settings['page']['title'] = $l['managenews_edit_title'];
+    loadTheme('ManageNews','EditNews');
   }
   else {
-    // No news? :O
-    
-    // The previous page number
-    $settings['page']['previous_page'] = $page - 1;
     // The current page number
-    $settings['page']['current_page'] = $page;
-    // The next page number
-    $settings['page']['next_page'] = $page + 1;
-    // Total amount of news articles
-    $news_count = sql_query("SELECT * FROM {$db_prefix}news $cat");
-    $settings['page']['total_news'] = 0;
-    while (mysql_fetch_assoc($news_count)) {
-      $settings['page']['total_news'] += 1;
+    $page = @$_REQUEST['pg'];
+    
+    // The first news article number of this page
+    $start = $page * $settings['num_news_items'];
+    
+    // Setup category SQL
+    if ($cat = (int)@$_REQUEST['cat'])
+      $cat = "WHERE `cat_id` = '$cat'";
+    else
+      $cat = "";
+    
+    $result = sql_query("
+      SELECT
+        *, mem.display_name AS username, IFNULL(mem.display_name, mem.username) AS username
+      FROM {$db_prefix}news AS n
+        LEFT JOIN {$db_prefix}members AS mem ON mem.id = n.poster_id
+      $cat
+      ORDER BY n.post_time DESC
+      LIMIT $start, {$settings['num_news_items']}");
+    $news = array();
+    // Is there even any news? :O
+    if (mysql_num_rows($result)) {
+      while ($row = mysql_fetch_assoc($result)) {
+        $category = mysql_fetch_assoc(sql_query("SELECT * FROM {$db_prefix}news_categories WHERE `cat_id` = '{$row['cat_id']}'"));
+        $news[] = array(
+          'id' => $row['news_id'],
+          'poster_id' => $row['poster_id'],
+          'poster_name' => $row['username'],
+          'subject' => $row['subject'],
+          'cat_id' => $category['cat_id'],
+          'cat_name' => $category['cat_name'],
+          'body' => stripslashes($row['body']),
+          'user_id' => $row['id'],
+          'username' => $row['username'],
+          'post_date' => formattime($row['post_time'],2),
+          'num_views' => $row['num_views'],
+          'num_comments' => (int)$row['num_comments'],
+          'allow_comments' => $row['allow_comments']
+        );
+      }
+      
+      // Total amount of news articles
+      $news_count = sql_query("SELECT * FROM {$db_prefix}news $cat");
+      $total_news = 0;
+      while (mysql_fetch_assoc($news_count)) {
+        $total_news += 1;
+      }
+      // The current page number
+      $settings['page']['page'] = $page;
+      // The last page number
+      $settings['page']['page_last'] = $total_news / $settings['num_news_items'];
+      
+      // The current category
+      $settings['page']['cat'] = @$_REQUEST['cat'];
+      
+      // Load news categories
+      $result = sql_query("SELECT * FROM {$db_prefix}news_categories");
+      while ($row = mysql_fetch_array($result))
+        $settings['page']['categories'][] = $row;
+      
+      // Load it up :D (the theme thingy)
+      $settings['page']['title'] = $l['managenews_manage_title'];
+      $settings['news'] = $news;
+      unset($news);
+      loadTheme('ManageNews','ShowNews');
     }
-    
-    // The current category
-    $settings['page']['cat'] = @$_REQUEST['cat'];
-    
-    // Load news categories
-    $result = sql_query("SELECT * FROM {$db_prefix}news_categories");
-    while ($row = mysql_fetch_array($result))
-      $settings['page']['categories'][] = $row;
-    
-    // Load the them
-    $settings['page']['title'] = $l['news_nonews_title'];
-    loadTheme('ManageNews','Nonews');
+    else {
+      // No news? :O
+      
+      // The previous page number
+      $settings['page']['previous_page'] = $page - 1;
+      // The current page number
+      $settings['page']['current_page'] = $page;
+      // The next page number
+      $settings['page']['next_page'] = $page + 1;
+      // Total amount of news articles
+      $news_count = sql_query("SELECT * FROM {$db_prefix}news $cat");
+      $settings['page']['total_news'] = 0;
+      while (mysql_fetch_assoc($news_count)) {
+        $settings['page']['total_news'] += 1;
+      }
+      
+      // The current category
+      $settings['page']['cat'] = @$_REQUEST['cat'];
+      
+      // Load news categories
+      $result = sql_query("SELECT * FROM {$db_prefix}news_categories");
+      while ($row = mysql_fetch_array($result))
+        $settings['page']['categories'][] = $row;
+      
+      // Load the them
+      $settings['page']['title'] = $l['news_nonews_title'];
+      loadTheme('ManageNews','Nonews');
+    }
   }
 }
 
