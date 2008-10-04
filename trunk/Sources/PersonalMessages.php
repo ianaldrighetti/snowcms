@@ -107,6 +107,25 @@ global $l, $settings, $user, $db_prefix;
   // Reload menus to reflect the change
   loadMenus();
   
+  // The current page number
+  $settings['page']['page'] = $page = $page_before = (int)@$_REQUEST['pg'];
+  // If the page number is lower then zero then make it zero
+  if ($page < 0)
+    $page = 0;
+  // The total amount of PMs
+  $settings['page']['total_pages'] = mysql_num_rows(sql_query("SELECT * FROM {$db_prefix}pms WHERE `uid_to` = '{$user['id']}'"));
+  // If page number is higher then maximum, lower it until it isn't
+  while ($settings['num_pms'] * $page >= $settings['page']['total_pages'] && $page > 0)
+    $page -= 1;
+  // If the page changed, redirect
+  if ($page != $page_before) {
+    $page = clean_header($page ? ';pg='.$page : '');
+    redirect('forum.php?action=pm'.$page);
+  }
+  // Total pages
+  $settings['page']['page_last'] = @($settings['page']['total_pages'] / $settings['num_pms']);
+  $offset = $page * $settings['num_pms'];
+  
   // Get the PMs
   $settings['page']['messages'] = array();
   $result = sql_query("
@@ -116,7 +135,8 @@ global $l, $settings, $user, $db_prefix;
       LEFT JOIN {$db_prefix}members AS t ON `uid_to` = t.id
       LEFT JOIN {$db_prefix}members AS f ON `uid_from` = f.id
     WHERE `uid_to` = '{$user['id']}'
-      AND `deleted_to` = '0'");
+      AND `deleted_to` = '0'
+    LIMIT $offset, {$settings['num_pms']}");
   while ($row = mysql_fetch_assoc($result)) {
     $settings['page']['messages'][] = array(
       'id' => $row['pm_id'],
@@ -151,6 +171,25 @@ global $l, $settings, $user, $db_prefix;
 function PMOutbox() {
 global $l, $settings, $db_prefix, $user;
   
+  // The current page number
+  $settings['page']['page'] = $page = $page_before = (int)@$_REQUEST['pg'];
+  // If the page number is lower then zero then make it zero
+  if ($page < 0)
+    $page = 0;
+  // The total amount of PMs
+  $settings['page']['total_pages'] = mysql_num_rows(sql_query("SELECT * FROM {$db_prefix}pms WHERE `uid_from` = '{$user['id']}'"));
+  // If page number is higher then maximum, lower it until it isn't
+  while ($settings['num_pms'] * $page >= $settings['page']['total_pages'] && $page > 0)
+    $page -= 1;
+  // If the page changed, redirect
+  if ($page != $page_before) {
+    $page = clean_header($page ? ';pg='.$page : '');
+    redirect('forum.php?action=pm;sa=outbox'.$page);
+  }
+  // Total pages
+  $settings['page']['page_last'] = @($settings['page']['total_pages'] / $settings['num_pms']);
+  $offset = $page * $settings['num_pms'];
+  
   // Get the PMs
   $settings['page']['messages'] = array();
   $result = sql_query("
@@ -160,7 +199,8 @@ global $l, $settings, $db_prefix, $user;
       LEFT JOIN {$db_prefix}members AS t ON `uid_to` = t.id
       LEFT JOIN {$db_prefix}members AS f ON `uid_from` = f.id
     WHERE `uid_from` = '{$user['id']}'
-      AND `deleted_from` = '0'");
+      AND `deleted_from` = '0'
+    LIMIT $offset, {$settings['num_pms']}");
   while ($row = mysql_fetch_assoc($result)) {
     $settings['page']['messages'][] = array(
       'id' => $row['pm_id'],

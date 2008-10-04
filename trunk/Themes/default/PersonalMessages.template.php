@@ -19,6 +19,8 @@ global $l, $settings, $user, $cmsurl, $theme_url;
   else
     echo '<p>'.$l['pm_inbox_desc'].'</p>';
   
+  pagination($settings['page']['page'],$settings['page']['page_last'],'forum.php?action=pm');
+  
   echo '
   
   <table width="100%" style="text-align: center">
@@ -46,6 +48,8 @@ global $l, $settings, $user, $cmsurl, $theme_url;
   }
   
   echo '</table>';
+  
+  pagination($settings['page']['page'],$settings['page']['page_last'],'forum.php?action=pm');
 }
 
 function InboxEmpty() {
@@ -54,12 +58,22 @@ global $l, $settings, $cmsurl;
   echo '
   <h1>'.$l['pm_inbox_empty_header'].'</h1>
   
-  '.PMBar();
+  '.PMBar().'
+  
+  <p>'.$l['pm_inbox_desc'].'</p>
+  
+  <p><b>[1]</b></p>
+  
+  ';
   
   if (@$_SESSION['error'])
-	 echo '<p><b>'.$l['main_error'].':</b> '.$_SESSION['error'].'</p>';
+	  echo '<p><b>'.$l['main_error'].':</b> '.$_SESSION['error'].'</p>';
   else
     echo '<p>'.$l['pm_inbox_empty_desc'].'</p>';
+  
+  echo '
+  
+  <p><b>[1]</b></p>';
 }
 
 function Message() {
@@ -73,7 +87,7 @@ global $l, $settings, $cmsurl;
   '.PMBar();
   
   if (@$_SESSION['error'])
-	 echo '<p><b>'.$l['main_error'].':</b> '.$_SESSION['error'].'</p>';
+	  echo '<p><b>'.$l['main_error'].':</b> '.$_SESSION['error'].'</p>';
   else
     echo '<p>'.$l['pm_message_desc'].'</p>';
   
@@ -112,6 +126,8 @@ global $l, $cmsurl, $settings, $user, $theme_url;
   else
     echo '<p>'.$l['pm_outbox_desc'].'</p>';
   
+  pagination($settings['page']['page'],$settings['page']['page_last'],'forum.php?action=pm;sa=outbox');
+  
   echo '
   
   <table width="100%" style="text-align: center">
@@ -139,12 +155,33 @@ global $l, $cmsurl, $settings, $user, $theme_url;
   }
   
   echo '</table>';
+  
+  pagination($settings['page']['page'],$settings['page']['page_last'],'forum.php?action=pm;sa=outbox');
 }
 
 function OutboxEmpty() {
+global $l, $settings, $cmsurl;
   
+  echo '
+  <h1>'.$l['pm_outbox_empty_header'].'</h1>
+  
+  '.PMBar().'
+  
+  <p>'.$l['pm_outbox_desc'].'</p>
+  
+  <p><b>[1]</b></p>
+  
+  ';
+  
+  if (@$_SESSION['error'])
+	  echo '<p><b>'.$l['main_error'].':</b> '.$_SESSION['error'].'</p>';
+  else
+    echo '<p>'.$l['pm_outbox_empty_desc'].'</p>';
+  
+  echo '
+  
+  <p><b>[1]</b></p>';
 }
-
 function Compile() {
 global $l, $settings, $cmsurl, $theme_dir, $theme_url;
   
@@ -177,14 +214,14 @@ global $l, $settings, $cmsurl, $theme_dir, $theme_url;
       </tr>
       <tr align="center" valign="middle">
         <td colspan="3">
-	        <a href="javascript:void(0);" onClick="add_bbcode(\'body\',\'[b]\',\'[/b]\');"><img src="'.$theme_url.'/'.$settings['theme'].'/images/bbc_bold.png" alt="'.$l['bbcode_bold'].'" /></a>
-    	    <a href="javascript:void(0);" onClick="add_bbcode(\'body\',\'[i]\',\'[/i]\');"><img src="'.$theme_url.'/'.$settings['theme'].'/images/bbc_italic.png" alt="'.$l['bbcode_italic'].'" /></a>
-	        <a href="javascript:void(0);" onClick="add_bbcode(\'body\',\'[u]\',\'[/u]\');"><img src="'.$theme_url.'/'.$settings['theme'].'/images/bbc_underline.png" alt="'.$l['bbcode_underline'].'" /></a>
-  	      <a href="javascript:void(0);" onClick="add_bbcode(\'body\',\'[s]\',\'[/s]\');"><img src="'.$theme_url.'/'.$settings['theme'].'/images/bbc_strikethrough.png" alt="'.$l['bbcode_strikethrough'].'" /></a>
-	        <a href="javascript:void(0);" onClick="add_bbcode(\'body\',\'[img]\',\'[/img]\');"><img src="'.$theme_url.'/'.$settings['theme'].'/images/bbc_image.png" alt="'.$l['bbcode_image'].'" /></a>
-    	    <a href="javascript:void(0);" onClick="add_bbcode(\'body\',\'[url]\',\'[/url]\');"><img src="'.$theme_url.'/'.$settings['theme'].'/images/bbc_link.png" alt="'.$l['bbcode_link'].'" /></a>
-	        <a href="javascript:void(0);" onClick="add_bbcode(\'body\',\'[code]\',\'[/code]\');"><img src="'.$theme_url.'/'.$settings['theme'].'/images/bbc_code.png" alt="'.$l['bbcode_code'].'" /></a>
-  	      <a href="javascript:void(0);" onClick="add_bbcode(\'body\',\'[quote]\',\'[/quote]\');"><img src="'.$theme_url.'/'.$settings['theme'].'/images/bbc_quote.png" alt="'.$l['bbcode_quote'].'" /></a>
+	        <a href="javascript:void(0);" onclick="add_bbcode(\'body\',\'[b]\',\'[/b]\');"><img src="'.$theme_url.'/'.$settings['theme'].'/images/bbc_bold.png" alt="'.$l['bbcode_bold'].'" /></a>
+    	    <a href="javascript:void(0);" onclick="add_bbcode(\'body\',\'[i]\',\'[/i]\');"><img src="'.$theme_url.'/'.$settings['theme'].'/images/bbc_italic.png" alt="'.$l['bbcode_italic'].'" /></a>
+	        <a href="javascript:void(0);" onclick="add_bbcode(\'body\',\'[u]\',\'[/u]\');"><img src="'.$theme_url.'/'.$settings['theme'].'/images/bbc_underline.png" alt="'.$l['bbcode_underline'].'" /></a>
+  	      <a href="javascript:void(0);" onclick="add_bbcode(\'body\',\'[s]\',\'[/s]\');"><img src="'.$theme_url.'/'.$settings['theme'].'/images/bbc_strikethrough.png" alt="'.$l['bbcode_strikethrough'].'" /></a>
+	        <a href="javascript:void(0);" onclick="add_bbcode(\'body\',\'[img]\',\'[/img]\');"><img src="'.$theme_url.'/'.$settings['theme'].'/images/bbc_image.png" alt="'.$l['bbcode_image'].'" /></a>
+    	    <a href="javascript:void(0);" onclick="add_bbcode(\'body\',\'[url]\',\'[/url]\');"><img src="'.$theme_url.'/'.$settings['theme'].'/images/bbc_link.png" alt="'.$l['bbcode_link'].'" /></a>
+	        <a href="javascript:void(0);" onclick="add_bbcode(\'body\',\'[code]\',\'[/code]\');"><img src="'.$theme_url.'/'.$settings['theme'].'/images/bbc_code.png" alt="'.$l['bbcode_code'].'" /></a>
+  	      <a href="javascript:void(0);" onclick="add_bbcode(\'body\',\'[quote]\',\'[/quote]\');"><img src="'.$theme_url.'/'.$settings['theme'].'/images/bbc_quote.png" alt="'.$l['bbcode_quote'].'" /></a>
 	      </td>
       </tr>
       <tr align="center" valign="middle">
@@ -274,5 +311,30 @@ global $l, $cmsurl;
   ';
   
   return $return;
+}
+
+function pagination($page, $last, $url) {
+global $l, $cmsurl;
+  
+  echo '<p>';
+  $i = $page < 2 ? 0 : $page - 2;
+  if ($i > 1)
+    echo '<a href="'.$cmsurl.$url.'">1</a> ... ';
+  elseif ($i == 1)
+    echo '<a href="'.$cmsurl.$url.'">1</a> ';
+  while ($i < ($page + 3 < $last ? $page + 3 : $last)) {
+    if ($i == $page)
+      echo '<b>['.($i+1).']</b> ';
+    elseif ($i)
+      echo '<a href="'.$cmsurl.$url.';pg='.$i.'">'.($i+1).'</a> ';
+    else
+      echo '<a href="'.$cmsurl.$url.'">'.($i+1).'</a> ';
+    $i += 1;
+  }
+  if ($i < $last - 1)
+    echo '... <a href="'.$cmsurl.$url.';pg='.($last-1).'">'.$last.'</a>';
+  elseif ($i == $last - 1)
+    echo '<a href="'.$cmsurl.$url.';pg='.($last-1).'">'.$last.'</a>';
+  echo '</p>';
 }
 ?>

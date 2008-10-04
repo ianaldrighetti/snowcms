@@ -206,7 +206,7 @@ global $cmsurl, $db_prefix, $l, $settings, $user;
     }
     
     // The current page number
-    $page = $page_before = @$_REQUEST['pg'];
+    $page = $page_before = (int)@$_REQUEST['pg'];
     // If the page number is lower then zero then make it zero
     if ($page < 0)
       $page = 0;
