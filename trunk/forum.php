@@ -31,11 +31,11 @@ require_once($source_dir.'/Core.php');
 // Load up a few things :P Such as $settings, $l[anguage], and $user, the permissions too!
   loadUser();
   loadSettings();
-  loadLanguage();
   loadPerms();
   loadBPerms();
   loadMenus();
   loadTree();
+  loadLanguage();
 // Write that this Guest/User is online
   WriteOnline();
 

@@ -192,6 +192,7 @@ $l['basicsettings_num_news_items'] = 'News items per page';
 $l['basicsettings_num_search_results'] = 'Search results per page';
 $l['basicsettings_num_pages'] = 'Pages per page';
 $l['basicsettings_num_members'] = 'Members per page';
+$l['basicsettings_num_pms'] = 'PMs per page';
 $l['basicsettings_num_topics'] = 'Topics per page';
 $l['basicsettings_num_posts'] = 'Posts per page';
 $l['basicsettings_timeformat'] = 'Time Format';

@@ -8,7 +8,8 @@ if(!defined('Snow'))
   
 function BNotAllowed() {
 global $cmsurl, $l, $settings, $user;
-echo '
+  
+  echo '
   <div id="error">
     <p class="title">'.$l['forum_error_header'].'</p>
     <p class="message">'.$l['forum_error_message'].'</p>
@@ -17,7 +18,8 @@ echo '
 
 function CantViewB() {
 global $cmsurl, $l, $settings, $user;
-echo '
+  
+  echo '
   <div id="error">
     <p class="title">'.$l['forum_error_header'].'</p>
     <p class="message">'.$l['forum_error_cantviewb_message'].'</p>
@@ -26,7 +28,8 @@ echo '
 
 function NoBoard() {
 global $cmsurl, $l, $settings, $user;
-echo '
+  
+  echo '
   <div id="error">
     <p class="title">'.$l['forum_error_header'].'</p>
     <p class="message">'.$l['forum_error_noboard_message'].'</p>
@@ -35,8 +38,21 @@ echo '
 
 function ThemeError() {
 global $cmsurl, $l, $settings;
-echo '
-  <h1>', $l['themeerror_header'], '</h1>
-  <p>', $l['themeerror_msg'], '</p>';
+  
+  echo '
+  <h1>'.$l['themeerror_header'].'</h1>
+  
+  <p>'.$l['themeerror_msg'].'</p>
+  ';
+}
+
+function LanguageError() {
+global $cmsurl, $l, $settings;
+  
+  echo '
+  <h1>Language Error</h1>
+  
+  <p>The language files failed to load. If you see this message again, contact a site administrator.</p>
+  ';
 }
 ?>

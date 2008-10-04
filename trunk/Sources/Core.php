@@ -123,33 +123,41 @@ global $db_prefix, $user, $cookie_prefix;
 function loadLanguage() {
 global $cmsurl, $l, $language_dir, $settings, $theme_dir, $user, $db_prefix, $cookie_prefix;
   
-  // Get the language record from either the user's profile, the cookies or the site's default
-  $language = clean($user['language'] ? $user['language'] : (@$_COOKIE[$cookie_prefix.'change-language'] ? @$_COOKIE[$cookie_prefix.'change-language'] : $settings['language']));
+  // Get the member's selected language from either their profile or cookies
+  $language = clean($user['language'] ? $user['language'] : (@$_COOKIE[$cookie_prefix.'change-language'] ? @$_COOKIE[$cookie_prefix.'change-language'] : ''));
   
   $l = array();
-  require_once($language_dir.'/'.$language.'.language.php');
-  // Does the current theme have its own language support?
-  if(file_exists($theme_dir.'/'.$settings['theme'].'/'.$language.'.language.php')) {
-    $tmp['1'] = $l;
-    unset($l);
-    $l = array();
-    require_once($theme_dir.'/'.$settings['theme'].'/languages/'.$language.'.language.php');
-    $tmp['2'] = $l;
-    $l = merge_languages($tmp);
+  // Load English
+  if (file_exists($language_dir.'/English.language.php'))
+    include_once($language_dir.'/English.language.php');
+  // Load the theme specific English
+  if (file_exists($theme_dir.'/'.$settings['theme'].'/languages/English.language.php'))
+    include_once($theme_dir.'/'.$settings['theme'].'/languages/English.language.php');
+  // Load the site default language
+  if (file_exists($language_dir.'/'.$settings['language'].'.language.php'))
+    include_once($language_dir.'/'.$settings['language'].'.language.php');
+  // Load the theme specific site default language
+  if (file_exists($theme_dir.'/'.$settings['theme'].'/languages/'.$settings['language'].'.language.php'))
+    include_once($theme_dir.'/'.$settings['theme'].'/languages/'.$settings['language'].'.language.php');
+  // Load the member's selected language
+  if (file_exists($language_dir.'/'.$language.'.language.php'))
+    include_once($language_dir.'/'.$language.'.language.php');
+  // Load the theme specific member's selected language
+  if (file_exists($theme_dir.'/'.$settings['theme'].'/languages/'.$language.'.language.php'))
+    include_once($theme_dir.'/'.$settings['theme'].'/languages/'.$language.'.language.php');
+  
+  // Check if any of them loaded
+  if ($l == array()) {
+    $settings['page']['title'] = 'Language Error';
+    $l['main_powered_by'] = 'Powered by %snowcms%';
+    $l['main_theme_by'] = 'Theme by %whom%';
+    loadTheme('Error','LanguageError');
+    exit;
   }
+  
   return $l;
 }
 
-// This will merge the $l arrays which will allow themes to have their own specific language files
-function merge_languages($array) {
-  $tmp = array();
-  foreach($array as $l) {
-    foreach($l as $key => $value) {
-      $tmp[$key] = $value;
-    }
-  }
-  return $tmp;
-}
 // This function loads the Theme file requested in a Source File, More comment inside :P
 function loadTheme($file, $function = 'Main') {
 global $cmsurl, $l, $theme_dir, $settings;

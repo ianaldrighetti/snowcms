@@ -95,6 +95,11 @@ global $cmsurl, $db_prefix, $l, $settings, $user, $language_dir, $theme_dir, $th
           'type' => 'text',
           'validation' => '>0'
         ),
+      'num_pms' =>
+        array(
+          'type' => 'text',
+          'validation' => '>0'
+        ),
       'num_topics' =>
         array(
           'type' => 'text',

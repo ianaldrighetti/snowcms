@@ -33,9 +33,9 @@ require_once($source_dir.'/Core.php');
   loadSettings();
   loadUser();
   changeLanguage();
-  loadLanguage();
   loadPerms();
   loadMenus();
+  loadLanguage();
 // Write that this Guest/User is online
   WriteOnline();
   
