@@ -123,11 +123,13 @@ INSERT INTO `{$db_prefix}menus` VALUES ('3','3','Forum','forum.php','0','3','1')
 INSERT INTO `{$db_prefix}menus` VALUES ('4','4','Profile','index.php?action=profile','0','3','3');
 INSERT INTO `{$db_prefix}menus` VALUES ('5','5','Messages','forum.php?action=pm','0','3','5');
 INSERT INTO `{$db_prefix}menus` VALUES ('6','6','Messages [%unread_pms%]','forum.php?action=pm','0','3','6');
-INSERT INTO `{$db_prefix}menus` VALUES ('7','7','SnowCMS','http://www.snowcms.com/','1','2','1');
-INSERT INTO `{$db_prefix}menus` VALUES ('8','8','Logout','index.php?action=logout%semicolon%sc=%sc%','0','3','3');
-INSERT INTO `{$db_prefix}menus` VALUES ('9','9','Login','index.php?action=login','0','3','2');
-INSERT INTO `{$db_prefix}menus` VALUES ('10','10','Register','index.php?action=register','0','3','2');
-INSERT INTO `{$db_prefix}menus` VALUES ('11','11','Control Panel','index.php?action=admin','0','3','4');
+INSERT INTO `{$db_prefix}menus` VALUES ('7','7','Member List','forum.php?action=members','0','3','6');
+INSERT INTO `{$db_prefix}menus` VALUES ('8','8','Forum Search','forum.php?action=search','0','3','6');
+INSERT INTO `{$db_prefix}menus` VALUES ('9','9','SnowCMS','http://www.snowcms.com/','1','2','1');
+INSERT INTO `{$db_prefix}menus` VALUES ('10','10','Logout','index.php?action=logout%semicolon%sc=%sc%','0','3','3');
+INSERT INTO `{$db_prefix}menus` VALUES ('11','11','Login','index.php?action=login','0','3','2');
+INSERT INTO `{$db_prefix}menus` VALUES ('12','12','Register','index.php?action=register','0','3','2');
+INSERT INTO `{$db_prefix}menus` VALUES ('13','13','Control Panel','index.php?action=admin','0','3','4');
 
 DROP TABLE IF EXISTS `{$db_prefix}messages`;
 
@@ -173,7 +175,13 @@ CREATE TABLE `{$db_prefix}pages` (
   PRIMARY KEY  (`page_id`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 
-INSERT INTO `{$db_prefix}pages` (`page_owner`, `owner_name`, `create_date`, `title`, `content`, `html`) VALUES ('-1','The SnowCMS Team','%current_time%','Welcome to SnowCMS','<p>Start modifing the default settings and creating pages now. Thank you for choosing SnowCMS.</p>\n\n<p>The SnowCMS Team</p>','1');
+INSERT INTO `{$db_prefix}pages` (`page_owner`, `owner_name`, `create_date`, `title`, `content`, `html`) VALUES ('-1','The SnowCMS Team','%current_time%','Welcome to SnowCMS','<p>Congratulations! Your SnowCMS installation has been successfully completed. Please delete your <code>install.php</code> file now. You can start modifying the default settings and adding content to your site right now. If you get stuck, you can always get support at the <a href="http://www.snowcms.com/">official SnowCMS website</a>.</p>
+
+<p><br /></p>
+
+<p>Thank you for choosing SnowCMS,</p>
+
+<p>The SnowCMS Team</p>','1');
 
 DROP TABLE IF EXISTS `{$db_prefix}permissions`;
 

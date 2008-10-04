@@ -98,6 +98,8 @@ $files = array(
   './Themes/default/images/bbc_quote.png',
   './Themes/default/images/bbc_strikethrough.png',
   './Themes/default/images/bbc_underline.png',
+  './Themes/default/images/board_new.png',
+  './Themes/default/images/board_old.png',
   './Themes/default/images/containerbg.png',
   './Themes/default/images/delete.png',
   './Themes/default/images/edit_post.png',
@@ -106,8 +108,6 @@ $files = array(
   './Themes/default/images/headbar.png',
   './Themes/default/images/male.png',
   './Themes/default/images/modify.png',
-  './Themes/default/images/off.gif',
-  './Themes/default/images/on.gif',
   './Themes/default/images/quote.png',
   './Themes/default/images/split.png',
   './Themes/default/images/star.png',
@@ -177,7 +177,7 @@ ob_start();
     echo '<p>The following files and directories do not exist. Please upload them before continuing:</p>
     <ul>
     ';
-    foreach($nofile as $file)
+    foreach ($nofile as $file)
       echo '  <li>'.$file.'</li>
     ';
     echo '</ul>';
@@ -245,113 +245,121 @@ ob_start();
           </table>
         </form>
       </div>';
+      unset($_SESSION['error2']);
     }
     elseif ($step == 2) {
-      // Can we even connect to MySQL? ._.
-      if ($mysql_connect = @mysql_connect(@$_REQUEST['mysql_host'], @$_REQUEST['mysql_user'], @$_REQUEST['mysql_pass']))
-        $mysql_connect = @mysql_select_db($_REQUEST['mysql_db']);
-      // We can't connect to the database
-      if (!$mysql_connect) {
-        $_SESSION['error'] = mysql_error();
-        header('location: install.php');
-        exit;
-      }
-      // We can connect to the database
-      else {
-        unset($_SESSION['error']);
-        // Get the MySQL Queries from the SQL file :D
-        $db_prefix = $_REQUEST['mysql_prefix'];
-        $sqls = file_get_contents('./install.sql');
-        // Replace a couple things so it is done right
-        $sqls = str_replace('%current_time%',time(),str_replace('{$db_prefix}', $db_prefix, $sqls));
-        // Separate the Queries the easy way xD
-        $mysql_queries = explode(";", $sqls);
-        // %semicolon% is used in place of semi colons to prevent them being exploded, so let's convert them now
-        foreach ($mysql_queries as $key => $value)
-          $mysql_queries[$key] = str_replace('%semicolon%',';',$value);
-        // MySQL Errors? No thanks!
-        $mysql_errors = array();
-        $num_queries = count($mysql_queries);
-        foreach($mysql_queries as $query) {
-          $i++;
-          if($i!=$num_queries) {
-            $check = mysql_query($query);
-            if(!$check)
-              $mysql_errors[] = mysql_error();
-          }
-        }
-        if(count($mysql_errors)>0) {
-          echo '
-          <h1>Step 1</h1>
-          <p>The following MySQL errors occurred:<br />';
-          foreach($mysql_errors as $error) {
-            echo $error.'<br />';
-          }
-          echo '</p>';
-        }
-        else {
-          // Get the current directory for settings
-          $currentdir = dirname(__FILE__);
-          $iurl = explode('/', $_SERVER['SERVER_NAME'].$_SERVER['REQUEST_URI']);
-			    unset($iurl[count($iurl)-1]);
-			    $iurl = implode('/', $iurl);
-			    $installpath = 'http://'.$iurl.'/';
-          // Now get details, such as directory paths, and administrative details
-          echo '<h1>Step 2</h1>
-          <p>Your MySQL database has been populated with the initial data. Now you need to create your administrator account and a few other settings.</p>';
-          echo '
-          <div align="center">
+      if (@$_SESSION['step'] == 2 && empty($_REQUEST['mysql_host'])) {
+        // Get the current directory for settings
+        $currentdir = dirname(__FILE__);
+        $iurl = explode('/', $_SERVER['SERVER_NAME'].$_SERVER['REQUEST_URI']);
+        unset($iurl[count($iurl)-1]);
+        $iurl = implode('/', $iurl);
+        $installpath = 'http://'.$iurl.'/';
+        // Show the form
+        echo '<h1>Step 2</h1>
+        
+        ';
+        if (empty($_SESSION['error2']))
+          echo '<p>Your MySQL database has been populated with the initial data. Now you need to create your administrator account and a few other settings.</p>';
+        else
+          echo '<p><b>Error:</b> '.$_SESSION['error2'].'</p>';
+        echo '
+        <div align="center">
           <form action="install.php?step=3" method="post">
             <table>
-                <tr>
-                  <td>Path to Source Directory</td><td><input name="source_dir" type="text" value="'.$currentdir.'/Sources"/></td>
-                </tr>
-                <tr>
-                  <td>Path to Theme Directory</td><td><input name="theme_dir" type="text" value="'.$currentdir.'/Themes"/></td>
-                </tr>
-                <tr>
-                  <td>Path to Language Directory</td><td><input name="language_dir" type="text" value="'.$currentdir.'/Languages"/></td>
-                </tr>
-                <tr>
-                  <td>URL of SnowCMS Installation</td><td><input name="cmsurl" type="text" value="'.$installpath.'"/></td>
-                </tr>
-                <tr>
-                  <td>URL of Themes Directory</td><td><input name="theme_url" type="text" value="'.$installpath.'Themes"/></td>
-                </tr>
-                <tr>
-                  <td>Cookie Prefix:</td><td><input name="cookie_prefix" type="text" value="scms_"/></td>
-                </tr>
-                <tr>
-                  <td>Admin Username:</td><td><input name="admin_user" type="text" value=""/></td>
-                </tr>
-                <tr>
-                  <td>Admin Password:</td><td><input name="admin_pass" type="password" value=""/></td>
-                </tr>
-                <tr>
-                  <td>Admin Password (Again):</td><td><input name="admin_pass2" type="password" value=""/></td>
-                </tr>
-                <tr>
-                  <td>Admin Email:</td><td><input name="admin_email" type="text" value=""/></td>
-                </tr>
-                <tr>
-                  <td colspan="2"><input name="step3" type="submit" value="Go to Step 3"/>
-                </tr>
-              </table>
-              <input name="mysql_host" type="hidden" value="'.$_REQUEST['mysql_host'].'"/>
-              <input name="mysql_user" type="hidden" value="'.$_REQUEST['mysql_user'].'"/>
-              <input name="mysql_pass" type="hidden" value="'.$_REQUEST['mysql_pass'].'"/>
-              <input name="mysql_db" type="hidden" value="'.$_REQUEST['mysql_db'].'"/>
-              <input name="mysql_prefix" type="hidden" value="'.$_REQUEST['mysql_prefix'].'"/>
-            </form>
-            </div>';
-            
-            //shouldn't store mysql user/pass in the form? security risk almost? encryption?
+              <tr><td>Path to Source Directory</td><td><input name="source_dir" value="'.$currentdir.'/Sources" /></td></tr>
+              <tr><td>Path to Theme Directory</td><td><input name="theme_dir" value="'.$currentdir.'/Themes" /></td></tr>
+              <tr><td>Path to Language Directory</td><td><input name="language_dir" value="'.$currentdir.'/Languages" /></td></tr>
+              <tr><td>URL of SnowCMS Installation</td><td><input name="cmsurl" value="'.$installpath.'" /></td></tr>
+              <tr><td>URL of Themes Directory</td><td><input name="theme_url" value="'.$installpath.'Themes" /></td></tr>
+              <tr><td>Cookie Prefix:</td><td><input name="cookie_prefix" value="scms_" /></td></tr>
+              <tr><td>Admin Username:</td><td><input name="admin_user" /></td></tr>
+              <tr><td>Admin Password:</td><td><input type="password" name="admin_pass" /></td></tr>
+              <tr><td>Admin Password (Again):</td><td><input type="password" name="admin_pass2" /></td></tr>
+              <tr><td>Admin Email:</td><td><input name="admin_email" type="text" /></td></tr>
+              <tr><td colspan="2"><input name="step3" type="submit" value="Finish Installation" /></tr>
+            </table>
+            <p>
+              <input name="mysql_host" type="hidden" value="'.$_SESSION['mysql_host'].'" />
+              <input name="mysql_user" type="hidden" value="'.$_SESSION['mysql_user'].'" />
+              <input name="mysql_pass" type="hidden" value="'.$_SESSION['mysql_pass'].'" />
+              <input name="mysql_db" type="hidden" value="'.$_SESSION['mysql_db'].'" />
+              <input name="mysql_prefix" type="hidden" value="'.$_SESSION['mysql_prefix'].'" />
+            </p>
+          </form>
+        </div>';
+        
+        // shouldn't store mysql user/pass in the form? security risk almost? encryption?
+      }
+      else {
+        // Can we even connect to MySQL? ._.
+        if ($mysql_connect = @mysql_connect(@$_REQUEST['mysql_host'], @$_REQUEST['mysql_user'], @$_REQUEST['mysql_pass']))
+          $mysql_connect = @mysql_select_db($_REQUEST['mysql_db']);
+        // We can't connect to the database
+        if (!$mysql_connect) {
+          $_SESSION['error'] = mysql_error();
+          header('location: install.php');
+          exit;
+        }
+        // We can connect to the database
+        else {
+          unset($_SESSION['error']);
+          // Get the MySQL Queries from the SQL file :D
+          $db_prefix = $_REQUEST['mysql_prefix'];
+          $sqls = file_get_contents('./install.sql');
+          // Replace a couple things so it is done right
+          $sqls = str_replace('%current_time%',time(),str_replace('{$db_prefix}', $db_prefix, $sqls));
+          // Separate the Queries the easy way xD
+          $mysql_queries = explode(";", $sqls);
+          // %semicolon% is used in place of semi colons to prevent them being exploded, so let's convert them now
+          foreach ($mysql_queries as $key => $value)
+            $mysql_queries[$key] = str_replace('%semicolon%',';',$value);
+          // MySQL Errors? No thanks!
+          $mysql_errors = array();
+          $num_queries = count($mysql_queries);
+          foreach($mysql_queries as $query) {
+            $i++;
+            if($i!=$num_queries) {
+              $check = mysql_query($query);
+              if(!$check)
+                $mysql_errors[] = mysql_error();
+            }
+          }
+          if (count($mysql_errors)) {
+            echo '
+            <h1>Step 1</h1>
+            <p>The following MySQL errors occurred:<br />';
+            foreach($mysql_errors as $error) {
+              echo $error.'<br />';
+            }
+            echo '</p>';
+          }
+          else {
+            // Now get details, such as directory paths, and administrative details
+            $_SESSION['step'] = 2;
+            $_SESSION['mysql_host'] = @$_REQUEST['mysql_host'];
+            $_SESSION['mysql_user'] = @$_REQUEST['mysql_user'];
+            $_SESSION['mysql_password'] = @$_REQUEST['mysql_password'];
+            $_SESSION['mysql_db'] = @$_REQUEST['mysql_db'];
+            $_SESSION['mysql_prefix'] = @$_REQUEST['mysql_prefix'];
+            header('location: install.php?step=2');
+            exit;
+          }
         }
       }
     }
     elseif ($step == 3) {
-    // Create the config.php file which holds details about MySQL and paths we will need all the time
-$config = '<?php
+      if (@$_SESSION['step'] == 3 && empty($_REQUEST['mysql_host']))
+        echo '<h1>Step 3</h1>
+        
+        <p>Your config.php file was not writable. To make your SnowCMS installation work, please open up your config.php file and put this in it:</p><br />
+        
+        <textarea cols="90" rows="30" readonly="readonly">'.$_SESSION['config'].'</textarea>
+        
+        <p><a href=".">Click here</a> one you are done.</p>';
+      else {
+        // Create the config.php file which holds details about MySQL and paths we will need all the time
+        $config = '<?php
 //                      SnowCMS
 //     Founded by soren121 & co-founded by aldo
 // Developed by Myles, aldo, antimatter15 & soren121
@@ -367,7 +375,7 @@ $config = '<?php
 if(!defined("Snow"))
   die("Hacking Attempt...");
   
-// Your MySQL Information
+// Your MySQL information
 $mysql_host = \''.$_REQUEST['mysql_host'].'\'; # Your MySQL Host, doubt you will change this
 $mysql_user = \''.$_REQUEST['mysql_user'].'\'; # Your MySQL Username
 $mysql_passwd = \''.$_REQUEST['mysql_pass'].'\'; # Your MySQL Password
@@ -377,59 +385,77 @@ $mysql_prefix = \''.$_REQUEST['mysql_prefix'].'\'; # Prefix for your database
 // Misc
 $cookie_prefix = \''.$_REQUEST['cookie_prefix'].'\'; # Prefix for cookies
 
-// Some SnowCMS Specific Settings
-$source_dir = \''.$_REQUEST['source_dir'].'\'; # Path to your Source directory without trailing /!
-$theme_dir = \''.$_REQUEST['theme_dir'].'\'; # Path to your Themes directory without trailing /!
-$language_dir = \''.$_REQUEST['language_dir'].'\'; # Path to your Languages directory without trailing /!
+// Some SnowCMS specific settings
+$source_dir = \''.$_REQUEST['source_dir'].'\'; # Path to your Source directory without trailing /
+$theme_dir = \''.$_REQUEST['theme_dir'].'\'; # Path to your Themes directory without trailing /
+$language_dir = \''.$_REQUEST['language_dir'].'\'; # Path to your Languages directory without trailing /
 $cmsurl = \''.$_REQUEST['cmsurl'].'\'; # URL to your SnowCMS Installation
 $theme_url = \''.$_REQUEST['theme_url'].'\'; # URL to your SnowCMS Themes folder
 
-/* Don\'t touch the stuff below! */
+// Don\'t touch the stuff below
 $db_prefix = \'`\'.$mysql_db.\'`.\'.$mysql_prefix;
 $scms_installed = true;
 ?>';
-    if(strlen($_REQUEST["admin_user"]) > 0 && strlen($_REQUEST["admin_pass"]) > 0){
-      if($_REQUEST["admin_pass"] == $_REQUEST["admin_pass2"]){
-        // Now make the admin account
-        mysql_connect($_REQUEST['mysql_host'], $_REQUEST['mysql_user'], $_REQUEST['mysql_pass']);
-        mysql_select_db($_REQUEST['mysql_db']);
-        $admin = mysql_query("INSERT INTO {$_REQUEST['mysql_prefix']}members (`username`,`display_name`,`password`,`email`,`reg_date`,`reg_ip`,`group`,`activated`) VALUES('".addslashes(mysql_real_escape_string($_REQUEST['admin_user']))."','".addslashes(mysql_real_escape_string($_REQUEST['admin_user']))."','".md5($_REQUEST['admin_pass'])."','".addslashes(mysql_real_escape_string($_REQUEST['admin_email']))."','".time()."','".$_SERVER['REMOTE_ADDR']."','1','1')");
-        echo '
-        <h1>You\'re done!</h1>';
-        if($admin) {
-          echo '<p>Your settings have been sent to the MySQL database.</p>';
+        if (@$_REQUEST["admin_user"]) {
+          if (strlen(@$_REQUEST["admin_pass"]) > 4) {
+            if (@$_REQUEST["admin_pass"] == @$_REQUEST["admin_pass2"]) {
+              if (preg_match("/^([a-z0-9._-](\+[a-z0-9])*)+@[a-z0-9.-]+\.[a-z]{2,6}$/i",@$_REQUEST['admin_email'])) {
+                unset($_SESSION['error']);
+                unset($_SESSION['step']);
+                unset($_SESSION['mysql_host']);
+                unset($_SESSION['mysql_user']);
+                unset($_SESSION['mysql_password']);
+                unset($_SESSION['mysql_db']);
+                unset($_SESSION['mysql_prefix']);
+                unset($_SESSION['error2']);
+                // Now make the admin account
+                mysql_connect($_REQUEST['mysql_host'], $_REQUEST['mysql_user'], $_REQUEST['mysql_pass']);
+                mysql_select_db($_REQUEST['mysql_db']);
+                $admin = mysql_query("INSERT INTO {$_REQUEST['mysql_prefix']}members (`username`,`display_name`,`password`,`email`,`reg_date`,`reg_ip`,`group`,`activated`) VALUES('".addslashes(mysql_real_escape_string($_REQUEST['admin_user']))."','".addslashes(mysql_real_escape_string($_REQUEST['admin_user']))."','".md5($_REQUEST['admin_pass'])."','".addslashes(mysql_real_escape_string($_REQUEST['admin_email']))."','".time()."','".$_SERVER['REMOTE_ADDR']."','1','1')");
+                echo '
+                <h1>You\'re done!</h1>';
+                if($admin) {
+                  echo '<p>Your settings have been sent to the MySQL database.</p>';
+                }
+                else
+                  echo '<p>Something went wrong while trying to create your admin account. Info: '.mysql_error().'</p>';
+              }
+              else {
+                $_SESSION['error2'] = 'Your email address was invalid.';
+                header('location: install.php?step=2"');
+                exit;
+              }
+            }
+            else {
+              $_SESSION['error2'] = 'Your password verification was wrong.';
+              header('location: install.php?step=2"');
+              exit;
+            }
+          }
+          else {
+            $_SESSION['error2'] = 'Your password is too short.';
+            header('location: install.php?step=2"');
+            exit;
+          }
         }
         else {
-          echo '<p>Something went wrong while trying to create your admin account. Info: '.mysql_error().'</p>';
+          $_SESSION['error2'] = 'You didn\'t enter a username.';
+          header('location: install.php?step=2');
+          exit;
         }
-      }else{
-        die("<p>Error! Passwords did not match!</p>");
-      }
-    }else{
-        die("<p>Error! You'r password and/or username can not be blank!</p>");
-    }
-    // Oh noes! the config.php file was NOT writable, so we will let them copy it and paste it without having to start all over again :)
-    if(!is_writeable('./config.php')) {
-      echo '
-      <p>Your config.php file was not writeable. To make your SnowCMS installation work, please open up your config.php file and put this in it:</p><br />
-      <textarea cols="60" rows="30" readonly="readonly">
-      '.htmlentities($config).'
-      </textarea>';
-    }
-    else {
-      // Yay! Write it to the config.php file, and your good to go!
-      $check = file_put_contents('./config.php', $config);
-      echo '<p>Your config.php file has been set! You\'re ready to go!</p>';
-    }
-    echo '<p>Once you are done, please delete this file (install.php) and CHMOD config.php to 644. Thank you for using SnowCMS! <a href="'.$_REQUEST['cmsurl'].'">Click here</a> to contine your home page.</p>';
-
-    }elseif($step == 3){
-      if(file_exists("install.php")){
-        echo "Attempting to auto-delete install.php...<br>";
-        unlink("install.php");
-        echo "Hopefully done...";
-      }else{
-        echo "this must be some strange world.... how do you not have install.php but you're running this now?";
+        // Oh noes! The config.php file was NOT writable, so we will let them copy it and paste it without having to start all over again :)
+        if (!is_writeable('./config.php')) {
+          $_SESSION['step'] = 3;
+          $_SESSION['config'] = htmlentities($config);
+          header('location: install.php?step=3');
+          exit;
+        }
+        else {
+          // Yay! Write it to the config.php file, and your good to go!
+          $check = file_put_contents('./config.php', $config);
+          header('location: index.php');
+          exit;
+        }
       }
     }
   }

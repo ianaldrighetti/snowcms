@@ -25,9 +25,9 @@ $mysql_prefix = 'scms_'; # Prefix for your database
 $cookie_prefix = 'scms_'; # Prefix for cookies
 
 // Some SnowCMS Specific Settings
-$source_dir = ''; # Path to your Source directory without trailing /!
-$theme_dir = ''; # Path to your Themes directory without trailing /!
-$language_dir = ''; # Path to your Languages directory without trailing /!
+$source_dir = ''; # Path to your Source directory without trailing /
+$theme_dir = ''; # Path to your Themes directory without trailing /
+$language_dir = ''; # Path to your Languages directory without trailing /
 $cmsurl = ''; # URL to your SnowCMS Installation
 $theme_url = ''; # URL to your SnowCMS Themes folder
 
