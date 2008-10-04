@@ -15,7 +15,7 @@ if(!defined("Snow"))
   die("Hacking Attempt...");
   
 function fSearch() {
-global $l, $settings, $db_prefix;
+global $l, $settings, $user, $db_prefix;
   
   // Does this member even have permission to search?
   if (can('search')) {
@@ -33,7 +33,7 @@ global $l, $settings, $db_prefix;
       }
       
       // Get all the messages, ready to search them
-      $result = sql_query("SELECT * FROM {$db_prefix}messages");
+      $result = sql_query("SELECT * FROM {$db_prefix}messages LEFT JOIN {$db_prefix}boards AS b ON `messages`.`bid` = `b`.`bid` WHERE {$user['board_query']}") or die(mysql_error());
       $results = array();
       $amount = 0;
       // Search one message at a time
@@ -57,7 +57,7 @@ global $l, $settings, $db_prefix;
             else {
               // It wasn't, add it to the found search results
               $topic = mysql_fetch_assoc(sql_query("SELECT * FROM {$db_prefix}topics WHERE `tid` = {$row['tid']}"));
-              $first_msg = mysql_fetch_assoc(sql_query("SELECT * FROM {$db_prefix}messages LEFT JOIN {$db_prefix}members ON uid = id WHERE `mid` = {$topic['first_msg']}"));
+              $first_msg = mysql_fetch_assoc(sql_query("SELECT * FROM {$db_prefix}messages LEFT JOIN {$db_prefix}members ON `uid` = `id` LEFT JOIN {$db_prefix}membergroups ON `group` = `group_id` WHERE `mid` = '{$topic['first_msg']}'"));
               $results[$amount] = $first_msg;
               $results[$amount]['times'] = 1;
               $amount += 1;

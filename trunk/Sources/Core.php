@@ -65,7 +65,7 @@ global $db_prefix, $user, $cookie_prefix;
   $user['email'] = null;
   $user['language'] = false;
   $user['sc'] = 'guest';
-  $user['board_query'] = 'FIND_IN_SET('. $user['group']. ', b.who_view)';
+  $user['board_query'] = "FIND_IN_SET('-1', b.who_view)";
   $user['unread_pms'] = 0;
   // Make sure we get their real IP :)
   $user['ip'] = @isset($_SERVER['HTTP_X_FORWARDED_FOR']) ? $_SERVER['HTTP_X_FORWARDED_FOR'] : $_SERVER['REMOTE_ADDR'];
@@ -90,7 +90,7 @@ global $db_prefix, $user, $cookie_prefix;
             'is_admin' => false,
             'email' => $row['email'],
             'language' => $row['language'],
-            'board_query' => "FIND_IN_SET(',{$row['group']},', b.who_view) OR b.who_view = ',{$row['group']},'",
+            'board_query' => "FIND_IN_SET('{$row['group']}', b.who_view)",
             'unread_pms' => $row['unread_pms'],
             'ip' => @$_SERVER['HTTP_X_FORWARDED_FOR'] ? $_SERVER['HTTP_X_FORWARDED_FOR'] : $_SERVER['REMOTE_ADDR'],
             'sc' => create_sid()

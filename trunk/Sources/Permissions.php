@@ -329,9 +329,9 @@ global $cmsurl, $db_prefix, $forumperms, $l, $settings, $user;
           SELECT
             grp.group_id, grp.groupname
           FROM {$db_prefix}membergroups AS grp
-          WHERE grp.group_id IN ($row[who_view])");
+          WHERE FIND_IN_SET(grp.group_id,'{$row['who_view']}') OR grp.group_id = '{$row['who_view']}'");
         $settings['groups'] = array();
-        while($row = mysql_fetch_assoc($result)) {
+        while ($row = mysql_fetch_assoc($result)) {
           $settings['groups'][] = array(
                                     'id' => $row['group_id'],
                                     'name' => $row['groupname']

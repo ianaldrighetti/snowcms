@@ -76,7 +76,7 @@ global $cmsurl, $db_prefix, $l, $settings, $user;
         $corder = (int)$_POST['cat_order'][$cat_id];
         $rows[] = "('$cat_id','$corder','$name')";
       }
-      $updated = ','.implode(',', $rows).',';
+      $updated = implode(',', $rows);
       sql_query("REPLACE INTO {$db_prefix}categories (`cid`,`corder`,`cname`) VALUES $updated");
     }
     // They are not allowed to update categories
@@ -262,7 +262,7 @@ global $cmsurl, $db_prefix, $forumperms, $l, $settings, $user;
           foreach($_REQUEST['groups'] as $group) {
             $who_view[] = (int)$group;
           }
-          $who_view = ','.implode(',', $who_view).',';
+          $who_view = implode(',', $who_view);
         }
         else {
           $who_view = (int)$_REQUEST['groups'];
@@ -293,7 +293,7 @@ global $cmsurl, $db_prefix, $forumperms, $l, $settings, $user;
           $board_order = (int)$_POST['board_order'][$board_id];
           $boards[] = "('$board_id','{$settings['boards'][$board_id]['cid']}','$board_order','{$settings['boards'][$board_id]['who_view']}','$board_name','{$settings['boards'][$board_id]['bdesc']}','{$settings['boards'][$board_id]['numtopics']}','{$settings['boards'][$board_id]['numposts']}','{$settings['boards'][$board_id]['last_msg']}','{$settings['boards'][$board_id]['last_uid']}','{$settings['boards'][$board_id]['last_name']}')";
         }
-        $query = ','.implode(',', $boards).',';
+        $query = implode(',', $boards);
         sql_query("REPLACE INTO {$db_prefix}boards (`bid`,`cid`,`border`,`who_view`,`name`,`bdesc`,`numtopics`,`numposts`,`last_msg`,`last_uid`,`last_name`) VALUES{$query}");
       }
       if (!empty($_REQUEST['update_board'])) {
@@ -308,7 +308,7 @@ global $cmsurl, $db_prefix, $forumperms, $l, $settings, $user;
             $tmp_array[] = (int)$group_id;
           }
         }
-        $who_view = ','.implode(',', $tmp_array).',';
+        $who_view = implode(',', $tmp_array);
         sql_query("UPDATE {$db_prefix}boards SET `cid` = $in_category, `name` = '$board_name', `bdesc` = '$board_desc', `who_view` = '$who_view' WHERE `bid` = '$board_id'");
         setPermissions($board_id, @$_REQUEST['groups'], true);
       }
@@ -400,7 +400,7 @@ global $db_prefix, $forumperms;
           $can = 0;
         $perms[] = "('$board_id','$group_id','$perm','$can')"; 
       }
-      $perms_query = ','.implode(',', $perms).',';
+      $perms_query = implode(',', $perms);
       sql_query("REPLACE INTO {$db_prefix}board_permissions (`bid`,`group_id`,`what`,`can`) VALUES{$perms_query}");
     }
     sql_query("UPDATE {$db_prefix}board_permissions SET `can` = 0 WHERE `bid` = '$board_id' AND `group_id` = '-1'");
@@ -427,7 +427,7 @@ global $db_prefix, $forumperms;
               $can = 0;
             $perms[] = "('$board_id','$group_id','$perm','$can')"; 
           }
-          $perms_query = ','.implode(',',$perms).',';
+          $perms_query = implode(',',$perms);
           sql_query("REPLACE INTO {$db_prefix}board_permissions (`bid`,`group_id`,`what`,`can`) VALUES{$perms_query}");
         }
         $groups[] = $group_id;
