@@ -71,10 +71,13 @@ global $cmsurl, $db_prefix, $l, $settings, $user;
 }
 
 function SingleComments() {
-global $cmsurl, $db_prefix, $l, $settings, $user;
+global $cmsurl, $db_prefix, $l, $settings, $user, $theme_url;
   
   echo '
   <h1>', $l['news_header'], '</h1>';
+  
+  if (@$_SESSION['error'])
+    echo '<p><b>'.$l['main_error'].':</b> '.$_SESSION['error'].'</p>';
   
   // Show news
   $news = $settings['news'];
@@ -92,9 +95,25 @@ global $cmsurl, $db_prefix, $l, $settings, $user;
   $i = 0;
   while ($i < count($comments)) {
     echo '
-    <p><b>'.str_replace('%subject%',$comments[$i]['subject'],
-         str_replace('%name%','<a href="'.$cmsurl.'index.php?action=profile;u='.$comments[$i]['user_id'].'">'.$comments[$i]['username'].'</a>',
-         str_replace('%date%',$comments[$i]['post_date'],$l['news_comment_heading']))).'</b></p>
+    <p>
+      <b>
+        '.str_replace('%subject%',$comments[$i]['subject'],
+          str_replace('%name%','<a href="'.$cmsurl.'index.php?action=profile;u='.$comments[$i]['user_id'].'">'.$comments[$i]['username'].'</a>',
+          str_replace('%date%',$comments[$i]['post_date'],$l['news_comment_heading']))).'
+      </b>';
+    if (can('manage_comments_edit'))
+      echo '<a href="'.$cmsurl.'index.php?action=news;id='.$comments[$i]['id'].'">
+        <img src="'.$theme_url.'/'.$settings['theme'].'/images/modify.png" alt="'.$l['managenews_manage_edit'].'" width="15" height="15" />
+      </a>'
+    if (can('manage_comments_edit') && can('manage_comments_delete'))
+      echo '
+      ';
+    if (can('manage_comments_delete'))
+      echo '<a href="'.$cmsurl.'index.php?action=news;id='.$news['id'].';did='.$comments[$i]['id'].';sc='.$user['sc'].'">
+        <img src="'.$theme_url.'/'.$settings['theme'].'/images/delete.png" alt="'.$l['managenews_manage_delete'].'" width="15" height="15" />
+      </a>'
+    echo '
+    </p>
     <p>'.bbc($comments[$i]['body']).'</p>
     <hr />
     ';

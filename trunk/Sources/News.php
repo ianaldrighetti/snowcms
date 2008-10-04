@@ -141,6 +141,24 @@ global $cmsurl, $db_prefix, $l, $settings, $user;
   else {
     // What news do they want?
     $news_id = (int)$_REQUEST['id'];
+    // Are they deleting news?
+    if ($did = (int)@$_REQUEST['did']) {
+      // Are they allowed to delete comments?
+      if (can('manage_comments_delete')) {
+        // Is there session verification valid?
+        if (@$_REQUEST['sc'] == $user['sc']) {
+          // Delete the comment
+          sql_query("DELETE FROM {$db_prefix}news_comments WHERE `post_id` = '$did'");
+        }
+        // Their session verification is invalid
+        else
+          $_SESSION['error'] = $l['news_error_delete_invalidsession'];
+      }
+      // They are not allowed to delete comments
+      else
+        $_SESSION['error'] = $l['news_error_delete_notallowed'];
+      redirect('index.php?action=news;id='.$news_id);
+    }
     $result = sql_query("
       SELECT
         *, mem.display_name AS username, IFNULL(mem.display_name, mem.username) AS username
