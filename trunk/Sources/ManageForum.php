@@ -6,13 +6,13 @@
 //
 //   SnowCMS is released under the GPL v3 License
 //       which means you are free to edit and
-//          redistribute it as your wish!
+//           redistribute it as you wish!
 //
 //                ManageForum.php file
 
 
-if(!defined("Snow"))
-  die("Hacking Attempt...");
+if (!defined("Snow"))
+  die(header("HTTP/1.1 404 Not Found"));
  
 // Displays the page
 function ManageForum() {

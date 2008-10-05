@@ -6,7 +6,7 @@
 //
 //   SnowCMS is released under the GPL v3 License
 //       which means you are free to edit and
-//          redistribute it as your wish!
+//           redistribute it as you wish!
 //
 //                  install.php file
 
@@ -22,7 +22,7 @@
 define("Snow", true);
 require_once('./config.php');
 if ($scms_installed)
- die("Hacking Attempt...");
+ die(header("HTTP/1.1 404 Not Found"));
 // Define some files that we should check if they exist, as they are pretty important ;)
 $files = array(
   './Languages',
@@ -367,14 +367,14 @@ ob_start();
 //
 //   SnowCMS is released under the GPL v3 License
 //       which means you are free to edit and
-//          redistribute it as your wish!
+//           redistribute it as you wish!
 //
 //                  config.php file
 
 
-if(!defined("Snow"))
-  die("Hacking Attempt...");
-  
+if (!defined("Snow"))
+  die(header("HTTP/1.1 404 Not Found"));
+
 // Your MySQL information
 $mysql_host = \''.$_REQUEST['mysql_host'].'\'; # Your MySQL Host, doubt you will change this
 $mysql_user = \''.$_REQUEST['mysql_user'].'\'; # Your MySQL Username

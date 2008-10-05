@@ -1,6 +1,7 @@
 <?php
-// SnowCMS Main.language.php file for English
-// Version 0.2
+// SnowCMS Language File
+//        English
+//          v0.7
 
 // Language's name
 $l['language_name'] = 'English';
@@ -141,8 +142,9 @@ $l['online_time'] = 'Last Active';
 
 // Admin.template.php
 $l['admin_title'] = 'Control Panel';
+$l['admin_header'] = 'Control Panel';
+$l['admin_desc'] = 'Here you can change various settings and moderate members, depending on your permissions.';
 $l['admin_snowcms_news'] = 'Latest news on SnowCMS';
-$l['admin_options'] = 'Admin Options';
 $l['admin_error_title'] = 'Error';
 $l['admin_news_timeout'] = 'Unable to get the latest news from the <a href="http://www.snowcms.com">SnowCMS</a> site due to a server timeout. Refresh the page, or check out our site.';
 $l['admin_current_version'] = 'Your SnowCMS Version:';

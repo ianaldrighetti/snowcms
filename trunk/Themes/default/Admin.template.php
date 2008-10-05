@@ -10,28 +10,34 @@ if(!defined('Snow'))
 function Main() {
 global $cmsurl, $settings, $l, $user;
   echo '
-  <h1>'.$l['admin_title'].'</h1>
-  <table>
-    <tr>
-      <td>'.$l['admin_current_version'].'</td>
-      <td>v'.$settings['version'].'</td>
-    </tr>
-    <tr>
-      <td>'. $l['admin_snowcms_current_version']. '</td>
-      <td>'. $settings['latest_version']. '</td>
-    </tr>
-  </table>
+  <h1>'.$l['admin_header'].'</h1>
   
-  <h2>'.$l['admin_snowcms_news'].'</h2>
-  <div style="overflow: auto; width: 475px; height: 100px;">
-    '. $settings['page']['news']. '
-	</div>
-	
-  <h2>'.$l['admin_options'].'</h2>
+  <p>'.$l['admin_desc'].'</p>
   
   ';
   
   AdminOptions();
+  
+  echo '
+  
+  <p style="clear: both; padding-bottom: 1px"></p>
+  
+  <h2>'.$l['admin_snowcms_news'].'</h2>
+	
+	<table width="100%">
+    <tr>
+      <td>'.$l['admin_current_version'].'</td>
+      <td>v'.$settings['version'].'</td>
+      <td>'.$l['admin_snowcms_current_version'].'</td>
+      <td>'.$settings['latest_version'].'</td>
+    </tr>
+  </table>
+  
+	<br />
+	
+  <div style="overflow: auto; width: 528px; height: 140px; margin: auto; border: solid 1px #467AA7">
+      '.$settings['page']['news'].'
+	</div>';
 }
 
 function NocURL() {

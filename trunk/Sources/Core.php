@@ -6,13 +6,13 @@
 //
 //   SnowCMS is released under the GPL v3 License
 //       which means you are free to edit and
-//          redistribute it as your wish!
+//           redistribute it as you wish!
 //
 //                   Core.php file
 
 
-if(!defined("Snow"))
-  die("Hacking Attempt...");
+if (!defined("Snow"))
+  die(header("HTTP/1.1 404 Not Found"));
 
 // This loads all the settings in the {db_prefix}settings table, also loads usernames into the settings array
 function loadSettings() {

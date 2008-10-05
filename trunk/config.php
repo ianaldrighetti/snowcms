@@ -6,14 +6,14 @@
 //
 //   SnowCMS is released under the GPL v3 License
 //       which means you are free to edit and
-//          redistribute it as your wish!
+//           redistribute it as you wish!
 //
 //                  config.php file
 
 // We can't let you access it directly :)
-if(!defined("Snow"))
-  die("Hacking Attempt...");
-  
+if (!defined("Snow"))
+  die(header("HTTP/1.1 404 Not Found"));
+
 // Your MySQL Information
 $mysql_host = 'localhost'; # Your MySQL Host, doubt you will change this
 $mysql_user = ''; # Your MySQL Username

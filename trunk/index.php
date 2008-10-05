@@ -6,7 +6,7 @@
 //
 //   SnowCMS is released under the GPL v3 License
 //       which means you are free to edit and
-//          redistribute it as your wish!
+//           redistribute it as you wish!
 //
 //                  index.php file
 
