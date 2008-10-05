@@ -445,7 +445,7 @@ global $l, $settings, $theme_dir, $theme_url;
   // These are added to make it so that if there isn't any code tags before or after some BBCode, it will still detect that it is outside code tags
   $str = '[/code]'.$str.'[code]';
   
-  // These three characters will have special meanings later, so wee need to encode them
+  // These three characters will have special meanings later, so we need to encode them
   $str = str_replace('!','&$33;',$str);
   $str = str_replace('#','&$35;',$str);
   $str = str_replace('$','&$36;',$str);
@@ -701,8 +701,12 @@ global $l, $settings, $theme_dir, $theme_url;
   // - was used in place of #, because # had a different meaning
   $str = str_replace('$','#',$str);
   
-  // convert ' to work properly
-  $str = str_replace('&&#35;39;','&#39;',$str);
+  // Convert ' to work properly
+  $str = str_replace('&&&#36;35;39;','&#39;',$str);
+  
+  // Convert special characters back to their normal form
+  $str = str_replace('&&#36;33;','!',$str);
+  $str = str_replace('&&#36;35;','#',$str);
   
   // Process newlines
   $str = strtr($str, array("\n" => "<br />"));

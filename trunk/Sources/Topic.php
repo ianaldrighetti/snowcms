@@ -101,13 +101,14 @@ global $cmsurl, $db_prefix, $l, $settings, $user;
       $posts = array();
       $result = sql_query("
         SELECT
-          t.tid, t.sticky, t.locked, t.bid, t.first_msg, grp.group_id, grp.groupname,
+          *, t.tid, t.sticky, t.locked, t.bid, t.first_msg, grp.group_id, grp.groupname,
           msg.mid, msg.tid, msg.bid, msg.uid, msg.subject, msg.post_time, msg.poster_name, msg.ip, msg.body,
           mem.id AS uid, mem.username, IFNULL(mem.username, msg.poster_name) AS username, mem.display_name, mem.avatar,
-          mem.signature, mem.group, mem.email, mem.numposts, ol.user_id, ol.last_active
+          mem.signature, mem.group, mem.email, mem.numposts, ol.user_id, ol.last_active, editor.display_name as editor_display_name
         FROM {$db_prefix}topics AS t
           LEFT JOIN {$db_prefix}messages AS msg ON msg.tid = t.tid
           LEFT JOIN {$db_prefix}members AS mem ON mem.id = msg.uid
+          LEFT JOIN {$db_prefix}members AS editor ON editor.id = msg.uid_editor
           LEFT JOIN {$db_prefix}membergroups AS grp ON grp.group_id = mem.group
           LEFT JOIN {$db_prefix}online AS ol ON ol.user_id = mem.id
         WHERE t.tid = '$Topic_ID'
@@ -126,6 +127,9 @@ global $cmsurl, $db_prefix, $l, $settings, $user;
             'post_time' => formattime($row['post_time'],2),
             'body' => bbc($row['body']),
             'username' => $row['display_name'] ? $row['display_name'] : $row['poster_name'],
+            'uid_editor' => $row['uid_editor'],
+            'editor_name' => $row['editor_display_name'] ? $row['editor_display_name'] : $row['editor_name'],
+            'edit_time' => $row['edit_time'],
             'avatar' => $row['avatar'],
             'signature' => bbc($row['signature']),
             'membergroup' => $row['groupname'],

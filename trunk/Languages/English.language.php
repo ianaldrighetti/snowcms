@@ -341,6 +341,7 @@ $l['topic_avatar'] = '%user%\'s avatar';
 $l['topic_online'] = 'Online';
 $l['topic_offline'] = 'Offline';
 $l['topic_posts'] = 'Posts:';
+$l['topic_edited'] = 'Edited by %user% at %time%';
 
 // Profile.template.php
 $l['profile_title'] = 'Profile';

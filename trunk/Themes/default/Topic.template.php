@@ -68,8 +68,16 @@ global $cmsurl, $theme_url, $l, $settings, $user;
     </div>
     <div id="post-right">
       <div id="post-content">
-        <p>'.$post['body'].'</p>
-      </div>';
+        <p>
+          '.$post['body'].'
+        </p>
+      ';
+  if ($post['uid_editor'])
+    echo '  <p style="font-size: x-small; padding-top: 5px; margin-bottom: 0">
+          <i>'.str_replace('%user%','<a href="'.$cmsurl.'index.php?action=profile;u='.$post['uid_editor'].'">'.$post['editor_name'].'</a>',
+              str_replace('%time%',formattime($post['edit_time'],2),$l['topic_edited'])).'</i>
+        </p>';
+  echo '</div>';
       if (!is_null($post['signature']))
       echo '
       <div id="user-sig">

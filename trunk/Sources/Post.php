@@ -237,7 +237,7 @@ global $cmsurl, $db_prefix, $l, $settings, $user;
         if ($edit = clean(@$_REQUEST['edit'])) {
           if ((canforum('edit_own', BoardFromTopic($Topic_ID)) && postOwner(@$_REQUEST['edit']) == $user['id']) || (canforum('edit_any', BoardFromTopic($Topic_ID)))) {
             // Yep!
-            sql_query("UPDATE {$db_prefix}messages SET `subject` = '$subject', `body` = '$body' WHERE `mid` = '$edit'");
+            sql_query("UPDATE {$db_prefix}messages SET `subject` = '$subject', `body` = '$body', `uid_editor` = '{$user['id']}', `editor_name` = '{$user['name']}', `edit_time` = '".time()."' WHERE `mid` = '$edit'");
             redirect('forum.php?topic='.clean_header($Topic_ID));
           }
         }
