@@ -41,7 +41,7 @@ global $cmsurl, $db_prefix, $l, $settings, $user, $theme_url;
           <th width="18px"></th>
         </tr>';
       
-      if (can('manage_forum_edit'))
+      if (can('manage_forum_edit')) {
         foreach ($settings['cats'] as $cat) {
           echo '
           <tr>
@@ -51,13 +51,14 @@ global $cmsurl, $db_prefix, $l, $settings, $user, $theme_url;
             echo '<td class="delete"><a href="', $cmsurl, 'index.php?action=admin;sa=forum;fa=categories;did=', $cat['id'], ';sc=', $user['sc'], '" onclick="return confirm(\'', $l['managecats_are_you_sure'], '\');"><img src="'.$theme_url.'/'.$settings['theme'].'/images/delete.png" alt="'.$l['managecats_category_delete'].'" width="15" height="15" /></td>';
           echo '
           </tr>';
+        }
         echo '
           <tr>
             <td></td><td><input name="update_cats" type="submit" value="', $l['managecats_update'], '"/></td><td></td>
           </tr>
         </table>
       </form>';
-        }
+      }
       elseif (can('manage_forum_delete'))
         foreach ($settings['cats'] as $cat) {
           echo '

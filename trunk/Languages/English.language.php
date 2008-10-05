@@ -666,13 +666,19 @@ $l['forum_startnew'] = 'Post New Topic';
 $l['forum_post_edit_submit'] = 'Save Changes';
 
 // Search.template.php
-$l['forum_search_title'] = 'Search';
-$l['forum_search_results_title'] = 'Search';
-$l['forum_search_noresults_title'] = 'Search';
-$l['forum_search_notallowed_title'] = 'Search';
-$l['forum_search_submit'] = 'Search';
-$l['forum_search_noresults'] = 'Your search returned no results.';
-$l['forum_search_notallowed'] = 'You\'re not allowed to search the forum.';
+$l['forumsearch_title'] = 'Forum Search';
+$l['forumsearch_header'] = 'Forum Search';
+$l['forumsearch_desc'] = 'Here you can search the forum.';
+$l['forumsearch_submit'] = 'Forum Search';
+$l['forumsearch_results_title'] = 'Forum Search';
+$l['forumsearch_results_header'] = 'Forum Search';
+$l['forumsearch_results_desc'] = 'Your search %query% returned %numb% result(s).';
+$l['forumsearch_noresults_title'] = 'Forum Search';
+$l['forumsearch_noresults_header'] = 'Forum Search';
+$l['forumsearch_noresults_desc'] = 'Your search %query% returned no results.';
+$l['forumsearch_notallowed_title'] = 'Forum Search';
+$l['forumsearch_notallowed_header'] = 'Forum Search';
+$l['forumsearch_notallowed_desc'] = 'You\'re not allowed to search the forum.';
 
 // Error.template.php
 $l['themeerror_title'] = 'Theme Error!';

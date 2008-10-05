@@ -127,27 +127,27 @@ global $l, $settings, $user, $db_prefix;
       // Were there any results?
       if ($settings['page']['results']) {
         // There were, load theme
-        $settings['page']['title'] = str_replace('%query%',$settings['page']['query'],$l['forum_search_results_title']);
+        $settings['page']['title'] = str_replace('%query%',$settings['page']['query'],$l['forumsearch_results_title']);
         LoadForum('Search','Results');
       }
       else {
         // There weren't, load this theme instead then
-        $settings['page']['title'] = str_replace('%query%',$settings['page']['query'],$l['forum_search_noresults_title']);
+        $settings['page']['title'] = str_replace('%query%',$settings['page']['query'],$l['forumsearch_noresults_title']);
         LoadForum('Search','NoResults');
       }
     }
     // No search query yet
     else {
       // Load theme
-      $settings['page']['title'] = $l['forum_search_title'];
+      $settings['page']['title'] = $l['forumsearch_title'];
       LoadForum('Search');
     }
   }
   // They're not allowed to search
   else {
     // Load theme
-    $settings['page']['title'] = $l['forum_search_notallowed_title'];
-    LoadForum('NotAllowed');
+    $settings['page']['title'] = $l['forumsearch_notallowed_title'];
+    LoadForum('Search','NotAllowed');
   }
 }
 ?>

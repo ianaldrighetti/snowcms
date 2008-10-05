@@ -10,10 +10,14 @@ function Main() {
 global $l, $settings;
   
   echo '
+  <h1>'.$l['forumsearch_header'].'</h1>
+  
+  <p>'.$l['forumsearch_desc'].'</p>
+  
   <form action="forum.php?action=search" method="post" style="text-align: center">
     <p>
       <input name="q" size="50" />
-      <input type="submit" value="'.$l['forum_search_submit'].'" />
+      <input type="submit" value="'.$l['forumsearch_submit'].'" />
     </p>
   </form>';
 }
@@ -23,10 +27,14 @@ global $l, $settings, $cmsurl;
   
   // Show search bar
   echo '
+  <h1>'.$l['forumsearch_results_header'].'</h1>
+  
+  <p>'.str_replace('%query%','<b>'.$settings['page']['query'].'</b>',str_replace('%numb%','5',$l['forumsearch_results_desc'])).'</p>
+  
   <form action="forum.php?action=search" method="post" style="text-align: center">
     <p>
       <input name="q" value="'.$settings['page']['query'].'" size="50" />
-      <input type="submit" value="'.$l['forum_search_submit'].'" />
+      <input type="submit" value="'.$l['forumsearch_submit'].'" />
     </p>
   </form>
   <hr />
@@ -122,20 +130,24 @@ function NoResults() {
 global $l, $settings;
   
   echo '
+  <h1>'.$l['forumsearch_noresults_header'].'</h1>
+  
+  <p>'.str_replace('%query%','<b>'.$settings['page']['query'].'</b>',$l['forumsearch_noresults_desc']).'</p>
+  
   <form action="forum.php?action=search" method="post" style="text-align: center">
     <p>
       <input name="q" value="'.$settings['page']['query'].'" size="50" />
-      <input type="submit" value="'.$l['forum_search_submit'].'" />
+      <input type="submit" value="'.$l['forumsearch_submit'].'" />
     </p>
-  </form>
-  <hr />
-  <p>'.str_replace('%query%',$settings['page']['query'],$l['forum_search_noresults']).'</p>';
+  </form>';
 }
 
 function NotAllowed() {
 global $l;
   
   echo '
-  <p>'.$l['forum_search_notallowed'].'</p>';
+  <h1>'.$l['forumsearch_notallowed_header'].'</h1>
+  
+  <p>'.$l['forumsearch_notallowed_desc'].'</p>';
 }
 ?>
