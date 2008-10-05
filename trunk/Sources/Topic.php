@@ -157,14 +157,13 @@ global $cmsurl, $db_prefix, $l, $settings, $user;
     }
     else {
       // Sneaky one aren't you? Trying to access a topic in a board you can't access :P Well we won't have it! ^_^
-      $settings['page']['title'] = $l['forum_error_topic_doesntexist_title'];    
-      loadForum('Topic','DoesntExist');
+      $settings['page']['title'] = $l['topic_unknown_title'];    
+      loadForum('Topic','UnknownTopic');
     }
   }
-  else {
-    $settings['page']['title'] = $l['forum_error_title'];
-    loadForum('Error','BNotAllowed');
-  }   
+  // You aren't allowed to view the forum
+  else
+    redirect('forum.php');
 }
 
 function Sticky() {

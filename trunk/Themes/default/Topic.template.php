@@ -127,13 +127,13 @@ global $cmsurl, $theme_url, $l, $settings, $user;
   ';
 }
 
-function DoesntExist() {
+function UnknownTopic() {
 global $cmsurl, $l, $settings, $user;
   
   echo '
-  <h1>'.$l['forum_error_topic_doesntexist_header'].'</h1>
+  <h1>'.$l['topic_unknown_header'].'</h1>
   
-  <p>'.$l['forum_error_topic_doesntexist_desc'].'</p>
+  <p>'.$l['topic_unknown_desc'].'</p>
   ';
 }
 

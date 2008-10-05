@@ -80,7 +80,7 @@ global $cmsurl, $db_prefix, $l, $settings, $user;
   }
   else {
     // Go away! :P You should not be here
-    $settings['page']['title'] = $l['forum_error_title'];
-    loadForum('Error','BNotAllowed');
+    $settings['page']['title'] = $l['forum_notallowed_title'];
+    loadForum('BoardIndex','NotAllowed');
   }
 }

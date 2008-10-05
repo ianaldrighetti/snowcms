@@ -24,7 +24,7 @@ if (!defined("Snow"))
 
 function loadBoard() {
 global $cmsurl, $db_prefix, $l, $settings, $user;
-  if(can('view_forum')) {
+  if (can('view_forum')) {
     // Get the Board ID
     $board_id = (int)$_REQUEST['board'];
     // Query! This is just kind of a query to see if they can view this board or not ;)
@@ -107,14 +107,12 @@ global $cmsurl, $db_prefix, $l, $settings, $user;
     }
     else {
       // No board has been found
-      $settings['page']['title'] = $l['forum_error_title'];
-      loadForum('Error','NoBoard');
+      $settings['page']['title'] = $l['board_unknown_title'];
+      loadForum('Board','UnknownBoard');
     }
   }
-  else {
-    // You aren't allowed to view this
-    $settings['page']['title'] = $l['forum_error_title'];
-    loadForum('Error','BNotAllowed');
-  }
+  // You aren't allowed to view the forum
+  else
+    redirect('forum.php');
 }
 ?>

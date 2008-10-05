@@ -278,44 +278,34 @@ $l['managepages_error_notallowed_homepage'] = 'You are not allowed to change the
 // Forum.template.php
 $l['forum_title'] = 'Forum Index';
 $l['forum_header'] = 'Forum Index';
-$l['forum_new_topic'] = 'New Topic';
-$l['forum_last_post'] = 'Last post by %user% in %msg%';
-// Forum.template.php - Links
-$l['forum_link_home'] = 'Home';
-$l['forum_link_forumindex'] = 'Forum Index';
-$l['forum_link_search'] = 'Search';
-$l['forum_link_admin'] = 'Admin';
-$l['forum_link_profile'] = 'Profile';
-$l['forum_link_members'] = 'Members';
-$l['forum_link_pm'] = 'Personal Messages';
-$l['forum_link_pm_unread'] = 'New Messages [%unread%]';
-$l['forum_link_register'] = 'Register';
-$l['forum_link_login'] = 'Login';
-// Forum.template.php - Board
 $l['forum_board_stats'] = '%posts% posts in %topics% topics';
+$l['forum_board_lastpost'] = 'Last post by %user% in %msg%';
 $l['forum_board_new'] = 'New posts';
 $l['forum_board_old'] = 'No new posts';
-$l['forum_board_subject'] = 'Subject';
-$l['forum_board_creator'] = 'Creator';
-$l['forum_board_replies'] = 'Replies';
-$l['forum_board_views'] = 'Views';
-$l['forum_board_last_post_title'] = 'Last Post';
-$l['forum_board_last_post'] = '%msg% by %user%';
-$l['forum_board_sticky'] = 'Sticky';
-$l['forum_no_posts'] = 'No Posts';
-$l['forum_topic_own_new'] = 'New replies';
-$l['forum_topic_new'] = 'New replies';
-$l['forum_topic_own_old'] = 'No new replies';
-$l['forum_topic_old'] = 'No new replies';
-// Forum.template.php - Errors
-$l['forum_error_title'] = 'Error';
-$l['forum_error_header'] = 'Error';
-$l['forum_error_message'] = 'Sorry, but you aren\'t allowed to view the '.$settings['site_name'].' forum.';
-$l['forum_error_cantviewb_message'] = 'Sorry, you are not allowed to view or access this board';
-$l['forum_error_noboard_message'] = 'The Board ID you have requested does not exist!';
-$l['forum_error_topic_doesntexist_title'] = 'Error';
-$l['forum_error_topic_doesntexist_header'] = 'Error';
-$l['forum_error_topic_doesntexist_desc'] = 'This topic doesn\'t exist. It may have been deleted or it may never have existed.';
+$l['forum_notallowed_title'] = 'Forum Index';
+$l['forum_notallowed_header'] = 'Forum Index';
+$l['forum_notallowed_desc'] = 'Sorry, but you aren\'t allowed to view the '.$settings['site_name'].' forum.';
+
+// Board.template.php
+$l['board_newtopic'] = 'New Topic';
+$l['board_subject'] = 'Subject';
+$l['board_creator'] = 'Creator';
+$l['board_replies'] = 'Replies';
+$l['board_views'] = 'Views';
+$l['board_lastpost'] = 'Last Post';
+$l['board_lastpost_data'] = '%msg% by %user%';
+$l['board_noposts'] = 'No Posts';
+$l['board_sticky'] = 'Sticky';
+$l['board_topic_own_new'] = 'New posts';
+$l['board_topic_new'] = 'New posts';
+$l['board_topic_own_old'] = 'No new posts';
+$l['board_topic_old'] = 'No new posts';
+$l['board_unknown_title'] = 'Unknown Board';
+$l['board_unknown_header'] = 'Unknown Board';
+$l['board_unknown_desc'] = 'This board does not exist or you do not have permission to view it.';
+$l['board_notallowed_title'] = 'Forum Index';
+$l['board_notallowed_header'] = 'Forum Index';
+$l['board_notallowed_desc'] = 'Sorry, but you aren\'t allowed to view the '.$settings['site_name'].' forum.';
 
 // Topic.template.php
 $l['topic_pages'] = 'Pages:';
@@ -344,6 +334,9 @@ $l['topic_online'] = 'Online';
 $l['topic_offline'] = 'Offline';
 $l['topic_posts'] = 'Posts:';
 $l['topic_edited'] = 'Edited by %user% at %time%';
+$l['topic_unknown_title'] = 'Unknown Topic';
+$l['topic_unknown_header'] = 'Unknown Topic';
+$l['topic_unknown_desc'] = 'This topic doesn\'t exist. It may have been deleted or it may have never existed.';
 
 // Profile.template.php
 $l['profile_title'] = 'Profile';

@@ -40,7 +40,7 @@ global $cmsurl, $theme_url, $l, $settings, $user;
             <td valign="middle" width="20%">'.
             ($board['last_post']['tid'] ? str_replace(
              '%msg%','<a href="'.$cmsurl.'forum.php?topic='.$board['last_post']['tid'].';msg='.$board['last_post']['mid'].'">'.$board['last_post']['subject'].'</a>',
-             str_replace('%user%','<a href="'.$cmsurl.'index.php?action=profile;u='.$board['last_post']['uid'].'">'.$board['last_post']['username'].'</a>',$l['forum_last_post'])) : '')
+             str_replace('%user%','<a href="'.$cmsurl.'index.php?action=profile;u='.$board['last_post']['uid'].'">'.$board['last_post']['username'].'</a>',$l['forum_board_lastpost'])) : '')
          .'</td>
           </tr>
         </table>
@@ -51,5 +51,15 @@ global $cmsurl, $theme_url, $l, $settings, $user;
     <div class="break">
     </div>';
   }
+}
+
+function NotAllowed() {
+global $l;
+  
+  echo '
+  <h1>'.$l['forum_notallowed_header'].'</h1>
+  
+  <p>'.$l['forum_notallowed_desc'].'</p>
+  ';
 }
 ?>
