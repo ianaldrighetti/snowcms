@@ -148,13 +148,25 @@ global $l, $settings, $db_prefix, $cmsurl;
   $settings['page']['total_members'] = @mysql_num_rows($all_members);
   
   // The current page number
-  $page = @$_REQUEST['pg'];
+  $page = $page_before = @$_REQUEST['pg'];
   // If the page number is lower then zero then make it zero
   if ($page < 0)
     $page = 0;
   // If page number is higher then maximum, lower it until it isn't
   while ($settings['num_members'] * $page >= $settings['page']['total_members'] && $page > 0)
     $page -= 1;
+    // If the page changed, redirect
+    if ($page != $page_before) {
+      $page = clean_header($page ? ';pg='.$page : '');
+      // Get the filter query
+      $f = clean_header(@$_REQUEST['f'] ? ';f='.$_REQUEST['f'] : '');
+      // Get the sort query
+      $s = clean_header(@$_REQUEST['s'] ? ';s='.$_REQUEST['s'] : '');
+      if ($admin)
+        redirect('index.php?action=admin;sa=members'.$f.$s.$page);
+      else
+        redirect('forum.php?action=members'.$f.$s.$page);
+    }
   
   // The first member number of this page
   $settings['page']['first_member'] = 1 + $start = $page * $settings['num_members'];

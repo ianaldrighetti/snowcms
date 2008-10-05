@@ -75,7 +75,7 @@ global $l, $db_prefix, $settings, $cmsurl, $theme_url;
     pagination($settings['page']['page'],$settings['page']['page_last'],'index.php?action=admin;sa=members'.$filter_get.$sort_get);
     
     // Show filter
-    echo '<form action="'.$cmsurl.'index.php" method="post" style="text-align: right; margin-bottom: 0"><p style="display: inline">
+    echo '<form action="'.$cmsurl.'index.php?action=admin;sa=members" method="post" style="text-align: right; margin-bottom: 0"><p style="display: inline">
        '.$settings['managemembers']['filter'].'
        </p></form>';
   }
