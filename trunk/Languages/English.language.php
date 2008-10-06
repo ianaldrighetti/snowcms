@@ -315,15 +315,11 @@ $l['topic_lastpage'] = 'Last Page';
 $l['topic_newtopic'] = 'New Topic';
 $l['topic_reply'] = 'Post Reply';
 $l['forum_postreply'] = 'Post Reply';
-$l['post_newtopic'] = 'Start new topic';
-$l['topic_topic_button'] = 'Post Topic';
-$l['topic_post_button'] = 'Post Reply';
 $l['topic_sticky'] = 'Sticky Topic';
 $l['topic_unsticky'] = 'Unsticky Topic';
 $l['topic_lock'] = 'Lock Topic';
 $l['topic_unlock'] = 'Unlock Topic';
 $l['topic_subject'] = 'Subject:';
-$l['post_postreply'] = 'Post Reply';
 $l['topic_editpost'] = 'Edit Post';
 $l['topic_quote'] = 'Reply with Quote';
 $l['topic_deletemsg'] = 'Delete Message';
@@ -662,8 +658,16 @@ $l['manageboards_edit_header'] = 'Edit Board';
 $l['manageboards_edit_button'] = 'Update Board';
 
 // Post.template.php
+$l['post_topic_header'] = 'New Topic';
+$l['post_topic_submit'] = 'Post Topic';
+$l['post_reply_header'] = 'Post Reply';
+$l['post_reply_submit'] = 'Post Reply';
+$l['post_edit_header'] = 'Edit Post';
+$l['post_edit_submit'] = 'Save Changes';
 $l['forum_startnew'] = 'Post New Topic';
-$l['forum_post_edit_submit'] = 'Save Changes';
+$l['post_edit_submit'] = 'Save Changes';
+$l['post_error_subject_short'] = 'That subject is too short.';
+$l['post_error_body_short'] = 'That post is too short.';
 
 // Search.template.php
 $l['forumsearch_title'] = 'Forum Search';

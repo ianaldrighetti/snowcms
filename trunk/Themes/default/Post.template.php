@@ -11,11 +11,15 @@ global $cmsurl, $settings, $l, $user, $theme_url, $theme_dir;
   echo '
   <script type="text/javascript" src="'.$theme_url.'/'.$settings['theme'].'/scripts/bbcode.js"></script>
   
+  <h1>'.$l['post_topic_header'].'</h1>
+  ';
+  
+  if (@$_SESSION['error'])
+    echo '<p><b>'.$l['main_error'].':</b> '.$_SESSION['error'].'</p>';
+  
+  echo '
   <form action="', $cmsurl, 'forum.php?action=post2;board=', $settings['board'], '" method="post"  class="write">
   <table id="post" border="0px">
-    <tr cellspacing="0px" cellpadding="0px">
-      <td class="title" colspan="3"><h1>'.$l['post_newtopic'].'</h1></td>
-    </tr>
     <tr align="center">
       <td width="20%">', $l['topic_subject'], '</td>
       <td><input name="subject" type="text" size="50" value="', $settings['subject'], '" />
@@ -70,7 +74,7 @@ global $cmsurl, $settings, $l, $user, $theme_url, $theme_dir;
   }
 echo '
     <tr align="center">
-      <td colspan="3"><input name="make_topic" type="submit" value="', $l['topic_topic_button'], '"/></td>
+      <td colspan="3"><input name="make_topic" type="submit" value="'.$l['post_topic_submit'].'"/></td>
     </tr>
   </table>
   </form>
@@ -85,12 +89,16 @@ global $cmsurl, $settings, $l, $user, $theme_url, $theme_dir;
   echo '
   <script type="text/javascript" src="'.$theme_url.'/'.$settings['theme'].'/scripts/bbcode.js"></script>
   
+  <h1>'.$l['post_reply_header'].'</h1>
+  ';
+  
+  if (@$_SESSION['error'])
+    echo '<p><b>'.$l['main_error'].':</b> '.$_SESSION['error'].'</p>';
+  
+  echo '
   <form action="', $cmsurl, 'forum.php?action=post2;topic=', $settings['topic'], '" method="post" class="write">
   <p><input type="hidden" name="edit" value="'.$settings['edit'].'" /></p>
   <table id="post" border="0px">
-    <tr cellspacing="0px" cellpadding="0px">
-      <td class="title" colspan="3"><h1>'.$l['post_postreply'].'</h1></td>
-    </tr>
     <tr align="center">
       <td width="20%">', $l['topic_subject'], '</td>
       <td><input name="subject" type="text" size="78" value="', $settings['subject'], '" />
@@ -143,7 +151,7 @@ global $cmsurl, $settings, $l, $user, $theme_url, $theme_dir;
   }
   echo '
     <tr align="center">
-      <td colspan="3"><input name="post_reply" type="submit" value="', $l['topic_post_button'] ,'"/></td>
+      <td colspan="3"><input name="post_reply" type="submit" value="'.$l['post_reply_submit'].'"/></td>
     </tr>
   </table>
   </form>
@@ -157,12 +165,16 @@ global $cmsurl, $settings, $l, $user, $theme_url, $theme_dir;
   echo '
   <script type="text/javascript" src="'.$theme_url.'/'.$settings['theme'].'/scripts/bbcode.js"></script>
   
+  <h1>'.$l['post_edit_header'].'</h1>
+  ';
+  
+  if (@$_SESSION['error'])
+    echo '<p><b>'.$l['main_error'].':</b> '.$_SESSION['error'].'</p>';
+  
+  echo '
   <form action="', $cmsurl, 'forum.php?action=post2;topic=', $settings['topic'], '" method="post" class="write">
   <p><input type="hidden" name="edit" value="'.$settings['edit'].'" /></p>
   <table id="post" border="0px">
-    <tr cellspacing="0px" cellpadding="0px">
-      <td class="title" colspan="3"><h1>'.$l['post_postreply'].'</h1></td>
-    </tr>
     <tr align="center">
       <td width="20%">', $l['topic_subject'], '</td>
       <td><input name="subject" type="text" size="78" value="', $settings['subject'], '" />
@@ -215,7 +227,7 @@ global $cmsurl, $settings, $l, $user, $theme_url, $theme_dir;
   }
   echo '
     <tr align="center">
-      <td colspan="3"><input name="post_reply" type="submit" value="', $l['forum_post_edit_submit'] ,'"/></td>
+      <td colspan="3"><input name="post_reply" type="submit" value="'.$l['post_edit_submit'].'"/></td>
     </tr>
   </table>
   </form>
