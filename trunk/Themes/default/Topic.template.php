@@ -72,11 +72,15 @@ global $cmsurl, $theme_url, $l, $settings, $user;
           '.$post['body'].'
         </p>
       ';
+  if ($post['can']['edit'])
+    echo '<p style="font-size: x-small; padding-top: 0px; text-align: right; margin-bottom: 0"><a href="#" onClick="quickEdit('.$post['tid'].','.$post['mid'].');return false;" title="'. $l['topic_editpost']. '"><img src="'. $theme_url.'/'.$settings['theme'].'/images/edit_post.png" alt="'. $l['topic_editpost'] .'"/></a></p>';
+    
   if ($post['uid_editor'])
     echo '  <p style="font-size: x-small; padding-top: 5px; margin-bottom: 0">
           <i>'.str_replace('%user%','<a href="'.$cmsurl.'index.php?action=profile;u='.$post['uid_editor'].'">'.$post['editor_name'].'</a>',
               str_replace('%time%',formattime($post['edit_time'],2),$l['topic_edited'])).'</i>
         </p>';
+       
   echo '</div>';
       if (!is_null($post['signature']))
       echo '
@@ -120,9 +124,10 @@ global $cmsurl, $theme_url, $l, $settings, $user;
   <br />
   ';
   if (canforum('post_reply', $settings['bid'])) echo '
+  <p><b>Quick Reply:</b></p>
   <form action="', $cmsurl, 'forum.php?action=post2;topic=', $settings['topic'], '" method="post" class="write">
   <p><textarea class="quickreply" name="body"></textarea></p>
-  <p style="text-align: center"><input type="submit" value="'.$l['topic_post_button'].'" /></p>
+  <p style="text-align: center"><input type="submit" value="'.$l['topic_reply'].'" /></p>
   </form>
   ';
 }
