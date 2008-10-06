@@ -36,6 +36,7 @@ require_once($source_dir.'/Core.php');
   loadMenus();
   loadTree();
   loadLanguage();
+  loadQuickEdit();
 // Write that this Guest/User is online
   WriteOnline();
 

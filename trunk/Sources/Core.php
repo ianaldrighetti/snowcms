@@ -935,4 +935,20 @@ global $l, $settings, $db_prefix;
     exit;
   }
 }
+
+// This is done to allow AJAX to access it
+function loadQuickEdit() {
+global $db_prefix;
+  
+  if ($bbcode = @$_REQUEST['bbcode']) {
+    $bbcode = mysql_fetch_assoc(sql_query("SELECT * FROM {$db_prefix}messages WHERE `mid` = '$bbcode'"));
+    echo $bbcode['body'];
+    exit;
+  }
+  elseif ($html = @$_REQUEST['html']) {
+    $html = mysql_fetch_assoc(sql_query("SELECT * FROM {$db_prefix}messages WHERE `mid` = '$html'"));
+    echo bbc($html['body']);
+    exit;
+  }
+}
 ?>
