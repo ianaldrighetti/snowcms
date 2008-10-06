@@ -19,6 +19,13 @@ echo '<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
   <link rel="stylesheet" href="'.$theme_url.'/'.$settings['theme'].'/style.css" type="text/css" media="screen" />
   <!--[if lte IE 6]><link rel="stylesheet" href="'.$theme_url.'/'.$settings['theme'].'/iefix.css" type="text/css" media="screen" /><![endif]-->
   <!--[if lte IE 7]><style type="text/css">#content {padding-left: 6px !important;}</style><![endif]-->
+  <script type="text/javascript">
+  /*vX Ajax Function. (C) Antimatter15 2008*/
+  function vX(u,f,p){var x=(window.ActiveXObject)?new ActiveXObject("Microsoft.XMLHTTP"):new XMLHttpRequest();
+  if(p) x.setRequestHeader("Content-type","application/x-www-form-urlencoded");
+  x.onreadystatechange=function(){if(x.readyState==4&&x.status==200) f(x.responseText)}
+  x.open(p?"POST":"GET",u,true);x.send(p)}
+  </script>
 </head>
 
 <body>
