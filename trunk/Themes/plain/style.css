@@ -1,0 +1,330 @@
+/*
+                Plain Theme
+   By The SnowCMS Team (www.snowcms.com)
+                 style.css
+*/
+
+body {
+  font-family: Arial, Sans;
+  font-size: small;
+}
+h1, h2, h3 {
+  font-family: Arial Black, Sans;
+}
+a {
+  color: #0000FF;
+  text-decoration: none;
+}
+a:hover {
+  color: #FF9900;
+  text-decoration: underline;
+}
+li {
+  margin-top: 5px;
+}
+* {
+  border: #CCCCCC;
+}
+.content .post-title {
+  color: #252525;
+  text-decoration: none;
+  font-size: 1.2em;
+  font-family: "Trebutchet MS",Verdana,Sans;
+}
+.content a:hover .post-title {
+  text-decoration: none;
+}
+.content span.date {
+  font-size: 0.8em;
+  margin-right: 15px;
+}
+.content span.commentnum {
+  font-size: 0.8em;
+}
+.content p.post {
+  padding: 5px;
+  margin-right: 10px;
+  border: 1px solid #CCCCCC;
+}
+.sidebar li {
+  color: #fff;
+  padding-top: 3px;
+  font-size: 0.9em;
+  list-style-type: square;
+}
+.sidebar a {
+  color: #fff;
+  font-size: 0.9em;
+  text-decoration: none;
+}
+.sidebar a:hover {
+  color: #5CA7DE;
+}
+.sidebar li:hover {
+  color: #5CA7DE;
+  font-weight: bold;
+}
+img.emoticon {
+  vertical-align: middle;
+}
+th.border {
+  border-style: solid;
+  border-width: 1px;
+}
+/* Admin CP CSS */
+.acp_left {
+  float: left;
+  width: 240px;
+  height: 65px;
+  overflow: hide;
+  border: 1px solid #CCCCCC;
+  margin-top: 3px;
+  margin-left: 25px;
+}
+.acp_right {
+  float: right;
+  width: 240px;
+  height: 65px;
+  border: 1px solid #CCCCCC;
+  margin-top: 3px;
+  margin-right: 25px;
+}
+.acp_left .main, .acp_right .main {
+  font-weight: bold;
+  font-size: 15px;
+  padding-top: 2px;
+  padding-left: 2px;
+  margin: 0px;
+  padding-right: 0px;
+  padding-bottom: 0px;
+}
+.acp_left .desc, .acp_right .desc {
+  font-size: 11px;
+  padding: 2px;
+  margin: 0px;
+}
+.padding th, .padding td {
+  padding-bottom: 5px;
+}
+/* Manage Categories */
+#mc .order {
+  border: 1px solid #CCCCCC;
+  width: 90%;
+}
+#mc .name {
+  border: 1px solid #CCCCCC;
+  width: 98%;
+}
+#mc .delete {
+  text-align: center;
+}
+#mc .delete a {
+  color: #CC0000;
+}
+#add_cat {
+  width: 100%;
+}
+#add_cat .add_header {
+  font-size: 14px;
+}
+#add_cat .cat_name {
+  border: 1px solid #CCCCCC;
+}
+#add_cat .order {
+  border: 1px solid #CCCCCC;
+}
+/* Manage Boards */
+#board_list input {
+  border: 1px solid #CCCCCC;
+  margin-top: 2px;
+}
+#board_list {
+  width: 100%;
+  padding: 0px;
+  margin: 0px;
+}
+#board_list .category {
+  border: 1px solid #CCCCCC;
+  height: 14px;
+  padding-left: 5px;
+  margin: 2px;
+  font-weight: bold;
+}
+#board_list .board {
+  border: 1px solid #CCCCCC;
+  height: 26px;
+  margin-top: 4px;
+  margin-left: 3%;
+  padding-top: 4px;
+  padding-left: 5px;
+}
+#board_list .board_order {
+  width: 5%;
+  text-align: center;
+}
+#board_list .board_name {
+  width: 80%;
+}
+#board_list .del {
+  color: #CC0000;
+}
+/* Add Boards */
+#add_board {
+  width: 100%;
+}
+input, textarea {
+  border: 1px solid #CCCCCC;
+}
+select {
+  width: 153px;
+  border: 1px solid #CCCCCC;
+}
+/* Forum */
+.link_tree {
+  width: 800px;
+  margin-right: auto;
+  margin-left: auto;
+  margin-top: 3px;
+  font-size: 90%;
+}
+.break {
+  clear: both;
+}
+.pm {
+  width: 800px;
+  margin-top: 5px;
+  margin-right: auto;
+  margin-left: auto;
+  background: #FFFFFF;
+}
+.memberlist {
+  width: 800px;
+  margin-top: 5px;
+  margin-right: auto;
+  margin-left: auto;
+  background: #FFFFFF;
+}
+.code-outer {
+  border-style: solid;
+  border-width: 1px;
+  margin: 5px;
+}
+.code-inner {
+  margin: 5px;
+  font-family: 'Courier New';
+}
+#pagination {
+  width: 800px;
+  text-align: right;
+  color: #FFF;
+  margin-right: auto;
+  margin-left: auto;
+  margin-top: 5px;
+}
+img.emoticon {
+  vertical-align: middle;
+}
+th.border {
+  border-style: solid;
+  border-width: 1px;
+}
+/* Board */
+.title th {
+  border-style: solid;
+  border-width: 1px;
+}
+.title .no-border {
+  border-style: none;
+}
+.messageindex_panel {
+  background: transparent;
+  margin-right: auto;
+  margin-left: auto;
+}
+.topic_panel {
+  background: transparent;
+  width: 100%;
+  margin-right: auto;
+  margin-left: auto;
+}
+/* Topic */
+#post-info {
+  float: right;
+  width: 459px;
+  padding-left: 5px;
+  text-align: left;
+  font-weight: bold;
+  border-style: solid;
+  border-width: 1px;
+}
+#post-info p {
+  margin: 1px;
+  margin-top: 4px;
+  margin-right: 4px;
+}
+#post-container {
+  background: url('images/postbg.png');
+}
+#post-container #post-left {
+  float: left;
+  width: 100px;
+  padding: 7px;
+  padding-top: 0;
+  font-weight: bold;
+  overflow: hidden;
+  border-top-style: solid;
+  border-width: 1px;
+}
+#post-container #post-right {
+  width: 464px;
+  float: right;
+  background: #FFFFFF;
+  text-align: left;
+}
+#post-container #post-right #post-content {
+  padding: 5px;
+  overflow: auto;
+}
+#post-container #post-right #user-sig {
+  padding: 5px;
+}
+textarea.quickreply {
+  width: 100%;
+  height: 100px;
+}
+.topic-page-end {
+  border-top-style: solid;
+  border-width: 1px;
+  width: 115px;
+}
+/* Posting new topics or replies */
+#post {
+  margin-top: 5px;
+  margin-right: auto;
+  margin-left: auto;
+  background: #FFFFFF;
+}
+#post-content a, .indexcontent a, #board a, .write a {
+  color: #1D5A9F;
+}
+/* Search */
+.search {
+  width: 800px;
+  margin-top: 5px;
+  margin-right: auto;
+  margin-left: auto;
+  background: #FFFFFF;
+}
+.results {
+  border-collapse: collapse;
+}
+.results td {
+  padding: 2px;
+  vertical-align: top;
+}
+.results .header {
+  background: #28A3DC;
+}
+.results .sidebar {
+  background: #28A3DC;
+}

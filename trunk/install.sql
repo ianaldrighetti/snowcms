@@ -131,7 +131,7 @@ INSERT INTO `{$db_prefix}menus` VALUES
 ('6','6','Messages [%unread_pms%]','forum.php?action=pm','0','3','6'),
 ('7','7','Member List','forum.php?action=members','0','3','3'),
 ('8','8','Forum Search','forum.php?action=search','0','3','3'),
-('9','9','SnowCMS','http://www.snowcms.com/','1','2','1'),
+('9','9','SnowCMS','http://www.snowcms.com/','1','3','1'),
 ('10','10','Logout','index.php?action=logout%semicolon%sc=%sc%','0','3','3'),
 ('11','11','Login','index.php?action=login','0','3','2'),
 ('12','12','Register','index.php?action=register','0','3','2'),
