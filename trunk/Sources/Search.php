@@ -21,12 +21,12 @@ global $l, $settings, $user, $db_prefix;
   if (can('search')) {
     // Translate post data into get data
     if (@$_POST['q'])
-      redirect('forum.php?action=search;q='.str_replace(' ','+',clean_header($_POST['q'])));
+      redirect('forum.php?action=search;q='.str_replace('=','%3D',str_replace(';','%3B',str_replace(' ','+',clean_header($_POST['q'])))));
     
     // If a search query has been entered, start searching
     if (@$_REQUEST['q']) {
       // Get the search query ready
-      $q = explode('+',clean($_REQUEST['q']));
+      $q = explode('+',str_replace('%3D','=',str_replace('%3B',';',clean($_REQUEST['q']))));
       // Add regex to the search query words
       foreach ($q as $key => $value) {
         $q[$key] = '/'.$value.'/i';
