@@ -119,7 +119,7 @@ global $cmsurl, $theme_url, $l, $settings, $user;
   </table>
   <br />
   ';
-  echo '
+  if (canforum('post_reply', $settings['bid'])) echo '
   <form action="', $cmsurl, 'forum.php?action=post2;topic=', $settings['topic'], '" method="post" class="write">
   <p><textarea class="quickreply" name="body"></textarea></p>
   <p style="text-align: center"><input type="submit" value="'.$l['topic_post_button'].'" /></p>
