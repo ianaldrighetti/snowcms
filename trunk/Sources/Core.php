@@ -938,17 +938,18 @@ global $l, $settings, $db_prefix;
 
 // This is done to allow AJAX to access it
 function loadQuickEdit() {
-global $db_prefix;
-  
+global $user, $db_prefix;
   if ($bbcode = @$_REQUEST['bbcode']) {
-    $bbcode = mysql_fetch_assoc(sql_query("SELECT * FROM {$db_prefix}messages WHERE `mid` = '$bbcode'"));
-    echo $bbcode['body'];
-    exit;
+    if ($bbcode = mysql_fetch_assoc(sql_query("SELECT * FROM {$db_prefix}messages LEFT JOIN {$db_prefix}boards AS b ON b.bid = messages.bid WHERE `mid` = '$bbcode' AND (FIND_IN_SET('{$user['group']}', 'b.who_view') OR '{$user['group']}' = '1')"))) {
+      echo $bbcode['body'];
+      exit;
+    }
   }
   elseif ($html = @$_REQUEST['html']) {
-    $html = mysql_fetch_assoc(sql_query("SELECT * FROM {$db_prefix}messages WHERE `mid` = '$html'"));
-    echo bbc($html['body']);
-    exit;
+    if ($html = mysql_fetch_assoc(sql_query("SELECT * FROM {$db_prefix}messages LEFT JOIN {$db_prefix}boards AS b ON b.bid = messages.bid WHERE `mid` = '$html' AND (FIND_IN_SET('{$user['group']}', 'b.who_view') OR '{$user['group']}' = '1')"))) {
+      echo bbc($html['body']);
+      exit;
+    }
   }
 }
 ?>
