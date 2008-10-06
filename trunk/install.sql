@@ -184,6 +184,16 @@ CREATE TABLE `{$db_prefix}pages` (
 INSERT INTO `{$db_prefix}pages` (`page_owner`, `owner_name`, `create_date`, `title`, `content`, `html`) VALUES
 ('-1','The SnowCMS Team','%current_time%','Welcome to SnowCMS','<p>Congratulations! Your SnowCMS installation has been successfully completed. Please delete your <code>install.php</code> file now. You can start modifying the default settings and adding content to your site right now. If you get stuck, you can always get support at the <a href="http://www.snowcms.com/">official SnowCMS website</a>.</p>
 
+<p><b>Common tasks:</b></p>
+
+<ul>
+<li>You can change your site logo for most themes by replacing the file <code>/Themes/<i>theme</i>/images/site_logo.png</code>.</li>
+<li>You can change your theme at <a href="index.php?action=admin%semicolon%sa=basic-settings">basic settings</a> or download more at <a href="http://www.snowcms.com/">SnowCMS.com</a>.</li>
+<li>You can modify what things say by changing the file <code>/Languages/<i>English</i>.language.php</code></li>
+<li>SnowCMS is open source, you can modify any file you want. (May not apply to all themes.)</li>
+<li>Remember to set your <a href="index.php?action=admin%semicolon%sa=mail-settings">mail settings</a> before enabling any email features.</li>
+</ul>
+
 <p><br /></p>
 
 <p>Thank you for choosing SnowCMS,</p>

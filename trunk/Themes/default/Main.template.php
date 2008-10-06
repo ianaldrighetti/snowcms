@@ -3,14 +3,15 @@
 // By The SnowCMS Team (www.snowcms.com)
 //           Main.template.php
 
-if(!defined('Snow'))
+if (!defined('Snow'))
   die("Hacking Attempt...");
 
 // If you want to change the layout of the site, you can edit this file, and it will change the layout of your site
 // However, if you want to change your forums layout, look at Forum.template.php 
 function theme_header() {
 global $l, $cmsurl, $theme_url, $settings, $user;
-echo '<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+  
+  echo '<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
   "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
 
@@ -24,10 +25,10 @@ echo '<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
 
 <body>
 <div class="container">
-  <div class="header">
-    <a class="headerlink" href="'.$cmsurl.'" title="'.$settings['site_name'].'"><img class="headerimg" src="'.$theme_url.'/'.$settings['theme'].'/images/title.png" alt="'.$settings['site_name'].'" /></a>
-  </div>
   <div class="sidebar">
+  <a href="'.$cmsurl.'" title="'.$settings['site_name'].'">
+    <img class="site_logo" src="'.$theme_url.'/'.$settings['theme'].'/images/site_logo.png" alt="'.$settings['site_name'].'" />
+  </a>
   <ul>';
   // Show the Side Menu
   theme_menu('side');
@@ -36,6 +37,7 @@ echo '<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
   ';
   languageOption();
   echo '</div>
+  <div class="header-right"></div>
   <div class="content">
   ';
 }

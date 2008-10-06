@@ -23,21 +23,19 @@ echo '<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
 
 <body>
 <div class="container">
-  <div class="header">
-    <div id="headerimg">
-      <a class="headerlink" href="'.$cmsurl.'" title="'.$settings['site_name'].'"><img class="headerimg" src="'.$theme_url.'/'.$settings['theme'].'/images/title.png" alt="'.$settings['site_name'].'" /></a>
-    </div>
-  </div>
   <div class="sidebar">
-    <ul>';
+  <a href="'.$cmsurl.'" title="'.$settings['site_name'].'">
+    <img class="site_logo" src="'.$theme_url.'/'.$settings['theme'].'/images/site_logo.png" alt="'.$settings['site_name'].'" />
+  </a>
+  <ul>';
       // Show the Side Menu
       theme_menu('side');
     echo '
     </ul>
-  </div>
   ';
   //languageOption();
-  echo '
+  echo '</div>
+  <div class="header-right"></div>
   <div class="content">
   '.link_tree();
 }

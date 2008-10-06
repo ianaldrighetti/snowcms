@@ -113,7 +113,7 @@ $files = array(
   './Themes/default/images/star.png',
   './Themes/default/images/status_offline.png',
   './Themes/default/images/status_online.png',
-  './Themes/default/images/title.png',
+  './Themes/default/images/site_logo.png',
   './Themes/default/images/topic_locked.png',
   './Themes/default/images/topic_new.png',
   './Themes/default/images/topic_old.png',
@@ -148,14 +148,10 @@ ob_start();
 </head>
 <body>
 <div class="container">
-  <div class="header">
-    <div class="headerimg">
-      <a class="headerlink" href="http://www.snowcms.com/" title="SnowCMS">
-        <img class="headerimg" src="Themes/default/images/title.png" alt="SnowCMS" />
-      </a>
-    </div>
-  </div>
   <div class="sidebar">
+  <a href="install.php" title="'.$settings['site_name'].'">
+    <img class="site_logo" src="Themes/default/images/site_logo.png" alt="'.$settings['site_name'].'" />
+  </a>
   <ul>
     <li><a href="http://www.snowcms.com/">SnowCMS.com</a></li>
     <li><a href="http://snowcms.google.com/">Google Code</a></li>
@@ -163,6 +159,7 @@ ob_start();
     <li><a href="http://www.snowcms.com/forum.php?board=4">Developer Blogs</a></li>
   </ul>
   </div>
+  <div class="header-right"></div>
   <div class="content">
     <?php
   $step = $_REQUEST['step'] ? $_REQUEST['step'] : 1;

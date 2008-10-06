@@ -15,28 +15,26 @@ body {
   margin-right: auto;
   background: url('images/containerbg.png') #fff;
 }
-.header {
-  background: url('images/headbar.png') #28A3DC;
-  width: 800px;
+.header-right {
+  background: url('images/headbar.png') no-repeat;
+  width: 619px;
   height: 35px;
   margin: 0px;
   padding: 0px;
-  float: left;
+  float: right;
 }
 .sidebar {
   color: #fff;
-  margin: 0 0 0 0;
-  padding-top: 0px;
   float: left;
+  width: 181px;
+  overflow: hidden;
 }
 .content {
   float: right;
   background: #fff;
   color: #252525;
-  margin: 0 10px 0 0;
   padding-top: 10px;
-  padding-left: 7px;
-  width: 580px;
+  width: 579px;
   margin: 20px;
   margin-top: 0;
   display: inline;
@@ -68,17 +66,6 @@ img {
 textarea {
   font-family: Verdana,Arial,Sans;
   font-size: 12px;
-}
-a.headerlink {
-  text-decoration: none;
-  border: 0;
-}
-img.headerimg {
-  margin-left: 46px;
-  margin-top: 1px;
-  margin-bottom: 1px;
-  border: 0;
-  text-decoration: none;
 }
 .content .post-title {
   color: #252525;
