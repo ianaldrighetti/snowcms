@@ -68,9 +68,9 @@ global $cmsurl, $theme_url, $l, $settings, $user;
     </div>
     <div id="post-right">
       <div class="post-content" id="pcmid'.$post['mid'].'">
-        <p>
+        <div><p>
           '.$post['body'].'
-        </p>
+        </p></div>
       ';
   if ($post['can']['edit'])
     echo '<p style="font-size: x-small; padding-top: 0px; text-align: right; margin-bottom: 0"><a href="#" onClick="quickEdit('.$post['tid'].','.$post['mid'].');return false;" title="'. $l['topic_editpost']. '"><img src="'. $theme_url.'/'.$settings['theme'].'/images/edit_post.png" alt="'. $l['topic_editpost'] .'"/></a></p>';

@@ -17,13 +17,12 @@
   function quickEdit_save(cnt){
     var tmid = cnt.getElementsByTagName("input")[0].value.split(";");
 
-    
     vX("forum.php?action=post2;topic="+tmid[0], function(e){
       vX("forum.php?html="+tmid[1], function(x){
         cnt.innerHTML = cnt.getElementsByTagName("textarea")[1].value;
-        cnt.getElementsByTagName("p")[0].innerHTML = x;
+        cnt.getElementsByTagName("div")[0].innerHTML = x;
       });
-    },"edit="+tmid[1]+"&body="+cnt.getElementsByTagName("textarea")[0].value)
+    },"edit="+tmid[1]+"&body="+encodeURIComponent(cnt.getElementsByTagName("textarea")[0].value))
     
     cnt.getElementsByTagName("textarea")[0].value = "Saving..."
     cnt.getElementsByTagName("textarea")[0].disabled = true;
