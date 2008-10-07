@@ -19,35 +19,8 @@ echo '<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
   <link rel="stylesheet" href="'.$theme_url.'/'.$settings['theme'].'/style.css" type="text/css" media="screen" />
   <!--[if lte IE 6]><link rel="stylesheet" href="'.$theme_url.'/'.$settings['theme'].'/iefix.css" type="text/css" media="screen" /><![endif]-->
   <!--[if lte IE 7]><style type="text/css">#content {padding-left: 6px !important;}</style><![endif]-->
-  <script type="text/javascript">
-  /*vX Ajax Function. (C) Antimatter15 2008*/
-  function vX(u,f,p){var x=(window.ActiveXObject)?new ActiveXObject("Microsoft.XMLHTTP"):new XMLHttpRequest();
-  x.open(p?"POST":"GET",u,true);if(p) x.setRequestHeader("Content-type","application/x-www-form-urlencoded");
-  x.onreadystatechange=function(){if(x.readyState==4&&x.status==200) f(x.responseText)};x.send(p)}
-  /*QuickEdit*/
-  function quickEdit(tid, mid){
-    vX("forum.php?bbcode="+mid, function(e){
-      var el = document.getElementsByName("pcmid"+mid)[0];
-      var bak = el.innerHTML;
-      el.innerHTML = "<input type=\\"hidden\\" value=\\""+tid+";"+mid+"\\"><textarea name=\\"editor\\" style=\\"width: 100%; height: 200px\\">"+e+"</textarea><br><input type=\\"button\\" onClick=\\"quickEdit_save(this.parentNode)\\" value=\\"Save\\"><input type=\\"button\\" value=\\"Cancel\\" onClick=\\"quickEdit_cancel(this.parentNode)\\"><textarea name=\\"backup\\" style=\\"display: none\\">"+bak+"</textarea>";
-    })
-  }
-  
-  function quickEdit_cancel(cnt){
-    cnt.innerHTML = cnt.getElementsByTagName("textarea")[1].value
-  }
-  
-  function quickEdit_save(cnt){
-    var tmid = cnt.getElementsByTagName("input")[0].value.split(";");
-    
-    vX("forum.php?action=post2;topic="+tmid[0], function(e){
-      vX("forum.php?html="+tmid[1], function(x){
-        cnt.innerHTML = cnt.getElementsByTagName("textarea")[1].value;
-        cnt.getElementsByTagName("p")[0].innerHTML = x;
-      });
-    },"edit="+tmid[1]+"&body="+cnt.getElementsByTagName("textarea")[0].value)
-  }
-  </script>
+  <script type="text/javascript" src="'.$theme_url.'/'.$settings['theme'].'/scripts/vX.js"></script>
+  <script type="text/javascript" src="'.$theme_url.'/'.$settings['theme'].'/scripts/quickedit.js"></script>
 </head>
 
 <body>
