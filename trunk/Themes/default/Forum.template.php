@@ -26,31 +26,13 @@ echo '<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
   x.onreadystatechange=function(){if(x.readyState==4&&x.status==200) f(x.responseText)};x.send(p)}
   /*QuickEdit*/
   function quickEdit(tid, mid){
-    alert("if this actually worked, you\'d be editing a post now. (tid:"+tid+", mid: "+mid+")");
-    vX("index.php", function(e){
-      alert("But just to show how awesome Antimatter15\'s vX Ajax library is, index.php is "+e.length+" characters long.")
-      alert("Seriously");
-      alert("Now go get angry at me. Or soemthing.");
-      vX("forum.php?action=post2;topic="+tid, function(e){
-        alert("Now go refresh the page and see how awesome vX really is");
-        alert("If you\'re a dev (Myles or Aldo), this needs 3 things to work.\\n 1) it needs to have a way to get the BBCode source of a post. \\n 2) it needs a way to edit (duh, i think this is already implemented).");
-        
-        if(confirm("Do you really really wanna edit?")){
-          var content = prompt("Put in what crap you wan to edit this post into")
-          if(content){
-            vX("forum.php?action=post2;topic="+tid, function(e){
-              alert("You Win!");
-              alert("Now, Myles/Aldo, you also need a way to grab the updated HTML output as well as the BBCode.");
-            },"edit="+mid+"&body="+content)
-          }else{
-            alert("looser, you need to put crap in it!")
-          }
-        }else{
-          alert("You=Lose");
-        }
-        
-      }, "body=Antimatter15 has an awesome vX AjaX Library.")
+    vX("forum.php?bbcode="+mid, function(e){
+      var el = document.getElementsByName("pcmid"+mid)[0];
+      var bak = el.innerHTML;
+      el.innerHTML = "<textarea style=\\"width: 100%; height: 200px\\"></textarea><br><input type=\\"button\\" value=\\"Save\\">";
+      
     })
+    
   }
   </script>
 </head>
