@@ -42,7 +42,8 @@ echo '<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
     
     vX("forum.php?action=post2;topic="+tmid[0], function(e){
       vX("forum.php?html="+tmid[1], function(x){
-        cnt.innerHTML = x;
+        cnt.innerHTML = cnt.getElementsByTagName("textarea")[1].value;
+        cnt.getElementsByTagName("p")[0].innerHTML = x;
       });
     },"edit="+tmid[1]+"&body="+cnt.getElementsByTagName("textarea")[0].value)
   }
