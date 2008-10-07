@@ -323,7 +323,7 @@ th.border {
   background: #FFFFFF;
   text-align: left;
 }
-#post-container #post-right #post-content {
+#post-container #post-right .post-content {
   padding: 5px;
   overflow: auto;
 }
@@ -346,7 +346,7 @@ textarea.quickreply {
   margin-left: auto;
   background: #FFFFFF;
 }
-#post-content a, .indexcontent a, #board a, .write a {
+.post-content a, .indexcontent a, #board a, .write a {
   color: #1D5A9F;
 }
 /* Search */

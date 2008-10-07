@@ -1,8 +1,7 @@
-
   /*QuickEdit*/
   function quickEdit(tid, mid){
     vX("forum.php?bbcode="+mid, function(e){
-      var el = document.getElementsByName("pcmid"+mid)[0];
+      var el = document.getElementById("pcmid"+mid);
       var bak = el.innerHTML;
       el.innerHTML = "<input type=\"hidden\" value=\""+tid+";"+mid+"\"><textarea name=\"editor\" style=\"width: 99%; height: 200px\">"+e+"</textarea><br><input type=\"button\" onClick=\"quickEdit_save(this.parentNode)\" value=\"Save\"><input type=\"button\" value=\"Cancel\" onClick=\"quickEdit_cancel(this.parentNode)\"><textarea name=\"backup\" style=\"display: none\">"+bak+"</textarea>";
     })
