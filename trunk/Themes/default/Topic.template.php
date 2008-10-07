@@ -37,7 +37,7 @@ global $cmsurl, $theme_url, $l, $settings, $user;
   </table>
   ';
   foreach($settings['posts'] as $post) {
-  echo '  
+  echo '
     <a name="mid'.$post['mid'].'"></a>
     <div id="post-container">
     <div id="post-left">
@@ -92,6 +92,7 @@ global $cmsurl, $theme_url, $l, $settings, $user;
     </div>
     <div class="break">
     </div>
+  <br />
   </div>';
   }
   echo '
