@@ -22,7 +22,7 @@ global $cmsurl, $settings, $l, $user, $theme_url, $theme_dir;
   <table id="post" border="0px">
     <tr align="center">
       <td width="20%">', $l['topic_subject'], '</td>
-      <td><input name="subject" type="text" size="50" value="', $settings['subject'], '" />
+      <td><input name="subject" type="text" size="50" value="', $settings['subject'], '" tabindex=1/>
       <td width="20%"></td>
     </tr>
     <tr align="center" valign="middle">
@@ -53,7 +53,7 @@ global $cmsurl, $settings, $l, $user, $theme_url, $theme_dir;
       </td>
     </tr>
     <tr align="center">
-      <td colspan="3"><textarea id="body" name="body" rows="12" cols="60" onclick="if(document.selection){this.selection = document.selection.createRange()}" onkeyup="if(document.selection){this.selection = document.selection.createRange()}" onchange="if(document.selection){this.selection = document.selection.createRange().duplicate()}" onfocus="if(document.selection){this.selection = document.selection.createRange().duplicate()}">', $settings['body'], '</textarea></td>
+      <td colspan="3"><textarea tabindex=2 id="body" name="body" rows="12" cols="60" onclick="if(document.selection){this.selection = document.selection.createRange()}" onkeyup="if(document.selection){this.selection = document.selection.createRange()}" onchange="if(document.selection){this.selection = document.selection.createRange().duplicate()}" onfocus="if(document.selection){this.selection = document.selection.createRange().duplicate()}">', $settings['body'], '</textarea></td>
     </tr>';
   if(canforum('sticky_topic', $settings['board']) || canforum('lock_topic', $settings['board'])) {
     if($settings['sticky'])
@@ -74,7 +74,7 @@ global $cmsurl, $settings, $l, $user, $theme_url, $theme_dir;
   }
 echo '
     <tr align="center">
-      <td colspan="3"><input name="make_topic" type="submit" value="'.$l['post_topic_submit'].'"/></td>
+      <td colspan="3"><input name="make_topic" tabindex=3 type="submit" value="'.$l['post_topic_submit'].'"/></td>
     </tr>
   </table>
   </form>
