@@ -940,16 +940,20 @@ global $l, $settings, $db_prefix;
 function loadQuickEdit() {
 global $user, $db_prefix;
   if ($bbcode = @$_REQUEST['bbcode']) {
-    if ($bbcode = mysql_fetch_assoc(sql_query("SELECT * FROM {$db_prefix}messages LEFT JOIN {$db_prefix}boards AS b ON b.bid = {$db_prefix}messages.bid WHERE `mid` = '$bbcode' AND (FIND_IN_SET('{$user['group']}', 'b.who_view') OR '{$user['group']}' = '1')"))) {
+    if ($bbcode = mysql_fetch_assoc(sql_query("SELECT * FROM {$db_prefix}messages LEFT JOIN {$db_prefix}boards AS b ON b.bid = {$db_prefix}messages.bid WHERE `mid` = '$bbcode' AND (FIND_IN_SET('{$user['group']}', `b`.`who_view`) OR '{$user['group']}' = '1')"))) {
       echo $bbcode['body'];
       exit;
     }
+    else
+      exit;
   }
   elseif ($html = @$_REQUEST['html']) {
-    if ($html = mysql_fetch_assoc(sql_query("SELECT * FROM {$db_prefix}messages LEFT JOIN {$db_prefix}boards AS b ON b.bid = {$db_prefix}messages.bid WHERE `mid` = '$html' AND (FIND_IN_SET('{$user['group']}', 'b.who_view') OR '{$user['group']}' = '1')"))) {
+    if ($html = mysql_fetch_assoc(sql_query("SELECT * FROM {$db_prefix}messages LEFT JOIN {$db_prefix}boards AS b ON b.bid = {$db_prefix}messages.bid WHERE `mid` = '$html' AND (FIND_IN_SET('{$user['group']}', `b`.`who_view`) OR '{$user['group']}' = '1')"))) {
       echo bbc($html['body']);
       exit;
     }
+    else
+      exit;
   }
 }
 ?>
