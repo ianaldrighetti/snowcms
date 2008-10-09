@@ -353,7 +353,7 @@ ob_start();
         
         <textarea cols="90" rows="30" readonly="readonly">'.$_SESSION['config'].'</textarea>
         
-        <p><a href=".">Click here</a> one you are done.</p>';
+        <p><a href=".">Click here</a> once you are done.</p>';
       else {
         // Create the config.php file which holds details about MySQL and paths we will need all the time
         $config = '<?php
