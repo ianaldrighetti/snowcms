@@ -389,8 +389,9 @@ global $db_prefix, $settings, $Topic_ID, $user;
      msg.tid, msg.mid, msg.uid, msg.poster_name, msg.body,
      mem.id, mem.display_name AS username, IFNULL(mem.display_name, msg.poster_name) AS username
     FROM {$db_prefix}messages AS msg
+      LEFT JOIN {$db_prefix}boards AS b ON b.bid = msg.bid
       LEFT JOIN {$db_prefix}members AS mem ON mem.id = msg.uid
-    WHERE msg.tid = '$Topic_ID' AND msg.uid = '{$user['board_query']}'
+    WHERE msg.tid = '$Topic_ID' AND msg.uid = {$user['board_query']}
     ORDER BY msg.mid DESC LIMIT 6");
   $settings['preview'] = array();
   while($row = mysql_fetch_assoc($result)) {
