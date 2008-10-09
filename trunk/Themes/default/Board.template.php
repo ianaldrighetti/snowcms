@@ -48,7 +48,7 @@ if (count($settings['topics']) > 0) {
      if ($topic['locked'])
        echo '<img src="'.$theme_url.'/'.$settings['theme'].'/images/topic_locked.png" style="float: right" />';
      if ($topic['sticky'])
-       echo $l['forum_board_sticky'].': <b><a href="'.$cmsurl.'forum.php?topic='.$topic['tid'].'">'.$topic['subject'].'</a></b>';
+       echo $l['board_sticky'].': <b><a href="'.$cmsurl.'forum.php?topic='.$topic['tid'].'">'.$topic['subject'].'</a></b>';
      else
        echo '<a href="'.$cmsurl.'forum.php?topic='.$topic['tid'].'">'.$topic['subject'].'</a>';
      echo '
