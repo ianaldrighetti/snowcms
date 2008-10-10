@@ -45,6 +45,7 @@ global $cmsurl, $db_prefix, $l, $settings, $user;
 	            VALUES ($board_id, {$user['id']})");
 	        }
 	      }
+	      $start = (int)@$_REQUEST['pg'] * $settings['num_topics'];
         $result = sql_query("
           SELECT 
             t.tid, t.sticky, t.locked, t.bid, t.first_msg, t.last_msg, IFNULL(t.last_msg, t.first_msg) AS last_msg, t.topic_starter, t.topic_ender AS topic_ender, IFNULL(t.topic_ender, t.topic_starter) AS topic_ender, t.num_replies, log.uid AS is_new, log.tid,
@@ -62,7 +63,8 @@ global $cmsurl, $db_prefix, $l, $settings, $user;
             LEFT JOIN {$db_prefix}topic_logs AS log ON log.uid = {$user['id']} AND log.tid = t.tid
           WHERE 
             t.bid = $board_id
-          ORDER BY t.sticky DESC, last_post_time DESC");
+          ORDER BY t.sticky DESC, last_post_time DESC
+          LIMIT $start, {$settings['num_topics']}");
         $topics = array();
         while($row = mysql_fetch_assoc($result)) {
           if(isset($row['is_new']))
@@ -99,7 +101,6 @@ global $cmsurl, $db_prefix, $l, $settings, $user;
         $settings['page']['page'] = (int)@$_REQUEST['pg'];
         $total_topics = mysql_num_rows(sql_query("SELECT * FROM {$db_prefix}topics WHERE `bid` = '$board_id'"));
         $settings['page']['page_last'] = $total_topics / $settings['num_topics'];
-        $settings['page']['page_last'] = 1;
         $settings['page']['board-name'] = $board['name'];
         $settings['topics'] = $topics;
         $settings['page']['title'] = $board['name'].' - '.$settings['site_name'];
