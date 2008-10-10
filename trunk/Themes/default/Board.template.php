@@ -58,7 +58,7 @@ if (count($settings['topics']) > 0) {
      <td style="text-align: center; padding: 5px;">'. $topic['numViews']. '</td>
      <td style="text-align: center">'.str_replace(
      '%time%','<a href="'.$cmsurl.'forum.php?topic='.$topic['tid'].';msg='.$topic['last_post']['mid'].'">'.
-     (strtotime(date('j/t/y')) < $topic['last_post']['time']
+     (time()-60*60*24 > $topic['last_post']['time']
      ? formattime($topic['last_post']['time'],3)
      : formattime($topic['last_post']['time'],1)
      ).'</a>',
