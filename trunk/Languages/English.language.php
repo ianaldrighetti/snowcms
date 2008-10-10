@@ -279,7 +279,8 @@ $l['managepages_error_notallowed_homepage'] = 'You are not allowed to change the
 // Forum.template.php
 $l['forum_title'] = 'Forum Index';
 $l['forum_header'] = 'Forum Index';
-$l['forum_board_stats'] = '%posts% posts in %topics% topics';
+$l['forum_board_posts'] = 'posts';
+$l['forum_board_topics'] = 'topics';
 $l['forum_board_lastpost'] = 'Last post by %user% in %msg%';
 $l['forum_board_new'] = 'New posts';
 $l['forum_board_old'] = 'No new posts';

@@ -293,16 +293,22 @@ th.border {
   float: right;
   width: 459px;
   padding-left: 4px;
-  text-align: left;
-  font-weight: bold;
+  text-align: right;
   border-style: solid;
   border-width: 1px;
   border-color: #F0F0F0;
 }
-#post-info p {
+#post-info .text {
+  width: 395px;
   margin: 1px;
-  margin-top: 4px;
+  padding-top: 8px;
+  text-align: left;
+}
+#post-info .image {
+  float: right;
+  padding-top: 7px;
   margin-right: 4px;
+  margin: 1px;
 }
 #post-container {
   background: url('images/postbg.png');
@@ -312,7 +318,6 @@ th.border {
   width: 100px;
   padding: 7px;
   padding-top: 2px;
-  font-weight: bold;
   overflow: hidden;
   border-top-style: solid;
   border-width: 1px;
@@ -350,7 +355,7 @@ textarea.quickreply {
   background: #FFFFFF;
 }
 .post-content a, .indexcontent a, #board a, .write a {
-  color: #1D5A9F;
+  color: #1133EE;
 }
 /* Search */
 .search {

@@ -25,7 +25,7 @@ global $cmsurl, $theme_url, $l, $settings, $user;
       <div id="board">
         <table width="100%">
           <tr>
-            <td width="10%" style="text-align: center">
+            <td width="5%" style="text-align: center">
               <img src="'.$theme_url.'/'.$settings['theme'].'/images/';
               if ($board['is_new'])
                 echo 'board_new.png" alt="'.$l['forum_board_new'].'"';
@@ -33,13 +33,21 @@ global $cmsurl, $theme_url, $l, $settings, $user;
                 echo 'board_old.png" alt="'.$l['forum_board_old'].'"';
               echo ' width="30" height="30" />
             </td>
-            <td width="54%"><p><a href="'.$cmsurl.'forum.php?board='.$board['id'].'">'.$board['name'].'</a><br />
-                '.$board['desc'].'</p>
+            <td width="55%"><p><a href="'.$cmsurl.'forum.php?board='.$board['id'].'">'.$board['name'].'</a><br />
+              '.$board['desc'].'</p>
             </td>
-            <td width="16%">'.str_replace('%posts%',$board['posts'],str_replace('%topics%',$board['topics'],$l['forum_board_stats'])).'</td>
-            <td valign="middle" width="20%">'.
+            <td width="10%">
+              '.$board['posts'].'&nbsp;'.$l['forum_board_posts'].'
+              <br />
+              '.$board['topics'].'&nbsp;'.$l['forum_board_topics'].'
+            </td>
+            <td width="30%" style="text-align: center">'.
             ($board['last_post']['tid'] ? str_replace(
-             '%msg%','<a href="'.$cmsurl.'forum.php?topic='.$board['last_post']['tid'].';msg='.$board['last_post']['mid'].'">'.$board['last_post']['subject'].'</a>',
+             '%msg%','<a href="'.$cmsurl.'forum.php?topic='.$board['last_post']['tid'].';msg='.$board['last_post']['mid'].'">'.
+            (strlen($board['last_post']['subject']) > 30
+            ? substr($board['last_post']['subject'],0,27).'...'
+            : $board['last_post']['subject']
+            ).'</a>',
              str_replace('%user%','<a href="'.$cmsurl.'index.php?action=profile;u='.$board['last_post']['uid'].'">'.$board['last_post']['username'].'</a>',$l['forum_board_lastpost'])) : '')
          .'</td>
           </tr>
