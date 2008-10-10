@@ -119,6 +119,11 @@ global $cmsurl, $db_prefix, $l, $settings, $user, $language_dir, $theme_dir, $th
         array(
           'type' => 'text',
           'validation' => 'A'
+        ),
+      'dateshort' =>
+        array(
+          'type' => 'text',
+          'validation' => 'A'
         )
     );
     // You can add options into the above array, with the name of the setting in the settings table...

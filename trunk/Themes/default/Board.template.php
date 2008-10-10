@@ -20,12 +20,12 @@ global $bperms, $cmsurl, $l, $settings, $user, $theme_url;
   </table>
   <table width="100%">
     <tr class="title">
-      <th width="5%" class="no-border"></th>
+      <th width="4%" class="no-border"></th>
       <th width="50%">'.$l['board_subject'].'</th>
-      <th width="15%">'.$l['board_creator'].'</th>
-      <th width="5%">'.$l['board_replies'].'</th>
-      <th width="5%">'.$l['board_views'].'</th>
-      <th width="20%">'.$l['board_lastpost'].'</th>
+      <th width="13%">'.$l['board_creator'].'</th>
+      <th width="6%" style="font-size: 70%">'.$l['board_replies'].'</th>
+      <th width="5%" style="font-size: 70%">'.$l['board_views'].'</th>
+      <th width="22%">'.$l['board_lastpost'].'</th>
     </tr>';
 if (count($settings['topics']) > 0) {
   foreach ($settings['topics'] as $topic) {
@@ -56,8 +56,12 @@ if (count($settings['topics']) > 0) {
      <td style="text-align: center; padding: 5px;"><a href="'. $cmsurl. 'index.php?action=profile;u='. $topic['starter_id']. '">'.$topic['username']. '</a></td>
      <td style="text-align: center; padding: 5px;">'. $topic['numReplies']. '</td>
      <td style="text-align: center; padding: 5px;">'. $topic['numViews']. '</td>
-     <td style="padding: 5px;">'.str_replace(
-     '%msg%','<a href="'.$cmsurl.'forum.php?topic='.$topic['tid'].';msg='.$topic['last_post']['mid'].'">'.$topic['last_post']['subject'].'</a>',
+     <td style="text-align: center">'.str_replace(
+     '%time%','<a href="'.$cmsurl.'forum.php?topic='.$topic['tid'].';msg='.$topic['last_post']['mid'].'">'.
+     (strtotime(date('j/t/y')) < $topic['last_post']['time']
+     ? formattime($topic['last_post']['time'],3)
+     : formattime($topic['last_post']['time'],1)
+     ).'</a>',
      str_replace('%user%','<a href="'.$cmsurl.'index.php?action=profile;u='.$topic['last_post']['uid'].'">'.$topic['last_post']['username'].'</a>',
      $l['board_lastpost_data'])).'</td>
    </tr>';

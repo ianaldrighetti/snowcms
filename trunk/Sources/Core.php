@@ -430,6 +430,7 @@ global $settings;
     case 0: return date($settings['dateformat'], $timestamp); break;
     case 1: return date($settings['timeformat'], $timestamp); break;
     case 2: return date($settings['timeformat'].', '.$settings['dateformat'], $timestamp); break;
+    case 3: return date($settings['dateshort'], $timestamp); break;
   }
 }
 

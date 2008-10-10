@@ -248,6 +248,7 @@ INSERT INTO `{$db_prefix}settings` VALUES
 ('remember_time','120'),
 ('timeformat','H:i:s'),
 ('dateformat','F jS, Y'),
+('dateshort','j/n/y'),
 ('mail_with_fsockopen','0'),
 ('smtp_host',''),
 ('smtp_user',''),

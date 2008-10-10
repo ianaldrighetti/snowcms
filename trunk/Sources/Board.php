@@ -91,7 +91,7 @@ global $cmsurl, $db_prefix, $l, $settings, $user;
                            'mid' => $row['mid2'],
                            'subject' => $row['subject2'],
                            'username' => $row['username2'],
-                           'time' => formattime($row['last_post_time']),
+                           'time' => $row['last_post_time'],
                            'uid' => $row['uid2'],
                            'is_post' => $row['mid2'] ? true : false
                          )
