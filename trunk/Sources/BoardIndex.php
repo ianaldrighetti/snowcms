@@ -43,7 +43,7 @@ global $cmsurl, $db_prefix, $l, $settings, $user;
       WHERE {$user['board_query']}
       ORDER BY b.border ASC");
       while($row = mysql_fetch_assoc($result)) {  
-      if(isset($row['is_new']))
+      if(isset($row['is_new']) || !$row['numtopics'])
         $new = false;
       else
         $new = true;
