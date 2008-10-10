@@ -297,6 +297,7 @@ th.border {
   font-weight: bold;
   border-style: solid;
   border-width: 1px;
+  border-color: #F0F0F0;
 }
 #post-info p {
   margin: 1px;
@@ -315,6 +316,7 @@ th.border {
   overflow: hidden;
   border-top-style: solid;
   border-width: 1px;
+  border-color: #F0F0F0;
   background: url('images/postbg.png');
 }
 #post-container #post-right {
@@ -337,6 +339,7 @@ textarea.quickreply {
 .topic-page-end {
   border-top-style: solid;
   border-width: 1px;
+  border-color: #F0F0F0;
   width: 115px;
 }
 /* Posting new topics or replies */
