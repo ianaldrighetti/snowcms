@@ -239,20 +239,28 @@ global $db_prefix;
   
   // Are they allowed to delete it?
   if (canforum('delete_any', $board) || del(PostOwner($msg), canforum('delete_own', $board))) {
-    sql_query("DELETE FROM {$db_prefix}messages WHERE `mid` = '$msg'");
-    $posts = mysql_fetch_assoc(sql_query("SELECT * FROM {$db_prefix}members WHERE `id` = '$member'"));
-    $posts = $posts['numposts'] - 1;
-    sql_query("UPDATE {$db_prefix}members SET `numposts` = '$posts' WHERE `id` = '$member'");
+    // Delete the message
+    sql_query("DELETE FROM {$db_prefix}messages WHERE `mid` = '$msg'") or die(mysql_error());
+    // Lower the member's post count by one
+    sql_query("UPDATE {$db_prefix}members SET `numposts` = `numposts` - 1 WHERE `id` = '$member'") or die(mysql_error());
+    // Lower the topic's reply count by one
+    sql_query("UPDATE {$db_prefix}topics SET `num_replies` = `num_replies` - 1 WHERE `tid` = '$topic'") or die(mysql_error());
+    // Lower the boards's post count by one
+    sql_query("UPDATE {$db_prefix}boards SET `numposts` = `numposts` - 1 WHERE `bid` = '$board'") or die(mysql_error());
     // Are they trying to a delete a topic?
-    $first_msg = mysql_fetch_assoc(sql_query("SELECT * FROM {$db_prefix}topics WHERE `tid` = '$topic'"));
+    $first_msg = mysql_fetch_assoc(sql_query("SELECT * FROM {$db_prefix}topics WHERE `tid` = '$topic'")) or die(mysql_error());
     if ($first_msg['first_msg'] == $msg) {
       // Yes, they are
+      // Lower the boards's topic count by one
+      sql_query("UPDATE {$db_prefix}boards SET `numtopics` = `numtopics` - 1 WHERE `bid` = '$board'") or die(mysql_error());
+      // Lower the boards's message count by topic's replies
+      sql_query("UPDATE {$db_prefix}topics AS `t` LEFT JOIN {$db_prefix}boards AS `b` ON `t`.`bid` = `b`.`bid` SET `b`.`numposts` = `b`.`numposts` - `t`.`num_replies` - 1 WHERE `t`.`tid` = '$topic'") or die(mysql_error());
       // Delete the topic
-      sql_query("DELETE FROM {$db_prefix}topics WHERE `tid` = '$topic'");
+      sql_query("DELETE FROM {$db_prefix}topics WHERE `tid` = '$topic'") or die(mysql_error());
       // Delete all of the messages in the topic
-      sql_query("DELETE FROM {$db_prefix}messages WHERE `tid` = '$topic'");
+      sql_query("DELETE FROM {$db_prefix}messages WHERE `tid` = '$topic'") or die(mysql_error());
       // Delete the topic log
-      sql_query("DELETE FROM {$db_prefix}topic_logs WHERE `tid` = '$topic'");
+      sql_query("DELETE FROM {$db_prefix}topic_logs WHERE `tid` = '$topic'") or die(mysql_error());
       redirect('forum.php?board='.$board);
     }
   }
