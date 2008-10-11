@@ -54,6 +54,11 @@ global $cmsurl, $theme_url, $l, $settings, $user;
         </table>
       </div>';
     }
+    
+    echo '
+    <div class="break">
+    </div>';
+  }
     echo '
       <br />
       <table width="100%" id="forum_who">
@@ -67,11 +72,6 @@ global $cmsurl, $theme_url, $l, $settings, $user;
           <td>', implode(", ", $settings['members_viewing']), '</td>
         </tr>
       </table>';
-    
-    echo '
-    <div class="break">
-    </div>';
-  }
 }
 
 function NotAllowed() {
