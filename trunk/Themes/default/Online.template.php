@@ -11,14 +11,14 @@ global $cmsurl, $l, $settings, $user;
 echo '
   <h1>'.$l['online_header'].'</h1>
   <p>'.$l['online_desc'].'</p>
-  <table>
+  <table width="100%">
     <tr>
       <td>'.$l['online_user'].'</td>'; if(can('view_online_special')) { echo '<td>'.$l['online_ip'].'</td>'; } echo '<td>'.$l['online_time'].'</td><td>'.$l['online_currently_viewing'].'</td>
     </tr>';
-  foreach($settings['page']['online'] as $online) {
+  foreach($settings['page']['online'] as $member) {
     echo '
     <tr>
-      <td>'; if($online['is_user']) { echo '<a href="'.$cmsurl.'index.php?action=profile;u='.$online['user_id'].'">'; } echo $online['user']; if($online['is_user']) { echo '</a>'; } echo '</td>'; if(can('view_online_special')) { echo '<td>'.$online['ip'].'</td>'; } echo '<td>'.$online['time'].'</td><td>'.$online['page'].'</td>
+      <td>', $member['id'] ? '<a href="'. $cmsurl. 'index.php?action=profile;u='. $member['id']. '">'. $member['name']. '</a>' : $member['name'], '</td>'; if(can('view_online_special')) { echo '<td>', $member['ip'], '</td>'; } echo '<td>', $member['last_active'], '</td><td>', $member['viewing'], '</td>
     </tr>';
   }
   echo '

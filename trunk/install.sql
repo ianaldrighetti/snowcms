@@ -161,10 +161,12 @@ DROP TABLE IF EXISTS `{$db_prefix}online`;
 
 CREATE TABLE `{$db_prefix}online` (
   `user_id` INT(11) NOT NULL DEFAULT '0',
-  `sc` varchar(50) NOT NULL DEFAULT '',
-  `ip` TEXT NOT NULL,
-  `page` TEXT NOT NULL,
-  `last_active` INT(10) NOT NULL DEFAULT '0'
+  `sc` VARCHAR(50) NOT NULL DEFAULT '',
+  `ip` TINYTEXT NOT NULL,
+  `url_data` TEXT NOT NULL,
+  `inForum` INT(1) NOT NULL default '0',
+  `last_active` INT(10) NOT NULL DEFAULT '0',
+  UNIQUE KEY (`sc`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 
 DROP TABLE IF EXISTS `{$db_prefix}pages`;

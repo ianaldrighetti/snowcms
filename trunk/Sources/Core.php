@@ -65,8 +65,9 @@ global $db_prefix, $user, $cookie_prefix;
   $user['email'] = null;
   $user['language'] = false;
   $user['sc'] = 'guest';
-  $user['board_query'] = "FIND_IN_SET('-1', b.who_view)";
+  $user['board_query'] = 'FIND_IN_SET(\'-1\', b.who_view)';
   $user['unread_pms'] = 0;
+  $user['sc'] = session_id();
   // Make sure we get their real IP :)
   $user['ip'] = @isset($_SERVER['HTTP_X_FORWARDED_FOR']) ? $_SERVER['HTTP_X_FORWARDED_FOR'] : $_SERVER['REMOTE_ADDR'];
   if(empty($_SESSION['id'])) {
@@ -301,37 +302,16 @@ global $db_prefix, $settings, $user;
 function WriteOnline() {
 global $db_prefix, $settings, $user;
   
-  if(!empty($_REQUEST['action']))
-    $action_or_page = 'action:'. clean($_REQUEST['action']);
-  elseif(!empty($_REQUEST['page']))
-    $action_or_page = 'page:'. clean($_REQUEST['page']);
-  else
-    $action_or_page = 0;
-  // Select all rows
-  $result = sql_query("
-    SELECT
-      *
-    FROM {$db_prefix}online");
-  $id_del = array();
-  $ip_del = array();
-  // While Loop =D Load all expired IP's and user_id's, and the current users as well
-  while($row = mysql_fetch_assoc($result)) {
-    if($user['is_logged'] && $row['user_id'] = $user['id'])
-      $id_del[] = $user['id'];
-    elseif($row['user_id'] != 0 && ($row['last_active']+($settings['login_threshold']*60))<time())
-      $id_del[] = $row['user_id'];
-    elseif($row['user_id'] == 0 && ($row['last_active']+($settings['login_threshold']*60))<time())
-      $ip_del[] = $row['ip'];
-    elseif($user['id'] == 0 && $row['ip'] = $user['ip'])
-      $ip_del[] = $row['ip'];
-  }
-  // Delete them all that aren't needed :)
-  if(count($id_del))
-    sql_query("DELETE FROM {$db_prefix}online WHERE `user_id` IN(". implode(",", $id_del). ")");
-  if(count($ip_del))
-    sql_query("DELETE FROM {$db_prefix}online WHERE `ip` IN('". implode("','", $ip_del). "') AND `sc` = 'guest'");
+  // Delete all rows that well, are no longer valid... expired, dead, you get it :P
+  $timeout = time() - ($settings['login_threshold'] * 60);
+  sql_query("
+    DELETE FROM {$db_prefix}online
+    WHERE last_active < $timeout
+    AND sc != '{$user['sc']}'");
   // We deleted theirs, make a new one...
-  sql_query("INSERT INTO {$db_prefix}online (`user_id`,`sc`,`ip`,`page`,`last_active`) VALUES('{$user['id']}','{$user['sc']}','{$user['ip']}','{$action_or_page}','".time()."')") or die(mysql_error());
+  $url_data = @addslashes(addslashes(serialize($_GET)));
+  $inForum = (defined('InForum') && InForum == true) ? 1 : 0;
+  sql_query("REPLACE INTO {$db_prefix}online (`user_id`,`sc`,`ip`,`url_data`,`inForum`,`last_active`) VALUES('{$user['id']}','{$user['sc']}','{$user['ip']}','{$url_data}','{$inForum}','".time()."')") or die(mysql_error());
 }
 
 // This returns true or false (bool) of whether or not they can do said function

@@ -14,13 +14,14 @@ session_start();
 error_reporting(E_ALL);
 
 // This is to stop access to files in other directories, Security I suppose
-define("Snow", true);
+define('Snow', true);
+define('InForum', true);
 
 // Load Some Important Files
 require_once('./config.php');
 // SnowCMS is not installed, so take them to the installer so they can install SnowCMS
 if(!$scms_installed)
-  header("Location: install.php");
+  header('Location: install.php');
 // Load Core.php, this file has many things we need, such as the functions we will call on soon :)
 require_once($source_dir.'/Core.php');
 
