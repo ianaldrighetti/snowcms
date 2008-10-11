@@ -73,6 +73,33 @@ global $cmsurl, $db_prefix, $l, $settings, $user;
         unset($cats[$cat['id']]);
       }
     }
+    // Who is viewing? And such...
+    // Get the number of guests...
+    $result = sql_query("SELECT * FROM {$db_prefix}online WHERE user_id = 0 AND inForum = 1");
+    $num_guests = mysql_num_rows($result);
+    // Now number of members and their names...
+    $result = sql_query("
+      SELECT
+        o.user_id, o.last_active, o.inForum, mem.id, mem.display_name
+      FROM {$db_prefix}online AS o
+        LEFT JOIN {$db_prefix}members AS mem ON mem.id = o.user_id
+      WHERE o.user_id != 0 AND o.inForum = 1
+      ORDER BY o.last_active DESC");
+    // So how many users?
+    $num_users = mysql_num_rows($result);
+    // Replacing array
+    $replace = array(
+                 '%num_guests%' => $num_guests,
+                 '%num_users%' => $num_users
+               );
+    // Replace it!
+    $settings['who_stats'] = str_replace(array_keys($replace), array_values($replace), $l['forum_who_stats']);
+    $settings['members_viewing'] = array();
+    // Now build an array of the people browsing the forum
+    while($row = mysql_fetch_assoc($result)) {
+      $settings['members_viewing'][] = '<a href="'. $cmsurl. 'index.php?action=profile;u='. $row['user_id']. '">'. $row['display_name']. '</a>';
+    }
+    mysql_free_result($result);
     // Load it up
     $settings['forum']['cats'] = $cats;
     $settings['page']['title'] = $l['forum_title'];

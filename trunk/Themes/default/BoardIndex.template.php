@@ -54,6 +54,19 @@ global $cmsurl, $theme_url, $l, $settings, $user;
         </table>
       </div>';
     }
+    echo '
+      <br />
+      <table width="100%" id="forum_who">
+        <tr class="title">
+          <td>', $l['forum_online'], '</td>
+        </tr>
+        <tr>
+          <td>', $settings['who_stats'], '</td>
+        </tr>
+        <tr>
+          <td>', implode(", ", $settings['members_viewing']), '</td>
+        </tr>
+      </table>';
     
     echo '
     <div class="break">

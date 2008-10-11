@@ -304,6 +304,8 @@ $l['forum_board_old'] = 'No new posts';
 $l['forum_notallowed_title'] = 'Forum Index';
 $l['forum_notallowed_header'] = 'Forum Index';
 $l['forum_notallowed_desc'] = 'Sorry, but you aren\'t allowed to view the '.$settings['site_name'].' forum.';
+$l['forum_online'] = 'Who\'s browsing?';
+$l['forum_who_stats'] = '%num_guests% Guests and %num_users% Users';
 
 // Board.template.php
 $l['board_newtopic'] = 'New Topic';
