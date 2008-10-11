@@ -190,6 +190,8 @@ $l['admin_menu_ips'] = 'Manage Banned IPs';
 $l['admin_menu_ips_desc'] = 'You can ban and unban IPs and IP ranges here.';
 $l['admin_menu_pms'] = 'Moderate PMs';
 $l['admin_menu_pms_desc'] = 'You can moderate members\' personal messages here.';
+$l['admin_menu_maintain'] = 'Maintenance';
+$l['admin_menu_maintain_desc'] = 'Run some maintenance on your site, like recounting posts and topics';
 
 // Settings.template.php
 $l['basicsettings_title'] = 'Basic Settings';
@@ -485,6 +487,7 @@ $l['permissions_perm_manage_forum_edit'] = 'Allow them to edit the categories an
 $l['permissions_perm_manage_forum_create'] = 'Allow them to create new categories and boards';
 $l['permissions_perm_manage_forum_delete'] = 'Allow them to delete categories and boards';
 $l['permissions_perm_manage_forum_perms'] = 'Allow them to manage forum permissions';
+$l['permissions_perm_maintain'] = 'Allow them to Maintain the site';
 // Permissions.template.php - Errors
 $l['permissions_error_change'] = 'Changing member groups failed.';
 $l['permissions_error_new'] = 'Adding member group failed.';
@@ -911,4 +914,18 @@ $l['profile_error_notallowed_avatar'] = 'You are not allowed to change avatars.'
 $l['profile_error_notallowed_signature'] = 'You are not allowed to change signatures.';
 $l['profile_error_notallowed_profile'] = 'You are not allowed to change profile text.';
 $l['profile_error_notallowed_password'] = 'You are not allowed to change passwords.';
+
+// Maintain.template.php
+$l['admin_maintain_title'] = 'Maintain your Site';
+$l['maintain_header'] = 'Maintain your site';
+$l['maintain_desc'] = 'You can manage your site here, such as optimizing your MySQL tables, or recounting forum statistics, and backing up your site.';
+$l['maintain_optimize'] = 'Optimize your MySQL Database';
+$l['maintain_recount'] = 'Recount forum statistics';
+$l['maintain_optimize_title'] = 'Optimize Database';
+$l['maintain_optimize_header'] = 'Optimizing Results';
+$l['maintain_optimize_none']  = 'No Tables were Optimized because none needed to be';
+$l['maintain_optimized_template'] = '%num_tables% table(s) optimized in %seconds% seconds';
+$l['maintain_go_back'] = 'Go back to <a href="'. $cmsurl. 'index.php?action=admin;sa=maintain">Maintenance</a>';
+// Must be tripley escaped, so don\'t should be don\\\'t :)
+$l['maintain_recount_alert'] = 'Forum Totals and Statistics Recounted!';
 ?>
