@@ -37,7 +37,7 @@ global $cmsurl, $db_prefix, $l, $settings, $user, $cookie_prefix;
   
   // Get and sanitize the username and encrypt the password
   $username = @clean($_REQUEST['username']);
-  $password = @md5($_REQUEST['password']);
+  $password = (@$_REQUEST['pass_hash'] != 1) ? clean($_REQUEST['pass_hash']) : @md5($_REQUEST['password']);
   if((!empty($username)) && (!empty($password))) {
     $result = sql_query("SELECT * FROM {$db_prefix}members WHERE `username` = '{$username}' AND `password` = '{$password}'");
     if(mysql_num_rows($result)>0) {

@@ -8,13 +8,13 @@ if(!defined('Snow'))
 
 // Shows the login form, enter your username, password, and choose your desired session length =D
 function Main() {
-global $cmsurl, $settings, $l, $user;
+global $cmsurl, $theme_url, $settings, $l, $user;
   
   echo '
   <h1>'.$settings['page']['title'].'</h1>
   
   <p>'.$l['login_desc'].'</p>
-  
+  <script src="', $theme_url, '/default/scripts/md5.js" type="text/javascript"></script>
   <form action="'.$cmsurl.'index.php?action=login2" method="post">
     <fieldset>
       <table>';
@@ -28,7 +28,7 @@ global $cmsurl, $settings, $l, $user;
           <td>'.$l['login_user'].'</td><td><input name="username" type="text" value="', @$_REQUEST['username'], '"/></td>
         </tr>
         <tr>
-          <td>'.$l['login_pass'].'</td><td><input name="password" type="password" /></td>
+          <td>'.$l['login_pass'].'</td><td><input name="password" type="password" id="password"/></td>
         </tr>
         <tr>
           <td>', $l['login_length'], '</td><td><select name="login_length">
@@ -41,10 +41,11 @@ global $cmsurl, $settings, $l, $user;
                                   </td>
         </tr>
         <tr>
-          <td colspan="2"><input name="login" type="submit" value="'.$l['login_button'].'"/></td>
+          <td colspan="2"><input name="login" type="submit" onClick="md5_password();" value="', $l['login_button'], '"/></td>
         </tr>
       </table>
     </fieldset>
+    <input name="pass_hash" id="pass_hash" type="hidden" value="1"/>
   </form>';
 }
 
