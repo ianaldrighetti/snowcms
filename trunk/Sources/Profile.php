@@ -35,7 +35,7 @@ global $cmsurl, $db_prefix, $l, $settings, $source_dir, $user, $perms;
       require_once($source_dir.'/Captcha.php');
       if (PhpCaptcha::Validate($captcha)) {
         // It is, now let's redirect them back to their profile with this fact
-        $_SESSION['captcha'] = true;
+        $_SESSION['passed_captcha'] = true;
         redirect('index.php?action=profile;u='.clean_header($UID));
       }
       else {
@@ -120,7 +120,8 @@ global $cmsurl, $db_prefix, $l, $settings, $source_dir, $user, $perms;
       loadTheme('Profile','AdminView');
     // Maybe they are trying to view someone's profile? o.O
     elseif (can('view_profile') && $UID != $user['id']) {
-      $settings['captcha'] = @$_SESSION['captcha'];
+      $settings['captcha'] = @$_SESSION['passed_captcha'];
+      echo $settings['captcha'] === true;
       loadTheme('Profile','View');
     }
     // Are they logged in? .-.

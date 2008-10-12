@@ -337,7 +337,7 @@ global $l, $settings, $cmsurl;
   ';
   
   if (@$_SESSION['error'])
-	 echo '<p>'.$_SESSION['error'].'</p>';
+	  echo '<p>'.$_SESSION['error'].'</p>';
   
   echo '
   <p>'.$l['profile_showemail_desc'].'</p>
