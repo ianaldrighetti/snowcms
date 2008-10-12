@@ -131,7 +131,6 @@ $l['page_error_details'] = 'An error has occurred! The page you have requested d
 
 // Online.template.php
 $l['online_title'] = 'Who\'s Online';
-$l['online_title_unknown'] = 'Unknown';
 $l['online_user_guest'] = 'Guest';
 $l['online_header'] = 'Who\'s Online';
 $l['online_desc'] = 'Here you can view who is online, and what page they are viewing.';
@@ -139,21 +138,22 @@ $l['online_user'] = 'User';
 $l['online_ip'] = 'IP';
 $l['online_currently_viewing'] = 'Currently Viewing';
 $l['online_time'] = 'Last Active';
+// Online.template.php - Action page names
+$l['online_home'] = 'Viewing the <a href="'.$cmsurl.'">homepage</a>';
 $l['online_topic_template'] = 'Viewing the topic <a href="%topic_url%">%topic_name%</a>';
 $l['online_board_template'] = 'Viewing the board <a href="%board_url%">%board_name%</a>';
-$l['online_forum_index'] = 'Viewing the <a href="'. $cmsurl. 'forum.php">Forum Index</a>';
+$l['online_forum_index'] = 'Viewing the <a href="'. $cmsurl. 'forum.php">forum index</a>';
 $l['online_page_template'] = 'Viewing the page <a href="%page_url%">%page_name%</a>';
-$l['online_viewing_home'] = 'Viewing <a href="'. $cmsurl. '">'.$settings['site_name'].'</a>';
-/* Action Page Names... */
 $l['online_activating_account'] = 'Activating their account';
 $l['online_admin'] = 'Administering the site';
 $l['online_login'] = 'Logging into their account';
 $l['online_logout'] = 'Logging out of their account';
-$l['online_news'] = 'Viewing the <a href="'. $cmsurl. 'index.php?action=news">news</a>';
-$l['online_online'] = 'Viewing Who\'s Online';
+$l['online_news'] = 'Viewing the <a href="'.$cmsurl.'index.php?action=news">news</a>';
+$l['online_online'] = 'Viewing <a href="'.$cmsurl.'index.php?action=online">who\'s online</a>';
 $l['online_profile'] = 'Viewing their profile';
-$l['online_viewing_profile'] = 'Viewing a profile';
+$l['online_viewing_profile'] = 'Viewing %user%\'s profile';
 $l['online_register'] = 'Registering for an account';
+$l['online_unknown'] = 'Unknown action';
 
 // Admin.template.php
 $l['admin_title'] = 'Control Panel';

@@ -306,12 +306,18 @@ global $db_prefix, $settings, $user;
   $timeout = time() - ($settings['login_threshold'] * 60);
   sql_query("
     DELETE FROM {$db_prefix}online
-    WHERE last_active < $timeout
-    AND sc != '{$user['sc']}'");
-  // We deleted theirs, make a new one...
-  $url_data = @addslashes(addslashes(serialize($_GET)));
-  $inForum = (defined('InForum') && InForum == true) ? 1 : 0;
-  sql_query("REPLACE INTO {$db_prefix}online (`user_id`,`sc`,`ip`,`url_data`,`inForum`,`last_active`) VALUES('{$user['id']}','{$user['sc']}','{$user['ip']}','{$url_data}','{$inForum}','".time()."')") or die(mysql_error());
+    WHERE `last_active` < '$timeout'
+    AND `sc `!= '{$user['sc']}'");
+  // Only if they are not logging in at step two
+  if (@$_REQUEST['action'] != 'login2') {
+    // We deleted theirs, now make a new one
+    $url_data = @addslashes(addslashes(serialize($_GET)));
+    $inForum = (defined('InForum') && InForum == true) ? 1 : 0;
+    sql_query("REPLACE INTO {$db_prefix}online (`user_id`,`sc`,`ip`,`url_data`,`inForum`,`last_active`) VALUES('{$user['id']}','{$user['sc']}','{$user['ip']}','{$url_data}','{$inForum}','".time()."')");
+  }
+  // They have just finished logging in, so delete references to them as a guest
+  else
+    sql_query("DELETE FROM {$db_prefix}online WHERE `sc` = '{$user['sc']}'");
 }
 
 // This returns true or false (bool) of whether or not they can do said function

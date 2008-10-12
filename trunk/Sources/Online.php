@@ -16,6 +16,7 @@ if (!defined("Snow"))
   
 function Online() {
 global $cmsurl, $db_prefix, $l, $settings, $user;
+  
   // Can they view the who is online?
   if(can('view_online')) {
     // Set online as an array, just incase their is nothing in the DB, but if you view ?action=online, 1 should be there by now
@@ -38,7 +39,7 @@ global $cmsurl, $db_prefix, $l, $settings, $user;
                                         'ip' => $row['ip'],
                                         'name' => $row['display_name'],
                                         'last_active' => formattime($row['last_active'], 2),
-                                        'viewing' => $l['online_title_unknown']
+                                        'viewing' => '<i>'.$l['online_unknown'].'</i>'
                                       );
       $url_data = unserialize(stripslashes($row['url_data']));
       $url_data['sc'] = $row['sc'];
@@ -61,7 +62,8 @@ global $cmsurl, $db_prefix, $l, $settings, $user;
 }
 
 function figureURLs($url_list) {
-global $cmsurl, $db_prefix, $l, $user;  
+global $cmsurl, $db_prefix, $l, $user;
+  
   // Setup a few array thingys...
   $pages = array();
   $topics = array();
@@ -151,7 +153,7 @@ global $cmsurl, $db_prefix, $l, $user;
                      '%topic_name%' => empty($topic_names[(int)$url['topic']]) ? '' : $topic_names[(int)$url['topic']]
                    );
         // Get 'er done!
-        $figured_urls[$url['sc']] = empty($topic_names[(int)$url['topic']]) ? $l['online_title_unknown'] : str_replace(array_keys($replace), array_values($replace), $l['online_topic_template']);
+        $figured_urls[$url['sc']] = empty($topic_names[(int)$url['topic']]) ? '<i>'.$l['online_unknown'].'</i>' : str_replace(array_keys($replace), array_values($replace), $l['online_topic_template']);
       }
       elseif(!empty($url['board'])) {
         // Board Name :)
@@ -160,7 +162,7 @@ global $cmsurl, $db_prefix, $l, $user;
                      '%board_name%' => empty($board_names[(int)$url['board']]) ? '' : $board_names[(int)$url['board']]
                    );
         // Set it :D
-        $figured_urls[$url['sc']] = empty($board_names[(int)$url['board']]) ? $l['online_title_unknown'] : str_replace(array_keys($replace), array_values($replace), $l['online_board_template']);
+        $figured_urls[$url['sc']] = empty($board_names[(int)$url['board']]) ? '<i>'.$l['online_unknown'].'</i>' : str_replace(array_keys($replace), array_values($replace), $l['online_board_template']);
       }
       else {
         // There is nothing else left but viewing the forum index...
@@ -175,29 +177,34 @@ global $cmsurl, $db_prefix, $l, $user;
                      '%page_url%' => $cmsurl. 'index.php?page='. (int)$url['page'],
                      '%page_name%' => empty($page_names[(int)$url['page']]) ? '' : $page_names[(int)$url['page']]
                    );
-        $figured_urls[$url['sc']] = empty($page_names[(int)$url['page']]) ? $l['online_title_unknown'] : str_replace(array_keys($replace), array_values($replace), $l['online_page_template']);
+        $figured_urls[$url['sc']] = empty($page_names[(int)$url['page']]) ? '<i>'.$l['online_unknown'].'</i>' : str_replace(array_keys($replace), array_values($replace), $l['online_page_template']);
       }
       elseif(!empty($url['action'])) {
+        // If they are viewing another member's profile, then get their username
+        if ($url['action'] == 'profile' && !empty($url['u'])) {
+          $url['username'] = mysql_fetch_assoc(sql_query("SELECT * FROM {$db_prefix}members WHERE `id` = '{$url['u']}'"));
+          $url['username'] = $url['username']['username'];
+        }
         // Viewing an action... This is the easiest one! :P
         // Here is an array of actions... :D that are set...
         $set_actions = array(
                          'activate' => $l['online_activating_account'],
                          'admin' => $l['online_admin'],
                          'login' => $l['online_login'],
-                         'login2' => $l['online_login'],
                          'logout' => $l['online_logout'],
                          'news' => $l['online_news'],
                          'online' => $l['online_online'],
-                         'profile' => empty($url['u']) ? $l['online_profile'] : $l['online_viewing_profile'],
+                         'profile' => empty($url['u']) ? $l['online_profile'] : str_replace('%user%',
+                           '<a href="'.$cmsurl.'index.php?action=profile;u='.$url['u'].'">'.$url['username'].'</a>',$l['online_viewing_profile']),
                          'register' => $l['online_register'],
                          'register3' => $l['online_register']
                        );
         // Now, set it and forget it! lol.
-        $figured_urls[$url['sc']] = empty($set_actions[strtolower($url['action'])]) ? $l['online_title_unknown'] : $set_actions[strtolower($url['action'])];
+        $figured_urls[$url['sc']] = empty($set_actions[strtolower($url['action'])]) ? '<i>'.$l['online_unknown'].'</i>' : $set_actions[strtolower($url['action'])];
       }
       else {
         // They must be viewing home..?
-        $figured_urls[$url['sc']] = $l['online_viewing_home'];
+        $figured_urls[$url['sc']] = $l['online_home'];
       }
     }
   }

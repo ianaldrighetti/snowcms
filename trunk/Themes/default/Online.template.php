@@ -11,7 +11,7 @@ global $cmsurl, $l, $settings, $user;
 echo '
   <h1>'.$l['online_header'].'</h1>
   <p>'.$l['online_desc'].'</p>
-  <table width="100%">
+  <table width="100%" style="text-align: center">
     <tr>
       <th>'.$l['online_user'].'</th>'; if(can('view_online_special')) { echo '<th>'.$l['online_ip'].'</th>'; } echo '<th>'.$l['online_time'].'</th><th>'.$l['online_currently_viewing'].'</th>
     </tr>';
