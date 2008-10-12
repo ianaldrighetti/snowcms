@@ -14,8 +14,8 @@
 if (!defined("Snow"))
   die(header("HTTP/1.1 404 Not Found"));
   
-// Make an Array of Permissions...
-// You can add permissions by 'WHAT' => Default(true/false),
+// Make an array of permissions
+// You can add permissions by 'WHAT' => Default (true/false),
 // WHAT as in, how will you check if they can or cant do it? accessed by can('WHAT')
 // Default as in, when a new member group is made, and they go to edit permissions, is it checked by default or not?
 $settings['permissions']['group'] = array(
@@ -30,6 +30,12 @@ $settings['permissions']['group'] = array(
   'change_email' => true,
   'change_birthdate' => true,
   'change_avatar' => true,
+  'change_icq' => true,
+  'change_aim' => true,
+  'change_msn' => true,
+  'change_yim' => true,
+  'change_gtalk' => true,
+  'change_site' => true,
   'change_signature' => true,
   'change_profile' => true,
   'change_password' => true,
@@ -64,6 +70,12 @@ $settings['permissions']['group'] = array(
   'moderate_password' => false,
   'moderate_birthdate' => false,
   'moderate_avatar' => false,
+  'moderate_icq' => true,
+  'moderate_aim' => true,
+  'moderate_msn' => true,
+  'moderate_yim' => true,
+  'moderate_gtalk' => true,
+  'moderate_site' => true,
   'moderate_group' => false,
   'moderate_signature' => false,
   'moderate_profile' => false,

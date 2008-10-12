@@ -107,8 +107,8 @@ global $cmsurl, $db_prefix, $l, $settings, $user;
           mem.signature, mem.group, mem.email, mem.numposts, ol.user_id, ol.last_active, editor.display_name as editor_display_name
         FROM {$db_prefix}topics AS t
           LEFT JOIN {$db_prefix}messages AS msg ON msg.tid = t.tid
-          LEFT JOIN {$db_prefix}members AS mem ON mem.id = msg.uid
           LEFT JOIN {$db_prefix}members AS editor ON editor.id = msg.uid_editor
+          LEFT JOIN {$db_prefix}members AS mem ON mem.id = msg.uid
           LEFT JOIN {$db_prefix}membergroups AS grp ON grp.group_id = mem.group
           LEFT JOIN {$db_prefix}online AS ol ON ol.user_id = mem.id
         WHERE t.tid = '$Topic_ID'
@@ -130,6 +130,14 @@ global $cmsurl, $db_prefix, $l, $settings, $user;
             'uid_editor' => $row['uid_editor'],
             'editor_name' => $row['editor_display_name'] ? $row['editor_display_name'] : $row['editor_name'],
             'edit_time' => $row['edit_time'],
+            'email' => $row['email'],
+            'icq' => $row['icq'],
+            'aim' => $row['aim'],
+            'msn' => $row['msn'],
+            'yim' => $row['yim'],
+            'gtalk' => $row['gtalk'],
+            'site_name' => $row['site_name'],
+            'site_url' => $row['site_url'],
             'avatar' => $row['avatar'],
             'signature' => bbc($row['signature']),
             'membergroup' => $row['groupname'],

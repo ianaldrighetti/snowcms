@@ -72,6 +72,9 @@ th {
 .no-border {
   border-style: none;
 }
+.no-border th {
+  border-style: none;
+}
 .content .post-title {
   color: #252525;
   text-decoration: none;

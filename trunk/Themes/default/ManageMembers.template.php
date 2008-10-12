@@ -125,7 +125,7 @@ global $l, $settings, $user, $cmsurl;
   if (@$_SESSION['error'])
     echo '<p><b>'.$l['main_error'].':</b> '.$_SESSION['error'].'</p>';
   
-  echo '<form action="'.$cmsurl.'index.php?action=admin;sa=members;u='.$_REQUEST['u'].'" method="post" style="display: inline">
+  echo '<form action="'.$cmsurl.'index.php?action=admin;sa=members;u='.$_REQUEST['u'].'" method="post" class="no-border" style="display: inline">
         
         <p>
         <input type="hidden" name="sc" value="'.$user['sc'].'" />
@@ -229,6 +229,75 @@ global $l, $settings, $user, $cmsurl;
     echo '<tr><th style="text-align: left">'.$l['managemembers_moderate_avatar'].':</th><td>
           '.$member['avatar'].'
           <input type="hidden" name="avatar" value="'.$member['avatar'].'" />
+        </td></tr>
+        ';
+  
+  echo '<tr><td colspan="2"><br /></td></tr>
+        ';
+  
+  if (can('moderate_icq'))
+    echo '<tr><th style="text-align: left">'.$l['managemembers_moderate_icq'].':</th><td><input name="icq" value="'.$member['icq'].'" /></td></tr>
+        ';
+  else
+    echo '<tr><th style="text-align: left">'.$l['managemembers_moderate_icq'].':</th><td>
+          '.$member['icq'].'
+          <input type="hidden" name="icq" value="'.$member['icq'].'" />
+        </td></tr>
+        ';
+  
+  if (can('moderate_aim'))
+    echo '<tr><th style="text-align: left">'.$l['managemembers_moderate_aim'].':</th><td><input name="aim" value="'.$member['aim'].'" /></td></tr>
+        ';
+  else
+    echo '<tr><th style="text-align: left">'.$l['managemembers_moderate_aim'].':</th><td>
+          '.$member['aim'].'
+          <input type="hidden" name="aim" value="'.$member['aim'].'" />
+        </td></tr>
+        ';
+  
+  if (can('moderate_msn'))
+    echo '<tr><th style="text-align: left">'.$l['managemembers_moderate_msn'].':</th><td><input name="msn" value="'.$member['msn'].'" /></td></tr>
+        ';
+  else
+    echo '<tr><th style="text-align: left">'.$l['managemembers_moderate_msn'].':</th><td>
+          '.$member['msn'].'
+          <input type="hidden" name="msn" value="'.$member['msn'].'" />
+        </td></tr>
+        ';
+  
+  if (can('moderate_yim'))
+    echo '<tr><th style="text-align: left">'.$l['managemembers_moderate_yim'].':</th><td><input name="yim" value="'.$member['yim'].'" /></td></tr>
+        ';
+  else
+    echo '<tr><th style="text-align: left">'.$l['managemembers_moderate_yim'].':</th><td>
+          '.$member['yim'].'
+          <input type="hidden" name="yim" value="'.$member['yim'].'" />
+        </td></tr>
+        ';
+  
+  if (can('moderate_gtalk'))
+    echo '<tr><th style="text-align: left">'.$l['managemembers_moderate_gtalk'].':</th><td><input name="gtalk" value="'.$member['gtalk'].'" /></td></tr>
+        ';
+  else
+    echo '<tr><th style="text-align: left">'.$l['managemembers_moderate_gtalk'].':</th><td>
+          '.$member['gtalk'].'
+          <input type="hidden" name="gtalk" value="'.$member['gtalk'].'" />
+        </td></tr>
+        ';
+  
+  if (can('moderate_site'))
+    echo '<tr><td colspan="2"><br /></td></tr>
+        <tr><th style="text-align: left">'.$l['managemembers_moderate_site_name'].':</th><td><input name="site_name" value="'.$member['site_name'].'" /></td></tr>
+        <tr><th style="text-align: left">'.$l['managemembers_moderate_site_url'].':</th><td><input name="site_url" value="'.$member['site_url'].'" /></td></tr>
+        ';
+  else
+    echo '<tr><th style="text-align: left">'.$l['managemembers_moderate_site_name'].':</th><td>
+          '.$member['site_name'].'
+          <input type="hidden" name="site_name" value="'.$member['site_name'].'" />
+        </td></tr>
+        <tr><th style="text-align: left">'.$l['managemembers_moderate_site_url'].':</th><td>
+          '.$member['site_url'].'
+          <input type="hidden" name="site_url" value="'.$member['site_url'].'" />
         </td></tr>
         ';
   

@@ -76,6 +76,13 @@ global $cmsurl, $db_prefix, $l, $settings, $source_dir, $user, $perms;
               'group_name' => $row['groupname'],
               'group_id' => $row['group'],
               'posts' => $row['numposts'],
+              'icq' => $row['icq'],
+              'aim' => $row['aim'],
+              'msn' => $row['msn'],
+              'yim' => $row['yim'],
+              'gtalk' => $row['gtalk'],
+              'site_name' => $row['site_name'],
+              'site_url' => $row['site_url'],
               'signature' => $row['signature'],
               'text' => $row['profile'],
               'activated' => $row['activated'],
@@ -155,6 +162,20 @@ global $l, $settings, $db_prefix, $user, $cmsurl, $cookie_prefix;
   $avatar = clean(@$_REQUEST['avatar']);
   if (substr($avatar,0,7) != 'http://' && substr($avatar,0,8) != 'https://' && substr($avatar,0,6) != 'ftp://' && substr($avatar,0,7) != 'ftps://' && $avatar != '')
     $avatar = 'http://'.$avatar;
+  // Clean the ICQ
+  $icq = clean(@$_REQUEST['icq']);
+  // Clean the AIM
+  $aim = clean(@$_REQUEST['aim']);
+  // Clean the MSN
+  $msn = clean(@$_REQUEST['msn']);
+  // Clean the YIM
+  $yim = clean(@$_REQUEST['yim']);
+  // Clean the GTalk
+  $gtalk = clean(@$_REQUEST['gtalk']);
+  // Clean the site name
+  $site_name = clean(@$_REQUEST['site_name']);
+  // Clean the site URL
+  $site_url = clean(@$_REQUEST['site_url']);
   // Clean the signature
   $signature = clean(@$_REQUEST['signature']);
   // Clean the profile text
@@ -200,6 +221,24 @@ global $l, $settings, $db_prefix, $user, $cmsurl, $cookie_prefix;
   // Are they trying to change their avatar and are they allowed to?
   elseif (!can('change_avatar') && $avatar != $member_data['avatar'])
     $_SESSION['error'] = $l['profile_error_notallowed_avatar'];
+  // Are they trying to change their ICQ and are they allowed to?
+  elseif (!can('change_icq') && $icq != $row['icq'])
+    $_SESSION['error'] = $l['profile_error_notallowed_icq'];
+  // Are they trying to change their AIM and are they allowed to?
+  elseif (!can('change_aim') && $aim != $row['aim'])
+    $_SESSION['error'] = $l['profile_error_notallowed_aim'];
+  // Are they trying to change their MSN and are they allowed to?
+  elseif (!can('change_msn') && $msn != $row['msn'])
+    $_SESSION['error'] = $l['profile_error_notallowed_msn'];
+  // Are they trying to change their YIM and are they allowed to?
+  elseif (!can('change_yim') && $yim != $row['yim'])
+    $_SESSION['error'] = $l['profile_error_notallowed_yim'];
+  // Are they trying to change their GTalk and are they allowed to?
+  elseif (!can('change_gtalk') && $gtalk != $row['gtalk'])
+    $_SESSION['error'] = $l['profile_error_notallowed_gtalk'];
+  // Are they trying to change their site and are they allowed to?
+  elseif (!can('change_site') && ($site_name != $row['site_name'] || $site_url != $row['site_url']))
+    $_SESSION['error'] = $l['profile_error_notallowed_site'];
   // Are they trying to change their signature and are they allowed to?
   elseif (!can('change_signature') && $signature != $row['signature'])
     $_SESSION['error'] = $l['profile_error_notallowed_signature'];
@@ -214,13 +253,13 @@ global $l, $settings, $db_prefix, $user, $cmsurl, $cookie_prefix;
   if (!@$_SESSION['error']) {
     // Update member's data
     if (@$_REQUEST['password-new']) {
-      sql_query("UPDATE {$db_prefix}members SET `display_name` = '$display_name', `email` = '$email', `birthdate` = '$birthdate', `avatar` = '$avatar', `signature` = '$signature', `profile` = '$profile', `password` = '$password_new' WHERE `id` = '{$user['id']}'");
+      sql_query("UPDATE {$db_prefix}members SET `display_name` = '$display_name', `email` = '$email', `birthdate` = '$birthdate', `avatar` = '$avatar', `icq` = '$icq', `aim` = '$aim', `msn` = '$msn', `yim` = '$yim', `gtalk` = '$gtalk', `site_name` = '$site_name', `site_url` = '$site_url', `signature` = '$signature', `profile` = '$profile', `password` = '$password_new' WHERE `id` = '{$user['id']}'");
       
       setcookie($cookie_prefix."password", $password_new);
       $_SESSION['pass'] = $password_new;
     }
     else
-      sql_query("UPDATE {$db_prefix}members SET `display_name` = '$display_name', `email` = '$email', `birthdate` = '$birthdate', `avatar` = '$avatar', `signature` = '$signature', `profile` = '$profile' WHERE `id` = '{$user['id']}'");
+      sql_query("UPDATE {$db_prefix}members SET `display_name` = '$display_name', `email` = '$email', `birthdate` = '$birthdate', `avatar` = '$avatar', `icq` = '$icq', `aim` = '$aim', `msn` = '$msn', `yim` = '$yim', `gtalk` = '$gtalk', `site_name` = '$site_name', `site_url` = '$site_url', `signature` = '$signature', `profile` = '$profile' WHERE `id` = '{$user['id']}'");
   redirect('index.php?action=profile;u='.$user['id']);
   }
   // There was an error

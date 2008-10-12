@@ -289,6 +289,20 @@ global $l, $db_prefix, $user, $settings, $cookie_prefix;
   $avatar = clean(@$_REQUEST['avatar']);
   if (substr($avatar,0,7) != 'http://' && substr($avatar,0,8) != 'https://' && substr($avatar,0,6) != 'ftp://' && substr($avatar,0,7) != 'ftps://' && $avatar != '')
     $avatar = 'http://'.$avatar;
+  // Clean the ICQ
+  $icq = clean(@$_REQUEST['icq']);
+  // Clean the AIM
+  $aim = clean(@$_REQUEST['aim']);
+  // Clean the MSN
+  $msn = clean(@$_REQUEST['msn']);
+  // Clean the YIM
+  $yim = clean(@$_REQUEST['yim']);
+  // Clean the GTalk
+  $gtalk = clean(@$_REQUEST['gtalk']);
+  // Clean the site name
+  $site_name = clean(@$_REQUEST['site_name']);
+  // Clean the site URL
+  $site_url = clean(@$_REQUEST['site_url']);
   // Clean the signature
   $signature = clean(@$_REQUEST['signature']);
   // Clean the profile text
@@ -337,6 +351,24 @@ global $l, $db_prefix, $user, $settings, $cookie_prefix;
   // Are they trying to change their avatar and are they allowed to?
   elseif (!can('moderate_avatar') && $avatar != $row['avatar'])
     $_SESSION['error'] = $l['managemembers_error_notallowed_avatar'];
+  // Are they trying to change their ICQ and are they allowed to?
+  elseif (!can('moderate_icq') && $icq != $row['icq'])
+    $_SESSION['error'] = $l['managemembers_error_notallowed_icq'];
+  // Are they trying to change their AIM and are they allowed to?
+  elseif (!can('moderate_aim') && $aim != $row['aim'])
+    $_SESSION['error'] = $l['managemembers_error_notallowed_aim'];
+  // Are they trying to change their MSN and are they allowed to?
+  elseif (!can('moderate_msn') && $msn != $row['msn'])
+    $_SESSION['error'] = $l['managemembers_error_notallowed_msn'];
+  // Are they trying to change their YIM and are they allowed to?
+  elseif (!can('moderate_yim') && $yim != $row['yim'])
+    $_SESSION['error'] = $l['managemembers_error_notallowed_yim'];
+  // Are they trying to change their GTalk and are they allowed to?
+  elseif (!can('moderate_gtalk') && $gtalk != $row['gtalk'])
+    $_SESSION['error'] = $l['managemembers_error_notallowed_gtalk'];
+  // Are they trying to change their site and are they allowed to?
+  elseif (!can('moderate_site') && ($site_name != $row['site_name'] || $site_url != $row['site_url']))
+    $_SESSION['error'] = $l['managemembers_error_notallowed_site'];
   // Are they trying to change their signature and are they allowed to?
   elseif (!can('moderate_signature') && $signature != $row['signature'])
     $_SESSION['error'] = $l['managemembers_error_notallowed_signature'];
@@ -350,9 +382,9 @@ global $l, $db_prefix, $user, $settings, $cookie_prefix;
   if (!@$_SESSION['error']) {
   // Update member's data
   if (@$_REQUEST['password-new']) // And change password
-    sql_query("UPDATE {$db_prefix}members SET `username` = '$username', `display_name` = '$display_name', `email` = '$email', `birthdate` = '$birthdate', `avatar` = '$avatar', `password` = '$password_new', `group` = '$group', `signature` = '$signature', `profile` = '$profile' WHERE `id` = '{$_REQUEST['u']}'");
+    sql_query("UPDATE {$db_prefix}members SET `username` = '$username', `display_name` = '$display_name', `email` = '$email', `birthdate` = '$birthdate', `avatar` = '$avatar', `icq` = '$icq', `aim` = '$aim', `msn` = '$msn', `yim` = '$yim', `gtalk` = '$gtalk', `site_name` = '$site_name', `site_url` = '$site_url', `password` = '$password_new', `group` = '$group', `signature` = '$signature', `profile` = '$profile' WHERE `id` = '{$_REQUEST['u']}'");
   else // And don't change password
-    sql_query("UPDATE {$db_prefix}members SET `username` = '$username', `display_name` = '$display_name', `email` = '$email', `birthdate` = '$birthdate', `avatar` = '$avatar', `group` = '$group', `signature` = '$signature', `profile` = '$profile' WHERE `id` = '$u'");
+    sql_query("UPDATE {$db_prefix}members SET `username` = '$username', `display_name` = '$display_name', `email` = '$email', `birthdate` = '$birthdate', `avatar` = '$avatar', `icq` = '$icq', `aim` = '$aim', `msn` = '$msn', `yim` = '$yim', `gtalk` = '$gtalk', `site_name` = '$site_name', `site_url` = '$site_url', `group` = '$group', `signature` = '$signature', `profile` = '$profile' WHERE `id` = '$u'");
   
     // If they changed their own username change settings to keep 'em logged in
     if ($_REQUEST['u'] == $user['id']) {

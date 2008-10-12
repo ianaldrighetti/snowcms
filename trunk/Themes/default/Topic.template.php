@@ -55,19 +55,73 @@ global $cmsurl, $theme_url, $l, $settings, $user;
         ', $l['topic_posts'], ' ',$post['numposts'], '
       </p>
       <br />
+      ';
+   echo '<br />
       <table style="display: inline">
-        <tr><td>
-      '.($post['status']
-          ? '<img src="'.$theme_url.'/'.$settings['theme'].'/images/status_online.png"
-              alt="'.$l['topic_online'].'" width="16" height="16" /></td>
+        <tr>
+          <td>
+            <a href="'.$cmsurl.'forum.php?action=pm;sa=compile;to='.$post['username'].'">
+            '.($post['status']
+              ? '<img src="'.$theme_url.'/'.$settings['theme'].'/images/status_online.png"
+              alt="'.$l['topic_online'].'" width="16" height="16" /></a></td>
             <td>'.$l['topic_online']
           : '<img src="'.$theme_url.'/'.$settings['theme'].'/images/status_offline.png"
-              alt="'.$l['topic_offline'].'" width="16" height="16" /></td>
+              alt="'.$l['topic_offline'].'" width="16" height="16" /></a></td>
             <td>'.$l['topic_offline'])
       .'
-        </td></tr>
+          </td>
+        </tr>
       </table>
-    </div>
+      ';
+  if (!$user['is_guest']) {
+    if ($post['icq'] || $post['aim'] || $post['msn'] || $post['yim'] || $post['gtalk'])
+      echo '
+      <br />
+      ';
+    if ($post['icq'])
+      echo '<a href="http://www.icq.com/whitepages/about_me.php?uin='.$post['icq'].'">
+        <img src="'.$theme_url.'/'.$settings['theme'].'/images/icq.png" alt="'.$l['topic_icq'].'" title="'.$l['topic_icq'].': '.$post['icq'].'" />
+      </a>
+      ';
+    if ($post['aim'])
+      echo '<a href="aim:goim?screenname='.$post['aim'].'&message=Hi.+It\'s+me+'.str_replace(' ','+',$user['name']).'+from+'.
+        str_replace(' ','+',$settings['site_name']).'.">
+        <img src="'.$theme_url.'/'.$settings['theme'].'/images/aim.png" alt="'.$l['topic_aim'].'" title="'.$l['topic_aim'].': '.$post['aim'].'" />
+      </a>
+      ';
+    if ($post['msn'])
+      echo '<a href="http://members.msn.com/'.$post['msn'].'">
+        <img src="'.$theme_url.'/'.$settings['theme'].'/images/msn.png" alt="'.$l['topic_msn'].'" title="'.$l['topic_msn'].': '.$post['msn'].'" />
+      </a>
+      ';
+    if ($post['yim'])
+      echo '<a href="http://edit.yahoo.com/config/send_webmesg?.target='.$post['yim'].'">
+        <img src="'.$theme_url.'/'.$settings['theme'].'/images/yim.png" alt="'.$l['topic_yim'].'" title="'.$l['topic_yim'].': '.$post['yim'].'" />
+      </a>
+      ';
+    if ($post['gtalk'])
+      echo '<img src="'.$theme_url.'/'.$settings['theme'].'/images/gtalk.png" alt="'.$l['topic_gtalk'].'" title="'.$l['topic_gtalk'].': '.$post['gtalk'].'" />
+      ';
+  }
+  echo '<br />
+      ';
+  if ($post['site_url'])
+    echo '<a href="'.$post['site_url'].'">
+          <img src="'.$theme_url.'/'.$settings['theme'].'/images/site.png" alt="'.$post['site_name'].'" title="'.$post['site_name'].'" />
+        </a>
+      ';
+  if (!$user['is_guest'])
+    echo '<a href="mailto:'.$post['email'].'">
+          <img src="'.$theme_url.'/'.$settings['theme'].'/images/email.png" alt="'.$l['topic_email'].'" title="'.$l['topic_email'].': '.$post['email'].'" />
+        </a>
+        ';
+  echo '<a href="'.$cmsurl.'index.php?action=profile;u='.$post['uid'].'">
+          <img src="'.$theme_url.'/'.$settings['theme'].'/images/profile.png"
+              alt="'.str_replace('%username%',$post['username'],$l['topic_profile']).'"
+              title="'.str_replace('%username%',$post['username'],$l['topic_profile']).'" />
+       </a>
+       ';
+  echo '</div>
     <div id="post-info">
       <div class="image">
         ', $user['is_logged'] ? '<a href="'. $cmsurl. 'forum.php?action=post;topic='. $post['tid']. ';quote='. $post['mid']. '" title="'. $l['topic_quote']. '"><img src="'. $theme_url.'/'.$settings['theme'].'/images/quote.png" alt="'. $l['topic_quote']. '"/></a>' : '', ' ', $post['can']['edit'] ? '<a href="'. $cmsurl. 'forum.php?action=post;topic='.$post['tid'].';edit='. $post['mid']. '" title="'. $l['topic_editpost']. '"><img src="'. $theme_url.'/'.$settings['theme'].'/images/edit_post.png" alt="'. $l['topic_editpost'] .'"/></a>' : '', ' ', $post['can']['del'] ? '<a href="'. $cmsurl. 'forum.php?action=delete;topic='.$post['tid'].';msg='. $post['mid']. ';sc='.$user['sc'].'" onClick="return confirm(\''. $l['topic_delconfirm']. '\')" title="'. $l['topic_deletemsg']. '"><img src="'. $theme_url. '/'. $settings['theme']. '/images/delete.png" alt="'. $l['topic_deletemsg']. '"/></a>' : '', ' ', $post['can']['split'] ? '<a href="'. $cmsurl. 'forum.php?action=split;msg='. $post['mid']. ';sc='. $user['sc']. '" title="'. $l['topic_split']. '"><img src="'. $theme_url. '/'.$settings['theme'].'/images/split.png" alt="'. $l['topic_split']. '"/></a>' : '', '
