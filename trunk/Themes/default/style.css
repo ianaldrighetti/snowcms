@@ -293,7 +293,7 @@ th.border {
 /* Topic */
 #post-info {
   float: right;
-  width: 459px;
+  width: 480px;
   padding-left: 4px;
   text-align: right;
   border-style: solid;
@@ -317,7 +317,7 @@ th.border {
 }
 #post-container #post-left {
   float: left;
-  width: 100px;
+  width: 120px;
   padding: 7px;
   padding-top: 2px;
   overflow: hidden;
@@ -327,7 +327,7 @@ th.border {
   background: url('images/postbg.png');
 }
 #post-container #post-right {
-  width: 464px;
+  width: 484px;
   float: right;
   background: #FFFFFF;
   text-align: left;
@@ -345,15 +345,15 @@ th.border {
   font-family: Arial;
   font-size: x-small;
 }
-textarea.quickreply {
-  width: 100%;
-  height: 100px;
-}
 .topic-page-end {
   border-top-style: solid;
   border-width: 1px;
   border-color: #C0C0C0;
-  width: 115px;
+  width: 135px;
+}
+textarea.quickreply {
+  width: 100%;
+  height: 100px;
 }
 /* Posting new topics or replies */
 #post {
