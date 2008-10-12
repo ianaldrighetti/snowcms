@@ -96,6 +96,8 @@ global $cmsurl, $db_prefix, $l, $settings, $user;
                            'is_post' => $row['mid2'] ? true : false
                          )
           );
+          $topics[count($topics)-1]['pages'] = floor($topics[count($topics)-1]['numReplies'] / $settings['num_posts'] + 1);
+          $topics[count($topics)-1]['hot'] = $topics[count($topics)-1]['numReplies'] >= @$settings['hot_posts'];
         }
         mysql_free_result($result);
         $settings['page']['page'] = (int)@$_REQUEST['pg'];
@@ -104,7 +106,7 @@ global $cmsurl, $db_prefix, $l, $settings, $user;
         $settings['page']['board-name'] = $board['name'];
         $settings['topics'] = $topics;
         $settings['page']['title'] = $board['name'].' - '.$settings['site_name'];
-        loadForum('Board');    
+        loadForum('Board');
     }
     else {
       // No board has been found

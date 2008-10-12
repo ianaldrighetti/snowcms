@@ -15,13 +15,18 @@ global $cmsurl, $theme_url, $l, $settings, $user;
     <tr>
       <td style="text-align: left;">', pagination($settings['page']['page'],$settings['page']['page_last'],'forum.php?topic='.$settings['topic']), '</td>
       <td style="text-align: right;">';
+  if (canforum('move_any', $settings['bid']))
+    echo '<a href="'.$cmsurl.'forum.php?action=move;topic='.$settings['topic'].'">'.$l['topic_move'].'</a>';
+  if (canforum('move_any', $settings['bid']) && (canforum('sticky_topic', $settings['bid']) || canforum('lock_topic', $settings['bid']) || canforum('post_new', $settings['bid']) || canforum('post_reply', $settings['bid'])))
+    echo ' - ';
   if (canforum('sticky_topic', $settings['bid'])) {
     if ($settings['sticky'])
       echo '<a href="'.$cmsurl.'forum.php?action=sticky;topic='.$settings['topic'].';sc='.$user['sc'].'">'.$l['topic_unsticky'].'</a>';
     else
       echo '<a href="'.$cmsurl.'forum.php?action=sticky;topic='.$settings['topic'].';sc='.$user['sc'].'">'.$l['topic_sticky'].'</a>';
   }
-  if (canforum('sticky_topic', $settings['bid']) && (canforum('lock_topic', $settings['bid']) || canforum('post_new', $settings['bid']) || canforum('post_reply', $settings['bid']))) echo ' - ';
+  if (canforum('sticky_topic', $settings['bid']) && (canforum('lock_topic', $settings['bid']) || canforum('post_new', $settings['bid']) || canforum('post_reply', $settings['bid'])))
+    echo ' - ';
   if (canforum('lock_topic', $settings['bid'])) {
     if ($settings['locked'])
       echo '<a href="'.$cmsurl.'forum.php?action=lock;topic='.$settings['topic'].';sc='.$user['sc'].'">'.$l['topic_unlock'].'</a>';
@@ -107,6 +112,8 @@ global $cmsurl, $theme_url, $l, $settings, $user;
     <tr>
       <td style="text-align: left;">', pagination($settings['page']['page'],$settings['page']['page_last'],'forum.php?topic='.$settings['topic']), '</td>
       <td style="text-align: right;">';
+  if (canforum('move_any', $settings['bid']))
+    echo '<a href="'.$cmsurl.'forum.php?action=move;topic='.$settings['topic'].'">'.$l['topic_move'].'</a> - ';
   if (canforum('sticky_topic', $settings['bid'])) {
     if ($settings['sticky'])
       echo '<a href="'.$cmsurl.'forum.php?action=sticky;topic='.$settings['topic'].';sc='.$user['sc'].'">'.$l['topic_unsticky'].'</a>';
@@ -145,6 +152,73 @@ global $cmsurl, $l, $settings, $user;
   <h1>'.$l['topic_unknown_header'].'</h1>
   
   <p>'.$l['topic_unknown_desc'].'</p>
+  ';
+}
+
+function MoveTopic() {
+global $l, $settings, $cmsurl;
+  
+  echo '
+  <h1>'.$l['topic_move_header'].'</h1>
+  
+  ';
+  
+  if (empty($_SESSION['error']))
+    echo '<p>'.str_replace('%topic%','<b>'.$settings['page']['topic']['subject'].'</b>',$l['topic_move_desc']).'</p>';
+  else
+    echo '<p><b>'.$l['main_error'].':</b> '.$_SESSION['error'].'</p>';
+  
+  echo '
+  <form action="" method="post" style="display: inline">
+    <p>
+      <input type="hidden" name="move-topic" value="true" />
+    </p>
+    <table>
+      <tr>
+        <td>'.$l['topic_move_board'].':</td>
+        <td>
+          <select name="board">
+          ';
+  
+  foreach ($settings['page']['boards'] as $board)
+    echo '  <option value="'.$board['bid'].'">'.$board['name'].'</option>
+       ';
+  
+  echo '</select>
+        </td>
+      </tr>
+      <tr>
+        <td>'.$l['topic_move_subject'].':</td>
+        <td><input name="subject" value="'.$l['topic_move_moved'].': '.$settings['page']['topic']['subject'].'" /></td>
+      </tr>
+    </table>
+    <p>
+      <textarea name="body" cols="93" rows="12" style="width: 100%">'.
+      str_replace('%url%',$cmsurl.'forum.php?topic='.$settings['page']['topic']['tid'],
+      str_replace('%subject%',$settings['page']['topic']['subject'],
+      $l['topic_move_message'])).'</textarea>
+    </p>
+    <p style="display: inline">
+      <input type="submit" value="'.$l['topic_move_submit'].'" />
+    </p>
+  </form>
+  <form action="'.$cmsurl.'forum.php?topic='.$settings['page']['topic']['tid'].'" method="post" style="display: inline">
+    <p style="display: inline">
+      <input type="submit" value="'.$l['main_cancel'].'" />
+    </p>
+  </form>
+  <br />
+  <br />
+  ';
+}
+
+function MoveNoBoards() {
+global $cmsurl, $l, $settings, $user;
+  
+  echo '
+  <h1>'.$l['topic_move_noboards_header'].'</h1>
+  
+  <p>'.$l['topic_move_noboards_desc'].'</p>
   ';
 }
 

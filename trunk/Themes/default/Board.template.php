@@ -20,12 +20,12 @@ global $bperms, $cmsurl, $l, $settings, $user, $theme_url;
   </table>
   <table width="100%">
     <tr class="title">
-      <th width="4%" class="no-border"></th>
-      <th width="50%">'.$l['board_subject'].'</th>
-      <th width="13%">'.$l['board_creator'].'</th>
-      <th width="6%" style="font-size: 70%">'.$l['board_replies'].'</th>
-      <th width="5%" style="font-size: 70%">'.$l['board_views'].'</th>
-      <th width="22%">'.$l['board_lastpost'].'</th>
+      <th width="3%" class="no-border"></th>
+      <th width="55%">'.$l['board_subject'].'</th>
+      <th width="12%">'.$l['board_creator'].'</th>
+      <th width="5%" style="font-size: 70%">'.$l['board_replies'].'</th>
+      <th width="4%" style="font-size: 70%">'.$l['board_views'].'</th>
+      <th width="21%">'.$l['board_lastpost'].'</th>
     </tr>';
 if (count($settings['topics']) > 0) {
   foreach ($settings['topics'] as $topic) {
@@ -34,23 +34,45 @@ if (count($settings['topics']) > 0) {
      <td style="text-align: center; padding: 5px;"><img src="'.$theme_url.'/'.$settings['theme'].'/images/';
      
      if ($topic['is_new'] && $topic['is_own'])
-       echo 'topic_own_new.png" alt="'.$l['board_topic_own_new'].'"';
+       echo 'topic_own_new'.($topic['hot'] ? '_hot' : '').'.png" alt="'.$l['board_topic_own_new'.($topic['hot'] ? '_hot' : '')].'"';
      else if ($topic['is_new'])
-       echo 'topic_new.png" alt="'.$l['board_topic_new'].'"';
+       echo 'topic_new'.($topic['hot'] ? '_hot' : '').'.png" alt="'.$l['board_topic_new'.($topic['hot'] ? '_hot' : '')].'"';
      else if ($topic['is_own'])
-       echo 'topic_own_old.png" alt="'.$l['board_topic_own_old'].'"';
+       echo 'topic_own_old'.($topic['hot'] ? '_hot' : '').'.png" alt="'.$l['board_topic_own_old'.($topic['hot'] ? '_hot' : '')].'"';
      else
-       echo 'topic_old.png" alt="'.$l['board_topic_old'].'"';
+       echo 'topic_old'.($topic['hot'] ? '_hot' : '').'.png" alt="'.$l['board_topic_old'.($topic['hot'] ? '_hot' : '')].'"';
      
      echo '/></td>
      <td style="padding: 5px;">
        ';
      if ($topic['locked'])
        echo '<img src="'.$theme_url.'/'.$settings['theme'].'/images/topic_locked.png" style="float: right" />';
+     
      if ($topic['sticky'])
-       echo $l['board_sticky'].': <b><a href="'.$cmsurl.'forum.php?topic='.$topic['tid'].'">'.$topic['subject'].'</a></b>';
+       echo $l['board_sticky'].': <b><a href="'.$cmsurl.'forum.php?topic='.$topic['tid'].'">'.$topic['subject'].'</a></b>
+       ';
      else
-       echo '<a href="'.$cmsurl.'forum.php?topic='.$topic['tid'].'">'.$topic['subject'].'</a>';
+       echo '<a href="'.$cmsurl.'forum.php?topic='.$topic['tid'].'">'.$topic['subject'].'</a>
+       ';
+     
+     if ($topic['pages'] > 1 && $topic['pages'] <= 5) {
+       echo '<span style="font-size: xx-small">-
+         <a href="'.$cmsurl.'forum.php?topic='.$topic['tid'].'">1</a>
+       ';
+       for ($i=2;$i<$topic['pages']+1;$i+=1)
+         echo '  <a href="'.$cmsurl.'forum.php?topic='.$topic['tid'].';pg='.($i-1).'">'.$i.'</a>
+       ';
+       echo '</span>';
+     }
+     elseif ($topic['pages'] > 5)
+       echo '<span style="font-size: xx-small">-
+         <a href="'.$cmsurl.'forum.php?topic='.$topic['tid'].'">1</a>
+         <a href="'.$cmsurl.'forum.php?topic='.$topic['tid'].';pg=1">2</a>
+         ...
+         <a href="'.$cmsurl.'forum.php?topic='.$topic['tid'].';pg='.($topic['pages']-2).'">'.($topic['pages']-1).'</a>
+         <a href="'.$cmsurl.'forum.php?topic='.$topic['tid'].';pg='.($topic['pages']-1).'">'.$topic['pages'].'</a>
+       </span>';
+     
      echo '
      </td>
      <td style="text-align: center; padding: 5px;"><a href="'. $cmsurl. 'index.php?action=profile;u='. $topic['starter_id']. '">'.$topic['username']. '</a></td>

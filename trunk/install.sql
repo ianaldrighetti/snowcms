@@ -258,6 +258,7 @@ INSERT INTO `{$db_prefix}settings` VALUES
 ('from_email',''),
 ('smtp_port','25'),
 ('board_posts_per_page','20'),
+('hot_posts','20'),
 ('num_posts','10'),
 ('num_topics','20'),
 ('num_news_items','6'),

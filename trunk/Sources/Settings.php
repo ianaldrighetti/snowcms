@@ -110,6 +110,11 @@ global $cmsurl, $db_prefix, $l, $settings, $user, $language_dir, $theme_dir, $th
           'type' => 'text',
           'validation' => '>0'
         ),
+      'hot_posts' =>
+        array(
+          'type' => 'text',
+          'validation' => '>0'
+        ),
       'timeformat' =>
         array(
           'type' => 'text',

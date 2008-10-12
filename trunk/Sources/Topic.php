@@ -240,31 +240,125 @@ global $db_prefix;
   // Are they allowed to delete it?
   if (canforum('delete_any', $board) || del(PostOwner($msg), canforum('delete_own', $board))) {
     // Delete the message
-    sql_query("DELETE FROM {$db_prefix}messages WHERE `mid` = '$msg'") or die(mysql_error());
+    sql_query("DELETE FROM {$db_prefix}messages WHERE `mid` = '$msg'");
     // Lower the member's post count by one
-    sql_query("UPDATE {$db_prefix}members SET `numposts` = `numposts` - 1 WHERE `id` = '$member'") or die(mysql_error());
+    sql_query("UPDATE {$db_prefix}members SET `numposts` = `numposts` - 1 WHERE `id` = '$member'");
     // Lower the topic's reply count by one
-    sql_query("UPDATE {$db_prefix}topics SET `num_replies` = `num_replies` - 1 WHERE `tid` = '$topic'") or die(mysql_error());
+    sql_query("UPDATE {$db_prefix}topics SET `num_replies` = `num_replies` - 1 WHERE `tid` = '$topic'");
     // Lower the boards's post count by one
-    sql_query("UPDATE {$db_prefix}boards SET `numposts` = `numposts` - 1 WHERE `bid` = '$board'") or die(mysql_error());
+    sql_query("UPDATE {$db_prefix}boards SET `numposts` = `numposts` - 1 WHERE `bid` = '$board'");
     // Are they trying to a delete a topic?
-    $first_msg = mysql_fetch_assoc(sql_query("SELECT * FROM {$db_prefix}topics WHERE `tid` = '$topic'")) or die(mysql_error());
+    $first_msg = mysql_fetch_assoc(sql_query("SELECT * FROM {$db_prefix}topics WHERE `tid` = '$topic'"));
     if ($first_msg['first_msg'] == $msg) {
-      // Yes, they are
-      // Lower the boards's topic count by one
-      sql_query("UPDATE {$db_prefix}boards SET `numtopics` = `numtopics` - 1 WHERE `bid` = '$board'") or die(mysql_error());
-      // Lower the boards's message count by topic's replies
-      sql_query("UPDATE {$db_prefix}topics AS `t` LEFT JOIN {$db_prefix}boards AS `b` ON `t`.`bid` = `b`.`bid` SET `b`.`numposts` = `b`.`numposts` - `t`.`num_replies` - 1 WHERE `t`.`tid` = '$topic'") or die(mysql_error());
+      // Lower the board's topic count by one
+      sql_query("UPDATE {$db_prefix}boards SET `numtopics` = `numtopics` - 1 WHERE `bid` = '$board'");
+      // Lower the board's message count by topic's replies
+      sql_query("UPDATE {$db_prefix}topics AS `t` LEFT JOIN {$db_prefix}boards AS `b` ON `t`.`bid` = `b`.`bid` SET `b`.`numposts` = `b`.`numposts` - `t`.`num_replies` - 1 WHERE `t`.`tid` = '$topic'");
       // Delete the topic
-      sql_query("DELETE FROM {$db_prefix}topics WHERE `tid` = '$topic'") or die(mysql_error());
+      sql_query("DELETE FROM {$db_prefix}topics WHERE `tid` = '$topic'");
       // Delete all of the messages in the topic
-      sql_query("DELETE FROM {$db_prefix}messages WHERE `tid` = '$topic'") or die(mysql_error());
+      sql_query("DELETE FROM {$db_prefix}messages WHERE `tid` = '$topic'");
       // Delete the topic log
-      sql_query("DELETE FROM {$db_prefix}topic_logs WHERE `tid` = '$topic'") or die(mysql_error());
+      sql_query("DELETE FROM {$db_prefix}topic_logs WHERE `tid` = '$topic'");
       redirect('forum.php?board='.$board);
     }
   }
   redirect('forum.php?topic='.$topic);
+}
+
+function Move() {
+global $l, $settings, $user, $db_prefix;
+  
+  $topic = (int)@$_REQUEST['topic'];
+  
+  // Get the topic information
+  $topic = $settings['page']['topic'] = mysql_fetch_assoc(sql_query("
+                               SELECT
+                                 *
+                               FROM {$db_prefix}topics AS `t`
+                                 LEFT JOIN {$db_prefix}messages AS `m`
+                                   ON `t`.`first_msg` = `m`.`mid`
+                                 LEFT JOIN {$db_prefix}boards AS `b`
+                                   ON `t`.`bid` = `b`.`bid`
+                               WHERE `t`.`tid` = '$topic'"));
+  
+  // Are they allowed to move topics and does the topic exist?
+  if (canforum('move_any',$topic['bid']) && $topic) {
+    // Have they already filled out the form and we are suppose to be just submitting it?
+    if (!empty($_REQUEST['move-topic'])) {
+      // Get the new board ID
+      $new_board = (int)@$_REQUEST['board'];
+      // Are they trying to move the topic to its current board?
+      if ($new_board != $topic['bid']) {
+        // Are they allowed to create topics where they are moving this topic to?
+        if (canforum('post_new',$new_board)) {
+          // Get the moved topic announcement topic's subject
+          $subject = clean(@$_REQUEST['subject']);
+          // Get the information about the new board to get its name
+          $new_board_name = mysql_fetch_assoc(sql_query("SELECT * FROM {$db_prefix}boards WHERE `bid` = '$new_board'"));
+          // Get the moved topic announcement topic's body
+          $body = str_replace('%board%',$new_board_name['name'],clean(@$_REQUEST['body']));
+          // Lower the board's message count by topic's replies
+          sql_query("UPDATE {$db_prefix}topics AS `t` LEFT JOIN {$db_prefix}boards AS `b` ON `t`.`bid` = `b`.`bid` SET `b`.`numposts` = `b`.`numposts` - `t`.`num_replies` WHERE `t`.`tid` = '{$topic['tid']}'");
+          // Update the topic data
+          sql_query("UPDATE {$db_prefix}topics SET `bid` = '$new_board' WHERE `tid` = '{$topic['tid']}'");
+          // Update the message data
+          sql_query("UPDATE {$db_prefix}messages SET `bid` = '$new_board' WHERE `tid` = '{$topic['tid']}'");
+          // Raise the new board's topic count by one
+          sql_query("UPDATE {$db_prefix}boards SET `numtopics` = `numtopics` + 1 WHERE `bid` = '$new_board'");
+          // Raise the new board's message count by topic's posts
+          sql_query("UPDATE {$db_prefix}topics AS `t` LEFT JOIN {$db_prefix}boards AS `b` ON `t`.`bid` = `b`.`bid` SET `b`.`numposts` = `b`.`numposts` + `t`.`num_replies` + 1 WHERE `t`.`tid` = '{$topic['tid']}'");
+          // Create the moved topic announement topic
+          sql_query("INSERT INTO {$db_prefix}topics (`sticky`,`locked`,`bid`,`starter_id`,`topic_starter`,`ender_id`,`topic_ender`)
+                     VALUES('0','1','{$topic['bid']}','{$user['id']}','{$user['name']}','{$user['id']}','{$user['name']}')");
+          $tid = mysql_insert_id();
+          sql_query("INSERT INTO {$db_prefix}messages (`tid`,`bid`,`uid`,`subject`,`post_time`,`poster_name`,`poster_email`,`ip`,`body`)
+                     VALUES('$tid','{$topic['bid']}','{$user['id']}','$subject','".time()."','{$user['name']}','{$user['email']}','{$user['ip']}','$body')");
+          $mid = mysql_insert_id();
+          sql_query("UPDATE {$db_prefix}topics SET `first_msg` = '$mid', `last_msg` = '$mid' WHERE `tid` = '$tid'");
+          // Redirect them to the new board
+          redirect('forum.php?topic='.$tid);
+        }
+        // They are not allowed to move topics to that board
+        else {
+          $_SESSION['error'] = $l['topic_move_error_notallowed'];
+          redirect('forum.php?action=move;topic='.$topic['tid']);
+        }
+      }
+      // They are trying to move the topic to its current board
+      else {
+          $_SESSION['error'] = $l['topic_move_error_sameboard'];
+          redirect('forum.php?action=move;topic='.$topic['tid']);
+      }
+    }
+    
+    // Get the list of boards they can move the topic to
+    $settings['page']['boards'] = array();
+    $result = sql_query("SELECT * FROM {$db_prefix}boards WHERE `bid` != '{$topic['bid']}'");
+    while ($row = mysql_fetch_assoc($result))
+      // Are they are not allowed to create topics there
+      if (canforum('post_new',$row['bid']))
+        $settings['page']['boards'][] = $row;
+    
+    // Are there any boards they are allowed to move this topic to?
+    if ($settings['page']['boards']) {
+      // Load the theme
+      $settings['page']['title'] = $l['topic_move_title'];
+      loadForum('Topic','MoveTopic');
+    }
+    // They can't move the topic to any boards
+    else {
+      // Load the theme
+      $settings['page']['title'] = $l['topic_move_noboards_title'];
+      loadForum('Topic','MoveNoBoards');
+    }
+  }
+  // They are not allowed to move topics or it doesn't exist, which?
+  elseif ($topic)
+    redirect('forum.php?topic='.$topic['tid']);
+  // The topic doesn't exist
+  else
+    redirect('forum.php');
 }
 
 // More simple functions to aid in moderation...

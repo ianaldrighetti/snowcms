@@ -68,7 +68,8 @@ require_once($source_dir.'/Core.php');
       'search' => array('Search.php','FSearch'),
       'search2' => array('Search.php','FSearch2'),
       'delete' => array('Topic.php','Delete'),
-      'sticky' => array('Topic.php','Sticky')
+      'sticky' => array('Topic.php','Sticky'),
+      'move' => array('Topic.php','Move')
     );
     if(is_array(@$actions[$_REQUEST['action']])) {
       // It is something defined, hope it works right >.<
