@@ -13,7 +13,7 @@ echo '
   <p>'.$l['online_desc'].'</p>
   <table width="100%">
     <tr>
-      <td>'.$l['online_user'].'</td>'; if(can('view_online_special')) { echo '<td>'.$l['online_ip'].'</td>'; } echo '<td>'.$l['online_time'].'</td><td>'.$l['online_currently_viewing'].'</td>
+      <th>'.$l['online_user'].'</th>'; if(can('view_online_special')) { echo '<th>'.$l['online_ip'].'</th>'; } echo '<th>'.$l['online_time'].'</th><th>'.$l['online_currently_viewing'].'</th>
     </tr>';
   foreach($settings['page']['online'] as $member) {
     echo '

@@ -24,7 +24,7 @@ if (!defined("Snow"))
   oh... xD
 */
 
-function Main() {
+function Maintain() {
 global $cmsurl, $db_prefix, $l, $mysql_db, $settings, $user;
   // Can they Maintain the site?
   if(can('maintain')) {

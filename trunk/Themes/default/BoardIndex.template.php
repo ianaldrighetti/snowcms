@@ -63,15 +63,19 @@ global $cmsurl, $theme_url, $l, $settings, $user;
       <br />
       <table width="100%" id="forum_who">
         <tr class="title">
-          <td>', $l['forum_online'], '</td>
+          <td>
+            <b><a href="index.php?action=online">', $l['forum_online'], '</a></b>
+            <span style="font-size: x-small"> - ', $settings['who_stats'], '</span>
+          </td>
         </tr>
         <tr>
-          <td>', $settings['who_stats'], '</td>
+          <td style="font-size: x-small">
+            Users: ', implode(", ", $settings['members_viewing']), '
+          </td>
         </tr>
-        <tr>
-          <td>', implode(", ", $settings['members_viewing']), '</td>
-        </tr>
-      </table>';
+      </table>
+      <br />
+      ';
 }
 
 function NotAllowed() {

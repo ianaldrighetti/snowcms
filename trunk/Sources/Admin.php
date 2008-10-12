@@ -45,7 +45,7 @@ global $cmsurl, $db_prefix, $l, $settings, $source_dir, $user;
         'pages' => array('Page.php','ManagePages'),
         'members' => array('Members.php','ManageMembers'),
         'permissions' => array('Permissions.php','GroupPermissions'),
-        'maintain' => array('Maintain.php','Main'),
+        'maintain' => array('Maintain.php','Maintain'),
         'menus' => array('Menus.php','ManageMenus'),
         'news' => array('News.php','ManageNews'),
         'mail-settings' => array('Settings.php','MailSettings'),

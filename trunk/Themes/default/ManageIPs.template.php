@@ -26,9 +26,9 @@ global $cmsurl, $settings, $l, $user, $cmsurl, $theme_url;
     
     <table width="100%" style="text-align: center">
       <tr>
-        <th style="border-style: solid; border-width: 1px">'.$l['manageips_ip'].'</th>
-        <th style="border-style: solid; border-width: 1px">'.$l['manageips_reason'].'</th>
-        <th width="15"></th>
+        <th>'.$l['manageips_ip'].'</th>
+        <th>'.$l['manageips_reason'].'</th>
+        <th class="no-border" style="width: 15px"></th>
       </tr>';
     foreach($ips as $ip) {
       echo '
@@ -40,8 +40,8 @@ global $cmsurl, $settings, $l, $user, $cmsurl, $theme_url;
     }
     echo '
       <tr>
-        <td><input name="new_ip" value="" /></td>
-        <td><input name="new_ip_reason" value="" /></td>
+        <td><input name="new_ip" style="width: 100%" /></td>
+        <td><input name="new_ip_reason" style="width: 100%" /></td>
         <td></td>
       </tr>
     </table>
@@ -65,13 +65,13 @@ global $l, $settings, $cmsurl;
     
     <table width="100%" style="text-align: center">
       <tr>
-        <th style="border-style: solid; border-width: 1px">'.$l['manageips_ip'].'</th>
-        <th style="border-style: solid; border-width: 1px">'.$l['manageips_reason'].'</th>
-        <th width="15"></th>
+        <th>'.$l['manageips_ip'].'</th>
+        <th>'.$l['manageips_reason'].'</th>
+        <th class="no-border" style="width: 15px"></th>
       </tr>
       <tr>
-        <td><input name="new_ip" value="" /></td>
-        <td><input name="new_ip_reason" value="" /></td>
+        <td><input name="new_ip" style="width: 100%" /></td>
+        <td><input name="new_ip_reason" style="width: 100%" /></td>
         <td></td>
       </tr>
     </table>

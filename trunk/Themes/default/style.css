@@ -66,6 +66,12 @@ textarea {
   font-family: Verdana,Arial,Sans;
   font-size: 12px;
 }
+th {
+  border: solid #C0C0C0 1px;
+}
+.no-border {
+  border-style: none;
+}
 .content .post-title {
   color: #252525;
   text-decoration: none;
@@ -272,9 +278,6 @@ th.border {
 .title th {
   border-style: solid;
   border-width: 1px;
-}
-.title .no-border {
-  border-style: none;
 }
 .messageindex_panel {
   background: transparent;

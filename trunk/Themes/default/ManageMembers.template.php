@@ -49,11 +49,11 @@ global $l, $db_prefix, $settings, $cmsurl, $theme_url;
     // Show member list header
     echo '<table style="width: 100%; text-align: center">
           <tr>
-            <th style="border-style: solid; border-width: 1px; width: 11%"><a href="'.$cmsurl.'index.php?action=admin;sa=members'.$page_get.$filter_get.';s=id'.$settings['manage_members']['id_desc'].'">'.$l['managemembers_id'].'</a></th>
-            <th style="border-style: solid; border-width: 1px; width: 29%"><a href="'.$cmsurl.'index.php?action=admin;sa=members'.$page_get.$filter_get.';s=username'.$settings['manage_members']['username_desc'].'">'.$l['managemembers_username'].'</a></th>
-            <th style="border-style: solid; border-width: 1px; width: 28%"><a href="'.$cmsurl.'index.php?action=admin;sa=members'.$page_get.$filter_get.';s=group'.$settings['manage_members']['group_desc'].'">'.$l['managemembers_group'].'</a></th>
-            <th style="border-style: solid; border-width: 1px; width: 29%"><a href="'.$cmsurl.'index.php?action=admin;sa=members'.$page_get.$filter_get.';s=joindate'.$settings['manage_members']['joindate_desc'].'">'.$l['managemembers_join_date'].'</a></th>
-            <th width="6%"></th>
+            <th style="width: 11%"><a href="'.$cmsurl.'index.php?action=admin;sa=members'.$page_get.$filter_get.';s=id'.$settings['manage_members']['id_desc'].'">'.$l['managemembers_id'].'</a></th>
+            <th style="width: 29%"><a href="'.$cmsurl.'index.php?action=admin;sa=members'.$page_get.$filter_get.';s=username'.$settings['manage_members']['username_desc'].'">'.$l['managemembers_username'].'</a></th>
+            <th style="width: 28%"><a href="'.$cmsurl.'index.php?action=admin;sa=members'.$page_get.$filter_get.';s=group'.$settings['manage_members']['group_desc'].'">'.$l['managemembers_group'].'</a></th>
+            <th style="width: 29%"><a href="'.$cmsurl.'index.php?action=admin;sa=members'.$page_get.$filter_get.';s=joindate'.$settings['manage_members']['joindate_desc'].'">'.$l['managemembers_join_date'].'</a></th>
+            <th class="no-border" style="width: 6%"></th>
           </tr>';
     
     // Show members on this page
