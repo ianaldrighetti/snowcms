@@ -169,27 +169,38 @@ global $cmsurl, $db_prefix, $l, $settings, $user, $theme_url;
 }
 
 function AddBoard() {
-global $cmsurl, $db_prefix, $l, $settings, $user;
+global  $l, $settings, $user, $cmsurl;
   
   echo '
-  <form action="', $cmsurl, 'index.php?action=admin;sa=forum;fa=boards" method="post">  
-    <table id="add_board">
+  <h1>'.$l['manageboards_add_header'].'</h1>
+  ';
+  
+  if (!empty($_SESSION['error']))
+    echo '<p><b>'.$l['main_error'].':</b> '.$_SESSION['error'].'</p>';
+  else
+    echo '<p>'.$l['manageboards_add_desc'].'</p>';
+  
+  echo '
+  <form action="'.$cmsurl.'index.php?action=admin;sa=forum;fa=boards" method="post">  
+    <table id="add_board" class="no-border">
       <tr class="category">
-        <td>', $l['manageboards_add_category'], '</td>
-        <td align="right"><select name="in_category">';
+        <th style="text-align: left">'.$l['manageboards_add_category'].':</th>
+        <td style="text-align: right"><select name="in_category">';
             foreach($settings['cats'] as $cat) 
-              echo '<option value="', $cat['id'], '">', $cat['name'], '</option>';
+              echo '<option value="'.$cat['id'].'">'.$cat['name'].'</option>';
         echo '
         </select></td>
       </tr>
       <tr class="board_name">
-        <td>'.$l['manageboards_add_boardname'].'</td><td align="right"><input name="board_name" type="text" value="" /></td>
+        <th style="text-align: left">'.$l['manageboards_add_boardname'].':</th>
+        <td style="text-align: right"><input name="board_name" type="text" value="" /></td>
       </tr>
       <tr class="board_desc">
-        <td>'.$l['manageboards_add_boarddesc'].'</td><td align="right"><textarea name="board_desc" cols="22" rows="2"></textarea></td>
+        <th style="text-align: left; vertical-align: top">'.$l['manageboards_add_boarddesc'].':</th>
+        <td style="text-align: right"><textarea name="board_desc" cols="35" rows="3"></textarea></td>
       </tr>
       <tr class="who_view">
-        <td valign="top">'.$l['manageboards_add_whoview'].'</td>
+        <th style="text-align: left; vertical-align: top">'.$l['manageboards_add_whoview'].':</th>
         <td align="right">
           ';
         foreach ($settings['groups'] as $group)

@@ -312,14 +312,26 @@ global $cmsurl, $db_prefix, $l, $settings, $user;
       $settings['page']['title'] = $l['managenews_title'];
       loadTheme('ManageNews');
     }
+    // Adding news =D
     elseif ($_REQUEST['ssa'] == 'add') {
-      // Adding news =D
+      // Have they already submitted the data and we are suppose to be just processing it?
       if (@$_REQUEST['add-news']) {
         // Clean the data of dirty injections
         $cat_id = clean(@$_REQUEST['cat_id']); // Category ID
         $subject = clean(@$_REQUEST['subject']); // Subject
         $body = clean(@$_REQUEST['body']); // Body text
         $allow_comments = @$_REQUEST['allow_comments'] == true; // Are comments for this post allowed
+        // Have they entered a subject?
+        if (strlen(str_replace(' ','',$subject)) <= 3) {
+          $_SESSION['error'] = $l['managenews_error_subject'];
+          $_SESSION['error_values'] = serialize(array('cat_id'=>$cat_id,'subject'=>$subject,'body'=>$body,'allow_comments'=>!$allow_comments));
+          redirect('index.php?action=admin;sa=news;ssa=add');
+        }
+        // Have they entered body text?
+        elseif (strlen(str_replace(' ','',$body)) <= 3) {
+          $_SESSION['error'] = $l['managenews_error_body'];
+          redirect('index.php?action=admin;sa=news;ssa=add');
+        }
         // Process SQL query
         sql_query("INSERT {$db_prefix}news (`poster_id`, `cat_id`, `poster_name`, `subject`, `body`, `post_time`, `allow_comments`) VALUES ('{$user['id']}','$cat_id','{$user['name']}','$subject','$body', '".time()."', '$allow_comments')");
         
@@ -350,7 +362,7 @@ global $cmsurl, $db_prefix, $l, $settings, $user;
       NewsList();
     }
   }
-  // Go away! You cant touch this, nah nah nah nah nah nah, cant touch this =D
+  // Go away! You can't touch this, nah nah nah nah nah nah, can't touch this =D
   else
     redirect('index.php?action=admin');
 }

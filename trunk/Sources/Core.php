@@ -799,8 +799,8 @@ global $_REQUEST, $_GET;
       foreach($matches as $arg) {
         // EXPLODED! Again, make the new $_GET and $_REQUEST variables
         $new = explode("=", $arg);
-        $_GET[$new[0]] = $new[1];
-        $_REQUEST[$new[0]] = $new[1];
+        $_GET[$new[0]] = @$new[1];
+        $_REQUEST[$new[0]] = @$new[1];
       }
     }
   }

@@ -741,6 +741,7 @@ $l['manageboards_modify'] = 'Modify';
 // ManageForum.template.php - Add board
 $l['manageboards_add_title'] = 'Add Board';
 $l['manageboards_add_header'] = 'Add Board';
+$l['manageboards_add_desc'] = 'Currently adding a new board to the forum.';
 $l['manageboards_add_category'] = 'Category';
 $l['manageboards_add_boardname'] = 'Board Name';
 $l['manageboards_add_boarddesc'] = 'Board Description';
@@ -752,6 +753,7 @@ $l['manageboards_add_update'] = 'Update Boards';
 $l['manageboards_edit_title'] = 'Edit Board';
 $l['manageboards_edit_header'] = 'Edit Board';
 $l['manageboards_edit_button'] = 'Update Board';
+$l['manageboards_error_name'] = 'You didn\'t enter a name for the board.';
 
 // Post.template.php
 $l['post_topic_header'] = 'New Topic';
@@ -854,6 +856,8 @@ $l['managenews_edit_subject'] = 'Subject';
 $l['managenews_edit_allowcomments'] = 'Allow Comments';
 $l['managenews_edit_submit'] = 'Save Changes';
 // ManageNews.template.php - Errors
+$l['managenews_error_subject'] = 'That subject is too short.';
+$l['managenews_error_body'] = 'The news post is too short.';
 $l['managenews_error_manage_delete_notallowed'] = 'You are not allowed to delete news.';
 $l['managenews_error_manage_delete_invalidsession'] = 'Your session verification failed. Try deleting that news again.';
 

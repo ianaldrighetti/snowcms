@@ -256,8 +256,14 @@ global $cmsurl, $db_prefix, $forumperms, $l, $settings, $user;
       if (!empty($_REQUEST['add_board'])) {
         $in_category = (int)$_REQUEST['in_category'];
         $board_name = clean($_REQUEST['board_name']);
-        $board_desc = clean($_REQUEST['board_desc']);      
-        if(is_array($_REQUEST['groups'])) {
+        $board_desc = clean($_REQUEST['board_desc']);
+        // Have they entered a board name?
+        if (strlen(str_replace(' ','',$board_name)) <= 3) {
+          $_SESSION['error'] = $l['manageboards_error_name'];
+          //$_SESSION['error_values'] = serialize(array('cat_id'=>$cat_id,'subject'=>$subject,'body'=>$body,'allow_comments'=>!$allow_comments));
+          redirect('index.php?action=admin;sa=forum;fa=boards;do=add');
+        }
+        if(is_array(@$_REQUEST['groups'])) {
           $who_view = array();
           foreach($_REQUEST['groups'] as $group) {
             $who_view[] = (int)$group;
@@ -265,12 +271,10 @@ global $cmsurl, $db_prefix, $forumperms, $l, $settings, $user;
           $who_view = implode(',', $who_view);
         }
         else {
-          $who_view = (int)$_REQUEST['groups'];
+          $who_view = (int)@$_REQUEST['groups'];
         }
         sql_query("INSERT INTO {$db_prefix}boards (`cid`,`who_view`,`name`,`bdesc`) VALUES('$in_category','$who_view','$board_name','$board_desc')");
-        $result = sql_query("SELECT * FROM {$db_prefix}boards ORDER BY `bid` DESC LIMIT 1");
-        $row = mysql_fetch_assoc($result);
-        setPermissions($row['bid'], $_REQUEST['groups']);
+        redirect('index.php?action=admin;sa=forum;fa=boards');
       }
       if (!empty($_REQUEST['update_boards'])) {
         $result = sql_query("SELECT * FROM {$db_prefix}boards");
