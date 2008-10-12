@@ -562,6 +562,7 @@ $l['permissions_error_delete_default'] = 'Cannot delete default group.';
 $l['mf_perms_title'] = 'Manage Board Permissions';
 $l['mf_perms_header'] = 'Board Permissions';
 $l['mf_perms_desc'] = 'Choose a board below, and from there, you can choose a member group to edit permissions for that are allowed access to that board.';
+
 $l['mf_perms_manage'] = 'Manage';
 $l['mf_perms_nocats'] = 'Error! It appears you don\'t have any <a href="'. $cmsurl. 'index.php?action=admin;sa=forum;fa=categories">categories</a> made, please make some if you want to access this</p>';
 $l['mf_bp_board_title'] = 'Choose Member Group';
@@ -891,7 +892,9 @@ $l['pm_inbox_subject'] = 'Subject';
 $l['pm_inbox_from'] = 'From';
 $l['pm_inbox_received'] = 'Received';
 $l['pm_inbox_delete'] = 'Delete';
-$l['pm_inbox_delete_areyousure'] = 'Are you sure you want to delete this page?\nYou cannot undo this action.';
+$l['pm_inbox_delete_areyousure'] = 'Are you sure you want to delete this PM?\nYou cannot undo this action.';
+$l['pm_inbox_report'] = 'Report';
+$l['pm_inbox_report_areyousure'] = 'Are you sure you want to report this PM to a moderator?';
 // PersonalMessages.template.php - View message
 $l['pm_message_title'] = 'Personal Messages';
 $l['pm_message_header'] = 'Message';
@@ -930,7 +933,10 @@ $l['pm_error_subject_short'] = 'That subject is too short.';
 $l['pm_error_body_short'] = 'That message is too short.';
 $l['pm_error_delete_doesntexist'] = 'That PM doesn\'t exist.';
 $l['pm_error_delete_notallowed'] = 'You are not allowed to delete PMs.';
-$l['pm_error_invalid_session'] = 'You session validation failed. Please try again.';
+$l['pm_error_delete_invalidsession'] = 'You session validation failed. Please try deleting that PM again.';
+$l['pm_error_report_doesntexist'] = 'That PM doesn\'t exist.';
+$l['pm_error_report_notallowed'] = 'You are not allowed to report PMs.';
+$l['pm_error_report_invalidsession'] = 'You session validation failed. Please try reporting that PM again.';
 
 // ManageIPs.template.php
 $l['manageips_title'] = 'Manage IPs';
@@ -947,7 +953,7 @@ $l['moderatepms_title'] = 'Moderate PMs';
 $l['moderatepms_header'] = 'PM List';
 $l['moderatepms_showing'] = 'Showing PMs %from% to %to%.';
 $l['moderatepms_showing_one'] = 'Showing PM %number%.';
-$l['moderatepms_showing_none'] = 'No members PMs this filter.';
+$l['moderatepms_showing_none'] = 'No personal messages have been reported.';
 $l['moderatepms_to'] = 'To';
 $l['moderatepms_from'] = 'From';
 $l['moderatepms_subject'] = 'Subject';
@@ -959,13 +965,19 @@ $l['moderatepms_filter_activated'] = 'Activated';
 $l['moderatepms_filter_unactivated'] = 'Unactivated';
 $l['moderatepms_filter_suspended'] = 'Suspended';
 $l['moderatepms_filter_banned'] = 'Banned';
+$l['moderatepms_delete'] = 'Delete';
+$l['moderatepms_delete_areyousure'] = 'Are you sure you want to delete this PM?\nYou cannot undo this action.';
+$l['moderatepms_clear'] = 'Clear';
+$l['moderatepms_clear_areyousure'] = 'Are you sure you want to mark this PM as fine?';
 // ModeratePMs.template.php - Single message
 $l['moderatepms_message_title'] = '%subject%';
 $l['moderatepms_message_header'] = '%subject%';
 $l['moderatepms_message_heading'] = 'From %from% to %to% at %time%';
 $l['moderatepms_message_delete'] = 'Delete';
-$l['moderatepms_message_cancel'] = 'Cancel';
 $l['moderatepms_message_delete_areyousure'] = 'Are you sure you want to delete this PM?\nYou cannot undo this action.';
+$l['moderatepms_message_clear'] = 'Clear';
+$l['moderatepms_message_clear_areyousure'] = 'Are you sure you want to mark this PM as fine?';
+$l['moderatepms_message_cancel'] = 'Cancel';
 // ModeratePMs.template.php - Errors
 $l['managemembers_error_username_none'] = 'You didn\'t enter a username.';
 $l['managemembers_error_username_already_used'] = 'That username is already in use.';

@@ -307,7 +307,7 @@ global $db_prefix, $settings, $user;
   sql_query("
     DELETE FROM {$db_prefix}online
     WHERE `last_active` < '$timeout'
-    AND `sc `!= '{$user['sc']}'");
+    AND `sc` != '{$user['sc']}'");
   // Only if they are not logging in at step two
   if (@$_REQUEST['action'] != 'login2') {
     // We deleted theirs, now make a new one
@@ -707,12 +707,12 @@ function sql_query($query) {
   $result = mysql_query($query);
   if(!$result) {
     // Oh noes! An SQL Error maybe? We don't want to die(mysql_error()); but we should save these errors in a file ;)
-    if(!file_exists('error_log')) 
-      @file_put_contents('error_log', mysql_error()."\n");
+    if(!file_exists('error_log.log')) 
+      @file_put_contents('error_log.log', mysql_error()."\n");
     else {
-      $errors = @file_get_contents('error_log');
+      $errors = @file_get_contents('error_log.log');
       $errors.= mysql_error()."\n";
-      @file_put_contents('error_log', $errors);
+      @file_put_contents('error_log.log', $errors);
     }
   }
   return $result;

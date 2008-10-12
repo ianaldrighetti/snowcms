@@ -66,14 +66,50 @@ global $l, $user, $db_prefix;
       }
       // Their session verification failed
       else
-        $_SESSION['error'] = $l['pm_error_invalid_session'];
+        $_SESSION['error'] = $l['pm_error_delete_invalidsession'];
     }
-    // They are not allowed to delete pages
+    // They are not allowed to delete PMs
     else
       $_SESSION['error'] = $l['pm_error_delete_notallowed'];
     // Redirect them so that if they refresh it won't do it again
     if (@$_REQUEST['sa'])
-      redirect('forum.php?action=pm;sa='.clean_header($_REQUEST['sa']));
+      redirect('forum.php?action=pm;sa='.clean($_REQUEST['sa']));
+    else
+      redirect('forum.php?action=pm');
+  }
+  
+  // Do they want to report a PM?
+  if (@$_REQUEST['report']) {
+   // Clean anything that's used in an SQL query
+    $report = (int)$_REQUEST['report'];
+    // Are they allowed to report PMs?
+    if (can('pm_report')) {
+      // Is their session valid?
+      if (ValidateSession(@$_REQUEST['sc'])) {
+        $pm = mysql_fetch_array(sql_query("SELECT * FROM {$db_prefix}pms WHERE `pm_id` = '$report'"));
+        // Does the PM exist?
+        if ($pm) {
+          // Was the PM sent to them?
+          if ($pm['uid_to'] == $user['id'])
+              sql_query("UPDATE {$db_prefix}pms SET `reported` = '1' WHERE `pm_id` = '$report'");
+          // That PM wasn't sent to them
+          else
+            $_SESSION['error'] = $l['pm_error_report_doesntexist'];
+        }
+        // That PM doesn't exist
+        else
+          $_SESSION['error'] = $l['pm_error_report_doesntexist'];
+      }
+      // Their session verification failed
+      else
+        $_SESSION['error'] = $l['pm_error_report_invalidsession'];
+    }
+    // They are not allowed to report PMs
+    else
+      $_SESSION['error'] = $l['pm_error_report_notallowed'];
+    // Redirect them so that if they refresh it won't do it again
+    if (@$_REQUEST['msg'])
+      redirect('forum.php?action=pm;msg='.clean($_REQUEST['msg']));
     else
       redirect('forum.php?action=pm');
   }
@@ -375,16 +411,8 @@ global $l, $settings, $db_prefix, $cmsurl;
     redirect('index.php?action=admin;sa=pms');
   
   // Redirect post data into get data
-  if (@$_POST['f'] == 'all' && @$_POST['s'])
-    redirect('index.php?action=admin;sa=pms;s='.$_POST['s']);
-  elseif (@$_POST['f'] && @$_POST['s'])
-    redirect('index.php?action=admin;sa=pms;f='.$_POST['f'].';s='.$_POST['s']);
-  elseif (@$_POST['f'] == 'all')
-    redirect('index.php?action=admin;sa=pms');
-  elseif (@$_POST['f'])
-    redirect('index.php?action=admin;sa=pms;f='.$_POST['f']);
-  elseif (@$_POST['s'])
-    redirect('index.php?action=admin;sa=pms;s='.$_POST['s']);
+  if (@$_POST['s'])
+    redirect('index.php?action=admin;sa=pms;s='.clean($_POST['s']));
   
   // Set some variables' defaults encase they don't get set in the following switch statement
   $settings['page']['to_desc'] = '';
@@ -435,26 +463,8 @@ global $l, $settings, $db_prefix, $cmsurl;
       $sort = 'ORDER BY `sent_time`';
   }
   
-  // Get the filter SQL ready for use in a following SQL query
-  switch (@$_REQUEST['f']) {
-    // Member is activated and not suspended or banned
-    case 'active':   $filter = "WHERE `activated` = '1' AND `suspension` < '".time()."' AND `banned` = '0'"; break;
-    // Member is activated
-    case 'activated':   $filter = "WHERE `activated` = '1'"; break;
-    // Member is unactivated
-    case 'unactivated': $filter = "WHERE `activated` = '0'"; break;
-    // Member is suspended
-    case 'suspended':   $filter = "WHERE `suspension` > '".time()."'"; break;
-    // Member is unsuspended
-    case 'banned':      $filter = "WHERE `banned` = '1'"; break;
-    // All members
-    case '':      $filter = ""; break;
-    // Members of a particular group
-    default: $filter = "WHERE `group_id` = '".clean($_REQUEST['f'])."'";
-  }
-  
   // Get the member records of all members out of the database
-  $all_pms = sql_query("SELECT * FROM {$db_prefix}pms $filter");
+  $all_pms = sql_query("SELECT * FROM {$db_prefix}pms WHERE `reported` = '1'");
   // The total amount of members
   $settings['page']['total_pms'] = @mysql_num_rows($all_pms);
   
@@ -481,6 +491,7 @@ global $l, $settings, $db_prefix, $cmsurl;
                FROM {$db_prefix}pms
                LEFT JOIN {$db_prefix}members AS `to_member` ON `uid_to` = `to_member`.`id`
                LEFT JOIN {$db_prefix}members AS `from_member` ON `uid_from` = `from_member`.`id`
+               WHERE `reported` = '1'
                $sort
                LIMIT $start, {$settings['num_pms']}");
   // Convert the members from an SQL result resource into a multi-demensional array
@@ -498,11 +509,6 @@ global $l, $settings, $db_prefix, $cmsurl;
     $settings['page']['page_get'] = @$_REQUEST['pg'];
   else
     $settings['page']['page_get'] = '';
-   // Get the filter from the query string
-  if (@$_REQUEST['f'])
-    $settings['page']['filter_get'] = @$_REQUEST['f'];
-  else
-    $settings['page']['filter_get'] = '';
   // Get the sort from the query string
   if (@$_REQUEST['s'])
     $settings['page']['sort_get'] = @$_REQUEST['s'];
@@ -522,7 +528,7 @@ global $l, $settings, $db_prefix, $cmsurl;
     loadTheme('ModeratePMs');
   }
   else
-    loadTheme('ModeratePMs','NoMembers');
+    loadTheme('ModeratePMs','NoPMs');
 }
 
 function loadMessage() {
@@ -531,12 +537,20 @@ global $l, $settings, $db_prefix;
   // Check if a message is being deleted
   if (@$_REQUEST['delete']) {
     $pm = (int)@$_REQUEST['pm'];
-    $row = mysql_fetch_assoc(sql_query("SELECT * FROM {$db_prefix}pms LEFT JOIN {$db_prefix}members ON `uid_to` = `id` WHERE `pm_id` = '$pm'"));
     // Check if still considered unread, if so, stop considering it as such :P
+    $row = mysql_fetch_assoc(sql_query("SELECT * FROM {$db_prefix}pms LEFT JOIN {$db_prefix}members ON `uid_to` = `id` WHERE `pm_id` = '$pm'"));
     if ((int)$row['unread_pms'] && $row['sent_time'] > $row['pms_lastread'])
       sql_query("UPDATE {$db_prefix}members SET `unread_pms` = `unread_pms` - 1 WHERE `id` = '{$row['id']}'");
     // Delete message
     sql_query("DELETE FROM {$db_prefix}pms WHERE `pm_id` = '$pm'");
+    // Redirect back to PM list
+    redirect('index.php?action=admin;sa=pms');
+  }
+  
+  // Check if a message is being cleared as okay
+  if (@$_REQUEST['clear']) {
+    $pm = (int)@$_REQUEST['pm'];
+    sql_query("UPDATE {$db_prefix}pms SET `reported` = '0' WHERE `pm_id` = '$pm'");
     // Redirect back to PM list
     redirect('index.php?action=admin;sa=pms');
   }
@@ -550,7 +564,7 @@ global $l, $settings, $db_prefix;
                LEFT JOIN {$db_prefix}members AS `to_member` ON `uid_to` = `to_member`.`id`
                LEFT JOIN {$db_prefix}members AS `from_member` ON `uid_from` = `from_member`.`id`
                WHERE
-                 `pm_id` = '".(int)$_REQUEST['pm']."'") or die(mysql_error());
+                 `pm_id` = '".(int)$_REQUEST['pm']."'");
   $row = mysql_fetch_assoc($result);
   $settings['page']['title'] = str_replace("%subject%",$row['subject'],$l['moderatepms_message_title']);
   $settings['page']['member'] = $row;

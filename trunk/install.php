@@ -121,7 +121,7 @@ if (!@$_REQUEST['type']) {
     './Themes/default/images/topic_old.png',
     './Themes/default/images/topic_own_new.png',
     './Themes/default/images/topic_own_old.png',
-    './Themes/default/images/www.png',
+    './Themes/default/images/site.png',
     './Themes/default/emoticons',
     './Themes/default/emoticons/emoticons.php',
     './Themes/default/scripts',

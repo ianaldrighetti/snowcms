@@ -25,10 +25,10 @@ global $l, $settings, $user, $cmsurl, $theme_url;
   
   <table width="100%" style="text-align: center">
     <tr>
-      <th style="border-style: solid; border-width: 1px; width: 45%">'.$l['pm_inbox_subject'].'</th>
-      <th style="border-style: solid; border-width: 1px; width: 15%">'.$l['pm_inbox_from'].'</th>
-      <th style="border-style: solid; border-width: 1px; width: 40%">'.$l['pm_inbox_received'].'</th>
-      <th></th>
+      <th style="width: 45%">'.$l['pm_inbox_subject'].'</th>
+      <th style="width: 15%">'.$l['pm_inbox_from'].'</th>
+      <th style="width: 40%">'.$l['pm_inbox_received'].'</th>
+      <th class="no-border"></th>
     </tr>';
   
   foreach ($settings['page']['messages'] as $message) {
@@ -38,8 +38,10 @@ global $l, $settings, $user, $cmsurl, $theme_url;
       <td><a href="'.$cmsurl.'index.php?action=profile;u='.$message['from_id'].'">'.$message['from'].'</a></td>
       <td>'.$message['time'].'</td>
       ';
+    if (can('pm_report'))
+      echo '<td><a href="'.$cmsurl.'forum.php?action=pm;report='.$message['id'].';sc='.$user['sc'].'" onclick="return confirm(\''.$l['pm_inbox_report_areyousure'].'\');"><img src="'.$theme_url.'/'.$settings['theme'].'/images/report.png" alt="'.$l['pm_inbox_report'].'" width="15" height="15" style="border: 0" /></a></td>';
     if (can('pm_delete'))
-      echo '<td><a href="'.$cmsurl.'forum.php?action=pm;did='.$message['id'].';sc='.$user['sc'].'" onclick="return confirm(\'', $l['pm_inbox_delete_areyousure'], '\');"><img src="'.$theme_url.'/'.$settings['theme'].'/images/delete.png" alt="'.$l['pm_inbox_delete'].'" width="15" height="15" style="border: 0" /></a></td>';
+      echo '<td><a href="'.$cmsurl.'forum.php?action=pm;did='.$message['id'].';sc='.$user['sc'].'" onclick="return confirm(\''.$l['pm_inbox_delete_areyousure'].'\');"><img src="'.$theme_url.'/'.$settings['theme'].'/images/delete.png" alt="'.$l['pm_inbox_delete'].'" width="15" height="15" style="border: 0" /></a></td>';
     else
       echo '<td></td>';
     echo '
@@ -132,10 +134,10 @@ global $l, $cmsurl, $settings, $user, $theme_url;
   
   <table width="100%" style="text-align: center">
     <tr>
-      <th style="border-style: solid; border-width: 1px; width: 45%">'.$l['pm_outbox_subject'].'</th>
-      <th style="border-style: solid; border-width: 1px; width: 15%">'.$l['pm_outbox_to'].'</th>
-      <th style="border-style: solid; border-width: 1px; width: 40%">'.$l['pm_outbox_sent'].'</th>
-      <th></th>
+      <th style="width: 45%">'.$l['pm_outbox_subject'].'</th>
+      <th style="width: 15%">'.$l['pm_outbox_to'].'</th>
+      <th style="width: 40%">'.$l['pm_outbox_sent'].'</th>
+      <th class="no-border"></th>
     </tr>';
   
   foreach ($settings['page']['messages'] as $message) {

@@ -7,10 +7,7 @@ if(!defined('Snow'))
   die("Hacking Attempt...");
 
 function Main() {
-global $l, $db_prefix, $settings, $cmsurl, $theme_url;
-  
-  // Load the filter listbox element
-  loadFilter();
+global $l, $settings, $user, $cmsurl, $theme_url;
   
   echo '
     <h1>'.$l['moderatepms_header'].'</h1>
@@ -27,8 +24,6 @@ global $l, $db_prefix, $settings, $cmsurl, $theme_url;
     $page_get = ';pg='.$page_get;
   if ($page_get = $settings['page']['page_get'])
     $page_get = ';pg='.$page_get;
-  if ($filter_get = $settings['page']['filter_get'])
-    $filter_get = ';f='.$filter_get;
   if ($sort_get = $settings['page']['sort_get'])
     $sort_get = ';s='.$sort_get;
   
@@ -38,21 +33,16 @@ global $l, $db_prefix, $settings, $cmsurl, $theme_url;
     echo '<p>'.str_replace("%number%",$first_pm,$l['moderatepms_showing_one']).'</p>';
   
   if ($total_pms) {
-    // Show filter
-    echo '<form action="'.$cmsurl.'index.php?action=admin;sa=pms" method="post" style="text-align: right; margin-bottom: 0"><p style="display: inline">
-       '.$settings['page']['filter'].'
-        </p></form>
-        ';
-    
-    pagination($settings['page']['page'],$settings['page']['page_last'],'index.php?action=admin;sa=pms'.$filter_get.$sort_get);
+    pagination($settings['page']['page'],$settings['page']['page_last'],'index.php?action=admin;sa=pms'.$sort_get);
     
     // Show member list header
     echo '<table style="width: 100%; text-align: center">
           <tr>
-            <th style="border-style: solid; border-width: 1px; width: 20%"><a href="'.$cmsurl.'index.php?action=admin;sa=pms'.$page_get.$filter_get.';s=to'.$settings['page']['to_desc'].'">'.$l['moderatepms_to'].'</a></th>
-            <th style="border-style: solid; border-width: 1px; width: 20%"><a href="'.$cmsurl.'index.php?action=admin;sa=pms'.$page_get.$filter_get.';s=from'.$settings['page']['from_desc'].'">'.$l['moderatepms_from'].'</a></th>
-            <th style="border-style: solid; border-width: 1px; width: 33%"><a href="'.$cmsurl.'index.php?action=admin;sa=pms'.$page_get.$filter_get.';s=subject'.$settings['page']['subject_desc'].'">'.$l['moderatepms_subject'].'</a></th>
-            <th style="border-style: solid; border-width: 1px; width: 27%"><a href="'.$cmsurl.'index.php?action=admin;sa=pms'.$page_get.$filter_get.';s=sentdate'.$settings['page']['sentdate_desc'].'">'.$l['moderatepms_date_sent'].'</a></th>
+            <th style="width: 20%"><a href="'.$cmsurl.'index.php?action=admin;sa=pms'.$page_get.';s=to'.$settings['page']['to_desc'].'">'.$l['moderatepms_to'].'</a></th>
+            <th style="width: 20%"><a href="'.$cmsurl.'index.php?action=admin;sa=pms'.$page_get.';s=from'.$settings['page']['from_desc'].'">'.$l['moderatepms_from'].'</a></th>
+            <th style="width: 28%"><a href="'.$cmsurl.'index.php?action=admin;sa=pms'.$page_get.';s=subject'.$settings['page']['subject_desc'].'">'.$l['moderatepms_subject'].'</a></th>
+            <th style="width: 25%"><a href="'.$cmsurl.'index.php?action=admin;sa=pms'.$page_get.';s=sentdate'.$settings['page']['sentdate_desc'].'">'.$l['moderatepms_date_sent'].'</a></th>
+            <th class="no-border" style="width: 7%"></th>
           </tr>';
     
     // Show members on this page
@@ -62,49 +52,33 @@ global $l, $db_prefix, $settings, $cmsurl, $theme_url;
         <td><a href="'.$cmsurl.'index.php?action=profile;u='.$pm['from_id'].'">'.$pm['from'].'</a></td>
         <td><a href="'.$cmsurl.'index.php?action=admin;sa=pms;pm='.$pm['id'].'">'.$pm['subject'].'</a></td>
         <td>'.formattime($pm['date_sent']).'</td>
+        <td>
+          <a href="'.$cmsurl.'index.php?action=admin;sa=pms;pm='.$pm['id'].';clear=true;sc='.$user['sc'].'" onclick="return confirm(\''.$l['moderatepms_clear_areyousure'].'\')"><img src="'.$theme_url.'/'.$settings['theme'].'/images/okay.png" alt="'.$l['moderatepms_clear'].'" /></a>
+          <a href="'.$cmsurl.'index.php?action=admin;sa=pms;pm='.$pm['id'].';delete=true;sc='.$user['sc'].'" onclick="return confirm(\''.$l['moderatepms_delete_areyousure'].'\')"><img src="'.$theme_url.'/'.$settings['theme'].'/images/delete.png" alt="'.$l['moderatepms_delete'].'" /></a>
+        </td>
       </tr>';
     }
     
     // Show member list footer
     echo '</table>';
     
-    pagination($settings['page']['page'],$settings['page']['page_last'],'index.php?action=admin;sa=pms'.$filter_get.$sort_get);
-    
-    // Show filter
-    echo '<form action="'.$cmsurl.'index.php?action=admin;sa=pms" method="post" style="text-align: right; margin-bottom: 0"><p style="display: inline">
-       '.$settings['page']['filter'].'
-       </p></form>';
+    pagination($settings['page']['page'],$settings['page']['page_last'],'index.php?action=admin;sa=pms'.$sort_get);
   }
 }
 
-function NoMembers() {
+function NoPMs() {
 global $l, $settings, $cmsurl;
-  
-  // Load the filter listbox element
-  loadFilter();
   
   echo '
   <h1>'.$l['moderatepms_header'].'</h1>
   
   <p><br /></p>
   
-  <form action="'.$cmsurl.'index.php" method="post" style="text-align: right; margin-bottom: 0">
-    <p style="display: inline">
-      '.$settings['page']['filter'].'
-    </p>
-  </form>
-  
   <p><b>[1]</b></p>
   
   <p style="text-align: center">'.$l['moderatepms_showing_none'].'</p>
   
-  <p><b>[1]</b></p>
-  
-  <form action="'.$cmsurl.'index.php" method="post" style="text-align: right; margin-bottom: 0">
-    <p style="display: inline">
-      '.$settings['page']['filter'].'
-    </p>
-  </form>';
+  <p><b>[1]</b></p>';
 }
 
 function Moderate() {
@@ -128,6 +102,13 @@ global $l, $settings, $user, $cmsurl;
       
       <form action="" method="post" style="display: inline">
         <p style="display: inline">
+          <input type="hidden" name="clear" value="true" />
+          <input type="submit" value="'.$l['moderatepms_message_clear'].'"
+           onclick="return confirm(\''.$l['moderatepms_message_clear_areyousure'].'\')" />
+        </p>
+      </form>
+      <form action="" method="post" style="display: inline">
+        <p style="display: inline">
           <input type="hidden" name="delete" value="true" />
           <input type="submit" value="'.$l['moderatepms_message_delete'].'"
            onclick="return confirm(\''.$l['moderatepms_message_delete_areyousure'].'\')" />
@@ -140,89 +121,6 @@ global $l, $settings, $user, $cmsurl;
         </p>
       </form>
       ';
-}
-
-function loadFilter() {
-global $l, $settings;
-  
-  // Get filter HTML
-  $filter = '
-          <input type="submit" value="'.$l['moderatepms_filter_button'].'" />
-          <input type="hidden" name="action" value="admin" />
-          <input type="hidden" name="sa" value="pms" />
-          ';
-  $filter .= '<select name="f">';
-  switch (@$_REQUEST['f']) {
-    case '':
-        $filter .= '<option value="all" selected="selected">'.$l['moderatepms_filter_everyone'].'</option>
-          <option value="active">'.$l['moderatepms_filter_active'].'</option>
-          <option value="activated">'.$l['moderatepms_filter_activated'].'</option>
-          <option value="unactivated">'.$l['moderatepms_filter_unactivated'].'</option>
-          <option value="suspended">'.$l['moderatepms_filter_suspended'].'</option>
-          <option value="banned">'.$l['moderatepms_filter_banned'].'</option>
-          '; break;
-    case 'active':
-      $filter .= '<option value="all" selected="selected">'.$l['moderatepms_filter_everyone'].'</option>
-          <option value="active" selected="selected">'.$l['moderatepms_filter_active'].'</option>
-          <option value="activated">'.$l['moderatepms_filter_activated'].'</option>
-          <option value="unactivated">'.$l['moderatepms_filter_unactivated'].'</option>
-          <option value="suspended">'.$l['moderatepms_filter_suspended'].'</option>
-          <option value="banned">'.$l['moderatepms_filter_banned'].'</option>
-          '; break;
-    case 'activated':
-      $filter .= '<option value="all">'.$l['moderatepms_filter_everyone'].'</option>
-          <option value="active">'.$l['moderatepms_filter_active'].'</option>
-          <option value="activated" selected="selected">'.$l['moderatepms_filter_activated'].'</option>
-          <option value="suspended">'.$l['moderatepms_filter_suspended'].'</option>
-          <option value="unactivated">'.$l['moderatepms_filter_unactivated'].'</option>
-          <option value="banned">'.$l['moderatepms_filter_banned'].'</option>
-          '; break;
-    case 'suspended':
-      $filter .= '<option value="all">'.$l['moderatepms_filter_everyone'].'</option>
-          <option value="active">'.$l['moderatepms_filter_active'].'</option>
-          <option value="activated">'.$l['moderatepms_filter_activated'].'</option>
-          <option value="suspended" selected="selected">'.$l['moderatepms_filter_suspended'].'</option>
-          <option value="unactivated">'.$l['moderatepms_filter_unactivated'].'</option>
-          <option value="banned">'.$l['moderatepms_filter_banned'].'</option>
-          '; break;
-    case 'unactivated':
-      $filter .= '<option value="all">'.$l['moderatepms_filter_everyone'].'</option>
-          <option value="active">'.$l['moderatepms_filter_active'].'</option>
-          <option value="activated">'.$l['moderatepms_filter_activated'].'</option>
-          <option value="suspended">'.$l['moderatepms_filter_suspended'].'</option>
-          <option value="unactivated" selected="selected">'.$l['moderatepms_filter_unactivated'].'</option>
-          <option value="banned">'.$l['moderatepms_filter_banned'].'</option>
-          '; break;
-    case 'banned':
-      $filter .= '<option value="all">'.$l['moderatepms_filter_everyone'].'</option>
-          <option value="active">'.$l['moderatepms_filter_active'].'</option>
-          <option value="activated">'.$l['moderatepms_filter_activated'].'</option>
-          <option value="suspended">'.$l['moderatepms_filter_suspended'].'</option>
-          <option value="unactivated">'.$l['moderatepms_filter_unactivated'].'</option>
-          <option value="banned" selected="selected">'.$l['moderatepms_filter_banned'].'</option>
-          '; break;
-    default:
-      $filter .= '<option value="all">'.$l['moderatepms_filter_everyone'].'</option>
-          <option value="active">'.$l['moderatepms_filter_active'].'</option>
-          <option value="activated">'.$l['moderatepms_filter_activated'].'</option>
-          <option value="unactivated">'.$l['moderatepms_filter_unactivated'].'</option>
-          <option value="suspended">'.$l['moderatepms_filter_suspended'].'</option>
-          <option value="banned">'.$l['moderatepms_filter_banned'].'</option>
-          ';
-  }
-  $filter .= '<option value="all">-----------------</option>
-          ';
-  foreach ($settings['page']['groups'] as $group) {
-    if ($settings['page']['filter_get'] == $group['group_id'])
-      $filter .= '<option value="'.$group['group_id'].'" selected="selected">'.$group['groupname'].'</option>'."\n";
-    else
-      $filter .= '<option value="'.$group['group_id'].'">'.$group['groupname'].'</option>'."\n";
-  }
-  $filter .= '</select>';
-  if (@$_REQUEST['s'])
-    $filter .= '<input type="hidden" name="s" value="'.$_REQUEST['s'].'" />
-          ';
-  $settings['page']['filter'] = $filter;
 }
 
 function pagination($page, $last, $url) {

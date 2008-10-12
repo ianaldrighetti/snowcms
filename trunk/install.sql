@@ -369,6 +369,7 @@ CREATE TABLE `{$db_prefix}pms` (
   `body` TEXT NOT NULL,
   `deleted_to` INT(1) NOT NULL DEFAULT '0',
   `deleted_from` INT(1) NOT NULL DEFAULT '0',
+  `reported` INT(1) NOT NULL DEFAULT '0',
   PRIMARY KEY  (`pm_id`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 
