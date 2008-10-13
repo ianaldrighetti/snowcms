@@ -4,7 +4,7 @@
 //          v0.7
 
 // Language's name
-$l['language_name'] = 'E||611\$##';
+$l['language_name'] = '1337';
 
 // Main
 $l['main_language_go'] = 'G0';
