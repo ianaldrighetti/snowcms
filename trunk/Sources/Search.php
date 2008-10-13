@@ -33,7 +33,7 @@ global $l, $settings, $user, $db_prefix;
       }
       
       // Get all the messages, ready to search them
-      $result = sql_query("SELECT * FROM {$db_prefix}messages LEFT JOIN {$db_prefix}boards AS b ON `messages`.`bid` = `b`.`bid` WHERE {$user['board_query']}") or die(mysql_error());
+      $result = sql_query("SELECT * FROM {$db_prefix}messages AS `m` LEFT JOIN {$db_prefix}boards AS b ON `m`.`bid` = `b`.`bid` WHERE {$user['board_query']}") or die(mysql_error());
       $results = array();
       $amount = 0;
       // Search one message at a time

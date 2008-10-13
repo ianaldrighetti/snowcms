@@ -49,12 +49,12 @@ global $l, $settings, $cmsurl;
   // Show the pervious page link if it is at least page two
   if ($prev_page > 0)
     echo '<table width="100%">
-      <tr><td><a href="'.$cmsurl.'forum.php?action=search;q='.$query.';pg='.$prev_page.'">'.$l['memberlist_previous_page'].'</a></td>
+      <tr><td><a href="'.$cmsurl.'forum.php?action=search;q='.$query.';pg='.$prev_page.'">'.$l['forumsearch_previous_page'].'</a></td>
       ';
   // Show the previous page link if it is page one
   elseif ($prev_page == 0)
     echo '<table width="100%">
-      <tr><td><a href="'.$cmsurl.'forum.php?action=search;q='.$query.'">'.$l['memberlist_previous_page'].'</a></td>
+      <tr><td><a href="'.$cmsurl.'forum.php?action=search;q='.$query.'">'.$l['forumsearch_previous_page'].'</a></td>
       ';
   // Don't show the previous page link, because it is the first page
   else
@@ -63,7 +63,7 @@ global $l, $settings, $cmsurl;
       ';
   // Show the next page link
   if (@($total_topics / $settings['num_search_results']) > $next_page)
-    echo '<td style="text-align: right"><a href="'.$cmsurl.'forum.php?action=search;q='.$query.';pg='.$next_page.'">'.$l['memberlist_next_page'].'</a></td></tr>
+    echo '<td style="text-align: right"><a href="'.$cmsurl.'forum.php?action=search;q='.$query.';pg='.$next_page.'">'.$l['forumsearch_next_page'].'</a></td></tr>
       </table>
       ';
   // Don't show the next page link, because it is the last page
@@ -104,12 +104,12 @@ global $l, $settings, $cmsurl;
   // Show the pervious page link if it is at least page two
   if ($prev_page > 0)
     echo '<table width="100%">
-      <tr><td><a href="'.$cmsurl.'forum.php?action=search;q='.$query.';pg='.$prev_page.'">'.$l['memberlist_previous_page'].'</a></td>
+      <tr><td><a href="'.$cmsurl.'forum.php?action=search;q='.$query.';pg='.$prev_page.'">'.$l['forumsearch_previous_page'].'</a></td>
       ';
   // Show the previous page link if it is page one
   elseif ($prev_page == 0)
     echo '<table width="100%">
-      <tr><td><a href="'.$cmsurl.'forum.php?action=search;q='.$query.'">'.$l['memberlist_previous_page'].'</a></td>
+      <tr><td><a href="'.$cmsurl.'forum.php?action=search;q='.$query.'">'.$l['forumsearch_previous_page'].'</a></td>
       ';
   // Don't show the previous page link, because it is the first page
   else
@@ -118,7 +118,7 @@ global $l, $settings, $cmsurl;
       ';
   // Show the next page link
   if (@($total_topics / $settings['num_search_results']) > $next_page)
-    echo '<td style="text-align: right"><a href="'.$cmsurl.'forum.php?action=search;q='.$query.';pg='.$next_page.'">'.$l['memberlist_next_page'].'</a></td></tr>
+    echo '<td style="text-align: right"><a href="'.$cmsurl.'forum.php?action=search;q='.$query.';pg='.$next_page.'">'.$l['forumsearch_next_page'].'</a></td></tr>
       </table>';
   // Don't show the next page link, because it is the last page
   else
