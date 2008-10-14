@@ -1,6 +1,6 @@
 <?php
 // SnowCMS Language File
-//        English
+//          1337
 //          v0.7
 
 // Language's name
