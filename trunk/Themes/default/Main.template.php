@@ -34,9 +34,7 @@ global $l, $cmsurl, $theme_url, $settings, $user;
   theme_menu('side');
   echo '
   </ul>
-  ';
-  languageOption();
-  echo '</div>
+  </div>
   <div class="header-right"></div>
   <div class="content">
   ';
@@ -64,6 +62,9 @@ echo '
     <div style="clear: both"></div>
   </div>
   <div class="footer">
+    ';
+languageOption();
+echo '
     <p>'.str_replace('%snowcms%','<a href="http://www.snowcms.com/" onClick="window.open(this.href); return false;">SnowCMS '.$settings['version'].'</a>',$l['main_powered_by']).' | '.str_replace('%whom%','<a href="http://www.snowcms.com/" onclick="window.open(this.href); return false;">The SnowCMS Team</a>',$l['main_theme_by']).'</p>
   </div>
 </div>
@@ -85,7 +86,7 @@ global $user, $settings, $l, $db_prefix, $language_dir, $cmsurl, $cookie_prefix;
     // Get the current language
     $current_language = clean($user['language'] ? $user['language'] : (@$_COOKIE[$cookie_prefix.'change-language'] ? @$_COOKIE[$cookie_prefix.'change-language'] : $settings['language']));
     
-    echo '<form action="'.$_SERVER['REQUEST_URI'].'" method="post" style="text-align: center"><p>
+    echo '<form action="'.$_SERVER['REQUEST_URI'].'" method="post" class="language-option"><p>
     <select name="change-language">
     ';
     
