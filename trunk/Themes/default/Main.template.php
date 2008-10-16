@@ -94,7 +94,7 @@ global $user, $settings, $l, $db_prefix, $language_dir, $cmsurl, $cookie_prefix;
       if (substr($language,0,1) != '.') {
         $l_temp = $l;
         include $language_dir.'/'.$language;
-        if ($current_language == $language)
+        if ($current_language.'.language.php' == $language)
           echo '<option value="'.strrev(substr(strrev($language),strlen(strstr($language,'.language.php')),strlen($language))).'" selected="selected">'.$l['language_name'].'</option>
       ';
         else
