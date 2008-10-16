@@ -25,7 +25,7 @@ global $cmsurl, $db_prefix, $l, $settings, $user;
     loadTheme('Login');
   }
   else {
-    // They are logged in, so inform them
+    // They are logged in, so inform them, silly pants :P
     $settings['page']['title'] = $l['login_loggedin_title'];
     loadTheme('Login','LoggedIn');
   }
@@ -37,6 +37,7 @@ global $cmsurl, $db_prefix, $l, $settings, $user, $cookie_prefix;
   
   // Get and sanitize the username and encrypt the password
   $username = @clean($_REQUEST['username']);
+  // Is this password pre hashed? If not, hash it...
   $password = (@$_REQUEST['pass_hash'] != 1) ? clean($_REQUEST['pass_hash']) : @md5($_REQUEST['password']);
   if((!empty($username)) && (!empty($password))) {
     $result = sql_query("SELECT * FROM {$db_prefix}members WHERE `username` = '{$username}' AND `password` = '{$password}'");
@@ -55,7 +56,7 @@ global $cmsurl, $db_prefix, $l, $settings, $user, $cookie_prefix;
         if($login_length==0)
           $login_length = $settings['remember_time']*60;
         setcookie($cookie_prefix."username", $_REQUEST['username'], time()+$login_length);
-        setcookie($cookie_prefix."password", md5($_REQUEST['password']), time()+$login_length);
+        setcookie($cookie_prefix."password", md5($password), time()+$login_length);
         setcookie($cookie_prefix."uid", $id, time()+$login_length);
         
         // Set the Session variables, like ID and Pass, enables them to be validated
@@ -73,10 +74,12 @@ global $cmsurl, $db_prefix, $l, $settings, $user, $cookie_prefix;
         loadTheme('Login','NotActivated');
       }
       elseif($is_banned) {
+        // You cant login! Your banned! Bad boy :P
         $settings['page']['title'] = $l['login_title'];
         loadTheme('Login','Banned');
       }
-      elseif($is_suspended>time()) {
+      elseif($is_suspended > time()) {
+        // Sorry, your still suspended :)
         $settings['page']['title'] = $l['login_title'];
         $settings['time'] = formattime($is_suspended);
         loadTheme('Login','Suspended');
@@ -107,7 +110,7 @@ global $cmsurl, $db_prefix, $l, $settings, $user, $cookie_prefix;
       // Destroy! Destroy! Their session :D
       session_destroy();
       // Delete them from the {db_prefix}online table
-      sql_query("DELETE FROM {$db_prefix}online WHERE `user_id` = '{$user['id']}'");
+      sql_query("DELETE FROM {$db_prefix}online WHERE `user_id` = '". clean(session_id()). "'");
       // Delete the Cookies... If they have any (the @ means to stfu, I don't want any errors)
         @setcookie($cookie_prefix."username", '', time()-($settings['remember_time']*60));
         @setcookie($cookie_prefix."password", '', time()-($settings['remember_time']*60));
@@ -121,6 +124,7 @@ global $cmsurl, $db_prefix, $l, $settings, $user, $cookie_prefix;
     }
   }
   else {
+    // Odd, an error occurred... O.O
     $settings['page']['title'] = $l['logout_error_title'];
     loadTheme('Login','LogoutError');
   }
