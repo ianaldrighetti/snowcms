@@ -354,6 +354,19 @@ global $perms, $user;
     return true;
 }
 
+// Call this function like so inlength('length',50) to check if the
+// field size 50 is within the range length_short to length_long
+function inlength($length, $numb) {
+global $settings;
+  
+  if($numb < $settings[$length.'_short'])
+    return 'short';
+  elseif($numb > $settings[$length.'_long'])
+    return 'long';
+  else
+    return '';
+}
+
 function canforum($what, $board = 0) {
 global $bperms, $user;
   // This is a super simple Permission handler, simply, can they do the requested $what or not?

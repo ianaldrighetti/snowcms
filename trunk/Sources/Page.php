@@ -26,7 +26,7 @@ global $cmsurl, $db_prefix, $l, $settings, $user;
   // Get it from MySQL
   $result = sql_query("SELECT * FROM {$db_prefix}pages WHERE `page_id` = '{$PageID}'");
   // Does it exist or not?
-  if (mysql_num_rows($result)) {
+  if(mysql_num_rows($result)) {
     while($row = mysql_fetch_assoc($result)) {
       $settings['page']['title'] = $row['title'];
 	    $settings['page']['date'] = $row['modify_date'] ? formattime($row['modify_date']) : formattime($row['create_date']);
@@ -48,15 +48,15 @@ function ManagePages() {
 global $cmsurl, $db_prefix, $l, $settings, $user;
   
   // This variable will be set if redirection is required to remove post data
-  if (@$_REQUEST['redirect'])
+  if(@$_REQUEST['redirect'])
     redirect('index.php?action=admin;sa=pages');
   
   $page = (int)@$_GET['page'];
   
   // If a page is set then we should be editing a page, not listing them
-  if ($page) {
+  if($page) {
     // Are they allowed to modify pages?
-    if (can('manage_pages_modify_html') || can('manage_pages_modify_bbcode')) {
+    if(can('manage_pages_modify_html') || can('manage_pages_modify_bbcode')) {
       // Are they modifing the homepage and if so, are they allowed to?
       if ($page != $settings['homepage'] || can('manage_pages_home'))
         EditPage();
@@ -70,15 +70,15 @@ global $cmsurl, $db_prefix, $l, $settings, $user;
       redirect('index.php?action=admin;sa=pages');
     }
   }
-  elseif (can('manage_pages_modify_html') || can('manage_pages_modify_bbcode') || can('manage_pages_create') || can('manage_pages_delete') || can('manage_pages_home')) {
+  elseif(can('manage_pages_modify_html') || can('manage_pages_modify_bbcode') || can('manage_pages_create') || can('manage_pages_delete') || can('manage_pages_home')) {
     $page = (int)@$_POST['page'];
     $settings['page']['make_page']['do'] = false;
     $settings['page']['update_page'] = 0;
     // Do we need to update a page?
     if (!empty($_REQUEST['update_page'])) {
       // Are they allowed to modify pages?
-      if (can('manage_pages_modify_html') || can('manage_pages_modify_bbcode')) {
-        if (!($page_title = clean($_REQUEST['page_title']))) {
+      if(can('manage_pages_modify_html') || can('manage_pages_modify_bbcode')) {
+        if(!($page_title = clean($_REQUEST['page_title']))) {
           // If they remove the page title, they'll regret it later
           $_SESSION['error'] = $l['managepages_no_title'];
           redirect('index.php?action=admin;sa=pages;page='.clean_header($page));
@@ -95,7 +95,7 @@ global $cmsurl, $db_prefix, $l, $settings, $user;
 		          ? 0
 		          : (int)@$_REQUEST['html']); // Can modify both, so check what they selected
 		    // If it's BBCode, clean it
-		    if (!$html)
+		    if(!$html)
 		      $page_content = clean(stripslashes($page_content));
         // Update it
         $result = sql_query("UPDATE {$db_prefix}pages SET `title` = '$page_title', `content` = '$page_content', `html` = '$html' WHERE `page_id` = '$page'");
@@ -106,13 +106,13 @@ global $cmsurl, $db_prefix, $l, $settings, $user;
       redirect('index.php?action=admin;sa=pages');
     }
     // Do they want to change which page is the homepage?
-    if (@$_REQUEST['homepage']) {
+    if(@$_REQUEST['homepage']) {
       // Are they allowed to change the homepage?
-      if (can('manage_pages_home')) {
+      if(can('manage_pages_home')) {
         // Clean it to prevent dirty hacking
         $homepage = clean($_REQUEST['homepage']);
         // Check if that page exists
-        if (mysql_num_rows(sql_query("SELECT * FROM {$db_prefix}pages WHERE `page_id` = '$homepage'")))
+        if(mysql_num_rows(sql_query("SELECT * FROM {$db_prefix}pages WHERE `page_id` = '$homepage'")))
           // Change the homepage
           sql_query("UPDATE {$db_prefix}settings SET `value` = '$homepage' WHERE `variable` = 'homepage'");
         else
@@ -125,13 +125,13 @@ global $cmsurl, $db_prefix, $l, $settings, $user;
       redirect('index.php?action=admin;sa=pages');
     }
     // Do they want to delete a page?
-    if (@$_REQUEST['did']) {
+    if(@$_REQUEST['did']) {
       // Are they allowed to delete pages?
-      if (can('manage_pages_delete')) {
+      if(can('manage_pages_delete')) {
         // Is their session valid?
-        if (ValidateSession(@$_REQUEST['sc'])) {
+        if(ValidateSession(@$_REQUEST['sc'])) {
           // Are they trying to delete the homepage?
-          if ($settings['homepage'] != $_REQUEST['did']) {
+          if($settings['homepage'] != $_REQUEST['did']) {
             // Clean anything that's used in an SQL query
             $did = clean($_REQUEST['did']);
             // Delete the page
@@ -155,21 +155,23 @@ global $cmsurl, $db_prefix, $l, $settings, $user;
       // Redirect them so that if they refresh it won't do it again
       redirect('index.php?action=admin;sa=pages'.$s.$pg);
     }
-    // Or are we supposed to create a page?
+    // Are we supposed to create a page?
     if(!empty($_REQUEST['create_page'])) {
       // Are they allowed to create a page?
-      if (can('manage_pages_create')) {
+      if(can('manage_pages_create')) {
         $settings['page']['make_page']['do'] = true;  
         // Who is the Page Owner? (Their User ID)
-        $page_owner = clean($user['id']);
+        $page_owner = $user['id'];
         // We save their name, just incase their account is deleted
-        $owner_name = clean($user['name']);
+        $owner_name = $user['name'];
         // The Time stamp of when it was made
         $create_date = time();
         // Clean the page's title
-		    if (!($title = clean($_REQUEST['page_title']))) {
-		      // They didn't even enter a page title
-		      $_SESSION['error'] = $l['managepages_no_title'];
+        $title = clean($_REQUEST['page_title']);
+        // Is the page title in the specified range?
+		    if(inlength('page_title',strlen($title))) {
+		      $_SESSION['error'] = $l['managepages_error_title_'.inlength('page_title',strlen($title))];
+		      $_SESSION['error_values'] = serialize(array('page_title'=>$title));
 		      redirect('index.php?action=admin;sa=pages');
 		    }
 		    // Set the page type

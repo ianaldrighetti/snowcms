@@ -7,7 +7,7 @@ if(!defined('Snow'))
   die("Hacking Attempt...");
 
 function Main() {
-global $cmsurl, $settings, $l, $user, $theme_url;
+global $cmsurl, $settings, $values, $l, $user, $theme_url;
   
   $pg = $settings['page']['page'] ? ';pg='.$settings['page']['page'] : '';
   $s = $settings['page']['sort'] ? ';s='.$settings['page']['sort'] : '';
@@ -41,7 +41,7 @@ global $cmsurl, $settings, $l, $user, $theme_url;
   echo '
   <form action="'.$cmsurl.'index.php?action=admin;sa=pages" method="post">
     <p><input type="hidden" name="create_page" value="true"></p>
-    <p><label>'.$l['managepages_newpagetitle'].'</label> <input name="page_title" type="text" /> <input type="submit" value="'.$l['managepages_createpage'].'" /></p>
+    <p><label>'.$l['managepages_newpagetitle'].'</label> <input name="page_title" value="'.$values['page_title'].'" /> <input type="submit" value="'.$l['managepages_createpage'].'" /></p>
   </form>
   ';
   
@@ -53,7 +53,7 @@ global $cmsurl, $settings, $l, $user, $theme_url;
   
   echo '<table width="100%" style="text-align: center">
     <tr>
-      <th style="width: 5%"></th>
+      <th class="no-border" style="width: 5%"></th>
       <th style="border-style: solid; border-width: 1px; width: 37%"><a href="'.$cmsurl.'index.php?action=admin;sa=pages'.$pg.';s=title'.
         ($settings['page']['sort'] == 'title' ? '_desc' : '')
         .'">'.$l['managepages_pagetitle'].'</a></th>
@@ -63,7 +63,7 @@ global $cmsurl, $settings, $l, $user, $theme_url;
       <th style="border-style: solid; border-width: 1px; width: 32%"><a href="'.$cmsurl.'index.php?action=admin;sa=pages'.$pg.';s=creationdate'.
         ($settings['page']['sort'] == 'creationdate' ? '_desc' : '')
         .'">'.$l['managepages_datemade'].'</a></th>
-      <th style="width: 4%"></th>
+      <th class="no-border" style="width: 4%"></th>
     </tr>';
   foreach($settings['page']['pages'] as $page) {
     echo '

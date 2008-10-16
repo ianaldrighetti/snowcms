@@ -192,6 +192,8 @@ $l['admin_menu_pms'] = 'Moderate PMs';
 $l['admin_menu_pms_desc'] = 'You can moderate members\' personal messages here.';
 $l['admin_menu_maintain'] = 'Maintenance';
 $l['admin_menu_maintain_desc'] = 'Run some maintenance on your site, like recounting posts and topics';
+$l['admin_menu_field-lengths'] = 'Field Lengths';
+$l['admin_menu_field-lengths_desc'] = 'You can set field length minimum and maximum values here.';
 
 // Settings.template.php
 $l['basicsettings_title'] = 'Basic Settings';
@@ -223,19 +225,7 @@ $l['basicsettings_value_bbcode'] = 'BBCode';
 $l['basicsettings_value_no_activation'] = 'No activation';
 $l['basicsettings_value_email_activation'] = 'Email activation';
 $l['basicsettings_value_admin_activation'] = 'Admin activation';
-// Settings.template.php - Errors
-$l['basicsettings_error_site_name_short'] = 'You didn\'t enter a site name.';
-$l['basicsettings_error_language_invalid'] = 'That language is invalid.';
-$l['basicsettings_error_theme_invalid'] = 'That theme is invalid.';
-$l['basicsettings_error_account_activation_invalid'] = 'That account activation method is invalid.';
-$l['basicsettings_error_login_threshold_low'] = 'Login threshold must be above zero.';
-$l['basicsettings_error_remember_time_low'] = 'Default cookie length must be above zero.';
-$l['basicsettings_error_num_news_items_low'] = 'There must be at least one news item per page.';
-$l['basicsettings_error_num_search_results_low'] = 'There must be at least one search result per page.';
-$l['basicsettings_error_manage_members_per_page_low'] = 'There must be at least one member per page.';
-$l['basicsettings_error_num_pages_low'] = 'There must be at least one page per page.';
-
-// Mail.template.php
+// Settings.template.php - Mail settings
 $l['mailsettings_title'] = 'Email Settings';
 $l['mailsettings_header'] = 'Email Settings';
 $l['mailsettings_desc'] = 'You can change mail settings here, like whether SMTP or Sendmail are used.';
@@ -250,6 +240,54 @@ $l['mailsettings_from_email'] = 'From Email Address:';
 $l['mailsettings_update'] = 'Update Settings';
 $l['mailsettings_error'] = 'Failed to update mail settings.';
 $l['mailsettings_error_verification'] = 'The verification password was wrong.';
+// Settings.template.php - Field lengths
+$l['fieldlengths_title'] = 'Field Lengths';
+$l['fieldlengths_header'] = 'Field Lengths';
+$l['fieldlengths_desc'] = 'Here you can set field length minimums and maximums.';
+$l['fieldlengths_submit'] = 'Update Settings';
+$l['fieldlengths_username'] = 'Username';
+$l['fieldlengths_display_name'] = 'Display Name';
+$l['fieldlengths_password'] = 'Password';
+$l['fieldlengths_email'] = 'Email Address';
+$l['fieldlengths_avatar'] = 'Avatar URL';
+$l['fieldlengths_icq'] = 'ICQ';
+$l['fieldlengths_aim'] = 'AIM';
+$l['fieldlengths_msn'] = 'MSN';
+$l['fieldlengths_yim'] = 'YIM';
+$l['fieldlengths_gtalk'] = 'GTalk';
+$l['fieldlengths_site'] = 'Site Name';
+$l['fieldlengths_site_url'] = 'Site URL';
+$l['fieldlengths_signature'] = 'Signature';
+$l['fieldlengths_profile'] = 'Profile Text';
+$l['fieldlengths_post_subject'] = 'Post Subject';
+$l['fieldlengths_post'] = 'Post Text';
+$l['fieldlengths_pm_subject'] = 'PM Subject';
+$l['fieldlengths_pm'] = 'PM Text';
+$l['fieldlengths_page_title'] = 'Page Title';
+$l['fieldlengths_page'] = 'Page Text';
+$l['fieldlengths_menu'] = 'Menu Name';
+$l['fieldlengths_menu_url'] = 'Menu URL';
+$l['fieldlengths_tos'] = 'TOS';
+$l['fieldlengths_ip'] = 'IP Ban Reason';
+$l['fieldlengths_news_cat'] = 'News Category';
+$l['fieldlengths_news_subject'] = 'News Subject';
+$l['fieldlengths_news'] = 'News Text';
+$l['fieldlengths_news_comment'] = 'News Comment';
+$l['fieldlengths_group'] = 'Member Group';
+$l['fieldlengths_board_cat'] = 'Board Category';
+$l['fieldlengths_board'] = 'Board Name';
+$l['fieldlengths_board_desc'] = 'Board Description';
+// Settings.template.php - Errors
+$l['basicsettings_error_site_name_short'] = 'You didn\'t enter a site name.';
+$l['basicsettings_error_language_invalid'] = 'That language is invalid.';
+$l['basicsettings_error_theme_invalid'] = 'That theme is invalid.';
+$l['basicsettings_error_account_activation_invalid'] = 'That account activation method is invalid.';
+$l['basicsettings_error_login_threshold_low'] = 'Login threshold must be above zero.';
+$l['basicsettings_error_remember_time_low'] = 'Default cookie length must be above zero.';
+$l['basicsettings_error_num_news_items_low'] = 'There must be at least one news item per page.';
+$l['basicsettings_error_num_search_results_low'] = 'There must be at least one search result per page.';
+$l['basicsettings_error_manage_members_per_page_low'] = 'There must be at least one member per page.';
+$l['basicsettings_error_num_pages_low'] = 'There must be at least one page per page.';
 
 // ManagePages.template.php
 $l['managepages_title'] = 'Manage Pages';
@@ -258,7 +296,6 @@ $l['managepages_createpage'] = 'Create Page';
 $l['managepages_newpagetitle'] = 'Page Title:';
 $l['managepages_header'] = 'Manage Pages';
 $l['managepages_desc'] = 'You can manage and create pages here.';
-$l['managepages_no_title'] = 'You didn\'t enter a title for the page.';
 $l['managepages_make_success'] = 'The page %title% was successfully created!';
 $l['managepages_make_fail'] = 'Failed to create the page %title%.';
 $l['managepages_pagetitle'] = 'Title';
@@ -286,6 +323,8 @@ $l['managepages_edit_cancel'] = 'Cancel';
 $l['managepages_edit_insert_link'] = 'Insert Link';
 $l['managepages_edit_show_info'] = 'Show extra page info';
 // ManagePages.template.php - Errors
+$l['managepages_error_title_short'] = 'That title is too short.';
+$l['managepages_error_title_long'] = 'That title is too long.';
 $l['managepages_error_invalid_session'] = 'Your session verification failed. Please try again.';
 $l['managepages_error_invalid_homepage'] = 'That is an invalid page.';
 $l['managepages_error_delete_homepage'] = 'You cannot delete the homepage.';

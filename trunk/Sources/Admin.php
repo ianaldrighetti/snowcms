@@ -41,6 +41,8 @@ global $cmsurl, $db_prefix, $l, $settings, $source_dir, $user;
     if(!empty($_REQUEST['sa'])) {
       $sa = array(
         'basic-settings' => array('Settings.php','BasicSettings'),
+        'mail-settings' => array('Settings.php','MailSettings'),
+        'field-lengths' => array('Settings.php','FieldLengthSettings'),
         'forum' => array('ManageForum.php','ManageForum'),
         'pages' => array('Page.php','ManagePages'),
         'members' => array('Members.php','ManageMembers'),
@@ -48,7 +50,6 @@ global $cmsurl, $db_prefix, $l, $settings, $source_dir, $user;
         'maintain' => array('Maintain.php','Maintain'),
         'menus' => array('Menus.php','ManageMenus'),
         'news' => array('News.php','ManageNews'),
-        'mail-settings' => array('Settings.php','MailSettings'),
         'tos' => array('TOS.php','ManageTOS'),
         'ips' => array('IPs.php','ManageIPs'),
         'pms' => array('PersonalMessages.php','ModeratePMs')
@@ -104,6 +105,8 @@ global $cmsurl, $db_prefix, $l, $settings, $source_dir, $user;
     $options[] = 'pms';
   if (can('maintain'))
     $options[] = 'maintain';
+  if (can('field_lengths'))
+    $options[] = 'field-lengths';
   
   $settings['page']['options'] = $options;
   

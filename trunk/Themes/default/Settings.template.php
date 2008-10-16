@@ -17,7 +17,7 @@ global $cmsurl, $settings, $l, $user;
   <h1>'.$l['basicsettings_header'].'</h1>
   ';
   
-  if (@$_SESSION['error'])
+  if(@$_SESSION['error'])
     echo '<p><b>'.$l['main_error'].':</b> '.$_SESSION['error'].'</p>';
   
   echo '
@@ -26,13 +26,13 @@ global $cmsurl, $settings, $l, $user;
   <form action="'.$cmsurl.'index.php?action=admin;sa=basic-settings" method="post" style="display: inline">
     <table>';
   foreach($settings['page']['settings'] as $setting => $info) {
-    if($info['type']=='text') {
-      $field = '<input name="'.$setting.'" type="text" value="'.$settings[$setting].'"/>';
+    if($info['type'] == 'text') {
+      $field = '<input name="'.$setting.'" type="text" value="'.$settings[$setting].'" />';
     }
-    elseif ($info['type'] == 'select') {
+    elseif($info['type'] == 'select') {
       $field = "\n".'          <select name="'.$setting.'">'."\n";
       $i = 0;
-      while ($i < count($info['values'])) {
+      while($i < count($info['values'])) {
        if ($settings[$setting] != $info['values'][$i+1])
          $field .= '            <option value="'.$info['values'][$i+1].'">'.$info['values'][$i].'</option>'."\n";
        else
@@ -66,7 +66,7 @@ global $cmsurl, $settings, $l, $user;
   <h1>'.$l['mailsettings_header'].'</h1>
   ';
   
-  if (@$_SESSION['error'])
+  if(@$_SESSION['error'])
 	  echo '<p>'.$_SESSION['error'].'</p>
 	';
   
@@ -97,7 +97,7 @@ global $cmsurl, $settings, $l, $user;
   <table width="100%">
   <tr>
     ';
-  if ($settings['mail_with_fsockopen'])
+  if($settings['mail_with_fsockopen'])
     echo '<td width="50%"><input type="radio" name="mail_with_fsockopen" id="smtp" value="1" checked="checked" onclick="smtp_clicked()" /> <label for="smtp">'.$l['mailsettings_smtp'].'</label></td>
     <td><input type="radio" name="mail_with_fsockopen" id="sendmail" value="0" onclick="sendmail_clicked()" /> <label for="sendmail">'.$l['mailsettings_sendmail'].'</label></td>
   ';
@@ -123,6 +123,44 @@ global $cmsurl, $settings, $l, $user;
   
   <p><input name="update" type="submit" value="'.$l['mailsettings_update'].'"/></p>
   
+  </form>';
+}
+
+function FieldLengths() {
+global $cmsurl, $settings, $l, $user;
+  echo '
+  <h1>'.$l['fieldlengths_header'].'</h1>
+  ';
+  
+  if(@$_SESSION['error'])
+    echo '<p><b>'.$l['main_error'].':</b> '.$_SESSION['error'].'</p>';
+  
+  echo '
+  <p>'.$l['fieldlengths_desc'].'</p>';
+  echo '
+  <form action="" method="post" style="display: inline">
+    <table>';
+  foreach ($settings['page']['settings'] as $setting) {
+    echo '
+      <tr>
+        <td>'.$l['fieldlengths_'.$setting].':</td>
+        <td>'.
+         '<input name="'.$setting.'_short" value="'.$settings[$setting.'_short'].'" /> - '.
+         '<input name="'.$setting.'_long" value="'.$settings[$setting.'_long'].'" />'.
+       '</td>
+      </tr>';
+  }
+  echo '
+    </table>
+    <br />
+    <p style="display: inline"><input type="submit" name="update" value="'.$l['fieldlengths_submit'].'" /></p>
+  </form>
+  
+  <form action="'.$cmsurl.'index.php?action=admin" method="post" style="display: inline">
+    <p style="display: inline">
+      <input type="hidden" name="redirect" value="admin" />
+      <input type="submit" name="update" value="'.$l['main_cancel'].'" />
+    </p>
   </form>';
 }
 ?>

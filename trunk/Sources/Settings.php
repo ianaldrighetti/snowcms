@@ -214,7 +214,7 @@ global $cmsurl, $db_prefix, $l, $settings, $user, $language_dir, $theme_dir, $th
         foreach($basic as $key => $value) {
           $setting = clean(@$_REQUEST[$key]);
           // Set setting
-          $query = "UPDATE {$db_prefix}settings SET `value` = '$setting' WHERE `variable` = '{$key}' LIMIT 1";
+          $query = "UPDATE {$db_prefix}settings SET `value` = '$setting' WHERE `variable` = '$key'";
           $result = sql_query($query);
         }
         redirect('index.php?action=admin');
@@ -285,6 +285,70 @@ global $cmsurl, $db_prefix, $l, $settings;
     loadTheme('Settings','ManageMailSettings');
   }
   // They don't have permission, so redrect them to the main control panel
+  else
+    redirect('index.php?action=admin');
+}
+
+function FieldLengthSettings() {
+global $cmsurl, $db_prefix, $l, $settings, $user, $language_dir, $theme_dir, $theme_name;
+  
+  if (can('manage_basic-settings')) {
+    $lengths = array(
+      'username',
+      'display_name',
+      'password',
+      'email',
+      'avatar',
+      'icq',
+      'aim',
+      'msn',
+      'yim',
+      'gtalk',
+      'site',
+      'site_url',
+      'signature',
+      'profile',
+      'post_subject',
+      'post',
+      'pm_subject',
+      'pm',
+      'page_title',
+      'page',
+      'menu',
+      'menu_url',
+      'tos',
+      'ip',
+      'news_cat',
+      'news_subject',
+      'news',
+      'news_comment',
+      'group',
+      'board_cat',
+      'board',
+      'board_desc'
+    );
+    
+    // You can add options into the above array, with the name of the setting (Minus short/long) in the settings table
+    // Make sure you made a $l var for it and inserted a row for it in the table (e.g. ip needs ip_short and ip_long in the table)
+    
+    // Are we updating them?
+    if(!empty($_REQUEST['update'])) {
+      // There wasn't, so set them all!
+      foreach($lengths as $length) {
+        $short = (int)@$_REQUEST[$length.'_short'];
+        $long = (int)@$_REQUEST[$length.'_long'];
+        // Set settings
+        sql_query("UPDATE {$db_prefix}settings SET `value` = '$short' WHERE `variable` = '{$length}_short'");
+        sql_query("UPDATE {$db_prefix}settings SET `value` = '$long' WHERE `variable` = '{$length}_long'");
+      }
+      redirect('index.php?action=admin');
+    }
+    // Set title, pass on $basic, and load Settings template with the Basic function
+    $settings['page']['title'] = $l['fieldlengths_title'];
+    $settings['page']['settings'] = $lengths;
+    loadTheme('Settings','FieldLengths');
+  }
+  // They don't have permission to change basic settings
   else
     redirect('index.php?action=admin');
 }

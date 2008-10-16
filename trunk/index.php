@@ -39,6 +39,8 @@ require_once($source_dir.'/Core.php');
 // Write that this Guest/User is online
   WriteOnline();
   
+  $values = @unserialize($_SESSION['error_values']);
+  
   // What should we do? ._.
   if(empty($_REQUEST['action']) && empty($_REQUEST['page'])) {
     // Neither the ?action= is set, nor the ?page= is set, so load Home()
