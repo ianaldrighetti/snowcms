@@ -10,6 +10,7 @@
 //
 //                  forum.php file
 
+ob_start();
 session_start();
 error_reporting(E_ALL);
 
@@ -88,4 +89,6 @@ require_once($source_dir.'/Core.php');
   // Remove the fact that they have completed the CAPTCHA
   // Otherwise they just need a person to complete it once and the bot gets free roaming forever
   unset($_SESSION['passed_captcha']);
+// Buh bye! xD
+ob_end_flush();
 ?>
