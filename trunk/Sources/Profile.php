@@ -139,8 +139,7 @@ function processEdit() {
 global $l, $settings, $db_prefix, $user, $cmsurl, $cookie_prefix;
   
   // Get current member information
-  $result = sql_query("SELECT * FROM {$db_prefix}members WHERE `id` = {$user['id']}");
-  $member_data = mysql_fetch_assoc($result);
+  $member_data = mysql_fetch_assoc(sql_query("SELECT * FROM {$db_prefix}members WHERE `id` = {$user['id']}"));
   
   // If the display name is empty, make it the username
   if (!@$_REQUEST['display_name'])
@@ -195,6 +194,34 @@ global $l, $settings, $db_prefix, $user, $cmsurl, $cookie_prefix;
       $_SESSION['error'] = $l['profile_error_password_short'];
   }
   
+  // Check if the avatar is within the allowed sizes (Requires cURL and GD)
+  // Only do so if the avatar is set, has changed and they are allowed to change it
+  if($avatar && $avatar != $member_data['avatar'] && can('change_avatar') && function_exists('curl_init')) {
+    $curl = curl_init($avatar);
+    curl_setopt($curl,CURLOPT_HEADER,false);
+    curl_setopt($curl,CURLOPT_RETURNTRANSFER,true);
+    curl_setopt($curl,CURLOPT_TIMEOUT,3);
+    $curl = curl_exec($curl);
+    // Did it load?
+    if($curl) {
+      // Is the file size small enough?
+      if(strlen($curl) < $settings['avatar_size'] * 1028) {
+        $gd = @imagecreatefromstring($curl);
+        // Is the image too large?
+        if(@imagesx($gd) > $settings['avatar_width'] || @imagesy($gd) > $settings['avatar_height'])
+          $_SESSION['error'] = str_replace('%width%',$settings['avatar_width'],
+                             str_replace('%height%',$settings['avatar_height'],$l['profile_error_avatar_size']));
+        unset($gd);
+      }
+      // The file size is too large
+      else
+        $_SESSION['error'] = str_replace('%filesize%',$settings['avatar_size'],$l['profile_error_avatar_filesize']);
+    }
+    // It didn't load, so the avatar is invalid (Or cURL isn't working)
+    else
+      $_SESSION['error'] = $l['profile_error_avatar_invalid'];
+  }
+  
   // Check if the email address is valid
   if (!$email)
     $_SESSION['error'] = $l['profile_error_email_none'];
@@ -203,51 +230,51 @@ global $l, $settings, $db_prefix, $user, $cmsurl, $cookie_prefix;
   
   // Check if someone else is using that display name
   $result = sql_query("SELECT * FROM {$db_prefix}members");
-  while ($row = mysql_fetch_assoc($result))
-    if ($row['id'] != $user['id'] && ($display_name == $row['username'] || $display_name == $row['display_name']))
+  while($row = mysql_fetch_assoc($result))
+    if($row['id'] != $user['id'] && ($display_name == $row['username'] || $display_name == $row['display_name']))
       $_SESSION['error'] = $l['profile_error_displayname_used'];
   
   // Encode the new password
   $password_new = md5(@$_REQUEST['password-new']);
   
   // Are they trying to change their display name and are they allowed to?
-  if (!can('change_display_name') && $display_name != $member_data['display_name'])
+  if(!can('change_display_name') && $display_name != $member_data['display_name'])
     $_SESSION['error'] = $l['profile_error_notallowed_displayname'];
   // Are they trying to change their email address and are they allowed to?
-  elseif (!can('change_email') && $email != $member_data['email'])
+  elseif(!can('change_email') && $email != $member_data['email'])
     $_SESSION['error'] = $l['profile_error_notallowed_email'];
   // Are they trying to change their birthdate and are they allowed to?
-  elseif (!can('change_birthdate') && $birthdate != $member_data['birthdate'])
+  elseif(!can('change_birthdate') && $birthdate != $member_data['birthdate'])
     $_SESSION['error'] = $l['profile_error_notallowed_birthdate'];
   // Are they trying to change their avatar and are they allowed to?
-  elseif (!can('change_avatar') && $avatar != $member_data['avatar'])
+  elseif(!can('change_avatar') && $avatar != $member_data['avatar'])
     $_SESSION['error'] = $l['profile_error_notallowed_avatar'];
   // Are they trying to change their ICQ and are they allowed to?
-  elseif (!can('change_icq') && $icq != $row['icq'])
+  elseif(!can('change_icq') && $icq != $row['icq'])
     $_SESSION['error'] = $l['profile_error_notallowed_icq'];
   // Are they trying to change their AIM and are they allowed to?
-  elseif (!can('change_aim') && $aim != $row['aim'])
+  elseif(!can('change_aim') && $aim != $row['aim'])
     $_SESSION['error'] = $l['profile_error_notallowed_aim'];
   // Are they trying to change their MSN and are they allowed to?
-  elseif (!can('change_msn') && $msn != $row['msn'])
+  elseif(!can('change_msn') && $msn != $row['msn'])
     $_SESSION['error'] = $l['profile_error_notallowed_msn'];
   // Are they trying to change their YIM and are they allowed to?
-  elseif (!can('change_yim') && $yim != $row['yim'])
+  elseif(!can('change_yim') && $yim != $row['yim'])
     $_SESSION['error'] = $l['profile_error_notallowed_yim'];
   // Are they trying to change their GTalk and are they allowed to?
-  elseif (!can('change_gtalk') && $gtalk != $row['gtalk'])
+  elseif(!can('change_gtalk') && $gtalk != $row['gtalk'])
     $_SESSION['error'] = $l['profile_error_notallowed_gtalk'];
   // Are they trying to change their site and are they allowed to?
-  elseif (!can('change_site') && ($site_name != $row['site_name'] || $site_url != $row['site_url']))
+  elseif(!can('change_site') && ($site_name != $row['site_name'] || $site_url != $row['site_url']))
     $_SESSION['error'] = $l['profile_error_notallowed_site'];
   // Are they trying to change their signature and are they allowed to?
-  elseif (!can('change_signature') && $signature != $row['signature'])
+  elseif(!can('change_signature') && $signature != $row['signature'])
     $_SESSION['error'] = $l['profile_error_notallowed_signature'];
   // Are they trying to change their profile text and are they allowed to?
-  elseif (!can('change_profile') && $profile != $member_data['profile'])
+  elseif(!can('change_profile') && $profile != $member_data['profile'])
     $_SESSION['error'] = $l['profile_error_notallowed_profile'];
   // Are they trying to change their password and are they allowed to?
-  elseif (!can('change_password') && $password_new != $member_data['password'] && @$_REQUEST['password-new'] != '')
+  elseif(!can('change_password') && $password_new != $member_data['password'] && @$_REQUEST['password-new'] != '')
     $_SESSION['error'] = $l['profile_error_notallowed_password'];
   
   // Is there an error?

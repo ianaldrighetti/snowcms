@@ -129,6 +129,21 @@ global $cmsurl, $db_prefix, $l, $settings, $user, $language_dir, $theme_dir, $th
         array(
           'type' => 'text',
           'validation' => 'A'
+        ),
+      'avatar_size' =>
+        array(
+          'type' => 'text',
+          'validation' => '>0'
+        ),
+      'avatar_width' =>
+        array(
+          'type' => 'text',
+          'validation' => '>0'
+        ),
+      'avatar_height' =>
+        array(
+          'type' => 'text',
+          'validation' => '>0'
         )
     );
     // You can add options into the above array, with the name of the setting in the settings table...
