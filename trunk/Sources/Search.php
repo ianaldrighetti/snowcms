@@ -128,6 +128,7 @@ global $l, $settings, $user, $db_prefix;
       if ($settings['page']['results']) {
         // There were, load theme
         $settings['page']['title'] = str_replace('%query%',$settings['page']['query'],$l['forumsearch_results_title']);
+        $settings['num_search_results'] = $amount;
         LoadForum('Search','Results');
       }
       else {
