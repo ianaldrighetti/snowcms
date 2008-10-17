@@ -29,7 +29,7 @@ global $l, $settings, $cmsurl;
   echo '
   <h1>'.$l['forumsearch_results_header'].'</h1>
   
-  <p>'.str_replace('%query%','<b>'.$settings['page']['query'].'</b>',str_replace('%numb%','5',$l['forumsearch_results_desc'])).'</p>
+  <p>'.str_replace('%query%','<b>'.$settings['page']['query'].'</b>', str_replace('%numb%',$settings['num_search_results'],$l['forumsearch_results_desc'])).'</p>
   
   <form action="forum.php?action=search" method="post" style="text-align: center">
     <p>
