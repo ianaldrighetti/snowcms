@@ -2,7 +2,7 @@ var qqtemp = "";
 
   /*QuickEdit*/
   function quickEdit(tid, mid){
-    var el = document.getElementById("pcmid"+mid);
+    var el = _.G("pcmid"+mid);
     var bak = el.innerHTML;
     el.innerHTML = "<input type=\"hidden\" value=\""+tid+";"+mid+"\"><textarea disabled=\"true\" name=\"editor\" style=\"width: 99%; height: 200px\">Loading...</textarea><br><input type=\"button\" onClick=\"quickEdit_save(this.parentNode)\" value=\"Save\"><input type=\"button\" value=\"Cancel\" onClick=\"quickEdit_cancel(this.parentNode)\"><textarea name=\"backup\" style=\"display: none\">"+bak+"</textarea>";
 
@@ -35,7 +35,7 @@ var qqtemp = "";
   
   function quickQuote(tid, mid){
     window.location.href = "#quickreply";
-    var qrt = document.getElementById("quickreplyinput")
+    var qrt = _.G("quickreplyinput")
     qrt.disabled = true;
     qqtemp = qrt.value;
     qrt.value = "Loading...";
