@@ -1,3 +1,5 @@
+var qqtemp = "";
+
   /*QuickEdit*/
   function quickEdit(tid, mid){
     var el = document.getElementById("pcmid"+mid);
@@ -35,6 +37,7 @@
     window.location.href = "#quickreply";
     var qrt = document.getElementById("quickreplyinput")
     qrt.disabled = true;
+    qqtemp = qrt.value;
     qrt.value = "Loading...";
     try{
       qrt.focus();
@@ -43,7 +46,7 @@
     _.X("forum.php?bbcode="+mid, function(e){
       var s = _.S(e,true); //deserialize JSON
       qrt.disabled = false;
-      qrt.value = "[quote by=\""+s.poster_name+"\"]\n"+_.H(unescape(s.bbcode.replace(/\+/g," ")), true)+"\n[/quote]\n";
+      qrt.value = qqtemp+"[quote by=\""+s.poster_name+"\"]\n"+_.H(unescape(s.bbcode.replace(/\+/g," ")), true)+"\n[/quote]\n";
       try{
         qrt.focus();
       }catch(err){}
