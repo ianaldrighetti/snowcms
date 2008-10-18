@@ -7,15 +7,15 @@ if(!defined('Snow'))
   die("Hacking Attempt...");
   
 function Main() {
-global $cmsurl, $settings, $l, $user;
+global $cmsurl, $settings, $l, $user, $theme_url;
   
   echo '
   <h1>'.$l['register_header'].'</h1>
   
   <p>'.$l['register_details'].'</p>
   
-  <script type="text/javascript" src="scripts/jquery.js"></script>
-  <script type="text/javascript" src="scripts/jquery-pstrength.js"></script>
+  <script type="text/javascript" src="'.$theme_url.'/'.$settings['theme'].'/scripts/jquery.js"></script>
+  <script type="text/javascript" src="'.$theme_url.'/'.$settings['theme'].'/scripts/jquery-pstrength.js"></script>
   <script type="text/javascript">$(function() {$(".password").pstrength();});</script>
   
   <form action="'.$cmsurl.'index.php?action=register" method="post">
