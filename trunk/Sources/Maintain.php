@@ -96,6 +96,15 @@ global $cmsurl, $db_prefix, $l, $mysql_db, $settings, $user;
         recountStats();
         $settings['alert'] = $l['maintain_recount_alert'];
       }
+      /*
+        The MySQL Database Backup also doesn't need its own page
+        its just a download... But of course, it still has a few
+        options you can do :P
+      */
+      elseif($do == 'backup') {
+        // Simple as this... call on it xD!
+        backupDB();
+      }
       // Load the layout =D
       $settings['page']['title'] = $l['admin_maintain_title'];
       loadTheme('Maintain','Menu');
@@ -139,5 +148,164 @@ global $db_prefix, $settings, $user;
       }
     }
   }
+}
+
+/*
+  This thing backs up your MySQL database
+  with all your dataz and structure and
+  everything you need :P
+*/
+function backupDB() {
+global $mysql_db;  
+  // What options?
+  // !!! Needs improvemnet, this is a temporary fix
+  // The structure
+  if(isset($_REQUEST['struc']) && $_REQUEST['struc'] == 1)
+    $option['struc'] = true;
+  else
+    $option['struc'] = false;
+  // The data? The important stuff
+  if(isset($_REQUEST['data']) && $_REQUEST['data'] == 1)
+    $option['data'] = true;
+  else
+    $option['data'] = false;
+  // Extended inserts?
+  if(isset($_REQUEST['extended']) && $_REQUEST['extended'] == 1)
+    $option['extended'] = true;
+  else
+    $option['extended'] = false;
+  // Gzip it?
+  if(isset($_REQUEST['gz']) && $_REQUEST['gz'] == 1)
+    $option['gz'] = true;
+  else
+    $option['gz'] = false;
+  // So yeah... Get the tables...
+  $tables = getTables();
+  // Loop through them... If anything to do so
+  if(count($tables)) {
+    $sql = 
+      "---- \r\n".
+      "-- MySQL Dump of `". $mysql_db. "` \r\n".
+      "-- on ". date("F j, Y @ g:i:sA"). " \r\n".
+      "---- \r\n";
+    foreach($tables as $table) {
+      // Well, did they want the structure?
+      if($option['struc']) {
+        $sql .=
+          "\r\n\r\n".
+          "---- \r\n".
+          "-- Table structure for `". $mysql_db. "`.`". $table. "` \r\n".
+          "---- \r\n";
+        $sql .= showCreate($table). "\r\n";
+      }
+      // Show the data? :S
+      if($option['data']) {
+        $tmp = showData($table, $option['extended']);
+        if(!empty($tmp)) {
+          $sql .=
+            "\r\n\r\n".
+            "---- \r\n".
+            "-- Table Data for `". $mysql_db. "`.`". $table. "` \r\n".
+            "---- \r\n";
+          // Now the dataz! xD
+          $sql .= $tmp;
+        }
+      }
+    }
+    ob_clean();
+    ob_start();
+    $file_name = $mysql_db.date('n-d-Y-g');
+    // GZ output? If so selected master...
+    if(function_exists('gzencode') && $option['gz']) {
+      $sql = gzencode($sql);
+      $ext = '.sql.gz';
+      header('Content-Type: application/x-gzip');
+    }
+    else {
+      $ext = '.sql';
+		  header("Content-Type: text/sql");
+		}
+		header("Content-Encoding: none");
+	  header("Content-Disposition:  filename=\"{$file_name}{$ext}\"");
+	  header("Cache-Control: private");
+	  header("Connection: close");
+	  echo $sql;
+	  ob_end_flush();
+	  exit;
+  }
+  else
+    exit;
+}
+
+// These following functions assist the function backupDB!
+function getTables() {
+global $mysql_db;
+  $request = sql_query("SHOW TABLES FROM `$mysql_db`");
+  $tables = array();
+  while($row = mysql_fetch_assoc($request))
+    $tables[] = $row['Tables_in_'. $mysql_db];
+  return $tables;
+}
+// Show Create Table for the table given...
+function showCreate($tbl_name) {
+global $mysql_db;
+  $result = sql_query("SHOW CREATE TABLE `$mysql_db`.`$tbl_name`");
+  $table = '';
+  while($row = mysql_fetch_assoc($result)) {
+    $table = $row['Create Table']. ';';
+  }
+  return $table;
+}
+// Get the data from a table... Extended or not ;)
+function showData($table, $extended = false) {
+global $mysql_db;
+  // Lets give us some time :)
+  @set_time_limit(600);
+  // Select all the data...
+  $result = mysql_query("SELECT * FROM `$mysql_db`.`$table`");
+  // Loop through it...
+  $rows = array();
+  while($row = mysql_fetch_assoc($result)) {
+    $data = array();
+    $keys = array_keys($row);
+    foreach($keys as $key)
+      $data[] = $row[$key];
+    $rows[] = $data;
+  }
+  // Lets make the field declarations...
+  $fields = array();
+  // How many?
+  $num_fields = mysql_num_fields($result);
+  // Gotta get them all
+  for($i = 0; $i < $num_fields; $i++)
+    $fields[] = mysql_field_name($result, $i);
+  // Free it!
+  mysql_free_result($result);
+  $field_list = '(`'. implode('`,`', $fields). '`)';
+  // So this can go two ways now...
+  // Extended Inserts or not (not recommended)
+  $insert = '';
+  if(!$extended && count($rows)) {
+    // Not extended Inserts :)
+    // Go through all the rows saved...
+    foreach($rows as $row) {
+      $insert .= "INSERT INTO `{$table}` {$field_list} VALUES('". implode("','", $row). "'); \r\n";
+    }
+    return $insert;
+  }
+  elseif($extended && count($rows)) {
+    // Extended Inserts :(
+    // Hold on, this might be a dumpy ride! D:!
+    // Make the $values array...
+    $values = array();
+    // Loop through all the data...
+    foreach($rows as $row) {
+      $values[] = "('". implode("','", $row). "')";
+    }
+    $insert = "INSERT INTO `{$table}` {$field_list} VALUES". implode(",", $values). "; \r\n";
+    return $insert;
+  }
+  else
+    return $insert;
 }
 ?>

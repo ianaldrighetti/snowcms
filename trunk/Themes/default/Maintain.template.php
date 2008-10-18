@@ -15,7 +15,7 @@ global $cmsurl, $settings, $l, $user;
   if(!empty($settings['alert'])) 
     echo '
   <script type="text/javascript">
-    alert(\'', $settings['alert'], '\');
+    setTimeout(\'alert(\\\'', $settings['alert'], '\\\')\', 100);
   </script>';
   echo '
   <table width="100%" id="maintain_table">
@@ -25,7 +25,29 @@ global $cmsurl, $settings, $l, $user;
     <tr>
       <td><a href="', $cmsurl, 'index.php?action=admin;sa=maintain;do=recount">', $l['maintain_recount'], '</a></td>
     </tr>
-  </table>';
+  </table>
+  <h2>', $l['maintain_backup'], '</h2>
+  <form action="', $cmsurl, 'index.php?action=admin;sa=maintain;do=backup" method="post">
+    <fieldset>
+      <table>
+        <tr>
+          <td>', $l['maintain_backup_structure'], '</td><td><input name="struc" type="checkbox" value="1" checked="checked"/></td>
+        </tr>
+        <tr>
+          <td>', $l['maintain_backup_data'], '</td><td><input name="data" type="checkbox" value="1" checked="checked"/></td>
+        </tr>
+        <tr>
+          <td>', $l['maintain_backup_extended'], '</td><td><input name="extended" type="checkbox" value="1"/></td>
+        </tr>
+        <tr>
+          <td>', $l['maintain_backup_gz'], '</td><td><input name="gz" type="checkbox" value="1" checked="checked"/></td>
+        </tr>
+        <tr>
+          <td></td><td><input type="submit" value="', $l['maintain_backup_download'], '"/></td>
+        </tr>
+      </table>
+    </fieldset>
+  </form>';
 }
 
 function Optimize() {

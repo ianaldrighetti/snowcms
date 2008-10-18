@@ -238,6 +238,12 @@ th.border {
 input, textarea {
   border: 1px solid #DDDDDD;
 }
+input[type="checkbox"] {
+  border: none;
+}
+fieldset {
+  border: none;
+}
 select {
   width: 153px;
 }
