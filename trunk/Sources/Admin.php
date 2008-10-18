@@ -40,9 +40,7 @@ global $cmsurl, $db_prefix, $l, $settings, $source_dir, $user;
   if(can('admin')) {
     if(!empty($_REQUEST['sa'])) {
       $sa = array(
-        'basic-settings' => array('Settings.php','BasicSettings'),
-        'mail-settings' => array('Settings.php','MailSettings'),
-        'field-lengths' => array('Settings.php','FieldLengthSettings'),
+        'settings' => array('Settings.php','Settings'),
         'forum' => array('ManageForum.php','ManageForum'),
         'pages' => array('Page.php','ManagePages'),
         'members' => array('Members.php','ManageMembers'),
@@ -57,17 +55,15 @@ global $cmsurl, $db_prefix, $l, $settings, $source_dir, $user;
       // Is the sa= in the $sa array? If so do it :D
       if(is_array(@$sa[$_REQUEST['sa']])) {
         require_once($source_dir.'/'.$sa[$_REQUEST['sa']][0]);
-          $sa[$_REQUEST['sa']][1]();
+        $sa[$_REQUEST['sa']][1]();
       }
-      else {
+      else
         // Its not :( We don't want an error, so show the AdminHome();
         AdminHome();
-      }
     }
-    else {
+    else
       // If sa is just plain not set, load the Admin Home
       AdminHome();
-    }
   }
   else {
     // Go away! We not want you here! >:(
@@ -83,8 +79,8 @@ global $cmsurl, $db_prefix, $l, $settings, $source_dir, $user;
   $options = array();
   if (can('manage_pages'))
     $options[] = 'pages';
-  if (can('manage_basic-settings'))
-    $options[] = 'basic-settings';
+  if (can('settings'))
+    $options[] = 'settings';
   if (can('manage_members'))
     $options[] = 'members';
   if (can('manage_permissions'))
@@ -93,8 +89,6 @@ global $cmsurl, $db_prefix, $l, $settings, $source_dir, $user;
     $options[] = 'menus';
   if (can('manage_forum'))
     $options[] = 'forum';
-  if (can('manage_mail_settings'))
-    $options[] = 'mail-settings';
   if (can('manage_news'))
     $options[] = 'news';
   if (can('manage_tos'))
@@ -105,8 +99,6 @@ global $cmsurl, $db_prefix, $l, $settings, $source_dir, $user;
     $options[] = 'pms';
   if (can('maintain'))
     $options[] = 'maintain';
-  if (can('field_lengths'))
-    $options[] = 'field-lengths';
   
   $settings['page']['options'] = $options;
   

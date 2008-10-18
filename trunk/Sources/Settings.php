@@ -11,11 +11,50 @@
 //                 Settings.php file
 
 
-if (!defined("Snow"))
+if(!defined("Snow"))
   die(header("HTTP/1.1 404 Not Found"));
+
+function Settings() {
+  if(@$_REQUEST['redirect'] == 'settings')
+    redirect('index.php?action=admin;sa=settings');
   
+  if(can('settings')) {
+    if(!empty($_REQUEST['ssa'])) {
+      $ssa = array(
+        'basic' => 'BasicSettings',
+        'mail' => 'MailSettings',
+        'lengths' => 'FieldLengthSettings'
+      );
+      if(@$ssa[$_REQUEST['ssa']])
+        $ssa[$_REQUEST['ssa']]();
+      else
+        SettingsHome();
+    }
+    else
+      SettingsHome();
+  }
+}
+
+function SettingsHome() {
+global $l, $settings;
+  
+  // Get the control panel menu options
+  $options = array();
+  if (can('manage_pages'))
+    $options[] = 'basic';
+  if (can('manage_basic-settings'))
+    $options[] = 'mail';
+  if (can('manage_members'))
+    $options[] = 'lengths';
+  
+  $settings['page']['options'] = $options;
+  
+  $settings['page']['title'] = $l['settings_title'];
+  loadTheme('Settings');
+}
+
 function BasicSettings() {
-global $cmsurl, $db_prefix, $l, $settings, $user, $language_dir, $theme_dir, $theme_name;
+global $cmsurl, $db_prefix, $l, $settings, $user, $language_dir, $theme_dir;
   
   if (can('manage_basic-settings')) {
     // An array of all the settings that can be set on this page...
@@ -52,31 +91,31 @@ global $cmsurl, $db_prefix, $l, $settings, $user, $language_dir, $theme_dir, $th
         array(
           'type' => 'select',
           'values' => array(
-                        $l['basicsettings_value_html'], 1,
-                        $l['basicsettings_value_bbcode'], 0
+                        $l['settings_basic_value_html'], 1,
+                        $l['settings_basic_value_bbcode'], 0
                       )
         ),
       'account_activation' =>
         array(
           'type' => 'select',
           'values' => array(
-                        $l['basicsettings_value_no_activation'], 0,
-                        $l['basicsettings_value_email_activation'], 1,
-                        $l['basicsettings_value_admin_activation'], 2
+                        $l['settings_basic_value_no_activation'], 0,
+                        $l['settings_basic_value_email_activation'], 1,
+                        $l['settings_basic_value_admin_activation'], 2
                       )
         ),
       'captcha' =>
         array(
           'type' => 'select',
           'values' => array(
-                        $l['basicsettings_value_none'], 0,
-                        $l['basicsettings_value_nofonts_weak'], 1,
-                        $l['basicsettings_value_nofonts_medium'], 2,
-                        $l['basicsettings_value_nofonts_strong'], 3,
-                        $l['basicsettings_value_weak'], 4,
-                        $l['basicsettings_value_medium'], 5,
-                        $l['basicsettings_value_strong'], 6,
-                        $l['basicsettings_value_superstrong'], 7
+                        $l['settings_basic_value_none'], 0,
+                        $l['settings_basic_value_nofonts_weak'], 1,
+                        $l['settings_basic_value_nofonts_medium'], 2,
+                        $l['settings_basic_value_nofonts_strong'], 3,
+                        $l['settings_basic_value_weak'], 4,
+                        $l['settings_basic_value_medium'], 5,
+                        $l['settings_basic_value_strong'], 6,
+                        $l['settings_basic_value_superstrong'], 7
                       )
         ),
       'login_threshold' =>
@@ -177,7 +216,7 @@ global $cmsurl, $db_prefix, $l, $settings, $user, $language_dir, $theme_dir, $th
     foreach (scandir($theme_dir) as $theme)
       if (substr($theme,0,1) != '.') {
         include $theme_dir.'/'.$theme.'/info.php';
-        $basic['theme']['values'][] = $theme_name;
+        $basic['theme']['values'][] = $settings['theme_name'];
         $basic['theme']['values'][] = $theme;
       }
     
@@ -246,20 +285,20 @@ global $cmsurl, $db_prefix, $l, $settings, $user, $language_dir, $theme_dir, $th
           $query = "UPDATE {$db_prefix}settings SET `value` = '$setting' WHERE `variable` = '$key'";
           $result = sql_query($query);
         }
-        redirect('index.php?action=admin');
+        redirect('index.php?action=admin;sa=settings');
       }
       // There was an error in validation
       else
-        redirect('index.php?action=admin;sa=basic-settings');
+        redirect('index.php?action=admin;sa=settings;ssa=basic');
     }
     // Set title, pass on $basic, and load Settings template with the Basic function
-    $settings['page']['title'] = $l['basicsettings_title'];
+    $settings['page']['title'] = $l['settings_basic_title'];
     $settings['page']['settings'] = $basic;
     loadTheme('Settings','Basic');
   }
   // They don't have permission to change basic settings
   else
-    redirect('index.php?action=admin');
+    redirect('index.php?action=admin;sa=settings');
 }
 
 function MailSettings() {
@@ -283,7 +322,7 @@ global $cmsurl, $db_prefix, $l, $settings;
         // Is the verification password correct?
         if ($smtp_pass == $smtp_pass_2)
           // It is
-          sql_query("UPDATE {$db_prefix}settings SET `value` = '$smtp_pass' WHERE `variable` = 'smtp_pass'") or $_SESSION['error'] = $l['mailsettings_error'];
+          sql_query("UPDATE {$db_prefix}settings SET `value` = '$smtp_pass' WHERE `variable` = 'smtp_pass'");
         else
           // It isn't
           $_SESSION['error'] = $l['mailsettings_error_verification'];
@@ -293,33 +332,33 @@ global $cmsurl, $db_prefix, $l, $settings;
       if (!@$_SESSION['error']) {
         if ($mail_with_fsockopen) {
           // Change all the settings
-          sql_query("UPDATE {$db_prefix}settings SET `value` = '$mail_with_fsockopen' WHERE `variable` = 'mail_with_fsockopen'") or $_SESSION['error'] = $l['mailsettings_error'];
-          sql_query("UPDATE {$db_prefix}settings SET `value` = '$smtp_host' WHERE `variable` = 'smtp_host'") or $_SESSION['error'] = $l['mailsettings_error'];
-          sql_query("UPDATE {$db_prefix}settings SET `value` = '$smtp_port' WHERE `variable` = 'smtp_port'") or $_SESSION['error'] = $l['mailsettings_error'];
-          sql_query("UPDATE {$db_prefix}settings SET `value` = '$smtp_user' WHERE `variable` = 'smtp_user'") or $_SESSION['error'] = $l['mailsettings_error'];
-          sql_query("UPDATE {$db_prefix}settings SET `value` = '$from_email' WHERE `variable` = 'from_email'") or $_SESSION['error'] = $l['mailsettings_error'];
+          sql_query("UPDATE {$db_prefix}settings SET `value` = '$mail_with_fsockopen' WHERE `variable` = 'mail_with_fsockopen'");
+          sql_query("UPDATE {$db_prefix}settings SET `value` = '$smtp_host' WHERE `variable` = 'smtp_host'");
+          sql_query("UPDATE {$db_prefix}settings SET `value` = '$smtp_port' WHERE `variable` = 'smtp_port'");
+          sql_query("UPDATE {$db_prefix}settings SET `value` = '$smtp_user' WHERE `variable` = 'smtp_user'");
+          sql_query("UPDATE {$db_prefix}settings SET `value` = '$from_email' WHERE `variable` = 'from_email'");
         }
         else {
           // Change only the non-fsockopen related settings
-          sql_query("UPDATE {$db_prefix}settings SET `value` = '$mail_with_fsockopen' WHERE `variable` = 'mail_with_fsockopen'") or $_SESSION['error'] = $l['mailsettings_error'];
-          sql_query("UPDATE {$db_prefix}settings SET `value` = '$from_email' WHERE `variable` = 'from_email'") or $_SESSION['error'] = $l['mailsettings_error'];
+          sql_query("UPDATE {$db_prefix}settings SET `value` = '$mail_with_fsockopen' WHERE `variable` = 'mail_with_fsockopen'");
+          sql_query("UPDATE {$db_prefix}settings SET `value` = '$from_email' WHERE `variable` = 'from_email'");
         }
       }
       
       // Redirect the page to make it so if they refresh the settings aren't updated again
-      redirect('index.php?action=admin;sa=mail-settings');
+      redirect('index.php?action=admin;sa=settings;ssa=mail');
     }
     // Set the page title and load the theme
-    $settings['page']['title'] = $l['mailsettings_title'];
+    $settings['page']['title'] = $l['settings_mail_title'];
     loadTheme('Settings','ManageMailSettings');
   }
   // They don't have permission, so redrect them to the main control panel
   else
-    redirect('index.php?action=admin');
+    redirect('index.php?action=admin;sa=settings');
 }
 
 function FieldLengthSettings() {
-global $cmsurl, $db_prefix, $l, $settings, $user, $language_dir, $theme_dir, $theme_name;
+global $cmsurl, $db_prefix, $l, $settings, $user, $language_dir, $theme_dir;
   
   if (can('manage_basic-settings')) {
     $lengths = array(
@@ -370,15 +409,15 @@ global $cmsurl, $db_prefix, $l, $settings, $user, $language_dir, $theme_dir, $th
         sql_query("UPDATE {$db_prefix}settings SET `value` = '$short' WHERE `variable` = '{$length}_short'");
         sql_query("UPDATE {$db_prefix}settings SET `value` = '$long' WHERE `variable` = '{$length}_long'");
       }
-      redirect('index.php?action=admin');
+      redirect('index.php?action=admin;sa=settings');
     }
     // Set title, pass on $basic, and load Settings template with the Basic function
-    $settings['page']['title'] = $l['fieldlengths_title'];
+    $settings['page']['title'] = $l['settings_lengths_title'];
     $settings['page']['settings'] = $lengths;
     loadTheme('Settings','FieldLengths');
   }
   // They don't have permission to change basic settings
   else
-    redirect('index.php?action=admin');
+    redirect('index.php?action=admin;sa=settings');
 }
 ?>
