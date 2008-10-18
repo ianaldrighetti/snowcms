@@ -130,7 +130,6 @@ if (!@$_REQUEST['type']) {
     './Themes/default/scripts/jquery.js',
     './Themes/default/scripts/jquery-pstrength.js',
     './config.php',
-    './image.php',
     './index.php',
     './install.sql'
   );
@@ -156,7 +155,7 @@ if (!@$_REQUEST['type']) {
   </a>
   <ul>
     <li><a href="http://www.snowcms.com/">SnowCMS.com</a></li>
-    <li><a href="http://snowcms.google.com/">Google Code</a></li>
+    <li><a href="http://snowcms.googlecode.com/">Google Code</a></li>
     <li><a href="http://www.snowcms.com/forum.php">Support Forum</a></li>
     <li><a href="http://www.snowcms.com/forum.php?board=4">Developer Blogs</a></li>
   </ul>
