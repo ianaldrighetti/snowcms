@@ -20,7 +20,7 @@ echo '<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
   <!--[if lte IE 6]><link rel="stylesheet" href="'.$theme_url.'/'.$settings['theme'].'/iefix.css" type="text/css" media="screen" /><![endif]-->
   <!--[if lte IE 7]><style type="text/css">#content {padding-left: 6px !important;}</style><![endif]-->
   <script type="text/javascript" src="'.$theme_url.'/'.$settings['theme'].'/scripts/vX.js"></script>
-  <script type="text/javascript" src="'.$theme_url.'/'.$settings['theme'].'/scripts/forum.js"></script>
+  <script type="text/javascript" src="'.$theme_url.'/'.$settings['theme'].'/scripts/forum_mini.js"></script>
 </head>
 
 <body>
