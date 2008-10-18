@@ -17,7 +17,10 @@ error_reporting(E_ALL);
 // This is to stop access to files in other directories, Security I suppose
 define('Snow', true);
 define('InForum', true);
-
+// We don't like you magic quotes...
+if(function_exists('set_magic_quotes_runtime'))
+  @set_magic_quotes_runtime(0);
+  
 // Load Some Important Files
 require_once('./config.php');
 // SnowCMS is not installed, so take them to the installer so they can install SnowCMS
@@ -26,6 +29,10 @@ if(!$scms_installed)
 // Load Core.php, this file has many things we need, such as the functions we will call on soon :)
 require_once($source_dir.'/Core.php');
 
+// Dumb Magic Quotes! DIE DIE DIE!
+if(get_magic_quotes_gpc())
+  WizardMagic();
+  
   // Connect to MySQL, if an Error Occurs, lets not make it look ugly =|
   @mysql_connect($mysql_host, $mysql_user, $mysql_passwd) or die(MySQLError(mysql_error()));
   

@@ -17,7 +17,7 @@ if (!defined("Snow"))
 // This loads all the settings in the {db_prefix}settings table, also loads usernames into the settings array
 function loadSettings() {
 global $db_prefix, $settings;
-  
+  // Get all the settings, cause we need them!
   $result = sql_query("SELECT * FROM {$db_prefix}settings");
     while($row = mysql_fetch_assoc($result)) 
       $settings[$row['variable']] = $row['value'];
@@ -28,14 +28,7 @@ global $db_prefix, $settings;
 // It makes it so later on, once we have a forum in, you can post PHP and HTML stuff, but it
 // Won't be parsed, but keep the site safe from SQL injections 
 function clean($str) {
-  $replace = array(
-    '&' => '&amp;',
-    '"' => '&quot;',
-    "'" => '&#39;',
-    '<' => '&lt;',
-    '>' => '&gt;'
-  );
-  $str = str_replace(array_keys($replace), array_values($replace), $str);
+  $str = htmlentities($str, ENT_QUOTES);
   return $str;
 }
 
@@ -791,31 +784,36 @@ global $db_prefix, $user;
   ); 
   // ^^^ Should be moved somewhere else, such as inside the loadPerms(); function (No, not the loadBPerms(); function!) ^^^
   
-// !!! This function changes (forcefully) the separator from & to ;
-// !!! This function needs improvement!!!!
+// This turns the & separator to a ; cause it looks nicer :)
 function cleanQuery() {
 global $_REQUEST, $_GET;
-  
   // Remove current request variables
   unset($_REQUEST);
-  
   // Add post variables to request
   foreach ($_POST as $key => $value) {
     $_REQUEST[$key] = $value;
-  }
-  
+  } 
   // Make sure there is even somehting that needs handling, we don't want errors
   if(!empty($_SERVER['QUERY_STRING'])) {
-  // EXPLOSION! Quick and Dirty
-  $matches = explode(";", $_SERVER['QUERY_STRING']);
-    if(count($matches)) {
-      foreach($matches as $arg) {
-        // EXPLODED! Again, make the new $_GET and $_REQUEST variables
-        $new = explode("=", $arg);
-        $_GET[$new[0]] = @$new[1];
-        $_REQUEST[$new[0]] = @$new[1];
-      }
-    }
+	  // The Query String...
+	  $query_str = (substr($_SERVER['QUERY_STRING'], 0, 5) == 'url=/' ? $_SERVER['REDIRECT_QUERY_STRING'] : $_SERVER['QUERY_STRING']);
+	  // Split... like EXPLOSION, just not the same :P
+	  $query_strings = split('[;&]', urldecode($query_str));
+	  // Loop ftw
+	  foreach($query_strings as $tmp)
+		  if(preg_match("/^([^=]+)([=](.*))*/", $tmp, $parts))
+			  $new[$parts[1]] = !empty($parts[2]) ? $parts[2] : '';
+		// Anything in the new?
+		if(count($new)) {
+		  // Set them
+		  foreach($new as $key => $value) {
+		    // Bug fix...
+		    $value = substr($value, 1, strlen($value));
+		    // Set them :)
+		    $_REQUEST[$key] = $value;
+		    $_GET[$key] = $value;
+		  }
+		}
   }
 }
 
@@ -941,7 +939,7 @@ function loadQuickEdit() {
 global $user, $db_prefix;
   if ($bbcode = @$_REQUEST['bbcode']) {
     if ($bbcode = mysql_fetch_assoc(sql_query("SELECT * FROM {$db_prefix}messages LEFT JOIN {$db_prefix}boards AS b ON b.bid = {$db_prefix}messages.bid WHERE `mid` = '$bbcode' AND (FIND_IN_SET('{$user['group']}', `b`.`who_view`) OR '{$user['group']}' = '1')"))) {
-      echo $bbcode['body'];
+      echo html_entity_decode($bbcode['body'], ENT_QUOTES);
       exit;
     }
     else
@@ -955,5 +953,40 @@ global $user, $db_prefix;
     else
       exit;
   }
+}
+
+function WizardMagic() {
+global $_REQUEST, $_GET, $_POST, $_COOKIE;
+  // This fixes magic quotes with the
+  // Wizard Magical powers! =D
+  $_REQUEST = assistWizard($_REQUEST);
+  $_GET = assistWizard($_GET);
+  $_POST = assistWizard($_POST);
+  $_COOKIE = assistWizard($_COOKIE);
+}
+
+// This assists WizardMagic();
+function assistWizard($array) {
+  // Is it an array? Lol... and something in it...
+  if(is_array($array) && count($array)) {
+    // Set a tmp var...
+    $tmp = array();
+    foreach($array as $key => $value) {
+      // If it isn't an array, clean it...
+      if(!is_array($value))
+        $tmp[$key] = stripslashes($value);
+      else {
+        // Its another array? ZOMG! D:
+        // I could do this recursively, but that could be bad
+        // Because people are mean like that, poopie heads!
+        // So yeah, we will only go into this once :P
+        foreach($value as $v_key => $v_data)
+          $tmp[$key][$v_key] = stripslashes($v_data);
+      }
+    }
+    return $tmp;
+  }
+  else
+    return array();
 }
 ?>
