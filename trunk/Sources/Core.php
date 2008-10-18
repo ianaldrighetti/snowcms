@@ -28,6 +28,7 @@ global $db_prefix, $settings;
 // It makes it so later on, once we have a forum in, you can post PHP and HTML stuff, but it
 // Won't be parsed, but keep the site safe from SQL injections 
 function clean($str) {
+  // Then ENT_QUOTES make it encode both " and '
   $str = htmlentities($str, ENT_QUOTES);
   return $str;
 }
@@ -47,69 +48,86 @@ function clean_header($str) {
 function loadUser() {
 global $db_prefix, $user, $cookie_prefix;
   
-  $user = array();
   // Set some default info, incase they are guests
-  $user['id'] = 0;
-  $user['group'] = -1;
-  $user['is_logged'] = false;
-  $user['is_guest'] = true;
-  $user['is_admin'] = false;
-  $user['name'] = null;
-  $user['email'] = null;
-  $user['language'] = false;
-  $user['sc'] = 'guest';
-  $user['board_query'] = 'FIND_IN_SET(\'-1\', b.who_view)';
-  $user['unread_pms'] = 0;
-  $user['sc'] = session_id();
-  // Make sure we get their real IP :)
-  $user['ip'] = @isset($_SERVER['HTTP_X_FORWARDED_FOR']) ? $_SERVER['HTTP_X_FORWARDED_FOR'] : $_SERVER['REMOTE_ADDR'];
+  $user = array(
+            'id' => 0,
+            'ip' => isset($_SERVER['HTTP_X_FORWARDED_FOR']) ? $_SERVER['HTTP_X_FORWARDED_FOR'] : $_SERVER['REMOTE_ADDR'],
+            'group' => -1,
+            'is_guest' => true,
+            'is_logged' => false,
+            'is_admin' => false,
+            'name' => '',
+            'email' => '',
+            'language' => false,
+            'sc' => session_id(),
+            'board_query' => 'FIND_IN_SET(\'-1\', b.who_view)',
+            'unread_pms' => 0
+          );
   if(empty($_SESSION['id'])) {
     // We need to sanitize the cookies, last thing we need is to be hacked by cookies, Those are some bad cookies (Like Oatmeal ones, Ewww!)
-    $_SESSION['id'] = @addslashes(mysql_real_escape_string($_COOKIE[$cookie_prefix.'uid']));
-    $_SESSION['user'] = @clean($_COOKIE[$cookie_prefix.'username']);
-    $_SESSION['pass'] = @clean($_COOKIE[$cookie_prefix.'password']);
+    $_SESSION['id'] = !empty($_COOKIE[$cookie_prefix. 'user_id']) ? (int)clean($_COOKIE[$cookie_prefix. 'user_id']) : '';
+    $_SESSION['password'] = !empty($_COOKIE[$cookie_prefix. 'password']) ? clean($_COOKIE[$cookie_prefix. 'password']) : '';
   }
-  if(isset($_SESSION['id'])) {
-    if(isset($_SESSION['pass'])) {
-      $result = sql_query("SELECT * FROM {$db_prefix}members WHERE `id` = '{$_SESSION['id']}' AND `password` = '{$_SESSION['pass']}'");
-      // If user ID and password are in the database
-      if (mysql_num_rows($result)) {
-        while($row = mysql_fetch_assoc($result)) {
-          $user = array(
-            'id' => $row['id'],
-            'name' => $row['display_name'] ? $row['display_name'] : $row['username'],
-            'group' => $row['group'],
-            'is_logged' => true,
-            'is_guest' => false,
-            'is_admin' => false,
-            'email' => $row['email'],
-            'language' => $row['language'],
-            'board_query' => "FIND_IN_SET('{$row['group']}', b.who_view)",
-            'unread_pms' => $row['unread_pms'],
-            'ip' => @$_SERVER['HTTP_X_FORWARDED_FOR'] ? $_SERVER['HTTP_X_FORWARDED_FOR'] : $_SERVER['REMOTE_ADDR'],
-            'sc' => create_sid()
-          );
-          if($user['group']==1) {
-            $user['is_admin'] = true;
-            $user['board_query'] = '1=1';
-          }
-        }
+  // So are they possibly logged in?
+  // Also... make sure the Session data
+  // Matches that of the Cookie Data
+  // Just an extra precaution :P
+  if(!empty($_SESSION['id']) && !empty($_SESSION['password']) && $_SESSION['id'] == $_COOKIE[$cookie_prefix. 'user_id'] && $_SESSION['password'] == $_COOKIE[$cookie_prefix. 'password']) {
+    $result = sql_query("SELECT * FROM {$db_prefix}members WHERE `id` = '{$_SESSION['id']}' AND `password` = '{$_SESSION['password']}'");
+    // If user ID and password are in the database
+    if(mysql_num_rows($result)) {
+      while($row = mysql_fetch_assoc($result)) {
+        $user = array(
+          'id' => $row['id'],
+          'name' => $row['display_name'],
+          'username' => $row['username'],
+          'group' => $row['group'],
+          'is_logged' => true,
+          'is_guest' => false,
+          'is_admin' => ($row['group'] === 1) ? true : false,
+          'email' => $row['email'],
+          'language' => $row['language'],
+          'board_query' => ($row['group'] === 1) ? '1=1' : "FIND_IN_SET('{$row['group']}', b.who_view)",
+          'unread_pms' => $row['unread_pms'],
+          'ip' => isset($_SERVER['HTTP_X_FORWARDED_FOR']) ? $_SERVER['HTTP_X_FORWARDED_FOR'] : $_SERVER['REMOTE_ADDR'],
+          'sc' => create_sid()
+        );
       }
-      else {
-        setcookie($cookie_prefix."uid","",time()-60*60*24);
-        setcookie($cookie_prefix."username","",time()-60*60*24);
-        setcookie($cookie_prefix."password","",time()-60*60*24);
-      }
+    }
+    else {
+      // Delete the cookie contents >:D!
+      setLoginCookie('', '', time() - (60*60*24*365));
     }
   }
   // Check session validation
-  if (!ValidateSession($user['sc']) && $user['group'] != -1 && @$_REQUEST['action'] != 'logout') {
+  if(!ValidateSession($user['sc']) && $user['group'] != -1 && @$_REQUEST['action'] != 'logout') {
     $result = sql_query("SELECT `sc` FROM {$db_prefix}members WHERE `id` = '{$user['id']}'");
     $row = mysql_fetch_assoc($result);
     redirect('index.php?action=logout;sc='.$row['sc']);
   }
   
   return $user;
+}
+
+// This function makes it all easy =D
+// This sets the User ID, Password, and Session ID
+// Of the user for later use... if they choose to
+// Stay logged in
+function setLoginCookie($user_id = '', $password = '', $expire = 0) {
+global $cookie_prefix, $cmsurl;
+  // Figure the Cookie Path and Cookie Domain
+  $url = parse_url($cmsurl);
+  if(empty($url['host'])) {
+    // Uh oh! no host O.o..?
+    $url['host'] = (substr($_SERVER['SERVER_NAME'], 0, 7) == 'http://') ? substr($_SERVER['SERVER_NAME'], 7, strlen($_SERVER['SERVER_NAME'])) : $_SERVER['SERVER_NAME'];
+  }
+  // Cookie path :D
+  if(empty($url['path'])) {
+    // None, forget it... just set it to /
+    $url['path'] = '/';
+  }
+  setcookie($cookie_prefix. 'user_id', $user_id, $expire, $url['path']);
+  setcookie($cookie_prefix. 'password', $password, $expire, $url['path']);
 }
 
 // This loads the Language file, from the language directory, later on (Maybe SnowCMS 0.8 or later)

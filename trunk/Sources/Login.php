@@ -36,37 +36,39 @@ function Login2() {
 global $cmsurl, $db_prefix, $l, $settings, $user, $cookie_prefix;
   
   // Get and sanitize the username and encrypt the password
-  $username = @clean($_REQUEST['username']);
+  $username = !empty($_REQUEST['username']) ? clean($_REQUEST['username']) : '';
   // Is this password pre hashed? If not, hash it...
-  $password = (@$_REQUEST['pass_hash'] != 1) ? clean($_REQUEST['pass_hash']) : @md5($_REQUEST['password']);
-  if((!empty($username)) && (!empty($password))) {
+  $password = (!empty($_REQUEST['pass_hash']) && $_REQUEST['pass_hash'] != 1) ? clean($_REQUEST['pass_hash']) : @md5($_REQUEST['password']);
+  if(!empty($username) && !empty($password)) {
     $result = sql_query("SELECT * FROM {$db_prefix}members WHERE `username` = '{$username}' AND `password` = '{$password}'");
-    if(mysql_num_rows($result)>0) {
+    if(mysql_num_rows($result)) {
       while($row = mysql_fetch_assoc($result)) {
         // We need their user ID
         $id = $row['id'];
+        // And if they are activated :P
         $is_activated = $row['activated'];
+        // Banned?
         $is_banned = $row['banned'];
+        // Suspended...?
         $is_suspended = $row['suspension'];
       }
       // Just cause their password and username is right, doesn't mean they can login :P
-      if($is_activated && $is_banned==0 && $is_suspended<time()) {
+      if($is_activated && $is_banned==0 && $is_suspended < time()) {
         // Set cookies :) Mmmmm, the good kind too, like Chocolate Chip, but not Oatmeal! Ewww!
         $login_length = (int)$_REQUEST['login_length'];
-        if($login_length==0)
+        if($login_length == 0)
           $login_length = $settings['remember_time']*60;
-        setcookie($cookie_prefix."username", $_REQUEST['username'], time()+$login_length);
-        setcookie($cookie_prefix."password", md5($password), time()+$login_length);
-        setcookie($cookie_prefix."uid", $id, time()+$login_length);
+        // Set the login cookie...
+        setLoginCookie($id, $password, time() + $login_length);
         
         // Set the Session variables, like ID and Pass, enables them to be validated
         // Its more secure to authenticate them on each page load, or at least we think so :P
         $_SESSION['id'] = $id;
-        $_SESSION['pass'] = $password;
+        $_SESSION['password'] = $password;
         // Update a few things, lkike last login, last ip, their session ID
         sql_query("UPDATE {$db_prefix}members SET `last_login` = '".time()."', `last_ip` = '{$user['ip']}' WHERE `id` = '{$_SESSION['id']}'");
         // Redirect them to the CMSURL URL :P
-        header("Location: {$cmsurl}");
+        redirect('index.php');
       }
       elseif(!$is_activated) {
         // Not activated... Give them a message and a link to a resend form
@@ -104,23 +106,21 @@ global $cmsurl, $db_prefix, $l, $settings, $user, $cookie_prefix;
 function Logout() {
 global $cmsurl, $db_prefix, $l, $settings, $user, $cookie_prefix;
   
-  if(ValidateSession(@$_REQUEST['sc'])) {
+  if(true) {
     // Are they even logged in? Lol.
     if($user['is_logged']) {
       // Destroy! Destroy! Their session :D
       session_destroy();
       // Delete them from the {db_prefix}online table
-      sql_query("DELETE FROM {$db_prefix}online WHERE `user_id` = '". clean(session_id()). "'");
-      // Delete the Cookies... If they have any (the @ means to stfu, I don't want any errors)
-        @setcookie($cookie_prefix."username", '', time()-($settings['remember_time']*60));
-        @setcookie($cookie_prefix."password", '', time()-($settings['remember_time']*60));
-        @setcookie($cookie_prefix."uid", '', time()-($settings['remember_time']*60));    
+      sql_query("DELETE FROM {$db_prefix}online WHERE `user_id` = '{$user['id']}'");
+      // Delete the Cookies... Simple enough :P
+      setLoginCookie('', '', time() - (60*60*24*365));
       // Redirect to the CMSURL URL
-      header("Location: {$cmsurl}");
+      redirect("index.php");
     }
     else {
       // Your not logged in -.-'
-      header("Location: {$cmsurl}");
+      redirect("index.php");
     }
   }
   else {
