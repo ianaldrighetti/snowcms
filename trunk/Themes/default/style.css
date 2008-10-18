@@ -406,3 +406,7 @@ textarea.quickreply {
 .results .sidebar {
   background: #28A3DC;
 }
+
+.error {
+  color: #ff0000
+}
