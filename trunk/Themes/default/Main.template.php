@@ -57,7 +57,7 @@ global $l, $cmsurl, $settings, $user;
 // by getting more users, if you do remove it, we can and will deny
 // you of support for your SnowCMS installation. Thanks!
 function theme_footer() {
-global $l, $cmsurl, $theme_url, $settings, $user;
+global $l, $cmsurl, $theme_url, $settings, $user, $num_queries;
 echo '
     <div style="clear: both"></div>
   </div>
@@ -65,7 +65,7 @@ echo '
     ';
 languageOption();
 echo '
-    <p>'.str_replace('%snowcms%','<a href="http://www.snowcms.com/" onClick="window.open(this.href); return false;">SnowCMS '.$settings['version'].'</a>',$l['main_powered_by']).' | '.str_replace('%whom%','<a href="http://www.snowcms.com/" onclick="window.open(this.href); return false;">The SnowCMS Team</a>',$l['main_theme_by']).'</p>
+    <p>'.str_replace('%snowcms%','<a href="http://www.snowcms.com/" onClick="window.open(this.href); return false;">SnowCMS '.$settings['version'].'</a>',$l['main_powered_by']).' | '.str_replace('%whom%','<a href="http://www.snowcms.com/" onclick="window.open(this.href); return false;">The SnowCMS Team</a>',$l['main_theme_by']).' | ', str_replace('%queries%', $num_queries, $l['page_made']), '</p>
   </div>
 </div>
 </body>

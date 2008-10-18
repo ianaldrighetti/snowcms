@@ -23,15 +23,15 @@ global $l, $settings, $db_prefix;
       // Save changes to current links
       foreach ($_REQUEST as $key => $value)
         if (substr($key,0,10) == 'link_name_') {
-          $link_id = clean(substr($key,10,strlen($key)));
+          $link_id = clean(substr($key, 10, strlen($key)));
           $link_name = clean($value);
-          $link_url = clean(@$_REQUEST['link_url_'.$link_id]);
-          $link_new_window = @$_REQUEST['link_new_window_'.$link_id] == true;
-          $link_main = @$_REQUEST['link_main_'.$link_id] == true;
-          $link_sidebar = (@$_REQUEST['link_sidebar_'.$link_id] == true) * 2;
+          $link_url = clean(@$_REQUEST['link_url_'. $link_id]);
+          $link_new_window = @$_REQUEST['link_new_window_'. $link_id] == true;
+          $link_main = @$_REQUEST['link_main_'. $link_id] == true;
+          $link_sidebar = (@$_REQUEST['link_sidebar_'. $link_id] == true) * 2;
           $link_menu = $link_main + $link_sidebar;
-          $link_perm = (int)@$_REQUEST['link_perm_'.$link_id];
-          $link_order = (int)@$_REQUEST['link_order_'.$link_id];
+          $link_perm = (int)@$_REQUEST['link_perm_'. $link_id];
+          $link_order = (int)@$_REQUEST['link_order_'. $link_id];
           sql_query("
           UPDATE {$db_prefix}menus
           SET

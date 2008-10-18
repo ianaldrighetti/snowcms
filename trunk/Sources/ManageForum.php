@@ -27,7 +27,8 @@ global $cmsurl, $db_prefix, $l, $settings, $source_dir, $user;
       'categories' => array('ManageForum.php','ManageCats'),
       'permissions' => array('Permissions.php','ForumPerms')
     );
-    if (is_array(@$fa[$_REQUEST['fa']])) {
+    // We can only do it if its in the array...
+    if(is_array(@$fa[$_REQUEST['fa']])) {
       require_once($source_dir.'/'.$fa[$_REQUEST['fa']][0]);
         $fa[$_REQUEST['fa']][1]();
     }
@@ -52,7 +53,7 @@ global $cmsurl, $db_prefix, $l, $settings, $user;
     $options[] = 'boards';
   if (can('manage_forum_perms'))
     $options[] = 'permissions';
-  
+  // We need to use this
   $settings['page']['options'] = $options;
   
   // Load the theme
@@ -70,6 +71,7 @@ global $cmsurl, $db_prefix, $l, $settings, $user;
     // Are they allowed to update categories?
     if (can('manage_forum_edit')) {
       $rows = array();
+      // Loop through each category, so we can save it
       foreach ($_POST['cat_name'] as $cat_id => $name) {
         $cat_id = (int)$cat_id;
         $name = clean($name);
@@ -121,15 +123,16 @@ global $cmsurl, $db_prefix, $l, $settings, $user;
       c.cid, c.corder, c.cname
     FROM {$db_prefix}categories AS c
     ORDER BY c.corder ASC");
-  $cats = array();
+  // Define an array
+  $settings['cats'] = array();
+  // Loop through each :)
   while ($row = mysql_fetch_assoc($result)) {
-    $cats[] = array(
+    $settings['cats'][] = array(
       'id' => $row['cid'],
       'order' => $row['corder'],
       'name' => $row['cname']
     );
   }
-  $settings['cats'] = $cats;
   $settings['page']['title'] = $l['managecats_title'];
   loadTheme('ManageForum','ShowCats');
 }
@@ -277,6 +280,7 @@ global $cmsurl, $db_prefix, $forumperms, $l, $settings, $user;
         redirect('index.php?action=admin;sa=forum;fa=boards');
       }
       if (!empty($_REQUEST['update_boards'])) {
+        // Looks like we need to update a board... Ok!
         $result = sql_query("SELECT * FROM {$db_prefix}boards");
         while($row = mysql_fetch_assoc($result)) {
           $settings['boards'][$row['bid']] = array(
@@ -376,7 +380,7 @@ global $cmsurl, $db_prefix, $forumperms, $l, $settings, $user;
 // A quick function to help out :P
 function isSelected($cid) {
 global $settings;
-  if($cid==$settings['board']['cid'])
+  if($cid == $settings['board']['cid'])
     return true;
   else
     return false;

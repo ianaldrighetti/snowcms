@@ -36,7 +36,8 @@ global $cmsurl, $db_prefix, $l, $settings, $source_dir, $user;
   // This variable will be set if redirection is required to stop IE showing an alert if refreshed
   if (@$_REQUEST['redirect'] == 'admin')
     redirect('index.php?action=admin');
-  
+
+  // Can they administrate the forum? :P
   if(can('admin')) {
     if(!empty($_REQUEST['sa'])) {
       $sa = array(
@@ -76,6 +77,8 @@ function AdminHome() {
 global $cmsurl, $db_prefix, $l, $settings, $source_dir, $user;
   
   // Get the control panel menu options
+  // By adding it to the array if they are
+  // allowed to do so...
   $options = array();
   if (can('manage_pages'))
     $options[] = 'pages';
@@ -100,9 +103,11 @@ global $cmsurl, $db_prefix, $l, $settings, $source_dir, $user;
   if (can('maintain'))
     $options[] = 'maintain';
   
+  // Save them so we can use them ;D
   $settings['page']['options'] = $options;
   
   // With cURL (If the curl_init function exists) get the latest version of SnowCMS and Latest News
+  // Soon this will be turned into a function, and I hope to have a fsockopen option too :)
   $settings['page']['news'] = null;
   if(function_exists('curl_init')) {
     $curl = curl_init('http://news.snowcms.com/latest.txt');
@@ -111,8 +116,9 @@ global $cmsurl, $db_prefix, $l, $settings, $source_dir, $user;
 	    curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
 	    curl_setopt($curl, CURLOPT_TIMEOUT, 3);
 	  $settings['latest_version'] = 'v' . curl_exec($curl);
-	  // Close the cURL Connection
-	  curl_close($curl);    
+	  // Close the cURL Connection, we don't want it open ;)
+	  curl_close($curl); 
+	  // Now the news for SnowCMS ;)!   
     $curl = curl_init('http://news.snowcms.com/v0.x-line/news.txt');
       curl_setopt($curl, CURLOPT_HEADER, false);
 	    curl_setopt($curl, CURLOPT_VERBOSE, false);
@@ -128,11 +134,12 @@ global $cmsurl, $db_prefix, $l, $settings, $source_dir, $user;
     $settings['page']['title'] = $l['admin_title'];
     loadTheme('Admin');
 	}
-	// We didn't try because you don't have cURL as far as we can tell :(
 	else {
+	  // We didn't try because you don't have cURL as far as we can tell :(
+	  // Oh well... we will use a frame... o.O
 	  $settings['latest_version'] = $l['admin_version_unavailable'];
 	  $settings['page']['title'] = $l['admin_title'];
-	  $settings['page']['news_url'] = "http://news.snowcms.com/v0.x-line/news.txt";
+	  $settings['page']['news_url'] = 'http://news.snowcms.com/v0.x-line/news.txt';
     loadTheme('Admin','NocURL');
 	}
 }

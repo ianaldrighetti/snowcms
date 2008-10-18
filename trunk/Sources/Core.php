@@ -21,7 +21,6 @@ global $db_prefix, $settings;
   $result = sql_query("SELECT * FROM {$db_prefix}settings");
     while($row = mysql_fetch_assoc($result)) 
       $settings[$row['variable']] = $row['value'];
-  return $settings;
 } 
 
 // Instead of using addslashes and or mysql_real_escape_string, we use this mostly to sanitize
@@ -105,8 +104,6 @@ global $db_prefix, $user, $cookie_prefix;
     $row = mysql_fetch_assoc($result);
     redirect('index.php?action=logout;sc='.$row['sc']);
   }
-  
-  return $user;
 }
 
 // This function makes it all easy =D
@@ -166,8 +163,6 @@ global $cmsurl, $l, $language_dir, $settings, $theme_dir, $user, $db_prefix, $co
     loadTheme('Error','LanguageError');
     exit;
   }
-  
-  return $l;
 }
 
 // This function loads the Theme file requested in a Source File, More comment inside :P
@@ -241,47 +236,53 @@ global $cmsurl, $l, $theme_dir, $settings;
 // Loads up the permissions into an array, so we can know what you can and can't do :)
 function loadPerms() {
 global $db_prefix, $perms, $user, $forumperms;
-  
+  // Set an array, so we don't get any possible
+  // PHP Notices later
   $perms = array();
+  // Set the current users group as an array too, just incase
   $perms[$user['group']] = array();
-  $result = sql_query("SELECT * FROM {$db_prefix}permissions") or die(mysql_error());
-    while($row = mysql_fetch_assoc($result)) {
-      $perms[$row['group_id']][$row['what']] = $row['can'] ? true : false;
-    }
-  return $perms;
+  // Select them!
+  $result = sql_query("SELECT * FROM {$db_prefix}permissions");
+  while($row = mysql_fetch_assoc($result)) {
+    $perms[$row['group_id']][$row['what']] = $row['can'] ? true : false;
+  }
 }
 
 // Loads up the permissions, except this is for the forum permissions,
 // So we can make sure you are allowed to edit/delete/move/etc
 function loadBPerms() {
 global $bperms, $db_prefix, $user, $forumperms;
-  
+  // Set an array
   $bperms = array();
+  // Set their group as an array too
   $bperms[$user['group']] = array();
-  $result = sql_query("SELECT * FROM {$db_prefix}board_permissions") or die(mysql_error());
-    while($row = mysql_fetch_assoc($result)) {
-      $bperms[$row['group_id']][$row['bid']][$row['what']] = $row['can'] ? true : false;
-    }
-  return $bperms;
+  // Load 'em up!
+  $result = sql_query("SELECT * FROM {$db_prefix}board_permissions");
+  // Loop through them, and save them to the array
+  while($row = mysql_fetch_assoc($result)) {
+    $bperms[$row['group_id']][$row['bid']][$row['what']] = $row['can'] ? true : false;
+  }
 }
 
 // Load all the menus, both the sidebar menu (if there is one) and the main one (If there is one :P)
 function loadMenus() {
 global $db_prefix, $settings, $user;
-  
+  // Setup a couple variables as an array...
   $menu = array();
   $menu['main'] = array();
   $menu['side'] = array();
-  $result = sql_query("SELECT * FROM {$db_prefix}menus ORDER BY `order` ASC") or die(mysql_error());
-  if (mysql_num_rows($result)) {  
+  $result = sql_query("SELECT * FROM {$db_prefix}menus ORDER BY `order` ASC");
+  // No point of continuing if no links...
+  if(mysql_num_rows($result)) {  
     while ($row = mysql_fetch_assoc($result)) {
+      // Who can view it?
       if ($row['permission'] == 1 || // Everyone
          ($row['permission'] == 2 && $user['is_guest']) || // Guests only
          ($row['permission'] == 3 && !$user['is_guest']) || // Members only
          ($row['permission'] == 4 && can('admin')) || // Admin only
          ($row['permission'] == 5 && !$user['is_guest'] && !$user['unread_pms']) || // No new messages
          ($row['permission'] == 6 && !$user['is_guest'] && $user['unread_pms'])) { // New messages
-        if ($row['menu'] == 1 || $row['menu'] == 3) {
+        if($row['menu'] == 1 || $row['menu'] == 3) {
           // This one goes on the main menu...
           $menu['main'][] = array(
             'id' => $row['link_id'],
@@ -292,13 +293,13 @@ global $db_prefix, $settings, $user;
             'menu' => $row['menu']
           );
         }
-        if ($row['menu'] == 2 || $row['menu'] == 3) {
+        if($row['menu'] == 2 || $row['menu'] == 3) {
           // And this little piggy goes on the sidebar menu
           $menu['side'][] = array(
             'id' => $row['link_id'],
             'order' => $row['order'],
-            'name' => str_replace('%unread_pms%',$user['unread_pms'],$row['link_name']),
-            'href' => str_replace('%sc%',$user['sc'],$row['href']),
+            'name' => str_replace('%unread_pms%', $user['unread_pms'], $row['link_name']),
+            'href' => str_replace('%sc%', $user['sc'], $row['href']),
             'target' => $row['target'] ? 'target="_blank"' : '',
             'menu' => $row['menu']
           );        
@@ -306,6 +307,7 @@ global $db_prefix, $settings, $user;
       }
     }
   }
+  // Save it to the settings array for later use...
   $settings['menu'] = $menu;
 }
 
@@ -322,8 +324,10 @@ global $db_prefix, $settings, $user;
   // Only if they are not logging in at step two
   if (@$_REQUEST['action'] != 'login2') {
     // We deleted theirs, now make a new one
-    $url_data = @addslashes(addslashes(serialize($_GET)));
+    $url_data = (!empty($_GET) && is_array($_GET)) ? addslashes(addslashes(serialize($_GET))) : '';
+    // They in the forum?
     $inForum = (defined('InForum') && InForum == true) ? 1 : 0;
+    // Now put it in, or replace it with an old one...
     sql_query("REPLACE INTO {$db_prefix}online (`user_id`,`sc`,`ip`,`url_data`,`inForum`,`last_active`) VALUES('{$user['id']}','". clean(session_id()). "','{$user['ip']}','{$url_data}','{$inForum}','".time()."')");
   }
   // They have just finished logging in, so delete references to them as a guest
@@ -407,6 +411,7 @@ global $db_prefix;
       $string = mkstring();
       $result = sql_query("SELECT * FROM {$db_prefix}members WHERE `sc` = '{$string}'");
     }
+    // Got it! Now set it to the session and the user name...
     $_SESSION['sc'] = $string;
     sql_query("UPDATE {$db_prefix}members SET `sc` = '$string' WHERE `id` = '{$_SESSION['id']}'");
   }
@@ -418,15 +423,15 @@ global $db_prefix;
 function mkstring() {
   // Randomly choose how long the session id will be
   $length = rand(40,50);
+  // Allowed characters ;)
   $chars = "GhHiIjJyYzAbvlLmMnTuaBcC78NoOpPqWxVwuXZ023eE1f45kKUvU69QStrRsdDFg";
   srand((double)microtime()*1000000);
-  $i = 0;
   $string = '';
-  while ($i <= ($length-1)) {
+  // Make it now, how long? Nobody knows!
+  for($i = 0; $i < $length; $i++) {
     $num = rand() % 33;
     $tmp = substr($chars, $num, 1);
     $string = $string.$tmp;
-    $i++;
   }
   // Returns it to the place it was called upon
   return $string;
@@ -434,8 +439,10 @@ function mkstring() {
 // Formats the time with the time format in settings If timestamp is unset, get the current time
 function formattime($timestamp = 0, $timedate = 0) {
 global $settings;
+  // No time stamp? (10 digit number), set the current...
   if(!$timestamp)
     $timestamp = time();
+  // How should it be formatted? There are a few ways...
   switch ($timedate) {
     case 0: return date($settings['dateformat'], $timestamp); break;
     case 1: return date($settings['timeformat'], $timestamp); break;
@@ -728,8 +735,17 @@ global $l, $settings, $theme_dir, $theme_url;
 
 // Our Version of mysql_query(), this function looks sad right now, but will be improved sooner or later...
 function sql_query($query) {
+global $num_queries;
+  // Number of MySQL Queries?
+  $num_queries = isset($num_queries) ? $num_queries + 1 : 0;
   $result = mysql_query($query);
   if(!$result) {
+    /*
+      NOTE:
+      The way errors are logged will be changed in probably
+      SnowCMS v0.8, maybe even in SunSpot, but most likely
+      not until v0.8 :)
+    */
     // Oh noes! An SQL Error maybe? We don't want to die(mysql_error()); but we should save these errors in a file ;)
     if(!file_exists('error_log.log')) 
       @file_put_contents('error_log.log', mysql_error()."\n");
@@ -739,6 +755,7 @@ function sql_query($query) {
       @file_put_contents('error_log.log', $errors);
     }
   }
+  // Return it now =-D
   return $result;
 }
 
@@ -768,8 +785,12 @@ echo '
 }
 
 // A simple function to redirect
-function redirect($relative_url) {
+function redirect($relative_url = false) {
 global $cmsurl;
+  // If its false, then redirect to the index.php
+  if($relative_url === false)
+    $relative_url = 'index.php';
+  // Now redirect XD
   header("Location: {$cmsurl}{$relative_url}");
   exit;
 }
@@ -777,9 +798,10 @@ global $cmsurl;
 // Validates if the Session ID matches that of the users...
 function ValidateSession($sc) {
 global $db_prefix, $user;
+  // Select the current user id
   $result = sql_query("SELECT `sc` FROM {$db_prefix}members WHERE `id` = '{$user['id']}'");
+  // Get it...
   $row = mysql_fetch_assoc($result);
-  mysql_free_result($result);
   // This is simple :D
   if($sc == $row['sc'])
     return true;
@@ -877,6 +899,7 @@ global $cmsurl, $db_prefix, $settings, $user;
                                 'name' => $settings['site_name'],
                                 'href' => $cmsurl.'forum.php'
                               );     
+    // Get out the stuff we need
     $result = sql_query("
       SELECT
         t.tid, t.bid, t.first_msg, msg.subject, msg.mid, b.bid, b.name, b.who_view
@@ -907,11 +930,11 @@ global $db_prefix, $user, $cookie_prefix;
     // Oh wait, it is
     $language = clean(@$_POST['change-language']);
     // If they are a user, it can be saved, however, if it is a guest, it can only be done via a cookie
-    if ($user['is_logged'] == true)
+    if ($user['is_logged'])
       sql_query("UPDATE {$db_prefix}members SET `language` = '$language' WHERE `id` = '{$user['id']}'");
     else
-      setcookie($cookie_prefix.'change-language',$language,time()+60*60*24*365);
-    
+      setcookie($cookie_prefix.'change-language', $language, time()+60*60*24*365);
+    // Set the users language....
     $user['language'] = $language;
   }
 }
@@ -919,9 +942,9 @@ global $db_prefix, $user, $cookie_prefix;
 // Return the post's owner
 function PostOwner($post) {
 global $db_prefix;
-  
-  $post = clean($post);
-  $post = mysql_fetch_assoc(sql_query("SELECT * FROM {$db_prefix}messages WHERE `mid` = '$post'"));
+  // Simple cleaning, but it does the job :P
+  $post = (int)$post;
+  $post = mysql_fetch_assoc(sql_query("SELECT * FROM {$db_prefix}messages WHERE `mid` = $post"));
   return $post['uid'];
 }
 
@@ -936,17 +959,19 @@ function hideEmail($email) {
     $return = preg_replace('/(.+)@(.*)/','$1...@$2',$email);
   if ($return == $email)
     $return = preg_replace('/.*@(.*)/','...@$1',$email);
-  
+  // Return the hidden email address now
   return $return;
 }
 
 // Check if their IP has been banned
 function checkIP() {
 global $l, $settings, $db_prefix;
+  // Get their IP Address
   $ip = @$_SERVER['HTTP_X_FORWARDED_FOR'] ? $_SERVER['HTTP_X_FORWARDED_FOR'] : $_SERVER['REMOTE_ADDR'];
+  // Now their IP Range...
   $ip_range = preg_replace('/^([12]?[0-9]{1,2}\.[12]?[0-9]{1,2}\.[12]?[0-9]{1,2}\.)[12]?[0-9]{1,2}/','$1',$ip);
-  if (mysql_fetch_assoc(sql_query("SELECT * FROM {$db_prefix}banned_ips WHERE `ip` = '$ip'")) ||
-      mysql_fetch_assoc(sql_query("SELECT * FROM {$db_prefix}banned_ips WHERE `ip` = '$ip_range'"))) {
+  // Is either their IP or IP Range banned?
+  if (mysql_fetch_assoc(sql_query("SELECT * FROM {$db_prefix}banned_ips WHERE `ip` = '$ip' OR `ip` = '$ip_range'"))) {
     echo 'Your IP address is banned.';
     exit;
   }

@@ -114,8 +114,6 @@ global $cmsurl, $db_prefix, $l, $settings, $user;
         WHERE t.tid = '$Topic_ID'
         ORDER BY msg.mid ASC LIMIT $start, {$settings['num_posts']}");
         while ($row = mysql_fetch_assoc($result)) {
-          if ($row['display_name'] != null)
-            $row['username'] = $row['display_name'];
           $posts[] = array(
             'tid' => $row['tid'],
             'mid' => $row['mid'],
@@ -374,7 +372,7 @@ function del($uid, $can) {
 global $db_prefix, $user;
   if(!$can)
     return false;
-  elseif($uid==$user['id'] && $can)
+  elseif($uid == $user['id'] && $can)
     return true;
   else
     return false;
@@ -383,14 +381,14 @@ function edit($uid, $can) {
 global $db_prefix, $user;
   if(!$can)
     return false;
-  elseif($uid==$user['id'] && $can)
+  elseif($uid == $user['id'] && $can)
     return true;
   else
     return false;
 }
 function Splitable($first_msg, $mid, $can) {
 global $user;
-  if($first_msg==$mid)
+  if($first_msg == $mid)
     return false;
   elseif($can)
     return true;

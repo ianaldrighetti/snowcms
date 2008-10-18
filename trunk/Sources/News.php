@@ -52,13 +52,14 @@ global $cmsurl, $db_prefix, $l, $settings, $user;
     if ($cat = (int)@$_REQUEST['cat'])
       $cat = "WHERE `cat_id` = '$cat'";
     else
-      $cat = "";
+      $cat = '';
     
     $result = sql_query("
       SELECT
-        *, mem.display_name AS username, IFNULL(mem.display_name, mem.username) AS username
+        *, n.cat_id, mem.display_name AS username, IFNULL(mem.display_name, mem.username) AS username
       FROM {$db_prefix}news AS n
         LEFT JOIN {$db_prefix}members AS mem ON mem.id = n.poster_id
+        LEFT JOIN {$db_prefix}news_categories AS nc ON nc.cat_id = n.cat_id
       $cat
       ORDER BY n.post_time DESC
       LIMIT $start, {$settings['num_news_items']}");
@@ -66,14 +67,13 @@ global $cmsurl, $db_prefix, $l, $settings, $user;
     // Is there even any news? :O
     if (mysql_num_rows($result)) {
       while ($row = mysql_fetch_assoc($result)) {
-        $category = mysql_fetch_assoc(sql_query("SELECT * FROM {$db_prefix}news_categories WHERE `cat_id` = '{$row['cat_id']}'"));
         $news[] = array(
           'id' => $row['news_id'],
           'poster_id' => $row['poster_id'],
           'poster_name' => $row['username'],
           'subject' => $row['subject'],
-          'cat_id' => $category['cat_id'],
-          'cat_name' => $category['cat_name'],
+          'cat_id' => $row['cat_id'],
+          'cat_name' => $row['cat_name'],
           'body' => stripslashes($row['body']),
           'user_id' => $row['id'],
           'username' => $row['username'],
@@ -86,10 +86,7 @@ global $cmsurl, $db_prefix, $l, $settings, $user;
       
       // Total amount of news articles
       $news_count = sql_query("SELECT * FROM {$db_prefix}news $cat");
-      $total_news = 0;
-      while (mysql_fetch_assoc($news_count)) {
-        $total_news += 1;
-      }
+      $total_news = mysql_num_rows($news_count);
       // The current page number
       $settings['page']['page'] = $page;
       // The last page number
@@ -120,10 +117,7 @@ global $cmsurl, $db_prefix, $l, $settings, $user;
       $settings['page']['next_page'] = $page + 1;
       // Total amount of news articles
       $news_count = sql_query("SELECT * FROM {$db_prefix}news $cat");
-      $settings['page']['total_news'] = 0;
-      while (mysql_fetch_assoc($news_count)) {
-        $settings['page']['total_news'] += 1;
-      }
+      $settings['page']['total_news'] = mysql_num_rows($news_count);
       
       // The current category
       $settings['page']['cat'] = @$_REQUEST['cat'];

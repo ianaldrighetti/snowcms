@@ -22,16 +22,18 @@ global $cmsurl, $db_prefix, $l, $settings, $user;
   if(can('view_forum')) {
     // Get All the categories! :D!
     $result = sql_query("SELECT * FROM {$db_prefix}categories ORDER BY `corder` ASC");
+    // Set an array, just incase there are none
     $cats = array();
-      while($row = mysql_fetch_assoc($result)) {
-        $cats[$row['cid']] = array(
-          'id' => $row['cid'],
-          'name' => $row['cname'],
-          'boards' => array()
-        );
-      }
+    // Loop through the categories, and have an array for the boards
+    while($row = mysql_fetch_assoc($result)) {
+      $cats[$row['cid']] = array(
+        'id' => $row['cid'],
+        'name' => $row['cname'],
+        'boards' => array()
+      );
+    }
     // Query for the boards! LEFT JOINs galore!
-    // !!! Needs Improvement :)
+    // Not really :P more Left Joins in Board.php :P
     $result = sql_query("
       SELECT 
         b.bid AS board_id, b.name, b.bdesc, b.who_view, b.numtopics, b.numposts, b.last_msg, b.last_uid, b.last_name, b.cid, log.uid AS is_new, log.bid,
@@ -42,11 +44,8 @@ global $cmsurl, $db_prefix, $l, $settings, $user;
         LEFT JOIN {$db_prefix}members AS mem ON mem.id = msg.uid
       WHERE {$user['board_query']}
       ORDER BY b.border ASC");
+      // Add the board to the respective category :p
       while($row = mysql_fetch_assoc($result)) {  
-      if(isset($row['is_new']) || !$row['numtopics'])
-        $new = false;
-      else
-        $new = true;
         $cats[$row['cid']]['boards'][$row['board_id']] = array(
           'id' => $row['board_id'],
           'name' => $row['name'],
@@ -54,7 +53,7 @@ global $cmsurl, $db_prefix, $l, $settings, $user;
           'who_view' => @explode(",", $row['who_view']),
           'topics' => $row['numtopics'],
           'posts' => $row['numposts'],
-          'is_new' => $new,
+          'is_new' => (isset($row['is_new']) || !$row['numtopics']) ? false : true,
           'last_post' => array(
                            'tid' => $row['tid'],
                            'mid' => $row['mid'],

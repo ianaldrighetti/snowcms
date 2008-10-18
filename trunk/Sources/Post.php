@@ -173,6 +173,8 @@ global $cmsurl, $db_prefix, $l, $settings, $user;
         // Update a few things :o like post count, number of posts and topics inside the board  
         sql_query("UPDATE {$db_prefix}members SET `numposts` = numposts + 1 WHERE `id` = '{$user['id']}'");
         sql_query("UPDATE {$db_prefix}boards SET `numtopics` = numtopics + 1, `numposts` = numposts + 1, `last_msg` = '$msg_id', `last_uid` = '{$user['id']}', `last_name` = '{$user['name']}' WHERE `bid` = '$Board_ID'");
+        // Insert a row to show they have posted here :)
+        sql_query("REPLACE INTO {$db_prefix}message_logs (`uid`,`tid`,`mid`) VALUES('{$user['id']}','$topic_id','$msg_id')");
         // Delete anything from board logs with the board ID of $Board_ID, there is a new post in town!
         sql_query("DELETE FROM {$db_prefix}board_logs WHERE `bid` = '$Board_ID' AND `uid` != '{$user['id']}'");
         // Log that this member has viewed this topic
@@ -273,6 +275,8 @@ global $cmsurl, $db_prefix, $l, $settings, $user;
           sql_query("DELETE FROM {$db_prefix}board_logs WHERE `bid` = '$board_id' AND `uid` != '{$user['id']}'");
           // Delete anything from topic logs with the topic ID of $Topic_ID, unless they are th current member
           sql_query("DELETE FROM {$db_prefix}topic_logs WHERE `tid` = '$Topic_ID' AND `uid` != '{$user['id']}'");
+          // Show they posted in this topic =D
+          sql_query("REPLACE INTO {$db_prefix}message_logs (`uid`,`tid`,`mid`) VALUES('{$user['id']}','$Topic_ID','$msg_id')");
           unset($_SESSION['subject'], $_SESSION['body'], $_SESSION['sticky'], $_SESSION['locked'], $_SESSION['board']);
           redirect("forum.php?board={$board_id}");
         }

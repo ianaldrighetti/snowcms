@@ -402,56 +402,46 @@ global $l, $db_prefix, $user, $settings, $cookie_prefix;
 
 function activate() {
 global $db_prefix, $l;
-  
+  // Simply activate the user...
   if (!ValidateSession(@$_REQUEST['sc']) || !@$_REQUEST['u'] || !can('moderate_activate'))
     die("Hacking Attempt...");
-  
   sql_query("UPDATE {$db_prefix}members SET `activated` = '1' WHERE `id` = '{$_REQUEST['u']}'") or ($_SESSION['error'] = $l['managemembers_error_activate']);
-  
   redirect('index.php?action=admin;sa=members;u='.clean_header($_REQUEST['u']));
 }
 
 function suspend() {
 global $db_prefix, $l;
-  
+  // Suspend the user, for as long as I say >:D
   if (!ValidateSession(@$_REQUEST['sc']) || !@$_REQUEST['u'] || !can('moderate_unsuspend'))
     die("Hacking Attempt...");
-  
   sql_query("UPDATE {$db_prefix}members SET `suspension` = '" . (time()+@$_REQUEST['suspension']*60*60) . "' WHERE `id` = '{$_REQUEST['u']}'") or ($_SESSION['error'] = $l['managemembers_error_suspension']);
-  
   redirect('index.php?action=admin;sa=members;u='.clean_header($_REQUEST['u']));
 }
 
 function unsuspend() {
 global $db_prefix, $l;
-  
+  // Unsuspend them, they must have been good :P
   if (!ValidateSession(@$_REQUEST['sc']) || !@$_REQUEST['u'] || !can('moderate_unsuspend'))
     die("Hacking Attempt...");
-  
   sql_query("UPDATE {$db_prefix}members SET `suspension` = '".time()."' WHERE `id` = '{$_REQUEST['u']}'") or ($_SESSION['error'] = $l['managemembers_error_unsuspend']);
-  
   redirect('index.php?action=admin;sa=members;u='.clean_header($_REQUEST['u']));
 }
 
 function ban() {
 global $db_prefix, $l;
-  
+  // Ban them... No chance of payroll! lol
   if (!ValidateSession(@$_REQUEST['sc']) || !@$_REQUEST['u'] || !can('moderate_ban'))
     die("Hacking Attempt...");
-  
   sql_query("UPDATE {$db_prefix}members SET `banned` = '1' WHERE `id` = '{$_REQUEST['u']}'") or ($_SESSION['error'] = $l['managemembers_error_ban']);
-  
   redirect('index.php?action=admin;sa=members;u='.clean_header($_REQUEST['u']));
 }
 
 function unban() {
 global $db_prefix, $l;
-  
+  // Unban them, I thought there was no chance? :(
   if (!ValidateSession(@$_REQUEST['sc']) || !@$_REQUEST['u'] || !can('moderate_unban'))
     die("Hacking Attempt...");
-  
   sql_query("UPDATE {$db_prefix}members SET `banned` = '0' WHERE `id` = '{$_REQUEST['u']}'") or ($_SESSION['error'] = $l['managemembers_error_unban']);
-  
   redirect('index.php?action=admin;sa=members;u='.clean_header($_REQUEST['u']));
 }
 ?>

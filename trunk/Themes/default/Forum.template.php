@@ -66,11 +66,11 @@ global $settings;
 
 // The forum footer function, you can change the copyright here, though we will have a setting to do that soon
 function forum_footer() {
-global $l, $cmsurl, $theme_url, $settings, $user;
+global $l, $cmsurl, $theme_url, $settings, $user, $num_queries;
 echo link_tree().'
   </div>
   <div class="footer">
-    <p>'.str_replace('%snowcms%','<a href="http://www.snowcms.com/" onClick="window.open(this.href); return false;">SnowCMS '.$settings['version'].'</a>',$l['main_powered_by']).' | '.str_replace('%whom%','<a href="http://www.snowcms.com/" onclick="window.open(this.href); return false;">The SnowCMS Team</a>',$l['main_theme_by']).'</p>
+    <p>'.str_replace('%snowcms%','<a href="http://www.snowcms.com/" onClick="window.open(this.href); return false;">SnowCMS '.$settings['version'].'</a>',$l['main_powered_by']).' | '.str_replace('%whom%','<a href="http://www.snowcms.com/" onclick="window.open(this.href); return false;">The SnowCMS Team</a>',$l['main_theme_by']).' | ', str_replace('%queries%', $num_queries, $l['page_made']), '</p>
   </div>
 </div>
 </body>

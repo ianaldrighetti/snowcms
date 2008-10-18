@@ -36,47 +36,42 @@ global $cmsurl, $db_prefix, $l, $settings, $user;
     // So does it exist / Can they view it?
     if(mysql_num_rows($result)) {
       $board = mysql_fetch_assoc($result);
+      // We can only keep track of new/old boards with members :)
       if($user['is_logged']) {
-        $result = sql_query("SELECT * FROM {$db_prefix}board_logs WHERE `bid` = '$board_id' AND `uid` = '{$user['id']}'");
-          if(mysql_num_rows($result)==0) {
-            sql_query("
-              REPLACE INTO {$db_prefix}board_logs
-				        (`bid`,`uid`)
-	            VALUES ($board_id, {$user['id']})");
-	        }
+        // Replace it
+        sql_query("
+          REPLACE INTO {$db_prefix}board_logs
+				    (`bid`,`uid`)
+	        VALUES ($board_id, {$user['id']})");
 	      }
 	      $start = (int)@$_REQUEST['pg'] * $settings['num_topics'];
+        // :O Look at that honkin query! ITS HUGE!!!!!!!!!
         $result = sql_query("
           SELECT 
-            t.tid, t.sticky, t.locked, t.bid, t.first_msg, t.last_msg, IFNULL(t.last_msg, t.first_msg) AS last_msg, t.topic_starter, t.topic_ender AS topic_ender, IFNULL(t.topic_ender, t.topic_starter) AS topic_ender, t.num_replies, log.uid AS is_new, log.tid,
+            t.tid AS topic_id, t.sticky, t.locked, t.bid, t.first_msg, t.last_msg, IFNULL(t.last_msg, t.first_msg) AS last_msg, t.topic_starter, t.topic_ender AS topic_ender, IFNULL(t.topic_ender, t.topic_starter) AS topic_ender, t.num_replies, log.uid AS is_new, log.tid,
             t.numviews, t.starter_id, t.ender_id, IFNULL(t.ender_id, t.starter_id) AS ender_id, msg.mid, msg.tid, msg.uid, msg.subject, msg.post_time, msg.poster_name,
             msg2.mid AS mid2, IFNULL(msg2.mid, msg.mid) AS mid2, msg2.uid AS uid2, IFNULL(msg2.uid, msg.uid) AS uid2, 
             msg2.subject AS subject2, IFNULL(msg2.subject, msg.subject) AS subject2, msg2.post_time AS last_post_time, IFNULL(msg2.post_time, msg.post_time) AS last_post_time,
             msg2.poster_name AS poster_name2, IFNULL(msg2.poster_name, msg.poster_name) AS poster_name2,
-            mem.display_name AS username, IFNULL(mem.display_name, mem.username) AS username,
-            mem2.display_name AS username2, IFNULL(mem2.display_name, mem2.username) AS username2
+            mem.display_name AS username, IFNULL(mem.display_name, mem.username) AS username, ml.uid, ml.tid, ml.mid AS is_own,
+            IFNULL(ml.mid, 0) AS is_own,mem2.display_name AS username2, IFNULL(mem2.display_name, mem2.username) AS username2
           FROM {$db_prefix}topics AS t
             LEFT JOIN {$db_prefix}messages AS msg ON msg.mid = t.first_msg
             LEFT JOIN {$db_prefix}messages AS msg2 ON msg2.mid = t.last_msg
             LEFT JOIN {$db_prefix}members AS mem ON mem.id = t.starter_id
             LEFT JOIN {$db_prefix}members AS mem2 ON mem2.id = t.ender_id
             LEFT JOIN {$db_prefix}topic_logs AS log ON log.uid = {$user['id']} AND log.tid = t.tid
+            LEFT JOIN {$db_prefix}message_logs AS ml ON (ml.uid = {$user['id']} AND ml.tid = t.tid)
           WHERE 
             t.bid = $board_id
           ORDER BY t.sticky DESC, last_post_time DESC
           LIMIT $start, {$settings['num_topics']}");
+        // Define topics as an array
         $topics = array();
+        // Loop through them, if there are any...
         while($row = mysql_fetch_assoc($result)) {
-          if(isset($row['is_new']))
-            $new = false;
-          else
-            $new = true;
-          if (mysql_num_rows(sql_query("SELECT * FROM {$db_prefix}messages WHERE `tid` = '{$row['tid']}' AND `uid` = '{$user['id']}'")))
-            $own = true;
-          else
-            $own = false;
           $topics[] = array(
-            'tid' => $row['tid'],
+            'tid' => $row['topic_id'],
             'subject' => $row['subject'],
             'sticky' => $row['sticky'],
             'locked' => $row['locked'],
@@ -85,8 +80,8 @@ global $cmsurl, $db_prefix, $l, $settings, $user;
             'numReplies' => $row['num_replies'],
             'numViews' => $row['numviews'],
             'starter_id' => $row['starter_id'],
-            'is_new' => $new,
-            'is_own' => $own,
+            'is_new' => isset($row['is_new']) ? false : true,
+            'is_own' => $row['is_own'] ? true : false,
             'last_post' => array(
                            'mid' => $row['mid2'],
                            'subject' => $row['subject2'],
@@ -96,10 +91,14 @@ global $cmsurl, $db_prefix, $l, $settings, $user;
                            'is_post' => $row['mid2'] ? true : false
                          )
           );
+          // Do some other stuff
+          // !!! Should be done in the above ARRAY!!!
           $topics[count($topics)-1]['pages'] = floor($topics[count($topics)-1]['numReplies'] / $settings['num_posts'] + 1);
           $topics[count($topics)-1]['hot'] = $topics[count($topics)-1]['numReplies'] >= @$settings['hot_posts'];
         }
+        // Free the result
         mysql_free_result($result);
+        // Qhat page we on?
         $settings['page']['page'] = (int)@$_REQUEST['pg'];
         $total_topics = mysql_num_rows(sql_query("SELECT * FROM {$db_prefix}topics WHERE `bid` = '$board_id'"));
         $settings['page']['page_last'] = $total_topics / $settings['num_topics'];

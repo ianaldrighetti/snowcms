@@ -17,6 +17,16 @@ CREATE TABLE `{$db_prefix}topic_logs` (
   UNIQUE KEY (`tid`,`uid`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 
+DROP TABLE IF EXISTS `{$db_prefix}message_logs`;
+
+CREATE TABLE `{$db_prefix}message_logs` (
+  `uid` INT(11) NOT NULL,
+  `tid` INT(11) NOT NULL,
+  `mid` INT(11) NOT NULL,
+  UNIQUE KEY (`uid`,`tid`),
+  KEY (`tid`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+
 DROP TABLE IF EXISTS `{$db_prefix}board_logs`;
 
 CREATE TABLE `{$db_prefix}board_logs` (

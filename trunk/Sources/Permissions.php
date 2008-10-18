@@ -184,10 +184,12 @@ global $cmsurl, $db_prefix, $l, $settings, $user;
                                 'numperms' => 0
                               );
       }
+      // How many users are there in this group?
       $result = sql_query("SELECT `group`, COUNT(*) FROM {$db_prefix}members GROUP BY `group`");
         while ($row = mysql_fetch_assoc($result)) {
           $groups[$row['group']]['numusers'] = $row['COUNT(*)']; 
         }
+      // How many permissions does this group have?
       $result = sql_query("SELECT `group_id`, COUNT(*) FROM {$db_prefix}permissions WHERE `can` = '1' GROUP BY `group_id`");
         while ($row = mysql_fetch_assoc($result)) {
           $groups[$row['group_id']]['numperms'] = $row['COUNT(*)']; 
@@ -212,16 +214,6 @@ global $cmsurl, $db_prefix, $l, $settings, $user;
     redirect('index.php?action=admin');
 }
 
-function ForumPermissions() {
-global $cmsurl, $db_prefix, $l, $settings, $permissions, $user;
-  if(can('manage_forum_perms')) {
-  
-  }
-  else {
-    $settings['page']['title'] = $l['admin_error_title'];
-    loadTheme('Admin','Error');
-  }
-}
 function loadMID() {
 global $cmsurl, $db_prefix, $l, $settings, $permissions, $user;
   $MID = (int)addslashes(mysql_real_escape_string($_REQUEST['mid']));
@@ -232,7 +224,8 @@ global $cmsurl, $db_prefix, $l, $settings, $permissions, $user;
        LEFT JOIN {$db_prefix}membergroups AS grp ON grp.group_id = p.group_id
      WHERE grp.group_id = $MID");
   $group = sql_query("SELECT * FROM {$db_prefix}membergroups WHERE `group_id` = '$MID'");
-  if(mysql_num_rows($group)>0) {
+  if(mysql_num_rows($group)) {
+    // The group does exist...
     $settings['perms'] = array();
     while($row = mysql_fetch_assoc($result))
       $settings['perms'][$row['what']] = array(
@@ -246,6 +239,7 @@ global $cmsurl, $db_prefix, $l, $settings, $permissions, $user;
     loadTheme('Permissions','Edit');
   }
   else {
+    // That group doesn't exist!
     $settings['page']['title'] = $l['admin_error_title'];
     loadTheme('Permissions','NoGroup');
   }

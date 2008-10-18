@@ -41,6 +41,7 @@ $l['main_code'] = 'Code';
 $l['main_back'] = 'Back';
 $l['main_cancel'] = 'Cancel';
 $l['main_default'] = 'Default';
+$l['page_made'] = 'Page made with %queries% queries';
 
 // Email
 $l['mail_smtp_fail'] = 'Sending email failed! Error: %error%';
