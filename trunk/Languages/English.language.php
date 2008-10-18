@@ -40,6 +40,7 @@ $l['main_quote_from'] = 'Quote from %user%';
 $l['main_code'] = 'Code';
 $l['main_back'] = 'Back';
 $l['main_cancel'] = 'Cancel';
+$l['main_default'] = 'Default';
 
 // Email
 $l['mail_smtp_fail'] = 'Sending email failed! Error: %error%';
@@ -207,6 +208,7 @@ $l['basicsettings_language'] = 'Default Language';
 $l['basicsettings_theme'] = 'Default Theme';
 $l['basicsettings_page_type'] = 'Default Page Type';
 $l['basicsettings_account_activation'] = 'Account activation';
+$l['basicsettings_captcha'] = 'CAPTCHA strength';
 $l['basicsettings_login_threshold'] = 'Login Threshold';
 $l['basicsettings_remember_time'] = 'Default Cookie Time';
 $l['basicsettings_num_news_items'] = 'News items per page';
@@ -228,6 +230,14 @@ $l['basicsettings_value_bbcode'] = 'BBCode';
 $l['basicsettings_value_no_activation'] = 'No activation';
 $l['basicsettings_value_email_activation'] = 'Email activation';
 $l['basicsettings_value_admin_activation'] = 'Admin activation';
+$l['basicsettings_value_none'] = 'None';
+$l['basicsettings_value_nofonts_weak'] = 'Weak (No fonts)';
+$l['basicsettings_value_nofonts_medium'] = 'Medium (No fonts)';
+$l['basicsettings_value_nofonts_strong'] = 'Strong (No fonts)';
+$l['basicsettings_value_weak'] = 'Weak';
+$l['basicsettings_value_medium'] = 'Medium';
+$l['basicsettings_value_strong'] = 'Strong';
+$l['basicsettings_value_superstrong'] = 'Super Strong';
 // Settings.template.php - Mail settings
 $l['mailsettings_title'] = 'Email Settings';
 $l['mailsettings_header'] = 'Email Settings';

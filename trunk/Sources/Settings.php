@@ -65,6 +65,20 @@ global $cmsurl, $db_prefix, $l, $settings, $user, $language_dir, $theme_dir, $th
                         $l['basicsettings_value_admin_activation'], 2
                       )
         ),
+      'captcha' =>
+        array(
+          'type' => 'select',
+          'values' => array(
+                        $l['basicsettings_value_none'], 0,
+                        $l['basicsettings_value_nofonts_weak'], 1,
+                        $l['basicsettings_value_nofonts_medium'], 2,
+                        $l['basicsettings_value_nofonts_strong'], 3,
+                        $l['basicsettings_value_weak'], 4,
+                        $l['basicsettings_value_medium'], 5,
+                        $l['basicsettings_value_strong'], 6,
+                        $l['basicsettings_value_superstrong'], 7
+                      )
+        ),
       'login_threshold' =>
         array(
           'type' => 'text',

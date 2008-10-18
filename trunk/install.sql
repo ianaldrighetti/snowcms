@@ -285,6 +285,7 @@ INSERT INTO `{$db_prefix}settings` VALUES
 ('default_group','2'),
 ('login_detection_time','15'),
 ('page_type','1'),
+('captcha','5'),
 ('age_youngest','13'),
 ('search_length','255'),
 ('avatar_width','100'),
