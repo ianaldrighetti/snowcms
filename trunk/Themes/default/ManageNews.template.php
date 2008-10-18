@@ -33,13 +33,11 @@ global $l, $cmsurl;
 }
 
 function AddNews() {
-global $l, $settings, $cmsurl;
+global $l, $settings, $values, $cmsurl;
   
   echo '
   <h1>'.$l['managenews_add_header'].'</h1>
   ';
-  
-  $error_values = unserialize(@$_SESSION['error_values']);
   
   if (@$_SESSION['error'])
 	  echo '<p><b>'.$l['main_error'].':</b> '.$_SESSION['error'].'</p>';
@@ -58,7 +56,7 @@ global $l, $settings, $cmsurl;
   
   $categories = $settings['page']['categories'];
   foreach ($categories as $value) {
-    if ($value['id'] == $error_values['cat_id'])
+    if ($value['id'] == $values['cat_id'])
       echo '<option value="'.$value['id'].'" selected="selected">'.$value['name'].'</option>
     ';
     else
@@ -67,12 +65,12 @@ global $l, $settings, $cmsurl;
   }
   
   echo '</select></td></tr>
-  <tr><td>'.$l['managenews_add_subject'].':</td><td><input name="subject" value="'.$error_values['subject'].'" /></td></tr>
+  <tr><td>'.$l['managenews_add_subject'].':</td><td><input name="subject" value="'.$values['subject'].'" /></td></tr>
   </table>
   
-  <p><textarea name="body" cols="70" rows="12">'.$error_values['body'].'</textarea></p>
+  <p><textarea name="body" cols="70" rows="12">'.$values['body'].'</textarea></p>
   
-  <p><input type="checkbox" name="allow_comments" id="allow_comments"'.(!$error_values['allow_comments'] ? ' checked="checked"' : '').' /> <label for="allow_comments">'.$l['managenews_add_allowcomments'].'</label></p>
+  <p><input type="checkbox" name="allow_comments" id="allow_comments"'.(!$values['allow_comments'] ? ' checked="checked"' : '').' /> <label for="allow_comments">'.$l['managenews_add_allowcomments'].'</label></p>
   
   <p style="display: inline"><input type="submit" value="'.$l['managenews_add_submit'].'"></p>
   
