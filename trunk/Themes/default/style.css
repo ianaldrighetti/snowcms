@@ -13,7 +13,6 @@ body {
   width: 800px;
   margin-left: auto;
   margin-right: auto;
-  overflow: hidden;
   background: url('images/containerbg.png') #fff;
 }
 .header-right {

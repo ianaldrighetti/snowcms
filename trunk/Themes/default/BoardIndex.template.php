@@ -59,23 +59,26 @@ global $cmsurl, $theme_url, $l, $settings, $user;
     <div class="break">
     </div>';
   }
+  echo '
+    <br />
+    <table width="100%" id="forum_who">
+      <tr class="title">
+        <td>
+          <b><a href="index.php?action=online">', $l['forum_online'], '</a></b>
+          <span style="font-size: x-small"> - ', $settings['who_stats'], '</span>
+        </td>
+      </tr>';
+  if ($settings['members_viewing'])
     echo '
-      <br />
-      <table width="100%" id="forum_who">
-        <tr class="title">
-          <td>
-            <b><a href="index.php?action=online">', $l['forum_online'], '</a></b>
-            <span style="font-size: x-small"> - ', $settings['who_stats'], '</span>
-          </td>
-        </tr>
-        <tr>
-          <td style="font-size: x-small">
-            Users: ', implode(", ", $settings['members_viewing']), '
-          </td>
-        </tr>
-      </table>
-      <br />
-      ';
+      <tr>
+        <td style="font-size: x-small">
+          '.$l['forum_users'].': '.implode(", ",$settings['members_viewing']).'
+        </td>
+      </tr>';
+  echo '
+    </table>
+    <br />
+    ';
 }
 
 function NotAllowed() {
