@@ -1,1 +1,4 @@
-vX=function(u,f,p,x){x=window.ActiveXObject?new ActiveXObject('Microsoft.XMLHTTP'):new XMLHttpRequest();x.open(p?'POST':'GET',u,!0);p?x.setRequestHeader('Content-type','application/x-www-form-urlencoded'):0;x.onreadystatechange=function(){x.readyState==4?f?f(x.responseText,x):f:0};x.send(p)}
+var _=_?_:{}
+_.X=function(u,f,p,x){x=window.ActiveXObject?new ActiveXObject('Microsoft.XMLHTTP'):new XMLHttpRequest();x.open(p?'POST':'GET',u,!0);p?x.setRequestHeader('Content-type','application/x-www-form-urlencoded'):0;x.onreadystatechange=function(){x.readyState==4?f?f(x.responseText,x):f:0};x.send(p)}
+_.S=function(j,d){if(d)return eval('('+j+')');if(!j)return j+'';var f=arguments.callee,c=j.constructor+'',t=[];if(c.match(/array/i)){for(x in j)t.push(f(j[x]));return'['+t.join(',')+']'}if(c.match(/object/i)){for(x in j)t.push(x+':'+f(j[x]));return'{'+t.join(',')+'}'}if(c.match(/string/i))return"'"+j.replace(/\'/g,"\\'")+"'";return j}
+_.H=function(s,d){var t=document.createElement('textarea');t.innerHTML=s;return d?t.value:t.innerHTML}

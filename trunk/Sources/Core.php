@@ -941,7 +941,7 @@ global $user, $db_prefix;
     if ($bbcode = mysql_fetch_assoc(sql_query("SELECT * FROM {$db_prefix}messages LEFT JOIN {$db_prefix}boards AS b ON b.bid = {$db_prefix}messages.bid WHERE `mid` = '$bbcode' AND (FIND_IN_SET('{$user['group']}', `b`.`who_view`) OR '{$user['group']}' = '1')"))) {
       echo '{
       poster_name: "'.str_replace('"','\\"',$bbcode['poster_name']).'", 
-      bbcode: "'.str_replace('"','\\"',$bbcode['body']).'", 
+      bbcode: "'.urlencode($bbcode['body']).'", 
       post_time: "'.str_replace('"','\\"',$bbcode['post_time']).'", 
       }';
       exit;
@@ -952,9 +952,9 @@ global $user, $db_prefix;
   elseif ($html = @$_REQUEST['html']) {
     if ($html = mysql_fetch_assoc(sql_query("SELECT * FROM {$db_prefix}messages LEFT JOIN {$db_prefix}boards AS b ON b.bid = {$db_prefix}messages.bid WHERE `mid` = '$html' AND (FIND_IN_SET('{$user['group']}', `b`.`who_view`) OR '{$user['group']}' = '1')"))) {
       echo '{
-      poster_name: "'.str_replace('"','\\"',$bbcode['poster_name']).'", 
-      html: "'.str_replace('"','\\"',bbc($bbcode['body'])).'", 
-      post_time: "'.str_replace('"','\\"',$bbcode['post_time']).'", 
+      poster_name: "'.str_replace('"','\\"',$html['poster_name']).'", 
+      html: "'.urlencode(bbc($html['body'])).'", 
+      post_time: "'.str_replace('"','\\"',$html['post_time']).'", 
       }';
       exit;
     }
