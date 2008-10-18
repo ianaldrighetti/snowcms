@@ -70,10 +70,51 @@ global $l, $cmsurl, $theme_url, $settings, $user, $num_queries;
 echo link_tree().'
   </div>
   <div class="footer">
+      ';
+languageOption();
+echo '
     <p>'.str_replace('%snowcms%','<a href="http://www.snowcms.com/" onClick="window.open(this.href); return false;">SnowCMS '.$settings['version'].'</a>',$l['main_powered_by']).' | '.str_replace('%whom%','<a href="http://www.snowcms.com/" onclick="window.open(this.href); return false;">The SnowCMS Team</a>',$l['main_theme_by']).' | ', str_replace('%queries%', $num_queries, $l['page_made']), '</p>
   </div>
 </div>
 </body>
 </html>';
+}
+
+function languageOption() {
+global $user, $settings, $l, $db_prefix, $language_dir, $cmsurl, $cookie_prefix;
+  
+  // Check how many languages there are
+  $total_languages = 0;
+  foreach (scandir($language_dir) as $language)
+    if (substr($language,0,1) != '.')
+      $total_languages += 1;
+  
+  // Only show the change language form if there are at least two
+  if ($total_languages > 1) {
+    // Get the current language
+    $current_language = clean($user['language'] ? $user['language'] : (@$_COOKIE[$cookie_prefix.'change-language'] ? @$_COOKIE[$cookie_prefix.'change-language'] : $settings['language']));
+    
+    echo '<form action="'.$_SERVER['REQUEST_URI'].'" method="post" class="language-option"><p>
+    <select name="change-language">
+    ';
+    
+    foreach (scandir($language_dir) as $language)
+      if (substr($language,0,1) != '.') {
+        $l_temp = $l;
+        include $language_dir.'/'.$language;
+        if ($current_language.'.language.php' == $language)
+          echo '<option value="'.strrev(substr(strrev($language),strlen(strstr($language,'.language.php')),strlen($language))).'" selected="selected">'.$l['language_name'].'</option>
+      ';
+        else
+          echo '<option value="'.strrev(substr(strrev($language),strlen(strstr($language,'.language.php')),strlen($language))).'">'.$l['language_name'].'</option>
+      ';
+        $l = $l_temp;
+      }
+    
+    echo '</select>
+    <input type="submit" value="'.$l['main_language_go'].'" />
+    </p></form>
+  ';
+  }
 }
 ?>
