@@ -16,7 +16,18 @@ global $cmsurl, $settings, $l, $user, $theme_url;
   
   <script type="text/javascript" src="'.$theme_url.'/'.$settings['theme'].'/scripts/jquery.js"></script>
   <script type="text/javascript" src="'.$theme_url.'/'.$settings['theme'].'/scripts/jquery-pstrength.js"></script>
-  <script type="text/javascript">$(function() {$(".password").pstrength();});</script>
+  <script type="text/javascript">
+  $(function() {$("#password").pstrength();});
+  $(function(){
+    $("#vpassword").keyup(function(){
+      if($(this).val() != $("#password").val()){
+        $("#vpassword_text > span").text("Passwords Don\'t Match!")
+      }else{
+        $("#vpassword_text > span").text("")
+      }
+    })
+  })
+  </script>
   
   <form action="'.$cmsurl.'index.php?action=register" method="post">
     <p><input type="hidden" name="register" value="true" /></p>
@@ -37,10 +48,12 @@ global $cmsurl, $settings, $l, $user, $theme_url;
           <td>'.$l['register_username'].'</td><td><input name="username" type="text" value="'.@$_REQUEST['username'].'"/></td>
         </tr>
         <tr>
-          <td>'.$l['register_password'].'</td><td><input class="password" name="password" type="password" /></td>
+          <td>'.$l['register_password'].'</td><td><input id="password" name="password" type="password" /></td>
         </tr>
         <tr>
-          <td>'.$l['register_verify_password'].'</td><td><input name="vpassword" type="password" /></td>
+          <td>'.$l['register_verify_password'].'</td><td><input id="vpassword" name="vpassword" type="password" />
+            <div id="vpassword_text"><span style="color: rgb(255, 0, 0);"></span></div>
+          </td>
         </tr>
         <tr>
           <td>'.$l['register_email'].'</td><td><input name="email" type="text" value="'.@$_REQUEST['email'].'" /></td>
