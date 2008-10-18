@@ -605,11 +605,11 @@ global $l, $settings, $theme_dir, $theme_url;
     $str = preg_replace('/(#['.$all_chars.']*)\[right\](['.$all_chars.']*)\[\/right\](['.$all_chars.']*\|)/is','$1<p style="text-align: right">$2</p>$3',$str);
     
     // [quote]\n
-    $str = preg_replace('/(#['.$all_chars.']*)\[quote\]\n?(['.$all_chars.']*\|)/is','$1<p class="quote-title">'.$l['main_quote'].':</p><blockquote style="padding: 5px; margin: 0px;">$2',$str);
+    $str = preg_replace('/(#['.$all_chars.']*)\[quote\]\n?(['.$all_chars.']*\|)/is','$1<p class="quote-title">'.$l['main_quote'].':</p><blockquote class="quote-body">$2',$str);
     // [quote=...]\n
-    $str = preg_replace('/(#['.$all_chars.']*)\[quote=(['.$link_chars.']*)\]\n?(['.$all_chars.']*\|)/is','$1<p class="quote-title">'.str_replace('%user%','$2',$l['main_quote_from']).':</p><blockquote style="padding: 5px; margin: 0px;">$3',$str);
+    $str = preg_replace('/(#['.$all_chars.']*)\[quote=(['.$link_chars.']*)\]\n?(['.$all_chars.']*\|)/is','$1<p class="quote-title">'.str_replace('%user%','$2',$l['main_quote_from']).':</p><blockquote class="quote-body">$3',$str);
     // [quote by=...]\n
-    $str = preg_replace('/(#['.$all_chars.']*)\[quote by=(['.$link_chars.']*)\]\n?(['.$all_chars.']*\|)/is','$1<p class="quote-title">'.str_replace('%user%','$2',$l['main_quote_from']).':</p><blockquote style="padding: 5px; margin: 0px;">$3',$str);
+    $str = preg_replace('/(#['.$all_chars.']*)\[quote by=(['.$link_chars.']*)\]\n?(['.$all_chars.']*\|)/is','$1<p class="quote-title">'.str_replace('%user%','$2',$l['main_quote_from']).':</p><blockquote class="quote-body">$3',$str);
     // [/quote]\n
     $str = preg_replace('/(#['.$all_chars.']*)\[\/quote\]\n(['.$all_chars.']*\|)/is','$1</blockquote>$2',$str);
     // [/quote]

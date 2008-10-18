@@ -40,6 +40,7 @@ if(get_magic_quotes_gpc())
 // Load up a few things :P Such as $settings, $l[anguage], and $user, the permissions too!
   loadUser();
   loadSettings();
+  changeLanguage();
   loadPerms();
   loadBPerms();
   loadMenus();
