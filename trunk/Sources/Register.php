@@ -59,14 +59,14 @@ global $cmsurl, $db_prefix, $l, $settings, $source_dir, $user;
     }
     // Process information sent
     else if (@$_REQUEST['register']) {
-      // Load the CAPTCHA Image Source
-      require_once($source_dir.'/Captcha.php');
+      // Salt used in hashing
+      $salt = 'salt4me';
       // Get their username, password, verification pass, email, and the captcha
-      $username = $_REQUEST['username'];
-      $password = $_REQUEST['password'];
-      $vpassword = $_REQUEST['vpassword'];
-      $email = $_REQUEST['email'];
-      $captcha = $_REQUEST['captcha'];
+      $username = @$_REQUEST['username'];
+      $password = @$_REQUEST['password'];
+      $vpassword = @$_REQUEST['vpassword'];
+      $email = @$_REQUEST['email'];
+      $captcha = sha1(strtolower(@$_REQUEST['captcha']).sha1($salt));
       // Set error as array, so if no errors, we won't get a PHP error
       $settings['page']['error'] = array();
       // Is the username taken?
@@ -91,7 +91,7 @@ global $cmsurl, $db_prefix, $l, $settings, $source_dir, $user;
         $settings['page']['error'][] = $l['register_error_invalid_email'];
       }
       // Is the CAPTCHA valid?
-      if(PhpCaptcha::Validate($captcha)) { } else {
+      if($captcha != @$_SESSION['captcha_'.sha1(sha1($salt))]) {
         $settings['page']['error'][] = $l['register_error_captcha'];
       }
       // Did they except the TOS?

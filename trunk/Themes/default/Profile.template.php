@@ -343,7 +343,7 @@ global $l, $settings, $cmsurl;
   <p>'.$l['profile_showemail_desc'].'</p>
   
   <form action="'.$cmsurl.'index.php?action=profile;sa=show-email;u='.$settings['page']['uid'].'" method="post">
-    <p><img src="'.$cmsurl.'image.php" alt="CAPTCHA" /></p>
+    <p><img src="'.$cmsurl.'index.php?action=captcha" alt="CAPTCHA" /></p>
     <p>
       <input name="captcha" />
       <input type="submit" value="'.$l['profile_showemail_submit'].'" />

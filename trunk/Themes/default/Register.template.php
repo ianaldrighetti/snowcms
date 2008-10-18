@@ -49,7 +49,7 @@ global $cmsurl, $settings, $l, $user;
           <td>'.$l['register_captcha'].'</td><td><input name="captcha" type="text"/></td>
         </tr>
         <tr>
-          <td>&nbsp;</td><td colspan="2"><img src="'.$cmsurl.'image.php" alt="CAPTCHA" /></td>
+          <td>&nbsp;</td><td colspan="2"><img src="'.$cmsurl.'index.php?action=captcha" alt="CAPTCHA" /></td>
         </tr>
         ';
       if ($settings['enable_tos'])

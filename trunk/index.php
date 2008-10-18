@@ -72,7 +72,8 @@ if(get_magic_quotes_gpc())
       'online' => array('Online.php','Online'),
       'profile' => array('Profile.php','Profile'),
       'register' => array('Register.php','Register'),
-      'register3' => array('Register.php','Register3')
+      'register3' => array('Register.php','Register3'),
+      'captcha' => array('Captcha.php','Captcha')
     );
     if ($settings['enable_tos'])
       $actions['tos'] = array('TOS.php','TOS');
@@ -93,6 +94,10 @@ if(get_magic_quotes_gpc())
   // Remove the fact that they have completed the CAPTCHA
   // Otherwise they just need a person to complete it once and the bot gets free roaming forever
   unset($_SESSION['passed_captcha']);
+  // Salt used in hashing
+  $salt = 'salt4me';
+  // Unset information about the CAPTCHA
+  unset($_SESSION['captcha_'.sha1(sha1($salt))]);
 // Flush it down the tube :P
 ob_end_flush();
 ?>

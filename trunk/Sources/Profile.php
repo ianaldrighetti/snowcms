@@ -30,10 +30,10 @@ global $cmsurl, $db_prefix, $l, $settings, $source_dir, $user, $perms;
   // Are they a guest trying to view someone's email address?
   if (@$_REQUEST['sa'] == 'show-email' && $user['group'] == -1) {
     // Have they already completed the CAPTCHA?
-    if ($captcha = @$_REQUEST['captcha']) {
-      // Yep, but is it correct?
-      require_once($source_dir.'/Captcha.php');
-      if (PhpCaptcha::Validate($captcha)) {
+    if (@$_REQUEST['captcha']) {
+      // Salt used in hashing
+      $salt = 'salt4me';
+      if (sha1(strtolower(@$_REQUEST['captcha']).sha1($salt)) == @$_SESSION['captcha_'.sha1(sha1($salt))]) {$
         // It is, now let's redirect them back to their profile with this fact
         $_SESSION['passed_captcha'] = true;
         redirect('index.php?action=profile;u='.clean_header($UID));

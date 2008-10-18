@@ -96,6 +96,10 @@ if(get_magic_quotes_gpc())
   // Remove the fact that they have completed the CAPTCHA
   // Otherwise they just need a person to complete it once and the bot gets free roaming forever
   unset($_SESSION['passed_captcha']);
+  // Salt used in hashing
+  $salt = 'salt4me';
+  // Unset information about the CAPTCHA
+  unset($_SESSION['captcha_'.sha1(sha1($salt))]);
 // Buh bye! xD
 ob_end_flush();
 ?>
