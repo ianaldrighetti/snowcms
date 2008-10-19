@@ -83,10 +83,10 @@ global $db_prefix, $user, $cookie_prefix;
           'group' => $row['group'],
           'is_logged' => true,
           'is_guest' => false,
-          'is_admin' => ($row['group'] === 1) ? true : false,
+          'is_admin' => ($row['group'] == 1) ? true : false,
           'email' => $row['email'],
           'language' => $row['language'],
-          'board_query' => ($row['group'] === 1) ? '1=1' : "FIND_IN_SET('{$row['group']}', b.who_view)",
+          'board_query' => ($row['group'] == 1) ? '1=1' : "FIND_IN_SET('{$row['group']}', b.who_view)",
           'unread_pms' => $row['unread_pms'],
           'ip' => isset($_SERVER['HTTP_X_FORWARDED_FOR']) ? $_SERVER['HTTP_X_FORWARDED_FOR'] : $_SERVER['REMOTE_ADDR'],
           'sc' => create_sid()
