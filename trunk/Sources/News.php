@@ -53,15 +53,20 @@ global $cmsurl, $db_prefix, $l, $settings, $user;
       $cat = "WHERE `cat_id` = '$cat'";
     else
       $cat = '';
-    
+    // Get the news posts
     $result = sql_query("
       SELECT
-        *, n.cat_id, mem.display_name AS username, IFNULL(mem.display_name, mem.username) AS username
+        *, mem.display_name AS username, IFNULL(mem.display_name, mem.username) AS username
       FROM {$db_prefix}news AS n
         LEFT JOIN {$db_prefix}members AS mem ON mem.id = n.poster_id
-        LEFT JOIN {$db_prefix}news_categories AS nc ON nc.cat_id = n.cat_id
+        *, `mem`.`display_name` AS `username`, IFNULL(`mem`.`display_name`, `mem`.`username`) AS `username`
+      FROM {$db_prefix}news AS `n`
+        LEFT JOIN {$db_prefix}members AS `mem` ON `mem`.`id` = `n`.`poster_id`
+        LEFT JOIN {$db_prefix}news_categories AS `cat` ON `cat`.`cat_id` = `n`.`cat_id`
+
       $cat
       ORDER BY n.post_time DESC
+      ORDER BY `n`.`post_time` DESC
       LIMIT $start, {$settings['num_news_items']}");
     $news = array();
     // Is there even any news? :O
@@ -83,7 +88,6 @@ global $cmsurl, $db_prefix, $l, $settings, $user;
           'allow_comments' => $row['allow_comments']
         );
       }
-      
       // Total amount of news articles
       $news_count = sql_query("SELECT * FROM {$db_prefix}news $cat");
       $total_news = mysql_num_rows($news_count);
@@ -179,22 +183,22 @@ global $cmsurl, $db_prefix, $l, $settings, $user;
     else {
       $result = sql_query("
         SELECT
-          *, mem.display_name AS username, IFNULL(mem.display_name, mem.username) AS username
-        FROM {$db_prefix}news AS n
-          LEFT JOIN {$db_prefix}members AS mem ON mem.id = n.poster_id
-        WHERE n.news_id = $news_id");
+          *, `mem`.`display_name` AS `username`, IFNULL(`mem`.`display_name`, `mem`.`username`) AS `username`
+        FROM {$db_prefix}news AS `n`
+          LEFT JOIN {$db_prefix}members AS `mem` ON `mem`.`id` = `n`.`poster_id`
+          LEFT JOIN {$db_prefix}news_categories AS `cat` ON `cat`.`cat_id` = `n`.`cat_id`
+        WHERE `n`.`news_id` = '$news_id'");
       $news = array();
       // Is there even any news? :O
       if (mysql_num_rows($result)) {
         while ($row = mysql_fetch_assoc($result)) {
-          $category = mysql_fetch_assoc(sql_query("SELECT * FROM {$db_prefix}news_categories WHERE `cat_id` = '{$row['cat_id']}'"));
           $news = array(
             'id' => $row['news_id'],
             'poster_id' => $row['poster_id'],
             'poster_name' => $row['username'],
             'subject' => $row['subject'],
-            'cat_id' => $category['cat_id'],
-            'cat_name' => $category['cat_name'],
+            'cat_id' => $row['cat_id'],
+            'cat_name' => $row['cat_name'],
             'body' => stripslashes($row['body']),
             'user_id' => $row['id'],
             'username' => $row['username'],
@@ -484,27 +488,27 @@ global $cmsurl, $db_prefix, $l, $settings, $user;
       $cat = "WHERE `cat_id` = '$cat'";
     else
       $cat = "";
-    
+    // Get the news posts
     $result = sql_query("
       SELECT
-        *, mem.display_name AS username, IFNULL(mem.display_name, mem.username) AS username
-      FROM {$db_prefix}news AS n
-        LEFT JOIN {$db_prefix}members AS mem ON mem.id = n.poster_id
+        *, `mem`.`display_name` AS `username`, IFNULL(`mem`.`display_name`, `mem`.`username`) AS `username`
+      FROM {$db_prefix}news AS `n`
+        LEFT JOIN {$db_prefix}members AS `mem` ON `mem`.`id` = `n`.`poster_id`
+        LEFT JOIN {$db_prefix}news_categories AS `cat` ON `cat`.`cat_id` = `n`.`cat_id`
       $cat
-      ORDER BY n.post_time DESC
+      ORDER BY `n`.`post_time` DESC
       LIMIT $start, {$settings['num_news_items']}");
     $news = array();
     // Is there even any news? :O
     if (mysql_num_rows($result)) {
       while ($row = mysql_fetch_assoc($result)) {
-        $category = mysql_fetch_assoc(sql_query("SELECT * FROM {$db_prefix}news_categories WHERE `cat_id` = '{$row['cat_id']}'"));
         $news[] = array(
           'id' => $row['news_id'],
           'poster_id' => $row['poster_id'],
           'poster_name' => $row['username'],
           'subject' => $row['subject'],
-          'cat_id' => $category['cat_id'],
-          'cat_name' => $category['cat_name'],
+          'cat_id' => $row['cat_id'],
+          'cat_name' => $row['cat_name'],
           'body' => stripslashes($row['body']),
           'user_id' => $row['id'],
           'username' => $row['username'],
@@ -514,7 +518,6 @@ global $cmsurl, $db_prefix, $l, $settings, $user;
           'allow_comments' => $row['allow_comments']
         );
       }
-      
       // Total amount of news articles
       $news_count = sql_query("SELECT * FROM {$db_prefix}news $cat");
       $total_news = 0;
@@ -570,5 +573,4 @@ global $cmsurl, $db_prefix, $l, $settings, $user;
     }
   }
 }
-
 ?>
