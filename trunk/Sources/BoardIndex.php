@@ -14,9 +14,22 @@
 if (!defined("Snow"))
   die(header("HTTP/1.1 404 Not Found"));
 
-// This function loads up the forum index
-// It shows the categories and then the boards within the categories with board information
-// Like last post, how many posts and topics, etc...
+/*
+
+   BoardIndex()
+   - Loads the board index, which is
+     accessed by forum.php
+   - checks to make sure they are 
+     allowed to view the forum
+   - Loads the categories, and the
+     boards and checks permissions,
+     if a category has no boards in
+     it, it is unsert
+   - It also loads who is currently
+     viewing the forum from the 
+     online board
+*/
+
 function BoardIndex() {
 global $cmsurl, $db_prefix, $l, $settings, $user;
   if(can('view_forum')) {
@@ -110,3 +123,4 @@ global $cmsurl, $db_prefix, $l, $settings, $user;
     loadForum('BoardIndex','NotAllowed');
   }
 }
+?>

@@ -106,22 +106,20 @@ global $cmsurl, $db_prefix, $l, $settings, $user, $cookie_prefix;
 function Logout() {
 global $cmsurl, $db_prefix, $l, $settings, $user, $cookie_prefix;
   
-  if(true) {
-    // Are they even logged in? Lol.
-    if($user['is_logged']) {
-      // Destroy! Destroy! Their session :D
-      session_destroy();
-      // Delete them from the {db_prefix}online table
-      sql_query("DELETE FROM {$db_prefix}online WHERE `user_id` = '{$user['id']}'");
-      // Delete the Cookies... Simple enough :P
-      setLoginCookie('', '', time() - (60*60*24*365));
-      // Redirect to the CMSURL URL
-      redirect("index.php");
-    }
-    else {
-      // Your not logged in -.-'
-      redirect("index.php");
-    }
+  // Are they even logged in? Lol.
+  if($user['is_logged']) {
+    // Destroy! Destroy! Their session :D
+    session_destroy();
+    // Delete them from the {db_prefix}online table
+    sql_query("DELETE FROM {$db_prefix}online WHERE `user_id` = '{$user['id']}'");
+    // Delete the Cookies... Simple enough :P
+    setLoginCookie('', '', time() - (60*60*24*365));
+    // Redirect to the CMSURL URL
+    redirect("index.php");
+  }
+  elseif(!$user['is_logged']) {
+    // Your not logged in -.-'
+    redirect("index.php");
   }
   else {
     // Odd, an error occurred... O.O

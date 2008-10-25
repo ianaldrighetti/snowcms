@@ -263,7 +263,6 @@ global $mysql_db;
       }
     }
     ob_clean();
-    ob_start();
     $file_name = $mysql_db.date('n-d-Y-g');
     // GZ output? If so selected master...
     if(function_exists('gzencode') && $option['gz']) {
