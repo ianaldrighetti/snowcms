@@ -11,9 +11,9 @@ function Main() {
 global $cmsurl, $theme_url, $settings, $l, $user;
   
   echo '
-  <h1>'.$settings['page']['title'].'</h1>
-  
+  <h1>'.$settings['page']['title'].'</h1> 
   <p>'.$l['login_desc'].'</p>
+  ', !empty($settings['maintenance_mode']) ? '<p class="maintenance_mode">'. $l['maintenance_mode_msg']. '</p>' : '', '
   <script src="', $theme_url, '/default/scripts/md5.js" type="text/javascript"></script>
   <form action="'.$cmsurl.'index.php?action=login2" method="post">
     <fieldset>

@@ -24,6 +24,7 @@ echo '<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
 </head>
 
 <body>
+', (!empty($settings['maintenance_mode']) && $user['is_admin']) ? '<p class="maintenance_reminder">'. $l['maintenance_remember']. '</p>' : '', '
 <div class="container">
   <div class="sidebar">
   <a href="'.$cmsurl.'" title="'.$settings['site_name'].'">

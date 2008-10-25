@@ -110,6 +110,15 @@ global $cmsurl, $db_prefix, $l, $mysql_db, $settings, $user;
         fixForumErrors();
         $settings['alert'] = $l['maintain_fixforum_alert']; 
       }
+      elseif(!empty($_REQUEST['save_maintenance'])) {
+        // Saving Maintenance Mode!
+        $mode = (int)isset($_REQUEST['enable_maintenance']) ? 1 : 0;
+        // Reason?
+        $reason = !empty($_REQUEST['maintenance_reason']) ? clean($_REQUEST['maintenance_reason']) : '';
+        // Now save it!
+        sql_query("REPLACE INTO {$db_prefix}settings (`variable`,`value`) VALUES('maintenance_mode', $mode),('maintenance_reason','$reason')");
+        loadSettings();
+      }
       // Load the layout =D
       $settings['page']['title'] = $l['admin_maintain_title'];
       loadTheme('Maintain','Menu');

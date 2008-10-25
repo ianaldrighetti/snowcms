@@ -364,7 +364,9 @@ INSERT INTO `{$db_prefix}settings` VALUES
 ('board_short','3'),
 ('board_long','50'),
 ('board_desc_short','3'),
-('board_desc_long','200');
+('board_desc_long','200'),
+('maintenance_mode','0'),
+('maintenance_reason','');
 
 DROP TABLE IF EXISTS `{$db_prefix}topics`;
 

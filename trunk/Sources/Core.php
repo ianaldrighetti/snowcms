@@ -1040,4 +1040,21 @@ function assistWizard($array) {
   else
     return array();
 }
+
+function maintenanceMode() {
+global $user, $l, $settings;
+  // Only Administrators can access
+  // the site when in Maintenance Mode
+  // If they aren't an admin, show the
+  // Maintenance Screen ;) with a login
+  // Form so other administrators may login
+  if(!$user['is_admin'] && $settings['maintenance_mode'] && @$_GET['action'] != 'login2') {
+    // They aren't an admin, and maintenance
+    // mode is enabled... Show a page with a
+    // Login Screen
+    $settings['page']['title'] = $l['maintenance_mode'];
+    loadTheme('Main','MaintenanceScr');
+    exit;
+  }
+}
 ?>

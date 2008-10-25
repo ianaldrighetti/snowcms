@@ -25,6 +25,7 @@ global $l, $cmsurl, $theme_url, $settings, $user;
 </head>
 
 <body>
+', (!empty($settings['maintenance_mode']) && $user['is_admin']) ? '<p class="maintenance_reminder">'. $l['maintenance_remember']. '</p>' : '', '
 <div class="container">
   <div class="sidebar">
   <a href="'.$cmsurl.'" title="'.$settings['site_name'].'">
@@ -109,5 +110,36 @@ global $user, $settings, $l, $db_prefix, $language_dir, $cmsurl, $cookie_prefix;
     </p></form>
   ';
   }
+}
+
+function MaintenanceScr() {
+global $cmsurl, $user, $l, $settings, $theme_url;
+  echo '
+  <h1>', $l['maintain_maintenance'], '</h1>
+  <p>', !empty($settings['maintenance_reason']) ? $settings['maintenance_reason'] : $l['maintenance_default_reason'], '</p>
+  <br />
+  <h2>', $l['maintenance_login_header'], '</h2>
+  <script src="', $theme_url, '/default/scripts/md5.js" type="text/javascript"></script>
+  <form action="', $cmsurl, 'index.php?action=login2" method="post">
+    <fieldset>
+      <table>
+        <tr>
+          <td>', $l['login_user'], ' <input name="username" type="text" value=""/></td><td>', $l['login_pass'], ' <input id="password" name="password" type="password" value=""/></td>
+        </tr>
+        <tr>
+          <td>', $l['login_length'], '<select name="login_length">
+                <option value="3600">', $l['login_hour'], '</option>
+                <option value="86400">', $l['login_day'], '</option>
+                <option value="604800">', $l['login_week'], '</option>
+                <option value="2592000">', $l['login_month'], '</option>
+                <option value="31104000" selected="yes">', $l['login_forever'], '</option>
+              </select>
+          </td>
+          <td><input name="login" type="submit" onClick="md5_password();" value="', $l['login_button'], '"/></td>
+        </tr>
+        <input name="pass_hash" id="pass_hash" type="hidden" value="1"/>
+      </table>
+    </fieldset>
+  </form>';
 }
 ?>

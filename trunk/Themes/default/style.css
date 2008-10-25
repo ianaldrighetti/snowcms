@@ -140,7 +140,7 @@ th.border {
   float: left;
   width: 240px;
   height: 65px;
-  overflow: hide;
+  overflow: hidden;
   border: 1px solid #467AA7;
   margin-top: 3px;
   margin-left: 25px;
@@ -423,4 +423,13 @@ textarea.quickreply {
   padding: 2px;
   font-size: 10px;
   background: #DDDDDD;
+}
+/* Maintenance Mode */
+.maintenance_reminder {
+  text-align: center;
+  margin-bottom: 1px;
+}
+.maintenance_mode {
+  text-align: center;
+  font-weight: bold;
 }

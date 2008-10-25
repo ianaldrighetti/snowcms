@@ -50,6 +50,23 @@ global $cmsurl, $settings, $l, $user;
         </tr>
       </table>
     </fieldset>
+  </form>
+  <h2>', $l['maintain_maintenance'], '</h2>
+  <p>', $l['maintain_maintenance_desc'], '</p>
+  <form action="', $cmsurl, 'index.php?action=admin;sa=maintain" method="post">
+    <fieldset>
+      <table>
+        <tr>
+          <td>', $l['maintain_maintenance_enable'], '</td><td><input name="enable_maintenance" type="checkbox" value="1"', !empty($settings['maintenance_mode']) ? ' checked="checked"' : '', '</td>
+        </tr>
+        <tr>
+          <td>', $l['maintain_maintenance_reason'], '</td><td><input name="maintenance_reason" type="text" value="', !empty($settings['maintenance_reason']) ? $settings['maintenance_reason'] : '', '"/>
+        </tr>
+        <tr>
+          <td colspan="2" align="right"><input name="save_maintenance" type="submit" value="', $l['maintain_maintenance_save'], '"/></td>
+        </tr>
+      </table>
+    </fieldset>
   </form>';
 }
 

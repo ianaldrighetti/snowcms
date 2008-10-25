@@ -42,6 +42,11 @@ $l['main_back'] = 'Back';
 $l['main_cancel'] = 'Cancel';
 $l['main_default'] = 'Default';
 $l['page_made'] = 'Page made with %queries% queries';
+$l['maintenance_mode'] = 'Maintenance Mode';
+$l['maintenance_mode_msg'] = 'Maintenance Mode is currently Enabled! So only administrators may login';
+$l['maintenance_remember'] = 'Remember <a href="'. $cmsurl. 'index.php?action=admin;sa=maintain">Maintenance Mode</a> is enabled';
+$l['maintenance_default_reason'] = 'Sorry, but right now the site is under going maintenance, come back soon!';
+$l['maintenance_login_header'] = 'Administrator Login';
 
 // Email
 $l['mail_smtp_fail'] = 'Sending email failed! Error: %error%';
@@ -1087,6 +1092,11 @@ $l['maintain_optimize_header'] = 'Optimizing Results';
 $l['maintain_optimize_none']  = 'No Tables were Optimized because none needed to be';
 $l['maintain_optimized_template'] = '%num_tables% table(s) optimized in %seconds% seconds';
 $l['maintain_go_back'] = 'Go back to <a href="'. $cmsurl. 'index.php?action=admin;sa=maintain">Maintenance</a>';
+$l['maintain_maintenance'] = 'Maintenance Mode';
+$l['maintain_maintenance_desc'] = 'When you put your site into maintenance mode, it will only allow administrators to login';
+$l['maintain_maintenance_enable'] = 'Enable Maintenance Mode';
+$l['maintain_maintenance_reason'] = 'Reason for being in Maintenance Mode';
+$l['maintain_maintenance_save'] = 'Save';
 // Must be tripley escaped, so don\'t should be don\\\'t :)
 $l['maintain_recount_alert'] = 'Forum Totals and Statistics Recounted!';
 $l['maintain_fixforum_alert'] = 'Completed';

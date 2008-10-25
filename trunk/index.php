@@ -44,6 +44,8 @@ if(get_magic_quotes_gpc())
   loadLanguage();
 // Write that this Guest/User is online
   WriteOnline();
+// Maintenance Mode?
+  maintenanceMode();
   
   $values = @unserialize($_SESSION['error_values']);
   

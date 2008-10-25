@@ -49,6 +49,8 @@ if(get_magic_quotes_gpc())
   loadQuickEdit();
 // Write that this Guest/User is online
   WriteOnline();
+// Maintenance Mode?
+  maintenanceMode();
 
 // What do we do? :O
   if((empty($_REQUEST['action'])) && (empty($_REQUEST['board'])) && (empty($_REQUEST['topic']))) {
