@@ -28,7 +28,7 @@ global $db_prefix, $settings;
 // Won't be parsed, but keep the site safe from SQL injections 
 function clean($str) {
   // Then ENT_QUOTES make it encode both " and '
-  $str = htmlentities($str, ENT_QUOTES);
+  $str = htmlspecialchars($str, ENT_QUOTES);
   return $str;
 }
 
