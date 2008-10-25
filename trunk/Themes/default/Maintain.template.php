@@ -25,6 +25,9 @@ global $cmsurl, $settings, $l, $user;
     <tr>
       <td><a href="', $cmsurl, 'index.php?action=admin;sa=maintain;do=recount">', $l['maintain_recount'], '</a></td>
     </tr>
+    <tr>
+      <td><a href="', $cmsurl, 'index.php?action=admin;sa=maintain;do=fix">', $l['maintain_fixforum'], '</a></td>
+    </tr>
   </table>
   <h2>', $l['maintain_backup'], '</h2>
   <form action="', $cmsurl, 'index.php?action=admin;sa=maintain;do=backup" method="post">

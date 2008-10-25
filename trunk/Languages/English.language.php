@@ -1075,6 +1075,7 @@ $l['maintain_header'] = 'Maintain your site';
 $l['maintain_desc'] = 'You can manage your site here, such as optimizing your MySQL tables, or recounting forum statistics, and backing up your site.';
 $l['maintain_optimize'] = 'Optimize your MySQL Database';
 $l['maintain_recount'] = 'Recount forum statistics';
+$l['maintain_fixforum'] = 'Fix possible board errors';
 $l['maintain_backup'] = 'Backup your database';
 $l['maintain_backup_structure'] = 'Include the Structure';
 $l['maintain_backup_data'] = 'Include the Data (<strong>Important!</strong>)';
@@ -1088,4 +1089,5 @@ $l['maintain_optimized_template'] = '%num_tables% table(s) optimized in %seconds
 $l['maintain_go_back'] = 'Go back to <a href="'. $cmsurl. 'index.php?action=admin;sa=maintain">Maintenance</a>';
 // Must be tripley escaped, so don\'t should be don\\\'t :)
 $l['maintain_recount_alert'] = 'Forum Totals and Statistics Recounted!';
+$l['maintain_fixforum_alert'] = 'Completed';
 ?>

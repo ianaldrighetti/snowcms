@@ -105,6 +105,11 @@ global $cmsurl, $db_prefix, $l, $mysql_db, $settings, $user;
         // Simple as this... call on it xD!
         backupDB();
       }
+      elseif($do == 'fix') {
+        // Fix a couple possible board errors
+        fixForumErrors();
+        $settings['alert'] = $l['maintain_fixforum_alert']; 
+      }
       // Load the layout =D
       $settings['page']['title'] = $l['admin_maintain_title'];
       loadTheme('Maintain','Menu');
@@ -151,6 +156,51 @@ global $db_prefix, $settings, $user;
 }
 
 /*
+  This fixes a couple board errors,
+  like if in case you delete topics
+  or messages and the last post by
+  info on the board is not right,
+  you should run this option and it
+  will be fixed
+*/
+function fixForumErrors() {
+global $db_prefix;
+  if(can('maintain')) {
+    // Get all the boards...
+    $result = sql_query("SELECT * FROM {$db_prefix}boards");
+    // Any boards in the first place?
+    if(mysql_num_rows($result)) {
+      // Loop through the boards
+      // And now we need to get the row
+      // and then of course get the latest
+      // topic info and such...
+      while($row = mysql_fetch_assoc($result)) {
+        $request = mysql_query("
+          SELECT
+            msg.mid, msg.tid, msg.bid, msg.uid, msg.subject, msg.poster_name
+          FROM {$db_prefix}messages AS msg
+          WHERE msg.bid = $row[bid]
+          ORDER BY msg.mid DESC
+          LIMIT 1");
+          // Anything? :O
+          if(mysql_num_rows($request)) {
+            $msg = mysql_fetch_assoc($request);
+            // Update the board...
+            sql_query("UPDATE {$db_prefix}boards SET `last_msg` = $msg[mid], `last_uid` = $msg[uid], `last_name` = '$msg[poster_name]' WHERE bid = $row[bid]");
+          }
+          elseif($row['last_msg'] != 0 || $row['last_uid'] != 0 || $row['last_name'] != '') {
+            // something is set, though we 
+            // found nothing, so do just that
+            sql_query("UPDATE {$db_prefix}boards SET `last_msg` = 0, `last_uid` = 0, `last_name` = '' WHERE bid = $row[bid]");
+          }
+          // Otherwise do nothing ;)
+          mysql_free_result($request);
+      }
+    }
+  }
+}
+
+/*
   This thing backs up your MySQL database
   with all your dataz and structure and
   everything you need :P
@@ -158,7 +208,7 @@ global $db_prefix, $settings, $user;
 function backupDB() {
 global $mysql_db;  
   // What options?
-  // !!! Needs improvemnet, this is a temporary fix
+  // !!! Needs improvement, this is a temporary fix
   // The structure
   if(isset($_REQUEST['struc']) && $_REQUEST['struc'] == 1)
     $option['struc'] = true;
