@@ -407,8 +407,7 @@ global $cmsurl, $db_prefix, $l, $settings, $user, $language_dir, $theme_dir;
         $short = (int)@$_REQUEST[$length.'_short'];
         $long = (int)@$_REQUEST[$length.'_long'];
         // Set settings
-        sql_query("REPLACE {$db_prefix}settings SET `value` = '$short' WHERE `variable` = '{$length}_short'");
-        sql_query("REPLACE {$db_prefix}settings SET `value` = '$long' WHERE `variable` = '{$length}_long'");
+        sql_query("REPLACE INTO {$db_prefix}settings (`variable`,`value`) VALUES('{$length}_short','$short'),('{$length}_long','$long')");
       }
       redirect('index.php?action=admin;sa=settings');
     }
