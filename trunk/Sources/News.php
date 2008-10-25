@@ -56,17 +56,12 @@ global $cmsurl, $db_prefix, $l, $settings, $user;
     // Get the news posts
     $result = sql_query("
       SELECT
-        *, mem.display_name AS username, IFNULL(mem.display_name, mem.username) AS username
-      FROM {$db_prefix}news AS n
-        LEFT JOIN {$db_prefix}members AS mem ON mem.id = n.poster_id
         *, `mem`.`display_name` AS `username`, IFNULL(`mem`.`display_name`, `mem`.`username`) AS `username`
-      FROM {$db_prefix}news AS `n`
+      FROM {$db_prefix}news AS n
         LEFT JOIN {$db_prefix}members AS `mem` ON `mem`.`id` = `n`.`poster_id`
         LEFT JOIN {$db_prefix}news_categories AS `cat` ON `cat`.`cat_id` = `n`.`cat_id`
-
       $cat
       ORDER BY n.post_time DESC
-      ORDER BY `n`.`post_time` DESC
       LIMIT $start, {$settings['num_news_items']}");
     $news = array();
     // Is there even any news? :O
