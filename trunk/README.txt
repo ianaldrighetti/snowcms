@@ -50,7 +50,7 @@ Support:
 As SnowCMS has not been officially released yet, we
 don't have a support system setup yet. However, visit
 us at our forums at 
-http://www.snowcms.com/forums
+http://www.snowcms.com/forum.php
 and we will try to help you out. :)
 
 ========================================================
