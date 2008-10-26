@@ -43,8 +43,8 @@ $l['main_cancel'] = 'Cancel';
 $l['main_default'] = 'Default';
 $l['page_made'] = 'Page made with %queries% queries';
 $l['maintenance_mode'] = 'Maintenance Mode';
-$l['maintenance_mode_msg'] = 'Maintenance Mode is currently Enabled! So only administrators may login';
-$l['maintenance_remember'] = 'Remember <a href="'. $cmsurl. 'index.php?action=admin;sa=maintain">Maintenance Mode</a> is enabled';
+$l['maintenance_mode_msg'] = 'Maintenance Mode has been enabled by the administrators of this site. Please check back later. Sorry for any inconvieniences.';
+$l['maintenance_remember'] = 'Remember, <a href="'. $cmsurl. 'index.php?action=admin;sa=maintain">Maintenance Mode</a> is enabled!';
 $l['maintenance_default_reason'] = 'Sorry, but right now the site is under going maintenance, come back soon!';
 $l['maintenance_login_header'] = 'Administrator Login';
 
