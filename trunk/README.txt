@@ -1,54 +1,66 @@
-Thank you for choosing SnowCMS! Beware that when you use
-SnowCMS that you could be using unstable code...
+Thank you for choosing SnowCMS 0.7 SVN!
 
-So, we highly recommend you DO NOT use SnowCMS that has
-been download from a nightly or SVN on a public site, also
-we will NOT provide update packages from one SVN revision
-to another, however you can of course install SnowCMS for
-you to test out and see what it is like.
+Note that this is NOT a final release, or something
+that should be considered as such. You may find critical
+bugs or security flaws. If you do, please be a good
+person and report these flaws at
+http://code.google.com/p/snowcms/issues/entry
+
+It is highly recommended that SVN releases NOT be
+installed on production sites. SVN is intended for
+development and testing purposes ONLY. We are not
+responsible for any issues you may have.
 
 =========================================================
 
 Installation:
 
-1) Of course, you have done this, downloaded it ;)
+1) Of course, you have done this, downloaded it. ;)
 2) Upload it to your server or where ever you want to 
-install it
-3) Access the directory of where install.php is, as it will
-automatically redirect you to the install.php file
-4) Input your MySQL database details, and hit continue
+install it.
+3) Access the directory of where install.php is in your
+browser, and SnowCMS will automatically send you to
+the installer.
+4) Input your MySQL database details, and hit Continue.
 5) If it succeeded, proceed to give your details, like
 directory paths (though they should be put in correctly by
 default, just check to make sure) and your administrative
-account details, hit continue
+account details, Hit continue.
 6) After that, it should successfully install, and you can
-login, however, don't forget to delete the install.php file!
+login.
+7) Remember to DELETE install.php!
 
 =======================================================
 
 License:
 
-SnowCMS is released under the GNU GPL v3 License
-(http://www.gnu.org/licenses/gpl-3.0.html) which means
-it is Open Source, and you can edit, modify, and
-redistribute it as you please!
+SnowCMS is released under the terms of the GNU General
+Public License version 3. You can freely use this
+software for any purpose, however, it must stay under
+the terms of the General Public License version 3.
+The complete terms can be found in the LICENSE.txt file.
+If that file was not included, please visit
+http://www.gnu.org/copyleft/gpl.html
+for a copy.
 
 ========================================================
 
 Support:
 
-Right now SnowCMS is still not publically released, however
-if you would like to get some help, check out www.snowcms.com
-and we can see what we can do...
+As SnowCMS has not been officially released yet, we
+don't have a support system setup yet. However, visit
+us at our forums at 
+http://www.snowcms.com/forums
+and we will try to help you out. :)
 
 ========================================================
 
-Again, thank you for using SnowCMS! Check www.snowcms.com
-a lot to see when SnowCMS is publically released, codenamed
-SunSpot.
+Again, thank you for using SnowCMS! Check back frequently at
+http://www.snowcms.com/
+for new releases and news! :)
 
-Best of Luck!
-SnowCMS Dev Team
+Best wishes,
+the SnowCMS Dev Team
 http://www.snowcms.com/
 
-Last Updated: 10/17/2008
+Last Updated: 10/26/2008
