@@ -836,7 +836,7 @@ global $_REQUEST, $_GET;
   // Make sure there is even somehting that needs handling, we don't want errors
   if(!empty($_SERVER['QUERY_STRING'])) {
 	  // The Query String...
-	  $query_str = (substr($_SERVER['QUERY_STRING'], 0, 5) == 'url=/' ? $_SERVER['REDIRECT_QUERY_STRING'] : $_SERVER['QUERY_STRING']);
+	  $query_str = !empty($_SERVER['QUERY_STRING']) ? $_SERVER['QUERY_STRING'] : '';
 	  // Split... like EXPLOSION, just not the same :P
 	  $query_strings = split('[;&]', urldecode($query_str));
 	  // Loop ftw
