@@ -122,7 +122,7 @@ global $cmsurl, $db_prefix, $l, $settings, $user, $theme_url;
             ';
           if (can('manage_forum_edit'))
             echo '<table width="100%">
-              <tr><td><input class="board_name" name="board_name[', $board['id'], ']" type="text" value="', $board['name'], '"/> <input class="board_order" name="board_order[', $board['id'], ']" type="text" value="', $board['order'], '"/></td><td style="text-align: right"><a href="', $cmsurl, 'index.php?action=admin;sa=forum;fa=boards;do=edit;id=', $board['id'], '"><img src="'.$theme_url.'/'.$settings['theme'].'/images/modify.png" alt="'.$l['manageboards_delete'].'" width="15" height="15" /></a>';
+              <tr><td><input class="board_name" name="board_name[', $board['id'], ']" type="text" value="', $board['name'], '"/> <input class="board_order" name="board_order[', $board['id'], ']" type="text" value="', $board['order'], '"/></td><td style="text-align: right"><a href="', $cmsurl, 'index.php?action=admin;sa=forum;fa=boards;do=edit;id=', $board['id'], '"><img src="'.$theme_url.'/'.$settings['theme'].'/images/modify.png" alt="'.$l['manageboards_modify'].'" width="15" height="15" /></a>';
           else
             echo '<table width="100%">
               <tr><td>'.$board['name'].'</td><td style="text-align: right">';
