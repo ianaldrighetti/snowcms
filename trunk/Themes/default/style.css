@@ -270,14 +270,15 @@ select {
   margin-left: auto;
   background: #FFFFFF;
 }
-.code-outer {
+.quote {
   border-style: solid;
   border-width: 1px;
-  margin: 5px;
+  padding: 5px;
 }
-.code-inner {
-  margin: 5px;
-  font-family: 'Courier New';
+.code {
+  border-style: solid;
+  border-width: 1px;
+  padding: 5px;
 }
 #pagination {
   width: 800px;
@@ -410,20 +411,6 @@ textarea.quickreply {
 
 .error {
   color: #ff0000
-}
-/* Forum Quotes */
-.quote-title {
-  font-weight: bold;
-  margin-bottom: 0px;
-  padding-bottom: 0px;
-  font-size: 9px;
-}
-.quote-body {
-  border: 1px solid #1C3346;
-  margin: 0;
-  padding: 2px;
-  font-size: 10px;
-  background: #DDDDDD;
 }
 /* Maintenance Mode */
 .maintenance_reminder {
