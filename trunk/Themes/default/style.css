@@ -313,6 +313,12 @@ th.border {
   margin-left: auto;
   color: #fff;
 }
+
+.topic_panel a {
+  color: #fff;
+  text-decoration: none
+}
+
 /* Topic */
 #post-info {
   float: right;
@@ -422,3 +428,5 @@ textarea.quickreply {
   text-align: center;
   font-weight: bold;
 }
+
+
