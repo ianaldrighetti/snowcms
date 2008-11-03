@@ -893,7 +893,7 @@ global $user, $db_prefix;
     if ($bbcode = mysql_fetch_assoc(sql_query("SELECT * FROM {$db_prefix}messages LEFT JOIN {$db_prefix}boards AS b ON b.bid = {$db_prefix}messages.bid WHERE `mid` = '$bbcode' AND (FIND_IN_SET('{$user['group']}', `b`.`who_view`) OR '{$user['group']}' = '1')"))) {
       echo '{
       poster_name: "'.str_replace('"','\\"',$bbcode['poster_name']).'", 
-      bbcode: "'.urlencode($bbcode['body']).'", 
+      bbcode: "'.urlencode(html_entity_decode($bbcode['body'])).'", 
       post_time: "'.str_replace('"','\\"',$bbcode['post_time']).'", 
       }';
       exit;
