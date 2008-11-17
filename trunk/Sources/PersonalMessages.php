@@ -373,6 +373,9 @@ global $l, $settings, $db_prefix, $user;
 function ModeratePMs() {
 global $cmsurl, $db_prefix, $l, $settings, $user;
   
+  // Add link to the link tree
+  AddTree('PMs','index.php?action=admin;sa=pms');
+  
   // Are they alloed to moderate PMs?
   if (can('moderate_pms')) {
     // Are they just viewing the list, a message or something else?

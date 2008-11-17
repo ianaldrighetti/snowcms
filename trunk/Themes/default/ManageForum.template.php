@@ -38,7 +38,7 @@ global $cmsurl, $db_prefix, $l, $settings, $user, $theme_url;
         <tr>
           <th class="border" width="90%">'.$l['mc_tr_cn'].'</th>
           <th class="border">'.$l['mc_tr_order'].'</th>
-          <th width="18px"></th>
+          <th class="no-border" width="18px"></th>
         </tr>';
       
       if (can('manage_forum_edit')) {

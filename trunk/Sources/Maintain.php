@@ -26,6 +26,10 @@ if (!defined("Snow"))
 
 function Maintain() {
 global $cmsurl, $db_prefix, $l, $mysql_db, $settings, $user;
+  
+  // Add link to the link tree
+  AddTree('Maintain','index.php?action=admin;sa=maintain');
+  
   // Can they Maintain the site?
   if(can('maintain')) {
     // So what are they running? Optimizing? Recounting?

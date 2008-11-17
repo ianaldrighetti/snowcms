@@ -16,6 +16,10 @@ if (!defined("Snow"))
 
 function ManageMembers() {
 global $cmsurl, $db_prefix, $l, $settings, $user;
+  
+  // Add link to the link tree
+  addTree('Members','index.php?action=admin;sa=members');
+  
   if(can('manage_members')) {
     // So they can, yippe for you! :P
     // Are they just viewing the list, or managing a member, or something else perhaps?

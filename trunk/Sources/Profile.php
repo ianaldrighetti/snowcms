@@ -28,7 +28,7 @@ global $cmsurl, $db_prefix, $l, $settings, $source_dir, $user, $perms;
      WHERE m.id = $UID");
   
   // Are they a guest trying to view someone's email address?
-  if (@$_REQUEST['sa'] == 'show-email' && $user['group'] == -1) {
+  if ($settings['captcha'] && @$_REQUEST['sa'] == 'show-email' && $user['group'] == -1) {
     // Have they already completed the CAPTCHA?
     if (@$_REQUEST['captcha']) {
       // Salt used in hashing

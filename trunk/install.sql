@@ -208,10 +208,10 @@ INSERT INTO `{$db_prefix}pages` (`page_owner`, `owner_name`, `create_date`, `tit
 
 <ul>
 <li>You can change your site logo for most themes by replacing the file <code>/Themes/<i>theme</i>/images/site_logo.png</code>.</li>
-<li>You can change your theme at <a href="index.php?action=admin%semicolon%sa=basic-settings">basic settings</a> or download more at <a href="http://www.snowcms.com/">SnowCMS.com</a>.</li>
-<li>You can modify what things say by changing the file <code>/Languages/<i>English</i>.language.php</code></li>
+<li>You can change your theme at <a href="index.php?action=admin%semicolon%sa=settings%semicolon%ssa=basic">basic settings</a> or download more at <a href="http://www.snowcms.com/">SnowCMS.com</a>.</li>
+<li>You can modify what things say by changing the file <code>/Languages/<i>Language</i>.language.php</code></li>
 <li>SnowCMS is open source, you can modify any file you want. (May not apply to all themes.)</li>
-<li>Remember to set your <a href="index.php?action=admin%semicolon%sa=mail-settings">mail settings</a> before enabling any email features.</li>
+<li>Remember to set your <a href="index.php?action=admin%semicolon%sa=settings%semicolon%ssa=mail">mail settings</a> before enabling any email features.</li>
 </ul>
 
 <p><br /></p>

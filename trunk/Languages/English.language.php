@@ -7,6 +7,7 @@
 $l['language_name'] = 'English';
 
 // Main
+$l['main_linktree'] = 'Home';
 $l['main_language_go'] = 'Go';
 $l['main_powered_by'] = 'Powered by %snowcms%';
 $l['main_theme_by'] = 'Theme by %whom%';
@@ -93,15 +94,14 @@ $l['logout_error_desc'] = 'Session verification failed! Try logging out again.';
 $l['register_title'] = 'Register';
 $l['register_header'] = 'Register';
 $l['register_details'] = 'You can register for an account on '.$settings['site_name'].' here';
+$l['register_reload'] = 'Reload';
 $l['register_username'] = 'Username:';
 $l['register_password'] = 'Password:';
 $l['register_verify_password'] = 'Verify Password:';
 $l['register_email'] = 'Email:';
-$l['register_captcha'] = 'Enter the Text you see in the image';
+$l['register_captcha'] = 'Enter the text you see in the image';
 $l['register_success'] = 'Thank you %username%! Your account has been created successfully and you may now <a href="'.$cmsurl.'index.php?action=login">login</a>';
-$l['register_successbut1'] = 'Thanks for registering! The administrators require you to activate your account via email, please check your email you used on your account, and click the link to activate your account.</p>
-
-<p>If you didn\'t receive your activation email, check your spam/bulk folder. Some email clients wrongly think our emails are spam. If you still can\'t find it, use the following form to resend your activation email.';
+$l['register_successbut1'] = 'Thanks for registering! The administrators require you to activate your account via email, please check your email you used on your account, and click the link to activate your account.</p>\r\n\r\n<p>If you didn\'t receive your activation email, check your spam/bulk folder. Some email clients wrongly think our emails are spam. If you still can\'t find it, use the following form to resend your activation email.';
 $l['register_resend'] = 'Resend';
 $l['register_successbut2'] = 'Thanks for registering! The administrators require themselves to activate accounts; you will recieve an email once your account is activated.';
 $l['register_failed'] = 'Registration failed!';
@@ -121,18 +121,23 @@ $l['activate_desc'] = 'Here you can activate your account by entering your usern
 $l['activate_button'] = 'Activate Account';
 $l['activate_account_activated'] = 'Your account has been successfully activated! You may now <a href="'. $cmsurl. 'index.php?action=login">login</a>.';
 // Register.template.php - Errors
-$l['register_error_user_taken'] = 'That username is already in use.';
-$l['register_error_username_to_short'] = 'The username must be 3 characters or longer.';
-$l['register_error_passwords'] = 'Those passwords don\'t match!';
-$l['register_error_password_to_short'] = 'Your password is too short!';
-$l['register_error_invalid_email'] = 'That email address is invalid!';
-$l['register_error_captcha'] = 'You failed the CAPTCHA test! Please try again.';
+$l['register_error_username_short'] = 'Your username is too short.';
+$l['register_error_username_long'] = 'Your username is too long';
+$l['register_error_username_invalid'] = 'Your username contains invalid characters.';
+$l['register_error_username_taken'] = 'That username is already in use.';
+$l['register_error_password_short'] = 'Your password is too short.';
+$l['register_error_password_long'] = 'Your password is too long.';
+$l['register_error_password_verification'] = 'Your verification password failed';
+$l['register_error_email_short'] = 'Your email address is too short.';
+$l['register_error_email_long'] = 'Your email address is too long.';
+$l['register_error_email_invalid'] = 'Your email address is invalid.';
+$l['register_error_captcha'] = 'You failed the CAPTCHA test. Please try again.';
 $l['register_error_tos'] = 'You must accept our TOS.';
 $l['register_error_activation_email'] = 'There was an error sending your activation email. Please wait for an administrator to manually register your account.';
 $l['register_error_unknown'] = 'An unknown error has disabled us from registering your account. Please try again later.';
 
 // Page.template.php
-$l['page_error_title'] = $settings['site_name'].' - Error';
+$l['page_error_title'] = 'Error';
 $l['page_error_header'] = 'Error';
 $l['page_error_details'] = 'An error has occurred! The page you have requested does not exist!';
 
@@ -165,6 +170,7 @@ $l['online_unknown'] = 'Unknown action';
 // Admin.template.php
 $l['admin_title'] = 'Control Panel';
 $l['admin_header'] = 'Control Panel';
+$l['admin_linktree'] = 'Control Panel';
 $l['admin_desc'] = 'Here you can change various settings and moderate members, depending on your permissions.';
 $l['admin_snowcms_news'] = 'Latest news on SnowCMS';
 $l['admin_error_title'] = 'Error';
@@ -201,6 +207,7 @@ $l['admin_menu_maintain_desc'] = 'Run some maintenance on your site, like recoun
 // Settings.template.php
 $l['settings_title'] = 'Settings';
 $l['settings_header'] = 'Settings';
+$l['settings_linktree'] = 'Settings';
 $l['settings_desc'] = 'Here you can set some important settings for your site. Select one of the categories below.';
 $l['settings_menu_basic'] = 'Basic Settings';
 $l['settings_menu_basic_desc'] = 'You can edit simple settings such as the site name, slogan and time format here.';
@@ -211,6 +218,7 @@ $l['settings_menu_lengths_desc'] = 'You can set field length minimum and maximum
 // Settings.template.php - Basic
 $l['settings_basic_title'] = 'Basic Settings';
 $l['settings_basic_header'] = 'Basic Settings';
+$l['settings_basic_linktree'] = 'Basic';
 $l['settings_basic_desc'] = 'Here are basic settings for your site, such as site name, slogan, time format, etc.';
 $l['settings_basic_submit'] = 'Update Settings';
 $l['settings_basic_site_name'] = 'Site Name';
@@ -250,8 +258,9 @@ $l['settings_basic_value_medium'] = 'Medium';
 $l['settings_basic_value_strong'] = 'Strong';
 $l['settings_basic_value_superstrong'] = 'Super Strong';
 // Settings.template.php - Mail
-$l['settings_mail_title'] = 'Email Settings';
-$l['settings_mail_header'] = 'Email Settings';
+$l['settings_mail_title'] = 'Mail Settings';
+$l['settings_mail_header'] = 'Mail Settings';
+$l['settings_mail_linktree'] = 'Mail';
 $l['settings_mail_desc'] = 'You can change mail settings here, like whether SMTP or Sendmail are used.';
 $l['settings_mail_smtp'] = 'SMTP';
 $l['settings_mail_sendmail'] = 'Sendmail';
@@ -266,6 +275,7 @@ $l['settings_mail_error_verification'] = 'The verification password was wrong.';
 // Settings.template.php - Field lengths
 $l['settings_lengths_title'] = 'Field Lengths';
 $l['settings_lengths_header'] = 'Field Lengths';
+$l['settings_lengths_linktree'] = 'Lengths';
 $l['settings_lengths_desc'] = 'Here you can set field length minimums and maximums.';
 $l['settings_lengths_submit'] = 'Update Settings';
 $l['settings_lengths_username'] = 'Username';
@@ -315,6 +325,7 @@ $l['basicsettings_error_num_pages_low'] = 'There must be at least one page per p
 // ManagePages.template.php
 $l['managepages_title'] = 'Manage Pages';
 $l['managepages_header'] = 'Manage Pages';
+$l['managepages_linktree'] = 'Manage Pages';
 $l['managepages_createpage'] = 'Create Page';
 $l['managepages_newpagetitle'] = 'Page Title:';
 $l['managepages_header'] = 'Manage Pages';
@@ -336,7 +347,8 @@ $l['managepages_no_page_desc'] = 'The page you have requested to edit does not e
 $l['managepages_edit_title'] = 'Editing %title%';
 $l['managepages_edit_header'] = 'Editing %title%';
 $l['managepages_edit_desc'] = 'You are currently editing a page; you can edit the content and the title of the page, and you use can use HTML in the content of the page.';
-$l['managepages_edit_pagetitle'] = 'Page Title:';
+$l['managepages_edit_pagetitle'] = 'Page Title';
+$l['managepages_edit_linktree'] = 'Link Tree';
 $l['managepages_edit_html'] = 'HTML';
 $l['managepages_edit_bbcode'] = 'BBCode';
 $l['managepages_edit_html_to_bbcode'] = '<b>Warning:</b> If you edit this page it will automatically be converted into BBCode.';
@@ -771,7 +783,7 @@ $l['managemenus_save_changes'] = 'Save Changes';
 $l['manageforum_title'] = 'Manage Forum';
 $l['manageforum_header'] = 'Manage Forum';
 $l['manageforum_desc'] = 'Click on one of the links below to manage your <a href="'. $cmsurl. 'forum.php">forum</a>';
-// // ManageForum.template.php - Options
+// ManageForum.template.php - Options
 $l['mf_link_categories'] = 'Manage Categories';
 $l['mf_link_categories_desc'] = 'Create, Edit, and Delete forum categories';
 $l['mf_link_boards'] = 'Manage Boards';
@@ -779,7 +791,7 @@ $l['mf_link_boards_desc'] = 'You can create, edit and delete your boards in your
 $l['managecats_title'] = 'Manage Categories';
 $l['mf_link_permissions'] = 'Forum Permissions';
 $l['mf_link_permissions_desc'] = 'Here is where you can edit permissions for each board and each member group';
-// // ManageForum.template.php - Categories
+// ManageForum.template.php - Categories
 $l['mf_new_category'] = 'New Category';
 $l['managecats_add_header'] = 'Add Category';
 $l['managecats_addbutton'] = 'Add Category';
@@ -795,7 +807,7 @@ $l['managecats_error_edit_notallowed'] = 'You are not allowed to update forum ca
 $l['managecats_error_delete_notallowed'] = 'You are not allowed to delete forum categories.';
 $l['managecats_error_delete_invalidsession'] = 'Your session verification failed. Try deleting that category again.';
 $l['managecats_error_create_notallowed'] = 'You are not allowed to create new forum categories.';
-// // ManageForum.template.php - Boards
+// ManageForum.template.php - Boards
 $l['manageboards_title'] = 'Manage Boards';
 $l['manageboards_header'] = 'Manage Boards';
 $l['manageboards_desc'] = 'You can edit, add, and delete boards in your forum, be sure that you have <a href="'. $cmsurl. 'index.php?action=admin;sa=forum;fa=categories">categories</a> created already';
@@ -831,7 +843,9 @@ $l['post_edit_submit'] = 'Save Changes';
 $l['forum_startnew'] = 'Post New Topic';
 $l['post_edit_submit'] = 'Save Changes';
 $l['post_error_subject_short'] = 'That subject is too short.';
+$l['post_error_subject_long'] = 'That subject is too long.';
 $l['post_error_body_short'] = 'That post is too short.';
+$l['post_error_body_long'] = 'That post is too long.';
 
 // Search.template.php
 $l['forumsearch_title'] = 'Forum Search';
@@ -932,6 +946,7 @@ $l['managenews_error_manage_delete_invalidsession'] = 'Your session verification
 // TOS.template.php
 $l['tos_title'] = 'Terms of Service';
 $l['tos_header'] = 'Terms of Service';
+$l['tos_desc'] = 'Here you can modify the terms of service for various different languages.';
 $l['tos_manage_title'] = 'Manage TOS';
 $l['tos_manage_header'] = 'Manage Terms of Service';
 $l['tos_manage_desc'] = 'Here you can modify your site\'s terms of service. You can also turn it on or off here.';

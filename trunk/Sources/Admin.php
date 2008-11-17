@@ -33,6 +33,9 @@ if (!defined("Snow"))
 function Admin() {
 global $cmsurl, $db_prefix, $l, $settings, $source_dir, $user;
   
+  // Add link to the link tree
+  addTree($l['admin_linktree'],'index.php?action=admin');
+  
   // This variable will be set if redirection is required to stop IE showing an alert if refreshed
   if (@$_REQUEST['redirect'] == 'admin')
     redirect('index.php?action=admin');

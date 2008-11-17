@@ -121,6 +121,7 @@ global $cmsurl, $settings, $values, $l, $user, $theme_url;
 
 function Editor() {
 global $cmsurl, $settings, $l, $user, $theme_url;
+  
   echo '
   <h1>'.str_replace('%title%',$settings['page']['edit_page']['title'],$l['managepages_edit_header']).'</h1>
   ';
@@ -140,7 +141,7 @@ global $cmsurl, $settings, $l, $user, $theme_url;
     </p>
     <table>
       <tr>
-        <td><label>'.$l['managepages_edit_pagetitle'].'</label></td><td><input name="page_title" type="text" value="'.$settings['page']['edit_page']['title'].'"/></td>
+        <td>'.$l['managepages_edit_pagetitle'].':</td><td><input name="page_title" value="'.$settings['page']['edit_page']['title'].'" /></td>
       </tr>
       <tr>
         <td colspan="2">

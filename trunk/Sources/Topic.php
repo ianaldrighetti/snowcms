@@ -149,6 +149,11 @@ global $cmsurl, $db_prefix, $l, $settings, $user;
           );
           $bid = $row['bid'];
         }
+        //$x = time();
+        //for ($i=0;$i<50;$i+=1)
+        //  bbc($posts[0]['body']);
+        //echo time() - $x;
+        //exit;
         $settings['page']['page'] = (int)@$_REQUEST['pg'];
         $total_posts = mysql_num_rows(sql_query("SELECT * FROM {$db_prefix}messages WHERE `tid` = '$Topic_ID'"));
         $settings['page']['page_last'] = $total_posts / $settings['num_posts'];

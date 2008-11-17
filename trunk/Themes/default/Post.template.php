@@ -7,7 +7,7 @@ if(!defined('Snow'))
   die('Hacking Attempt...');
   
 function Topic() {
-global $cmsurl, $settings, $l, $user, $theme_url, $theme_dir;
+global $cmsurl, $settings, $l, $values, $user, $theme_url, $theme_dir;
   echo '
   <script type="text/javascript" src="'.$theme_url.'/'.$settings['theme'].'/scripts/bbcode.js"></script>
   
@@ -18,11 +18,11 @@ global $cmsurl, $settings, $l, $user, $theme_url, $theme_dir;
     echo '<p><b>'.$l['main_error'].':</b> '.$_SESSION['error'].'</p>';
   
   echo '
-  <form action="', $cmsurl, 'forum.php?action=post2;board=', $settings['board'], '" method="post"  class="write">
+  <form action="', $cmsurl, 'forum.php?action=post2;board=', $settings['board'], '" method="post" class="write">
   <table id="post" border="0px">
     <tr align="center">
       <td width="20%">', $l['topic_subject'], '</td>
-      <td><input name="subject" type="text" size="50" value="', $settings['subject'], '" tabindex=1/>
+      <td><input name="subject" type="text" size="50" value="'.$values['subject'].'" />
       <td width="20%"></td>
     </tr>
     <tr align="center" valign="middle">
@@ -53,14 +53,14 @@ global $cmsurl, $settings, $l, $user, $theme_url, $theme_dir;
       </td>
     </tr>
     <tr align="center">
-      <td colspan="3"><textarea tabindex=2 id="body" name="body" rows="12" cols="60" onclick="if(document.selection){this.selection = document.selection.createRange()}" onkeyup="if(document.selection){this.selection = document.selection.createRange()}" onchange="if(document.selection){this.selection = document.selection.createRange().duplicate()}" onfocus="if(document.selection){this.selection = document.selection.createRange().duplicate()}">', $settings['body'], '</textarea></td>
+      <td colspan="3"><textarea tabindex=2 id="body" name="body" rows="12" cols="60" onclick="if(document.selection){this.selection = document.selection.createRange()}" onkeyup="if(document.selection){this.selection = document.selection.createRange()}" onchange="if(document.selection){this.selection = document.selection.createRange().duplicate()}" onfocus="if(document.selection){this.selection = document.selection.createRange().duplicate()}">'.$values['body'].'</textarea></td>
     </tr>';
   if(canforum('sticky_topic', $settings['board']) || canforum('lock_topic', $settings['board'])) {
-    if($settings['sticky'])
+    if($values['sticky'])
       $settings['sticky'] = 'checked="checked"';
     else
       $settings['sticky'] = '';
-    if($settings['locked'])
+    if($values['locked'])
       $settings['locked'] = 'checked="checked"';
     else
       $settings['locked'] = '';
@@ -101,7 +101,7 @@ global $cmsurl, $settings, $l, $user, $theme_url, $theme_dir;
   <table id="post" border="0px">
     <tr align="center">
       <td width="20%">', $l['topic_subject'], '</td>
-      <td><input name="subject" type="text" size="78" value="', $settings['subject'], '" />
+      <td><input name="subject" type="text" size="78" value="'.$values['subject'].'" />
       <td width="20%"></td>
     </tr>
    <tr align="center" valign="middle">
@@ -130,14 +130,14 @@ global $cmsurl, $settings, $l, $user, $theme_url, $theme_dir;
     echo '</td>
     </tr>
     <tr align="center">
-      <td colspan="3"><textarea name="body" id="body" rows="12" cols="60"onclick="if(document.selection){this.selection = document.selection.createRange()}" onkeyup="if(document.selection){this.selection = document.selection.createRange()}" onchange="if(document.selection){this.selection = document.selection.createRange().duplicate()}" onfocus="if(document.selection){this.selection = document.selection.createRange().duplicate()}">', $settings['body'], '</textarea></td>
+      <td colspan="3"><textarea name="body" id="body" rows="12" cols="60"onclick="if(document.selection){this.selection = document.selection.createRange()}" onkeyup="if(document.selection){this.selection = document.selection.createRange()}" onchange="if(document.selection){this.selection = document.selection.createRange().duplicate()}" onfocus="if(document.selection){this.selection = document.selection.createRange().duplicate()}">'.$values['subject'].'</textarea></td>
     </tr>';
   if(canforum('sticky_topic', $settings['board']) || canforum('lock_topic', $settings['board'])) {
-    if($settings['sticky'])
+    if($values['sticky'])
       $settings['sticky'] = 'checked="checked"';
     else
       $settings['sticky'] = '';
-    if($settings['locked'])
+    if($values['locked'])
       $settings['locked'] = 'checked="checked"';
     else
       $settings['locked'] = '';
@@ -177,7 +177,7 @@ global $cmsurl, $settings, $l, $user, $theme_url, $theme_dir;
   <table id="post" border="0px">
     <tr align="center">
       <td width="20%">', $l['topic_subject'], '</td>
-      <td><input name="subject" type="text" size="78" value="', $settings['subject'], '" />
+      <td><input name="subject" type="text" size="78" value="'.$values['subject'].'" />
       <td width="20%"></td>
     </tr>
    <tr align="center" valign="middle">
@@ -206,14 +206,14 @@ global $cmsurl, $settings, $l, $user, $theme_url, $theme_dir;
     echo '</td>
     </tr>
     <tr align="center">
-      <td colspan="3"><textarea name="body" id="body" rows="12" cols="60"onclick="if(document.selection){this.selection = document.selection.createRange()}" onkeyup="if(document.selection){this.selection = document.selection.createRange()}" onchange="if(document.selection){this.selection = document.selection.createRange().duplicate()}" onfocus="if(document.selection){this.selection = document.selection.createRange().duplicate()}">', $settings['body'], '</textarea></td>
+      <td colspan="3"><textarea name="body" id="body" rows="12" cols="60"onclick="if(document.selection){this.selection = document.selection.createRange()}" onkeyup="if(document.selection){this.selection = document.selection.createRange()}" onchange="if(document.selection){this.selection = document.selection.createRange().duplicate()}" onfocus="if(document.selection){this.selection = document.selection.createRange().duplicate()}">'.$values['subject'].'</textarea></td>
     </tr>';
   if(canforum('sticky_topic', $settings['board']) || canforum('lock_topic', $settings['board'])) {
-    if($settings['sticky'])
+    if($values['sticky'])
       $settings['sticky'] = 'checked="checked"';
     else
       $settings['sticky'] = '';
-    if($settings['locked'])
+    if($values['locked'])
       $settings['locked'] = 'checked="checked"';
     else
       $settings['locked'] = '';

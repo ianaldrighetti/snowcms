@@ -124,7 +124,7 @@ global $l, $settings, $user, $cmsurl;
           '.$profile['gtalk'].'
         </td></tr>';
   }
-  else
+  elseif ($settings['captcha'])
     echo '<tr><th style="text-align: left">'.$l['profile_email'].':</th><td><a href="'.$cmsurl.'index.php?action=profile;sa=show-email;u='.$profile['id'].'">'.$profile['email_guest'].'</a></td></tr>';
   if ($profile['site_url'] && $profile['site_name'])
     echo '

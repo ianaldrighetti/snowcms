@@ -17,6 +17,7 @@ if (!defined("Snow"))
 // This loads all the settings in the {db_prefix}settings table, also loads usernames into the settings array
 function loadSettings() {
 global $db_prefix, $settings;
+  
   // Get all the settings, cause we need them!
   $result = sql_query("SELECT * FROM {$db_prefix}settings");
     while($row = mysql_fetch_assoc($result)) 
@@ -27,6 +28,7 @@ global $db_prefix, $settings;
 // It makes it so later on, once we have a forum in, you can post PHP and HTML stuff, but it
 // Won't be parsed, but keep the site safe from SQL injections 
 function clean($str) {
+  
   // Then ENT_QUOTES make it encode both " and '
   $str = htmlspecialchars($str, ENT_QUOTES);
   return $str;
@@ -236,10 +238,9 @@ global $cmsurl, $l, $theme_dir, $settings;
 // Loads up the permissions into an array, so we can know what you can and can't do :)
 function loadPerms() {
 global $db_prefix, $perms, $user, $forumperms;
-  // Set an array, so we don't get any possible
-  // PHP Notices later
+  // Set an array, so we don't get any possible PHP notices later
   $perms = array();
-  // Set the current users group as an array too, just incase
+  // Set the current users group as an array too, just in case
   $perms[$user['group']] = array();
   // Select them!
   $result = sql_query("SELECT * FROM {$db_prefix}permissions");
@@ -267,12 +268,12 @@ global $bperms, $db_prefix, $user, $forumperms;
 // Load all the menus, both the sidebar menu (if there is one) and the main one (If there is one :P)
 function loadMenus() {
 global $db_prefix, $settings, $user;
-  // Setup a couple variables as an array...
+  // Setup a couple variables in an array
   $menu = array();
   $menu['main'] = array();
   $menu['side'] = array();
   $result = sql_query("SELECT * FROM {$db_prefix}menus ORDER BY `order` ASC");
-  // No point of continuing if no links...
+  // No point of continuing if no links
   if(mysql_num_rows($result)) {  
     while ($row = mysql_fetch_assoc($result)) {
       // Who can view it?
@@ -283,7 +284,7 @@ global $db_prefix, $settings, $user;
          ($row['permission'] == 5 && !$user['is_guest'] && !$user['unread_pms']) || // No new messages
          ($row['permission'] == 6 && !$user['is_guest'] && $user['unread_pms'])) { // New messages
         if($row['menu'] == 1 || $row['menu'] == 3) {
-          // This one goes on the main menu...
+          // This one goes on the main menu
           $menu['main'][] = array(
             'id' => $row['link_id'],
             'order' => $row['order'],
@@ -307,7 +308,7 @@ global $db_prefix, $settings, $user;
       }
     }
   }
-  // Save it to the settings array for later use...
+  // Save it to the settings array for later use
   $settings['menu'] = $menu;
 }
 
@@ -324,10 +325,8 @@ global $db_prefix, $settings, $user;
   // Only if they are not logging in at step two
   if (@$_REQUEST['action'] != 'login2') {
     // We deleted theirs, now make a new one
-    $url_data = (!empty($_GET) && is_array($_GET)) ? addslashes(addslashes(serialize($_GET))) : '';
-    // They in the forum?
+    $url_data = @addslashes(addslashes(serialize($_GET)));
     $inForum = (defined('InForum') && InForum == true) ? 1 : 0;
-    // Now put it in, or replace it with an old one...
     sql_query("REPLACE INTO {$db_prefix}online (`user_id`,`sc`,`ip`,`url_data`,`inForum`,`last_active`) VALUES('{$user['id']}','". clean(session_id()). "','{$user['ip']}','{$url_data}','{$inForum}','".time()."')");
   }
   // They have just finished logging in, so delete references to them as a guest
@@ -411,7 +410,7 @@ global $db_prefix;
       $string = mkstring();
       $result = sql_query("SELECT * FROM {$db_prefix}members WHERE `sc` = '{$string}'");
     }
-    // Got it! Now set it to the session and the user name...
+    // Got it! Now set it to the session and the user name
     $_SESSION['sc'] = $string;
     sql_query("UPDATE {$db_prefix}members SET `sc` = '$string' WHERE `id` = '{$_SESSION['id']}'");
   }
@@ -428,7 +427,7 @@ function mkstring() {
   srand((double)microtime()*1000000);
   $string = '';
   // Make it now, how long? Nobody knows!
-  for($i = 0; $i < $length; $i++) {
+  for ($i = 0; $i < $length; $i++) {
     $num = rand() % 33;
     $tmp = substr($chars, $num, 1);
     $string = $string.$tmp;
@@ -436,13 +435,15 @@ function mkstring() {
   // Returns it to the place it was called upon
   return $string;
 }
+
 // Formats the time with the time format in settings If timestamp is unset, get the current time
 function formattime($timestamp = 0, $timedate = 0) {
 global $settings;
-  // No time stamp? (10 digit number), set the current...
+  
+  // No time stamp? (10 digit number), set the current
   if(!$timestamp)
     $timestamp = time();
-  // How should it be formatted? There are a few ways...
+  // How should it be formatted? There are a few ways
   switch ($timedate) {
     case 0: return date($settings['dateformat'], $timestamp); break;
     case 1: return date($settings['timeformat'], $timestamp); break;
@@ -645,6 +646,7 @@ global $l, $settings, $theme_dir, $theme_url, $smileys;
 // Our Version of mysql_query(), this function looks sad right now, but will be improved sooner or later...
 function sql_query($query) {
 global $num_queries;
+  
   // Number of MySQL Queries?
   $num_queries = isset($num_queries) ? $num_queries + 1 : 0;
   $result = mysql_query($query);
@@ -669,7 +671,7 @@ global $num_queries;
 }
 
 /* 
-  This is called upon when a MySQL Connection Error Occurs, and hopefully won't look so devastating
+  This is called upon when a MySQL connection error Occurs and hopefully won't look so devastating
   when it occurs, hopefully...
 */
 function MySQLError($error) {
@@ -696,6 +698,7 @@ echo '
 // A simple function to redirect
 function redirect($relative_url = false) {
 global $cmsurl;
+  
   // If its false, then redirect to the index.php
   if($relative_url === false)
     $relative_url = 'index.php';
@@ -707,6 +710,7 @@ global $cmsurl;
 // Validates if the Session ID matches that of the users...
 function ValidateSession($sc) {
 global $db_prefix, $user;
+  
   // Select the current user id
   $result = sql_query("SELECT `sc` FROM {$db_prefix}members WHERE `id` = '{$user['id']}'");
   // Get it...
@@ -717,25 +721,27 @@ global $db_prefix, $user;
   else
     return false;
 }
-  /* This is an array of permissions that can be done on the forum ;) */
-  // 'PERM' => 'Defaultly (Is that a word?) Set'
-  $forumperms = array(
-    'delete_any' => false,  
-    'delete_own' => true,
-    'lock_topic' => false,
-    'move_any' => false,
-    'edit_any' => false,
-    'edit_own' => true,
-    'post_new' => true,
-    'post_reply' => true,
-    'sticky_topic' => false,
-    'split_topic' => false
-  ); 
-  // ^^^ Should be moved somewhere else, such as inside the loadPerms(); function (No, not the loadBPerms(); function!) ^^^
-  
+
+// This is an array of permissions that can be done on the forum ;)
+// 'PERM' => 'Defaultly (Is that a word?) Set'
+$forumperms = array(
+  'delete_any' => false,  
+  'delete_own' => true,
+  'lock_topic' => false,
+  'move_any' => false,
+  'edit_any' => false,
+  'edit_own' => true,
+  'post_new' => true,
+  'post_reply' => true,
+  'sticky_topic' => false,
+  'split_topic' => false
+); 
+// ^^^ Should be moved somewhere else, such as inside the loadPerms(); function (No, not the loadBPerms(); function!) ^^^
+
 // This turns the & separator to a ; cause it looks nicer :)
 function cleanQuery() {
 global $_REQUEST, $_GET;
+  
   // Remove current request variables
   unset($_REQUEST);
   // Add post variables to request
@@ -785,7 +791,7 @@ global $cmsurl, $db_prefix, $settings, $user;
     $settings['linktree'][] = array(
                                 'name' => $settings['site_name'],
                                 'href' => $cmsurl.'forum.php'
-                              );    
+                              );
     $result = sql_query("
       SELECT
         b.bid, b.name
@@ -807,7 +813,7 @@ global $cmsurl, $db_prefix, $settings, $user;
     $settings['linktree'][] = array(
                                 'name' => $settings['site_name'],
                                 'href' => $cmsurl.'forum.php'
-                              );     
+                              );
     // Get out the stuff we need
     $result = sql_query("
       SELECT
@@ -843,7 +849,7 @@ global $db_prefix, $user, $cookie_prefix;
       sql_query("UPDATE {$db_prefix}members SET `language` = '$language' WHERE `id` = '{$user['id']}'");
     else
       setcookie($cookie_prefix.'change-language', $language, time()+60*60*24*365);
-    // Set the users language....
+    // Set the user's language
     $user['language'] = $language;
   }
 }
@@ -851,6 +857,7 @@ global $db_prefix, $user, $cookie_prefix;
 // Return the post's owner
 function PostOwner($post) {
 global $db_prefix;
+  
   // Simple cleaning, but it does the job :P
   $post = (int)$post;
   $post = mysql_fetch_assoc(sql_query("SELECT * FROM {$db_prefix}messages WHERE `mid` = $post"));
@@ -965,5 +972,13 @@ global $user, $l, $settings;
     loadTheme('Main','MaintenanceScr');
     exit;
   }
+}
+
+// Add a link to the link tree
+function addTree($name, $href) {
+global $linktree;
+  
+  $linktree[]['name'] = $name;
+  $linktree[count($linktree)-1]['href'] = $href;
 }
 ?>

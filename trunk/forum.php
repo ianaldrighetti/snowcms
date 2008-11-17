@@ -52,6 +52,8 @@ if(get_magic_quotes_gpc())
 // Maintenance Mode?
   maintenanceMode();
 
+$values = @unserialize($_SESSION['error_values']);
+
 // What do we do? :O
   if((empty($_REQUEST['action'])) && (empty($_REQUEST['board'])) && (empty($_REQUEST['topic']))) {
     // Okay, show the BoardIndex :)

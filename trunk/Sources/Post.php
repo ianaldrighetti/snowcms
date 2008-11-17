@@ -90,16 +90,16 @@ global $cmsurl, $db_prefix, $l, $settings, $user;
   }
   elseif(!empty($_REQUEST['board'])) {
     // :o What Board?
-    $Board_ID = (int)addslashes(mysql_real_escape_string($_REQUEST['board']));    
+    $board_id = (int)addslashes(mysql_real_escape_string($_REQUEST['board']));    
     // K, they are making a new topic
     // But can they? :)
-    if(canforum('post_new', $Board_ID)) {
+    if(canforum('post_new', $board_id)) {
       // Okay, their permissions say yes, but lets see what the forum says! :D!
       $result = sql_query("
          SELECT 
            b.bid, b.who_view
          FROM {$db_prefix}boards AS b
-         WHERE b.bid = $Board_ID");
+         WHERE b.bid = $board_id");
       // Well, does this board exist? ._.
       if(mysql_num_rows($result)>0) {
         while($row = mysql_fetch_assoc($result))
@@ -142,79 +142,71 @@ global $cmsurl, $db_prefix, $l, $settings, $user;
 
 function Post2() {
 global $cmsurl, $db_prefix, $l, $settings, $user;
+  
   // This actually submits the post itself... 
   // So, what are we doing? New topic? Posting a Reply?
   $what = isset($_REQUEST['board']) ? 'new_topic' : 'post_reply';
   // Do they want to post a new topic? And can they post it in the board?
-  if($what == 'new_topic' && canforum('post_new', (int)$_REQUEST['board']) && postable($_REQUEST['board'])) {
+  if($what == 'new_topic' && canforum('post_new', (int)@$_REQUEST['board']) && postable(@$_REQUEST['board'])) {
     // Just sanitize a variable
-    $Board_ID = (int)$_REQUEST['board'];
-    // Make sure they didn't leave it all empty...
-    if (strlen($_REQUEST['subject']) > 2) {
-      if (strlen($_REQUEST['body']) > 2) {
-        // Okie Dokie then...
-        $isSticky = canforum('sticky_topic') ? (int)@$_REQUEST['sticky'] : 0;
-        $isLocked = canforum('lock_topic') ? (int)@$_REQUEST['locked'] : 0;
-        $result = sql_query("
-          INSERT INTO {$db_prefix}topics
-          (`sticky`,`locked`,`bid`,`starter_id`,`topic_starter`,`ender_id`,`topic_ender`)
-          VALUES('$isSticky','$isLocked','$Board_ID','{$user['id']}','{$user['name']}','{$user['id']}','{$user['name']}')");
-        // Inserting the topic in the topic table is done, but that doesn't mean its finished :P
-        $topic_id = mysql_insert_id();
-        $subject = clean($_REQUEST['subject']);
-        $post_time = time();
-        $body = clean($_REQUEST['body']);
-        $result = sql_query("
-        INSERT INTO {$db_prefix}messages
-        (`tid`,`bid`,`uid`,`subject`,`post_time`,`poster_name`,`poster_email`,`ip`,`body`)
-        VALUES('$topic_id','$Board_ID','{$user['id']}','$subject','$post_time','{$user['name']}','{$user['email']}','{$user['ip']}','{$body}')");
-        $msg_id = mysql_insert_id();
-        sql_query("UPDATE {$db_prefix}topics SET `first_msg` = '$msg_id', `last_msg` = '$msg_id' WHERE `tid` = '$topic_id'");
-        // Update a few things :o like post count, number of posts and topics inside the board  
-        sql_query("UPDATE {$db_prefix}members SET `numposts` = numposts + 1 WHERE `id` = '{$user['id']}'");
-        sql_query("UPDATE {$db_prefix}boards SET `numtopics` = numtopics + 1, `numposts` = numposts + 1, `last_msg` = '$msg_id', `last_uid` = '{$user['id']}', `last_name` = '{$user['name']}' WHERE `bid` = '$Board_ID'");
-        // Insert a row to show they have posted here :)
-        sql_query("REPLACE INTO {$db_prefix}message_logs (`uid`,`tid`,`mid`) VALUES('{$user['id']}','$topic_id','$msg_id')");
-        // Delete anything from board logs with the board ID of $Board_ID, there is a new post in town!
-        sql_query("DELETE FROM {$db_prefix}board_logs WHERE `bid` = '$Board_ID' AND `uid` != '{$user['id']}'");
-        // Log that this member has viewed this topic
-        if ($user['is_logged']) {
-          $result = sql_query("SELECT * FROM {$db_prefix}topic_logs WHERE `tid` = '$topic_id' AND `uid` = '{$user['id']}'");
-          if(mysql_num_rows($result)==0) {
-            sql_query("
-              REPLACE INTO {$db_prefix}topic_logs
-              (`tid`,`uid`)
-             VALUES ($topic_id, {$user['id']})");
-          }
-        }
-        unset($_SESSION['subject'], $_SESSION['body'], $_SESSION['sticky'], $_SESSION['locked'], $_SESSION['board']);
-        redirect("forum.php?board=".clean_header($Board_ID));
-      }
-      else {
-        $_SESSION['error'] = $l['post_error_body_short'];
-        $_SESSION['subject'] = @$_REQUEST['subject'];
-        $_SESSION['body'] = @$_REQUEST['body'];
-        $_SESSION['sticky'] = (int)@$_REQUEST['sticky'];
-        $_SESSION['locked'] = (int)@$_REQUEST['locked'];
-        $_SESSION['board'] = (int)@$_REQUEST['board'];
-        redirect("forum.php?action=post;board={$Board_ID}");
-      }
+    $board_id = (int)@$_REQUEST['board'];
+    // Is the subject within the allowed length?
+    if (inlength('post_subject',strlen(@$_REQUEST['subject'])))
+      $_SESSION['error'] = $l['post_error_subject_'.inlength('post_subject',strlen(@$_REQUEST['subject']))];
+    // Is the post text within the allowed length?
+    elseif (inlength('post',strlen($_REQUEST['body'])))
+      $_SESSION['error'] = $l['post_error_body_'.inlength('post',strlen(@$_REQUEST['body']))];
+    // Was there an error?
+    if (isset($_SESSION['error'])) {
+      $_SESSION['error_values'] = serialize(array('subject'=>clean(@$_REQUEST['subject']),'body'=>clean(@$_REQUEST['body']),
+                                        'sticky'=>(int)@$_REQUEST['sticky'],'locked'=>(int)@$_REQUEST['locked']));
+      redirect("forum.php?action=post;board={$board_id}");
     }
+    // There wasn't an error
     else {
-      $_SESSION['error'] = $l['post_error_subject_short'];
-      $_SESSION['subject'] = @$_REQUEST['subject'];
-      $_SESSION['body'] = @$_REQUEST['body'];
-      $_SESSION['sticky'] = (int)@$_REQUEST['sticky'];
-      $_SESSION['locked'] = (int)@$_REQUEST['locked'];
-      $_SESSION['board'] = (int)@$_REQUEST['board'];
-      redirect("forum.php?action=post;board={$Board_ID}");
+      $isSticky = canforum('sticky_topic') ? (int)@$_REQUEST['sticky'] : 0;
+      $isLocked = canforum('lock_topic') ? (int)@$_REQUEST['locked'] : 0;
+      $result = sql_query("
+        INSERT INTO {$db_prefix}topics
+        (`sticky`,`locked`,`bid`,`starter_id`,`topic_starter`,`ender_id`,`topic_ender`)
+        VALUES('$isSticky','$isLocked','$board_id','{$user['id']}','{$user['name']}','{$user['id']}','{$user['name']}')");
+      // Inserting the topic in the topic table is done, but that doesn't mean its finished :P
+      $topic_id = mysql_insert_id();
+      $subject = clean($_REQUEST['subject']);
+      $post_time = time();
+      $body = clean($_REQUEST['body']);
+      $result = sql_query("
+      INSERT INTO {$db_prefix}messages
+      (`tid`,`bid`,`uid`,`subject`,`post_time`,`poster_name`,`poster_email`,`ip`,`body`)
+      VALUES('$topic_id','$board_id','{$user['id']}','$subject','$post_time','{$user['name']}','{$user['email']}','{$user['ip']}','{$body}')");
+      $msg_id = mysql_insert_id();
+      sql_query("UPDATE {$db_prefix}topics SET `first_msg` = '$msg_id', `last_msg` = '$msg_id' WHERE `tid` = '$topic_id'");
+      // Update a few things :o like post count, number of posts and topics inside the board  
+      sql_query("UPDATE {$db_prefix}members SET `numposts` = numposts + 1 WHERE `id` = '{$user['id']}'");
+      sql_query("UPDATE {$db_prefix}boards SET `numtopics` = numtopics + 1, `numposts` = numposts + 1, `last_msg` = '$msg_id', `last_uid` = '{$user['id']}', `last_name` = '{$user['name']}' WHERE `bid` = '$board_id'");
+      // Insert a row to show they have posted here :)
+      sql_query("REPLACE INTO {$db_prefix}message_logs (`uid`,`tid`,`mid`) VALUES('{$user['id']}','$topic_id','$msg_id')");
+      // Delete anything from board logs with the board ID of $board_id, there is a new post in town!
+      sql_query("DELETE FROM {$db_prefix}board_logs WHERE `bid` = '$board_id' AND `uid` != '{$user['id']}'");
+      // Log that this member has viewed this topic
+      if ($user['is_logged']) {
+        $result = sql_query("SELECT * FROM {$db_prefix}topic_logs WHERE `tid` = '$topic_id' AND `uid` = '{$user['id']}'");
+        if(mysql_num_rows($result)==0) {
+          sql_query("
+            REPLACE INTO {$db_prefix}topic_logs
+            (`tid`,`uid`)
+           VALUES ($topic_id, {$user['id']})");
+        }
+      }
+      unset($_SESSION['subject'], $_SESSION['body'], $_SESSION['sticky'], $_SESSION['locked'], $_SESSION['board']);
+      redirect("forum.php?board=".clean_header($board_id));
     }
   }
   // Are they trying to create or edit a post?
   elseif ($what == 'post_reply' && (canforum('post_reply', BoardFromTopic(@$_REQUEST['topic'])) || canforum('edit_own', BoardFromTopic(@$_REQUEST['topic'])) && @$_REQUEST['edit'] && postOwner(@$_REQUEST['edit']) == $user['id']) || (canforum('edit_any', BoardFromTopic(@$_REQUEST['topic'])) && @$_REQUEST['edit'])) {
-    $Topic_ID = (int)$_REQUEST['topic'];
+    $topic_id = (int)$_REQUEST['topic'];
     // Check if the topic is locked
-    $locked = mysql_fetch_assoc(sql_query("SELECT * FROM {$db_prefix}topics WHERE `tid` = '$Topic_ID'"));
+    $locked = mysql_fetch_assoc(sql_query("SELECT * FROM {$db_prefix}topics WHERE `tid` = '$topic_id'"));
     if (!$locked['locked']) {
       // It isn't
       // Hmm, make sure it is at least filled out, ya know? :P
@@ -226,14 +218,14 @@ global $cmsurl, $db_prefix, $l, $settings, $user;
           $body.="\n\n    [url=http://xkcd.com/406/]-Summer Glau[/url]";
         }
         
-        $board_id = boardfromTopic($Topic_ID);
+        $board_id = boardfromTopic($topic_id);
         // Get a couple options, like locked topic, sticky topic, etc.
         $options = array();
         $options['sticky'] = canforum('sticky_topic', $board_id) ? (int)@$_REQUEST['sticky'] : 0;
         $options['locked'] = canforum('lock_topic', $board_id) ? (int)@$_REQUEST['locked'] : 0;
         // If they stickied the topic or locked it, we need to update the original topic :)
         if(canforum('sticky_topic', $board_id) || canforum('lock_topic', $board_id)) {
-          sql_query("UPDATE {$db_prefix}topics SET `sticky` = '{$options['sticky']}', `locked` = '{$options['locked']}' WHERE tid = '$Topic_ID'");
+          sql_query("UPDATE {$db_prefix}topics SET `sticky` = '{$options['sticky']}', `locked` = '{$options['locked']}' WHERE tid = '$topic_id'");
         }
         // No Subject? No Problem!
         if (empty($subject)) {
@@ -248,17 +240,16 @@ global $cmsurl, $db_prefix, $l, $settings, $user;
                 *
               FROM {$db_prefix}topics AS t
                 LEFT JOIN {$db_prefix}messages AS msg ON msg.mid = t.first_msg
-              WHERE t.tid = '$Topic_ID'"));
+              WHERE t.tid = '$topic_id'"));
             $subject = "Re: ".$subject['subject'];
           }
         }
-        
         // Is a message being edited and are they allowed to do it?
         if ($edit = (int)@$_REQUEST['edit']) {
-          if ((canforum('edit_own', BoardFromTopic($Topic_ID)) && postOwner(@$_REQUEST['edit']) == $user['id']) || (canforum('edit_any', BoardFromTopic($Topic_ID)))) {
+          if ((canforum('edit_own', BoardFromTopic($topic_id)) && postOwner(@$_REQUEST['edit']) == $user['id']) || (canforum('edit_any', BoardFromTopic($topic_id)))) {
             // Yep!
             sql_query("UPDATE {$db_prefix}messages SET `subject` = '$subject', `body` = '$body', `uid_editor` = '{$user['id']}', `editor_name` = '{$user['name']}', `edit_time` = '".time()."' WHERE `mid` = '$edit'");
-            redirect('forum.php?topic='.clean_header($Topic_ID));
+            redirect('forum.php?topic='.clean_header($topic_id));
           }
         }
         else {
@@ -266,19 +257,19 @@ global $cmsurl, $db_prefix, $l, $settings, $user;
           $post_time = time();
           sql_query("INSERT INTO {$db_prefix}messages
                      (`tid`,`bid`,`uid`,`subject`,`post_time`,`poster_name`,`poster_email`,`ip`,`body`)
-               VALUES('$Topic_ID','$board_id','{$user['id']}','$subject','$post_time','{$user['name']}','{$user['email']}','{$user['ip']}','{$body}')");
+               VALUES('$topic_id','$board_id','{$user['id']}','$subject','$post_time','{$user['name']}','{$user['email']}','{$user['ip']}','{$body}')");
           $msg_id = mysql_insert_id();
-          sql_query("UPDATE {$db_prefix}topics SET `last_msg` = '$msg_id', `ender_id` = '{$user['id']}', `topic_ender` = '{$user['name']}', `num_replies` = num_replies + 1 WHERE `tid` = '$Topic_ID'");
+          sql_query("UPDATE {$db_prefix}topics SET `last_msg` = '$msg_id', `ender_id` = '{$user['id']}', `topic_ender` = '{$user['name']}', `num_replies` = num_replies + 1 WHERE `tid` = '$topic_id'");
           sql_query("UPDATE {$db_prefix}members SET `numposts` = numposts + 1 WHERE `id` = '{$user['id']}'");
           sql_query("UPDATE {$db_prefix}boards SET `numposts` = numposts + 1, `last_msg` = '$msg_id', `last_uid` = '{$user['id']}', `last_name` = '{$user['name']}' WHERE `bid` = '$board_id'");
           // Delete anything from board logs with the board ID of $board_id, unless they are th current member
           sql_query("DELETE FROM {$db_prefix}board_logs WHERE `bid` = '$board_id' AND `uid` != '{$user['id']}'");
-          // Delete anything from topic logs with the topic ID of $Topic_ID, unless they are th current member
-          sql_query("DELETE FROM {$db_prefix}topic_logs WHERE `tid` = '$Topic_ID' AND `uid` != '{$user['id']}'");
+          // Delete anything from topic logs with the topic ID of $topic_id, unless they are th current member
+          sql_query("DELETE FROM {$db_prefix}topic_logs WHERE `tid` = '$topic_id' AND `uid` != '{$user['id']}'");
           // Show they posted in this topic =D
           sql_query("REPLACE INTO {$db_prefix}message_logs (`uid`,`tid`,`mid`) VALUES('{$user['id']}','$Topic_ID','$msg_id')");
           unset($_SESSION['subject'], $_SESSION['body'], $_SESSION['sticky'], $_SESSION['locked'], $_SESSION['board']);
-          redirect("forum.php?board={$board_id}");
+          redirect("forum.php?board=$board_id");
         }
       }
       else {
@@ -289,9 +280,9 @@ global $cmsurl, $db_prefix, $l, $settings, $user;
         $_SESSION['locked'] = (int)@$_REQUEST['locked'];
         $_SESSION['board'] = (int)@$_REQUEST['board'];
         if (@$_REQUEST['edit'])
-          redirect("forum.php?action=post;topic={$Topic_ID};edit=".clean(@$_REQUEST['edit']));
+          redirect("forum.php?action=post;topic=$topic_id;edit=".clean(@$_REQUEST['edit']));
         else
-          redirect("forum.php?action=post;topic={$Topic_ID}");
+          redirect("forum.php?action=post;topic=$topic_id");
       }
     }
     else

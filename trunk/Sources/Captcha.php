@@ -18,8 +18,6 @@ require_once $theme_dir.'/'.$settings['theme'].'/info.php';
 function Captcha() {
 global $settings, $source_dir;
   
-  $settings['captcha'] = 5;
-  
   if ($settings['captcha'] >= 4) {
     $strength = $settings['captcha'] - 4;
     $fonts = true;

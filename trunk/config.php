@@ -10,28 +10,28 @@
 //
 //                  config.php file
 
-// We can't let you access it directly :)
+
 if (!defined("Snow"))
   die(header("HTTP/1.1 404 Not Found"));
 
-// Your MySQL Information
+// Your MySQL information
 $mysql_host = 'localhost'; # Your MySQL Host, doubt you will change this
-$mysql_user = ''; # Your MySQL Username
+$mysql_user = 'root'; # Your MySQL Username
 $mysql_passwd = ''; # Your MySQL Password
-$mysql_db = ''; # Your MySQL DB
-$mysql_prefix = 'scms_'; # Prefix for your database
+$mysql_db = 'snowcms'; # Your MySQL DB
+$mysql_prefix = ''; # Prefix for your database
 
 // Misc
-$cookie_prefix = 'scms_'; # Prefix for cookies
+$cookie_prefix = ''; # Prefix for cookies
 
-// Some SnowCMS Specific Settings
-$source_dir = ''; # Path to your Source directory without trailing /
-$theme_dir = ''; # Path to your Themes directory without trailing /
-$language_dir = ''; # Path to your Languages directory without trailing /
-$cmsurl = ''; # URL to your SnowCMS Installation
-$theme_url = ''; # URL to your SnowCMS Themes folder
+// Some SnowCMS specific settings
+$source_dir = 'C:\\Users\\Myles\\XAMPP\\htdocs\\scms/Sources'; # Path to your Source directory without trailing /
+$theme_dir = 'C:\\Users\\Myles\\XAMPP\\htdocs\\scms/Themes'; # Path to your Themes directory without trailing /
+$language_dir = 'C:\\Users\\Myles\\XAMPP\\htdocs\\scms/Languages'; # Path to your Languages directory without trailing /
+$cmsurl = 'http://localhost/scms/'; # URL to your SnowCMS Installation
+$theme_url = 'http://localhost/scms/Themes'; # URL to your SnowCMS Themes folder
 
-/* Don't touch the stuff below! */
+// Don't touch the stuff below
 $db_prefix = '`'.$mysql_db.'`.'.$mysql_prefix;
-$scms_installed = false;
+$scms_installed = true;
 ?>

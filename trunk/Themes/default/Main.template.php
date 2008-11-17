@@ -39,7 +39,28 @@ global $l, $cmsurl, $theme_url, $settings, $user;
   </div>
   <div class="header-right"></div>
   <div class="content">
-  ';
+  '.link_tree();
+}
+
+// The footer of your site!
+// Please do NOT remove the powered by link, it helps support SnowCMS
+// by getting more users, if you do remove it, we can and will deny
+// you of support for your SnowCMS installation. Thanks!
+function theme_footer() {
+global $l, $cmsurl, $theme_url, $settings, $user, $num_queries;
+echo '
+    <div style="clear: both"><br /></div>
+     '.link_tree().'
+  </div>
+  <div class="footer">
+    ';
+languageOption();
+echo '
+    <p>'.str_replace('%snowcms%','<a href="http://www.snowcms.com/" onClick="window.open(this.href); return false;">SnowCMS '.$settings['version'].'</a>',$l['main_powered_by']).' | '.str_replace('%whom%','<a href="http://www.snowcms.com/" onclick="window.open(this.href); return false;">The SnowCMS Team</a>',$l['main_theme_by']).' | ', str_replace('%queries%', $num_queries, $l['page_made']), '</p>
+  </div>
+</div>
+</body>
+</html>';
 }
 
 // Call on by either theme_menu('main') or theme_menu('side')
@@ -52,26 +73,6 @@ global $l, $cmsurl, $settings, $user;
       echo '<li><a href="'.$link['href'].'" '.$link['target'].'>'.$link['name'].'</a></li>';
     }
   }
-}
-
-// The footer of your site!
-// Please do NOT remove the powered by link, it helps support SnowCMS
-// by getting more users, if you do remove it, we can and will deny
-// you of support for your SnowCMS installation. Thanks!
-function theme_footer() {
-global $l, $cmsurl, $theme_url, $settings, $user, $num_queries;
-echo '
-    <div style="clear: both"></div>
-  </div>
-  <div class="footer">
-    ';
-languageOption();
-echo '
-    <p>'.str_replace('%snowcms%','<a href="http://www.snowcms.com/" onClick="window.open(this.href); return false;">SnowCMS '.$settings['version'].'</a>',$l['main_powered_by']).' | '.str_replace('%whom%','<a href="http://www.snowcms.com/" onclick="window.open(this.href); return false;">The SnowCMS Team</a>',$l['main_theme_by']).' | ', str_replace('%queries%', $num_queries, $l['page_made']), '</p>
-  </div>
-</div>
-</body>
-</html>';
 }
 
 function languageOption() {
@@ -110,6 +111,17 @@ global $user, $settings, $l, $db_prefix, $language_dir, $cmsurl, $cookie_prefix;
     </p></form>
   ';
   }
+}
+
+// This constructs the link tree that is gotten from the linktree array in $settings
+function link_tree() {
+global $linktree;
+  
+  $tree = array();
+  foreach($linktree as $link) {
+    $tree[] = '<a href="'.$link['href'].'">'.$link['name'].'</a>';
+  }
+  return '<p class="link_tree">'.implode(" > ",$tree).'</p>';
 }
 
 function MaintenanceScr() {

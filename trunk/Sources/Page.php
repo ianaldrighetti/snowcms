@@ -20,25 +20,28 @@ global $cmsurl, $db_prefix, $l, $settings, $user;
   
   // If Main Page is true, we need to show the Page ID Set to be shown at the Home, or else get ?page=
   if($main_page) 
-    $PageID = $settings['homepage'];
+    $page_id = $settings['homepage'];
   else
-    $PageID = clean($_REQUEST['page']);
+    $page_id = clean($_REQUEST['page']);
   // Get it from MySQL
-  $result = sql_query("SELECT * FROM {$db_prefix}pages WHERE `page_id` = '{$PageID}'");
+  $result = sql_query("SELECT * FROM {$db_prefix}pages WHERE `page_id` = '{$page_id}'");
   // Does it exist or not?
-  if(mysql_num_rows($result)) {
-    while($row = mysql_fetch_assoc($result)) {
-      $settings['page']['title'] = $row['title'];
-	    $settings['page']['date'] = $row['modify_date'] ? formattime($row['modify_date']) : formattime($row['create_date']);
-      $settings['page']['content'] = stripslashes($row['content']);
-      $settings['page']['html'] = $row['html'];
-    }
+  if ($row = mysql_fetch_assoc($result)) {
+    $settings['page']['title'] = $row['title'];
+    $settings['page']['date'] = $row['modify_date'] ? formattime($row['modify_date']) : formattime($row['create_date']);
+    $settings['page']['content'] = stripslashes($row['content']);
+    $settings['page']['html'] = $row['html'];
+    // Add link to the link tree only if it isn't the home page
+    if (!$main_page)
+      addTree($settings['page']['title'],'index.php?page='.$page_id);
     // It does! Set content and page title, then load Page.template.php
     loadTheme('Page');
   }
   else {
     // Oh Noes! Page doesn't exist D: Load Error Title and Error Function in Page.template.php
     $settings['page']['title'] = $l['page_error_title'];
+    // Add link to the link tree
+    addTree($settings['page']['title'],'index.php');
     loadTheme('Page','Error');
   }
 }
@@ -46,6 +49,9 @@ global $cmsurl, $db_prefix, $l, $settings, $user;
 // An admin function to manage pages
 function ManagePages() {
 global $cmsurl, $db_prefix, $l, $settings, $user;
+  
+  // Add link to the link tree
+  addTree($l['managepages_linktree'],'index.php?action=admin;sa=pages');
   
   // This variable will be set if redirection is required to remove post data
   if(@$_REQUEST['redirect'])
@@ -278,6 +284,7 @@ global $cmsurl, $db_prefix, $l, $settings, $user;
 
 function EditPage() {
 global $cmsurl, $db_prefix, $l, $settings, $user;
+  
   if(can('manage_pages_modify_html') || can('manage_pages_modify_bbcode')) {  
     // Get the Page ID and clean it!
     $page = (int)addslashes(mysql_real_escape_string(@$_REQUEST['page']));

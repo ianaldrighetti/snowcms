@@ -62,52 +62,46 @@ global $cmsurl, $db_prefix, $l, $settings, $source_dir, $user;
       // Salt used in hashing
       $salt = 'salt4me';
       // Get their username, password, verification pass, email, and the captcha
-      $username = @$_REQUEST['username'];
+      $username = clean(@$_REQUEST['username']);
       $password = @$_REQUEST['password'];
       $vpassword = @$_REQUEST['vpassword'];
-      $email = @$_REQUEST['email'];
-      $captcha = sha1(strtolower(@$_REQUEST['captcha']).sha1($salt));
+      $email = clean(@$_REQUEST['email']);
       // Set error as array, so if no errors, we won't get a PHP error
       $settings['page']['error'] = array();
+      // Is the username outside of the allowed lengths?
+      if(inlength('username',strlen(@$_REQUEST['username'])))
+        $settings['page']['error'][] = $l['register_error_username_'.inlength('username',strlen(@$_REQUEST['username']))];
       // Is the username taken?
-      $result = sql_query("SELECT * FROM {$db_prefix}members WHERE `username` = '".clean($username)."'");
-      if(mysql_num_rows($result)>0) {
-        $settings['page']['error'][] = $l['register_error_user_taken'];
-      }
-      // Is the username to short?
-      if(strlen($username)<3) {
-        $settings['page']['error'][] = $l['register_error_username_to_short'];
-      }
-      //Do the passwords match?
-      if($password!=$vpassword) {
-        $settings['page']['error'][] = $l['register_error_passwords'];
-      }
-      // If the passwords match, is it long enough?
-      if(($password==$vpassword) && (strlen($password)<5)) {
-        $settings['page']['error'][] = $l['register_error_password_to_short'];
-      }
+      $result = sql_query("SELECT * FROM {$db_prefix}members WHERE `username` = '".$username."' OR `display_name` = '".$username."'");
+      if(mysql_num_rows($result) > 0)
+        $settings['page']['error'][] = $l['register_error_username_taken'];
+      // Is the password outside of the allowed lengths?
+      if(inlength('password',strlen($password)))
+        $settings['page']['error'][] = $l['register_error_password_'.inlength('password',strlen($password))];
+      // Do the passwords match?
+      if($password != $vpassword)
+        $settings['page']['error'][] = $l['register_error_password_verification'];
       // Email valid?
-      if(!preg_match("/^([a-z0-9._-](\+[a-z0-9])*)+@[a-z0-9.-]+\.[a-z]{2,6}$/i", $email)) {
+      if(!preg_match("/^([a-z0-9._-](\+[a-z0-9])*)+@[a-z0-9.-]+\.[a-z]{2,6}$/i", $email))
         $settings['page']['error'][] = $l['register_error_invalid_email'];
-      }
+      // Is the email outside of the allowed lengths?
+      if(inlength('email',strlen(@$_REQUEST['email'])))
+        $settings['page']['error'][] = $l['register_error_email_'.inlength('email',strlen(@$_REQUEST['email']))];
       // Is the CAPTCHA valid?
-      if($captcha != @$_SESSION['captcha_'.sha1(sha1($salt))]) {
+      if($settings['captcha'] && sha1(strtolower(@$_REQUEST['captcha']).sha1($salt)) != @$_SESSION['captcha_'.sha1(sha1($salt))])
         $settings['page']['error'][] = $l['register_error_captcha'];
-      }
       // Did they except the TOS?
-      if (!@$_REQUEST['tos'] && $settings['enable_tos'])
+      if(!@$_REQUEST['tos'] && $settings['enable_tos'])
         $settings['page']['error'][] = $l['register_error_tos'];
       // Did we get no errors? If no, register them
-      if(count($settings['page']['error'])==0) {
+      if(!count($settings['page']['error'])) {
         // Clean username, encrypt pass, clean email, set time registered
-        $username = clean($username);
         $password = md5($password);
-        $email = clean($email);
         $time = time();
         $activated = 1;
         $acode = base64_encode(md5(time().$email.$password.rand(1,500)));
         // What is account Activation?
-        if($settings['account_activation']>0) {
+        if($settings['account_activation'] > 0) {
           $activated = 0;
         }
         $settings['page']['error'] = null;
@@ -115,7 +109,7 @@ global $cmsurl, $db_prefix, $l, $settings, $source_dir, $user;
         $result = sql_query("INSERT INTO {$db_prefix}members (`username`,`display_name`,`password`,`email`,`reg_date`,`reg_ip`,`group`,`activated`,`acode`) VALUES('{$username}','{$username}','{$password}','{$email}','{$time}','{$user['ip']}','{$settings['default_group']}','{$activated}','{$acode}')");
         if($result) {
           // It was a Success! Weeee!
-          if($settings['account_activation'] == 0) {
+          if(!$settings['account_activation']) {
             $row = mysql_fetch_assoc(sql_query("SELECT * FROM {$db_prefix}members WHERE `username` = '$username'"));
             redirect('index.php?action=register;sa=success;u='.$row['id']);
           }
@@ -140,9 +134,10 @@ global $cmsurl, $db_prefix, $l, $settings, $source_dir, $user;
           // It failed...!
           redirect('index.php?action=register;sa=error');
       }
+      // There were errors!
       else {
-        // Their were errors! Load the Register template so it can show them
         $_SESSION['register-error'] = implode('\n',$settings['page']['error']);
+        $_SESSION['error_values'] = serialize(array('username'=>$username,'email'=>$email));
         redirect('index.php?action=register;sa=error');
       }
     }

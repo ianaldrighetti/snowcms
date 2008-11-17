@@ -15,6 +15,11 @@ if(!defined("Snow"))
   die(header("HTTP/1.1 404 Not Found"));
 
 function Settings() {
+global $l;
+  
+  // Add link to the link tree
+  addTree($l['settings_linktree'],'index.php?action=admin;sa=settings');
+  
   if(@$_REQUEST['redirect'] == 'settings')
     redirect('index.php?action=admin;sa=settings');
   
@@ -55,6 +60,9 @@ global $l, $settings;
 
 function BasicSettings() {
 global $cmsurl, $db_prefix, $l, $settings, $user, $language_dir, $theme_dir;
+  
+  // Add link to the link tree
+  addTree($l['settings_basic_linktree'],'index.php?action=admin;sa=settings;ssa=basic');
   
   if (can('manage_basic-settings')) {
     // An array of all the settings that can be set on this page...
@@ -304,6 +312,9 @@ global $cmsurl, $db_prefix, $l, $settings, $user, $language_dir, $theme_dir;
 function MailSettings() {
 global $cmsurl, $db_prefix, $l, $settings;
   
+  // Add link to the link tree
+  addTree($l['settings_mail_linktree'],'index.php?action=admin;sa=settings;ssa=mail');
+  
   // Do they have permission?
   if(can('manage_mail_settings')) {
     // Are they changing settings?
@@ -359,6 +370,9 @@ global $cmsurl, $db_prefix, $l, $settings;
 
 function FieldLengthSettings() {
 global $cmsurl, $db_prefix, $l, $settings, $user, $language_dir, $theme_dir;
+  
+  // Add link to the link tree
+  addTree($l['settings_lengths_linktree'],'index.php?action=admin;sa=settings;ssa=lengths');
   
   if (can('manage_basic-settings')) {
     $lengths = array(

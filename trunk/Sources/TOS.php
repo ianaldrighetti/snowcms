@@ -31,6 +31,9 @@ global $l, $settings, $db_prefix, $user;
 function ManageTOS() {
 global $l, $settings, $db_prefix, $user, $language_dir;
   
+  // Add link to the link tree
+  AddTree('Terms of Service','index.php?action=admin;sa=tos');
+  
   // Are they allowed to manage the TOS?
   if (can('manage_tos')) {
     // Convert post data into get data

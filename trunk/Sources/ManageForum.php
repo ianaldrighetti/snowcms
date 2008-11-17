@@ -18,6 +18,9 @@ if (!defined("Snow"))
 function ManageForum() {
 global $cmsurl, $db_prefix, $l, $settings, $source_dir, $user;
   
+  // Add link to the link tree
+  AddTree('Forum','index.php?action=admin;sa=forum');
+  
   // Are they allowed to manage the forum?
   if (can('manage_forum')) {
     // We need another sub action kind of thing don't we? .-.
@@ -64,6 +67,9 @@ global $cmsurl, $db_prefix, $l, $settings, $user;
 // Awwww, kitty ^^
 function ManageCats() {
 global $cmsurl, $db_prefix, $l, $settings, $user;
+  
+  // Add link to the link tree
+  AddTree('Categories','index.php?action=admin;sa=forum;fa=categories');
   
   // Manage the categories! :O
   // Are they updating categories?
@@ -140,11 +146,16 @@ global $cmsurl, $db_prefix, $l, $settings, $user;
 function ManageBoards() {
 global $cmsurl, $db_prefix, $forumperms, $l, $settings, $user;
   
+  // Add link to the link tree
+  AddTree('Boards','index.php?action=admin;sa=forum;fa=boards');
+  
   // Are they allowed to manage boards?
   if (can('manage_forum_edit') || can('manage_forum_create') || can('manage_forum_delete')) {
     $do = @$_REQUEST['do'] ? $_REQUEST['do'] : null;
     // Are they creating a new board?
     if ($do == "add") {
+      // Add link to the link tree
+      AddTree('Add','index.php?action=admin;sa=forum;fa=boards;do=add');
       // Are they allowed to create new boards?
       if (can('manage_forum_create')) {
         // Adding a board, load up category list, member groups and such
@@ -188,8 +199,9 @@ global $cmsurl, $db_prefix, $forumperms, $l, $settings, $user;
     elseif ($do == "edit") {
       // Are they allowed to edit boards?
       if (can('manage_forum_edit')) {
-        // Load up the board we need to edit and such...
+        // Clean the board ID
         $board_id = (int)$_REQUEST['id'];
+        // Load up the board we need to edit and such.
         $result = sql_query("
           SELECT
             b.bid, b.cid, b.border, b.who_view, b.name, b.bdesc
@@ -205,6 +217,8 @@ global $cmsurl, $db_prefix, $forumperms, $l, $settings, $user;
           $settings['board']['order'] = $row['border'];
           $settings['board']['who_view'] = @explode(",", $row['who_view']);
           $settings['board']['desc'] = $row['bdesc'];
+          // Add link to the link tree
+          AddTree($settings['board']['name'],'index.php?action=admin;sa=forum;fa=boards;do=edit;id='.$board_id);
           // Now load up the member groups (Except #1) and see which are checked :P
           $result = sql_query("
             SELECT

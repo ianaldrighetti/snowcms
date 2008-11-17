@@ -11,7 +11,7 @@
 //               Permisions.php file
 
 
-if (!defined("Snow"))
+if(!defined("Snow"))
   die(header("HTTP/1.1 404 Not Found"));
   
 // Make an array of permissions
@@ -100,6 +100,10 @@ $settings['permissions']['forum'] = array(
 
 function GroupPermissions() {
 global $cmsurl, $db_prefix, $l, $settings, $user;
+  
+  // Add link to the link tree
+  AddTree('Permissions','index.php?action=admin;sa=permissions');
+  
   if (can('manage_permissions')) {
     // Editing a Member Group already? Maybe just maybe we should load that...
     if (empty($_REQUEST['mid']) && empty($_REQUEST['me'])) {
@@ -247,9 +251,13 @@ global $cmsurl, $db_prefix, $l, $settings, $permissions, $user;
 
 function ForumPerms() {
 global $cmsurl, $db_prefix, $forumperms, $l, $settings, $user;
-  if (can('manage_forum_perms')) {
+  
+  // Add link to the link tree
+  AddTree('Permissions','index.php?action=admin;sa=forum;fa=permissions');
+  
+  if(can('manage_forum_perms')) {
     // Are they editing a groups board permission right now?
-    if (!empty($_REQUEST['bid']) && !empty($_REQUEST['gid'])) {
+    if(!empty($_REQUEST['bid']) && !empty($_REQUEST['gid'])) {
       // Get some data from the URL
       $board_id = (int)$_REQUEST['bid'];
       $group_id = (int)$_REQUEST['gid'];

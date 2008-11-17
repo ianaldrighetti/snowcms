@@ -18,6 +18,9 @@ global $l, $settings, $db_prefix, $cmsurl;
   
   // To do: check if permissions allow IP (un)banning
   
+  // Add link to the link tree
+  AddTree('IPs','index.php?action=admin;sa=ips');
+  
   // Change IPs' details
   if (@$_REQUEST['change_ips']) {
     // Check if the IPs are valid

@@ -16,6 +16,9 @@ if (!defined("Snow"))
 function ManageMenus() {
 global $l, $settings, $db_prefix;
   
+  // Add link to the link tree
+  AddTree('Menus','index.php?action=admin;sa=menus');
+  
   // Check if they are allowed to manage menus
   if (can('manage_menus')) {
     // Change links' names details
