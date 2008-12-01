@@ -24,12 +24,12 @@ $mysql_prefix = ''; # Prefix for your database
 // Misc
 $cookie_prefix = ''; # Prefix for cookies
 
-// Some SnowCMS specific settings
-$source_dir = 'C:\\Users\\Myles\\XAMPP\\htdocs\\scms/Sources'; # Path to your Source directory without trailing /
-$theme_dir = 'C:\\Users\\Myles\\XAMPP\\htdocs\\scms/Themes'; # Path to your Themes directory without trailing /
-$language_dir = 'C:\\Users\\Myles\\XAMPP\\htdocs\\scms/Languages'; # Path to your Languages directory without trailing /
-$cmsurl = 'http://localhost/scms/'; # URL to your SnowCMS Installation
-$theme_url = 'http://localhost/scms/Themes'; # URL to your SnowCMS Themes folder
+// Some SnowCMS Specific Settings
+$source_dir = ''; # Path to your Sources directory without trailing /
+$theme_dir = ''; # Path to your Themes directory without trailing /
+$language_dir = ''; # Path to your Languages directory without trailing /
+$cmsurl = ''; # URL to your SnowCMS Installation
+$theme_url = ''; # URL to your SnowCMS Themes folder
 
 // Don't touch the stuff below
 $db_prefix = '`'.$mysql_db.'`.'.$mysql_prefix;
