@@ -15,19 +15,19 @@ if (!defined("Snow"))
   die(header("HTTP/1.1 404 Not Found"));
 
 // Your MySQL information
-$mysql_host = 'localhost'; # Your MySQL Host, doubt you will change this
-$mysql_user = 'root'; # Your MySQL Username
+$mysql_host = ''; # Your MySQL Host, doubt you will change this
+$mysql_user = ''; # Your MySQL Username
 $mysql_passwd = ''; # Your MySQL Password
-$mysql_db = 'snowcms'; # Your MySQL DB
+$mysql_db = ''; # Your MySQL DB
 $mysql_prefix = ''; # Prefix for your database
 
 // Misc
 $cookie_prefix = ''; # Prefix for cookies
 
 // Some SnowCMS Specific Settings
-$source_dir = ''; # Path to your Sources directory without trailing /
-$theme_dir = ''; # Path to your Themes directory without trailing /
-$language_dir = ''; # Path to your Languages directory without trailing /
+$source_dir = 'Sources'; # Path to your Sources directory without trailing /
+$theme_dir = 'Themes'; # Path to your Themes directory without trailing /
+$language_dir = 'Languages'; # Path to your Languages directory without trailing /
 $cmsurl = ''; # URL to your SnowCMS Installation
 $theme_url = ''; # URL to your SnowCMS Themes folder
 
