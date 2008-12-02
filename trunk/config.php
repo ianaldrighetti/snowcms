@@ -33,5 +33,5 @@ $theme_url = ''; # URL to your SnowCMS Themes folder
 
 // Don't touch the stuff below
 $db_prefix = '`'.$mysql_db.'`.'.$mysql_prefix;
-$scms_installed = true;
+$scms_installed = false;
 ?>
