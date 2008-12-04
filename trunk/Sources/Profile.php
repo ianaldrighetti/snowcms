@@ -277,6 +277,11 @@ global $l, $settings, $db_prefix, $user, $cmsurl, $cookie_prefix;
   elseif(!can('change_password') && $password_new != $member_data['password'] && @$_REQUEST['password-new'] != '')
     $_SESSION['error'] = $l['profile_error_notallowed_password'];
   
+  // Does the site URL not have a protocol?
+  if (!preg_match('/^(ht|f)tps?:\/\//',$site_url))
+    // Add http://
+    $site_url = 'http://'.$site_url;
+  
   // Is there an error?
   if (!@$_SESSION['error']) {
     // Update member's data
