@@ -1,3 +1,5 @@
 #summary Bug tracker has moved
 
 Bug tracker has moved.
+
+http://www.snowcms.com/tracker/index.php
