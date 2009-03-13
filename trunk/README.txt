@@ -18,17 +18,18 @@ Installation:
 1) Of course, you have done this, downloaded it. ;)
 2) Upload it to your server or where ever you want to 
 install it.
-3) Access the directory of where install.php is in your
+3) Be sure to CHMOD your config.php to 0777!
+4) Access the directory of where install.php is in your
 browser, and SnowCMS will automatically send you to
 the installer.
-4) Input your MySQL database details, and hit Continue.
-5) If it succeeded, proceed to give your details, like
+5) Input your MySQL database details, and hit Continue.
+6) If it succeeded, proceed to give your details, like
 directory paths (though they should be put in correctly by
 default, just check to make sure) and your administrative
 account details, Hit continue.
-6) After that, it should successfully install, and you can
+7) After that, it should successfully install, and you can
 login.
-7) Remember to DELETE install.php!
+8) Remember to DELETE install.php!
 
 =======================================================
 
