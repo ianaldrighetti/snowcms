@@ -4,7 +4,7 @@ Note that this is NOT a final release, or something
 that should be considered as such. You may find critical
 bugs or security flaws. If you do, please be a good
 person and report these flaws at
-http://code.google.com/p/snowcms/issues/entry
+http://www.snowcms.com/tracker/
 
 It is highly recommended that SVN releases NOT be
 installed on production sites. SVN is intended for
@@ -64,4 +64,4 @@ Best wishes,
 the SnowCMS Dev Team
 http://www.snowcms.com/
 
-Last Updated: 10/26/2008
+Last Updated: 4/24/2009
