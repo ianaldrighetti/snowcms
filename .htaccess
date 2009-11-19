@@ -1,0 +1,15 @@
+<Files config.php>
+	Order Deny,Allow
+	Deny from all
+	Allow from localhost
+</Files>
+<Files sqlite_*>
+	Order Deny,Allow
+	Deny from all
+	Allow from localhost
+</Files>
+<Files *.db>
+	Order Deny,Allow
+	Deny from all
+	Allow from localhost
+</Files>

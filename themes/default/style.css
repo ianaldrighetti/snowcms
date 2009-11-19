@@ -1,0 +1,1129 @@
+/* Just links! */
+a
+{
+	color: #0C5BC8;
+	background-color: transparent;
+	text-decoration: none;
+}
+a:hover
+{
+	color: #3170CC;
+	background-color: transparent;
+	text-decoration: underline;
+}
+
+/* Main CSS */
+*
+{
+  margin: 0px;
+}
+body
+{
+  font-family: Verdana, sans-serif;
+  font-size: small;
+  background: #EBEBEB url('images/snow_corner.png') no-repeat;
+}
+#container
+{
+  width: 850px;
+  background: transparent;
+  margin: 20px auto auto auto;
+}
+#container .top_fade
+{
+  background: transparent url('images/top_fade.png') repeat-x;
+  height: 30px;
+}
+#container .logo
+{
+  background: #2CA4DC url('images/top_logo_bg.png') repeat-x;
+}
+#container .logo h1
+{
+  font-size: 20px;
+  padding: 10px 0px 0px 10px;
+}
+#container .logo h3
+{
+  font-size: 14px;
+  font-weight: normal;
+  font-style: italic;
+  padding: 0px 0px 5px 12px;
+}
+#container .logo a
+{
+  color: #FFFFFF;
+}
+
+#container .welcome
+{
+  float: right;
+  min-width: 282px;
+  padding-right: 8px;
+  color: #000000;
+}
+
+#container .welcome a
+{
+  color: #000000;
+  font-weight: bold;
+}
+
+#container .welcome a.logout
+{
+  font-weight: normal;
+}
+
+#container .welcome .login
+{
+  padding: 0;
+  margin: 0;
+}
+
+#container .welcome .login table
+{
+  border-collapse: collapse;
+}
+
+#container .welcome .login table td
+{
+  padding: 0;
+}
+
+#container .welcome .login, #container .welcome .login input
+{
+  font-size: x-small;
+}
+
+#container .welcome .login input.text
+{
+  height: 12px;
+  width: 103px;
+}
+
+#container .welcome .login input.button
+{
+  height: 20px;
+}
+
+/* Main Menu CSS */
+#container .top_menu
+{
+	margin: 0;
+	padding: 0;
+	width: 100%;
+	background: #1C3346;
+}
+
+#container .top_menu ul
+{
+  padding-left: 0;
+  float: left;
+  clear: both;
+  background: #1C3346;
+}
+
+#container .top_menu ul li
+{
+  float: left;
+  margin: 0;
+  display: inline;
+}
+
+#container .top_menu ul li a
+{
+  display: block;
+  padding: 6px 10px 6px 10px;
+  color: #FFFFFF;
+  text-decoration: none;
+  font-weight: bold;
+}
+
+#container .top_menu ul li a:hover
+{
+  background: #FFFFFF;
+  color: #000000;
+  border: solid #4682B4;
+  border-width: 1px 1px 0px 1px;
+  padding: 5px 9px 6px 9px;
+}
+
+#container .bottom_menu
+{
+	background: #FFFFFF;
+	clear: both;
+  padding-bottom: 5px;
+  font-size: 90%;
+}
+
+#container .bottom_menu ul
+{
+  text-align: center;
+}
+
+#container .bottom_menu ul li
+{
+  display: inline;
+}
+
+#container .bottom_menu ul li a
+{
+  padding: 5px 7px 5px 7px;
+  text-decoration: none;
+}
+
+#container .bottom_menu ul li a:hover
+{
+  background: #1C3346;
+  color: #FFFFFF;
+  border: solid #000000;
+  border-width: 1px 1px 0px 1px;
+  padding: 4px 6px 5px 6px;
+}
+
+#container .admin_menu
+{
+	margin: 0;
+	padding: 0;
+	width: 100%;
+	background: #4682B4;
+}
+
+#container .admin_menu ul
+{
+  list-style: none;
+  float: left;
+  clear: both;
+  background: #4682B4;
+}
+
+#container .admin_menu ul li a
+{
+  font-weight: normal;
+}
+
+#container .admin_menu ul li a:hover
+{
+  background: #FFFFFF;
+  color: #000000;
+  border: solid #4682B4;
+  border-width: 1px 1px 0px 1px;
+  padding: 5px 9px 6px 9px;
+}
+
+.admin_menu_selected
+{
+  font-weight: bold !important;
+}
+
+/* Main Body CSS */
+#container .main_body
+{
+  background: #FFFFFF;
+  padding: 2px 2px 0 2px;
+}
+#container .sidebar
+{
+  float: left;
+  width: 144px;
+}
+#container .sidebar .item
+{
+  padding: 2px;
+}
+#container .sidebar .item input[type="text"], #container .sidebar .item input[type="password"]
+{
+  width: 125px;
+}
+#container .sidebar h3
+{
+
+}
+#container .content
+{
+  background: #FFFFFF;
+  padding-left: 20px;
+  padding-right: 20px;
+  padding-bottom: 20px;
+}
+
+/* Footer CSS */
+#container .footer
+{
+  background: #1C3346;
+  text-align: center;
+  padding: 4px;
+  color: #FFFFFF;
+}
+#container .footer a
+{
+  color: #DDDDDD;
+  text-decoration: none;
+}
+#container .footer a:hover
+{
+  text-decoration: underline;
+}
+
+/* Misc. stuffs */
+.break
+{
+  clear: both;
+}
+#container .tableborder
+{
+  border: 1px solid #1C3346;
+}
+input[type="password"]
+{
+  width: 151px;
+}
+input
+{
+  font-family: Verdana, sans-serif;
+}
+select
+{
+  width: 157px;
+}
+
+/* No borders around linked images! Eww! */
+img
+{
+  border: 0;
+  vertical-align: top;
+}
+
+/* Fieldsets are ugly >_< But you gotta do them I guess :P */
+fieldset
+{
+  border: 0px;
+}
+label
+{
+  border: 0;
+}
+.left
+{
+  text-align: left !important;
+}
+.center
+{
+  text-align: center !important;
+  margin: auto;
+}
+.right
+{
+  text-align: right !important;
+}
+.bold
+{
+  font-weight: bold !important;
+}
+.normal
+{
+  font-weight: normal !important;
+}
+.italic
+{
+  font-style: italic !important;
+}
+
+/* Theme Error... OH NOES! */
+.theme_error
+{
+  border: 2px solid red;
+  background: #FFC6C6;
+  padding: 4px;
+  text-align: center;
+  margin: 4px;
+}
+
+/* Header stuff */
+h1
+{
+  font-size: 20px;
+}
+h3
+{
+  font-size: 14px;
+}
+
+/* Generic Error..? */
+.generic_error
+{
+  border: 2px solid red;
+  background: #FFC6C6;
+  padding: 4px;
+  text-align: center;
+  margin: 4px;
+}
+
+.error
+{
+  color: red;
+}
+
+.register
+{
+  font-size: 9px;
+}
+
+/* Login Form */
+.loginform
+{
+  width: 300px;
+  margin: 0px auto 0px auto;
+}
+.loginform input.text
+{
+  width: 151px;
+}
+input.text
+{
+  width: 151px;
+}
+
+/* Registration Form */
+.registrationform
+{
+  width: 500px;
+  margin: 0px auto 0px auto;
+}
+.registrationform input.text, .registrationform input.text
+{
+  width: 151px;
+}
+
+/* Reminder Form */
+.reminderform
+{
+  width: 151px;
+  margin: 0px auto 0px auto;
+}
+.reminderform input[type="text"], .reminderform input[type="password"]
+{
+  width: 151px;
+}
+
+#agreement
+{
+  padding-top: 10px;
+  overflow: auto;
+  height: 230px;
+}
+
+/* Sorry, but your success is only generic :P */
+.generic_success
+{
+  background: #D9FFB3;
+  padding: 4px;
+  text-align: center;
+  margin: 4px;
+}
+
+/* Small text */
+.small
+{
+  font-size: 10px;
+}
+.dd_menu
+{
+  position: absolute;
+  visibility: hidden;
+  overflow: hidden;
+  border-bottom: 1px solid #1C3346;
+  margin: 0;
+  padding: 0;
+}
+.dd_menu li
+{
+  float: none !important;
+  display: block !important;
+  color: white;
+}
+.dd_menu li a
+{
+  font-style: normal;
+}
+
+/* Admin CP CSS */
+.admin_cp
+{
+
+}
+.admin_cp th
+{
+  text-align: left;
+  background: #1C3346;
+  padding: 4px;
+  color: #FFFFFF;
+}
+/* The page editor! */
+textarea
+{
+  font-family: Verdana, sans-serif;
+  font-size: 12px;
+}
+.resize_editor
+{
+  font-size: 14px;
+  float: right;
+  margin-right: 5px;
+  font-weight: bold;
+}
+.is_post_group
+{
+  text-decoration: none;
+  border-bottom: 1px dashed #444444;
+}
+
+/* Settings CSS */
+.admin_settings
+{
+  margin-top: 10px;
+}
+
+/* Help text */
+.help_bg
+{
+  background: #EDEDED;
+}
+.help_text
+{
+  padding: 10px;
+  font-size: 12px;
+}
+
+.htable
+{
+  width: 100%;
+  text-align: center;
+}
+.vtable
+{
+  width: 100%;
+  text-align: left;
+}
+.vtable th
+{
+  text-align: left;
+}
+.htable th, .vtable th
+{
+  border: solid black 1px;
+}
+.htable th a, .vtable th a
+{
+  color: black;
+}
+
+.htable .blank
+{
+  border: none;
+}
+
+.stats-table
+{
+  width: 49%;
+}
+.stats-table caption
+{
+  font-weight: bold;
+}
+.stats-table th
+{
+  text-align: left;
+  font-weight: normal;
+}
+.stats-table td
+{
+  text-align: right;
+}
+
+.separator
+{
+  border-bottom: solid gray 1px;
+  padding: 0;
+}
+
+/* Manage boards */
+.admin_category
+{
+  background: #1C3346;
+  color: #FFFFFF;
+  padding: 4px;
+  margin: 2px;
+  font-weight: bold;
+}
+.admin_board
+{
+  padding: 2px;
+  margin: 2px;
+}
+
+.hand_cursor
+{
+  cursor: hand;
+}
+
+.poll
+{
+	background: #0C5BC8;
+	height: 10px;
+}
+
+blockquote
+{
+  border: solid black 1px;
+  padding: 5px;
+}
+
+.blockcode
+{
+  display: block;
+  border: solid black 1px;
+  padding: 5px;
+}
+
+.page_editor
+{
+  width: 800px;
+  height: 260px;
+}
+
+/* Forum index style */
+.forumindex th
+{
+  background: #4682B4;
+  text-align: left;
+  color: #FFFFFF;
+  font-size: 110%;
+}
+
+/* Category header links :| */
+.forumindex th a
+{
+  color: #FFFFFF;
+  text-decoration: none;
+}
+.forumindex th a:hover
+{
+  text-decoration: underline;
+}
+
+/* Board options and topic listings ;) */
+.board_options
+{
+  background: #1C3346;
+  color: #FFFFFF;
+}
+
+.board_options a
+{
+  color: #DDDDDD;
+  text-decoration: none;
+}
+
+.board_options a:hover
+{
+  text-decoration: underline;
+}
+
+.topic_listing th
+{
+  background: #4682B4;
+  text-align: left;
+  color: #FFFFFF;
+}
+
+.topic_listing th a
+{
+  color: #DDDDDD;
+  text-decoration: none;
+}
+
+.topic_listing th a:hover
+{
+  text-decoration: underline;
+}
+
+/* Post listing ;) */
+.num_replies
+{
+  font-size: 12px;
+}
+
+.poll_display
+{
+  background: #FFFFFF;
+  margin: 5px;
+}
+
+.topic_options
+{
+  background: #1C3346;
+  color: #FFFFFF;
+}
+
+.topic_options a
+{
+  color: #DDDDDD;
+}
+
+.post_listing
+{
+  wdith: 100%;
+  border-collapse: collapse;
+}
+
+.post_listing th
+{
+  background: #4682B4;
+  color: #FFFFFF;
+  padding: 2px;
+}
+
+.post_listing th a
+{
+  color: #DDDDDD;
+  text-decoration: none;
+}
+
+.post_listing th a:hover
+{
+  text-decoration: underline;
+}
+
+.post_listing td
+{
+  padding: 2px;
+}
+
+.last_posts
+{
+  margin-top: 10px;
+}
+
+.last_posts th
+{
+  text-align: left !important;
+  background: #1C3346;
+  color: #FFFFFF;
+  padding: 4px;
+}
+
+.last_posts .post_header
+{
+  background: #4682B4;
+  color: #FFFFFF;
+  padding: 2px;
+  font-size: 10px;
+}
+
+.last_posts .post_header a
+{
+  color: #DDDDDD !important;
+  font-weight: bold;
+}
+
+.last_posts .post
+{
+  padding: 4px !important;
+}
+
+.signature
+{
+  border: 1px solid #4682B4;
+  border-width: 1px 0px 0px 0px;
+}
+
+/* Quick reply */
+.quick_reply
+{
+  margin-top: 10px;
+  text-align: center;
+}
+
+.quick_reply th
+{
+  background: #1C3346;
+  padding: 4px;
+  text-align: left !important;
+  color: #FFFFFF;
+}
+
+.quick_reply .quick_reply_box
+{
+  width: 80%;
+  height: 100px;
+}
+
+/* Private messages */
+.pm_links
+{
+  width: 500px;
+  text-align: center;
+}
+.pm_space_outer
+{
+  float: right;
+  padding-top: 3px;
+  width: 300px;
+}
+.pm_space
+{
+  float: right;
+}
+.pm_space_total
+{
+  width: 200px;
+  border: solid black 1px;
+  background: #009900;
+  height: 16px;
+}
+.pm_space_used
+{
+  background: #DD3333;
+  height: 16px;
+}
+.pm_space_text
+{
+  width: 200px;
+  font-family: calibri, sans-serif;
+  text-align: center;
+  color: white;
+  position: relative;
+  top: -17px;
+}
+.pm_folder .status
+{
+  width: 22px;
+}
+a.pm_folder .subject
+{
+  width: 20px;
+}
+.pm_folder .recipients
+{
+  width: 120px;
+}
+.pm_folder .sender
+{
+  width: 120px;
+}
+.pm_folder .time_sent
+{
+  width: 210px;
+}
+.pm_folder .options
+{
+  width: 66px;
+}
+.empty_pm_folder
+{
+  padding: 4px;
+  text-align: center;
+  margin: 4px;
+}
+
+.membergroup_color
+{
+  width: 70px;
+  height: 15px;
+  margin: auto;
+}
+
+.autofillbox {
+  position: absolute;
+  display: none;
+  margin: 0;
+  padding: 0;
+  z-index: 1337;
+  border: 1px solid #808080;
+  background-color: #D3D3D3;
+  overflow: auto;
+  max-height: 272px;
+}
+/* Post previewing CSS */
+#post_preview
+{
+  margin: 5px;
+}
+#post_preview .preview_header
+{
+  background: #1C3346;
+  color: #FFFFFF;
+  padding: 2px;
+}
+#post_preview .preview_body
+{
+  margin: 4px;
+}
+
+.red_border
+{
+  border: 1px solid red;
+}
+
+select#timezone
+{
+  width: 90%;
+}
+
+select#format_datetime, select#format_date, select#format_time
+{
+  width: 270px;
+}
+
+input#format_datetime_other, input#format_date_other, input#format_time_other
+{
+  width: 264px;
+}
+
+.profile-avatar
+{
+  float: right;
+}
+
+.permissions
+{
+  padding-left: 0;
+}
+
+.permissions li
+{
+  list-style: none;
+}
+
+.news_add
+{
+  text-align: center;
+  margin: auto;
+}
+
+.news .time_created, .news_time_created
+{
+  float: left;
+  font-weight: bold;
+}
+
+.news .category, .news_category
+{
+  float: right;
+}
+
+.news .body, .news_body
+{
+  clear: both;
+  padding-top: 10px;
+}
+
+.news .creator, .news_creator
+{
+  padding-top: 10px;
+}
+
+.home_news_separator
+{
+  margin: 12px 0 6px 0;
+  border: none;
+  border-top: solid black 1px;
+}
+
+.backup
+{
+  text-align: center;
+  margin: auto;
+}
+
+.error_log
+{
+  margin-top: 10px !important;
+}
+
+.error_log tr.header
+{
+  background: #1C3346;
+  color: #FFFFFF;
+}
+
+.error_log tr.header th
+{
+  padding: 4px;
+  font-weight: normal !important;
+}
+
+.error_log tr.header th a
+{
+  color: #DDDDDD;
+  text-decoration: none;
+}
+
+.error_log tr.header th a:hover
+{
+  text-decoration: underline;
+}
+
+.error_log input[type="submit"]
+{
+  font-size: 11px;
+}
+
+.admin_header
+{
+  font-size: small;
+}
+
+.dimensions, .dimensions
+{
+  width: 50px;
+}
+
+.date
+{
+  width: 42px;
+}
+
+/* Forum stats and information */
+.forumstats
+{
+  margin-top: 25px;
+}
+
+.forumstats th
+{
+  background: #1C3346;
+  color: #FFFFFF;
+}
+.forumstats th.sub
+{
+  background: #4682B4;
+  color: #FFFFFF;
+  font-size: 11px;
+  text-align: left;
+}
+
+/* Online little list :P */
+.list_online
+{
+  margin: 15px 0px 15px 0px;
+}
+
+.list_online th
+{
+  background: #1C3346;
+  color: #FFFFFF;
+  text-align: left;
+}
+
+.list_online .list
+{
+  border: 1px solid #1C3346;
+  margin: 2px;
+}
+
+.medium
+{
+  font-size: medium;
+}
+
+.theme_name
+{
+  font-weight: bold;
+}
+
+.theme_preview
+{
+  border: solid #999999 1px;
+}
+
+.password_strength_plain_text
+{
+  width: 150px;
+  text-align: right;
+  font-weight: bold;
+  color: #BBBBBB;
+}
+
+.password_strength_weak_text
+{
+  text-align: right;
+  font-weight: bold;
+  color: #DD0000;
+}
+
+.password_strength_medium_text
+{
+  text-align: right;
+  font-weight: bold;
+  color: #FFBB00;
+}
+
+.password_strength_strong_text
+{
+  text-align: right;
+  font-weight: bold;
+  color: #00CC00;
+}
+
+.password_strength_perfect_text
+{
+  text-align: right;
+  font-weight: bold;
+  color: #00AAEE;
+}
+
+.password_strength_background
+{
+  background: #DDDDDD;
+  width: 150px;
+  height: 5px;
+}
+
+.password_strength_weak_bar
+{
+  background: #DD0000;
+  width: 25%;
+  height: 5px;
+}
+
+.password_strength_medium_bar
+{
+  background: #FFBB00;
+  width: 50%;
+  height: 5px;
+}
+
+.password_strength_strong_bar
+{
+  background: #00CC00;
+  width: 75%;
+  height: 5px;
+}
+
+.password_strength_perfect_bar
+{
+  background: #00AAEE;
+  width: 100%;
+  height: 5px;
+}
+
+.post_member
+{
+  width: 100%;
+  font-size: smaller;
+}
+
+.post_member th
+{
+  text-align: left;
+  background: none;
+  color: black;
+  font-weight: normal;
+}
+
+.post_member td
+{
+  text-align: right;
+}
