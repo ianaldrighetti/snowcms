@@ -1,0 +1,20 @@
+<Files *.php>
+	Order Deny,Allow
+	Deny from all
+	Allow from localhost
+</Files>
+<Files *.txt>
+	Order Deny,Allow
+	Deny from all
+	Allow from localhost
+</Files>
+<Files *.ttf>
+	Order Deny,Allow
+	Deny from all
+	Allow from localhost
+</Files>
+<Files *.ini>
+	Order Deny,Allow
+	Deny from all
+	Allow from localhost
+</Files>
