@@ -9,7 +9,11 @@ In the source code of SnowCMS, all queries are written in MySQL correct syntax. 
 
 = Supported database types =
 *MySQL* - Will be supported.
+
 *SQLite v2* - Will be supported.
+
 *SQLite v3* - Under review.
+
 *PostgreSQL* - Under review.
+
 *Microsoft SQL Server* - Under review.
