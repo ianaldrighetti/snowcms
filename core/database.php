@@ -22,7 +22,7 @@ if(!defined('IN_SNOW'))
 
 function load_database()
 {
-  global $core_dir, $db;
+  global $core_dir, $db, $db_type;
 
   # Does the right stuff exist? It needs to for this system to run!
   if(file_exists($core_dir. '/engines/'. strtolower($db_type). '.engine.php') && file_exists($core_dir. '/engines/'. strtolower($db_type). '_result.engine.php'))
