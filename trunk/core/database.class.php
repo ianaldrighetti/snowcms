@@ -55,6 +55,9 @@ abstract class Database
   # The result class which query and insert return (global $db_result_class in connect()).
   public $result_class = null;
 
+  # Holds all the debugging stuff which gets written to a file when the object is destructed.
+  protected $debug_text = '';
+
   /*
 
     Connects to the SQL database or server.
@@ -150,7 +153,7 @@ abstract class Database
       string $db_query - The database query you want to execute.
       array $db_vars - The variable values to replace in the query.
       string $hook_name - The name of hook to run BEFORE anything else is done. The run_hook method
-                          is to have $db_query, $db_vars and $db_compat passed as references.
+                          is to have $db_query, $db_vars and $db_compat passed as parameters.
       string $db_compat - A string which can be null or a string giving the database class a heads up
                           on any possible compatibility issues.
     returns {Database_Result} - Returns an object with methods such as fetch_assoc, num_rows, etc.
@@ -162,7 +165,7 @@ abstract class Database
 
     Sanitizes the variable in a query using the correct methods.
 
-    @method private mixed var_sanitize(string $var_name, string $datatype, mixed $value, $file, $line);
+    @method protected mixed var_sanitize(string $var_name, string $datatype, mixed $value, $file, $line);
       string $var_name - The name of the variable in the query.
       string $datatype - The datatype of the variable.
       mixed $value - Contains the value of the variable.
@@ -184,7 +187,7 @@ abstract class Database
     More information about databasing can be found at http://code.google.com/p/snowcms/wiki/Databasing
 
   */
-  abstract private function var_sanitize($var_name, $datatype, $value, $file, $line);
+  abstract protected function var_sanitize($var_name, $datatype, $value, $file, $line);
 
   /*
 
@@ -195,12 +198,12 @@ abstract class Database
     fatally.
 
   */
-  abstract private function sanitize_float($var_name, $value, $file, $line);
-  abstract private function sanitize_float_array($var_name, $value, $file, $line);
-  abstract private function sanitize_int($var_name, $value, $file, $line);
-  abstract private function sanitize_int_array($var_name, $value, $file, $line);
-  abstract private function sanitize_string($var_name, $value, $file, $line);
-  abstract private function sanitize_string_array($var_name, $value, $file, $line);
+  abstract protected function sanitize_float($var_name, $value, $file, $line);
+  abstract protected function sanitize_float_array($var_name, $value, $file, $line);
+  abstract protected function sanitize_int($var_name, $value, $file, $line);
+  abstract protected function sanitize_int_array($var_name, $value, $file, $line);
+  abstract protected function sanitize_string($var_name, $value, $file, $line);
+  abstract protected function sanitize_string_array($var_name, $value, $file, $line);
 
   private function sanitize_raw($var_name, $value, $file, $line)
   {
@@ -219,8 +222,8 @@ abstract class Database
       array $data - The actual data to be inserted.
       array $keys - Some database types (Like PostgreSQL) do not support REPLACE, in order to fix that you must supply the column
                     names which are the primary/unique keys that way an UPDATE query can be attempted, if that fails, the data is inserted.
-      string $hook_name - The hook to run (using run_hook in $api) BEFORE the anything is done, run_hook is to pass $columns, $data and $keys
-                          as references.
+      string $hook_name - The hook to run (using run_hook in $api) BEFORE the anything is done, run_hook is to pass $type, $tbl_name, $columns,
+                          $data and $keys as parameters.
     returns {Database_Result} - An object containing methods such as affected_rows(), etc.
 
     More information about databasing can be found at http://code.google.com/p/snowcms/wiki/Databasing
@@ -233,7 +236,7 @@ abstract class Database
     Logs a database error into the SnowCMS error log, if the error is fatal, show a plain ol'
     ugly error page stating an error occurred.
 
-    @method private void log_error(string $error_message[, bool $is_fatal = false[, string $file = null[, int $line = 0]]]);
+    @method protected void log_error(string $error_message[, bool $is_fatal = false[, string $file = null[, int $line = 0]]]);
       string $error_message - The error message to log.
       bool $is_fatal - Whether or not the error that occurred means that SnowCMS can no longer continue running.
       string $file - The file that the method was called in that created the error.
@@ -241,9 +244,28 @@ abstract class Database
     returns void - Nothing is returned by this method.
 
   */
-  private function log_error($error_message, $is_fatal = false, $file = null, $line = 0)
+  protected function log_error($error_message, $is_fatal = false, $file = null, $line = 0)
   {
     # !!!
+  }
+
+  /*
+
+    The destructor writes all the debugging text to a file, if any, upon this object being destructed.
+
+  */
+  public function __destruct()
+  {
+    global $base_dir;
+
+    $this->debug_text = trim($this->debug_text);
+
+    if(!empty($this->debug_text))
+    {
+      $fp = fopen($base_dir. '/db_debug.sql', 'a');
+      fwrite($fp, $this->debug_text);
+      @fclose($fp);
+    }
   }
 }
 ?>

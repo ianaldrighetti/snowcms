@@ -123,7 +123,225 @@ class MySQLDatabase extends Database
       return false;
 
     # Just incase, for some odd reason :P
-    $this->run_hook($hook_name, &$db_query, &$db_vars, &$db_compat);
+    if(!empty($hook_name))
+      $this->run_hook($hook_name, $db_query, $db_vars, $db_compat);
+
+    # debug set?
+    if(isset($db_vars['debug']))
+    {
+      $prev_debug = $this->debug;
+
+      $this->debug = !empty($db_vars['debug']);
+      unset($db_vars['debug']);
+    }
+
+    /*
+
+      In other databases such as SQLite, PostgreSQL, SQL Server, etc. anything that isn't
+      MySQL at this time would do any query fixing to make it parse right upon execution.
+
+    */
+
+    # Let's use debug_backtrace() to find where this was called and what not ;)
+    $backtrace = debug_backtrace();
+    $file = realpath($backtrace[0]['file']);
+    $line = (int)$backtrace[0]['line'];
+
+    # Replace {db->prefix} and {db_prefix} with $this->prefix... :P
+    $db_query = strtr($db_query, array('{db->prefix}' => $this->prefix, '{db_prefix}' => $this->prefix));
+
+    # Any possible variables that may need replacing?
+    if(mb_strpos($db_query, '{') !== false)
+    {
+      # Find all the variables.
+      preg_match_all('~{[\w-]+:\w+}~', $db_query, $matches);
+
+      if(count($matches[0]))
+      {
+        # Holds all our soon-to-be replaced variables.
+        $replacements = array();
+
+        # Holds onto any undefined variables, you never know ;)
+        $undefined = array();
+
+        # No need to parse the same variables multiple times, is there?
+        $matches[0] = array_unique($matches[0]);
+
+        foreach($matches[0] as $variable)
+        {
+          list($datatype, $variable_name) = explode(':', mb_substr($variable, 1, mb_strlen($variable) - 2));
+
+          # Let's just be safe, shall we?
+          $datatype = trim($datatype);
+          $variable_name = trim($variable_name);
+
+          # Has it been defined or not?
+          if(!isset($db_vars[$variable_name]))
+          {
+            $undefined[] = $variable_name;
+            continue;
+          }
+
+          # Sanitize that value to how it should be!!!
+          $replacements[$variable] = $this->var_sanitize($variable_name, $datatype, $db_vars[$variable_name], $file, $line);
+        }
+
+        # Did we get any undefined variables? :/
+        if(count($undefined) > 0)
+          $this->log_error('Undefined database variables <em>'. implode('</em>, <em>', $undefined). '</em>', true, $file, $line);
+
+        # Maybe replace the variables in the query?
+        if(count($replacements))
+          $db_query = strtr($db_query, $replacements);
+      }
+    }
+
+    # Woo!!! QUERY THAT DATABASE!
+    $query_start = microtime(true);
+    $query_result = @mysql_query(trim($db_query), $this->con);
+    $query_took = round(microtime(true) - $time_started, 5);
+
+    # That is one more query!
+    $this->num_queries++;
+
+    # Let's not call on it multiple times, mmk?
+    $mysql_errno = $this->errno();
+    $mysql_error = $this->error();
+
+    # Debug this query, perhaps?
+    if(!empty($this->debug))
+    {
+      $this->debug_text .= "Query:\r\n$db_query\r\nFile: $file\r\nLine: $line\r\nExecuted in $query_took seconds\r\nError: ". (empty($query_result) ? '['. $mysql_errno. '] '. $mysql_error : 'None'). "\r\n\r\n";
+      $this->debug = isset($prev_debug) ? $prev_debug : $this->debug;
+    }
+
+    # An error occur?
+    if(empty($query_result))
+      $this->log_error('['. $mysql_errno. '] '. $mysql_error, true, $file, $line);
+
+    # Return a MySQLResult Object ;)
+    return new $this->result_class($query_result, mysql_affected_rows($query_result), 0, $mysql_errno, $mysql_error, $this->num_queries - 1);
+  }
+
+  protected function var_sanitize($var_name, $datatype, $value, $file, $line)
+  {
+    global $api;
+
+    $datatype = mb_strtolower($datatype);
+
+    # Is it a string? It could have a length :)
+    if(mb_substr($datatype, 0, 6) == 'string' && mb_strpos($datatype, '-') !== false)
+    {
+      list(, $length) = explode('-', $datatype);
+
+      $datatype = 'string';
+      $value = mb_substr($value, 0, (int)$length);
+    }
+
+    $datatypes = array(
+      'float' => 'sanitize_float',
+      'float_array' => 'sanitize_float_array',
+      'int' => 'sanitize_int',
+      'int_array' => 'sanitize_int_array',
+      'raw' => 'sanitize_raw',
+      'string' => 'sanitize_string',
+      'string_array' => 'sanitize_string_array',
+      'text' => 'sanitize_string',
+      'text_array' => 'sanitize_string_array',
+    );
+
+    $api->run_hook('database_types', $datatypes);
+
+    # Is the datatype defined?
+    if(!isset($datatypes[$datatype]))
+      $this->log_error('Undefined data type <string>'. mb_strtoupper($datatype). '</strong>.', true, $file, $line);
+
+    # Return the sanitized value...
+    return $this->$datatypes[$datatype]($var_name, $value, $file, $line);
+  }
+
+  protected function sanitize_float($var_name, $value, $file, $line)
+  {
+    # Make sure it is of the right type :)
+    if((string)$value !== (string)(float)$value)
+      $this->log_error('Wrong data type, float expected ('. $var_name. ')', true, $file, $line);
+
+    return (string)(float)$value;
+  }
+
+  protected function sanitize_float_array($var_name, $value, $file, $line)
+  {
+    # Not an array? Well, it can't be an array of floats then can it?
+    if(!is_array($value))
+      $this->log_error('Wrong data type, array expected ('. $var_name. ')', true, $file, $line);
+
+    $new_value = array();
+    if(count($value))
+      foreach($value as $v)
+        $new_value[] = $this->sanitize_float($var_name, $v, $file, $line);
+
+    return implode(', ', $new_value);
+  }
+
+  protected function sanitize_int($var_name, $value, $file, $line)
+  {
+    # Mmmm, inty!
+    if((string)$value !== (string)(int)$value)
+      $this->log_error('Wrong data type, integer expected ('. $var_name. ')', true, $file, $line);
+
+    return (string)(int)$value;
+  }
+
+  protected function sanitize_int_array($var_name, $value, $file, $line)
+  {
+    if(!is_array($value))
+      $this->log_error('Wrong data type, array expected ('. $var_name. ')', true, $file, $line);
+
+    $new_value = array();
+    if(count($value))
+      foreach($value as $v)
+        $new_value[] = $this->sanitize_int($var_name, $v, $file, $line);
+
+    return implode(', ', $new_value);
+  }
+
+  protected function sanitize_string($var_name, $value, $file, $line)
+  {
+    # No need to see if it is a string P:
+    return '\''. $this->escape($value). '\'';
+  }
+
+  protected function sanitize_string_array($var_name, $value, $file, $line)
+  {
+    if(!is_array($value))
+      $this->log_error('Wrong data type, array expected ('. $var_name. ')', true, $file, $line);
+
+    $new_value = array();
+    if(count($value))
+      foreach($value as $v)
+        $new_value[] = $this->sanitize_string($var_name, $v, $file, $line);
+
+    return implode(', ', $new_value);
+  }
+
+  public function insert($type, $tbl_name, $columns, $data, $keys = array(), $hook_name = null)
+  {
+    global $api;
+
+    if(empty($this->con))
+      return false;
+
+    if(!empty($hook_name))
+      $this->run_hook($hook_name, $type, $tbl_name, $data, $keys);
+
+    $type = mb_strtolower($type);
+
+    # We only support insert, ignore and replace.
+    if(!in_array($type, array('insert', 'ignore', 'replace')))
+      $this->log_error('Unknown insert type '. $type, true, $file, $line);
+
+    # Replace {db->prefix} and {db_prefix} with $this->prefix
+    $tbl_name = strtr($tbl_name, array('{db->prefix}' => $this->prefix, '{db_prefix}' => $this->prefix));
   }
 }
 

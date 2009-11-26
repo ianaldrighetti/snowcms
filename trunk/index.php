@@ -21,6 +21,8 @@
 if(function_exists('set_magic_quotes_runtime'))
   @set_magic_quotes_runtime(0);
 
+mb_internal_encoding('UTF-8');
+
 # These are some variables that should NOT be set yet!!!
 foreach(array('db_class', 'db_result_class') as $variable)
   if(isset($GLOBALS[$variable]))
@@ -33,7 +35,6 @@ define('IN_SNOW', true, true);
 
 # We want to see those errors...
 error_reporting(E_STRICT | E_ALL);
-
 # config.php not exist? A good sign SnowCMS isn't installed :P
 if(!file_exists('config.php'))
 {
@@ -45,6 +46,8 @@ require(dirname(__FILE__). '/config.php');
 
 # Now load up the database, very important you know!
 require($core_dir. '/database.php');
+
+load_database();
 
 # Now that our database is loaded up, let's get the API started, very important you know?
 require($core_dir. '/api.class.php');
