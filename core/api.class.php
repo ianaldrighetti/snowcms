@@ -131,18 +131,17 @@ class API
 
     Runs the specified hook, along with running the registered callbacks of the hook.
 
-    @method public void run_hook(string $hook_name[, mixed $...[, mixed $...[, ...]]]);
+    @method public void run_hook(string $hook_name[, mixed $args = null]);
       string $hook_name - The name of the hook you are executing.
-      mixed $... - A parameter to pass to the registered hooks, if any.
-      mixed $... - Another parameter to pass to the registered hooks, if any.
-      ... - Even more, if any.
+      mixed $args - Either a single argument or an array of arguments.
     returns void - Nothing is returned.
 
     NOTE: If you want to allow hooks to change something variable wise, pass the variable
-          as a reference parameter (&$var).
+          as a reference parameter (&$var) INSIDE an array! Otherwise you will get a
+          E_DEPRECATED error!
 
   */
-  public function run_hook($hook_name)
+  public function run_hook($hook_name, $args = null)
   {
     # No registered callbacks for this hook? Don't waste the time! :)
     if(!isset($this->hooked[$hook_name]) || count($this->hooked[$hook_name]) == 0)
@@ -151,26 +150,24 @@ class API
     # Sort the hooks array by importance :) That is, if there is more than 1!
     if(count($this->hooked[$hook_name]) > 1)
       $this->sort($this->hooked[$hook_name]);
-
-    # Collect all the parameters...
-    $parameters = array();
-    if(func_num_args() > 1)
-      $parameters = array_slice(func_get_args(), 1, count(func_get_args()));
+print_r($this->hooked[$hook_name]);
+    if(!is_array($args))
+      $args = array($args);
 
     # No need to count parameters over and over and over again, is there?
-    $num_params = count($parameters);
+    $num_args = count($args);
 
     # Now run all the hooks!
     foreach($this->hooked[$hook_name] as $hook)
     {
       # All parameters?
       if($hook['args'] === null)
-        call_user_func_array($hook['callback'], $parameters);
+        call_user_func_array($hook['callback'], $args);
       # More parameters than we have?
-      elseif($hook['args'] > count($parameters))
-        call_user_func_array($hook['callback'], array_merge($parameters, array_fill($num_params, $num_params - $hook['args'], null)));
+      elseif($hook['args'] > $num_args)
+        call_user_func_array($hook['callback'], array_merge($args, array_fill($num_args, $num_args - $hook['args'], null)));
       else
-        call_user_func_array($hook['callback'], array_slice($parameters, 0, $hook['args']));
+        call_user_func_array($hook['callback'], array_slice($args, 0, $hook['args']));
     }
   }
 
