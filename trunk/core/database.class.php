@@ -60,6 +60,16 @@ abstract class Database
 
   /*
 
+    This constructor simply takes the database result's class name and saves it to the result_class attribute.
+
+  */
+  public function __construct($db_result_class = null)
+  {
+    $this->result_class = $db_result_class;
+  }
+
+  /*
+
     Connects to the SQL database or server.
 
     @method public bool connect();
@@ -149,17 +159,19 @@ abstract class Database
     changes the query for any compatibility issues. ONLY SELECT, UPDATE and DELETE queries should be
     used with this method, check out the insert method for doing INSERT's and REPLACE's
 
-    @method public {Database_Result} query(string $db_query[, array $db_vars = array()[ string $hook_name = null[, string $db_compat = null]]]);
+    @method public {Database_Result} query(string $db_query[, array $db_vars = array()[ string $hook_name = null[, string $db_compat = null[ string $file = null[, int $line = 0]]]]]);
       string $db_query - The database query you want to execute.
       array $db_vars - The variable values to replace in the query.
       string $hook_name - The name of hook to run BEFORE anything else is done. The run_hook method
                           is to have $db_query, $db_vars and $db_compat passed as parameters.
       string $db_compat - A string which can be null or a string giving the database class a heads up
                           on any possible compatibility issues.
+      string $file - The file query was called on, LEAVE THIS BLANK! This is for use by the insert method!
+      int $line - The line the query was called on, LEAVE THIS BLANK! This is for use by the insert method as well!
     returns {Database_Result} - Returns an object with methods such as fetch_assoc, num_rows, etc.
 
   */
-  abstract public function query($db_query, $db_vars = array(), $hook_name = null, $db_compat = null);
+  abstract public function query($db_query, $db_vars = array(), $hook_name = null, $db_compat = null, $file = null, $line = 0);
 
   /*
 
@@ -228,6 +240,10 @@ abstract class Database
 
     More information about databasing can be found at http://code.google.com/p/snowcms/wiki/Databasing
 
+    NOTE: It is recommended for running the query through the database that you use the query method, simply pass the method the
+          file and line the insert method was called on to query, also, set the db_compat parameter in query to insert, return
+          query's result.
+
   */
   abstract public function insert($type, $tbl_name, $columns, $data, $keys = array(), $hook_name = null);
 
@@ -244,9 +260,44 @@ abstract class Database
     returns void - Nothing is returned by this method.
 
   */
-  protected function log_error($error_message, $is_fatal = false, $file = null, $line = 0)
+  public function log_error($error_message, $is_fatal = false, $file = null, $line = 0)
   {
-    # !!!
+
+    # !!! Error needs to be logged somewhere ;) If it can be, that is.
+    # !!! Once member system is implemented, only show the file and line
+    #     to administrators.
+
+    # Fatal error..?
+    if(!empty($is_fatal) && ($error_message === 1 || $error_message === 2))
+    {
+      die('<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+	<meta name="robots" content="noindex" />
+	<title>Database connection issues</title>
+</head>
+<body>
+  <h1>Database connection issues</h1>
+  <p>Sorry for the inconvience, but SnowCMS could not connect to the database at this time. '. ($error_message == 1 ? 'This could be caused by the MySQL server being overloaded, down, or the supplied MySQL credentials are wrong.' : 'This was caused by having insufficient rights for the database.'). ' If this continues, please contact the server administrator if at all possible.</p>
+</body>
+</html>');
+    }
+    elseif(!empty($is_fatal))
+    {
+      die('<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+	<meta name="robots" content="noindex" />
+	<title>Fatal database error</title>
+</head>
+<body>
+  <h1>Fatal database error</h1>
+  <p><strong>Database error</strong>: '. $error_message. ' '. ((!empty($file)) ? '<br /><strong>File</strong>: '. $file. '<br /><strong>Line</strong>: '. $line : 'If this continues, please contact the server administrator if at all possible.'). '</p>
+</body>
+</html>');
+    }
   }
 
   /*

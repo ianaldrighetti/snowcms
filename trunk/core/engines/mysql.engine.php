@@ -20,11 +20,11 @@
 if(!defined('IN_SNOW'))
   die;
 
-class MySQLDatabase extends Database
+class MySQL extends Database
 {
   public function connect()
   {
-    global $db_host, $db_name, $db_pass, $db_persist, $db_result_class, $db_type, $db_user, $tbl_prefix;
+    global $db_host, $db_name, $db_pass, $db_persist, $db_type, $db_user, $tbl_prefix;
 
     # Persistent connection or not?
     if(empty($db_persist))
@@ -43,11 +43,8 @@ class MySQLDatabase extends Database
     $select_db = @mysql_select_db($db_name, $this->con);
 
     # Failed to select the database..? That isn't good!
-    if(empty($select_db))
-    {
-      $this->con = null;
-      return false;
-    }
+    if(empty($select_db) && !empty($this->con))
+      $this->log_error(2, true);
 
     # Sweet, everything seems to be in order so far, set a couple other things others
     # may need to use at a later time.
@@ -57,7 +54,6 @@ class MySQLDatabase extends Database
     $this->drop_if_exists = true;
     $this->if_not_exists = true;
     $this->extended_inserts = true;
-    $this->result_class = $db_result_class;
 
     # Alright, we are done here.
     return true;
@@ -115,7 +111,7 @@ class MySQLDatabase extends Database
     return $tables;
   }
 
-  public function query($db_query, $db_vars = array(), $hook_name = null, $db_compat = null)
+  public function query($db_query, $db_vars = array(), $hook_name = null, $db_compat = null, $file = null, $line = 0)
   {
     global $api;
 
@@ -143,9 +139,13 @@ class MySQLDatabase extends Database
     */
 
     # Let's use debug_backtrace() to find where this was called and what not ;)
-    $backtrace = debug_backtrace();
-    $file = realpath($backtrace[0]['file']);
-    $line = (int)$backtrace[0]['line'];
+    # Only if file and line aren't set already ;)
+    if(empty($file) || empty($line))
+    {
+      $backtrace = debug_backtrace();
+      $file = realpath($backtrace[0]['file']);
+      $line = (int)$backtrace[0]['line'];
+    }
 
     # Replace {db->prefix} and {db_prefix} with $this->prefix... :P
     $db_query = strtr($db_query, array('{db->prefix}' => $this->prefix, '{db_prefix}' => $this->prefix));
@@ -199,7 +199,7 @@ class MySQLDatabase extends Database
     # Woo!!! QUERY THAT DATABASE!
     $query_start = microtime(true);
     $query_result = @mysql_query(trim($db_query), $this->con);
-    $query_took = round(microtime(true) - $time_started, 5);
+    $query_took = round(microtime(true) - $query_start, 5);
 
     # That is one more query!
     $this->num_queries++;
@@ -220,7 +220,7 @@ class MySQLDatabase extends Database
       $this->log_error('['. $mysql_errno. '] '. $mysql_error, true, $file, $line);
 
     # Return a MySQLResult Object ;)
-    return new $this->result_class($query_result, mysql_affected_rows($query_result), 0, $mysql_errno, $mysql_error, $this->num_queries - 1);
+    return new $this->result_class($query_result, mysql_affected_rows($this->con), $db_compat == 'insert' ? mysql_insert_id($query_result) : 0, $mysql_errno, $mysql_error, $this->num_queries - 1);
   }
 
   protected function var_sanitize($var_name, $datatype, $value, $file, $line)
@@ -334,6 +334,12 @@ class MySQLDatabase extends Database
     if(!empty($hook_name))
       $this->run_hook($hook_name, $type, $tbl_name, $data, $keys);
 
+    # Let's get where you called us from!
+    $backtrace = debug_backtrace();
+    $file = realpath($backtrace[0]['file']);
+    $line = (int)$backtrace[0]['line'];
+    unset($backtrace);
+
     $type = mb_strtolower($type);
 
     # We only support insert, ignore and replace.
@@ -342,8 +348,47 @@ class MySQLDatabase extends Database
 
     # Replace {db->prefix} and {db_prefix} with $this->prefix
     $tbl_name = strtr($tbl_name, array('{db->prefix}' => $this->prefix, '{db_prefix}' => $this->prefix));
+
+    # Just an array, and not an array inside an array? We'll fix that...
+    if(!isset($data[0]) || !is_array($data[0]))
+      $data = array($data);
+
+    # The number of columns :)
+    $num_columns = count($columns);
+
+    # Now get the column names, quite useful you know :)
+    $column_names = array_keys($columns);
+
+    # Now we can get all the rows ready :)
+    $rows = array();
+    foreach($data as $row_index => $row)
+    {
+      # Not enough data?
+      if($num_columns != count($row))
+        $this->log_error('Number of columns doesn\'t match the number of supplied columns in row #'. ($row_index + 1), true, $file, $line);
+
+      # Save the values to an array, all sanitized and what not, of course!
+      $values = array();
+      foreach($row as $index => $value)
+        $values[] = $this->var_sanitize($column_names[$index], $columns[$column_names[$index]], $value, $file, $line);
+
+      # Add those values to our rows now :)
+      $rows[] = '('. implode(', ', $values). ')';
+    }
+
+    $inserts = array(
+      'insert' => 'INSERT',
+      'ignore' => 'INSERT IGNORE',
+      'replace' => 'REPLACE',
+    );
+
+    # Construct the query, MySQL suports extended inserts! Hip hip! HURRAY!
+    $db_query = $inserts[$insert_type]. ' INTO `'. $tbl_name. '` (`'. implode('`, `', $column_names). '`) VALUES'. implode(', ', $rows);
+
+    # Let query handle it XD!
+    return $this->query($db_query, array(), $hook_name, 'insert');
   }
 }
 
-$db_class = 'MySQLDatabase';
+$db_class = 'MySQL';
 ?>
