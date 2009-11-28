@@ -17,36 +17,21 @@
 #                     File version: SnowCMS 2.0                         #
 #########################################################################
 
-# No direct access!!!
 if(!defined('IN_SNOW'))
   die;
 
 #
-# config.php holds all your database information and paths.
+# register_globals is one of the worst ideas ever pawned, and if enabled, could
+# lead to devastating incidents, and we don't want ;)
 #
+function mitigate_globals()
+{
+  # There are some things which are fine, all the rest are bad...
+  $safe_variables = array('GLOBALS', '_POST', '_GET', '_COOKIE', '_FILES', 'start_time', 'db_type', 'db_host', 'db_user', 'db_pass', 'db_pass', 'db_name', 'db_persist', 'db_debug', 'tbl_prefix', 'base_dir', 'core_dir', 'theme_dir', 'plugin_dir', 'base_url', 'theme_url', 'cookie_name');
 
-# Database settings:
-$db_type = ''; # Your database type, an example would be mysql, sqlite or postgresql
-$db_host = ''; # The location of your database, could be localhost or a path (for SQLite)
-$db_user = ''; # The user that has access to your database, though not all database systems have this.
-$db_pass = ''; # The password to your database user.
-$db_name = ''; # The name of the database.
-$db_persist = false; # Whether or not to have a persistent connection to the database.
-$db_debug = false; # Enable database debugging? (Outputs queries into a file ;))
-$tbl_prefix = 'snow_'; # The prefix of the tables, allows multiple installs on the same database.
-
-# The location of your root directory of your SnowCMS installation.
-$base_dir = defined('__DIR__') ? __DIR__ : dirname(__FILE__);
-
-# Some other useful paths...
-$core_dir = $base_dir. '/core';
-$theme_dir = $base_dir. '/themes';
-$plugin_dir = $base_dir. '/plugins';
-
-# The address of where your SnowCMS install is accessible (No trailing /!)
-$base_url = '';
-$theme_url = $base_url. '/themes';
-
-# What do you want to be the name of the cookie?
-$cookie_name = 'SCMS643';
+  # Loop through GLOBALS and remove anything that shouldn't be there...
+  foreach($GLOBALS as $variable => $dummy)
+    if(!in_array($variable, $safe_variables))
+      unset($GLOBALS[$variable]);
+}
 ?>

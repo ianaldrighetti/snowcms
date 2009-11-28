@@ -120,7 +120,7 @@ class MySQL extends Database
 
     # Just incase, for some odd reason :P
     if(!empty($hook_name))
-      $this->run_hook($hook_name, $db_query, $db_vars, $db_compat);
+      $this->run_hook($hook_name, array(&$db_query, &$db_vars, &$db_compat));
 
     # debug set?
     if(isset($db_vars['debug']))
@@ -150,8 +150,8 @@ class MySQL extends Database
     # Replace {db->prefix} and {db_prefix} with $this->prefix... :P
     $db_query = strtr($db_query, array('{db->prefix}' => $this->prefix, '{db_prefix}' => $this->prefix));
 
-    # Any possible variables that may need replacing?
-    if(mb_strpos($db_query, '{') !== false)
+    # Any possible variables that may need replacing? (Don't do this if it is an insert, or things could get ugly)
+    if(mb_strpos($db_query, '{') !== false && $db_compat != 'insert')
     {
       # Find all the variables.
       preg_match_all('~{[\w-]+:\w+}~', $db_query, $matches);
@@ -250,7 +250,7 @@ class MySQL extends Database
       'text_array' => 'sanitize_string_array',
     );
 
-    $api->run_hook('database_types', $datatypes);
+    $api->run_hook('database_types', array(&$datatypes));
 
     # Is the datatype defined?
     if(!isset($datatypes[$datatype]))
@@ -332,7 +332,7 @@ class MySQL extends Database
       return false;
 
     if(!empty($hook_name))
-      $this->run_hook($hook_name, $type, $tbl_name, $data, $keys);
+      $this->run_hook($hook_name, array(&$type, &$tbl_name, &$data, &$keys));
 
     # Let's get where you called us from!
     $backtrace = debug_backtrace();
@@ -385,8 +385,9 @@ class MySQL extends Database
     # Construct the query, MySQL suports extended inserts! Hip hip! HURRAY!
     $db_query = $inserts[$insert_type]. ' INTO `'. $tbl_name. '` (`'. implode('`, `', $column_names). '`) VALUES'. implode(', ', $rows);
 
-    # Let query handle it XD!
-    return $this->query($db_query, array(), $hook_name, 'insert');
+    # Let query handle it XD! (passes insert in db compat to let you know
+    # if you don't have to do anything at all, which you shouldn't!!!
+    return $this->query($db_query, array(), null, 'insert');
   }
 }
 
