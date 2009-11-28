@@ -1,7 +1,7 @@
 import sys
 #    returns ,\n    Returns: \n      
-name = sys.argv[1]
-f = open("core/"+name)
+name = "../trunk/core/"+sys.argv[1]
+f = open(name)
 com = False
 clone = ""
 idt = 0
@@ -42,5 +42,5 @@ for line in f:
   else:
     clone += line
 f.close()
-nf = open("core/"+name,"w")
+nf = open(name,"w")
 nf.write(clone)

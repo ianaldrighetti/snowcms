@@ -49,6 +49,7 @@ Format: 1.4
 File: API  (core/api.class.php)
 File: Database  (core/database.class.php)
 File: Database_Maintenance  (core/database_maintenance.class.php)
+File: Database_Result  (core/database_result.class.php)
 File: Member  (core/member.class.php)
 
 Group: Index  {
