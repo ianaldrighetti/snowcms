@@ -44,7 +44,7 @@ abstract class Database_Result
   protected $query_num = 0;
 
   /*
-      Constructor: int
+    Constructor: __construct
     The constructor of Database_Result which populates the attributes.
 
     Parameters:
@@ -67,7 +67,6 @@ abstract class Database_Result
   }
 
   /*
-    Constructor: int
 
     The following are accessors to Database_Result's private attributes
 
@@ -193,9 +192,10 @@ abstract class Database_Result
     Returns: 
      bool - Returns TRUE on success, FALSE on failure.
 
-    NOTE: According to most people, you should ONLY free a result IF and ONLY IF
-          the query you executed returns huge result sets, otherwise you can end up
-          using more memory in the process of freeing the result.
+    Note: 
+      According to most people, you should ONLY free a result IF and ONLY IF
+      the query you executed returns huge result sets, otherwise you can end up
+      using more memory in the process of freeing the result.
 
   */
   abstract public function free_result();

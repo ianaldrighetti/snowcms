@@ -35,7 +35,7 @@ class API
   private $hooked_actions = array();
 
   # Yup, thats right, an array containing sub-actions plugins can register on actions
-  # Please note that sub-actions only work if the plugin that registered the action
+  # Please Note that sub-actions only work if the plugin that registered the action
   # uses this sub-action API
   private $hooked_subactions = array();
 
@@ -62,7 +62,8 @@ class API
      bool - TRUE if your hook was registered successfully, FALSE on failure, which means that
                    a hook has already been registered with that callback in that hook group.
 
-    NOTE: You can view a list of available hooks at Google Code <http://code.google.com/p/snowcms/wiki/Hooks>
+    Note: 
+      You can view a list of available hooks at Google Code <http://code.google.com/p/snowcms/wiki/Hooks>
 
   */
   public function add_hook($hook_name, $callback, $importance = 10, $args = null)
@@ -152,9 +153,10 @@ class API
     Returns: 
      void - Nothing is returned.
 
-    NOTE: If you want to allow hooks to change something variable wise, pass the variable
-          as a reference parameter (&$var) INSIDE an array! Otherwise you will get a
-          E_DEPRECATED error!
+    Note: 
+      If you want to allow hooks to change something variable wise, pass the variable
+      as a reference parameter (&$var) INSIDE an array! Otherwise you will get a
+      E_DEPRECATED error!
 
   */
   public function run_hook($hook_name, $args = null)
@@ -198,7 +200,8 @@ class API
     Returns: 
      array - Returns the sorted array
 
-    NOTE: Original function available at <http://mschat.net/forum/index.php?topic=1609.0>
+    See Also: 
+      Original function available at <http://mschat.net/forum/index.php?topic=1609.0>
 
   */
   private function sort(&$array)
