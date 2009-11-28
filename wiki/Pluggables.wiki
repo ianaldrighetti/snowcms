@@ -1,0 +1,11 @@
+#summary Along with the API, SnowCMS also allows you to override what functions do, called pluggable functions, or just pluggables.
+#labels Featured,Phase-Implementation
+
+===Currently available===
+clean_request - [http://code.google.com/p/snowcms/source/browse/trunk/core/clean_request.php /core/clean_request.php]
+
+init_session - [http://code.google.com/p/snowcms/source/browse/trunk/core/session.php /core/session.php]
+
+Member class - [http://code.google.com/p/snowcms/source/browse/trunk/core/member.class.php /core/member.class.php]
+
+init_member - [http://code.google.com/p/snowcms/source/browse/trunk/core/member.class.php /core/member.class.php]
