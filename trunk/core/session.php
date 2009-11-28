@@ -17,36 +17,34 @@
 #                     File version: SnowCMS 2.0                         #
 #########################################################################
 
-# No direct access!!!
 if(!defined('IN_SNOW'))
   die;
 
-#
-# config.php holds all your database information and paths.
-#
+# Another pluggable function, sessions!!! Woo!
+if(!function_exists('init_session'))
+{
+  #
+  # Simply starts up the session... Simple, right?
+  #
+  function init_session()
+  {
+    global $api;
 
-# Database settings:
-$db_type = ''; # Your database type, an example would be mysql, sqlite or postgresql
-$db_host = ''; # The location of your database, could be localhost or a path (for SQLite)
-$db_user = ''; # The user that has access to your database, though not all database systems have this.
-$db_pass = ''; # The password to your database user.
-$db_name = ''; # The name of the database.
-$db_persist = false; # Whether or not to have a persistent connection to the database.
-$db_debug = false; # Enable database debugging? (Outputs queries into a file ;))
-$tbl_prefix = 'snow_'; # The prefix of the tables, allows multiple installs on the same database.
+    # Are sessions set to automatically start upon load? Turn it off :P
+    if(@ini_get('session.auto_start') == 1)
+      session_write_close();
 
-# The location of your root directory of your SnowCMS installation.
-$base_dir = defined('__DIR__') ? __DIR__ : dirname(__FILE__);
+    # Use cookies, mmm...
+    @ini_set('session.use_cookies', 1);
 
-# Some other useful paths...
-$core_dir = $base_dir. '/core';
-$theme_dir = $base_dir. '/themes';
-$plugin_dir = $base_dir. '/plugins';
+    # And use ONLY cookies! Otherwise people can do that ?PHPSESSID attack crap...
+    @ini_set('session.use_only_cookies', 1);
 
-# The address of where your SnowCMS install is accessible (No trailing /!)
-$base_url = '';
-$theme_url = $base_url. '/themes';
+    # Maybe you have something to add?
+    $api->run_hook('sessions');
 
-# What do you want to be the name of the cookie?
-$cookie_name = 'SCMS643';
+    # Now start the session.
+    session_start();
+  }
+}
 ?>

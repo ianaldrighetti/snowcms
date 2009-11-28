@@ -11,6 +11,8 @@ CREATE TABLE '{$db_prefix}members'
   'member_id' INTEGER PRIMARY KEY,
   'member_name' VARCHAR(80) NOT NULL,
   'member_pass' VARCHAR(40) NOT NULL,
+  'member_hash' VARCHAR(10) NULL,
+  'member_groups' VARCHAR(255) NOT NULL,
   'display_name' VARCHAR(255) NOT NULL,
   'member_email' VARCHAR(100) NOT NULL,
   'member_registered' INT NOT NULL,

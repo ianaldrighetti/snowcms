@@ -38,6 +38,9 @@ class API
   # uses this sub-action API
   private $hooked_subactions = array();
 
+  # Registered groups, permission hook, in other words.
+  private $groups = array();
+
   /*
 
     Adds a callback on the specified hook name. The callback is called on when the hook is ran.
@@ -150,7 +153,7 @@ class API
     # Sort the hooks array by importance :) That is, if there is more than 1!
     if(count($this->hooked[$hook_name]) > 1)
       $this->sort($this->hooked[$hook_name]);
-print_r($this->hooked[$hook_name]);
+
     if(!is_array($args))
       $args = array($args);
 
@@ -357,6 +360,85 @@ print_r($this->hooked[$hook_name]);
       return $this->hooked_subactions[$action_name];
     else
       return isset($this->hooked_subactions[$action_name][$subaction_name]) ? $this->hooked_subactions[$action_name][$subaction_name] : false;
+  }
+
+  /*
+
+    Allows plugins to add (register) a group that members can have assigned to them, that way these plugins
+    can use permissions for any features they may add.
+
+    @method public bool add_group(string $group_identifier, string $group_name);
+      string $group_identifier - This is the identifier which is saved in the member_groups column of the table.
+                                 Say you had a group named Page Manager, a good group identifier would be
+                                 page_manager. When checking to see if the member was assigned that group you
+                                 would simply do $member->is_a('page_manager')
+      string $group_name - The actual display name of this group, such as Page Manager. You should pass this name
+                            through the l() function before passing it on to this method.
+    returns bool - Returns TRUE if the group was added successfully, FALSE if the group is already registered.
+
+  */
+  public function add_group($group_identifier, $group_name)
+  {
+    if($this->group_registered($group_identifier))
+      return false;
+
+    $this->groups[mb_strtolower($group_identifier)] = $group_name;
+    return true;
+  }
+
+  /*
+
+    Removes the specified group identifier from the registered groups.
+
+    @method public bool remove_group(string $group_identifier);
+      string $group_identifier - The group to remove.
+    returns bool - Returns TRUE if the group was successfully removed, FALSE on failure.
+
+  */
+  public function remove_group($group_identifier)
+  {
+    # You can't remove the group administrator or member...
+    if(!$this->group_registered($group_identifier) || in_array(mb_strtolower($group_identifier), array('administrator', 'member')))
+      return false;
+
+    unset($this->groups[mb_strtolower($group_identifier)]);
+    return true;
+  }
+
+  /*
+
+    Checks to see if the specified group is registered.
+
+    @method public bool group_registered(string $group_identifier);
+      string $group_identifier - The group identifier to check.
+    returns bool - Returns TRUE if the group is registered, FALSE if not.
+
+  */
+  public function group_registered($group_identifier)
+  {
+    # Did I mention that you can't register the group administrator or member? Silly me!
+    return in_array(mb_strtolower($group_identifier), array('administrator', 'member')) ? isset($this->groups[mb_strtolower($group_identifier)]) : true;
+  }
+
+  /*
+
+    Returns the specified group name, or if no group identifier is supplied, all
+    groups are returned.
+
+    @method public mixed return_group([string $group_identifier = null]);
+      string $group_identifier - The group identifier.
+    returns mixed - An array is returned (containing all registered groups), a string containing
+                    the groups name, or FALSE if the group is not registered.
+
+  */
+  public function return_group($group_identifier = null)
+  {
+    if(empty($group_identifier))
+      return asort($this->groups, SORT_STRING);
+    elseif(!$this->group_registered($group_identifier))
+      return false;
+    else
+      return $this->groups[mb_strtolower($group_identifier)];
   }
 }
 

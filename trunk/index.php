@@ -23,12 +23,7 @@ if(function_exists('set_magic_quotes_runtime'))
 
 mb_internal_encoding('UTF-8');
 
-# These are some variables that should NOT be set yet!!!
-foreach(array('db_class', 'db_result_class') as $variable)
-  if(isset($GLOBALS[$variable]))
-    unset($GLOBALS[$variable]);
-
-$start_time = microtime();
+$start_time = microtime(true);
 
 # We are currently in SnowCMS :)
 define('IN_SNOW', true, true);
@@ -44,6 +39,11 @@ if(!file_exists('config.php'))
 
 require(dirname(__FILE__). '/config.php');
 
+require_once($core_dir. '/mitigate_globals.php');
+
+# register_globals is horrible, just plain bad...
+mitigate_globals();
+
 # Now load up the database, very important you know!
 require($core_dir. '/database.php');
 
@@ -54,3 +54,27 @@ require($core_dir. '/api.class.php');
 
 # Call on load_api which is in api.class.php :)
 load_api();
+
+# Just a hook before anything else major is done.
+$api->run_hook('pre_start');
+
+require($core_dir. '/clean_request.php');
+
+# We need to filter out some baaaad stuff, like any register_globals issues and other security things.
+clean_request();
+
+require($core_dir. '/session.php');
+
+# Start up the session.
+init_session();
+
+require($core_dir. '/member.class.php');
+
+# Now get that member stuff started up!
+init_member();
+
+# Include our l() function for translation :)
+require($core_dir. '/l.php');
+
+# Initialize the current members session, if any, though...
+echo 'Executed in ', round(microtime(true) - $start_time, 6), ' seconds.';

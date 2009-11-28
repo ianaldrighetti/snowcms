@@ -17,36 +17,32 @@
 #                     File version: SnowCMS 2.0                         #
 #########################################################################
 
-# No direct access!!!
 if(!defined('IN_SNOW'))
   die;
 
 #
-# config.php holds all your database information and paths.
+# This function is simply passed the text string you want translated (in English!), and
+# the translated string is returned. If no translation is available, the original string
+# is returned. (A plugin is required for translations, it is available at the SnowCMS plugin site)
 #
+# NOTE: You can use this function just as you would with sprintf, pass all the parameters you
+#       want to be replaced in the string. Check out www.php.net/sprintf for more information.
+#
+function l($str)
+{
+  global $api;
 
-# Database settings:
-$db_type = ''; # Your database type, an example would be mysql, sqlite or postgresql
-$db_host = ''; # The location of your database, could be localhost or a path (for SQLite)
-$db_user = ''; # The user that has access to your database, though not all database systems have this.
-$db_pass = ''; # The password to your database user.
-$db_name = ''; # The name of the database.
-$db_persist = false; # Whether or not to have a persistent connection to the database.
-$db_debug = false; # Enable database debugging? (Outputs queries into a file ;))
-$tbl_prefix = 'snow_'; # The prefix of the tables, allows multiple installs on the same database.
+  # CAN HAZ TRANSLATION?
+  $api->run_hook('translate', array(&$str));
 
-# The location of your root directory of your SnowCMS installation.
-$base_dir = defined('__DIR__') ? __DIR__ : dirname(__FILE__);
+  # Hmm, any warrant for calling sprintf?
+  if(func_num_args() > 1)
+  {
+    $args = func_get_args();
 
-# Some other useful paths...
-$core_dir = $base_dir. '/core';
-$theme_dir = $base_dir. '/themes';
-$plugin_dir = $base_dir. '/plugins';
+    $str = call_user_func_array('sprintf', $args);
+  }
 
-# The address of where your SnowCMS install is accessible (No trailing /!)
-$base_url = '';
-$theme_url = $base_url. '/themes';
-
-# What do you want to be the name of the cookie?
-$cookie_name = 'SCMS643';
+  return $str;
+}
 ?>
