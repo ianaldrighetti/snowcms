@@ -21,6 +21,7 @@ if(!defined('IN_SNOW'))
   die;
 
 #
+# Class: API
 # This class is a major part of SnowCMS, it allows plugins (or flakes) to use hooks
 # in various places which allow the plugins to add new features, or change how current
 # features work as well.
@@ -42,10 +43,11 @@ class API
   private $groups = array();
 
   /*
+    Method: add_hook
 
     Adds a callback on the specified hook name. The callback is called on when the hook is ran.
 
-    @method public bool add_hook(string $hook_name, callback $callback[, int $importance = 10[, int $args = null]]);
+    Parameters:
       string $hook_name - The name of the hook you want to have the callback associated with.
       callback $callback - The callback (like a function name or create_function()) to be called
                            when the system runs the specified $hook_name.
@@ -55,7 +57,9 @@ class API
                   that as many arguments as the hook at run time has, that is as many as your callback
                   will receive. If you specify more arguments than the hook supplies, null will be supplied
                   in the place of unspecified arguments.
-    returns bool - TRUE if your hook was registered successfully, FALSE on failure, which means that
+
+    Returns: 
+     bool - TRUE if your hook was registered successfully, FALSE on failure, which means that
                    a hook has already been registered with that callback in that hook group.
 
     NOTE: You can view a list of available hooks at Google Code <http://code.google.com/p/snowcms/wiki/Hooks>
@@ -82,13 +86,16 @@ class API
   }
 
   /*
+    Method: remove_hook
 
     Removes the specified callback from the specified hook.
 
-    @method public bool remove_hook(string $hook_name, string $callback);
+    Parameters:
       string $hook_name - The hook name to remove the specified callback from.
       string $callback - The callback to remove from the specified hook.
-    returns bool - TRUE if the callback was removed, FALSE if the callback wasn't found.
+
+    Returns: 
+     bool - TRUE if the callback was removed, FALSE if the callback wasn't found.
 
   */
   public function remove_hook($hook_name, $callback)
@@ -107,13 +114,16 @@ class API
   }
 
   /*
+    Method: hook_registered
 
     Allows you to check if a callback is already registered in the specified hook name.
 
-    @method public bool hook_registered(string $hook_name, callback $callback);
+    Parameters:
       string $hook_name - The hook name to search for $callback in.
       callback $callback - The callback to search for in $hook_name.
-    returns bool - Returns TRUE if the callback is already registered in the specified hook,
+
+    Returns: 
+     bool - Returns TRUE if the callback is already registered in the specified hook,
                    FALSE if not.
 
   */
@@ -131,13 +141,16 @@ class API
   }
 
   /*
+    Method: run_hook
 
     Runs the specified hook, along with running the registered callbacks of the hook.
 
-    @method public void run_hook(string $hook_name[, mixed $args = null]);
+    Parameters:
       string $hook_name - The name of the hook you are executing.
       mixed $args - Either a single argument or an array of arguments.
-    returns void - Nothing is returned.
+
+    Returns: 
+     void - Nothing is returned.
 
     NOTE: If you want to allow hooks to change something variable wise, pass the variable
           as a reference parameter (&$var) INSIDE an array! Otherwise you will get a
@@ -175,12 +188,15 @@ class API
   }
 
   /*
+    Method: sort
 
     Used to sort the hooked array in order of importance.
 
-    @method private array sort(array $array);
+    Parameters:
       array $array - The array to sort by the index 'importance'
-    returns array - Returns the sorted array
+
+    Returns: 
+     array - Returns the sorted array
 
     NOTE: Original function available at <http://mschat.net/forum/index.php?topic=1609.0>
 
@@ -205,18 +221,21 @@ class API
   }
 
   /*
+    Method: add_action
 
     Adds an action through the API, adding an action allows plugins to add actions accessible through index.php.
     For example, say you add the action help, callback of view_help and the file help.php, whenever someone would
     access the page index.php?action=help the file help.php would be included and the function view_help would be
     executed.
 
-    @method public bool add_action(string $action_name, callback $callback[, string $file = null]);
+    Parameters:
       string $action_name - The action name you want to register.
       callback $callback - The callback to be called (duh :P) when the action is accessed.
       string $file - The file to include before executing the callback, if null is supplied, no
                      file is executed.
-    returns bool - TRUE is returned if the action was successfully added, FALSE if not, which means that
+
+    Returns: 
+     bool - TRUE is returned if the action was successfully added, FALSE if not, which means that
                    that action is already registered (check out the method remove_action).
 
   */
@@ -230,12 +249,15 @@ class API
   }
 
   /*
+    Method: remove_action
 
     Removes the specified action.
 
-    @method public bool remove_action(string $action_name);
+    Parameters:
       string $action_name - The action to remove.
-    returns bool - TRUE if the action was successfully removed, FALSE on failure, meaning that
+
+    Returns: 
+     bool - TRUE if the action was successfully removed, FALSE on failure, meaning that
                    the action wasn't registered.
 
   */
@@ -249,12 +271,15 @@ class API
   }
 
   /*
+    Method: action_registered
 
     Checks to see if the specified action is registered.
 
-    @method public bool action_registered(string $action_name);
+    Parameters:
       string $action_name - The action name to check.
-    returns bool - TRUE if the action is registered, FALSE if not.
+
+    Returns: 
+     bool - TRUE if the action is registered, FALSE if not.
 
   */
   public function action_registered($action_name)
@@ -263,14 +288,17 @@ class API
   }
 
   /*
+    Method: return_action
 
     Returns the requested action, the first index contains the callback, the second contains the file
     to be included before calling on the callback, unless it is null. However, if you leave the action
     name parameter blank, all registered actions are returned.
 
-    @method public array return_action([string $action_name = null]);
+    Parameters:
       string $action_name - The action name to return information about.
-    returns array - Returns the array containing a callback and file to include before calling on the
+
+    Returns: 
+     array - Returns the array containing a callback and file to include before calling on the
                     the callback, however, FALSE is returned if the action does not exist.
 
   */
@@ -283,16 +311,19 @@ class API
   }
 
   /*
+    Method: add_subaction
 
     Registers the specified sub-action to the action.
 
-    @method public bool add_subaction(string $action_name, string $subaction_name, callback $callback[, string $file = null]);
+    Parameters:
       string $action_name - The action name you want to register the subaction with.
       string $subaction_name - The subaction name you want to register.
       callback $callback - The callback to be called (duh :P) when the subaction is accessed.
       string $file - The file to include before executing the callback, if null is supplied, no
                      file is executed.
-    returns bool - TRUE is returned if the subaction was successfully added, FALSE if not, which means that
+
+    Returns: 
+     bool - TRUE is returned if the subaction was successfully added, FALSE if not, which means that
                    that subaction is already registered (check out the method remove_subaction).
 
   */
@@ -307,13 +338,16 @@ class API
   }
 
   /*
+    Method: remove_subaction
 
     Removes the specified sub-action from the action.
 
-    @method public bool remove_subaction(string $action_name, string $subaction_name);
+    Parameters:
       string $action_name - The action from which you want to remove.
       string $subaction_name - The sub-action you want to remove.
-    returns bool - TRUE if the sub-action was successfully removed, FALSE on failure, meaning that
+
+    Returns: 
+     bool - TRUE if the sub-action was successfully removed, FALSE on failure, meaning that
                    the sub-action wasn't registered.
 
   */
@@ -327,13 +361,16 @@ class API
   }
 
   /*
+    Method: subaction_registered
 
     Checks to see if the specified sub-action is registered in the action.
 
-    @method public bool subaction_registered(string $action_name, string $subaction_name);
+    Parameters:
       string $action_name - The action name to check within.
       string $subaction_name - The sub-action to check to see if it is registered.
-    returns bool - TRUE if the subaction is registered, FALSE if not.
+
+    Returns: 
+     bool - TRUE if the subaction is registered, FALSE if not.
 
   */
   public function subaction_registered($action_name, $subaction_name)
@@ -342,15 +379,18 @@ class API
   }
 
   /*
+    Method: return_subaction
 
     Returns the requested subaction, the first index contains the callback, the second contains the file
     to be included before calling on the callback, unless it is null. However, if you leave the subaction
     name parameter blank, all registered subactions of action are returned.
 
-    @method public array return_subaction(string $action_name[, string $subaction_name = null]);
+    Parameters:
       string $action_name - The action name to return retrieve subaction information about.
       string $subaction_name - The subaction to return information about.
-    returns array - Returns the array containing a callback and file to include before calling on the
+
+    Returns: 
+     array - Returns the array containing a callback and file to include before calling on the
                     the callback, however, FALSE is returned if the subaction does not exist.
 
   */
@@ -363,18 +403,21 @@ class API
   }
 
   /*
+    Method: add_group
 
     Allows plugins to add (register) a group that members can have assigned to them, that way these plugins
     can use permissions for any features they may add.
 
-    @method public bool add_group(string $group_identifier, string $group_name);
+    Parameters:
       string $group_identifier - This is the identifier which is saved in the member_groups column of the table.
                                  Say you had a group named Page Manager, a good group identifier would be
                                  page_manager. When checking to see if the member was assigned that group you
                                  would simply do $member->is_a('page_manager')
       string $group_name - The actual display name of this group, such as Page Manager. You should pass this name
                             through the l() function before passing it on to this method.
-    returns bool - Returns TRUE if the group was added successfully, FALSE if the group is already registered.
+
+    Returns: 
+     bool - Returns TRUE if the group was added successfully, FALSE if the group is already registered.
 
   */
   public function add_group($group_identifier, $group_name)
@@ -387,12 +430,15 @@ class API
   }
 
   /*
+    Method: remove_group
 
     Removes the specified group identifier from the registered groups.
 
-    @method public bool remove_group(string $group_identifier);
+    Parameters:
       string $group_identifier - The group to remove.
-    returns bool - Returns TRUE if the group was successfully removed, FALSE on failure.
+
+    Returns: 
+     bool - Returns TRUE if the group was successfully removed, FALSE on failure.
 
   */
   public function remove_group($group_identifier)
@@ -406,12 +452,15 @@ class API
   }
 
   /*
+    Method: group_registered
 
     Checks to see if the specified group is registered.
 
-    @method public bool group_registered(string $group_identifier);
+    Parameters:
       string $group_identifier - The group identifier to check.
-    returns bool - Returns TRUE if the group is registered, FALSE if not.
+
+    Returns: 
+     bool - Returns TRUE if the group is registered, FALSE if not.
 
   */
   public function group_registered($group_identifier)
@@ -421,13 +470,16 @@ class API
   }
 
   /*
+    Method: return_group
 
     Returns the specified group name, or if no group identifier is supplied, all
     groups are returned.
 
-    @method public mixed return_group([string $group_identifier = null]);
+    Parameters:
       string $group_identifier - The group identifier.
-    returns mixed - An array is returned (containing all registered groups), a string containing
+
+    Returns: 
+     mixed - An array is returned (containing all registered groups), a string containing
                     the groups name, or FALSE if the group is not registered.
 
   */
