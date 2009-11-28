@@ -23,6 +23,8 @@ if(!defined('IN_SNOW'))
 # A pluggable class, how classy? Hahaha, yeah, I know, bad pun.
 if(!class_exists('Member'))
 {
+  #Class: Member
+  
   class Member
   {
     private $id;
@@ -126,6 +128,7 @@ if(!class_exists('Member'))
     }
 
     /*
+    : 
 
       Just a lot of accessors ;)
 
@@ -171,14 +174,17 @@ if(!class_exists('Member'))
     }
 
     /*
+    Method: is_a
 
       Allows you to see if the member is a specified group. You can pass a single group identifier,
       or an array of group identifiers. If you pass a group (array) of group identifiers, FALSE will
       be returned if the member isn't ALL of the specified groups.
 
-      @method public bool is_a(mixed $what);
+      Parameters:
         mixed $what - An array of group identifiers, or a single group identifier.
-      returns bool - Returns TRUE if the member is all of the groups you specified, FALSE if not.
+  
+    Returns: 
+     bool - Returns TRUE if the member is all of the groups you specified, FALSE if not.
 
     */
     public function is_a($what)
@@ -206,9 +212,12 @@ if(!class_exists('Member'))
     }
 
     /*
+    Method: is_guest
 
-      @method public bool is_guest();
-      returns bool - Returns TRUE if the person isn't logged in, FALSE if not.
+      Parameters:
+  
+    Returns: 
+     bool - Returns TRUE if the person isn't logged in, FALSE if not.
 
     */
     public function is_guest()
@@ -217,9 +226,12 @@ if(!class_exists('Member'))
     }
 
     /*
+    Method: is_logged
 
-      @method public bool is_logged();
-      returns bool - Returns TRUE if the member is logged in, FALSE if not.
+      Parameters:
+  
+    Returns: 
+     bool - Returns TRUE if the member is logged in, FALSE if not.
 
     */
     public function is_logged()
@@ -228,9 +240,12 @@ if(!class_exists('Member'))
     }
 
     /*
+    Method: is_admin
 
-      @method public bool is_admin();
-      returns bool - Returns TRUE if the member is an administrator, FALSE if not.
+      Parameters:
+  
+    Returns: 
+     bool - Returns TRUE if the member is an administrator, FALSE if not.
 
     */
     public function is_admin()
@@ -239,10 +254,13 @@ if(!class_exists('Member'))
     }
 
     /*
+    Method: data
 
-      @method public string data(string $variable);
+      Parameters:
         string $variable - The name of the data's variable.
-      returns string - Returns the value of the variable, NULL if the variable is not set.
+  
+    Returns: 
+     string - Returns the value of the variable, NULL if the variable is not set.
 
     */
     public function data($variable)
