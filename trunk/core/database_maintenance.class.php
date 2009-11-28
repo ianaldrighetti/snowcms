@@ -53,9 +53,9 @@ abstract class Database_Maintenance
     Returns: 
      bool - TRUE on success, FALSE on failure.
 
-    NOTE: 
-          If the database system has a command that optimizes the whole database (Ex: SQLite)
-          it is recommended you have a static variable to check if this method was already called.
+    Note: 
+      If the database system has a command that optimizes the whole database (Ex: SQLite)
+      it is recommended you have a static variable to check if this method was already called.
 
   */
   abstract public function optimize_table($table);
@@ -114,7 +114,7 @@ abstract class Database_Maintenance
       string $table - The name of the table to create.
       array $columns - An array of columns which contains each columns information. Ex:
                        $columns = array('col_name' => array('type' => 'int', 'length' => 10, 'attributes' => 'unsigned', 'null' => false, 'auto_increment' => true), 'another_col' => array(...))
-                       NOTE: Make note that any MySQL datatype could be used in type, so if you get a MySQL only supported datatype, use a similar one of equal or greater capabilities.
+                       Note: Make Note that any MySQL datatype could be used in type, so if you get a MySQL only supported datatype, use a similar one of equal or greater capabilities.
                              attributes could be UNSIGNED, ZEROFILL or BINARY.
       array $indexes - Any indexes (PRIMARY, UNIQUE or INDEX) you want added to the table. Example:
                        array(
