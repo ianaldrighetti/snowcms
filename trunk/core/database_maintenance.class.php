@@ -53,7 +53,8 @@ abstract class Database_Maintenance
     Returns: 
      bool - TRUE on success, FALSE on failure.
 
-    NOTE: If the database system has a command that optimizes the whole database (Ex: SQLite)
+    NOTE: 
+          If the database system has a command that optimizes the whole database (Ex: SQLite)
           it is recommended you have a static variable to check if this method was already called.
 
   */

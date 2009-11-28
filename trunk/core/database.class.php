@@ -79,7 +79,8 @@ abstract class Database
     Returns: 
      bool - Returns TRUE if the connection was a success, FALSE if connection failed.
 
-    NOTE: To get the database information, simply global the variables, such as $db_host, $db_name, $db_user, $db_passwd, $db_prefix, etc.
+    Note: 
+      To get the database information, simply global the variables, such as $db_host, $db_name, $db_user, $db_passwd, $db_prefix, etc.
 
   */
   abstract public function connect();
@@ -216,18 +217,20 @@ abstract class Database
     Returns: 
      mixed - Returns the correctly sanitized value.
 
-    NOTE: SnowCMS currently supports the following datatypes:
-            float - a number such as 1, 1.0, etc.
-            float_array - an array containing floats, when all numbers inside are properly sanitized, implode with a comma.
-            int - a integer.
-            int_array - an array containing integers, implode using commas.
-            raw - a string which will be put into the query, with nothing done to it.
-            string - a string.
-            string_array - an array containing strings, implode using commas.
-            text - an alias of string.
-            text_array - an alias of string_array.
-
-    More information about databasing can be found at http://code.google.com/p/snowcms/wiki/Databasing
+    Note: 
+      SnowCMS currently supports the following datatypes:
+      float - a number such as 1, 1.0, etc.
+      float_array - an array containing floats, when all numbers inside are properly sanitized, implode with a comma.
+      int - a integer.
+      int_array - an array containing integers, implode using commas.
+      raw - a string which will be put into the query, with nothing done to it.
+      string - a string.
+      string_array - an array containing strings, implode using commas.
+      text - an alias of string.
+      text_array - an alias of string_array.
+    
+    See Also:
+      More information about databasing can be found at http://code.google.com/p/snowcms/wiki/Databasing
 
   */
   abstract protected function var_sanitize($var_name, $datatype, $value, $file, $line);
@@ -275,9 +278,10 @@ abstract class Database
 
     More information about databasing can be found at http://code.google.com/p/snowcms/wiki/Databasing
 
-    NOTE: It is recommended for running the query through the database that you use the query method, simply pass the method the
-          file and line the insert method was called on to query, also, set the db_compat parameter in query to insert, return
-          query's result.
+    Note: 
+      It is recommended for running the query through the database that you use the query method, simply pass the method the
+      file and line the insert method was called on to query, also, set the db_compat parameter in query to insert, return
+      query's result.
 
   */
   abstract public function insert($type, $tbl_name, $columns, $data, $keys = array(), $hook_name = null);
