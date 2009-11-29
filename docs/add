@@ -1,0 +1,4 @@
+svn add *
+svn add */*
+svn add */*/*
+svn add */*/*/*
