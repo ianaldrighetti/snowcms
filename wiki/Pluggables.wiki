@@ -9,3 +9,5 @@ init_session - [http://code.google.com/p/snowcms/source/browse/trunk/core/sessio
 Member class - [http://code.google.com/p/snowcms/source/browse/trunk/core/member.class.php /core/member.class.php]
 
 init_member - [http://code.google.com/p/snowcms/source/browse/trunk/core/member.class.php /core/member.class.php]
+
+log_online - [http://code.google.com/p/snowcms/source/browse/trunk/core/log_online.php /core/log_online.php]
