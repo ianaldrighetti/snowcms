@@ -20,6 +20,7 @@
 if(!defined('IN_SNOW'))
   die;
 
+# Class: Database
 # The abstract class used by SQL engines.
 abstract class Database
 {
@@ -59,6 +60,7 @@ abstract class Database
   protected $debug_text = '';
 
   /*
+    : 
 
     This constructor simply takes the database result's class name and saves it to the result_class attribute.
 
@@ -69,97 +71,123 @@ abstract class Database
   }
 
   /*
+    Method: connect
 
     Connects to the SQL database or server.
 
-    @method public bool connect();
-    returns bool - Returns TRUE if the connection was a success, FALSE if connection failed.
+    Parameters:
 
-    NOTE: To get the database information, simply global the variables, such as $db_host, $db_name, $db_user, $db_passwd, $db_prefix, etc.
+    Returns: 
+     bool - Returns TRUE if the connection was a success, FALSE if connection failed.
+
+    Note:
+       To get the database information, simply global the variables, such as $db_host, $db_name, $db_user, $db_passwd, $db_prefix, etc.
 
   */
   abstract public function connect();
 
   /*
+    Method: close
 
     Closes the connection to the SQL database or server.
 
-    @method public bool close();
-    returns bool - Returns TRUE if the connection was successfully closed, FALSE otherwise.
+    Parameters:
+
+    Returns: 
+     bool - Returns TRUE if the connection was successfully closed, FALSE otherwise.
 
   */
   abstract public function close();
 
   /*
+    Method: errno
 
     Returns the error number of which occurred from the last database method called, if any.
 
-    @method public int errno();
-    returns int - Returns the last error number, 0 if none.
+    Parameters:
+
+    Returns: 
+     int - Returns the last error number, 0 if none.
 
   */
   abstract public function errno();
 
   /*
+    Method: error
 
     Returns the error string from the last SELECT, UPDATE, INSERT, etc. query.
 
-    @method public string error();
-    returns string - Returns the last error string, an empty string if no errors occurred.
+    Parameters:
+
+    Returns: 
+     string - Returns the last error string, an empty string if no errors occurred.
 
   */
   abstract public function error();
 
   /*
+    Method: escape
 
     Makes a string safe to use in a query.
 
-    @method public string escape(string $str[, bool $htmlspecialchars = false]);
+    Parameters:
       string $str - The string that needs sanitizing.
       bool $htmlspecialchars - Whether or not to first do htmlspecialchars on the string.
-    returns string - Returns the sanitized string.
+
+    Returns: 
+     string - Returns the sanitized string.
 
   */
   abstract public function escape($str, $htmlspecialchars = false);
 
   /*
+    Method: unescape
 
     The opposite of the escape method.
 
-    @method public string unescape(string $str[, bool $htmlspecialchars_decode = false]);
+    Parameters:
       string $str - The string to unescape.
       bool $htmlspecialchars_decode - Whether or not to undo htmlspecialchars after unescaping.
-    returns string - Returns the unescaped string.
+
+    Returns: 
+     string - Returns the unescaped string.
 
   */
   abstract public function unescape($str, $htmlspecialchars_decode = false);
 
   /*
+    Method: version
 
     Returns a string containing the databases version (Like MySQL 5.0.11).
 
-    @method public string version();
-    returns string - Returns the version of the databases version number.
+    Parameters:
+
+    Returns: 
+     string - Returns the version of the databases version number.
 
   */
   abstract public function version();
 
   /*
+      Method: tables
     Returns an array containing all the tables in the database.
 
-    @method public array tables();
-    returns array - Returns an array containing all the tables in the database.
+    Parameters:
+
+    Returns: 
+     array - Returns an array containing all the tables in the database.
 
   */
   abstract public function tables();
 
   /*
+    Method: query
 
     Queries the database, however, it isn't a simple [mysql|sqlite|...]_query as this method
     changes the query for any compatibility issues. ONLY SELECT, UPDATE and DELETE queries should be
     used with this method, check out the insert method for doing INSERT's and REPLACE's
 
-    @method public {Database_Result} query(string $db_query[, array $db_vars = array()[ string $hook_name = null[, string $db_compat = null[ string $file = null[, int $line = 0]]]]]);
+    Parameters:
       string $db_query - The database query you want to execute.
       array $db_vars - The variable values to replace in the query.
       string $hook_name - The name of hook to run BEFORE anything else is done. The run_hook method
@@ -168,24 +196,30 @@ abstract class Database
                           on any possible compatibility issues.
       string $file - The file query was called on, LEAVE THIS BLANK! This is for use by the insert method!
       int $line - The line the query was called on, LEAVE THIS BLANK! This is for use by the insert method as well!
-    returns {Database_Result} - Returns an object with methods such as fetch_assoc, num_rows, etc.
+
+    Returns: 
+     {Database_Result} - Returns an object with methods such as fetch_assoc, num_rows, etc.
 
   */
   abstract public function query($db_query, $db_vars = array(), $hook_name = null, $db_compat = null, $file = null, $line = 0);
 
   /*
+    Method: var_sanitize
 
     Sanitizes the variable in a query using the correct methods.
 
-    @method protected mixed var_sanitize(string $var_name, string $datatype, mixed $value, $file, $line);
+    Parameters:
       string $var_name - The name of the variable in the query.
       string $datatype - The datatype of the variable.
       mixed $value - Contains the value of the variable.
       string $file - The file that query/insert was called in.
       int $line - The line that query/insert was called on.
-    returns mixed - Returns the correctly sanitized value.
 
-    NOTE: SnowCMS currently supports the following datatypes:
+    Returns: 
+     mixed - Returns the correctly sanitized value.
+
+    Note:
+       SnowCMS currently supports the following datatypes:
             float - a number such as 1, 1.0, etc.
             float_array - an array containing floats, when all numbers inside are properly sanitized, implode with a comma.
             int - a integer.
@@ -202,6 +236,7 @@ abstract class Database
   abstract protected function var_sanitize($var_name, $datatype, $value, $file, $line);
 
   /*
+    Method: var_sanitize
 
     All the following methods are helper methods of var_sanitize. They all get passed
     the variable name, value, file name and line number. These helper methods are expected
@@ -223,11 +258,12 @@ abstract class Database
   }
 
   /*
+    Method: insert
 
     Inserts or replaces data in the database. You can insert/replace multiple rows
     by having arrays inside the data array.
 
-    @method public {Database_Result} insert(string $type, string $tbl_name, array $columns, array $data[, array $keys = array()]);
+    Parameters:
       string $type - The type of insert you want to perform, INSERT, IGNORE or REPLACE supported.
       string $tbl_name - The table name that the data will be inserted into.
       array $columns - An array containg the columns that will have data inserted into.
@@ -236,11 +272,14 @@ abstract class Database
                     names which are the primary/unique keys that way an UPDATE query can be attempted, if that fails, the data is inserted.
       string $hook_name - The hook to run (using run_hook in $api) BEFORE the anything is done, run_hook is to pass $type, $tbl_name, $columns,
                           $data and $keys as parameters.
-    returns {Database_Result} - An object containing methods such as affected_rows(), etc.
+
+    Returns: 
+     {Database_Result} - An object containing methods such as affected_rows(), etc.
 
     More information about databasing can be found at http://code.google.com/p/snowcms/wiki/Databasing
 
-    NOTE: It is recommended for running the query through the database that you use the query method, simply pass the method the
+    Note:
+       It is recommended for running the query through the database that you use the query method, simply pass the method the
           file and line the insert method was called on to query, also, set the db_compat parameter in query to insert, return
           query's result.
 
@@ -248,16 +287,19 @@ abstract class Database
   abstract public function insert($type, $tbl_name, $columns, $data, $keys = array(), $hook_name = null);
 
   /*
+    Method: log_error
 
     Logs a database error into the SnowCMS error log, if the error is fatal, show a plain ol'
     ugly error page stating an error occurred.
 
-    @method protected void log_error(string $error_message[, bool $is_fatal = false[, string $file = null[, int $line = 0]]]);
+    Parameters:
       string $error_message - The error message to log.
       bool $is_fatal - Whether or not the error that occurred means that SnowCMS can no longer continue running.
       string $file - The file that the method was called in that created the error.
       int $line - The line that the method was called on that created the error.
-    returns void - Nothing is returned by this method.
+
+    Returns: 
+     void - Nothing is returned by this method.
 
   */
   public function log_error($error_message, $is_fatal = false, $file = null, $line = 0)
@@ -301,6 +343,7 @@ abstract class Database
   }
 
   /*
+    Method: log_error
 
     The destructor writes all the debugging text to a file, if any, upon this object being destructed.
 

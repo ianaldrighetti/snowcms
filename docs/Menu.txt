@@ -47,15 +47,18 @@ Format: 1.4
 
 
 File: API  (core/api.class.php)
+File: clean_request  (core/clean_request.php)
 File: Database  (core/database.class.php)
 File: Database_Maintenance  (core/database_maintenance.class.php)
-File: Database_Result  (core/database_result.class.php)
+File: Language  (core/l.php)
 File: Member  (core/member.class.php)
+File: Settings  (core/settings.class.php)
 
 Group: Index  {
 
    Index: Everything
    Class Index: Classes
    Function Index: Functions
+   Variable Index: Variables
    }  # Group: Index
 

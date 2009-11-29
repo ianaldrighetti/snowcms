@@ -17,16 +17,19 @@
 #                     File version: SnowCMS 2.0                         #
 #########################################################################
 
+# Title: Language
+
 if(!defined('IN_SNOW'))
   die;
 
-#
+# Function: l
 # This function is simply passed the text string you want translated (in English!), and
 # the translated string is returned. If no translation is available, the original string
 # is returned. (A plugin is required for translations, it is available at the SnowCMS plugin site)
 #
-# NOTE: You can use this function just as you would with sprintf, pass all the parameters you
-#       want to be replaced in the string. Check out www.php.net/sprintf for more information.
+# Note:
+#       You can use this function just as you would with sprintf, pass all the parameters you
+#       want to be replaced in the string. Check out http://www.php.net/sprintf for more information.
 #
 function l($str)
 {

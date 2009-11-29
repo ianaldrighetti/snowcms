@@ -20,6 +20,7 @@
 if(!defined('IN_SNOW'))
   die;
 
+#Class: Settings
 class Settings
 {
   private $settings;
