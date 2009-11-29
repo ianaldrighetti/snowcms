@@ -236,8 +236,7 @@ abstract class Database
   abstract protected function var_sanitize($var_name, $datatype, $value, $file, $line);
 
   /*
-    Method: var_sanitize
-
+    Method: sanitize_float
     All the following methods are helper methods of var_sanitize. They all get passed
     the variable name, value, file name and line number. These helper methods are expected
     to properly sanitize the value according to the variables datatype. If the value given
@@ -246,11 +245,73 @@ abstract class Database
 
   */
   abstract protected function sanitize_float($var_name, $value, $file, $line);
+  
+  
+  
+  /*
+    Method: sanitize_float_array
+    
+    All the following methods are helper methods of var_sanitize. They all get passed
+    the variable name, value, file name and line number. These helper methods are expected
+    to properly sanitize the value according to the variables datatype. If the value given
+    is not able to be sanitized properly, you must call on the database method log_error
+    fatally.
+
+  */
   abstract protected function sanitize_float_array($var_name, $value, $file, $line);
+  
+  
+  /*
+    Method: sanitize_int
+    
+    All the following methods are helper methods of var_sanitize. They all get passed
+    the variable name, value, file name and line number. These helper methods are expected
+    to properly sanitize the value according to the variables datatype. If the value given
+    is not able to be sanitized properly, you must call on the database method log_error
+    fatally.
+
+  */
   abstract protected function sanitize_int($var_name, $value, $file, $line);
+  
+  
+  /*
+    Method: sanitize_int_array
+    
+    All the following methods are helper methods of var_sanitize. They all get passed
+    the variable name, value, file name and line number. These helper methods are expected
+    to properly sanitize the value according to the variables datatype. If the value given
+    is not able to be sanitized properly, you must call on the database method log_error
+    fatally.
+
+  */
   abstract protected function sanitize_int_array($var_name, $value, $file, $line);
+  
+  
+  /*
+    Method: sanitize_string
+    
+    All the following methods are helper methods of var_sanitize. They all get passed
+    the variable name, value, file name and line number. These helper methods are expected
+    to properly sanitize the value according to the variables datatype. If the value given
+    is not able to be sanitized properly, you must call on the database method log_error
+    fatally.
+
+  */
   abstract protected function sanitize_string($var_name, $value, $file, $line);
+  
+  
+  /*
+    Method: sanitize_string_array
+    
+    All the following methods are helper methods of var_sanitize. They all get passed
+    the variable name, value, file name and line number. These helper methods are expected
+    to properly sanitize the value according to the variables datatype. If the value given
+    is not able to be sanitized properly, you must call on the database method log_error
+    fatally.
+
+  */
   abstract protected function sanitize_string_array($var_name, $value, $file, $line);
+  
 
   private function sanitize_raw($var_name, $value, $file, $line)
   {
