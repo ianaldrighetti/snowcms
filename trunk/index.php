@@ -23,6 +23,9 @@ if(function_exists('set_magic_quotes_runtime'))
 
 mb_internal_encoding('UTF-8');
 
+# All times from time() should be UTC ;)
+@ini_set('date.timezone', 'UTC');
+
 $start_time = microtime(true);
 
 # We are currently in SnowCMS :)
@@ -58,6 +61,11 @@ load_api();
 # Just a hook before anything else major is done.
 $api->run_hook('pre_start');
 
+require($core_dir. '/settings.class.php');
+
+# Load up the settings :)
+init_settings();
+
 require($core_dir. '/clean_request.php');
 
 # We need to filter out some baaaad stuff, like any register_globals issues and other security things.
@@ -75,6 +83,11 @@ init_member();
 
 # Include our l() function for translation :)
 require($core_dir. '/l.php');
+
+require($core_dir. '/theme.class.php');
+
+# Initialize the theme!!!
+init_theme();
 
 # Initialize the current members session, if any, though...
 echo 'Executed in ', round(microtime(true) - $start_time, 6), ' seconds.';

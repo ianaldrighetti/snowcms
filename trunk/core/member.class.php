@@ -23,8 +23,6 @@ if(!defined('IN_SNOW'))
 # A pluggable class, how classy? Hahaha, yeah, I know, bad pun.
 if(!class_exists('Member'))
 {
-  #Class: Member
-  
   class Member
   {
     private $id;
@@ -37,10 +35,11 @@ if(!class_exists('Member'))
     private $ip;
     private $groups;
     private $data;
+    private $session_id;
 
     public function __construct()
     {
-      global $_SESSION, $api, $cookie_name, $db;
+      global $api, $cookie_name, $db;
 
       # Just define them, for now.
       $member_id = 0;
@@ -74,10 +73,10 @@ if(!class_exists('Member'))
         # Alright, let's see if what you have is right :P
         $result = $db->query('
           SELECT
-            member_id, member_name, member_pass, member_hash, display_name,
-            member_email, member_groups, member_registered, member_activated
+            member_id AS id, member_name AS name, member_pass AS pass, member_hash AS hash, display_name,
+            member_email AS email, member_groups AS groups, member_registered AS registered
           FROM {db->prefix}members
-          WHERE member_id = {int:member_id}
+          WHERE member_id = {int:member_id} AND member_activated > 0
           LIMIT 1',
           array(
             'member_id' => $member_id,
@@ -89,17 +88,17 @@ if(!class_exists('Member'))
           $member = $result->fetch_assoc();
 
           # Now one last check, then we will know if it is who you are claiming to be!
-          if(!empty($member['member_hash']) && sha1($member['member_pass']. $member['member_hash']) == $passwrd)
+          if(!empty($member['hash']) && sha1($member['pass']. $member['hash']) == $passwrd)
           {
             # Now we can get some stuff done... ;)
-            $this->id = $member['member_id'];
-            $this->name = $member['member_name'];
-            $this->passwrd = $member['member_pass'];
-            $this->hash = $member['member_hash'];
+            $this->id = $member['id'];
+            $this->name = $member['name'];
+            $this->passwrd = $member['pass'];
+            $this->hash = $member['hash'];
             $this->display_name = $member['display_name'];
-            $this->email = $member['member_email'];
-            $this->registered = $member['member_registered'];
-            $this->groups = @explode(',', $member['member_groups']);
+            $this->email = $member['email'];
+            $this->registered = $member['registered'];
+            $this->groups = @explode(',', $member['groups']);
 
             # Time to load their other data from the {db->prefix}member_data table :)
             $this->data = array();
@@ -124,11 +123,33 @@ if(!class_exists('Member'))
         $this->groups = array('guest');
 
       # Don't think I did a good enough job at logging in the member? FINE! :P
-      $api->run_hook('post_login', array(&$this));
+      $member = array();
+      $api->run_hook('post_login', array(&$member));
+
+      if(count($member) > 0)
+      {
+        $this->id = isset($member['id']) ? $member['id'] : $this->id;
+        $this->name = isset($member['name']) ? $member['name'] : $this->name;
+        $this->passwrd = isset($member['pass']) ? $member['pass'] : $this->passwrd;
+        $this->hash = isset($member['hash']) ? $member['hash'] : $this->hash;
+        $this->display_name = isset($member['display_name']) ? $member['display_name'] : $this->display_name;
+        $this->email = isset($member['email']) ? $member['email'] : $this->email;
+        $this->registered = isset($member['registered']) ? $member['registered'] : $this->registered;
+        $this->groups = isset($member['groups']) ? @explode(',', $member['groups']) : $this->groups;
+      }
+
+      # The session id not set yet? or is it old..?
+      if(empty($_SESSION['session_id']) || empty($_SESSION['session_assigned']) || ((int)$_SESSION['session_assigned'] + 86400) < time())
+      {
+        $rand = mt_rand(1, 2);
+        $_SESSION['session_id'] = sha1(($rand == 1 ? session_id() : ''). substr(str_shuffle('abcdefghijklmnopqrstuvwxyz1234567890'), 0, mt_rand(16, 32)). ($rand == 2 ? session_id() : ''));
+        $_SESSION['session_assigned'] = time();
+      }
+
+      $this->session_id = $_SESSION['session_id'];
     }
 
     /*
-    : 
 
       Just a lot of accessors ;)
 
@@ -173,18 +194,20 @@ if(!class_exists('Member'))
       return $this->groups;
     }
 
+    public function session_id()
+    {
+      return $this->session_id;
+    }
+
     /*
-    Method: is_a
 
       Allows you to see if the member is a specified group. You can pass a single group identifier,
       or an array of group identifiers. If you pass a group (array) of group identifiers, FALSE will
       be returned if the member isn't ALL of the specified groups.
 
-      Parameters:
+      @method public bool is_a(mixed $what);
         mixed $what - An array of group identifiers, or a single group identifier.
-  
-    Returns: 
-     bool - Returns TRUE if the member is all of the groups you specified, FALSE if not.
+      returns bool - Returns TRUE if the member is all of the groups you specified, FALSE if not.
 
     */
     public function is_a($what)
@@ -212,12 +235,9 @@ if(!class_exists('Member'))
     }
 
     /*
-    Method: is_guest
 
-      Parameters:
-  
-    Returns: 
-     bool - Returns TRUE if the person isn't logged in, FALSE if not.
+      @method public bool is_guest();
+      returns bool - Returns TRUE if the person isn't logged in, FALSE if not.
 
     */
     public function is_guest()
@@ -226,12 +246,9 @@ if(!class_exists('Member'))
     }
 
     /*
-    Method: is_logged
 
-      Parameters:
-  
-    Returns: 
-     bool - Returns TRUE if the member is logged in, FALSE if not.
+      @method public bool is_logged();
+      returns bool - Returns TRUE if the member is logged in, FALSE if not.
 
     */
     public function is_logged()
@@ -240,12 +257,9 @@ if(!class_exists('Member'))
     }
 
     /*
-    Method: is_admin
 
-      Parameters:
-  
-    Returns: 
-     bool - Returns TRUE if the member is an administrator, FALSE if not.
+      @method public bool is_admin();
+      returns bool - Returns TRUE if the member is an administrator, FALSE if not.
 
     */
     public function is_admin()
@@ -254,13 +268,10 @@ if(!class_exists('Member'))
     }
 
     /*
-    Method: data
 
-      Parameters:
+      @method public string data(string $variable);
         string $variable - The name of the data's variable.
-  
-    Returns: 
-     string - Returns the value of the variable, NULL if the variable is not set.
+      returns string - Returns the value of the variable, NULL if the variable is not set.
 
     */
     public function data($variable)

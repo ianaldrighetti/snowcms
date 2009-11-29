@@ -20,27 +20,49 @@
 if(!defined('IN_SNOW'))
   die;
 
-#
-# Class: API
-# This class is a major part of SnowCMS, it allows plugins (or flakes) to use hooks
-# in various places which allow the plugins to add new features, or change how current
-# features work as well.
-#
+/*
+  Class: API
+  This class is a major part of SnowCMS, it allows plugins (or flakes) to use hooks in various places
+  which allow the plugins to add new features, or change how current features work as well.
+*/
 class API
 {
-  # An array containing callbacks that have hooked themselves through the API...
-  private $hooked = array();
+  /*
+    Variable: hooked
+    An array containing callbacks that have hooked themselves through the API...
+  */
+  private $hooked;
 
-  # Another array containing actions plugins have registered (allows ?action=REGISTERED_ACTION)
-  private $hooked_actions = array();
+  /*
+    Variable: hooked_actions
+    Another array containing actions plugins have registered (allows ?action=REGISTERED_ACTION)
+  */
+  private $hooked_actions;
 
-  # Yup, thats right, an array containing sub-actions plugins can register on actions
-  # Please Note that sub-actions only work if the plugin that registered the action
-  # uses this sub-action API
-  private $hooked_subactions = array();
+  /*
+    Variable: hooked_subactions
+    Yup, thats right, an array containing sub-actions plugins can register on actions
+    Please note that sub-actions only work if the plugin that registered the action
+    uses this sub-action API
+  */
+  private $hooked_subactions;
 
-  # Registered groups, permission hook, in other words.
-  private $groups = array();
+  /*
+    Variable: groups
+    Registered groups, permission hook, in other words.
+  */
+  private $groups;
+
+  /*
+    Constructor: __construct
+  */
+  public function __construct()
+  {
+    $this->hooked = array();
+    $this->hooked_actions = array();
+    $this->hooked_subactions = array();
+    $this->groups = array();
+  }
 
   /*
     Method: add_hook
@@ -58,12 +80,11 @@ class API
                   will receive. If you specify more arguments than the hook supplies, null will be supplied
                   in the place of unspecified arguments.
 
-    Returns: 
+    Returns:
      bool - TRUE if your hook was registered successfully, FALSE on failure, which means that
                    a hook has already been registered with that callback in that hook group.
 
-    Note: 
-      You can view a list of available hooks at Google Code <http://code.google.com/p/snowcms/wiki/Hooks>
+    NOTE: You can view a list of available hooks at Google Code <http://code.google.com/p/snowcms/wiki/Hooks>
 
   */
   public function add_hook($hook_name, $callback, $importance = 10, $args = null)
@@ -87,16 +108,13 @@ class API
   }
 
   /*
-    Method: remove_hook
 
     Removes the specified callback from the specified hook.
 
-    Parameters:
+    @method public bool remove_hook(string $hook_name, string $callback);
       string $hook_name - The hook name to remove the specified callback from.
       string $callback - The callback to remove from the specified hook.
-
-    Returns: 
-     bool - TRUE if the callback was removed, FALSE if the callback wasn't found.
+    returns bool - TRUE if the callback was removed, FALSE if the callback wasn't found.
 
   */
   public function remove_hook($hook_name, $callback)
@@ -123,7 +141,7 @@ class API
       string $hook_name - The hook name to search for $callback in.
       callback $callback - The callback to search for in $hook_name.
 
-    Returns: 
+    Returns:
      bool - Returns TRUE if the callback is already registered in the specified hook,
                    FALSE if not.
 
@@ -150,13 +168,12 @@ class API
       string $hook_name - The name of the hook you are executing.
       mixed $args - Either a single argument or an array of arguments.
 
-    Returns: 
+    Returns:
      void - Nothing is returned.
 
-    Note: 
-      If you want to allow hooks to change something variable wise, pass the variable
-      as a reference parameter (&$var) INSIDE an array! Otherwise you will get a
-      E_DEPRECATED error!
+    NOTE: If you want to allow hooks to change something variable wise, pass the variable
+          as a reference parameter (&$var) INSIDE an array! Otherwise you will get a
+          E_DEPRECATED error!
 
   */
   public function run_hook($hook_name, $args = null)
@@ -197,11 +214,10 @@ class API
     Parameters:
       array $array - The array to sort by the index 'importance'
 
-    Returns: 
+    Returns:
      array - Returns the sorted array
 
-    See Also: 
-      Original function available at <http://mschat.net/forum/index.php?topic=1609.0>
+    NOTE: Original function available at <http://mschat.net/forum/index.php?topic=1609.0>
 
   */
   private function sort(&$array)
@@ -237,7 +253,7 @@ class API
       string $file - The file to include before executing the callback, if null is supplied, no
                      file is executed.
 
-    Returns: 
+    Returns:
      bool - TRUE is returned if the action was successfully added, FALSE if not, which means that
                    that action is already registered (check out the method remove_action).
 
@@ -259,7 +275,7 @@ class API
     Parameters:
       string $action_name - The action to remove.
 
-    Returns: 
+    Returns:
      bool - TRUE if the action was successfully removed, FALSE on failure, meaning that
                    the action wasn't registered.
 
@@ -281,7 +297,7 @@ class API
     Parameters:
       string $action_name - The action name to check.
 
-    Returns: 
+    Returns:
      bool - TRUE if the action is registered, FALSE if not.
 
   */
@@ -300,7 +316,7 @@ class API
     Parameters:
       string $action_name - The action name to return information about.
 
-    Returns: 
+    Returns:
      array - Returns the array containing a callback and file to include before calling on the
                     the callback, however, FALSE is returned if the action does not exist.
 
@@ -325,7 +341,7 @@ class API
       string $file - The file to include before executing the callback, if null is supplied, no
                      file is executed.
 
-    Returns: 
+    Returns:
      bool - TRUE is returned if the subaction was successfully added, FALSE if not, which means that
                    that subaction is already registered (check out the method remove_subaction).
 
@@ -349,7 +365,7 @@ class API
       string $action_name - The action from which you want to remove.
       string $subaction_name - The sub-action you want to remove.
 
-    Returns: 
+    Returns:
      bool - TRUE if the sub-action was successfully removed, FALSE on failure, meaning that
                    the sub-action wasn't registered.
 
@@ -372,7 +388,7 @@ class API
       string $action_name - The action name to check within.
       string $subaction_name - The sub-action to check to see if it is registered.
 
-    Returns: 
+    Returns:
      bool - TRUE if the subaction is registered, FALSE if not.
 
   */
@@ -392,7 +408,7 @@ class API
       string $action_name - The action name to return retrieve subaction information about.
       string $subaction_name - The subaction to return information about.
 
-    Returns: 
+    Returns:
      array - Returns the array containing a callback and file to include before calling on the
                     the callback, however, FALSE is returned if the subaction does not exist.
 
@@ -419,7 +435,7 @@ class API
       string $group_name - The actual display name of this group, such as Page Manager. You should pass this name
                             through the l() function before passing it on to this method.
 
-    Returns: 
+    Returns:
      bool - Returns TRUE if the group was added successfully, FALSE if the group is already registered.
 
   */
@@ -440,7 +456,7 @@ class API
     Parameters:
       string $group_identifier - The group to remove.
 
-    Returns: 
+    Returns:
      bool - Returns TRUE if the group was successfully removed, FALSE on failure.
 
   */
@@ -462,7 +478,7 @@ class API
     Parameters:
       string $group_identifier - The group identifier to check.
 
-    Returns: 
+    Returns:
      bool - Returns TRUE if the group is registered, FALSE if not.
 
   */
@@ -481,7 +497,7 @@ class API
     Parameters:
       string $group_identifier - The group identifier.
 
-    Returns: 
+    Returns:
      mixed - An array is returned (containing all registered groups), a string containing
                     the groups name, or FALSE if the group is not registered.
 
@@ -497,6 +513,10 @@ class API
   }
 }
 
+/*
+  Function: load_api
+  Instaniates the API class into the $api variable and loads all enabled plugins.
+*/
 function load_api()
 {
   global $api, $db, $plugin_dir;
@@ -509,7 +529,7 @@ function load_api()
     SELECT
       dependency_name, dependency_names, dependencies, directory
     FROM {db->prefix}plugins
-    WHERE runtime_error > 0
+    WHERE runtime_error > 0 AND is_activated = 1
     ORDER BY dependencies DESC');
 
   # Any plugins activated, otherwise, don't do this :)
@@ -599,5 +619,11 @@ function load_api()
       $api->run_hook('post_plugin_activation');
     }
   }
+
+  # Simple hook, something you can hook onto if you want to do something right before SnowCMS stops executing.
+  register_shutdown_function(create_function('', '
+    global $api;
+
+    $api->run_hook(\'snow_exit\');'));
 }
 ?>
