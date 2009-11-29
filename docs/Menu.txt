@@ -48,7 +48,7 @@ Group: Core  {
    File: API  (core/api.class.php)
    File: Clean Request  (core/clean_request.php)
    File: Database  (core/database.class.php)
-   File: Database Maintenance  (core/database_maintenance.class.php)
+   File: Database Maintenance  (no auto-title, core/database_maintenance.class.php)
    File: Language  (core/l.php)
    File: Load Database  (core/database.php)
    File: Member  (core/member.class.php)
