@@ -84,7 +84,8 @@ class API
      bool - TRUE if your hook was registered successfully, FALSE on failure, which means that
                    a hook has already been registered with that callback in that hook group.
 
-    NOTE: You can view a list of available hooks at Google Code <http://code.google.com/p/snowcms/wiki/Hooks>
+    Note:
+       You can view a list of available hooks at Google Code <http://code.google.com/p/snowcms/wiki/Hooks>
 
   */
   public function add_hook($hook_name, $callback, $importance = 10, $args = null)
@@ -171,7 +172,8 @@ class API
     Returns:
      void - Nothing is returned.
 
-    NOTE: If you want to allow hooks to change something variable wise, pass the variable
+    Note:
+       If you want to allow hooks to change something variable wise, pass the variable
           as a reference parameter (&$var) INSIDE an array! Otherwise you will get a
           E_DEPRECATED error!
 
@@ -217,7 +219,8 @@ class API
     Returns:
      array - Returns the sorted array
 
-    NOTE: Original function available at <http://mschat.net/forum/index.php?topic=1609.0>
+    Note:
+       Original function available at <http://mschat.net/forum/index.php?topic=1609.0>
 
   */
   private function sort(&$array)
