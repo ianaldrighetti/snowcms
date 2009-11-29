@@ -41,9 +41,11 @@ CREATE TABLE `{$db_prefix}plugins`
   `dependencies` TINYINT(3) UNSIGNED NOT NULL,
   `directory` VARCHAR(255) NOT NULL,
   `runtime_error` TINYINT(1) UNSIGNED NOT NULL DEFAULT '0',
+  `is_activated` TINYINT(1) UNSIGNED NOT NULL DEFAULT '0',
   PRIMARY KEY (`dependency_name`),
   KEY (`dependencies`),
-  KEY (`runtime_error`)
+  KEY (`runtime_error`),
+  KEY (`is_activated`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 
 ----

@@ -23,11 +23,9 @@ if(!defined('IN_SNOW'))
 # This is a pluggable function, so make sure someone hasn't defined it already...
 if(!function_exists('clean_request'))
 {
-  #
-  # With this function we make things a tiny bit safer, for example, we make $_REQUEST
-  # only contain $_POST and $_GET not that and $_COOKIE. We undo what magic quotes does
-  # as it, well, is quite dumb.
-  #
+  /*
+    Function: clean_request
+  */
   function clean_request()
   {
     global $_COOKIE, $_GET, $_POST, $_REQUEST;

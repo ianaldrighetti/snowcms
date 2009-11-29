@@ -32,11 +32,13 @@ CREATE TABLE '{$db_prefix}plugins'
   'dependencies' SMALLINT NOT NULL DEFAULT '0',
   'directory' VARCHAR(255) NOT NULL,
   'runtime_error' SMALLINT NOT NULL DEFAULT '0',
+  'is_activated' SMALLINT NOT NULL DEFAULT '0',
   PRIMARY KEY ('dependency_name')
 );
 
 CREATE INDEX '{$db_prefix}plugins_dependencies' ON '{$db_prefix}plugins' ('dependencies');
 CREATE INDEX '{$db_prefix}plugins_runtime_error' ON '{$db_prefix}plugins' ('runtime_error');
+CREATE INDEX '{$db_prefix}plugins_is_activated' ON '{$db_prefix}plugins' ('is_activated');
 
 CREATE TABLE '{$db_prefix}settings'
 (
