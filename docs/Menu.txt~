@@ -1,8 +1,9 @@
 Format: 1.4
 
 
-Title: SnowCMS
-SubTitle: Version 2.0
+# You can add a title and sub-title to your menu like this:
+# Title: [project name]
+# SubTitle: [subtitle]
 
 # You can add a footer to your documentation like this:
 # Footer: [text]
@@ -45,6 +46,8 @@ SubTitle: Version 2.0
 # --------------------------------------------------------------------------
 
 
+File: SnowCMS  (index.php)
+
 Group: Core  {
 
    File: API  (core/api.class.php)
@@ -59,11 +62,13 @@ Group: Core  {
    File: Settings  (core/settings.class.php)
    }  # Group: Core
 
+
 Group: Index  {
 
    Index: Everything
    Class Index: Classes
    Function Index: Functions
    Variable Index: Variables
+   File Index: Files
    }  # Group: Index
 

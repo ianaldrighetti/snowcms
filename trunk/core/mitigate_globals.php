@@ -17,10 +17,11 @@
 #                     File version: SnowCMS 2.0                         #
 #########################################################################
 
+# Title: Mitigate Globals
 if(!defined('IN_SNOW'))
   die;
 
-#
+# Function: mitigate_globals
 # register_globals is one of the worst ideas ever pawned, and if enabled, could
 # lead to devastating incidents, and we don't want ;)
 #
