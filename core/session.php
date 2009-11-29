@@ -20,12 +20,16 @@
 if(!defined('IN_SNOW'))
   die;
 
+# Title: Session
+
 # Another pluggable function, sessions!!! Woo!
 if(!function_exists('init_session'))
 {
-  #
+  # Function: init_session
   # Simply starts up the session... Simple, right?
   #
+  # Note:
+  #   This is a pluggable function.
   function init_session()
   {
     global $api;

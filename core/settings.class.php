@@ -25,7 +25,10 @@ class Settings
 {
   private $settings;
   private $update_settings;
-
+  
+  /*
+    Constructor: __construct
+  */
   public function __construct()
   {
     global $api;
@@ -37,7 +40,10 @@ class Settings
 
     $api->add_hook('snow_exit', array($this, 'save'), 10, 0);
   }
-
+  /*
+    Method: reload
+    Loads the settings.
+  */
   public function reload()
   {
     global $db;
@@ -55,12 +61,27 @@ class Settings
       foreach($this->update_settings as $variable => $value)
         $this->settings[$variable] = $value;
   }
-
+  
+  /*
+    Method: get
+    Get the value of a setting
+    
+    Parameters:
+      string $variable - The name of the setting
+    
+    Returns:
+      the value of the setting.
+  */
   public function get($variable)
   {
     return isset($this->settings[$variable]) ?  $this->settings[$variable] : null;
   }
 
+  /*
+    Method: save
+    Save the settings
+    
+  */
   public function save()
   {
     global $db;
@@ -86,6 +107,11 @@ class Settings
   }
 }
 
+
+/*
+  Function: init_settings
+  Sets the global $settings to a new settings object
+*/
 function init_settings()
 {
   global $settings;

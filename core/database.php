@@ -17,9 +17,15 @@
 #                     File version: SnowCMS 2.0                         #
 #########################################################################
 
+# Title: Load Database
+
 if(!defined('IN_SNOW'))
   die;
 
+/*
+  Function: load_database
+  Loads the database
+*/
 function load_database()
 {
   global $core_dir, $db, $db_type;

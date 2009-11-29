@@ -20,11 +20,16 @@
 if(!defined('IN_SNOW'))
   die;
 
+# Title: Clean Request
+# This cleans the requests in magical ways I can't comprehend
+
+
 # This is a pluggable function, so make sure someone hasn't defined it already...
 if(!function_exists('clean_request'))
 {
   /*
     Function: clean_request
+    I don't know what this does so ask aldo
   */
   function clean_request()
   {
@@ -46,7 +51,14 @@ if(!function_exists('clean_request'))
     if(isset($_REQUEST['GLOBALS']) || isset($_COOKIE['GLOBALS']) || isset($_FILES['GLOBALS']))
       die('Hacking attempt...');
   }
-
+  /*
+    Function: remove_magic
+    I don't know what this does so ask aldo
+    
+    Parameters:
+      array $array - Ask aldo
+      int $depth - Ask aldo
+  */
   function remove_magic($array, $depth = 0)
   {
     if(count($array) == 0)
