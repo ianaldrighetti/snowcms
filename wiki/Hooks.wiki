@@ -8,6 +8,8 @@ pre_start - [http://code.google.com/p/snowcms/source/browse/trunk/index.php /ind
 
 post_plugin_activation - [http://code.google.com/p/snowcms/source/browse/trunk/core/api.class.php /core/api.class.php]
 
+snow_exit - [http://code.google.com/p/snowcms/source/browse/trunk/core/api.class.php /core/api.class.php]
+
 sessions - [http://code.google.com/p/snowcms/source/browse/trunk/core/session.php /core/session.php]
 
 cookie_data - [http://code.google.com/p/snowcms/source/browse/trunk/core/member.class.php /core/member.class.php]
@@ -23,3 +25,5 @@ post_login - [http://code.google.com/p/snowcms/source/browse/trunk/core/member.c
 init_member - [http://code.google.com/p/snowcms/source/browse/trunk/core/member.class.php /core/member.class.php]
 
 translate - [http://code.google.com/p/snowcms/source/browse/trunk/core/l.php /core/l.php]
+
+save_settings - [http://code.google.com/p/snowcms/source/browse/trunk/core/settings.class.php /core/settings.class.php]
