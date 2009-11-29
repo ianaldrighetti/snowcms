@@ -17,7 +17,6 @@
 #                     File version: SnowCMS 2.0                         #
 #########################################################################
 
-# Title: Database Maintenance
 
 if(!defined('IN_SNOW'))
   die;
