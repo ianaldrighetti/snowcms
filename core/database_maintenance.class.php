@@ -20,61 +20,73 @@
 if(!defined('IN_SNOW'))
   die;
 
+# Class: Database_Maintenance
 # A database maintenance class, only included when needed!!!
 abstract class Database_Maintenance
 {
   # The database object...
 
   /*
+    Method: backup_table
 
     Creates a copy of $table into $backup_table.
 
-    @method public bool backup_table(string $table, $backup_table);
+    Parameters:
       string $table - The original table to backup.
       string $backup_table - The table to copy $table's data over to (The table $backup_table
                              should not be created, as this method will do that)
-    returns bool - TRUE if the table was successfully backed up, FALSE on failure.
+
+    Returns: 
+     bool - TRUE if the table was successfully backed up, FALSE on failure.
 
   */
   abstract public function backup_table($table, $backup_table);
 
   /*
+    Method: optimize_table
 
     Optimizes the specified table.
 
-    @method public bool optimize_table(string $table);
+    Parameters:
       string - The table to optimize.
-    returns bool - TRUE on success, FALSE on failure.
 
-    NOTE: If the database system has a command that optimizes the whole database (Ex: SQLite)
+    Returns: 
+     bool - TRUE on success, FALSE on failure.
+
+    Note:
+       If the database system has a command that optimizes the whole database (Ex: SQLite)
           it is recommended you have a static variable to check if this method was already called.
 
   */
   abstract public function optimize_table($table);
 
   /*
+    Method: table_sql
 
     Generates the CREATE TABLE command for the specified table, if $file is specified,
     append that data to the specified file and return a bool (TRUE on success, FALSE on failure),
     otherwise return the string containing the CREATE TABLE.
 
-    @method public mixed table_sql(string $table[, bool $drop_if_exists = true[, string $file = null]]);
+    Parameters:
       string $table - The table to generate the CREATE TABLE command for.
       bool $drop_if_exists - Whether or not to include DROP TABLE IF EXISTS `$table` command before  the
                              the CREATE TABLE. (Be sure the database supports such a command)
       string $file - The file to append the command to, unless $file is empty.
-    returns mixed - Could return a string containing the command ($file empty) or a bool containing
+
+    Returns: 
+     mixed - Could return a string containing the command ($file empty) or a bool containing
                     whether or not the command was successfully written to $file
 
   */
   abstract public function table_sql($table, $drop_if_exists = true, $file = null);
 
   /*
+    Method: insert_sql
 
     Generates the INSERT INTO commands for the table data contained within the specified table.
     If $file is specified, append that data to the file, otherwise return the string containing the data.
 
-    @method public mixed insert_sql(string $table[, bool $extended_inserts = true[, int $rows_per_insert = 10[, int $start = false[, int $rows = false[, string $file = null]]]]]);
+    Parameters:
       string $table - The table to get the data from.
       bool $extended_inserts - Whether or not to use extended inserts in the backup, if the database
                                type doesn't support extended inserts, ignore this.
@@ -85,21 +97,25 @@ abstract class Database_Maintenance
       int $rows - The number of rows to retrieve from the SELECT * query (LIMIT $start, $rows). If this is false,
                   don't include a LIMIT clause in your SELECT * query.
       string $file - The file to append the data to, unless $file is empty.
-    returns mixed - Could return a string containing the data ($file empty) or a bool containing
+
+    Returns: 
+     mixed - Could return a string containing the data ($file empty) or a bool containing
                     whether or not the data was successfully written to $file.
 
   */
   abstract public function insert_sql($table, $extended_inserts = true, $rows_per_insert = 10, $start = false, $rows = false, $file = null);
 
   /*
+    Method: create_table
 
     Creates a table with the specified table name, columns and indexes.
 
-    @method public bool create_table(string $table, array $columns[, array $indexes = array()[, string $on_exists = 'fail']]);
+    Parameters:
       string $table - The name of the table to create.
       array $columns - An array of columns which contains each columns information. Ex:
                        $columns = array('col_name' => array('type' => 'int', 'length' => 10, 'attributes' => 'unsigned', 'null' => false, 'auto_increment' => true), 'another_col' => array(...))
-                       NOTE: Make note that any MySQL datatype could be used in type, so if you get a MySQL only supported datatype, use a similar one of equal or greater capabilities.
+                       Note:
+       Make note that any MySQL datatype could be used in type, so if you get a MySQL only supported datatype, use a similar one of equal or greater capabilities.
                              attributes could be UNSIGNED, ZEROFILL or BINARY.
       array $indexes - Any indexes (PRIMARY, UNIQUE or INDEX) you want added to the table. Example:
                        array(
