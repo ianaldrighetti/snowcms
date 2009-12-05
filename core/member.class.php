@@ -19,7 +19,7 @@
 
 if(!defined('IN_SNOW'))
   die;
-  
+
 # Class: Member
 # A pluggable class, how classy? Hahaha, yeah, I know, bad pun.
 if(!class_exists('Member'))
@@ -151,7 +151,7 @@ if(!class_exists('Member'))
     }
 
     /*
-    : 
+    :
 
       Just a lot of accessors ;)
 
@@ -210,8 +210,8 @@ if(!class_exists('Member'))
 
       Parameters:
         mixed $what - An array of group identifiers, or a single group identifier.
-  
-    Returns: 
+
+    Returns:
      bool - Returns TRUE if the member is all of the groups you specified, FALSE if not.
 
     */
@@ -243,8 +243,8 @@ if(!class_exists('Member'))
     Method: is_guest
 
       Parameters:
-  
-    Returns: 
+
+    Returns:
      bool - Returns TRUE if the person isn't logged in, FALSE if not.
 
     */
@@ -257,8 +257,8 @@ if(!class_exists('Member'))
     Method: is_logged
 
       Parameters:
-  
-    Returns: 
+
+    Returns:
      bool - Returns TRUE if the member is logged in, FALSE if not.
 
     */
@@ -271,8 +271,8 @@ if(!class_exists('Member'))
     Method: is_admin
 
       Parameters:
-  
-    Returns: 
+
+    Returns:
      bool - Returns TRUE if the member is an administrator, FALSE if not.
 
     */
@@ -286,8 +286,8 @@ if(!class_exists('Member'))
 
       Parameters:
         string $variable - The name of the data's variable.
-  
-    Returns: 
+
+    Returns:
      string - Returns the value of the variable, NULL if the variable is not set.
 
     */
@@ -311,7 +311,7 @@ if(!function_exists('init_member'))
 
     # Have you not set $member yet? We will then.
     if(!isset($member))
-      $member = new Member();
+      $member = $api->load_class('Member');
   }
 }
 ?>

@@ -32,6 +32,28 @@ CREATE TABLE `{$db_prefix}members`
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 
 ----
+-- Used via the Messages API
+----
+CREATE TABLE `{$db_prefix}messages`
+(
+  `area_name` VARCHAR(255) NOT NULL,
+  `area_id` INT(11) UNSIGNED NOT NULL,
+  `message_id` INT(11) UNSIGNED NOT NULL AUTO_INCREMENT,
+  `member_id` INT(11) UNSIGNED NOT NULL DEFAULT '0',
+  `member_name` VARCHAR(255) NOT NULL,
+  `member_email` VARCHAR(255) NOT NULL,
+  `member_ip` VARCHAR(150) NOT NULL,
+  `subject` VARCHAR(255) NOT NULL DEFAULT '',
+  `message` TEXT NOT NULL,
+  `message_type` VARCHAR(16) NOT NULL DEFAULT '',
+  `is_approved` TINYINT(1) UNSIGNED NOT NULL DEFAULT '0',
+  `extra` TEXT NOT NULL,
+  PRIMARY KEY (`area_name`, `area_id`, `message_id`),
+  KEY (`is_approved`),
+  KEY (`extra`(255))
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+
+----
 -- This is where currently enabled plugins are held
 ----
 CREATE TABLE `{$db_prefix}plugins`
@@ -57,3 +79,5 @@ CREATE TABLE `{$db_prefix}settings`
   `value` TEXT NOT NULL,
   PRIMARY KEY (`variable`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+
+INSERT INTO `{$db_prefix}settings` (`variable`, `value`) VALUES('show_version', 1),('version', '2.0 SVN');

@@ -20,12 +20,22 @@
 if(!defined('IN_SNOW'))
   die;
 
-#Class: Settings
+/*
+  Class: Settings
+
+  This class handles the loading and savings of settings for the system.
+*/
 class Settings
 {
+  # Variable: settings
+  # Contains the most up-to-date settings and values.
   private $settings;
+
+  # Variable: update_settings
+  # Contains the setting variables and values which are to be updated
+  # before the Settings object is destructed.
   private $update_settings;
-  
+
   /*
     Constructor: __construct
   */
@@ -42,7 +52,17 @@ class Settings
   }
   /*
     Method: reload
-    Loads the settings.
+
+    Loads all the current settings from the database into the
+    settings attribute. If there were any settings added/updated
+    during the running of the system, those additions/updates
+    are added to the settings array.
+
+    Parameters:
+      none
+
+    Returns:
+      void - Nothing is returned by this method.
   */
   public function reload()
   {
@@ -54,6 +74,7 @@ class Settings
         variable, value
       FROM {db->prefix}settings');
 
+    $this->settings = array();
     while($row = $result->fetch_assoc())
       $this->settings[$row['variable']] = $row['value'];
 
@@ -61,26 +82,64 @@ class Settings
       foreach($this->update_settings as $variable => $value)
         $this->settings[$variable] = $value;
   }
-  
+
   /*
     Method: get
-    Get the value of a setting
-    
+
+    Gets the value of the specified variable from the settings
+    attribute.
+
     Parameters:
       string $variable - The name of the setting
-    
+
     Returns:
-      the value of the setting.
+      string - Returns the value of the setting, NULL if the setting
+               was not found.
   */
   public function get($variable)
   {
-    return isset($this->settings[$variable]) ?  $this->settings[$variable] : null;
+    return !empty($variable) && is_string($variable) && isset($this->settings[$variable]) ?  $this->settings[$variable] : null;
+  }
+
+  /*
+    Method: set
+
+    Adds/updates a settings value.
+
+    Parameters:
+      string $variable - The variable to add/update.
+      string $value - The new value to set/update $variable to.
+
+    Returns:
+      void - Nothing is returned by this method.
+
+    NOTE: You can also pass ++ or -- as a string in the value parameter
+          to increment, or decrement the variables value.
+  */
+  public function set($variable, $value)
+  {
+    if(empty($variable) || !is_string($variable))
+      return;
+
+    $update_settings[$variable] = $value == '++' || $value == '--' ? ($value == '++' ? $settings[$variable] + 1 : $settings[$variable] - 1) : $value;
+    $settings[$variable] = $update_settings[$variable];
   }
 
   /*
     Method: save
-    Save the settings
-    
+
+    Saves the settings to the database, if any settings were updated.
+
+    Parameters:
+      none
+
+    Returns:
+      void - Nothing is returned by this method.
+
+    NOTE: You do NOT need to call on this method yourself! In the construction
+          of this object, a callback is registered on a shutdown hook to automatically
+          save the settings.
+
   */
   public function save()
   {
@@ -114,8 +173,8 @@ class Settings
 */
 function init_settings()
 {
-  global $settings;
+  global $api, $settings;
 
-  $settings = new Settings();
+  $settings = $api->load_class('Settings');
 }
 ?>
