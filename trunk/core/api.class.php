@@ -58,6 +58,7 @@ class API
   */
   public function __construct()
   {
+    # Just turn all our attributes into empty arrays.
     $this->hooked = array();
     $this->hooked_actions = array();
     $this->hooked_subactions = array();
@@ -82,7 +83,7 @@ class API
 
     Returns:
      bool - TRUE if your hook was registered successfully, FALSE on failure, which means that
-                   a hook has already been registered with that callback in that hook group.
+            a hook has already been registered with that callback in that hook group.
 
     Note:
        You can view a list of available hooks at Google Code <http://code.google.com/p/snowcms/wiki/Hooks>
@@ -120,9 +121,11 @@ class API
   */
   public function remove_hook($hook_name, $callback)
   {
+    # Can't remove a hook if it doesn't exist, right?
     if(!isset($this->hooked[$hook_name]))
       return false;
 
+    # Let's try to find it, shall we?
     foreach($this->hooked[$hook_name] as $key => $hook)
       if($hook['callback'] == $callback)
       {
@@ -258,12 +261,17 @@ class API
 
     Returns:
      bool - TRUE is returned if the action was successfully added, FALSE if not, which means that
-                   that action is already registered (check out the method remove_action).
+                   that action is already registered (check out the method remove_action) or that
+                   the supplied callback was not valid.
 
   */
   public function add_action($action_name, $callback, $file = null)
   {
+    # You can't register an action if it already exists, silly pants! :P
     if($this->action_registered($action_name))
+      return false;
+    # Is your callback, well, callable?
+    elseif(!is_callable($callback))
       return false;
 
     $this->hooked_actions[$action_name] = array($callback, $file);
@@ -285,6 +293,7 @@ class API
   */
   public function remove_action($action_name)
   {
+    # Can't remove something that isn't there, either.
     if(!$this->action_registered($action_name))
       return false;
 
@@ -353,6 +362,9 @@ class API
   {
     # Sub-action already registered?
     if($this->subaction_registered($action_name, $subaction_name))
+      return false;
+    # Callback not valid?
+    elseif(!is_callable($callback))
       return false;
 
     $this->hooked_subactions[$action_name][$subaction_name] = array($callback, $file);
@@ -439,12 +451,17 @@ class API
                             through the l() function before passing it on to this method.
 
     Returns:
-     bool - Returns TRUE if the group was added successfully, FALSE if the group is already registered.
+     bool - Returns TRUE if the group was added successfully, FALSE if the group is already registered or if for
+            some reason the group identifier or group name are not strings.
 
   */
   public function add_group($group_identifier, $group_name)
   {
+    # Don't even think about it ;)
     if($this->group_registered($group_identifier))
+      return false;
+    # The group ID and group name must be a string... weirdo!
+    elseif(!is_string($group_identifier) || !is_string($group_name))
       return false;
 
     $this->groups[mb_strtolower($group_identifier)] = $group_name;
@@ -488,7 +505,7 @@ class API
   public function group_registered($group_identifier)
   {
     # Did I mention that you can't register the group administrator or member? Silly me!
-    return in_array(mb_strtolower($group_identifier), array('administrator', 'member')) ? isset($this->groups[mb_strtolower($group_identifier)]) : true;
+    return !in_array(mb_strtolower($group_identifier), array('administrator', 'member')) ? isset($this->groups[mb_strtolower($group_identifier)]) : true;
   }
 
   /*
@@ -513,6 +530,47 @@ class API
       return false;
     else
       return $this->groups[mb_strtolower($group_identifier)];
+  }
+
+  /*
+    Method: load_class
+
+    Parameters:
+      string $class_name - The name of the class you want to load. If $filename is not
+                           specified $core_dir/lower($class_name).class.php is attempted to be
+                           opened.
+      array $params - An array of parameters you want to pass during the construction of
+                      $class_name. (The class must have __construct defined)
+      string $filename - The file where $class_name exists. Defaults to null.
+
+    Returns:
+      Object - Returns the instantiated Object of $class_name, however, if the file was
+               not found or the class did not exist, FALSE is returned.
+  */
+  public function load_class($class_name, $params = array(), $filename = null)
+  {
+    global $core_dir;
+
+    if(empty($filename))
+      $filename = $core_dir. '/'. mb_strtolower(basename($class_name)). '.class.php';
+
+    if(!file_exists($filename))
+      return false;
+
+    require_once($filename);
+
+    if(!class_exists($class_name))
+      return false;
+
+    $obj = new $class_name();
+
+    # Any parameters, perhaps?
+    if(count($params) > 0 && is_callable(array($obj, '__construct')))
+      call_user_func_array(array($obj, '__construct'), $params);
+    elseif(!is_callable(array($obj, '__construct')))
+      return false;
+
+    return $obj;
   }
 }
 

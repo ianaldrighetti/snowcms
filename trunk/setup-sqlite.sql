@@ -25,6 +25,26 @@ CREATE INDEX '{$db_prefix}members_member_name' ON '{$db_prefix}members' ('member
 CREATE INDEX '{$db_prefix}members_display_name' ON '{$db_prefix}members' ('display_name');
 CREATE INDEX '{$db_prefix}members_member_activated' ON '{$db_prefix}members' ('member_activated');
 
+CREATE TABLE '{$db_prefix}messages'
+(
+  'area_name' VARCHAR(255) NOT NULL,
+  'area_id' INT NOT NULL,
+  'message_id' INTEGER PRIMARY KEY,
+  'member_id' INT NOT NULL DEFAULT '0',
+  'member_name' VARCHAR(255) NOT NULL,
+  'member_email' VARCHAR(255) NOT NULL,
+  'member_ip' VARCHAR(150) NOT NULL,
+  'subject' VARCHAR(255) NULL,
+  'message' TEXT NOT NULL,
+  'message_type' VARCHAR(16) NULL,
+  'is_approved' SMALLINT NOT NULL DEFAULT '0',
+  'extra' TEXT NOT NULL
+);
+
+CREATE UNIQUE INDEX '{$db_prefix}messages_area' ON '{$db_prefix}messages' ('area_name', 'area_id', 'message_id');
+CREATE INDEX '{$db_prefix}messages_is_approved' ON '{$db_prefix}messages' ('is_approved');
+CREATE INDEX '{$db_prefix}messages_extra' ON '{$db_prefix}messages' ('extra');
+
 CREATE TABLE '{$db_prefix}plugins'
 (
   'dependency_name' VARCHAR(255) NOT NULL,
@@ -46,3 +66,6 @@ CREATE TABLE '{$db_prefix}settings'
   'value' TEXT NULL,
   PRIMARY KEY ('variable')
 );
+
+INSERT INTO '{$db_prefix}settings' ('variable', 'value') VALUES('show_version', 1);
+INSERT INTO '{$db_prefix}settings' ('variable', 'value') VALUES('version', '2.0 SVN');
