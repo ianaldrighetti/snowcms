@@ -339,7 +339,7 @@ class HTTP
 
       # Well, we have gone as far as we have, no it is up to you ;)
       return $callback(array(
-        'url' => $url,
+        'url' => substr(mb_strtolower($url), 0, 8) == 'https://' && !$this->ssl_supported() ? 'http'. substr(mb_strtolower($url), 5, mb_strlen($url)) : $url,
         'post_data' => array_merge($this->post_data, $post_data),
         'resume_from' => max((int)$resume_from, 0),
         'fp' => !empty($fp) ? $fp : null,
@@ -348,7 +348,7 @@ class HTTP
         'max_redirects' => $this->max_redirects,
         'include_header' => !empty($this->include_header),
         'http_version' => $this->http_version,
-        'port' => $this->port,
+        'port' => substr(mb_strtolower($url), 0, 8) == 'https://' && $this->port == 80 && $this->ssl_supported() ? 443 : $this->port,
         'timeout' => $this->timeout,
         'user_agent' => $this->user_agent,
       ));
@@ -378,7 +378,48 @@ if(!function_exists('http_curl_request'))
   */
   function http_curl_request($request)
   {
+    $ch = curl_init();
+      curl_setopt($ch, CURLOPT_URL, $request['url']);
+      curl_setopt($ch, CURLOPT_RESUME_FROM, $request['resume_from']);
+      curl_setopt($ch, CURLOPT_FOLLOWLOCATION, $request['allow_redirect']);
+      curl_setopt($ch, CURLOPT_MAXREDIRS, $request['max_redirects']);
+      curl_setopt($ch, CURLOPT_HEADER, $request['include_header']);
+      curl_setopt($ch, CURLOPT_HTTP_VERSION, $request['http_version'] == 1 ? CURL_HTTP_VERSION_1_0 : CURL_HTTP_VERSION_1_1);
+      curl_setopt($ch, CURLOPT_PORT, $request['port']);
+      curl_setopt($ch, CURLOPT_TIMEOUT, $request['timeout']);
 
+    # Any post data..?
+    if(!empty($request['post_data']) && count($request['post_data']) > 0)
+    {
+      curl_setopt($ch, CURLOPT_POST, true);
+      curl_setopt($ch, CURLOPT_POSTFIELDS, $request['post_data']);
+    }
+
+    # Any referer set?
+    if(!empty($request['referer']))
+      curl_setopt($ch, CURLOPT_REFERER, $request['referer']);
+
+    # How about a user agent?
+    if(!empty($request['user_agent']))
+      curl_setopt($ch, CURLOPT_USERAGENT, $request['user_agent']);
+
+    # Execute the cURL session...
+    $data = curl_exec($ch);
+    curl_close($ch);
+
+    # Did you want this written to a file?
+    if(!empty($request['fp']))
+    {
+      flock($fp, LOCK_EX);
+      fwrite($fp, $data);
+      flock($fp, LOCK_UN);
+      fclose($fp);
+
+      return $data !== false;
+    }
+    else
+      # You just wanted the data, so here you go...
+      return $data;
   }
 }
 ?>
