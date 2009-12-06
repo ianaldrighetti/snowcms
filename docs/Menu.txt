@@ -49,7 +49,7 @@ Group: Core  {
    File: Clean Request  (core/clean_request.php)
    File: Database  (core/database.class.php)
    File: Database Maintenance  (no auto-title, core/database_maintenance.class.php)
-   File: Database_Result  (core/database_result.class.php)
+   File: Database Result  (no auto-title, core/database_result.class.php)
    File: HTTP  (core/http.class.php)
    File: Language  (core/l.php)
    File: Load Database  (core/database.php)
