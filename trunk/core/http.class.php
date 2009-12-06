@@ -26,9 +26,6 @@ if(!defined('IN_SNOW'))
   Makes it easier on you, and it also makes it better for end users
   otherwise some plugins may only support curl or fsockopen, but with
   this, it can use either.
-
-  At download params:
-    POST data, resume from (in bytes), timeout, url (duh), output file
 */
 class HTTP
 {
@@ -74,7 +71,7 @@ class HTTP
   private $user_agent;
 
   /*
-    Constructor: __construct([int port = null[, array $post_data = null[, string $user_agent = null[, int $http_version = null]]]]);
+    Constructor: __construct
 
     Parameters:
       int $port - The port to use when requesting a URL.
@@ -165,7 +162,223 @@ class HTTP
     Returns:
       void - Nothing is returned by this method.
 
-    NOTE: You can set the post data for the specific request you are making via the method
+    Note: You can set the post data for the specific request you are making via the method
   */
+  public function set_post_data($post_data)
+  {
+    if(is_array($post_data))
+      $this->post_data = $post_data;
+  }
+
+  /*
+    Method: set_http_version
+
+    Parameters:
+      float $http_version - The version of HTTP to use when requesting the remote file.
+                            Can either be 1.0 or 1.1
+
+    Returns:
+      void - Nothing is returned by this method.
+  */
+  public function set_http_version($http_version)
+  {
+    $this->http_version = $http_version == 1 || $http_version == 1.1 ? $http_version : 1.1;
+  }
+
+  /*
+    Method: set_port
+
+    Parameters:
+      int $port - The port number to send the request to. Such as 80 (HTTP), 443 (HTTPS)
+                  or others.
+
+    Returns:
+      void - Nothing is returned by this method.
+
+    Note:
+      The port defaults to 80. If you are going to attempt to make an SSL connection
+      ensure that the server supports it via <HTTP::ssl_supported>.
+  */
+  public function set_port($port)
+  {
+    if((string)$port == (string)(int)$port && $port > 0)
+      $this->port = (int)$port;
+  }
+
+  /*
+    Method: set_timeout
+
+    Parameters:
+      int $timeout - In seconds, how long the request can take before timing out.
+
+    Returns:
+      void - Nothing is returned by this method.
+  */
+  public function set_timeout($timeout)
+  {
+    if((string)$timeout == (string)(int)$timeout && $timeout > 0)
+      $this->timeout = (int)$timeout;
+  }
+
+  /*
+    Method: set_user_agent
+
+    Parameters:
+      string $user_agent - The user agent to send in the request.
+
+    Returns:
+      void - Nothing is returned by this method.
+  */
+  public function set_user_agent($user_agent)
+  {
+    if(is_string($user_agent))
+      $this->user_agent = $user_agent;
+  }
+
+  /*
+    Method: ssl_supported
+
+    Parameters:
+      none
+
+    Returns:
+      bool - Returns TRUE if PHP supports SSL, FALSE if not.
+  */
+  public function ssl_supported()
+  {
+    # OpenSSL available..?
+    return function_exists('openssl_seal');
+  }
+
+  /*
+    Method: request
+
+    Parameters:
+      string $url - The URL to request.
+      array $post_data - An associative array which contains POST data to
+                         send when the request is made. If the post_data
+                         attribute contains anything, this parameter will
+                         have that data merged with this one.
+      int $resume_from - Where to start the download from, in bytes.
+      string $filename - If this is specified, this method will store the
+                         data retrieved in that specified file.
+
+    Returns:
+      mixed - If filename is left empty, a string containing the data from
+              the request is returned, however, FALSE on failure. If filename
+              is not left empty, TRUE will be returned if the data was saved
+              to the file successfully, FALSE on failure which could mean
+              the request as a whole failed, or the file could not be written to.
+
+    Note:
+      If the protocol of $url is https, the port is automatically changed to 443.
+      Only if the server supports SSL, otherwise the protocol is automatically
+      changed to http.
+      If $resume_from is set to 0 and $filename is set, if $filename already exists
+      then its contents will be overwritten, however, if $resume_from is set to
+      greater than 0, than the file is appended to.
+      There is an array inside which plugins can hook into (called 'request_callbacks')
+      and modify to add additional support to remote file accessing. Currently
+      SnowCMS supports cURL and fsockopen as methods of remote requesting. The order
+      in which each callback is in is the order in which SnowCMS tests to see if
+      the current PHP setup supports it. So if cURL and fsockopen are supported, cURL
+      is still used.
+  */
+  public function request($url, $post_data = array(), $resume_from = 0, $filename = null)
+  {
+    global $api;
+
+    # Just incase...
+    $url = ltrim($url);
+
+    # In the embedded arrays, each array is to contain two things,
+    # a test index which is a callback that returns TRUE or FALSE.
+    # That bool the test callback tells request whether or not the
+    # remote request can be made via the callback index. The callback
+    # index contains, obviously, a callback to a function which
+    # makes the remote request. An array containing all the information
+    # (such as url, post_data, etc. etc.) to use in the request is passed.
+    # If filename isn't empty, an index in the passed array will contain
+    # the pointer to the file which you will write to via fwrite (the index
+    # being called 'fp'). The callback is to return FALSE on failure, or
+    # TRUE if all data was written to the file successfully OR the string
+    # containing the retrieved data if 'fp' was empty. Capeesh? :P
+    $request_callbacks = array(
+      array(
+        'test' => create_function('', '
+                    return function_exists(\'curl_exec\');'),
+        'callback' => 'http_curl_request',
+      ),
+      array(
+        'test' => create_function('', '
+                    return function_exists(\'fsockopen\');'),
+        'callback' => 'http_fsockopen_request',
+      ),
+    );
+
+    # Well, want to add anything...?
+    $api->run_hook('request_callbacks', array(&$request_callbacks));
+
+    # Find what will be handling our request :)
+    if(!empty($request_callbacks))
+    {
+      foreach($request_callbacks as $request_callback)
+        if($request_callback['test']())
+        {
+          $callback = $request_callback['callback'];
+          break;
+        }
+
+      # Nothing found..? What a shame...
+      if(empty($callback))
+        return false;
+
+      # You wanted this written to a file?
+      if(!empty($filename))
+        $fp = @fopen($filename, $resume_from > 0 ? 'ab' : 'wb');
+
+      # Well, we have gone as far as we have, no it is up to you ;)
+      return $callback(array(
+        'url' => $url,
+        'post_data' => array_merge($this->post_data, $post_data),
+        'resume_from' => max((int)$resume_from, 0),
+        'fp' => !empty($fp) ? $fp : null,
+        'referer' => $this->referer,
+        'allow_redirect' => !empty($this->allow_redirect),
+        'max_redirects' => $this->max_redirects,
+        'include_header' => !empty($this->include_header),
+        'http_version' => $this->http_version,
+        'port' => $this->port,
+        'timeout' => $this->timeout,
+        'user_agent' => $this->user_agent,
+      ));
+    }
+    else
+      return false;
+  }
+}
+
+if(!function_exists('http_curl_request'))
+{
+  /*
+    Function: http_curl_request
+
+    This function completes the specified remote request using the
+    PHP extension cURL.
+
+    Parameters:
+      array $request - An array containing things such as the url, post_data,
+                       among others. Check out <HTTP::request> for more info.
+
+    Returns:
+      mixed - If the index in $request 'fp' is set, TRUE will be returned
+              if the file was successfully written to, FALSE on failure.
+              Otherwise, a string containing the retrieved data is returned,
+              or FALSE on failure.
+  */
+  function http_curl_request($request)
+  {
+
+  }
 }
 ?>

@@ -113,7 +113,7 @@ class Settings
     Returns:
       void - Nothing is returned by this method.
 
-    NOTE: You can also pass ++ or -- as a string in the value parameter
+    Note: You can also pass ++ or -- as a string in the value parameter
           to increment, or decrement the variables value.
   */
   public function set($variable, $value)
@@ -136,7 +136,7 @@ class Settings
     Returns:
       void - Nothing is returned by this method.
 
-    NOTE: You do NOT need to call on this method yourself! In the construction
+    Note: You do NOT need to call on this method yourself! In the construction
           of this object, a callback is registered on a shutdown hook to automatically
           save the settings.
 

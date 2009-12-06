@@ -17,14 +17,29 @@
 #                     File version: SnowCMS 2.0                         #
 #########################################################################
 
-# Title: Mitigate Globals
 if(!defined('IN_SNOW'))
   die;
 
-# Function: mitigate_globals
-# register_globals is one of the worst ideas ever pawned, and if enabled, could
-# lead to devastating incidents, and we don't want ;)
-#
+/*
+  Title: Mitigate Globals
+
+  Mitigates any possible effects of register_globals
+  http://www.php.net/manual/en/ini.core.php#ini.register-globals>, because
+  you should know, register_globals is HORRIBLE!!!
+*/
+
+/*
+  Function: mitigate_globals
+
+  register_globals is one of the worst ideas ever pawned, and if enabled, could
+  lead to devastating incidents, and we don't want ;)
+
+  Parameters:
+    none
+
+  Returns:
+    void - Nothing is returned by this function.
+*/
 function mitigate_globals()
 {
   # There are some things which are fine, all the rest are bad...
@@ -34,5 +49,10 @@ function mitigate_globals()
   foreach($GLOBALS as $variable => $dummy)
     if(!in_array($variable, $safe_variables))
       unset($GLOBALS[$variable]);
+
+
+  # Don't even try it, okay?
+  if(isset($_REQUEST['GLOBALS']) || isset($_COOKIE['GLOBALS']) || isset($_FILES['GLOBALS']))
+    die('Hacking attempt...');
 }
 ?>
