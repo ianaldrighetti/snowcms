@@ -60,7 +60,7 @@ abstract class Database
   protected $debug_text = '';
 
   /*
-    : 
+    :
 
     This constructor simply takes the database result's class name and saves it to the result_class attribute.
 
@@ -77,7 +77,7 @@ abstract class Database
 
     Parameters:
 
-    Returns: 
+    Returns:
      bool - Returns TRUE if the connection was a success, FALSE if connection failed.
 
     Note:
@@ -93,7 +93,7 @@ abstract class Database
 
     Parameters:
 
-    Returns: 
+    Returns:
      bool - Returns TRUE if the connection was successfully closed, FALSE otherwise.
 
   */
@@ -106,7 +106,7 @@ abstract class Database
 
     Parameters:
 
-    Returns: 
+    Returns:
      int - Returns the last error number, 0 if none.
 
   */
@@ -119,7 +119,7 @@ abstract class Database
 
     Parameters:
 
-    Returns: 
+    Returns:
      string - Returns the last error string, an empty string if no errors occurred.
 
   */
@@ -134,7 +134,7 @@ abstract class Database
       string $str - The string that needs sanitizing.
       bool $htmlspecialchars - Whether or not to first do htmlspecialchars on the string.
 
-    Returns: 
+    Returns:
      string - Returns the sanitized string.
 
   */
@@ -149,7 +149,7 @@ abstract class Database
       string $str - The string to unescape.
       bool $htmlspecialchars_decode - Whether or not to undo htmlspecialchars after unescaping.
 
-    Returns: 
+    Returns:
      string - Returns the unescaped string.
 
   */
@@ -162,7 +162,7 @@ abstract class Database
 
     Parameters:
 
-    Returns: 
+    Returns:
      string - Returns the version of the databases version number.
 
   */
@@ -174,7 +174,7 @@ abstract class Database
 
     Parameters:
 
-    Returns: 
+    Returns:
      array - Returns an array containing all the tables in the database.
 
   */
@@ -197,7 +197,7 @@ abstract class Database
       string $file - The file query was called on, LEAVE THIS BLANK! This is for use by the insert method!
       int $line - The line the query was called on, LEAVE THIS BLANK! This is for use by the insert method as well!
 
-    Returns: 
+    Returns:
      {Database_Result} - Returns an object with methods such as fetch_assoc, num_rows, etc.
 
   */
@@ -215,7 +215,7 @@ abstract class Database
       string $file - The file that query/insert was called in.
       int $line - The line that query/insert was called on.
 
-    Returns: 
+    Returns:
      mixed - Returns the correctly sanitized value.
 
     Note:
@@ -245,12 +245,12 @@ abstract class Database
 
   */
   abstract protected function sanitize_float($var_name, $value, $file, $line);
-  
-  
-  
+
+
+
   /*
     Method: sanitize_float_array
-    
+
     All the following methods are helper methods of var_sanitize. They all get passed
     the variable name, value, file name and line number. These helper methods are expected
     to properly sanitize the value according to the variables datatype. If the value given
@@ -259,11 +259,11 @@ abstract class Database
 
   */
   abstract protected function sanitize_float_array($var_name, $value, $file, $line);
-  
-  
+
+
   /*
     Method: sanitize_int
-    
+
     All the following methods are helper methods of var_sanitize. They all get passed
     the variable name, value, file name and line number. These helper methods are expected
     to properly sanitize the value according to the variables datatype. If the value given
@@ -272,11 +272,11 @@ abstract class Database
 
   */
   abstract protected function sanitize_int($var_name, $value, $file, $line);
-  
-  
+
+
   /*
     Method: sanitize_int_array
-    
+
     All the following methods are helper methods of var_sanitize. They all get passed
     the variable name, value, file name and line number. These helper methods are expected
     to properly sanitize the value according to the variables datatype. If the value given
@@ -285,11 +285,11 @@ abstract class Database
 
   */
   abstract protected function sanitize_int_array($var_name, $value, $file, $line);
-  
-  
+
+
   /*
     Method: sanitize_string
-    
+
     All the following methods are helper methods of var_sanitize. They all get passed
     the variable name, value, file name and line number. These helper methods are expected
     to properly sanitize the value according to the variables datatype. If the value given
@@ -298,11 +298,11 @@ abstract class Database
 
   */
   abstract protected function sanitize_string($var_name, $value, $file, $line);
-  
-  
+
+
   /*
     Method: sanitize_string_array
-    
+
     All the following methods are helper methods of var_sanitize. They all get passed
     the variable name, value, file name and line number. These helper methods are expected
     to properly sanitize the value according to the variables datatype. If the value given
@@ -311,7 +311,7 @@ abstract class Database
 
   */
   abstract protected function sanitize_string_array($var_name, $value, $file, $line);
-  
+
 
   private function sanitize_raw($var_name, $value, $file, $line)
   {
@@ -334,7 +334,7 @@ abstract class Database
       string $hook_name - The hook to run (using run_hook in $api) BEFORE the anything is done, run_hook is to pass $type, $tbl_name, $columns,
                           $data and $keys as parameters.
 
-    Returns: 
+    Returns:
      {Database_Result} - An object containing methods such as affected_rows(), etc.
 
     More information about databasing can be found at http://code.google.com/p/snowcms/wiki/Databasing
@@ -359,7 +359,7 @@ abstract class Database
       string $file - The file that the method was called in that created the error.
       int $line - The line that the method was called on that created the error.
 
-    Returns: 
+    Returns:
      void - Nothing is returned by this method.
 
   */

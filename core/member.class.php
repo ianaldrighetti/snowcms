@@ -20,24 +20,85 @@
 if(!defined('IN_SNOW'))
   die;
 
-# Class: Member
-# A pluggable class, how classy? Hahaha, yeah, I know, bad pun.
+/*
+  Class: Member
+  A pluggable class, how classy? Hahaha, yeah, I know, bad pun.
+*/
 if(!class_exists('Member'))
 {
   class Member
   {
+    # Variable: id
+    # Contains the members ID.
     private $id;
+
+    # Variable: name
+    # Contains the members login name
     private $name;
+
+    # Variable: passwrd
+    # Contains the members hashed password
     private $passwrd;
+
+    # Variable: hash
+    # A set of random characters (up to 16 characters) that the members
+    # authentication cookie is salted with. Only changes whenever the
+    # member changes their current password.
     private $hash;
+
+    # Variable: display_name
+    # Contains the members display name
     private $display_name;
+
+    # Variable: email
+    # Contains the members email address.
     private $email;
+
+    # Variable: registered
+    # Contains the unix timestamp of when the member registered
+    # their account.
     private $registered;
+
+    # Variable: ip
+    # The members current IP address.
     private $ip;
+
+    # Variable: groups
+    # Contains an array of groups the member is assigned to. It the
+    # members groups array will contain either administrator, member
+    # or guest, but not more than one of those, however it can contain
+    # other registered groups which are done via the <API>
     private $groups;
+
+    # Variable: data
+    # Contains an array of members data, such as options and other
+    # various settings which are contained with the {db->prefix}member_data
+    # table in the database.
     private $data;
+
+    # Variable: session_id
+    # The members current session ID. This should be used to verify that
+    # it is the actual member completing such actions as commenting, deleting
+    # and any other actions which should require some sort of verification.
     private $session_id;
 
+    /*
+      Constructor: __construct
+
+      During the construction of this object, all the attributes of the
+      object are set to default values or populated with member data if
+      the current person browsing the site has a valid authentication cookie.
+
+      This class can either be redeclared entirely, or a plugin can hook into
+      the hook named 'post_login' to completely redefine any of Member's
+      attributes. This is useful for bridging SnowCMS with other systems, but
+      you could also use this tactic to implement other login systems such as
+      OpenID, or anything else, for that matter.
+
+
+      Parameters:
+        none
+    */
     public function __construct()
     {
       global $api, $cookie_name, $db;
@@ -151,58 +212,138 @@ if(!class_exists('Member'))
     }
 
     /*
-    :
+      Method: id
 
-      Just a lot of accessors ;)
+      Parameters:
+        none
 
+      Returns:
+        int - Returns the members ID.
     */
     public function id()
     {
       return $this->id;
     }
 
+    /*
+      Method: name
+
+      Parameters:
+        none
+
+      Returns:
+        string - Returns the members login name.
+    */
     public function name()
     {
       return $this->name;
     }
 
+    /*
+      Method: passwrd
+
+      Parameters:
+        none
+
+      Returns:
+        string - Returns the members hashed password.
+    */
     public function passwrd()
     {
       return $this->passwrd;
     }
 
+    /*
+      Method: hash
+
+      Parameters:
+        none
+
+      Returns:
+        string - A set of random characters that the members authentication
+                cookie is salted with.
+    */
     public function hash()
     {
       return $this->hash;
     }
 
+    /*
+      Method: display_name
+
+      Parameters:
+        none
+
+      Returns:
+        string - Returns the display name of the member.
+    */
     public function display_name()
     {
       return $this->display_name;
     }
 
+    /*
+      Method: email
+
+      Parameters:
+        none
+
+      Returns:
+        string - Returns the members email address.
+    */
     public function email()
     {
       return $this->email;
     }
 
+    /*
+      Method: registered
+
+      Parameters:
+        none
+
+      Returns:
+        int - Returns the unix timestamp containing the time
+              at which the member registered an account.
+    */
     public function registered()
     {
       return $this->registered;
     }
 
+    /*
+      Method: groups
+
+      Parameters:
+        none
+
+      Returns:
+        array - An array containing the groups the member is
+                part of, which will contain either administrator,
+                member, guest, but it can also contain others, but
+                no more than one of the previously mentioned groups.
+    */
     public function groups()
     {
       return $this->groups;
     }
 
+    /*
+      Method: session_id
+
+      Parameters:
+        none
+
+      Returns:
+        string - A string containing the members current session_id.
+    */
     public function session_id()
     {
       return $this->session_id;
     }
 
     /*
-    Method: is_a
+      Method: is_a
 
       Allows you to see if the member is a specified group. You can pass a single group identifier,
       or an array of group identifiers. If you pass a group (array) of group identifiers, FALSE will
@@ -211,9 +352,8 @@ if(!class_exists('Member'))
       Parameters:
         mixed $what - An array of group identifiers, or a single group identifier.
 
-    Returns:
-     bool - Returns TRUE if the member is all of the groups you specified, FALSE if not.
-
+      Returns:
+       bool - Returns TRUE if the member is all of the groups you specified, FALSE if not.
     */
     public function is_a($what)
     {
@@ -240,13 +380,13 @@ if(!class_exists('Member'))
     }
 
     /*
-    Method: is_guest
+      Method: is_guest
 
       Parameters:
+        none
 
-    Returns:
-     bool - Returns TRUE if the person isn't logged in, FALSE if not.
-
+      Returns:
+        bool - Returns TRUE if the person isn't logged in, FALSE if not.
     */
     public function is_guest()
     {
@@ -254,13 +394,13 @@ if(!class_exists('Member'))
     }
 
     /*
-    Method: is_logged
+      Method: is_logged
 
       Parameters:
+        none
 
-    Returns:
-     bool - Returns TRUE if the member is logged in, FALSE if not.
-
+      Returns:
+        bool - Returns TRUE if the member is logged in, FALSE if not.
     */
     public function is_logged()
     {
@@ -268,13 +408,13 @@ if(!class_exists('Member'))
     }
 
     /*
-    Method: is_admin
+      Method: is_admin
 
       Parameters:
+        none
 
-    Returns:
-     bool - Returns TRUE if the member is an administrator, FALSE if not.
-
+      Returns:
+        bool - Returns TRUE if the member is an administrator, FALSE if not.
     */
     public function is_admin()
     {
@@ -282,14 +422,13 @@ if(!class_exists('Member'))
     }
 
     /*
-    Method: data
+      Method: data
 
       Parameters:
         string $variable - The name of the data's variable.
 
-    Returns:
-     string - Returns the value of the variable, NULL if the variable is not set.
-
+      Returns:
+        string - Returns the value of the variable, NULL if the variable is not set.
     */
     public function data($variable)
     {
@@ -300,9 +439,17 @@ if(!class_exists('Member'))
 
 if(!function_exists('init_member'))
 {
-  #
-  # Just gets the member authenticated and stuff XD.
-  #
+  /*
+    Function: init_member
+
+    Loads the Member class, if $member has not been set yet.
+
+    Paramters:
+      none
+
+    Returns:
+      void - Nothing is returned by this function.
+  */
   function init_member()
   {
     global $api, $member;

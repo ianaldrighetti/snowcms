@@ -25,11 +25,23 @@ if(!defined('IN_SNOW'))
 # Another pluggable function, sessions!!! Woo!
 if(!function_exists('init_session'))
 {
-  # Function: init_session
-  # Simply starts up the session... Simple, right?
-  #
-  # Note:
-  #   This is a pluggable function.
+  /*
+    Function: init_session
+
+    Begins the session for the current, well, session of browsing.
+    If session.auto_start is enabled, this function closes that session
+    to open up another one as there are some possible modifications
+    done to how sessions are handled.
+
+    Parameters:
+      none
+
+    Returns:
+      void - Nothing is returned by this function.
+
+    Note:
+      This is a pluggable function.
+  */
   function init_session()
   {
     global $api;

@@ -20,8 +20,14 @@
 if(!defined('IN_SNOW'))
   die;
 
-# Title: Clean Request
-# This cleans the requests in magical ways I can't comprehend
+/*
+  Title: Clean Request
+
+  Simply cleans the GLOBALS array in PHP of unwanted variables, such as
+  old and deprecated variables (such as HTTP_GET_VARS), but it also removes
+  what PHP's magic quotes <http://www.php.net/manual/en/security.magicquotes.php>
+  did to variables like $_GET, $_POST, $_REQUEST, etc.
+*/
 
 
 # This is a pluggable function, so make sure someone hasn't defined it already...
@@ -46,18 +52,19 @@ if(!function_exists('clean_request'))
       $_POST = remove_magic($_POST);
       $_REQUEST = remove_magic($_REQUEST);
     }
-
-    # Don't even try it, okay?
-    if(isset($_REQUEST['GLOBALS']) || isset($_COOKIE['GLOBALS']) || isset($_FILES['GLOBALS']))
-      die('Hacking attempt...');
   }
+
   /*
     Function: remove_magic
-    I don't know what this does so ask aldo
-    
+
+    Strips slashes with stripslashes, recursively to the specified depth.
+
     Parameters:
-      array $array - Ask aldo
-      int $depth - Ask aldo
+      array $array - The array to remove the effects of magic quotes from.
+      int $depth - How deep you want this function to go inside embedded arrays.
+
+    Returns:
+      array - An array is returned which has had the effects of magic quotes undone.
   */
   function remove_magic($array, $depth = 0)
   {

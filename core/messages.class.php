@@ -20,4 +20,16 @@
 if(!defined('IN_SNOW'))
   die;
 
+/*
+  Class: Messages
+
+  This is another one of SnowCMS's API's available to developers. With this
+  class it allows for plugins to store and retrieve messages made by members
+  or guests, that way each plugin doesn't have to setup a message storing
+  system independently.
+*/
+class Messages
+{
+
+}
 ?>

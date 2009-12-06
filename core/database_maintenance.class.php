@@ -22,12 +22,15 @@ if(!defined('IN_SNOW'))
   die;
 
 
-# Class: Database_Maintenance
-# A database maintenance class, only included when needed!!!
+/*
+  Class: Database_Maintenance
+
+  Database_Maintenance contains tools for backing up tables, backing up
+  the data contained within those tables, optimization, and also the
+  creation of and altering of tables.
+*/
 abstract class Database_Maintenance
 {
-  # The database object...
-
   /*
     Method: backup_table
 
@@ -38,7 +41,7 @@ abstract class Database_Maintenance
       string $backup_table - The table to copy $table's data over to (The table $backup_table
                              should not be created, as this method will do that)
 
-    Returns: 
+    Returns:
      bool - TRUE if the table was successfully backed up, FALSE on failure.
 
   */
@@ -52,7 +55,7 @@ abstract class Database_Maintenance
     Parameters:
       string - The table to optimize.
 
-    Returns: 
+    Returns:
      bool - TRUE on success, FALSE on failure.
 
     Note:
@@ -75,7 +78,7 @@ abstract class Database_Maintenance
                              the CREATE TABLE. (Be sure the database supports such a command)
       string $file - The file to append the command to, unless $file is empty.
 
-    Returns: 
+    Returns:
      mixed - Could return a string containing the command ($file empty) or a bool containing
                     whether or not the command was successfully written to $file
 
@@ -100,7 +103,7 @@ abstract class Database_Maintenance
                   don't include a LIMIT clause in your SELECT * query.
       string $file - The file to append the data to, unless $file is empty.
 
-    Returns: 
+    Returns:
      mixed - Could return a string containing the data ($file empty) or a bool containing
                     whether or not the data was successfully written to $file.
 
@@ -140,5 +143,27 @@ abstract class Database_Maintenance
 
   */
   abstract public function create_table($table, $columns, $indexes = array(), $on_exists = 'fail');
+
+  /*
+    Method: alter_table
+
+    This method is still a Work In Progress, and could change at any time.
+
+    Parameters:
+      string $table - The name of the table to alter.
+      array $column - An array containing column/index information.
+      string $type - The type of alteration which is being done, which can
+                     be either 'column' or 'index'
+      string $location - If the column does not exist, where should it be placed?
+                         This can either be at_first, ar_end or a column name
+                         (if a column name is supplied, the column you are adding will
+                         be added after it). However, you can also specify 'fail'
+                         which if the column already exists, this method will return FALSE.
+
+    Returns:
+      bool - Returns TRUE if the column/index was added/updated successfully, FALSE
+             on failure.
+  */
+  abstract public function alter_table($table, $column, $type = 'column', $location = 'at_end');
 }
 ?>
