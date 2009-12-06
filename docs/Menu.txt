@@ -47,12 +47,8 @@ Group: Core  {
 
    File: API  (core/api.class.php)
    File: Clean Request  (core/clean_request.php)
-   File: Database  (core/database.class.php)
-   File: Database Maintenance  (no auto-title, core/database_maintenance.class.php)
-   File: Database Result  (no auto-title, core/database_result.class.php)
    File: HTTP  (core/http.class.php)
    File: Language  (core/l.php)
-   File: Load Database  (core/database.php)
    File: Member  (core/member.class.php)
    File: Messages  (core/messages.class.php)
    File: Mitigate Globals  (core/mitigate_globals.php)
@@ -60,6 +56,14 @@ Group: Core  {
    File: Settings  (core/settings.class.php)
    File: Theme  (core/theme.class.php)
    }  # Group: Core
+
+Group: Database  {
+
+   File: Database  (core/database.class.php)
+   File: Database Maintenance  (no auto-title, core/database_maintenance.class.php)
+   File: Database Result  (no auto-title, core/database_result.class.php)
+   File: Load Database  (core/database.php)
+   }  # Group: Database
 
 Group: Index  {
 
