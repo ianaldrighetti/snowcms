@@ -134,7 +134,7 @@ abstract class Theme
       return false;
 
     # Make sure you don't have more attributes than allowed...
-    $allowed_attributes = array('charset', ' href', ' hreflang', ' media', ' rel', ' rev', ' target', ' type', ' class', ' dir', ' id', ' lang', ' style', ' title', ' xml:lang')
+    $allowed_attributes = array('charset', ' href', ' hreflang', ' media', ' rel', ' rev', ' target', ' type', ' class', ' dir', ' id', ' lang', ' style', ' title', ' xml:lang');
     foreach($link as $attr => $value)
       if(!in_array($attr, $allowed_attributes))
         return false;
@@ -239,5 +239,21 @@ abstract class Theme
     unset($this->js_vars[$variable]);
     return true;
   }
+}
+
+/*
+  Function: init_theme
+
+  Creates the $theme object.
+
+  Parameters:
+    none
+
+  Returns:
+    void - Nothing is returned by this function.
+*/
+function init_theme()
+{
+
 }
 ?>

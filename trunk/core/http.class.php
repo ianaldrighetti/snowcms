@@ -306,7 +306,7 @@ class HTTP
     $request_callbacks = array(
       array(
         'test' => create_function('', '
-                    return function_exists(\'curl_exec\');'),
+                    return !function_exists(\'curl_exec\');'),
         'callback' => 'http_curl_request',
       ),
       array(
@@ -335,14 +335,14 @@ class HTTP
 
       # You wanted this written to a file?
       if(!empty($filename))
-        $fp = @fopen($filename, $resume_from > 0 ? 'ab' : 'wb');
+        $fp = fopen($filename, $resume_from > 0 ? 'ab' : 'wb');
 
       # Well, we have gone as far as we have, no it is up to you ;)
       return $callback(array(
         'url' => substr(mb_strtolower($url), 0, 8) == 'https://' && !$this->ssl_supported() ? 'http'. substr(mb_strtolower($url), 5, mb_strlen($url)) : $url,
         'post_data' => array_merge($this->post_data, $post_data),
         'resume_from' => max((int)$resume_from, 0),
-        'fp' => !empty($fp) ? $fp : null,
+        'fp' => !empty($filename) ? $fp : null,
         'referer' => $this->referer,
         'allow_redirect' => !empty($this->allow_redirect),
         'max_redirects' => $this->max_redirects,
@@ -378,6 +378,9 @@ if(!function_exists('http_curl_request'))
   */
   function http_curl_request($request)
   {
+    if(!is_array($request))
+      return false;
+
     $ch = curl_init();
       curl_setopt($ch, CURLOPT_URL, $request['url']);
       curl_setopt($ch, CURLOPT_RESUME_FROM, $request['resume_from']);
@@ -387,12 +390,14 @@ if(!function_exists('http_curl_request'))
       curl_setopt($ch, CURLOPT_HTTP_VERSION, $request['http_version'] == 1 ? CURL_HTTP_VERSION_1_0 : CURL_HTTP_VERSION_1_1);
       curl_setopt($ch, CURLOPT_PORT, $request['port']);
       curl_setopt($ch, CURLOPT_TIMEOUT, $request['timeout']);
+      curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+      curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
 
     # Any post data..?
     if(!empty($request['post_data']) && count($request['post_data']) > 0)
     {
       curl_setopt($ch, CURLOPT_POST, true);
-      curl_setopt($ch, CURLOPT_POSTFIELDS, $request['post_data']);
+      curl_setopt($ch, CURLOPT_POSTFIELDS, http_build_query($request['post_data']));
     }
 
     # Any referer set?
@@ -405,20 +410,183 @@ if(!function_exists('http_curl_request'))
 
     # Execute the cURL session...
     $data = curl_exec($ch);
+
+    # Get the error number... Just incase...
+    $curl_errno = curl_errno($ch);
     curl_close($ch);
+
+    # Did we get error #33? We can fix that :P
+    if($curl_errno == 33)
+    {
+      $new_request = $request;
+      $new_request['resume_from'] = 0;
+      $new_request['fp'] = null;
+
+      # Make the request again, with everything originally
+      # except the resume from and fp...
+      $data = http_curl_request($new_request);
+
+      # Cheating..? Sure, but don't tell anyone xD
+      $data = mb_substr($data, $request['resume_from'], mb_strlen($data));
+    }
 
     # Did you want this written to a file?
     if(!empty($request['fp']))
     {
-      flock($fp, LOCK_EX);
-      fwrite($fp, $data);
-      flock($fp, LOCK_UN);
-      fclose($fp);
+      flock($request['fp'], LOCK_EX);
+      fwrite($request['fp'], $data);
+      flock($request['fp'], LOCK_UN);
+      fclose($request['fp']);
 
       return $data !== false;
     }
     else
       # You just wanted the data, so here you go...
+      return $data;
+  }
+}
+
+if(!function_exists('http_fsockopen_request'))
+{
+  /*
+    Function: http_fsockopen_request
+
+    This function completes the specified remote request using fsockopen.L.
+
+    Parameters:
+      array $request - An array containing things such as the url, post_data,
+                       among others. Check out <HTTP::request> for more info.
+      int $num_redirects - This holds the number of times that the function has
+                           followed the HTTP Location header. This is used by
+                           the function itself! So no touchy, please :)
+
+    Returns:
+      mixed - If the index in $request 'fp' is set, TRUE will be returned
+              if the file was successfully written to, FALSE on failure.
+              Otherwise, a string containing the retrieved data is returned,
+              or FALSE on failure.
+  */
+  function http_fsockopen_request($request, $num_redirects = 0)
+  {
+    if(!is_array($request))
+      return false;
+    elseif($num_redirects > $request['max_redirects'])
+      return false;
+
+    # Parse the URL... We need to for fsockopen.
+    $parsed = parse_url($request['url']);
+
+    $fp = fsockopen(($parsed['scheme'] == 'https' ? 'ssl://' : ''). $parsed['host'], $request['port'], $errno, $errstr, $request['timeout']);
+
+    # Couldn't connect...?
+    if(empty($fp))
+      return false;
+
+    # Make our request path, used in our request, of course!
+    $request_path = (!empty($parsed['path']) ? $parsed['path'] : '/'). (!empty($parsed['query']) ? '?'. $parsed['query'] : '');
+
+    # No post data? Then GET!
+    if(empty($post_data))
+    {
+      $commands = "GET $request_path HTTP/". ($request['http_version'] == 1 ? '1.0' : '1.1'). "\r\n";
+      $commands .= "Host: {$parsed['host']}\r\n";
+
+      if(!empty($request['resume_from']) && $request['resume_from'] > 0)
+        $commands .= "Range: {$request['resume_from']}-\r\n";
+
+      if(!empty($request['referer']))
+        $commands .= "Referer: {$request['referer']}\r\n";
+
+      if(!empty($request['user_agent']))
+        $commands .= "User-Agent: {$request['user_agent']}\r\n";
+
+      $commands .= "Connection: close\r\n\r\n";
+    }
+    else
+    {
+      # Turn the array into a string.
+      $post_data = http_build_query($request['post_data']);
+
+      $commands = "POST $request_path HTTP/". ($request['http_version'] == 1 ? '1.0' : '1.1'). "\r\n";
+      $commands .= "Host: {$parsed['host']}\r\n";
+
+      if(!empty($request['resume_from']) && $request['resume_from'] > 0)
+        $commands .= "Range: {$request['resume_from']}-\r\n";
+
+      if(!empty($request['referer']))
+        $commands .= "Referer: {$request['referer']}\r\n";
+
+      if(!empty($request['user_agent']))
+        $commands .= "User-Agent: {$request['user_agent']}\r\n";
+
+      $commands .= "Content-Type: application/x-www-form-urlencoded\r\n";
+      $commands .= "Content-Length: ". mb_strlen($post_data). "\r\n";
+      $commands .= "Connection: close\r\n\r\n";
+      $commands .= $post_data. "\r\n\r\n";
+    }
+
+    # Send those commands to the server.
+    fwrite($fp, $commands);
+
+    # Now we can start to get the data.
+    $data = '';
+    while(!feof($fp))
+      $data .= fgets($fp, 4096);
+    fclose($fp);
+
+    # Get the headers and data separated.
+    list($full_raw_headers, $data) = explode("\r\n\r\n", $data, 2);
+
+    # Get the status.
+    list($http_status, $raw_headers) = explode("\r\n", $full_raw_headers, 2);
+
+    # Now read the headers into an easy to read array... :D
+    $headers = array();
+    $raw_headers = explode("\r\n", $raw_headers);
+    if(count($raw_headers) > 0)
+      foreach($raw_headers as $header)
+      {
+        $header = trim($header);
+        if(empty($header) || mb_strpos($header, ':') === false)
+          continue;
+
+        list($name, $content) = explode(':', $header, 2);
+        $headers[mb_strtolower($name)] = trim($content);
+      }
+
+    # So do we need to redirect, perhaps?
+    if(mb_strpos($http_status, '302') !== false || mb_strpos($http_status, '301') !== false || mb_strpos($http_status, '307') !== false)
+      return !empty($headers['location']) ? http_fsockopen_request(array_merge($request, array('url' => $headers['location'], 'fp' => null)), $num_redirects + 1) : false;
+
+    # Okay, well, if the transfer-encoding header is not set, then we can
+    # just stop here, if not, we need to do a little bit extra.
+    if(!empty($headers['transfer-encoding']) && mb_strtolower($headers['transfer-encoding']) == 'chunked')
+    {
+      list($hex, $data) = explode("\r\n", $data, 2);
+
+      $new_data = '';
+      while($hex != '0')
+      {
+        $new_data .= substr($data, 0, hexdec($hex));
+        $data = ltrim(substr($data, hexdec($hex), strlen($data)));
+        list($hex, $data) = explode("\r\n", $data, 2);
+      }
+      $data = $new_data;
+    }
+
+    $data = $request['include_header'] ? implode("\r\n\r\n", array($full_raw_headers, $data)) : $data;
+
+    # Did you want this written to a file?
+    if(!empty($request['fp']))
+    {
+      flock($request['fp'], LOCK_EX);
+      fwrite($request['fp'], $data);
+      flock($request['fp'], LOCK_UN);
+      fclose($request['fp']);
+
+      return $data !== false;
+    }
+    else
       return $data;
   }
 }

@@ -28,6 +28,15 @@ if(!defined('IN_SNOW'))
   the translated string is returned. If no translation is available, the original string
   is returned. (A plugin is required for translations, it is available at the SnowCMS plugin site)
 
+  Parameters:
+    string $str - The string to translate, this string must be English (en_US)
+    mixed ... - You can pass on parameters which replace content inside the string ($str)
+                in printf format. For more information, see www.php.net/sprintf
+
+  Returns:
+    string - Returns a translated string, but of course, if the current language is en_US
+             the original string is simply translated, with all the formatting replaced, though.
+
   Note:
     You can use this function just as you would with sprintf, pass all the parameters you
     want to be replaced in the string. Check out http://www.php.net/sprintf for more information.
@@ -36,16 +45,16 @@ function l($str)
 {
   global $api;
 
+  # Any extra parameters?
+  if(func_num_args() > 1)
+    $args = func_get_args();
+
   # CAN HAZ TRANSLATION?
-  $api->run_hook('translate', array(&$str));
+  $api->run_hook('translate', array(&$str, &$args));
 
   # Hmm, any warrant for calling sprintf?
   if(func_num_args() > 1)
-  {
-    $args = func_get_args();
-
     $str = call_user_func_array('sprintf', $args);
-  }
 
   return $str;
 }
