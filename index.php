@@ -21,8 +21,6 @@
 if(function_exists('set_magic_quotes_runtime'))
   @set_magic_quotes_runtime(0);
 
-mb_internal_encoding('UTF-8');
-
 # All times from time() should be UTC ;)
 @ini_set('date.timezone', 'UTC');
 
@@ -88,6 +86,10 @@ require($core_dir. '/theme.class.php');
 
 # Initialize the theme!!!
 init_theme();
+
+require($core_dir. '/members.class.php');
+
+$members = new Members();
 
 # Initialize the current members session, if any, though...
 echo 'Executed in ', round(microtime(true) - $start_time, 6), ' seconds.';

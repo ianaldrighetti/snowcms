@@ -239,7 +239,7 @@ class Members
 
       # Now make sure that the member name and email are allowed, we don't want them to be
       # in use already, as that would be pretty bad :P
-      if(!$this->name_allowed($member_name) || !$this->email_allowed($member_email))
+      if(!$this->name_allowed($member_name) || !$this->email_allowed($member_email) || !$this->password_allowed($member_name, $member_pass))
         return false;
 
       # How about a hash? (This hash will likely get changed eventually, but :P)
@@ -273,10 +273,50 @@ class Members
         $options['member_ip'] = $member->ip();
 
       # Is the member activated?
-      $options['member_activated'] = !empty($options['member_activated']);
+      $options['member_activated'] = !empty($options['member_activated']) ? 1 : 0;
 
       # If the member is not activated, then we will generate an activation code...
       $options['member_acode'] = empty($options['member_activated']) && empty($options['member_acode']) ? sha1($this->generate_hash(mt_rand(30, 40))) : (!empty($options['member_acode']) ? $options['member_acode'] : '');
+
+      # Alright! Now insert that member!!!
+      $result = $db->insert('insert', '{db->prefix}members',
+                  array(
+                    'member_name' => 'string', 'member_pass' => 'string', 'member_hash' => 'string',
+                    'display_name' => 'string', 'member_email' => 'string', 'member_groups' => 'string',
+                    'member_registered' => 'int', 'member_ip' => 'string', 'member_activated' => 'int',
+                    'member_acode' => 'string',
+                  ),
+                  array(
+                    htmlchars($member_name), sha1($member_name. $member_pass), $options['member_hash'],
+                    htmlchars($options['display_name']), $member_email, implode(',', $options['member_groups']),
+                    $options['member_registered'], $options['member_ip'], $options['member_activated'],
+                    $options['member_acode'],
+                  ), array(), 'members_create_query');
+
+      $handled = $result->success() ? $result->insert_id() : false;
+
+      # Maybe there is some default data that needs insertion?
+      if(!empty($handled))
+      {
+        $data = array();
+
+        # If you want to add data, do:
+        # $data[] = array(varible, value)
+        $api->run_hook('members_create_default_data', array(&$data));
+
+        # Anything?
+        if(count($data) > 0)
+        {
+          foreach($data as $key => $value)
+            $data[$key] = array($handled, $value[0], $value[1]);
+
+          $db->insert('replace', '{db->prefix}member_data',
+            array(
+              'member_id' => 'int', 'variable' => 'string-255', 'value' => 'string',
+            ),
+            $data, array('member_id'), 'members_create_default_data_query');
+        }
+      }
     }
 
     return (string)(int)$handled == (string)$handled ? (int)$handled : false;
@@ -378,6 +418,8 @@ class Members
 
     if($handled === null)
     {
+      $member_email = strtolower(htmlchars($member_email));
+
       # Check the email with regex!
       if(!preg_match('~^([a-z0-9._-](\+[a-z0-9])*)+@[a-z0-9.-]+\.[a-z]{2,6}$~i', $member_email))
         return false;
@@ -397,11 +439,11 @@ class Members
       }
 
       # Maybe the domain is disallowed?
-      $disallowed_domains = explode("\n", mb_strtolower($settings->get('disallowed_emails')));
+      $disallowed_domains = explode("\n", mb_strtolower($settings->get('disallowed_email_domains')));
 
       list(, $email_domain) = explode('@', $member_email);
 
-      if(count($disallowed_domain))
+      if(count($disallowed_domains))
       {
         foreach($disallowed_domains as $disallowed_domain)
         {
@@ -511,6 +553,46 @@ class Members
   }
 
   /*
+    Method: password_allowed
+
+    Checks to see if the supplied password is allowed.
+
+    Parameters:
+      string $member_name - The login name of the member you are
+                            checking the password of.
+      string $member_pass - The password to check.
+
+    Returns:
+      bool - Returns TRUE if the password is allowed, FALSE if not.
+
+    Note:
+      The supplied password parameter should NOT be hashed, it should
+      be the password in its original (unhashed) form.
+  */
+  public function password_allowed($member_name, $member_pass)
+  {
+    global $api, $db, $settings;
+
+    $handled = null;
+    $api->run_hook('members_password_allowed', array(&$handled, $member_pass));
+
+    if($handled === null)
+    {
+      # Just a low setting? So must have at least 3 characters...
+      if($settings->get('password_security') == 1)
+        $handled = strlen($member_pass) >= 3;
+      # Must be at least 4 characters long and cannot contain their username ;)
+      elseif($settings->get('password_security') == 2)
+        $handled = strlen($member_pass) >= 4 && stripos($member_pass, $member_name) === false;
+      # At least 5 characters in length and must contain at least 1 number.
+      else
+        $handled = strlen($member_pass) >= 5 && preg_match('~[0-9]+~', $member_pass);
+    }
+
+    return !empty($handled);
+  }
+
+  /*
     Method: generate_hash
 
     Generates a random as long as the supplied length.
@@ -536,10 +618,94 @@ class Members
              );
 
     $str = '';
-    for($i = 0; $i < 75; $i++)
+    for($i = 0; $i < $length; $i++)
       $str .= $chars[mt_rand(0, 74)];
 
     return $str;
+  }
+
+  /*
+    Method: update
+
+    Updates the information of a supplied member ID.
+
+    Parameters:
+      int $member_id - The member ID to update.
+      array $options - An array containing the information you want to update.
+
+    Returns:
+      bool - Returns TRUE if the member was successfully updated, FALSE if not.
+
+    Note:
+      For the $options parameter, these are acceptable indices to use:
+        member_name - Their login name, however, if this is changed, their current password
+                      MUST be supplied, otherwise, the update will fail (Password must
+                      not be hashed yet).
+        member_pass - The users new password.
+        member_hash - A salt that the authentication cookie is hashed with.
+        display_name - The members display name.
+        member_email - The members email address.
+        member_groups - An array containing the members groups.
+        member_ip - The IP of the member.
+        member_activated - The current status of the member. 0 means unactivated, 1 means
+                           activated and 11 means that the member changed their email and
+                           that the administrator has set the option to require the member
+                           to verify their new email address before it is changed.
+        member_acode - An activation code for activating or reactivating their account.
+        data - An array containing nested arrays formatted in: array(variable, value).
+               These are added to the member_data table.
+  */
+  public function update($member_id, $options)
+  {
+    global $api, $db;
+
+    if(count($options) == 1)
+      return false;
+
+    $handled = null;
+    $api->run_hook('members_update', array(&$handled));
+
+    if($handled === null)
+    {
+      if(isset($options['data']))
+      {
+        $member_data = $options['data'];
+        unset($options['data']);
+      }
+
+      $allowed_columns = array(
+        'member_name' => 'string-80',
+        'member_pass' => 'string-40',
+        'member_hash' => 'string-16',
+        'display_name' => 'string-255',
+        'member_email' => 'string',
+        'member_groups' => 'string',
+        'member_ip' => 'string',
+        'member_activated' => 'int',
+        'member_acode' => 'string',
+      );
+
+      $api->run_hook('members_update_allowed_columns', array(&$allowed_columns));
+
+      $data = array();
+      foreach($allowed_columns as $column => $type)
+      {
+        # Only add the data if the column exists...
+        if(isset($options[$column]))
+          $data[$column] = $options[$column];
+      }
+
+      # Let's let you check the data (just incase ;)) first...
+      $api->run_hook('members_update_check_data', array(&$handled, &$data));
+
+      # If a hook didn't change handled, we can do our stuff :P
+      if($handled !== false)
+      {
+
+      }
+    }
+
+    return !empty($handled);
   }
 }
 ?>

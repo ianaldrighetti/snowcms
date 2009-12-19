@@ -69,3 +69,7 @@ CREATE TABLE '{$db_prefix}settings'
 
 INSERT INTO '{$db_prefix}settings' ('variable', 'value') VALUES('show_version', 1);
 INSERT INTO '{$db_prefix}settings' ('variable', 'value') VALUES('version', '2.0 SVN');
+INSERT INTO '{$db_prefix}settings' ('variable', 'value') VALUES('password_security', 1);
+INSERT INTO '{$db_prefix}settings' ('variable', 'value') VALUES('reserved_names', '');
+INSERT INTO '{$db_prefix}settings' ('variable', 'value') VALUES('disallowed_emails', '');
+INSERT INTO '{$db_prefix}settings' ('variable', 'value') VALUES('disallowed_email_domains', '');
