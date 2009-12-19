@@ -113,8 +113,8 @@ if(!class_exists('Member'))
       {
         list($member_id, $passwrd) = @explode('|', $_COOKIE[$cookie_name]);
 
-        $member_id = (string)$member_id == (string)(int)$member_id && (int)$member_id > 0 && mb_strlen($passwrd) == 40 ? (int)$member_id : 0;
-        $passwrd = $member_id > 0 && mb_strlen($passwrd) == 40 ? $passwrd : '';
+        $member_id = (string)$member_id == (string)(int)$member_id && (int)$member_id > 0 && strlen($passwrd) == 40 ? (int)$member_id : 0;
+        $passwrd = $member_id > 0 && strlen($passwrd) == 40 ? $passwrd : '';
 
         $api->run_hook('cookie_data', array(&$member_id, &$passwrd));
 
@@ -130,7 +130,7 @@ if(!class_exists('Member'))
         unset($member_id, $passwrd);
 
       # So after ALL that, did your member id get set?
-      if($member_id > 0)
+      if(isset($member_id) && $member_id > 0)
       {
         # Alright, let's see if what you have is right :P
         $result = $db->query('
@@ -312,6 +312,20 @@ if(!class_exists('Member'))
     }
 
     /*
+      Method: ip
+
+      Parameters:
+        none
+
+      Returns:
+        string - Returns the current users IP.
+    */
+    public function ip()
+    {
+      return $this->ip;
+    }
+
+    /*
       Method: groups
 
       Parameters:
@@ -358,12 +372,12 @@ if(!class_exists('Member'))
     public function is_a($what)
     {
       # Hold on there! If they are an administrator, they are EVERYTHING!!!
-      if($this->is_a('administrator') && (is_string($what) && mb_strtolower($what) != 'administrator'))
+      if($this->is_a('administrator') && (is_string($what) && strtolower($what) != 'administrator'))
         return true;
 
       if(!is_array($what))
       {
-        $what = mb_strtolower($what);
+        $what = strtolower($what);
 
         # Is it in our array?
         return in_array($what, $this->groups);
