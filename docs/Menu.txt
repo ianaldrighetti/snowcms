@@ -50,6 +50,7 @@ Group: Core  {
    File: HTTP  (core/http.class.php)
    File: Language  (core/l.php)
    File: Member  (core/member.class.php)
+   File: Members  (core/members.class.php)
    File: Messages  (core/messages.class.php)
    File: Mitigate Globals  (core/mitigate_globals.php)
    File: Session  (core/session.php)
