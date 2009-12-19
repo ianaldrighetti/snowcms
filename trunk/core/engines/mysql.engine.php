@@ -151,7 +151,7 @@ class MySQL extends Database
     $db_query = strtr($db_query, array('{db->prefix}' => $this->prefix, '{db_prefix}' => $this->prefix));
 
     # Any possible variables that may need replacing? (Don't do this if it is an insert, or things could get ugly)
-    if(mb_strpos($db_query, '{') !== false && $db_compat != 'insert')
+    if(strpos($db_query, '{') !== false && $db_compat != 'insert')
     {
       # Find all the variables.
       preg_match_all('~{[\w-]+:\w+}~', $db_query, $matches);
@@ -169,7 +169,7 @@ class MySQL extends Database
 
         foreach($matches[0] as $variable)
         {
-          list($datatype, $variable_name) = explode(':', mb_substr($variable, 1, mb_strlen($variable) - 2));
+          list($datatype, $variable_name) = explode(':', substr($variable, 1, strlen($variable) - 2));
 
           # Let's just be safe, shall we?
           $datatype = trim($datatype);
@@ -227,15 +227,15 @@ class MySQL extends Database
   {
     global $api;
 
-    $datatype = mb_strtolower($datatype);
+    $datatype = strtolower($datatype);
 
     # Is it a string? It could have a length :)
-    if(mb_substr($datatype, 0, 6) == 'string' && mb_strpos($datatype, '-') !== false)
+    if(substr($datatype, 0, 6) == 'string' && strpos($datatype, '-') !== false)
     {
       list(, $length) = explode('-', $datatype);
 
       $datatype = 'string';
-      $value = mb_substr($value, 0, (int)$length);
+      $value = substr($value, 0, (int)$length);
     }
 
     $datatypes = array(
@@ -254,7 +254,7 @@ class MySQL extends Database
 
     # Is the datatype defined?
     if(!isset($datatypes[$datatype]))
-      $this->log_error('Undefined data type <string>'. mb_strtoupper($datatype). '</strong>.', true, $file, $line);
+      $this->log_error('Undefined data type <string>'. strtoupper($datatype). '</strong>.', true, $file, $line);
 
     # Return the sanitized value...
     return $this->$datatypes[$datatype]($var_name, $value, $file, $line);
@@ -340,7 +340,7 @@ class MySQL extends Database
     $line = (int)$backtrace[0]['line'];
     unset($backtrace);
 
-    $type = mb_strtolower($type);
+    $type = strtolower($type);
 
     # We only support insert, ignore and replace.
     if(!in_array($type, array('insert', 'ignore', 'replace')))

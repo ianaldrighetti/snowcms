@@ -464,7 +464,7 @@ class API
     elseif(!is_string($group_identifier) || !is_string($group_name))
       return false;
 
-    $this->groups[mb_strtolower($group_identifier)] = $group_name;
+    $this->groups[strtolower($group_identifier)] = $group_name;
     return true;
   }
 
@@ -483,10 +483,10 @@ class API
   public function remove_group($group_identifier)
   {
     # You can't remove the group administrator or member...
-    if(!$this->group_registered($group_identifier) || in_array(mb_strtolower($group_identifier), array('administrator', 'member')))
+    if(!$this->group_registered($group_identifier) || in_array(strtolower($group_identifier), array('administrator', 'member')))
       return false;
 
-    unset($this->groups[mb_strtolower($group_identifier)]);
+    unset($this->groups[strtolower($group_identifier)]);
     return true;
   }
 
@@ -505,7 +505,7 @@ class API
   public function group_registered($group_identifier)
   {
     # Did I mention that you can't register the group administrator or member? Silly me!
-    return !in_array(mb_strtolower($group_identifier), array('administrator', 'member')) ? isset($this->groups[mb_strtolower($group_identifier)]) : true;
+    return !in_array(strtolower($group_identifier), array('administrator', 'member')) ? isset($this->groups[strtolower($group_identifier)]) : true;
   }
 
   /*
@@ -529,7 +529,7 @@ class API
     elseif(!$this->group_registered($group_identifier))
       return false;
     else
-      return $this->groups[mb_strtolower($group_identifier)];
+      return $this->groups[strtolower($group_identifier)];
   }
 
   /*
@@ -552,7 +552,7 @@ class API
     global $core_dir;
 
     if(empty($filename))
-      $filename = $core_dir. '/'. mb_strtolower(basename($class_name)). '.class.php';
+      $filename = $core_dir. '/'. strtolower(basename($class_name)). '.class.php';
 
     if(!file_exists($filename))
       return false;

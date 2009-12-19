@@ -339,7 +339,7 @@ class HTTP
 
       # Well, we have gone as far as we have, no it is up to you ;)
       return $callback(array(
-        'url' => substr(mb_strtolower($url), 0, 8) == 'https://' && !$this->ssl_supported() ? 'http'. substr(mb_strtolower($url), 5, mb_strlen($url)) : $url,
+        'url' => substr(strtolower($url), 0, 8) == 'https://' && !$this->ssl_supported() ? 'http'. substr(strtolower($url), 5, strlen($url)) : $url,
         'post_data' => array_merge($this->post_data, $post_data),
         'resume_from' => max((int)$resume_from, 0),
         'fp' => !empty($filename) ? $fp : null,
@@ -348,7 +348,7 @@ class HTTP
         'max_redirects' => $this->max_redirects,
         'include_header' => !empty($this->include_header),
         'http_version' => $this->http_version,
-        'port' => substr(mb_strtolower($url), 0, 8) == 'https://' && $this->port == 80 && $this->ssl_supported() ? 443 : $this->port,
+        'port' => substr(strtolower($url), 0, 8) == 'https://' && $this->port == 80 && $this->ssl_supported() ? 443 : $this->port,
         'timeout' => $this->timeout,
         'user_agent' => $this->user_agent,
       ));
@@ -427,7 +427,7 @@ if(!function_exists('http_curl_request'))
       $data = http_curl_request($new_request);
 
       # Cheating..? Sure, but don't tell anyone xD
-      $data = mb_substr($data, $request['resume_from'], mb_strlen($data));
+      $data = substr($data, $request['resume_from'], strlen($data));
     }
 
     # Did you want this written to a file?
@@ -520,7 +520,7 @@ if(!function_exists('http_fsockopen_request'))
         $commands .= "User-Agent: {$request['user_agent']}\r\n";
 
       $commands .= "Content-Type: application/x-www-form-urlencoded\r\n";
-      $commands .= "Content-Length: ". mb_strlen($post_data). "\r\n";
+      $commands .= "Content-Length: ". strlen($post_data). "\r\n";
       $commands .= "Connection: close\r\n\r\n";
       $commands .= $post_data. "\r\n\r\n";
     }
@@ -547,20 +547,20 @@ if(!function_exists('http_fsockopen_request'))
       foreach($raw_headers as $header)
       {
         $header = trim($header);
-        if(empty($header) || mb_strpos($header, ':') === false)
+        if(empty($header) || strpos($header, ':') === false)
           continue;
 
         list($name, $content) = explode(':', $header, 2);
-        $headers[mb_strtolower($name)] = trim($content);
+        $headers[strtolower($name)] = trim($content);
       }
 
     # So do we need to redirect, perhaps?
-    if(mb_strpos($http_status, '302') !== false || mb_strpos($http_status, '301') !== false || mb_strpos($http_status, '307') !== false)
+    if(strpos($http_status, '302') !== false || strpos($http_status, '301') !== false || strpos($http_status, '307') !== false)
       return !empty($headers['location']) ? http_fsockopen_request(array_merge($request, array('url' => $headers['location'], 'fp' => null)), $num_redirects + 1) : false;
 
     # Okay, well, if the transfer-encoding header is not set, then we can
     # just stop here, if not, we need to do a little bit extra.
-    if(!empty($headers['transfer-encoding']) && mb_strtolower($headers['transfer-encoding']) == 'chunked')
+    if(!empty($headers['transfer-encoding']) && strtolower($headers['transfer-encoding']) == 'chunked')
     {
       list($hex, $data) = explode("\r\n", $data, 2);
 
