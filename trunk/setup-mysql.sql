@@ -23,7 +23,7 @@ CREATE TABLE `{$db_prefix}members`
   `member_groups` VARCHAR(255) NOT NULL,
   `member_registered` INT(10) UNSIGNED NOT NULL,
   `member_ip` VARCHAR(150) NOT NULL,
-  `member_activated` TINYINT(1) UNSIGNED NOT NULL DEFAULT '0',
+  `member_activated` TINYINT(3) UNSIGNED NOT NULL DEFAULT '0',
   `member_acode` VARCHAR(40) NOT NULL,
   PRIMARY KEY (`member_id`),
   KEY (`member_name`),
@@ -80,4 +80,4 @@ CREATE TABLE `{$db_prefix}settings`
   PRIMARY KEY (`variable`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 
-INSERT INTO `{$db_prefix}settings` (`variable`, `value`) VALUES('show_version', 1),('version', '2.0 SVN');
+INSERT INTO `{$db_prefix}settings` (`variable`, `value`) VALUES('show_version', 1),('version', '2.0 SVN'),('password_security', 1),('reserved_names', ''),('disallowed_emails', ''),('disallowed_email_domains', '');

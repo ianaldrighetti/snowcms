@@ -59,24 +59,12 @@ class MySQL_Result extends Database_Result
 
   public function num_fields()
   {
-    static $num_fields = -1;
-
-    # It shouldn't change!!! So we can just "remember" it :)
-    if($num_fields === -1)
-      $num_fields = mysql_num_fields($this->result);
-
-    return $num_fields;
+    return mysql_num_fields($this->result);
   }
 
   public function num_rows()
   {
-    static $num_rows = -1;
-
-    # Same goes for number of rows, shouldn't change :P
-    if($num_rows === -1)
-      $num_rows = mysql_num_rows($this->result);
-
-    return $num_rows;
+    return mysql_num_rows($this->result);
   }
 }
 

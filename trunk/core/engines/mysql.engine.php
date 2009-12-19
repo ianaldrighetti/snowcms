@@ -120,7 +120,7 @@ class MySQL extends Database
 
     # Just incase, for some odd reason :P
     if(!empty($hook_name))
-      $this->run_hook($hook_name, array(&$db_query, &$db_vars, &$db_compat));
+      $api->run_hook($hook_name, array(&$db_query, &$db_vars, &$db_compat));
 
     # debug set?
     if(isset($db_vars['debug']))
@@ -198,7 +198,7 @@ class MySQL extends Database
 
     # Woo!!! QUERY THAT DATABASE!
     $query_start = microtime(true);
-    $query_result = @mysql_query(trim($db_query), $this->con);
+    $query_result = mysql_query(trim($db_query), $this->con);
     $query_took = round(microtime(true) - $query_start, 5);
 
     # That is one more query!
@@ -220,7 +220,7 @@ class MySQL extends Database
       $this->log_error('['. $mysql_errno. '] '. $mysql_error, true, $file, $line);
 
     # Return a MySQLResult Object ;)
-    return new $this->result_class($query_result, mysql_affected_rows($this->con), $db_compat == 'insert' ? mysql_insert_id($query_result) : 0, $mysql_errno, $mysql_error, $this->num_queries - 1);
+    return new $this->result_class($query_result, mysql_affected_rows($this->con), $db_compat == 'insert' ? mysql_insert_id($this->con) : 0, $mysql_errno, $mysql_error, $this->num_queries - 1);
   }
 
   protected function var_sanitize($var_name, $datatype, $value, $file, $line)
@@ -332,7 +332,7 @@ class MySQL extends Database
       return false;
 
     if(!empty($hook_name))
-      $this->run_hook($hook_name, array(&$type, &$tbl_name, &$data, &$keys));
+      $api->run_hook($hook_name, array(&$type, &$tbl_name, &$data, &$keys));
 
     # Let's get where you called us from!
     $backtrace = debug_backtrace();
@@ -383,7 +383,7 @@ class MySQL extends Database
     );
 
     # Construct the query, MySQL suports extended inserts! Hip hip! HURRAY!
-    $db_query = $inserts[$insert_type]. ' INTO `'. $tbl_name. '` (`'. implode('`, `', $column_names). '`) VALUES'. implode(', ', $rows);
+    $db_query = $inserts[$type]. ' INTO `'. $tbl_name. '` (`'. implode('`, `', $column_names). '`) VALUES'. implode(', ', $rows);
 
     # Let query handle it XD! (passes insert in db compat to let you know
     # if you don't have to do anything at all, which you shouldn't!!!
