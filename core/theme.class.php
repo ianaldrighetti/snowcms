@@ -38,6 +38,10 @@ abstract class Theme
   # The title specific to the current page.
   protected $title;
 
+  # Variable: url
+  # The URL of the current themes base directory.
+  protected $url;
+
   # Variable: links
   # An array containing all the <link> tags to be added inside the <head> of
   # the document. Each array inside links can contain charset, href, hreflang,
@@ -64,17 +68,22 @@ abstract class Theme
 
     Parameters:
       string $main_title - The value to set the main_title attribute to.
+      string $url - The URL to the base directory of the current theme.
   */
-  public function __construct($main_title = null)
+  public function __construct($main_title = null, $url = null)
   {
-    if(!empty($main_title))
-      $this->set_main_title($main_title);
-
     $this->title = null;
+    $this->url = null;
     $this->links = array();
     $this->js_vars = array();
     $this->js_files = array();
     $this->meta = array();
+
+    if(!empty($main_title))
+      $this->set_main_title($main_title);
+
+    if(!empty($url))
+      $this->set_url($url);
   }
 
   /*
@@ -115,6 +124,68 @@ abstract class Theme
     }
     else
       return false;
+  }
+
+  /*
+    Method: set_url
+
+    Parameters:
+      string $url - The URL of the current themes base directory (No trailing /!)
+
+    Returns:
+      bool - Returns TRUE on success, FALSE on failure.
+  */
+  public function set_url($url)
+  {
+    if(!empty($url) && is_string($url))
+    {
+      $this->url = $url;
+      return true;
+    }
+    else
+      return false;
+  }
+
+  /*
+    Method: main_title
+
+    Parameters:
+      none
+
+    Returns:
+      string - Returns the current main title of the theme.
+  */
+  public function main_title()
+  {
+    return $this->main_title;
+  }
+
+  /*
+    Method: title
+
+    Parameters:
+      none
+
+    Returns:
+      string - Returns the current title of the page.
+  */
+  public function title()
+  {
+    return $this->title;
+  }
+
+  /*
+    Method: url
+
+    Parameters:
+      none
+
+    Returns:
+      string - Returns the URL of the theme.
+  */
+  public function url()
+  {
+    return $this->url;
   }
 
   /*
@@ -176,7 +247,7 @@ abstract class Theme
   */
   public function remove_link($link_href)
   {
-    if(empty($link_href) || !is_string($link_href) || count($this->links) == 0)
+    if(empty($link_href) || !is_string($link_href) || count($this->links) == 0 || !$this->link_exists($link_href))
       return false;
 
     foreach($this->links as $key => $link)
@@ -186,6 +257,7 @@ abstract class Theme
         return true;
       }
 
+    # This should never happen o.O
     return false;
   }
 
@@ -239,6 +311,183 @@ abstract class Theme
     unset($this->js_vars[$variable]);
     return true;
   }
+
+  /*
+    Method: add_js_file
+
+    Parameters:
+      array $script - Contains the attributes of the script tag.
+
+    Returns:
+      bool - Returns TRUE on success, FALSE on failure.
+  */
+  public function add_js_file($script)
+  {
+    if(empty($script) || !is_array($script) || empty($script['src']) || $this->js_file_exists($script['src']))
+      return false;
+
+    # No type? Add it ourselves :P
+    if(empty($script['type']))
+      $script['type'] = 'text/javascript';
+
+    if(empty($script['language']))
+      $script['language'] = 'JavaScript';
+
+    # Let's make sure you aren't throwing some random crap in...
+    $allowed_attributes = array('type', 'charset', 'defer', 'src');
+    foreach($script as $attr => $value)
+      if(!in_array($attr, $allowed_attributes))
+        return false;
+
+    $this->js_files[] = $script;
+    return true;
+  }
+
+  /*
+    Method: js_file_exists
+
+    Parameters:
+      string $script_src - The script source (The URL of the JS file).
+
+    Returns:
+      bool - Returns TRUE if the js file exists, FALSE if not.
+  */
+  public function js_file_exists($script_src)
+  {
+    if(empty($script_src) || !is_string($script_src) || count($this->js_files) == 0)
+      return false;
+
+    foreach($this->js_files as $js)
+      if($js['src'] == $script_src)
+        return true;
+
+    return false;
+  }
+
+  /*
+    Method: remove_js_file
+
+    Parameters:
+      string $script_src - The script source (The URL of the JS file).
+
+    Returns:
+      bool - Returns TRUE on success, FALSE on failure.
+  */
+  public function remove_js_file($script_src)
+  {
+    if(empty($script_src) || !is_string($script_src) || count($this->js_files) == 0 || !$this->js_file_exists($script_src))
+      return false;
+
+    foreach($this->js_files as $key => $js)
+      if($js['src'] == $script_src)
+      {
+        unset($this->js_files[$key]);
+        return true;
+      }
+
+    # This shouldn't happen o.O
+    return false;
+  }
+
+  /*
+    Method: add_meta
+
+    Parameters:
+      array $meta - An array containing the meta tags information.
+
+    Returns:
+      bool - Returns TRUE on success, FALSE on failure.
+  */
+  public function add_meta($meta)
+  {
+    if(empty($meta) || !is_array($meta) || count($meta) == 0 || ((isset($meta['name']) || isset($meta['http-equiv'])) && $this->meta_exists(isset($meta['name']) ? $meta['name'] : $meta['http-equiv'])))
+      return false;
+    elseif(!empty($meta['name']) && !empty($meta['http-equiv']))
+      return false;
+
+
+    $allowed_attributes = array('content', 'http-equiv', 'name', 'scheme', 'dir', 'lang', 'xml:lang');
+    foreach($meta as $attr => $value)
+      if(!in_array($attr, $allowed_attributes))
+        return false;
+
+    $this->meta[] = $meta;
+    return true;
+  }
+
+  /*
+    Method: meta_exists
+
+    Parameters:
+      string $name - The name of the tag (or http-equiv).
+
+    Returns:
+      bool - Returns TRUE if the meta tag exists, FALSE if not.
+  */
+  public function meta_exists($name)
+  {
+    if(empty($name) || !is_string($name) || count($this->meta) == 0)
+      return false;
+
+    foreach($this->meta as $meta)
+      if((isset($meta['name']) && $meta['name'] == $name) || (isset($meta['http-equiv']) && $meta['http-equiv'] == $name))
+        return true;
+
+    return false;
+  }
+
+  /*
+    Method: remove_meta
+
+    Parameters:
+      string $name - The name of the tag (or http-equiv).
+
+    Returns:
+      bool - Returns TRUE on success, FALSE on failure.
+  */
+  public function remove_meta($name)
+  {
+    if(!$this->meta_exists($name))
+      return false;
+
+    foreach($this->meta as $key => $meta)
+      if((isset($meta['name']) && $meta['name'] == $name) || (isset($meta['http-equiv']) && $meta['http-equiv'] == $name))
+      {
+        unset($this->meta[$key]);
+        return true;
+      }
+
+    # Should never happen :/
+    return false;
+  }
+
+  /*
+    Method: header
+
+    This is a method which the Implemented_Theme class must implement!
+    The method outputs the themes header HTML.
+
+    Parameters:
+      none
+
+    Returns:
+      void - Nothing is returned by this method.
+  */
+  abstract public function header();
+
+  /*
+    Method: footer
+
+    This is a method which the Implemented_Theme class must implement!
+    The method outputs the themes footer HTML.
+
+    Parameters:
+      none
+
+    Returns:
+      void - Nothing is returned by this method.
+  */
+  abstract public function footer();
 }
 
 /*
@@ -254,6 +503,12 @@ abstract class Theme
 */
 function init_theme()
 {
+  global $api, $settings, $theme, $theme_dir, $theme_url;
 
+  require_once($theme_dir. '/'. $settings->get('theme'). '/implemented_theme.class.php');
+  $theme = $api->load_class('Implemented_Theme', array($settings->get('site_name'), $theme_url. '/'. $settings->get('theme')));
+
+  # You can hook into here to add all your theme stuffs (<link>'s, js vars, js files, etc).
+  $api->run_hook('post_init_theme');
 }
 ?>

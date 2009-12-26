@@ -385,6 +385,9 @@ class Messages
       # Maybe you wanted to add something?
       $api->run_hook('messages_add_data', array(&$columns, &$data, $options));
 
+      # Serialize that extra array first!
+      $data['extra'] = serialize(is_array($data['extra']) ? $data['extra'] : array());
+
       # Now insert that comment! :D
       $result = $db->insert('insert', '{db->prefix}messages',
                   $columns,
@@ -407,6 +410,57 @@ class Messages
 
   /*
     Method: delete
+
+    Deletes the specified messages.
+
+    Parameters:
+      string $area_name - The area name of which the message is under.
+      int $area_id - The area identifier where the message is at.
+      mixed $messages - Either an integer, an array of integers or NULL
+                        which will delete all messages in the specified area.
+
+    Returns:
+      bool - Returns TRUE on success, FALSE on failure.
+
+    Note:
+      Be sure to have verified the users session id with <Member.verify>!
   */
+  public function delete($area_name, $area_id, $messages)
+  {
+    global $api, $db;
+
+    if(!is_array($messages) && $messages !== null)
+      $messages = array($messages);
+    elseif(is_array($messages) && !count($messages))
+      return true;
+
+    if(!empty($messages)
+    {
+      foreach($messages as $key => $message_id)
+        if((int)$message_id < 1)
+          unset($messages[$key]);
+
+      $messages = array_unique($messages);
+    }
+
+    $handled = null;
+    $api->run_hook('messages_delete', array(&$handled, $area_name, $area_id, $messages));
+
+    if($handled === null)
+    {
+      $result = $db->query('
+        DELETE FROM {db->prefix}messages
+        WHERE area_name = {string:area_name} AND area_id = {int:area_id}'. (empty($messages) ? ' AND message_id IN({array_int:messages})' : ''),
+        array(
+          'area_name' => $area_name,
+          'area_id' => $area_id,
+          'messages' => !empty($messages) ? $messages : array(),
+        ), 'messages_delete_query');
+
+      $handled = $result->success();
+    }
+
+    return !empty($handled);
+  }
 }
 ?>

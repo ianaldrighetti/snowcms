@@ -20,32 +20,16 @@
 if(!defined('IN_SNOW'))
   die;
 
-/*
-  Class: Tasks
-
-  This is another tool which is available to developers. With this tool
-  plugins can add/remove/edit tasks which can be set to be processed on
-  a regular basis.
-
-  Note:
-    Please realize that the scheduled tasks may not always occur at the
-    time you expect them too! These tasks are ran when a visitor comes to
-    a page, and if their are any tasks which need to be done, then they
-    are ran, but not always at the time you want! Also realize that admins
-    can disable tasks altogether.
-*/
-class Tasks
+class Implemented_Theme extends Theme
 {
-  /*
-    Constructor: __construct
-  */
-}
+  public function header()
+  {
 
-function init_tasks()
-{
-  global $api, $settings;
+  }
 
-  if($settings->get('enable_tasks') == 1)
-    $tasks = $api->load_class('Tasks');
+  public function footer()
+  {
+
+  }
 }
 ?>
