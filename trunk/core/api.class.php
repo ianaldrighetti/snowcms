@@ -27,31 +27,26 @@ if(!defined('IN_SNOW'))
 */
 class API
 {
-  /*
-    Variable: hooked
-    An array containing callbacks that have hooked themselves through the API...
-  */
+  # Variable: hooked
+  # An array containing callbacks that have hooked themselves through the API...
   private $hooked;
 
-  /*
-    Variable: hooked_actions
-    Another array containing actions plugins have registered (allows ?action=REGISTERED_ACTION)
-  */
+  # Variable: hooked_actions
+  # Another array containing actions plugins have registered (allows ?action=REGISTERED_ACTION)
   private $hooked_actions;
 
-  /*
-    Variable: hooked_subactions
-    Yup, thats right, an array containing sub-actions plugins can register on actions
-    Please note that sub-actions only work if the plugin that registered the action
-    uses this sub-action API
-  */
+  # Variable: hooked_subactions
+  # Yup, thats right, an array containing sub-actions plugins can register on actions
+  # Please note that sub-actions only work if the plugin that registered the action
+  # uses this sub-action API
   private $hooked_subactions;
 
-  /*
-    Variable: groups
-    Registered groups, permission hook, in other words.
-  */
+  # Variable: groups
+  # Registered groups, permission hook, in other words.
   private $groups;
+
+  # Variable: objects
+  # Holds objects which have been loaded :)
 
   /*
     Constructor: __construct
@@ -542,14 +537,22 @@ class API
       array $params - An array of parameters you want to pass during the construction of
                       $class_name. (The class must have __construct defined)
       string $filename - The file where $class_name exists. Defaults to null.
+      bool $new - If set to true, the object returned will NOT be saved to the objects attribute
+                  and won't be taken from that attribute if the same object has already been
+                  instantiated on this page load. If FALSE, you will obtain a globally accessible
+                  object (Recommended for classes such as Messages, Members, etc).
 
     Returns:
       Object - Returns the instantiated Object of $class_name, however, if the file was
                not found or the class did not exist, FALSE is returned.
   */
-  public function load_class($class_name, $params = array(), $filename = null)
+  public function load_class($class_name, $params = array(), $filename = null, $new = false)
   {
     global $core_dir;
+
+    # Did you want a new object?
+    if(empty($new) && isset($this->objects[strtolower(basename($class_name))]))
+      return $this->objects[strtolower(basename($class_name))];
 
     if(empty($filename))
       $filename = $core_dir. '/'. strtolower(basename($class_name)). '.class.php';
@@ -569,6 +572,10 @@ class API
       call_user_func_array(array($obj, '__construct'), $params);
     elseif(!is_callable(array($obj, '__construct')))
       return false;
+
+    # Did you want this globally accessible?
+    if(empty($new))
+      $this->objects[strtolower(basename($class_name))] = $obj;
 
     return $obj;
   }

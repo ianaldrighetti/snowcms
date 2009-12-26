@@ -34,7 +34,13 @@ CREATE TABLE '{$db_prefix}messages'
   'member_name' VARCHAR(255) NOT NULL,
   'member_email' VARCHAR(255) NOT NULL,
   'member_ip' VARCHAR(150) NOT NULL,
+  'modified_id' INT NULL DEFAULT '0',
+  'modified_name' VARCHAR(255) NULL DEFAULT '',
+  'modified_email' VARCHAR(255) NULL DEFAULT '',
+  'modified_ip' VARCHAR(150) NULL DEFAULT '',
   'subject' VARCHAR(255) NULL,
+  'poster_time' INT NOT NULL DEFAULT '0',
+  'modified_time' INT NULL DEFAULT '0',
   'message' TEXT NOT NULL,
   'message_type' VARCHAR(16) NULL,
   'is_approved' SMALLINT NOT NULL DEFAULT '0',
@@ -42,6 +48,8 @@ CREATE TABLE '{$db_prefix}messages'
 );
 
 CREATE UNIQUE INDEX '{$db_prefix}messages_area' ON '{$db_prefix}messages' ('area_name', 'area_id', 'message_id');
+CREATE INDEX '{$db_prefix}messages_poster_time' ON '{$db_prefix}messages' ('poster_time');
+CREATE INDEX '{$db_prefix}messages_modified_time' ON '{$db_prefix}messages' ('modified_time');
 CREATE INDEX '{$db_prefix}messages_is_approved' ON '{$db_prefix}messages' ('is_approved');
 CREATE INDEX '{$db_prefix}messages_extra' ON '{$db_prefix}messages' ('extra');
 

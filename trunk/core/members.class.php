@@ -707,5 +707,78 @@ class Members
 
     return !empty($handled);
   }
+
+  /*
+    Method: delete
+
+    Deletes the specified members.
+
+    Parameters:
+      mixed $members - This can either be an integer, or an array of integers.
+
+    Returns:
+      bool - Returns TRUE if the specified members were deleted, FALSE if not.
+
+    Note:
+      Be sure before executing this command that you verify their session id!
+      Check out <Members.verify>
+  */
+  public function delete($members)
+  {
+    global $api, $db;
+
+    $handled = null;
+    $api->run_hook('members_delete', array(&$handled, $members));
+
+    if($handled === null)
+    {
+      # Not an array? We will fix that!!!
+      if(!is_array($members))
+        $members = array($members);
+
+      # Yeah, we deleted nothing successfully! Ha!
+      if(!count($members))
+        return true;
+
+      # Now let's just make sure they are all plausible ids...
+      foreach($members as $key => $member_id)
+      {
+        $member_id = (int)$member_id;
+
+        if($member_id < 1)
+          unset($members[$key]);
+      }
+
+      $members = array_unique($members);
+
+      # Now delete those members!
+      $result = $db->query('
+        DELETE FROM {db->prefix}members
+        WHERE member_id IN({array_int:members})
+        LIMIT {int:member_count}',
+        array(
+          'members' => $members,
+          'member_count' => count($members),
+        ), 'members_delete_query');
+
+      # Was it a success? We still have some more to do!
+      if($result->success())
+      {
+        # Now delete their data in the member_data table.
+        $result = $db->query('
+          DELETE FROM {db->prefix}member_data
+          WHERE member_id IN({array_int:members})',
+          array(
+            'members' => $members,
+          ), 'members_delete_query_data');
+      }
+
+      $handled = $result->success();
+
+      $api->run_hook('post_members_delete', array($members));
+    }
+
+    return !empty($handled);
+  }
 }
 ?>
