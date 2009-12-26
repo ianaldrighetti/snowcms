@@ -89,7 +89,6 @@ init_theme();
 
 require($core_dir. '/members.class.php');
 
-$members = new Members();
-
 # Initialize the current members session, if any, though...
-echo 'Executed in ', round(microtime(true) - $start_time, 6), ' seconds.';
+echo 'Executed in ', round(microtime(true) - $start_time, 6), ' seconds with ', $db->num_queries, ' queries.';
+?>

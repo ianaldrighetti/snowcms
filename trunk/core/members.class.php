@@ -287,8 +287,8 @@ class Members
                     'member_acode' => 'string',
                   ),
                   array(
-                    htmlchars($member_name), sha1($member_name. $member_pass), $options['member_hash'],
-                    htmlchars($options['display_name']), $member_email, implode(',', $options['member_groups']),
+                    htmlchars($member_name), sha1(strtolower($member_name). $member_pass), $options['member_hash'],
+                    htmlchars($options['display_name']), htmlchars($member_email), implode(',', $options['member_groups']),
                     $options['member_registered'], $options['member_ip'], $options['member_activated'],
                     $options['member_acode'],
                   ), array(), 'members_create_query');
@@ -640,7 +640,8 @@ class Members
       For the $options parameter, these are acceptable indices to use:
         member_name - Their login name, however, if this is changed, their current password
                       MUST be supplied, otherwise, the update will fail (Password must
-                      not be hashed yet).
+                      not be hashed yet), their member name must be supplied if their password
+                      is changed.
         member_pass - The users new password.
         member_hash - A salt that the authentication cookie is hashed with.
         display_name - The members display name.
@@ -652,14 +653,18 @@ class Members
                            that the administrator has set the option to require the member
                            to verify their new email address before it is changed.
         member_acode - An activation code for activating or reactivating their account.
-        data - An array containing nested arrays formatted in: array(variable, value).
+        data - An array containing nested arrays formatted in: array(variable => value).
                These are added to the member_data table.
+        admin_override - Set this to true if it is the administrator modifying the account, in
+                         which case an activation code is generated (but it can be supplied) and
+                         the members activation state changes to 11, and they are required to set
+                         a new password.
   */
   public function update($member_id, $options)
   {
     global $api, $db;
 
-    if(count($options) == 1)
+    if(count($options) == 0)
       return false;
 
     $handled = null;
@@ -674,6 +679,7 @@ class Members
       }
 
       $allowed_columns = array(
+        'member_id' => 'int',
         'member_name' => 'string-80',
         'member_pass' => 'string-40',
         'member_hash' => 'string-16',
@@ -687,7 +693,9 @@ class Members
 
       $api->run_hook('members_update_allowed_columns', array(&$allowed_columns));
 
-      $data = array();
+      $data = array(
+        'member_id' => $member_id,
+      );
       foreach($allowed_columns as $column => $type)
       {
         # Only add the data if the column exists...
@@ -701,7 +709,69 @@ class Members
       # If a hook didn't change handled, we can do our stuff :P
       if($handled !== false)
       {
+        if(isset($data['member_groups']) && !is_array($data['member_groups']))
+          $data['member_groups'] = array($data['member_groups']);
 
+        # Make sure their name and password are OK, if supplied!
+        if(isset($data['member_name']) && !$this->name_allowed($data['member_name'], $member_id))
+          # Must be taken!
+          return false;
+        elseif(isset($data['member_pass']) && !$this->password_allowed(isset($data['member_name']) ? $data['member_name'] : '', $data['member_pass']))
+          return false;
+        elseif(isset($data['member_email']) && !$this->email_allowed($data['member_email'], $member_id))
+          return false;
+        elseif(isset($data['display_name']) && !$this->name_allowed($data['display_name'], $member_id))
+          return false;
+        elseif((isset($data['member_groups']) && !is_array($data['member_groups'])) || (isset($data['member_groups']) && (!in_array('member', $data['member_groups']) && !in_array('administrator', $data['member_groups']))))
+          return false;
+
+        # Now we need to hash the password, maybe!
+        if(!empty($options['member_name']) && !empty($options['member_pass']))
+          $data['member_pass'] = sha1(strtolower($options['member_name']). $options['member_pass']);
+        elseif(empty($options['admin_override']) && ((!empty($options['member_name']) && empty($options['member_pass'])) || (empty($options['member_name']) && !empty($options['member_pass']))))
+        { echo 'yay'; return false; }
+        elseif(!empty($options['admin_override']))
+        {
+          $data['member_acode'] = empty($data['member_acode']) ? sha1($this->generate_hash(mt_rand(30, 40))) : $data['member_acode'];
+          $data['member_activated'] = 11;
+        }
+
+        # Our data array could be empty, simply because they are updating member_data table information!
+        if(!empty($data))
+        {
+          $db_vars = array();
+          $values = array();
+          foreach($data as $column => $value)
+          {
+            $values[] = $column. ' = {'. $allowed_columns[$column]. ':'. $column. '_value}';
+            $db_vars[$column. '_value'] = $column == 'member_groups' ? implode(',', $value) : $value;
+          }
+
+          # Now replace that data!
+          $result = $db->query('
+                      UPDATE {db->prefix}members
+                      SET '. implode(', ', $values). '
+                      LIMIT 1',
+                      $db_vars, 'members_update_query');
+
+          $handled = $result->success();
+        }
+
+        if(!empty($member_data) && count($member_data) > 0 && ($handled === null || $handled))
+        {
+          $data = array();
+          foreach($member_data as $variable => $value)
+            $data[] = array($member_id, $variable, $value);
+
+          $result = $db->insert('replace', '{db->prefix}member_data',
+                      array(
+                        'member_id' => 'int', 'variable' => 'string-255', 'value' => 'string',
+                      ),
+                      $data,
+                      array('member_id'), 'members_update_data_query');
+
+          $handled = $result->success();
+        }
       }
     }
 

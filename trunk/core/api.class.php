@@ -554,13 +554,14 @@ class API
     if(empty($new) && isset($this->objects[strtolower(basename($class_name))]))
       return $this->objects[strtolower(basename($class_name))];
 
-    if(empty($filename))
+    if(!class_exists($class_name) && empty($filename))
       $filename = $core_dir. '/'. strtolower(basename($class_name)). '.class.php';
 
-    if(!file_exists($filename))
+    if(!class_exists($class_name) && !file_exists($filename))
       return false;
 
-    require_once($filename);
+    if(!class_exists($class_name))
+      require_once($filename);
 
     if(!class_exists($class_name))
       return false;

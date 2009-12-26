@@ -51,7 +51,7 @@ abstract class Database
   public $extended_inserts = false;
 
   # Is the database in a forced debug mode?
-  public $debug = false;
+  public $debug = true;
 
   # The result class which query and insert return (global $db_result_class in connect()).
   public $result_class = null;
