@@ -55,6 +55,7 @@ Group: Core  {
    File: Mitigate Globals  (core/mitigate_globals.php)
    File: Session  (core/session.php)
    File: Settings  (core/settings.class.php)
+   File: Tasks  (core/tasks.class.php)
    File: Theme  (core/theme.class.php)
    }  # Group: Core
 
