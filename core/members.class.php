@@ -145,7 +145,7 @@ class Members
 
           if($result->num_rows() > 0)
             while($row = $result->fetch_assoc())
-              $this->loaded[$row['member_id']][$row['variable']] = $row['value'];
+              $this->loaded[$row['member_id']]['data'][$row['variable']] = $row['value'];
         }
       }
 
@@ -191,6 +191,9 @@ class Members
         $member_data = $this->loaded[$members];
       elseif($member_data == -1)
         $member_data = null;
+
+      # Wanna touch it?
+      $api->run_hook('post_members_get', array(&$member_data, $members));
 
       return $member_data === null ? false : $member_data;
     }

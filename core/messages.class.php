@@ -394,7 +394,7 @@ class Messages
                   array_values($data),
                   array(), 'messages_add_query');
 
-      $handled = $result->success() ? $result->last_id() : false;
+      $handled = $result->success() ? $result->insert_id() : false;
     }
 
     return (string)(int)$handled == (string)$handled ? (int)$handled : false;
@@ -434,7 +434,7 @@ class Messages
     elseif(is_array($messages) && !count($messages))
       return true;
 
-    if(!empty($messages)
+    if(!empty($messages))
     {
       foreach($messages as $key => $message_id)
         if((int)$message_id < 1)

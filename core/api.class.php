@@ -262,13 +262,12 @@ class API
   */
   public function add_action($action_name, $callback, $file = null)
   {
-    # You can't register an action if it already exists, silly pants! :P
-    if($this->action_registered($action_name))
-      return false;
-    # Is your callback, well, callable?
-    elseif(!is_callable($callback))
+    # You can't register an action if it already exists, silly pants! :P and that the callback is,
+    # well, callable and that the file exists (if any...)
+    if($this->action_registered($action_name) || !is_callable($callback) || (!empty($file) && !file_exists($file)))
       return false;
 
+    # Everything appears to be in order.
     $this->hooked_actions[$action_name] = array($callback, $file);
     return true;
   }

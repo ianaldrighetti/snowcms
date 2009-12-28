@@ -87,8 +87,34 @@ require($core_dir. '/theme.class.php');
 # Initialize the theme!!!
 init_theme();
 
-require($core_dir. '/members.class.php');
+# Whether or not their is an action in the address, there is still some sort of
+# action going on, whether you like it or not! If there is no action (or a valid one)
+# in the address, we will spoof it...
+if(empty($_GET['action']) || (!empty($_GET['action']) && !$api->action_registered($_GET['action'])))
+{
+  # Use the default action in the settings...
+  $_GET['action'] = $settings->get('default_action');
 
+  # Now if there is an action in the URL, that means it is invalid, and we
+  # don't want spiders to index that crap, do we?
+  if(!empty($_GET['action']))
+    $theme->add_meta(array('name' => 'robots', 'content' => 'noindex'));
+}
+
+# Do the requested action, if it exists :P
+if(!empty($_GET['action']) && $api->action_registered($_GET['action']))
+{
+  $action = $api->return_action($_GET['action']);
+
+  if(!empty($action[1]))
+    require_once($action[1]);
+
+  $action[0]();
+}
+else
+{
+  # Uh oh, this isn't good at all...
+}
 # Initialize the current members session, if any, though...
 echo 'Executed in ', round(microtime(true) - $start_time, 6), ' seconds with ', $db->num_queries, ' queries.';
 ?>
