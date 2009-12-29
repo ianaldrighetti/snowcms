@@ -122,6 +122,9 @@ class MySQL extends Database
     if(!empty($hook_name))
       $api->run_hook($hook_name, array(&$db_query, &$db_vars, &$db_compat));
 
+    # For every query...
+    $api->run_hook('pre_query_exec', array(&$db_query, &$db_vars, &$db_compat, $hook_name));
+
     # debug set?
     if(isset($db_vars['debug']))
     {
@@ -219,8 +222,12 @@ class MySQL extends Database
     if(empty($query_result))
       $this->log_error('['. $mysql_errno. '] '. $mysql_error, true, $file, $line);
 
-    # Return a MySQLResult Object ;)
-    return new $this->result_class($query_result, mysql_affected_rows($this->con), $db_compat == 'insert' ? mysql_insert_id($this->con) : 0, $mysql_errno, $mysql_error, $this->num_queries - 1);
+    # Put it in a MySQLResult Object ;)
+    $result = new $this->result_class($query_result, mysql_affected_rows($this->con), $db_compat == 'insert' ? mysql_insert_id($this->con) : 0, $mysql_errno, $mysql_error, $this->num_queries - 1);
+
+    $api->run_hook('post_query_exec', array(&$result, $query_result, $this->result_class, $db_compat, $query_took, $mysql_errno, $mysql_error));
+
+    return $result;
   }
 
   protected function var_sanitize($var_name, $datatype, $value, $file, $line)
@@ -257,7 +264,7 @@ class MySQL extends Database
       $this->log_error('Undefined data type <string>'. strtoupper($datatype). '</strong>.', true, $file, $line);
 
     # Return the sanitized value...
-    return $this->$datatypes[$datatype]($var_name, $value, $file, $line);
+    return is_callable(array($this, $datatypes[$datatype])) ? $this->$datatypes[$datatype]($var_name, $value, $file, $line) : $datatypes[$datatype]($var_name, $value, $file, $line);
   }
 
   protected function sanitize_float($var_name, $value, $file, $line)
@@ -332,7 +339,9 @@ class MySQL extends Database
       return false;
 
     if(!empty($hook_name))
-      $api->run_hook($hook_name, array(&$type, &$tbl_name, &$data, &$keys));
+      $api->run_hook($hook_name, array(&$type, &$tbl_name, &$columns, &$data, &$keys));
+
+    $api->run_hook('pre_insert_exec', array(&$type, &$tbl_name, &$columns, &$data, &$keys));
 
     # Let's get where you called us from!
     $backtrace = debug_backtrace();

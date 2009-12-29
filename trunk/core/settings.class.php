@@ -91,14 +91,59 @@ class Settings
 
     Parameters:
       string $variable - The name of the setting
+      string $type - The data type to have the setting value
+                     returned as.
 
     Returns:
-      string - Returns the value of the setting, NULL if the setting
+      mixed - Returns the value of the setting, NULL if the setting
                was not found.
+
+    Note:
+      The following data types are allowed:
+        bool, boolean - TRUE or FALSE, internally stored as 0 or 1, but just
+                        a note, 0 is turned into FALSE, anything else is TRUE.
+        int, integer - A whole number, you should know that! Anything other
+                       then a valid integer will be returned as 0.
+        float, double - You get the idea... If it isn't a valid float, then
+                        0 is returned.
+        string - The value is simply type casted to a string. (If nothing is
+                 supplied, it is seen as a string, or if the type is unknown.)
+        array, object - The value is ran through the unserialize function. If
+                        the array/object can't be read correctly, then FALSE
+                        is returned.
   */
-  public function get($variable)
+  public function get($variable, $type = null)
   {
-    return !empty($variable) && is_string($variable) && isset($this->settings[$variable]) ?  $this->settings[$variable] : null;
+    global $api;
+
+    $types = array(
+      'boolean' => create_function('$value', '
+                     return $value != 0;'),
+      'integer' => create_function('$value', '
+                     return (int)$value;'),
+      'float' => create_function('$value', '
+                   return (float)$value;'),
+      'string' => create_function('$value', '
+                    return (string)$value;'),
+      'array' => create_function('$value', '
+                   return @unserialize($value);'),
+    );
+
+    # Now some aliases :)
+    $types['bool'] = &$types['boolean'];
+    $types['int'] = &$types['integer'];
+    $types['double'] = &$types['float'];
+    $types['object'] = &$types['array'];
+
+    # Got a type? Go ahead.
+    $api->run_hook('settings_get_types', array(&$types));
+
+    # Type not set or unknown?
+    $type = strtolower($type);
+    if($type === null || !isset($types[$type]))
+      $type = 'string';
+
+    return !empty($variable) && is_string($variable) ? $types[$type](isset($this->settings[$variable]) ? $this->settings[$variable] : '') : null;
   }
 
   /*
@@ -109,19 +154,55 @@ class Settings
     Parameters:
       string $variable - The variable to add/update.
       string $value - The new value to set/update $variable to.
+      string $type - The data type of the supplied value.
 
     Returns:
       void - Nothing is returned by this method.
 
-    Note: You can also pass ++ or -- as a string in the value parameter
-          to increment, or decrement the variables value.
+    Note:
+      You can also pass ++ or -- as a string in the value parameter
+      to increment, or decrement the variables value.
+
+      The following types are allowed:
+        bool, boolean - Saved as a 1 (TRUE) or 0 (FALSE).
+        int, integer - Type-casted to an integer.
+        float, double - Type-casted to a float.
+        string - Type-casted as a string.
+        array, object - Passed through the serialize function.
   */
-  public function set($variable, $value)
+  public function set($variable, $value, $type = null)
   {
     if(empty($variable) || !is_string($variable))
       return;
 
-    $update_settings[$variable] = $value == '++' || $value == '--' ? ($value == '++' ? $settings[$variable] + 1 : $settings[$variable] - 1) : $value;
+    $types = array(
+      'boolean' => create_function('$value', '
+                     return $value ? 1 : 0;'),
+      'integer' => create_function('$value', '
+                     return (int)$value;'),
+      'float' => create_function('$value', '
+                   return (float)$value;'),
+      'string' => create_function('$value', '
+                    return (string)$value;'),
+      'array' => create_function('$value', '
+                   return @serialize($value);'),
+    );
+
+    # Now some aliases :)
+    $types['bool'] = &$types['boolean'];
+    $types['int'] = &$types['integer'];
+    $types['double'] = &$types['float'];
+    $types['object'] = &$types['array'];
+
+    # Got a type? Go ahead.
+    $api->run_hook('settings_set_types', array(&$types));
+
+    # So the type not set or unknown?
+    $type = strtolower($type);
+    if($type == null || !isset($types[$type]))
+      $type = 'string';
+
+    $update_settings[$variable] = $types[$type]($value == '++' || $value == '--' ? ($value == '++' ? $settings[$variable] + 1 : $settings[$variable] - 1) : $value);
     $settings[$variable] = $update_settings[$variable];
   }
 
@@ -136,9 +217,10 @@ class Settings
     Returns:
       void - Nothing is returned by this method.
 
-    Note: You do NOT need to call on this method yourself! In the construction
-          of this object, a callback is registered on a shutdown hook to automatically
-          save the settings.
+    Note:
+      You do NOT need to call on this method yourself! In the construction
+      of this object, a callback is registered on a shutdown hook to automatically
+      save the settings.
 
   */
   public function save()

@@ -36,8 +36,59 @@ if(!defined('IN_SNOW'))
 */
 class Tasks
 {
+  # Variable: queue
+  # Holds the tasks which need to be ran, if any!
+  private $queue;
+
   /*
     Constructor: __construct
+  */
+  public function __construct()
+  {
+    global $api, $db;
+
+    $this->queue = array();
+
+    # Queue up the tasks that need running...
+    $result = $db->query('
+      SELECT
+        task_name, last_ran, run_every, file, func, enabled
+      FROM {db->prefix}tasks
+      WHERE enabled = 1 AND ((last_ran + run_every) < {int:cur_time} OR queued = 1)
+      LIMIT {int:max_tasks}',
+      array(
+        'cur_time' => time(),
+        'max_tasks' => $settings->get('max_tasks', 'int'),
+      ), 'tasks_query');
+
+    if($result->num_rows() > 0)
+    {
+      # Load'em up!
+      $queue_tasks = array();
+      while($row = $result->fetch_assoc())
+      {
+        $this->queue[] = $row;
+        $queue_tasks[] = $row['task_name'];
+      }
+
+      # Queue them in the database :)
+      $db->query('
+        UPDATE {db->prefix}tasks
+        SET queued = 1
+        WHERE task_name IN({string_array:queue_tasks})
+        LIMIT {int:num_tasks}',
+        array(
+          'queue_tasks' => $queue_tasks,
+          'num_tasks' => count($queue_tasks),
+        ), 'tasks_queue_query');
+    }
+
+    # Register an action for running tasks :)
+    $api->add_action('tasks', array($this, 'run'));
+  }
+
+  /*
+    Method: run
   */
 }
 
