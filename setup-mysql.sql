@@ -89,4 +89,22 @@ CREATE TABLE `{$db_prefix}settings`
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 
 INSERT INTO `{$db_prefix}settings` (`variable`, `value`) VALUES('show_version', 1),('version', '2.0 SVN'),('password_security', 1),('reserved_names', ''),('disallowed_emails', '');
-INSERT INTO `{$db_prefix}settings` (`variable`, `value`) VALUES('disallowed_email_domains', ''),('enable_tasks', 1),('site_name', 'SnowCMS'),('theme', 'default');
+INSERT INTO `{$db_prefix}settings` (`variable`, `value`) VALUES('disallowed_email_domains', ''),('enable_tasks', 1),('site_name', 'SnowCMS'),('theme', 'default'),('max_tasks', 2);
+
+----
+-- Need to do something?
+----
+CREATE TABLE `{$db_prefix}tasks`
+(
+  `task_name` VARCHAR(255) NOT NULL,
+  `last_ran` INT(10) UNSIGNED NOT NULL DEFAULT '0',
+  `run_every` INT(10) UNSIGNED NOT NULL DEFAULT '86400',
+  `file` VARCHAR(255) NOT NULL DEFAULT '',
+  `func` VARCHAR(255) NOT NULL DEFAULT '',
+  `queued` TINYINT(1) UNSIGNED NOT NULL DEFAULT '0',
+  `enabled` TINYINT(1) UNSIGNED NOT NULL DEFAULT '1',
+  PRIMARY KEY (`task_name`),
+  KEY (`last_ran`),
+  KEY (`queued`),
+  KEY (`enabled`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;

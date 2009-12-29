@@ -84,3 +84,20 @@ INSERT INTO '{$db_prefix}settings' ('variable', 'value') VALUES('disallowed_emai
 INSERT INTO '{$db_prefix}settings' ('variable', 'value') VALUES('enable_tasks', 1);
 INSERT INTO '{$db_prefix}settings' ('variable', 'value') VALUES('site_name', 'SnowCMS');
 INSERT INTO '{$db_prefix}settings' ('variable', 'value') VALUES('theme', 'default');
+INSERT INTO '{$db_prefix}settings' ('variable', 'value') VALUES('max_tasks', 2);
+
+CREATE TABLE '{$db_prefix}tasks'
+(
+  'task_name' VARCHAR(255) NOT NULL,
+  'last_ran' INT NOT NULL DEFAULT '0',
+  'run_every' INT NOT NULL DEFAULT '86400',
+  'file' VARCHAR(255) NULL DEFAULT '',
+  'func' VARCHAR(255) NULL DEFAULT '',
+  'queued' SMALLINT NOT NULL DEFAULT '0',
+  'enabled' SMALLINT NOT NULL DEFAULT '1',
+  PRIMARY KEY ('task_name')
+);
+
+CREATE INDEX '{$db_prefix}tasks_last_ran' ON '{$db_prefix}tasks' ('last_ran');
+CREATE INDEX '{$db_prefix}tasks_queued' ON '{$db_prefix}tasks' ('queued');
+CREATE INDEX '{$db_prefix}tasks_enabled' ON '{$db_prefix}tasks' ('enabled');
