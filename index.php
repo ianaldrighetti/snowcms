@@ -115,6 +115,7 @@ else
 {
   # Uh oh, this isn't good at all...
 }
+
 # Initialize the current members session, if any, though...
 echo 'Executed in ', round(microtime(true) - $start_time, 6), ' seconds with ', $db->num_queries, ' queries.';
 ?>

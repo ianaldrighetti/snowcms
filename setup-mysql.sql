@@ -52,12 +52,12 @@ CREATE TABLE `{$db_prefix}messages`
   `modified_time` INT(10) UNSIGNED NOT NULL DEFAULT '0',
   `message` TEXT NOT NULL,
   `message_type` VARCHAR(16) NOT NULL DEFAULT '',
-  `is_approved` TINYINT(1) UNSIGNED NOT NULL DEFAULT '0',
+  `message_status` VARCHAR(40) NOT NULL DEFAULT 'unapproved',
   `extra` TEXT NOT NULL,
   PRIMARY KEY (`area_name`, `area_id`, `message_id`),
   KEY (`poster_time`),
   KEY (`modified_time`),
-  KEY (`is_approved`),
+  KEY (`message_status`),
   KEY (`extra`(255))
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 
