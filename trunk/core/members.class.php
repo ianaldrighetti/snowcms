@@ -210,7 +210,7 @@ class Members
   }
 
   /*
-    Method: create
+    Method: add
 
     Creates a member with the supplied information.
 
@@ -226,7 +226,7 @@ class Members
       int - Returns an integer if the member was successfully created (which is the new
             new members ID) or FALSE on failure.
   */
-  public function create($member_name, $member_pass, $member_email, $options = array())
+  public function add($member_name, $member_pass, $member_email, $options = array())
   {
     global $api, $db, $member;
 
@@ -234,7 +234,7 @@ class Members
     # Set the handled parameter to an integer or FALSE, otherwise the
     # system will handle the creation of the member.
     $handled = null;
-    $api->run_hook('members_create', array(&$handled, $member_name, $member_pass, $member_email, $options));
+    $api->run_hook('members_add', array(&$handled, $member_name, $member_pass, $member_email, $options));
 
     if($handled === null)
     {
@@ -294,7 +294,7 @@ class Members
                     htmlchars($options['display_name']), htmlchars($member_email), implode(',', $options['member_groups']),
                     $options['member_registered'], $options['member_ip'], $options['member_activated'],
                     $options['member_acode'],
-                  ), array(), 'members_create_query');
+                  ), array(), 'members_add_query');
 
       $handled = $result->success() ? $result->insert_id() : false;
 
@@ -305,7 +305,7 @@ class Members
 
         # If you want to add data, do:
         # $data[] = array(varible, value)
-        $api->run_hook('members_create_default_data', array(&$data));
+        $api->run_hook('members_add_default_data', array(&$data));
 
         # Anything?
         if(count($data) > 0)
@@ -317,7 +317,7 @@ class Members
             array(
               'member_id' => 'int', 'variable' => 'string-255', 'value' => 'string',
             ),
-            $data, array('member_id'), 'members_create_default_data_query');
+            $data, array('member_id'), 'members_add_default_data_query');
         }
       }
     }
@@ -671,34 +671,45 @@ class Members
       return false;
 
     $handled = null;
-    $api->run_hook('members_update', array(&$handled));
+    $api->run_hook('members_update', array(&$handled, $member_id, $options));
 
     if($handled === null)
     {
-      if(isset($options['data']))
+      # Can't update a profile that doesn't exist, can we?
+      $result = $db->query('
+        SELECT
+          member_id
+        FROM {db->prefix}members
+        WHERE member_id = {int:member_id}
+        LIMIT 1',
+        array(
+          'member_id' => $member_id,
+        ), 'members_update_profile_exists');
+
+      if($result->num_rows() == 0)
+        return false;
+      elseif(isset($options['data']))
       {
         $member_data = $options['data'];
         unset($options['data']);
       }
 
       $allowed_columns = array(
-        'member_id' => 'int',
         'member_name' => 'string-80',
         'member_pass' => 'string-40',
         'member_hash' => 'string-16',
         'display_name' => 'string-255',
-        'member_email' => 'string',
-        'member_groups' => 'string',
-        'member_ip' => 'string',
+        'member_email' => 'string-255',
+        'member_groups' => 'string-255',
+        'member_registered' => 'int',
+        'member_ip' => 'string-150',
         'member_activated' => 'int',
-        'member_acode' => 'string',
+        'member_acode' => 'string-40',
       );
 
       $api->run_hook('members_update_allowed_columns', array(&$allowed_columns));
 
-      $data = array(
-        'member_id' => $member_id,
-      );
+      $data = array();
       foreach($allowed_columns as $column => $type)
       {
         # Only add the data if the column exists...
@@ -732,7 +743,7 @@ class Members
         if(!empty($options['member_name']) && !empty($options['member_pass']))
           $data['member_pass'] = sha1(strtolower($options['member_name']). $options['member_pass']);
         elseif(empty($options['admin_override']) && ((!empty($options['member_name']) && empty($options['member_pass'])) || (empty($options['member_name']) && !empty($options['member_pass']))))
-        { echo 'yay'; return false; }
+          return false;
         elseif(!empty($options['admin_override']))
         {
           $data['member_acode'] = empty($data['member_acode']) ? sha1($this->generate_hash(mt_rand(30, 40))) : $data['member_acode'];
@@ -742,7 +753,9 @@ class Members
         # Our data array could be empty, simply because they are updating member_data table information!
         if(!empty($data))
         {
-          $db_vars = array();
+          $db_vars = array(
+            'member_id' => $member_id,
+          );
           $values = array();
           foreach($data as $column => $value)
           {
@@ -750,12 +763,13 @@ class Members
             $db_vars[$column. '_value'] = $column == 'member_groups' ? implode(',', $value) : $value;
           }
 
-          # Now replace that data!
+          # Now update that data!
           $result = $db->query('
-                      UPDATE {db->prefix}members
-                      SET '. implode(', ', $values). '
-                      LIMIT 1',
-                      $db_vars, 'members_update_query');
+            UPDATE {db->prefix}members
+            SET '. implode(', ', $values). '
+            WHERE member_id = {int:member_id}
+            LIMIT 1',
+            $db_vars, 'members_update_query');
 
           $handled = $result->success();
         }

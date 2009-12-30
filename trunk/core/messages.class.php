@@ -85,44 +85,11 @@ class Messages
 
     if($handled === null)
     {
-      # Current page 0? Then we don't need to do this...
-      if($cur_page > 0)
-      {
-        $offset = (($cur_page - 1) * $per_page);
-        $row_count = $per_page;
-
-        # Make sure you aren't inputting a wrong page :P
-        $result = $db->query('
-          SELECT
-            COUNT(*)
-          FROM {db->prefix}messages
-          WHERE area_name = {string:area_name} AND area_id = {int:area_id}',
-          array(
-            'area_name' => $area_name,
-            'area_id' => $area_id,
-          ), 'messages_load_count_query');
-
-        list($num_messages) = $result->fetch_row();
-        $total_pages = ceil($num_messages / $per_page);
-
-        # Set the right page...
-        $this->page = $cur_page > $total_pages ? $total_pages : $cur_page;
-      }
-      else
-        $this->page = 0;
-
-      # Reset the loaded messages array...
-      $this->loaded = array();
-      $this->count = 0;
-
-      # All that member information to load! ;)
-      $member_ids = array();
-
       # Now all of the database variables.
       $db_vars = array(
         'area_name' => $area_name,
         'area_id' => $area_id,
-        'is_approved' => isset($params['is_approved']) ? $params['is_approved'] : 1,
+        'message_status' => isset($params['message_status']) ? $params['message_status'] : 'approved',
       );
 
       if(isset($params['message_type']))
@@ -144,6 +111,36 @@ class Messages
         $extra_search = implode(' AND ', $extra_search);
       }
 
+      # Current page 0? Then we don't need to do this...
+      if($cur_page > 0)
+      {
+        $offset = (($cur_page - 1) * $per_page);
+        $row_count = $per_page;
+
+        # Make sure you aren't inputting a wrong page :P
+        $result = $db->query('
+          SELECT
+            COUNT(*)
+          FROM {db->prefix}messages
+          WHERE area_name = {string:area_name} AND area_id = {int:area_id} AND message_status = {int:message_status}'. (isset($params['message_type']) ? ' AND message_type = {string:message_type}' : ''). (isset($params['extra']) ? $extra_search : ''),
+          $db_vars, 'messages_load_count_query');
+
+        list($num_messages) = $result->fetch_row();
+        $total_pages = ceil($num_messages / $per_page);
+
+        # Set the right page...
+        $this->page = $cur_page > $total_pages ? $total_pages : $cur_page;
+      }
+      else
+        $this->page = 0;
+
+      # Reset the loaded messages array...
+      $this->loaded = array();
+      $this->count = 0;
+
+      # All that member information to load! ;)
+      $member_ids = array();
+
       # A LIMIT clause?
       if($this->page > 0)
       {
@@ -155,9 +152,9 @@ class Messages
       $result = $db->query('
         SELECT
           message_id, member_id, member_name, member_email, member_ip, modified_id, modified_name, modified_email,
-          modified_ip, subject, poster_time, modified_time, message, message_type, is_approved, extra
+          modified_ip, subject, poster_time, modified_time, message, message_type, message_status, extra
         FROM {db->prefix}messages
-        WHERE area_name = {string:area_name} AND area_id = {int:area_id} AND is_approved = {int:is_approved}'. (isset($params['message_type']) ? ' AND message_type = {string:message_type}' : ''). (isset($params['extra']) ? $extra_search : ''). '
+        WHERE area_name = {string:area_name} AND area_id = {int:area_id} AND message_status = {int:message_status}'. (isset($params['message_type']) ? ' AND message_type = {string:message_type}' : ''). (isset($params['extra']) ? $extra_search : ''). '
         ORDER BY poster_time '. (strtoupper($order) == 'ASC' ? 'ASC' : 'DESC'). ($this->page > 0 ? '
         LIMIT {int:offset},{int:row_count}' : ''),
         $db_vars, 'messages_load_query');
@@ -194,7 +191,8 @@ class Messages
             'subject' => $row['subject'],
             'message' => $row['message'],
             'type' => $row['message_type'],
-            'is_approved' => !empty($row['is_approved']),
+            'status' => $row['message_status'],
+            'is_approved' => $row['message_status'] == 'approved',
             'extra' => @unserialize($row['extra']),
           );
 
@@ -363,7 +361,7 @@ class Messages
         'poster_time' => 'int',
         'message' => 'string',
         'message_type' => 'string',
-        'is_approved' => 'int',
+        'message_status' => 'string-40',
         'extra' => 'string',
       );
 
@@ -378,11 +376,11 @@ class Messages
         'poster_time' => isset($options['poster_time']) ? $options['poster_time'] : time(),
         'message' => !empty($options['message_type']) && !empty($options['dont_htmlchars_message']) ? $message : htmlchars($message),
         'message_type' => !empty($options['message_type']) ? $options['message_type'] : '',
-        'is_approved' => isset($options['is_approved']) ? $options['is_approved'] : 1,
+        'message_status' => isset($options['message_status']) ? $options['message_status'] : 'approved',
         'extra' => isset($options['extra']) && is_array($options['extra']) ? $options['extra'] : array(),
       );
 
-      # Maybe you wanted to add something?
+      # Maybe you wanted to add something (Or change something!)?
       $api->run_hook('messages_add_data', array(&$columns, &$data, $options));
 
       # Serialize that extra array first!
@@ -402,10 +400,115 @@ class Messages
 
   /*
     Method: update
-  */
-  public function update()
-  {
 
+    Updates the specified message in the specified area.
+
+    Parameters:
+      string $area_name - The area name of which the message is under.
+      int $area_id - The area identifier where the message is at.
+      int $message_id - The message's ID that you want to update in
+                        the specified area.
+      array $options - An array containing all the changes you want done.
+
+    Returns:
+      bool - Returns TRUE on success, FALSE failure.
+  */
+  public function update($area_name, $area_id, $message_id, $options)
+  {
+    global $api, $db;
+
+    if(count($options) == 0)
+      return false;
+
+    $handled = null;
+    $api->run_hook('messages_update', array(&$handled, $area_name, $area_id, $message_id, $options));
+
+    if($handled === null)
+    {
+      # Can't update a message which doesn't exist, now can we?
+      $result = $db->query('
+        SELECT
+          message_id
+        FROM {db->prefix}messages
+        WHERE area_name = {string:area_name} AND area_id = {int:area_id} AND message_id = {int:message_id}
+        LIMIT 1',
+        array(
+          'area_name' => $area_name,
+          'area_id' => $area_id,
+          'message_id' => $message_id,
+        ), 'messages_update_message_exists');
+
+      if($result->num_rows() == 0)
+        return false;
+
+      # All the allowed columns that can be modified ;)
+      $allowed_columns = array(
+        'member_id' => 'int',
+        'member_name' => 'string-255',
+        'member_email' => 'string-255',
+        'member_ip' => 'string-150',
+        'modified_id' => 'int',
+        'modified_name' => 'string-255',
+        'modified_email' => 'string-255',
+        'modified_ip' => 'string-150',
+        'subject' => 'string-255',
+        'poster_time' => 'int',
+        'modified_time' => 'int',
+        'message' => 'string',
+        'message_type' => 'string-16',
+        'message_status' => 'string-40',
+        'extra' => 'string',
+      );
+
+      $api->run_hook('messages_update_allowed_columns', array(&$allowed_columns));
+
+      $data = array();
+      foreach($allowed_columns as $column => $type)
+      {
+        # Only add the data if the column exists...
+        if(isset($options[$column]))
+          $data[$column] = $options[$column];
+      }
+
+      $api->run_hook('members_update_check_data', array(&$handled, &$data));
+
+      # Did you not like the data..? (Was something wrong..?)
+      if($handled !== false)
+      {
+        # The only thing we don't allow to be empty is the message, poster_time, and message_status
+        if((isset($data['message']) && empty($data['message'])) || (isset($data['poster_time']) && empty($data['poster_time'])) || (isset($data['message_status']) && empty($data['message_status'])))
+          return false;
+        elseif(isset($data['extra']))
+          $data['extra'] = @serialize(is_array($data['extra']) ? $data['extra'] : array());
+
+        if(!empty($data))
+        {
+          $db_vars = array(
+            'area_name' => $area_name,
+            'area_id' => $area_id,
+            'message_id' => $message_id,
+          );
+          $values = array();
+          foreach($data as $column => $value)
+          {
+            $values[] = $column. ' = {'. $allowed_columns[$column]. ':'. $column. '_value}';
+            $db_vars[$column. '_value'] = $value;
+          }
+
+          # Now to update the stuff in the database :)
+          $result = $db->query('
+            UPDATE {db->prefix}messages
+            SET '. implode(', ', $values). '
+            WHERE area_name = {string:area_name} AND area_id = {int:area_id} AND message_id = {int:message_id}
+            LIMIT 1',
+            $db_vars, 'messages_update_query');
+
+          $handled = $result->success();
+        }
+      }
+    }
+
+    return !empty($handled);
   }
 
   /*

@@ -597,7 +597,7 @@ function load_api()
     SELECT
       dependency_name, dependency_names, dependencies, directory
     FROM {db->prefix}plugins
-    WHERE runtime_error > 0 AND is_activated = 1
+    WHERE runtime_error = 0 AND is_activated = 1
     ORDER BY dependencies DESC');
 
   # Any plugins activated, otherwise, don't do this :)

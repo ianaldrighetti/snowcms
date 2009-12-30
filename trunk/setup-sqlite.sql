@@ -43,14 +43,14 @@ CREATE TABLE '{$db_prefix}messages'
   'modified_time' INT NULL DEFAULT '0',
   'message' TEXT NOT NULL,
   'message_type' VARCHAR(16) NULL,
-  'is_approved' SMALLINT NOT NULL DEFAULT '0',
+  'message_status' VARCHAR(40) NULL DEFAULT 'unapproved',
   'extra' TEXT NOT NULL
 );
 
 CREATE UNIQUE INDEX '{$db_prefix}messages_area' ON '{$db_prefix}messages' ('area_name', 'area_id', 'message_id');
 CREATE INDEX '{$db_prefix}messages_poster_time' ON '{$db_prefix}messages' ('poster_time');
 CREATE INDEX '{$db_prefix}messages_modified_time' ON '{$db_prefix}messages' ('modified_time');
-CREATE INDEX '{$db_prefix}messages_is_approved' ON '{$db_prefix}messages' ('is_approved');
+CREATE INDEX '{$db_prefix}messages_message_status' ON '{$db_prefix}messages' ('message_status');
 CREATE INDEX '{$db_prefix}messages_extra' ON '{$db_prefix}messages' ('extra');
 
 CREATE TABLE '{$db_prefix}plugins'
