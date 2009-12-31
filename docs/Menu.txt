@@ -48,6 +48,7 @@ Group: Core  {
    File: API  (core/api.class.php)
    File: Clean Request  (core/clean_request.php)
    File: HTTP  (core/http.class.php)
+   File: init_core  (core/core.php)
    File: Language  (core/l.php)
    File: Member  (core/member.class.php)
    File: Members  (core/members.class.php)
