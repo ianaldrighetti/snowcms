@@ -1,0 +1,140 @@
+* {
+	margin: 0;
+	padding: 0;
+}
+
+body {
+	font-family: Georgia, Times, sans-serif;
+	background: #F5F5F5;
+}
+
+#wrapper {
+	width: 935px;
+	height: 100%;
+	min-height: 100%;
+	margin: 0px auto;
+	padding-left: 44px;
+	background: url('bodybg.png') repeat-y;
+}
+
+#header {
+	width: 835px;
+	height: 175px;
+	background: url('colorbg.png') no-repeat;
+}
+
+#header h2 {
+	color: #fff;
+	font-size: 2.1em;
+	text-shadow: #000 0px 5px 10px;
+	text-align: center;
+	padding-top: 40px;
+	font-family: "Trebuchet MS", sans;
+}
+
+#header p {
+	color: #fff;
+	font-size: 0.9em;
+	text-shadow: #000 0px 5px 5px;
+	text-align: center;
+	font-family: "Trebuchet MS", sans;
+}
+
+#header div#menu-outer {
+	height: 30px;
+	margin-top: 45px;
+}
+
+#header div div#menu-inner {
+	display: table;
+	margin: 0 auto;
+}
+
+#header div div ul {
+	min-width: 100px;
+}
+
+#header div ul li {
+	display: inline;
+	list-style-type: none;
+	width: 100px;
+	height: 30px;
+	margin-right: 0;
+	background: url('linkbg.png') repeat-x;
+	padding: 5px 15px;
+}
+
+a
+{
+  color: #1E262E !important;
+  text-decoration: none;
+}
+
+a:hover
+{
+  text-decoration: underline;
+}
+
+#content h1
+{
+  font-size: 150%;
+}
+
+#content {
+	width: 560px;
+	min-height: 300px;
+	padding: 10px 10px 10px 20px;
+	float: left;
+}
+
+#sidebar {
+	width: 225px;
+	padding: 10px;
+	min-height: 300px;
+	float: left;
+}
+
+#footer {
+	width: 835px;
+	height: 24px;
+	background: #1e262c url('colorbg.png') no-repeat;
+	clear: both;
+	font-size: 0.7em;
+	color: #fff;
+	text-align: center;
+}
+
+#footer p {
+	padding-top: 4px;
+}
+
+#footer a, a:visited, a:link {
+	color: #fff;
+}
+
+.login_form fieldset
+{
+  border: none;
+}
+
+.login_form input
+{
+  font-size: 120%;
+  width: 250px !important;
+}
+
+.login_form table
+{
+  text-align: center;
+  margin: auto;
+}
+
+.login_form table th
+{
+  font-weight: normal;
+}
+
+.login_form table td, .login_form table th
+{
+  text-align: left !important;
+}

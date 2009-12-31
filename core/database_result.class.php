@@ -54,6 +54,10 @@ abstract class Database_Result
   # 2 means 3, etc. etc.
   protected $query_num = 0;
 
+  # Variable: current
+  # Holds the current position, not used by default, maybe for a plugin though, HINT HINT!
+  protected $current = null;
+
   /*
     Constructor: __construct
 

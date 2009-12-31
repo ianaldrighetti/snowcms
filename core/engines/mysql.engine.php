@@ -123,7 +123,11 @@ class MySQL extends Database
       $api->run_hook($hook_name, array(&$db_query, &$db_vars, &$db_compat));
 
     # For every query...
-    $api->run_hook('pre_query_exec', array(&$db_query, &$db_vars, &$db_compat, $hook_name));
+    $return = null;
+    $api->run_hook('pre_query_exec', array(&$db_query, &$db_vars, &$db_compat, &$hook_name, &$return));
+
+    if(!empty($return))
+      return $return;
 
     # debug set?
     if(isset($db_vars['debug']))
@@ -225,7 +229,7 @@ class MySQL extends Database
     # Put it in a MySQLResult Object ;)
     $result = new $this->result_class($query_result, mysql_affected_rows($this->con), $db_compat == 'insert' ? mysql_insert_id($this->con) : 0, $mysql_errno, $mysql_error, $this->num_queries - 1);
 
-    $api->run_hook('post_query_exec', array(&$result, $query_result, $this->result_class, $db_compat, $query_took, $mysql_errno, $mysql_error));
+    $api->run_hook('post_query_exec', array(&$result, $db_query, $query_result, $this->result_class, $db_compat, $hook_name, $query_took, $mysql_errno, $mysql_error));
 
     return $result;
   }

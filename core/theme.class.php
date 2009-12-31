@@ -84,6 +84,12 @@ abstract class Theme
 
     if(!empty($url))
       $this->set_url($url);
+
+    # Our first meta tag!
+    $this->add_meta(array('http-equiv' => 'Content-Type', 'content' => 'text/html; charset=utf-8'));
+
+    # Do any possible specific theme stuff :)
+    $this->init();
   }
 
   /*
@@ -205,7 +211,7 @@ abstract class Theme
       return false;
 
     # Make sure you don't have more attributes than allowed...
-    $allowed_attributes = array('charset', ' href', ' hreflang', ' media', ' rel', ' rev', ' target', ' type', ' class', ' dir', ' id', ' lang', ' style', ' title', ' xml:lang');
+    $allowed_attributes = array('charset', 'href', 'hreflang', 'media', 'rel', 'rev', 'target', 'type', 'class', 'dir', 'id', 'lang', 'style', 'title', 'xml:lang');
     foreach($link as $attr => $value)
       if(!in_array($attr, $allowed_attributes))
         return false;
@@ -334,7 +340,7 @@ abstract class Theme
       $script['language'] = 'JavaScript';
 
     # Let's make sure you aren't throwing some random crap in...
-    $allowed_attributes = array('type', 'charset', 'defer', 'src');
+    $allowed_attributes = array('type', 'charset', 'defer', 'src', 'language');
     foreach($script as $attr => $value)
       if(!in_array($attr, $allowed_attributes))
         return false;
@@ -462,6 +468,24 @@ abstract class Theme
   }
 
   /*
+    Method: init
+
+    This is a protected method, which can be overloaded by the Implemented_Theme
+    class, which can be used to add any required CSS, JavaScript, or what-have-you
+    without hardcoding it :)
+
+    Parameters:
+      none
+
+    Returns:
+      void - Nothing is returned by this method.
+  */
+  protected function init()
+  {
+
+  }
+
+  /*
     Method: header
 
     This is a method which the Implemented_Theme class must implement!
@@ -488,6 +512,36 @@ abstract class Theme
       void - Nothing is returned by this method.
   */
   abstract public function footer();
+
+  /*
+    Method: generate_tag
+
+    Parameters:
+      string $name - The name of the HTML tag, like meta, link, etc.
+      array $attributes - Attributes of the HTML tag.
+
+    Returns:
+      string - Returns the formed tag.
+  */
+  protected function generate_tag($name, $attributes)
+  {
+    if(empty($name))
+      return false;
+
+    $tag = '<'. $name;
+
+    if(is_array($attributes) && count($attributes) > 0)
+    {
+      $attr = array();
+
+      foreach($attributes as $name => $value)
+        $attr[] = $name. '="'. addcslashes($value, '"'). '"';
+
+      $tag .= ' '. implode(' ', $attr);
+    }
+
+      return ($tag. ' />');
+  }
 }
 
 /*
