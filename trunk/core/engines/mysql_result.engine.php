@@ -24,47 +24,101 @@ class MySQL_Result extends Database_Result
 {
   public function data_seek($row_num = 0)
   {
-    return mysql_data_seek($this->result, $row_num);
+    global $api;
+
+    # Got something to do?
+    $return = null;
+    $current = $this->current;
+    $api->run_hook('database_data_seek', array($this->result, $row_num, &$return, &$current));
+    $this->current = $current;
+
+    return $return === null ? mysql_data_seek($this->result, $row_num) : $return;
   }
 
   public function fetch_array()
   {
-    return mysql_fetch_array($this->result);
+    global $api;
+
+    $return = null;
+    $current = $this->current;
+    $api->run_hook('database_fetch_array', array($this->result, &$return, &$current));
+    $this->current = $current;
+
+    return $return === null ? mysql_fetch_array($this->result) : $return;
   }
 
   public function fetch_assoc()
   {
-    return mysql_fetch_assoc($this->result);
+    global $api;
+
+    $return = null;
+    $current = $this->current;
+    $api->run_hook('database_fetch_assoc', array($this->result, &$return, &$current));
+    $this->current = $current;
+
+    return $return === null ? mysql_fetch_assoc($this->result) : $return;
   }
 
   public function fetch_object()
   {
-    return mysql_fetch_object($this->result);
+    global $api;
+
+    $return = null;
+    $current = $this->current;
+    $api->run_hook('database_fetch_object', array($this->result, &$return, &$current));
+    $this->current = $current;
+
+    return $return === null ? mysql_fetch_object($this->result) : $return;
   }
 
   public function fetch_row()
   {
-    return mysql_fetch_row($this->result);
+    global $api;
+
+    $return = null;
+    $current = $this->current;
+    $api->run_hook('database_fetch_row', array($this->result, &$return, &$current));
+    $this->current = $current;
+
+    return $return === null ? mysql_fetch_row($this->result) : $return;
   }
 
   public function field_name($field_offset)
   {
-    return mysql_field_name($this->result, $field_offset);
+    global $api;
+
+    $return = null;
+    $api->run_hook('database_field_name', array($this->result, $field_offset, &$return));
+
+    return $return === null ? mysql_field_name($this->result, $field_offset) : $return;
   }
 
   public function free_result()
   {
-    return mysql_free_result($this->result);
+    @mysql_free_result($this->result);
+    $this->result = null;
+
+    return true;
   }
 
   public function num_fields()
   {
-    return mysql_num_fields($this->result);
+    global $api;
+
+    $return = null;
+    $api->run_hook('database_num_fields', array($this->result, &$return));
+
+    return $return === null ? mysql_num_fields($this->result) : $return;
   }
 
   public function num_rows()
   {
-    return mysql_num_rows($this->result);
+    global $api;
+
+    $return = null;
+    $api->run_hook('database_num_rows', array($this->result, &$return));
+
+    return $return === null ? mysql_num_rows($this->result) : $return;
   }
 }
 

@@ -47,6 +47,11 @@ class API
 
   # Variable: objects
   # Holds objects which have been loaded :)
+  private $objects;
+
+  # Variable: request_params
+  # An array containing registered request parameters (Like page for ?page=)
+  private $request_params;
 
   /*
     Constructor: __construct
@@ -58,6 +63,8 @@ class API
     $this->hooked_actions = array();
     $this->hooked_subactions = array();
     $this->groups = array();
+    $this->objects = array();
+    $this->request_params = array();
   }
 
   /*
@@ -264,7 +271,7 @@ class API
   {
     # You can't register an action if it already exists, silly pants! :P and that the callback is,
     # well, callable and that the file exists (if any...)
-    if($this->action_registered($action_name) || !is_callable($callback) || (!empty($file) && !file_exists($file)))
+    if($this->action_registered($action_name) || (empty($file) && !is_callable($callback)) || (!empty($file) && !file_exists($file)))
       return false;
 
     # Everything appears to be in order.
@@ -356,9 +363,6 @@ class API
   {
     # Sub-action already registered?
     if($this->subaction_registered($action_name, $subaction_name))
-      return false;
-    # Callback not valid?
-    elseif(!is_callable($callback))
       return false;
 
     $this->hooked_subactions[$action_name][$subaction_name] = array($callback, $file);
@@ -578,6 +582,88 @@ class API
       $this->objects[strtolower(basename($class_name))] = $obj;
 
     return $obj;
+  }
+
+  /*
+    Method: add_request_param
+
+    Adds a request parameter to watch for. Allows for URL's such as ?page=PAGE_ID
+    or ?topic=TOPIC_ID and such.
+
+    Parameters:
+      string $request_param - The name of the request parameter to watch for.
+      callback $callback - The callback to call when this request parameter is used
+                           in a URL.
+      string $file - The file to include before calling $callback, if any.
+
+    Returns:
+      bool - Returns TRUE on success, FALSE on failure.
+
+    Note:
+      Please note that if the action parameter is found in the URL, that any registered
+      request parameters won't be checked for. For example, doing index.php?topic=1&action=delete
+      will ignore the topic=1 parameter and view it as an action request.
+  */
+  public function add_request_param($request_param, $callback, $file = null)
+  {
+    if(empty($request_param) || !is_string($request_param) || (!empty($file) && !file_exists($file)) || $this->request_param_registered($request_param))
+      return false;
+
+    $this->request_params[$request_param] = array($callback, $file);
+    return true;
+  }
+
+  /*
+    Method: remove_request_param
+
+    Parameters:
+      string $request_param - The name of the request parameter to remove.
+
+    Returns:
+      bool - Returns TRUE on success, FALSE on failure.
+  */
+  public function remove_request_param($request_param)
+  {
+    if(!$this->request_param_registered($request_param))
+      return false;
+
+    unset($this->request_params[$request_param]);
+    return true;
+  }
+
+  /*
+    Method: request_param_registered
+
+    Checks to see if the supplied request parameter exists.
+
+    Parameters:
+      string $request_param - The name of the request parameter to check.
+
+    Returns:
+      bool - Returns TRUE if the request parameter exists, FALSE if not.
+  */
+  public function request_param_registered($request_param)
+  {
+    return is_string($request_param) ? isset($this->request_params[$request_param]) : false;
+  }
+
+  /*
+    Method: return_request_param
+
+    Parameters:
+      string $request_param - The request parameter to return the information about.
+                              If nothing is supplied, all the registered request
+                              parameters are returned.
+
+    Returns:
+      array - An array containing the callback and file (if any) of the request parameter.
+  */
+  public function return_request_param($request_param = null)
+  {
+    if(empty($request_param))
+      return $this->request_params;
+    else
+      return $this->request_param_registered($request_param) ? $this->request_params[$request_param] : false;
   }
 }
 

@@ -17,14 +17,17 @@
 #                     File version: SnowCMS 2.0                         #
 #########################################################################
 
+$start_time = microtime(true);
+
 # Magic quotes, what a joke!!!
 if(function_exists('set_magic_quotes_runtime'))
   @set_magic_quotes_runtime(0);
 
-# All times from time() should be UTC ;)
-@ini_set('date.timezone', 'UTC');
-
-$start_time = microtime(true);
+# All time/date stuff should be considered UTC, makes life easier!
+if(function_exists('date_default_timezone_set'))
+  date_default_timezone_set('UTC');
+else
+  @ini_set('date.timezone', 'UTC');
 
 # We are currently in SnowCMS :)
 define('IN_SNOW', true, true);
@@ -87,18 +90,28 @@ require($core_dir. '/theme.class.php');
 # Initialize the theme!!!
 init_theme();
 
+# Now there is some stuff that the system itself needs to take care of :)
+require($core_dir. '/core.php');
+
+init_core();
+
+# Get the request parameter name... If any.
+if(count($_GET) > 0 && !isset($_GET['action']))
+  $request_param = key($_GET);
+
 # Whether or not their is an action in the address, there is still some sort of
 # action going on, whether you like it or not! If there is no action (or a valid one)
 # in the address, we will spoof it...
-if(empty($_GET['action']) || (!empty($_GET['action']) && !$api->action_registered($_GET['action'])))
+if((empty($_GET['action']) && empty($request_param)) || (!empty($_GET['action']) && !$api->action_registered($_GET['action'])) || (!empty($request_param) && !$api->request_param_registered($request_param)))
 {
-  # Use the default action in the settings...
-  $_GET['action'] = $settings->get('default_action');
-
   # Now if there is an action in the URL, that means it is invalid, and we
   # don't want spiders to index that crap, do we?
-  if(!empty($_GET['action']))
+  if(!empty($_GET['action']) || !empty($request_param))
     $theme->add_meta(array('name' => 'robots', 'content' => 'noindex'));
+
+  # Use the default action in the settings...
+  $_GET['action'] = $settings->get('default_action');
+  $request_param = null;
 }
 
 # Do the requested action, if it exists :P
@@ -111,11 +124,28 @@ if(!empty($_GET['action']) && $api->action_registered($_GET['action']))
 
   $action[0]();
 }
+elseif(!empty($request_param))
+{
+  # Cool, a custom request parameter :P
+  $request = $api->return_request_param($request_param);
+
+  if(!empty($request[1]))
+    require_once($request[1]);
+
+  $request[0]();
+}
 else
 {
-  # Uh oh, this isn't good at all...
-}
+  # Uh oh, no action, so it is the home page!!!
+  $theme->set_title(l('An error has occurred'));
+  $theme->add_meta(array('name' => 'robots', 'content' => 'noindex'));
 
-# Initialize the current members session, if any, though...
-echo 'Executed in ', round(microtime(true) - $start_time, 6), ' seconds with ', $db->num_queries, ' queries.';
+  $theme->header();
+
+  echo '
+    <h1>', l('Request error'), '</h1>
+    <p>', l('Sorry, but we could not find a way to properly execute your request.'), '</p>';
+
+  $theme->footer();
+}
 ?>
