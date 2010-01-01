@@ -49,9 +49,9 @@ if(!function_exists('login_view'))
       exit;
     }
 
-    # Just a bit more security... :)
+    # Just a bit more security... CSRF security, that is!
     $form = $api->load_class('Form');
-    $form_token = $form->add('login_form');
+    $form->add('login_form');
 
     $theme->set_title(l('Login'));
     $theme->add_js_file(array('src' => $theme_url. '/default/js/secure_form.js'));
@@ -60,8 +60,19 @@ if(!function_exists('login_view'))
 
     echo '
       <h1>', l('Login to your account'), '</h1>
-      <p>', l('Here you can login to your account, if you do not have an account, you can <a href="%s">register one</a>.', $base_url. '/index.php?action=register'), '</p>
-      <form id="login_form" name="login_form" action="', $base_url, '/index.php?action=login2" method="post" class="login_form" onsubmit="secure_form(\'login_form\');">
+      <p>', l('Here you can login to your account, if you do not have an account, you can <a href="%s">register one</a>.', $base_url. '/index.php?action=register'), '</p>';
+
+    # You can hook into this to display a message
+    if(strlen($api->apply_filter('login_message', '')) > 0)
+    {
+      echo '
+      <div id="', $api->apply_filter('login_message_id', 'login_error'), '">
+        ', $api->apply_filter('login_message'), '
+      </div>';
+    }
+
+    echo '
+      <form id="login_form" name="login_form" action="', $api->apply_filter('login_action_url', $base_url. '/index.php?action=login2'), '" method="post" class="login_form" onsubmit="', $api->apply_filter('login_onsubmit', 'secure_form(\'login_form\');'), '">
         <fieldset>
           <table>
             <tr>
@@ -98,7 +109,7 @@ if(!function_exists('login_view'))
             </tr>
           </table>
         </fieldset>
-        <input type="hidden" name="form_token" value="', $form_token, '" />
+        <input type="hidden" name="form_token" value="', $form->token('login_form'), '" />
       </form>';
 
     $theme->footer();
@@ -108,7 +119,18 @@ if(!function_exists('login_view'))
 if(!function_exists('login_process'))
 {
   /*
+    Function: login_process
 
+    Processes the data submitted by the login form.
+
+    Parameters:
+      none
+
+    Returns:
+      void - Nothing is returned by this function.
+
+    Note:
+      This function is overloadable.
   */
   function login_process()
   {
@@ -123,7 +145,59 @@ if(!function_exists('login_process'))
       exit;
     }
 
+    # We'll be needing this.
+    $form = $api->load_class('Form');
 
+    # Check that form token, if it isn't valid, then throw an error...
+    if(empty($_POST['form_token']) || !$form->is_valid('login_form', $_POST['form_token']))
+    {
+      # Do what you want to do if you have anything to do.
+      $api->run_hook('login_process_token_invalid');
+
+      # Well, it was wrong, so say so.
+      $api->add_filter('login_message', create_function('$value', '
+        return l(\'Your security key is invalid. Please resubmit the form.\');'));
+
+      # Show the login form, and we are done here.
+      login_view();
+      exit;
+    }
+    # Nothing supplied?
+    elseif(empty($_POST['username']) || empty($_POST['password']))
+    {
+      $api->run_hook('login_process_empty_fields');
+
+      # Please enter a username/Please enter a password :P
+      $api->add_filter('login_message', create_function('$value', '
+        return l(empty($_POST[\'username\']) ? \'Please enter a username.\' : \'Please enter a password.\');'));
+
+      login_view();
+      exit;
+    }
+
+    # So you got the stuff, but is it the right stuff? Let's see!
+    $result = $db->query('
+      SELECT
+        member_id, member_pass, member_hash, member_activated
+      FROM {db->prefix}members
+      WHERE '. ($db->case_sensitive ? 'LOWER(member_name) = LOWER({string:member_name})' : 'member_name = {string:member_name}'). '
+      LIMIT 1',
+      array(
+        'member_name' => $_POST['username'],
+      ), 'login_process_query');
+
+    # Did we get anything? If we got 0 rows, this member doesn't even exist!
+    if($result->num_rows() == 0)
+    {
+      $api->run_hook('login_process_member_nonexist');
+
+      # Wrong username or password :P
+      $api->add_filter('login_message', create_function('$value', '
+        return l(\'Invalid username or password supplied.\');'));
+
+      login_view();
+      exit;
+    }
   }
 }
 ?>

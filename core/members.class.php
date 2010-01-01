@@ -290,7 +290,7 @@ class Members
                     'member_acode' => 'string',
                   ),
                   array(
-                    htmlchars($member_name), sha1(strtolower($member_name). $member_pass), $options['member_hash'],
+                    htmlchars($member_name), sha1(strtolower(htmlchars($member_name)). $member_pass), $options['member_hash'],
                     htmlchars($options['display_name']), htmlchars($member_email), implode(',', $options['member_groups']),
                     $options['member_registered'], $options['member_ip'], $options['member_activated'],
                     $options['member_acode'],
