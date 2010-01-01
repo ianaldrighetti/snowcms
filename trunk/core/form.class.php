@@ -71,11 +71,21 @@ class Form
 
     # Save the registered forms right before exit...
     $api->add_hook('snow_exit', create_function('', '
-      global $api;
+      global $api, $db;
 
       $form = $api->load_class(\'Form\');
 
-      $form->save();'));
+      $form->save();
+
+      # Maybe we should remove expired ones? But not every page load :P
+      # (Why 79? Because that\'s that Wolfram|Alpha answered to the query \'random number between 1 and 100\' :P)
+      if(mt_rand(1, 100) == 79)
+        $db->query(\'
+          DELETE FROM {db->prefix}forms
+          WHERE form_registered < {int:timeout}\',
+          array(
+            \'timeout\' => time() - 86400,
+          ), \'form_delete_expired\');'));
   }
 
   /*
@@ -137,6 +147,8 @@ class Form
     Parameters:
       string $name - The name of the form.
       string $token - The token to check the validity of.
+      int $max_age - The maximum age of the token, in seconds. Defaults to
+                     86400 seconds (1 day).
 
     Returns:
       bool - Returns TRUE if the token is correct, FALSE if not.
@@ -147,9 +159,26 @@ class Form
       just say that the form token was incorrect and have them resubmit the data,
       if it is theirs of course :P.
   */
-  public function is_valid($name, $token)
+  public function is_valid($name, $token, $max_age = 86400)
   {
-    return $this->exists($name) && $this->forms[$name]['token'] == $token;
+    return $this->exists($name) && $this->forms[$name]['token'] == $token && ($this->forms[$name]['registered'] + $max_age) >= time();
+  }
+
+  /*
+    Method: token
+
+    Returns the token associated with the specified form name.
+
+    Parameters:
+      string $form_name - The form name of which you want to retrieve the token of.
+
+    Returns:
+      string - Returns the token of the specified form name, an empty string if
+               there was no form name found.
+  */
+  public function token($form_name)
+  {
+    return $this->exists($form_name) ? $this->forms[$form_name]['token'] : '';
   }
 
   /*

@@ -64,13 +64,13 @@ body {
 	padding: 5px 15px;
 }
 
-a
+#content a
 {
   color: #1E262E !important;
   text-decoration: none;
 }
 
-a:hover
+#content a:hover
 {
   text-decoration: underline;
 }

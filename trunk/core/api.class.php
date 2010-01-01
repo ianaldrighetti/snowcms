@@ -53,6 +53,10 @@ class API
   # An array containing registered request parameters (Like page for ?page=)
   private $request_params;
 
+  # Variable: filters
+  # Holds registered filter callbacks...
+  private $filters;
+
   /*
     Constructor: __construct
   */
@@ -65,6 +69,7 @@ class API
     $this->groups = array();
     $this->objects = array();
     $this->request_params = array();
+    $this->filters = array();
   }
 
   /*
@@ -97,12 +102,8 @@ class API
     if(!isset($this->hooked[$hook_name]))
       $this->hooked[$hook_name] = array();
 
-    # Not callable?
-    if(!is_callable($callback))
-      return false;
-
-    # Is that callback already registered?
-    if($this->hook_registered($hook_name, $callback))
+    # Not callable or the callback already registered?
+    if(!is_callable($callback) || $this->hook_registered($hook_name, $callback))
       return false;
 
     # Your hook is now registered :)
@@ -112,19 +113,21 @@ class API
   }
 
   /*
+    Method: remove_hook
 
     Removes the specified callback from the specified hook.
 
-    @method public bool remove_hook(string $hook_name, string $callback);
+    Parameters:
       string $hook_name - The hook name to remove the specified callback from.
       string $callback - The callback to remove from the specified hook.
-    returns bool - TRUE if the callback was removed, FALSE if the callback wasn't found.
 
+    Returns:
+      bool - TRUE if the callback was removed, FALSE if the callback wasn't found.
   */
   public function remove_hook($hook_name, $callback)
   {
     # Can't remove a hook if it doesn't exist, right?
-    if(!isset($this->hooked[$hook_name]))
+    if(!isset($this->hooked[$hook_name]) || count($this->hooked[$hook_name]))
       return false;
 
     # Let's try to find it, shall we?
@@ -155,7 +158,7 @@ class API
   public function hook_registered($hook_name, $callback)
   {
     # That hook not even made in the hooked array? Definitely a no!
-    if(!isset($this->hooked[$hook_name]))
+    if(!isset($this->hooked[$hook_name]) || count($this->hooked[$hook_name]) == 0)
       return false;
 
     foreach($this->hooked[$hook_name] as $key => $hook)
@@ -455,11 +458,8 @@ class API
   */
   public function add_group($group_identifier, $group_name)
   {
-    # Don't even think about it ;)
-    if($this->group_registered($group_identifier))
-      return false;
-    # The group ID and group name must be a string... weirdo!
-    elseif(!is_string($group_identifier) || !is_string($group_name))
+    # Can't add a group over another, nor can you have information which aren't strings! :P
+    if($this->group_registered($group_identifier) || !is_string($group_identifier) || !is_string($group_name))
       return false;
 
     $this->groups[strtolower($group_identifier)] = $group_name;
@@ -553,22 +553,27 @@ class API
   {
     global $core_dir;
 
-    # Did you want a new object?
+    # If you don't want a new object, and one exists, we will just return the one we have :)
     if(empty($new) && isset($this->objects[strtolower(basename($class_name))]))
       return $this->objects[strtolower(basename($class_name))];
 
+    # Does the class not exist? No file? We will assume it is in {CLASS_NAME}.class.php
     if(!class_exists($class_name) && empty($filename))
       $filename = $core_dir. '/'. strtolower(basename($class_name)). '.class.php';
 
+    # Does the class not exist, and the file doesn't either?!
     if(!class_exists($class_name) && !file_exists($filename))
       return false;
 
+    # Only include the file if the class doesn't exist, otherwise we might have a problem.
     if(!class_exists($class_name))
       require_once($filename);
 
+    # Wow, class STILL not exist? Nothing we can do...
     if(!class_exists($class_name))
       return false;
 
+    # Declare and instantiate! Woo!
     $obj = new $class_name();
 
     # Any parameters, perhaps?
@@ -577,7 +582,7 @@ class API
     elseif(!is_callable(array($obj, '__construct')))
       return false;
 
-    # Did you want this globally accessible?
+    # Did you want this globally accessible? If so, save it.
     if(empty($new))
       $this->objects[strtolower(basename($class_name))] = $obj;
 
@@ -664,6 +669,127 @@ class API
       return $this->request_params;
     else
       return $this->request_param_registered($request_param) ? $this->request_params[$request_param] : false;
+  }
+
+  /*
+    Method: add_filter
+
+    Much like hooks, filters work in almost the same way, except they just modify
+    the value of a string.
+
+    Parameters:
+      string $filter_name - The name of the filter to add the callback to.
+      callback $callback - The callback to have called when the filter name
+                           is applied.
+      int $importance - The importance (or priority) of the callback supplied. The lower the number
+                        the sooner it will be executed over others hooking into the same hook.
+
+    Returns:
+      bool - Returns TRUE on success, FALSE on failure.
+
+    Note:
+      All callbacks are expected to accept 1 parameter, the value they are applying a filter to,
+      the callback is also expected to return the value that was changed (if at all) in the callback.
+  */
+  public function add_filter($filter_name, $callback, $importance = 10)
+  {
+    # Can't add your callback if it is already registered, or invalid, for that matter.
+    if($this->filter_registered($filter_name, $callback) || !is_string($filter_name) || !is_callable($callback))
+      return false;
+    elseif(!isset($this->filters[$filter_name]))
+      $this->filters[$filter_name] = array();
+
+    $this->filters[$filter_name][] = array(
+                                       'callback' => $callback,
+                                       'importance' => $importance,
+                                     );
+
+    return true;
+  }
+
+  /*
+    Method: remove_filter
+
+    Removes the specified filter callback from the filter name.
+
+    Parameters:
+      string $filter_name - The name of the filter.
+      callback $callback - The callback to have removed.
+
+    Returns:
+      bool - Returns TRUE on success, FALSE on failure.
+  */
+  public function remove_filter($filter_name, $callback)
+  {
+    # This filter not even have its own array? Or nothing in it? Then nothing can be in it!
+    if(!isset($this->filters[$filter_name]) || count($this->filters[$filter_name]) == 0)
+      return false;
+
+    foreach($this->filters[$filter_name] as $key => $filter)
+      if($filter['callback'] == $callback)
+      {
+        unset($this->filters[$filter_name][$key]);
+        return true;
+      }
+
+    return false;
+  }
+
+  /*
+    Method: filter_registered
+
+    Checks to see if the supplied callback is already registered with the filter name.
+
+    Parameters:
+      string $filter_name - The name of the filter the callback is registered to.
+      callback $callback - The callback to check.
+
+    Returns:
+      bool - Returns TRUE if the callback is registered to the supplied filter name,
+             FALSE if not.
+  */
+  public function filter_registered($filter_name, $callback)
+  {
+    # Not even set, or nothing in it? Definitely can't be registered :P
+    if(!isset($this->filters[$filter_name]) || count($this->filters[$filter_name]) == 0)
+      return false;
+
+    foreach($this->filters[$filter_name] as $filter)
+      if($filter['callback'] == $callback)
+        return true;
+
+    # Out of the loop and nothing? Then nothing...
+    return false;
+  }
+
+  /*
+    Method: apply_filter
+
+    Applies all the registered filters to the supplied string.
+
+    Parameters:
+      string $filter_name - The name of the filter to apply to the value.
+      string $value - The string to have filters applied to.
+
+    Returns:
+      string - Returns the value with the filters applied.
+  */
+  public function apply_filter($filter_name, $value)
+  {
+    # No filters? Well then, take your dang value! :P
+    if(!isset($this->filters[$filter_name]) || count($this->filters[$filter_name]) == 0)
+      return $value;
+
+    # Needs sorting?
+    if(count($this->filters[$filter_name]) > 1)
+      $this->sort($this->filters[$filter_name]);
+
+    # Apply all them filters!
+    foreach($this->filters[$filter_name] as $filter)
+      $value = call_user_func($filter['callback'], $value);
+
+    # Now return it :)
+    return $value;
   }
 }
 
