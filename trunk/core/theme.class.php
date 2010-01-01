@@ -562,6 +562,8 @@ function init_theme()
   require_once($theme_dir. '/'. $settings->get('theme'). '/implemented_theme.class.php');
   $theme = $api->load_class('Implemented_Theme', array($settings->get('site_name'), $theme_url. '/'. $settings->get('theme')));
 
+  $theme->add_js_file(array('src' => $theme_url. '/default/js/snowobj.js'));
+
   # You can hook into here to add all your theme stuffs (<link>'s, js vars, js files, etc).
   $api->run_hook('post_init_theme');
 }

@@ -119,7 +119,7 @@ if(!empty($_GET['action']) && $api->action_registered($_GET['action']))
 {
   $action = $api->return_action($_GET['action']);
 
-  if(!empty($action[1]))
+  if(!empty($action[1]) && !is_callable($action[0]))
     require_once($action[1]);
 
   $action[0]();
@@ -129,7 +129,7 @@ elseif(!empty($request_param))
   # Cool, a custom request parameter :P
   $request = $api->return_request_param($request_param);
 
-  if(!empty($request[1]))
+  if(!empty($request[1]) && !is_callable($request[0]))
     require_once($request[1]);
 
   $request[0]();
