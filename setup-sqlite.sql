@@ -1,3 +1,14 @@
+CREATE TABLE '{$db_prefix}forms'
+(
+  'session_id' VARCHAR(150) NOT NULL,
+  'form_name' VARCHAR(100) NOT NULL,
+  'form_token' VARCHAR(255) NOT NULL,
+  'form_registered' INT NOT NULL DEFAULT '0',
+  PRIMARY KEY ('session_id','form_name')
+);
+
+CREATE INDEX '{$db_prefix}forms_form_registered' ON '{$db_prefix}forms' ('form_registered');
+
 CREATE TABLE '{$db_prefix}member_data'
 (
   'member_id' INT NOT NULL,

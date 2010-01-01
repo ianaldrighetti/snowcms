@@ -1,4 +1,17 @@
 ----
+-- Holds registered forms...
+----
+CREATE TABLE `{$db_prefix}forms`
+(
+  `session_id` VARCHAR(150) NOT NULL,
+  `form_name` VARCHAR(100) NOT NULL,
+  `form_token` VARCHAR(255) NOT NULL,
+  `form_registered` INT(10) UNSIGNED NOT NULL DEFAULT '0',
+  PRIMARY KEY (`session_id`,`form_name`),
+  KEY (`form_registered`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+
+----
 -- Holds members extra information, this is what a plugin should use to store extra member stuffs!
 ----
 CREATE TABLE `{$db_prefix}member_data`

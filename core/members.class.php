@@ -249,7 +249,7 @@ class Members
       if(!empty($options['member_hash']) && (mb_strlen($options['member_hash']) == 0 || mb_strlen($options['member_hash']) > 16))
         return false;
       elseif(empty($options['member_hash']))
-        $options['member_hash'] = $this->generate_hash(mt_rand(8, 16));
+        $options['member_hash'] = $this->rand_str(mt_rand(8, 16));
 
       # Have you set a display name? Gotta check that!
       if(!empty($options['display_name']) && !$this->name_allowed($options['display_name']))
@@ -279,7 +279,7 @@ class Members
       $options['member_activated'] = !empty($options['member_activated']) ? 1 : 0;
 
       # If the member is not activated, then we will generate an activation code...
-      $options['member_acode'] = empty($options['member_activated']) && empty($options['member_acode']) ? sha1($this->generate_hash(mt_rand(30, 40))) : (!empty($options['member_acode']) ? $options['member_acode'] : '');
+      $options['member_acode'] = empty($options['member_activated']) && empty($options['member_acode']) ? sha1($this->rand_str(mt_rand(30, 40))) : (!empty($options['member_acode']) ? $options['member_acode'] : '');
 
       # Alright! Now insert that member!!!
       $result = $db->insert('insert', '{db->prefix}members',
@@ -596,7 +596,7 @@ class Members
   }
 
   /*
-    Method: generate_hash
+    Method: rand_str
 
     Generates a random as long as the supplied length.
 
@@ -609,7 +609,7 @@ class Members
       string - Returns the randomly (pseudo-random, of course, because we all know,
                computers can't really make true random stuff ;)) generated string.
   */
-  public function generate_hash($length = 0)
+  public function rand_str($length = 0)
   {
     if(empty($length) || $length < 1)
       $length = mt_rand(1, 100);
@@ -746,7 +746,7 @@ class Members
           return false;
         elseif(!empty($options['admin_override']))
         {
-          $data['member_acode'] = empty($data['member_acode']) ? sha1($this->generate_hash(mt_rand(30, 40))) : $data['member_acode'];
+          $data['member_acode'] = empty($data['member_acode']) ? sha1($this->rand_str(mt_rand(30, 40))) : $data['member_acode'];
           $data['member_activated'] = 11;
         }
 

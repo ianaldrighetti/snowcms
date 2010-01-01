@@ -22,7 +22,12 @@ if(!defined('IN_SNOW'))
 
 /*
   Class: Member
-  A pluggable class, how classy? Hahaha, yeah, I know, bad pun.
+
+  The Member class contains all the information about the current member,
+  such as their member ID, name, display name, email, and so on. This class
+  can be totally overloaded, just be sure to have all the same methods
+  implemented as the one below ;) However, you can also hook into the
+  constructor and load the information yourself.
 */
 if(!class_exists('Member'))
 {
@@ -463,6 +468,9 @@ if(!function_exists('init_member'))
 
     Returns:
       void - Nothing is returned by this function.
+
+    Note:
+      This function is overloadable.
   */
   function init_member()
   {
@@ -473,6 +481,40 @@ if(!function_exists('init_member'))
     # Have you not set $member yet? We will then.
     if(!isset($member))
       $member = $api->load_class('Member');
+
+    # Are you not logged in? Then we need to go a little something :)
+    if($member->is_guest())
+      $api->add_hook('post_init_theme', 'member_guest_login_prep');
   }
+}
+
+/*
+  Function: member_guest_login_prep
+
+  If the current person browsing the site is a guest, then a random hash
+  needs to be generated which is used for salting their password before
+  they login, that is, if they do login.
+
+  Parameters:
+    none
+
+  Returns:
+    void - Nothing is returned by this function.
+*/
+function member_guest_login_prep()
+{
+  global $api, $theme;
+
+  # The Members class has a random string generator :)
+  $members = $api->load_class('Members');
+
+  # Do we need to store the last random string?
+  if(!empty($_SESSION['guest_rand_str']))
+    $_SESSION['last_guest_rand_str'] = $_SESSION['guest_rand_str'];
+
+  $_SESSION['guest_rand_str'] = $members->rand_str(mt_rand(20, 40));
+
+  $theme->add_js_var('prev_login_salt', $_SESSION['last_guest_rand_str']);
+  $theme->add_js_var('login_salt', $_SESSION['guest_rand_str']);
 }
 ?>

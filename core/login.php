@@ -20,19 +20,48 @@
 if(!defined('IN_SNOW'))
   die;
 
-function login_view()
+if(!function_exists('login_view'))
 {
-  global $api, $base_url, $theme, $theme_url;
+  /*
+    Function: login_view
 
-  $theme->set_title(l('Login'));
-  $theme->add_js_file(array('src' => $theme_url. '/default/js/secure_form.js'));
+    Simply displays the login form.
 
-  $theme->header();
+    Parameters:
+      none
 
-  echo '
+    Returns:
+      void - Nothing is returned by this function.
+
+    Note:
+      This function is overloadable.
+  */
+  function login_view()
+  {
+    global $api, $base_url, $member, $theme, $theme_url;
+
+    $api->run_hook('login_view');
+
+    # Are you already logged in? If you are, you don't need this!
+    if($member->is_logged())
+    {
+      header('Location: /');
+      exit;
+    }
+
+    # Just a bit more security... :)
+    $form = $api->load_class('Form');
+    $form_token = $form->add('login_form');
+
+    $theme->set_title(l('Login'));
+    $theme->add_js_file(array('src' => $theme_url. '/default/js/secure_form.js'));
+
+    $theme->header();
+
+    echo '
       <h1>', l('Login to your account'), '</h1>
       <p>', l('Here you can login to your account, if you do not have an account, you can <a href="%s">register one</a>.', $base_url. '/index.php?action=register'), '</p>
-      <form action="', $base_url, '/index.php?action=login2" method="post" class="login_form" onsubmit="secure_form(this.form);">
+      <form id="login_form" name="login_form" action="', $base_url, '/index.php?action=login2" method="post" class="login_form" onsubmit="secure_form(\'login_form\');">
         <fieldset>
           <table>
             <tr>
@@ -54,13 +83,13 @@ function login_view()
               <td>', l('Stay logged in for'), ':</td>
               <td style="text-align: right !important;">
                 <select name="session_length">
-                  <option value="0">', l('This session'), '</option>
-                  <option value="3600">', l('An hour'), '</option>
-                  <option value="86400">', l('A day'), '</option>
-                  <option value="604800">', l('A week'), '</option>
-                  <option value="2419200">', l('A month'), '</option>
-                  <option value="31536000">', l('A year'), '</option>
-                  <option value="-1" selected="selected">', l('Forever'), '</option>
+                  <option value="0"', isset($_REQUEST['session_length']) && $_REQUEST['session_length'] == 0 ? ' selected="selected"' : '', '>', l('This session'), '</option>
+                  <option value="3600"', isset($_REQUEST['session_length']) && $_REQUEST['session_length'] == 3600 ? ' selected="selected"' : '', '>', l('An hour'), '</option>
+                  <option value="86400"', isset($_REQUEST['session_length']) && $_REQUEST['session_length'] == 86400 ? ' selected="selected"' : '', '>', l('A day'), '</option>
+                  <option value="604800"', isset($_REQUEST['session_length']) && $_REQUEST['session_length'] == 604800 ? ' selected="selected"' : '', '>', l('A week'), '</option>
+                  <option value="2419200"', isset($_REQUEST['session_length']) && $_REQUEST['session_length'] == 2419200 ? ' selected="selected"' : '', '>', l('A month'), '</option>
+                  <option value="31536000"', isset($_REQUEST['session_length']) && $_REQUEST['session_length'] == 31536000 ? ' selected="selected"' : '', '>', l('A year'), '</option>
+                  <option value="-1"', (isset($_REQUEST['session_length']) && $_REQUEST['session_length'] == -1) || !isset($_REQUEST['session_length']) ? ' selected="selected"' : '', '>', l('Forever'), '</option>
                 </select>
               </td>
             </tr>
@@ -69,8 +98,32 @@ function login_view()
             </tr>
           </table>
         </fieldset>
+        <input type="hidden" name="form_token" value="', $form_token, '" />
       </form>';
 
-  $theme->footer();
+    $theme->footer();
+  }
+}
+
+if(!function_exists('login_process'))
+{
+  /*
+
+  */
+  function login_process()
+  {
+    global $api, $db, $member;
+
+    $api->run_hook('login_process');
+
+    # Are you logged in? You Silly Pants you!
+    if($member->is_logged())
+    {
+      header('Location: /');
+      exit;
+    }
+
+
+  }
 }
 ?>
