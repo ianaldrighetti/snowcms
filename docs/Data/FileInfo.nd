@@ -1,7 +1,7 @@
 1.4
 PHP
 /home/antimatter15/Desktop/snowcms/trunk/core/admin.php	1262275187	0	/home/antimatter15/Desktop/snowcms/trunk/core/admin.php
-/home/antimatter15/Desktop/snowcms/trunk/core/login.php	1262309589	1	login_view
+/home/antimatter15/Desktop/snowcms/trunk/core/login.php	1262635604	1	/home/antimatter15/Desktop/snowcms/trunk/core/login.php
 /home/antimatter15/Desktop/snowcms/trunk/core/profile.php	1262275187	0	/home/antimatter15/Desktop/snowcms/trunk/core/profile.php
 /home/antimatter15/Desktop/snowcms/trunk/core/resend.php	1262275187	0	/home/antimatter15/Desktop/snowcms/trunk/core/resend.php
 /home/antimatter15/Desktop/snowcms/trunk/core/register.php	1262275187	0	/home/antimatter15/Desktop/snowcms/trunk/core/register.php
@@ -14,7 +14,7 @@ PHP
 /home/antimatter15/Desktop/snowcms/trunk/core/http.class.php	1261244534	1	HTTP
 /home/antimatter15/Desktop/snowcms/trunk/core/database_maintenance.class.php	1260057929	1	Database_Maintenance
 /home/antimatter15/Desktop/snowcms/trunk/core/theme.class.php	1262309589	1	Theme
-/home/antimatter15/Desktop/snowcms/trunk/core/api.class.php	1262275187	1	API
+/home/antimatter15/Desktop/snowcms/trunk/core/api.class.php	1262635604	1	API
 /home/antimatter15/Desktop/snowcms/trunk/core/reminder.php	1262275187	0	/home/antimatter15/Desktop/snowcms/trunk/core/reminder.php
 /home/antimatter15/Desktop/snowcms/trunk/core/tasks.class.php	1262275187	1	Tasks
 /home/antimatter15/Desktop/snowcms/trunk/core/engines/mysql.engine.php	1262275187	0	/home/antimatter15/Desktop/snowcms/trunk/core/engines/mysql.engine.php
@@ -23,7 +23,7 @@ PHP
 /home/antimatter15/Desktop/snowcms/trunk/core/activate.php	1262275187	0	/home/antimatter15/Desktop/snowcms/trunk/core/activate.php
 /home/antimatter15/Desktop/snowcms/trunk/core/messages.class.php	1262275187	1	Messages
 /home/antimatter15/Desktop/snowcms/trunk/themes/default/implemented_theme.class.php	1262275187	0	/home/antimatter15/Desktop/snowcms/trunk/themes/default/implemented_theme.class.php
-/home/antimatter15/Desktop/snowcms/trunk/core/form.class.php	1262309589	1	Form
+/home/antimatter15/Desktop/snowcms/trunk/core/form.class.php	1262635604	1	Form
 /home/antimatter15/Desktop/snowcms/trunk/core/engines/mysql_maintenance.engine.php	1259442442	0	/home/antimatter15/Desktop/snowcms/trunk/core/engines/mysql_maintenance.engine.php
 /home/antimatter15/Desktop/snowcms/trunk/core/logout.php	1262275187	0	/home/antimatter15/Desktop/snowcms/trunk/core/logout.php
 /home/antimatter15/Desktop/snowcms/trunk/core/database_search.class.php	1261244534	0	/home/antimatter15/Desktop/snowcms/trunk/core/database_search.class.php
@@ -35,7 +35,7 @@ PHP
 /home/antimatter15/Desktop/snowcms/trunk/core/database_result.class.php	1262275187	1	Database_Result
 /home/antimatter15/Desktop/snowcms/trunk/core/member.class.php	1262309589	1	Member
 /home/antimatter15/Desktop/snowcms/trunk/core/core.php	1262275187	1	init_core
-/home/antimatter15/Desktop/snowcms/trunk/core/members.class.php	1262309589	1	Members
+/home/antimatter15/Desktop/snowcms/trunk/core/members.class.php	1262635604	1	Members
 /home/antimatter15/Desktop/snowcms/trunk/core/mail.class.php	1261244534	0	/home/antimatter15/Desktop/snowcms/trunk/core/mail.class.php
 /home/antimatter15/Desktop/snowcms/trunk/config-sample.php	1259442443	0	/home/antimatter15/Desktop/snowcms/trunk/config-sample.php
 /home/antimatter15/Desktop/snowcms/trunk/core/clean_request.php	1261244534	1	Clean Request

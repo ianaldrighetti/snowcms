@@ -51,7 +51,7 @@ Group: Core  {
    File: HTTP  (core/http.class.php)
    File: init_core  (core/core.php)
    File: Language  (core/l.php)
-   File: login_view  (core/login.php)
+   File: login.php  (core/login.php)
    File: Member  (core/member.class.php)
    File: Members  (core/members.class.php)
    File: Messages  (core/messages.class.php)
@@ -76,5 +76,6 @@ Group: Index  {
    Class Index: Classes
    Function Index: Functions
    Variable Index: Variables
+   File Index: Files
    }  # Group: Index
 
