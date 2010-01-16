@@ -114,7 +114,7 @@ if(!class_exists('Member'))
       $this->ip = isset($_SERVER['HTTP_X_FORWARDED_FOR']) ? $_SERVER['HTTP_X_FORWARDED_FOR'] : $_SERVER['REMOTE_ADDR'];
 
       # Get that cookie, mmm..!
-      if(!empty($_COOKIE[$cookie_name]) && empty($_SESSION['member_id']) && empty($_SESSION['member_pass']))
+      if(!empty($_COOKIE[$cookie_name]))
       {
         list($member_id, $passwrd) = @explode('|', $_COOKIE[$cookie_name]);
 
@@ -123,8 +123,12 @@ if(!class_exists('Member'))
 
         $api->run_hook('cookie_data', array(&$member_id, &$passwrd));
 
-        $_SESSION['member_id'] = $member_id;
-        $_SESSION['member_pass'] = $passwrd;
+        # Only set this if the data was previously empty.
+        if(empty($_SESSION['member_id']) || empty($_SESSION['member_pass']))
+        {
+          $_SESSION['member_id'] = $member_id;
+          $_SESSION['member_pass'] = $passwrd;
+        }
       }
       else
         $api->run_hook('cookie_empty', array(&$member_id, &$passwrd));
@@ -514,7 +518,6 @@ function member_guest_login_prep()
 
   $_SESSION['guest_rand_str'] = $members->rand_str(mt_rand(20, 40));
 
-  $theme->add_js_var('prev_login_salt', $_SESSION['last_guest_rand_str']);
   $theme->add_js_var('login_salt', $_SESSION['guest_rand_str']);
 }
 ?>

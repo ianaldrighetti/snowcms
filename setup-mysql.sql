@@ -121,3 +121,20 @@ CREATE TABLE `{$db_prefix}tasks`
   KEY (`queued`),
   KEY (`enabled`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+
+----
+-- Holds uploaded files, well, the files information that is.
+----
+CREATE TABLE `{$db_prefix}uploads`
+(
+  `area_name` VARCHAR(255) NOT NULL,
+  `area_id` INT(11) UNSIGNED NOT NULL,
+  `upload_id` INT(11) UNSIGNED NOT NULL AUTO_INCREMENT,
+  `member_id` INT(11) UNSIGNED NOT NULL DEFAULT '0',
+  `member_name` VARCHAR(255) NOT NULL,
+  `member_email` VARCHAR(255) NOT NULL,
+  `member_ip` VARCHAR(150) NOT NULL,
+  `filename` VARCHAR(255) NOT NULL,
+  `filesize` INT(11) UNSIGNED NOT NULL DEFAULT '0',
+  `downloads`
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;

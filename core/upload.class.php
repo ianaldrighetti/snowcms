@@ -20,5 +20,11 @@
 if(!defined('IN_SNOW'))
   die;
 
-# Title: Logout Handler
+/*
+  Class: Upload
+*/
+class Upload
+{
+
+}
 ?>

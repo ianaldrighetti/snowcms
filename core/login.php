@@ -20,6 +20,8 @@
 if(!defined('IN_SNOW'))
   die;
 
+# Title: Login Handler
+
 if(!function_exists('login_view'))
 {
   /*
@@ -67,7 +69,7 @@ if(!function_exists('login_view'))
     {
       echo '
       <div id="', $api->apply_filter('login_message_id', 'login_error'), '">
-        ', $api->apply_filter('login_message'), '
+        ', $api->apply_filter('login_message', ''), '
       </div>';
     }
 
@@ -92,7 +94,7 @@ if(!function_exists('login_view'))
             </tr>
             <tr>
               <td>', l('Stay logged in for'), ':</td>
-              <td style="text-align: right !important;">
+              <td style="padding-left: 20px;">
                 <select name="session_length">
                   <option value="0"', isset($_REQUEST['session_length']) && $_REQUEST['session_length'] == 0 ? ' selected="selected"' : '', '>', l('This session'), '</option>
                   <option value="3600"', isset($_REQUEST['session_length']) && $_REQUEST['session_length'] == 3600 ? ' selected="selected"' : '', '>', l('An hour'), '</option>
@@ -134,7 +136,7 @@ if(!function_exists('login_process'))
   */
   function login_process()
   {
-    global $api, $db, $member;
+    global $api, $cookie_name, $db, $member;
 
     $api->run_hook('login_process');
 
@@ -151,25 +153,25 @@ if(!function_exists('login_process'))
     # Check that form token, if it isn't valid, then throw an error...
     if(empty($_POST['form_token']) || !$form->is_valid('login_form', $_POST['form_token']))
     {
-      # Do what you want to do if you have anything to do.
-      $api->run_hook('login_process_token_invalid');
-
       # Well, it was wrong, so say so.
       $api->add_filter('login_message', create_function('$value', '
         return l(\'Your security key is invalid. Please resubmit the form.\');'));
+
+      # Do what you want to do if you have anything to do.
+      $api->run_hook('login_process_token_invalid');
 
       # Show the login form, and we are done here.
       login_view();
       exit;
     }
     # Nothing supplied?
-    elseif(empty($_POST['username']) || empty($_POST['password']))
+    elseif(empty($_POST['username']) || (empty($_POST['password']) && empty($_POST['secured_password'])))
     {
-      $api->run_hook('login_process_empty_fields');
-
       # Please enter a username/Please enter a password :P
       $api->add_filter('login_message', create_function('$value', '
         return l(empty($_POST[\'username\']) ? \'Please enter a username.\' : \'Please enter a password.\');'));
+
+      $api->run_hook('login_process_empty_fields');
 
       login_view();
       exit;
@@ -189,15 +191,70 @@ if(!function_exists('login_process'))
     # Did we get anything? If we got 0 rows, this member doesn't even exist!
     if($result->num_rows() == 0)
     {
-      $api->run_hook('login_process_member_nonexist');
-
       # Wrong username or password :P
       $api->add_filter('login_message', create_function('$value', '
         return l(\'Invalid username or password supplied.\');'));
 
+      $api->run_hook('login_process_member_nonexist');
+
       login_view();
       exit;
     }
+
+    # Now let's check that password!
+    $row = $result->fetch_assoc();
+
+    # No success as of yet.
+    $login_success = false;
+
+    # Is the secured_password field not empty? Cool, :)
+    if(!empty($_POST['secured_password']) && !empty($_SESSION['last_guest_rand_str']) && strlen($_POST['secured_password']) == 40 && $_POST['secured_password'] == sha1($row['member_pass']. $_SESSION['last_guest_rand_str']))
+      $login_success = true;
+    # Maybe it is just plain text, pssssh!
+    elseif(sha1($_POST['password']) == $row['member_pass'])
+      $login_success = true;
+    # You want to check something?
+    else
+      $api->run_hook('login_process_check_custom', array(&$login_success));
+
+    # Failed to login? Sucks to be you.
+    if(empty($login_success))
+    {
+      $api->add_filter('login_message', create_function('$value', '
+        return l(\'Invalid username or password supplied.\');'));
+
+      $api->run_hook('login_process_wrong_password');
+
+      login_view();
+      exit;
+    }
+
+    # Logging in appeared to be a success, so we don't need the form token.
+    $form->delete('login_form');
+
+    # So how long did you want to be remembered?
+    # Forever?
+    if(isset($_POST['session_length']) && $_POST['session_length'] == -1)
+      $cookie_expires = time() + 315360000;
+    # A more specific time?
+    elseif(!empty($_POST['session_length']) && (string)$_POST['session_length'] == (string)(int)$_POST['session_length'])
+      $cookies_expires = time() + (int)$_POST['session_length'];
+    # Just until you close your browser?
+    else
+      $cookie_expires = 0;
+
+    # Set the cookie, a chocolate chip cookie :) No one likes oatmeal cookies, they are nasty...
+    # Oh yeah, and give the password a touch of salt, :D Take that HTTP sniffers!
+    setcookie($cookie_name, $row['member_id']. '|'. sha1($row['member_pass']. $row['member_hash']), $cookie_expires);
+
+    $_SESSION['member_id'] = (int)$row['member_id'];
+    $_SESSION['member_pass'] = sha1($row['member_pass']. $row['member_hash']);
+
+    $api->run_hook('login_success', array($row));
+
+    # Redirect back home...
+    header('Location: /');
+    exit;
   }
 }
 ?>
