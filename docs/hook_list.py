@@ -6,7 +6,8 @@ pat = re.compile(""".*['"](.*?)['"].*""")
 print """
 title: Hooks
 
-This is a list of all the Hooks which are internally part of SnowCMS
+Here is a simple list of hook names and where they are located, soon there will be a more in depth updating of this list, such as including the parameters that are passed by these hooks, if any.
+
 
 """
 
@@ -18,6 +19,7 @@ for line in open("hooks.txt"):
     print "Topic: ",m.group(1)
     if len(lp) > 1:
       print lp[1]
+    print linepart[0].strip()
     print "(start code)"
     print lp[0]
     print "(end code)"
