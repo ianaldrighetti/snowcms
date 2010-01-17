@@ -51,15 +51,18 @@ Group: Core  {
    File: HTTP  (core/http.class.php)
    File: init_core  (core/core.php)
    File: Language  (core/l.php)
-   File: login.php  (core/login.php)
+   File: Login Handler  (core/login.php)
+   File: Logout Handler  (core/logout.php)
    File: Member  (core/member.class.php)
    File: Members  (core/members.class.php)
    File: Messages  (core/messages.class.php)
    File: Mitigate Globals  (core/mitigate_globals.php)
+   File: Registration Handler  (core/register.php)
    File: Session  (core/session.php)
    File: Settings  (core/settings.class.php)
    File: Tasks  (core/tasks.class.php)
    File: Theme  (core/theme.class.php)
+   File: Upload  (core/upload.class.php)
    }  # Group: Core
 
 Group: Database  {
@@ -76,6 +79,5 @@ Group: Index  {
    Class Index: Classes
    Function Index: Functions
    Variable Index: Variables
-   File Index: Files
    }  # Group: Index
 
