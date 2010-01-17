@@ -904,6 +904,8 @@ function load_api()
   register_shutdown_function(create_function('', '
     global $api;
 
-    $api->run_hook(\'snow_exit\');'));
+    $api->run_hook(\'snow_exit\');
+    
+    '));
 }
 ?>
