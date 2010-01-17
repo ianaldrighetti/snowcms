@@ -19,4 +19,19 @@
 
 if(!defined('IN_SNOW'))
   die;
+
+/*
+  Dependency Name: plugins.snowcms.com/snowcms/captcha
+  Plugin Name: CAPTCHA
+  Author: SnowCMS
+  Version: 1.0
+  Dependencies:
+  Update URL: plugins.snowcms.com/snowcms/captcha
+  Description:
+    CAPTCHA is a plugin which allows you to integrate CAPTCHA
+    images into features of SnowCMS.
+*/
+
+# Register the CAPTCHA image action.
+$api->add_action('captcha', 'captcha_display', dirname(__FILE__). '/captcha.php');
 ?>

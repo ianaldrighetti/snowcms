@@ -213,7 +213,7 @@ if(!class_exists('Member'))
       if(empty($_SESSION['session_id']) || empty($_SESSION['session_assigned']) || ((int)$_SESSION['session_assigned'] + 86400) < time())
       {
         $rand = mt_rand(1, 2);
-        $_SESSION['session_id'] = sha1(($rand == 1 ? session_id() : ''). substr(str_shuffle('abcdefghijklmnopqrstuvwxyz1234567890'), 0, mt_rand(16, 32)). ($rand == 2 ? session_id() : ''));
+        $_SESSION['session_id'] = sha1(($rand == 1 ? session_id() : ''). substr(str_shuffle('abcdefghijklmnopqrstuvwxyz1234567890-_'), 0, mt_rand(16, 32)). ($rand == 2 ? session_id() : ''));
         $_SESSION['session_assigned'] = time();
       }
 
