@@ -52,8 +52,8 @@ if(!function_exists('login_view'))
     }
 
     # Just a bit more security... CSRF security, that is!
-    $form = $api->load_class('Form');
-    $form->add('login_form');
+    $token = $api->load_class('Tokens');
+    $token->add('login_form');
 
     $theme->set_title(l('Login'));
     $theme->add_js_file(array('src' => $theme_url. '/default/js/secure_form.js'));
@@ -111,7 +111,7 @@ if(!function_exists('login_view'))
             </tr>
           </table>
         </fieldset>
-        <input type="hidden" name="form_token" value="', $form->token('login_form'), '" />
+        <input type="hidden" name="form_token" value="', $token->token('login_form'), '" />
       </form>';
 
     $theme->footer();
@@ -136,22 +136,25 @@ if(!function_exists('login_process'))
   */
   function login_process()
   {
-    global $api, $cookie_name, $db, $member;
+    global $api, $base_url, $cookie_name, $db, $theme, $member;
 
     $api->run_hook('login_process');
 
     # Are you logged in? You Silly Pants you!
     if($member->is_logged())
     {
-      header('Location: /');
+      header('Location: '. $base_url);
       exit;
     }
 
     # We'll be needing this.
-    $form = $api->load_class('Form');
+    $token = $api->load_class('Tokens');
+
+    # No indexing robots!
+    $theme->add_meta(array('name' => 'robots', 'content' => 'noindex'));
 
     # Check that form token, if it isn't valid, then throw an error...
-    if(empty($_POST['form_token']) || !$form->is_valid('login_form', $_POST['form_token']))
+    if(empty($_POST['form_token']) || !$token->is_valid('login_form', $_POST['form_token']))
     {
       # Well, it was wrong, so say so.
       $api->add_filter('login_message', create_function('$value', '
@@ -229,8 +232,8 @@ if(!function_exists('login_process'))
       exit;
     }
 
-    # Logging in appeared to be a success, so we don't need the form token.
-    $form->delete('login_form');
+    # Remove form data from your guest session, just taking up space.
+    $token->clear();
 
     # So how long did you want to be remembered?
     # Forever?
@@ -252,8 +255,8 @@ if(!function_exists('login_process'))
 
     $api->run_hook('login_success', array($row));
 
-    # Redirect back home...
-    header('Location: /');
+    # Redirect to check cookie, so we can do just that :P
+    header('Location: '. $base_url. '/index.php?action=checkcookie&id='. $row['member_id']);
     exit;
   }
 }

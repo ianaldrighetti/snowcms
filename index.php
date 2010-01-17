@@ -19,6 +19,8 @@
 
 $start_time = microtime(true);
 
+ob_start();
+
 # Magic quotes, what a joke!!!
 if(function_exists('set_magic_quotes_runtime'))
   @set_magic_quotes_runtime(0);

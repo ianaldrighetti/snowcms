@@ -1,14 +1,14 @@
 ----
--- Holds registered forms...
+-- Holds registered tokens...
 ----
-CREATE TABLE `{$db_prefix}forms`
+CREATE TABLE `{$db_prefix}tokens`
 (
   `session_id` VARCHAR(150) NOT NULL,
-  `form_name` VARCHAR(100) NOT NULL,
-  `form_token` VARCHAR(255) NOT NULL,
-  `form_registered` INT(10) UNSIGNED NOT NULL DEFAULT '0',
-  PRIMARY KEY (`session_id`,`form_name`),
-  KEY (`form_registered`)
+  `token_name` VARCHAR(100) NOT NULL,
+  `token` VARCHAR(255) NOT NULL,
+  `token_registered` INT(10) UNSIGNED NOT NULL DEFAULT '0',
+  PRIMARY KEY (`session_id`,`token_name`),
+  KEY (`token_registered`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 
 ----
@@ -103,6 +103,7 @@ CREATE TABLE `{$db_prefix}settings`
 
 INSERT INTO `{$db_prefix}settings` (`variable`, `value`) VALUES('show_version', 1),('version', '2.0 SVN'),('password_security', 1),('reserved_names', ''),('disallowed_emails', '');
 INSERT INTO `{$db_prefix}settings` (`variable`, `value`) VALUES('disallowed_email_domains', ''),('enable_tasks', 1),('site_name', 'SnowCMS'),('theme', 'default'),('max_tasks', 2);
+INSERT INTO `{$db_prefix}settings` (`variable`, `value`) VALUES('registration_enabled', 1),('captcha_width', 200),('captcha_height', 50),('captcha_num_chars', 6);
 
 ----
 -- Need to do something?

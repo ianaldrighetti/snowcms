@@ -22,6 +22,20 @@ if(!defined('IN_SNOW'))
 
 /*
   Function: init_core
+
+  Registers actions which are default "features", such as logging in/out,
+  registration, and other such operations.
+
+  Parameters:
+    none
+
+  Returns:
+    void - Nothing is returned by this function.
+
+  Note:
+    All the actions registered in this function can be overloaded, simply
+    by registering the actions before init_core is called, but also, all
+    the functions which are used are overloadable as well.
 */
 function init_core()
 {
@@ -32,7 +46,7 @@ function init_core()
   # are overloadable, so simply define them before this too!!!)
   $api->add_action('activate', 'activate_view', $core_dir. '/activate.php');
   $api->add_action('admin', 'admin_switch', $core_dir. '/admin.php');
-  $api->add_action('captcha', 'captcha_display', $core_dir. '/captcha.php');
+  $api->add_action('checkcookie', 'checkcookie_verify', $core_dir. '/checkcookie.php');
   $api->add_action('login', 'login_view', $core_dir. '/login.php');
   $api->add_action('login2', 'login_process', $core_dir. '/login.php');
   $api->add_action('logout', 'logout_process', $core_dir. '/logout.php');

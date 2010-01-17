@@ -21,18 +21,18 @@ if(!defined('IN_SNOW'))
   die;
 
 /*
-  Class: Form
+  Class: Tokens
 
   Allows the registration and validation of registered form data, or any
   other kinda of data you expect to get from the end-user. This class is
   included with SnowCMS in the hopes that developers will use this tool
   to help prevent CSRF (Cross-Site Request Forgery).
 */
-class Form
+class Tokens
 {
-  # Variable: forms
+  # Variable: tokens
   # Contains the forms which are registered for the current member/guest.
-  private $forms;
+  private $tokens;
 
   /*
     Constructor: __construct
@@ -44,48 +44,48 @@ class Form
   {
     global $api, $db, $member;
 
-    $this->forms = array();
+    $this->tokens = array();
 
     # Let's see if they have any registered forms :)
     # and of course, only if they aren't older than 1 day.
     $result = $db->query('
       SELECT
-        form_name, form_token, form_registered
-      FROM {db->prefix}forms
-      WHERE session_id = {string:session_id} AND form_registered >= {int:timeout}',
+        token_name, token, token_registered
+      FROM {db->prefix}tokens
+      WHERE session_id = {string:session_id} AND token_registered >= {int:timeout}',
       array(
         'session_id' => $member->is_logged() ? 'member_id-'. $member->id() : 'ip'. $member->ip(),
         'timeout' => time() - 86400,
-      ), 'form_load_registered_query');
+      ), 'token_load_registered_query');
 
     if($result->num_rows() > 0)
     {
       while($row = $result->fetch_assoc())
-        $this->forms[$row['form_name']] = array(
-                                            'token' => $row['form_token'],
-                                            'registered' => $row['form_registered'],
+        $this->tokens[$row['token_name']] = array(
+                                            'token' => $row['token'],
+                                            'registered' => $row['token_registered'],
                                             'is_new' => false,
                                             'deleted' => false,
                                           );
     }
 
-    # Save the registered forms right before exit...
+    # Save the registered tokens right before exit...
     $api->add_hook('snow_exit', create_function('', '
       global $api, $db;
 
-      $form = $api->load_class(\'Form\');
+      $token = $api->load_class(\'Tokens\');
 
-      $form->save();
+      $token->save();
 
       # Maybe we should remove expired ones? But not every page load :P
       # (Why 79? Because that\'s that Wolfram|Alpha answered to the query \'random number between 1 and 100\' :P)
       if(mt_rand(1, 100) == 79)
         $db->query(\'
-          DELETE FROM {db->prefix}forms
-          WHERE form_registered < {int:timeout}\',
+          DELETE FROM {db->prefix}tokens
+          WHERE token_registered < {int:timeout}\',
           array(
             \'timeout\' => time() - 86400,
-          ), \'form_delete_expired\');'));
+          ), \'token_delete_expired\');'));
   }
 
   /*
@@ -94,7 +94,7 @@ class Form
     Associates the specified token with the form name.
 
     Parameters:
-      string $name - The name of the form.
+      string $name - The name of the token.
       string $token - The token to associate with the form
                       name, make sure it is random, however,
                       you can leave this parameter blank, and
@@ -115,7 +115,7 @@ class Form
     }
 
     # Add it to the current forms.
-    $this->forms[$name] = array(
+    $this->tokens[$name] = array(
                             'token' => $token,
                             'registered' => time(),
                             'is_new' => true,
@@ -129,23 +129,23 @@ class Form
     Method: exists
 
     Parameters:
-      string $name - The name of the form.
+      string $name - The name of the token.
 
     Returns:
       bool - Returns TRUE if the form exists, FALSE if not.
   */
   public function exists($name)
   {
-    return isset($this->forms[$name]) && !$this->forms[$name]['deleted'];
+    return isset($this->tokens[$name]) && !$this->tokens[$name]['deleted'];
   }
 
   /*
     Method: is_valid
 
-    Checks to see if the supplied token matches the one with the form name.
+    Checks to see if the supplied token matches the one with the token name.
 
     Parameters:
-      string $name - The name of the form.
+      string $name - The name of the token.
       string $token - The token to check the validity of.
       int $max_age - The maximum age of the token, in seconds. Defaults to
                      86400 seconds (1 day).
@@ -161,7 +161,7 @@ class Form
   */
   public function is_valid($name, $token, $max_age = 86400)
   {
-    return $this->exists($name) && $this->forms[$name]['token'] == $token && ($this->forms[$name]['registered'] + $max_age) >= time();
+    return $this->exists($name) && $this->tokens[$name]['token'] == $token && ($this->tokens[$name]['registered'] + $max_age) >= time();
   }
 
   /*
@@ -170,24 +170,24 @@ class Form
     Returns the token associated with the specified form name.
 
     Parameters:
-      string $form_name - The form name of which you want to retrieve the token of.
+      string $token_name - The form name of which you want to retrieve the token of.
 
     Returns:
       string - Returns the token of the specified form name, an empty string if
                there was no form name found.
   */
-  public function token($form_name)
+  public function token($token_name)
   {
-    return $this->exists($form_name) ? $this->forms[$form_name]['token'] : '';
+    return $this->exists($token_name) ? $this->tokens[$token_name]['token'] : '';
   }
 
   /*
     Method: delete
 
-    Deletes the specified form.
+    Deletes the specified token.
 
     Parameters:
-      string $name - The name of the form.
+      string $name - The name of the token.
 
     Returns:
       bool - Returns TRUE on success, FALSE on failure.
@@ -196,7 +196,7 @@ class Form
   {
     if($this->exists($name))
     {
-      $this->forms[$name]['deleted'] = true;
+      $this->tokens[$name]['deleted'] = true;
       return true;
     }
     else
@@ -206,7 +206,7 @@ class Form
   /*
     Method: clear
 
-    Marks all forms for deletion.
+    Marks all tokens for deletion.
 
     Parameters:
       string $session_id - The session ID to clear all the forms of,
@@ -223,9 +223,9 @@ class Form
     # Is it the current session? Just mark them for deletion.
     if(empty($session_id) || $session_id == ($member->is_logged() ? 'member_id-'. $member->id() : 'ip'. $member->ip()))
     {
-      if(count($this->forms))
-        foreach($this->forms as $form_name => $form)
-          $this->delete($form_name);
+      if(count($this->tokens))
+        foreach($this->tokens as $token_name => $form)
+          $this->delete($token_name);
 
       return true;
     }
@@ -233,11 +233,11 @@ class Form
     {
       # It is a different session ID than the current, so do it RIGHT NOW! :P
       $result = $db->query('
-        DELETE FROM {db->prefix}forms
+        DELETE FROM {db->prefix}tokens
         WHERE session_id = {string:session_id}',
         array(
           'sessiond_id' => $session_id,
-        ), 'form_clear_query');
+        ), 'token_clear_query');
 
       return $result->success();
     }
@@ -246,8 +246,8 @@ class Form
   /*
     Method: save
 
-    Saves any new information about the forms in the database, such as
-    adding new forms, updating current ones or deleting, well, deleted ones!
+    Saves any new information about the tokens in the database, such as
+    adding new tokens, updating current ones or deleting, well, deleted ones!
 
     Parameters:
       none
@@ -262,39 +262,39 @@ class Form
   {
     global $db, $member;
 
-    if(count($this->forms) > 0)
+    if(count($this->tokens) > 0)
     {
       $deleted = array();
       $changed = array();
-      foreach($this->forms as $form_name => $form)
+      foreach($this->tokens as $token_name => $form)
       {
         # Is it marked for deletion?
         if($form['deleted'])
-          $deleted[] = $form_name;
+          $deleted[] = $token_name;
         # Maybe it is updated/new?
         elseif($form['is_new'])
-          $changed[] = array($member->is_logged() ? 'member_id-'. $member->id() : 'ip'. $member->ip(), $form_name, $form['token'], $form['registered']);
+          $changed[] = array($member->is_logged() ? 'member_id-'. $member->id() : 'ip'. $member->ip(), $token_name, $form['token'], $form['registered']);
 
       }
 
       # Any deleted?
       if(count($deleted) > 0)
         $db->query('
-          DELETE FROM {db->prefix}forms
-          WHERE form_name IN({string_array:deleted})',
+          DELETE FROM {db->prefix}tokens
+          WHERE token_name IN({string_array:deleted})',
           array(
             'deleted' => $deleted,
-          ), 'forms_save_delete_query');
+          ), 'token_save_delete_query');
 
       # So do any need adding, or deletion?
       if(count($changed) > 0)
-        $db->insert('replace', '{db->prefix}forms',
+        $db->insert('replace', '{db->prefix}tokens',
           array(
-            'session_id' => 'string', 'form_name' => 'string-100', 'form_token' => 'string-255',
-            'form_registered' => 'int',
+            'session_id' => 'string', 'token_name' => 'string-100', 'token' => 'string-255',
+            'token_registered' => 'int',
           ),
           $changed,
-          array('sessiond_id', 'form_name'), 'forms_save_replace_query');
+          array('sessiond_id', 'token_name'), 'token_save_replace_query');
     }
   }
 }

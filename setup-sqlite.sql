@@ -1,13 +1,13 @@
-CREATE TABLE '{$db_prefix}forms'
+CREATE TABLE '{$db_prefix}tokens'
 (
   'session_id' VARCHAR(150) NOT NULL,
-  'form_name' VARCHAR(100) NOT NULL,
-  'form_token' VARCHAR(255) NOT NULL,
-  'form_registered' INT NOT NULL DEFAULT '0',
-  PRIMARY KEY ('session_id','form_name')
+  'token_name' VARCHAR(100) NOT NULL,
+  'token' VARCHAR(255) NOT NULL,
+  'token_registered' INT NOT NULL DEFAULT '0',
+  PRIMARY KEY ('session_id', 'token_name')
 );
 
-CREATE INDEX '{$db_prefix}forms_form_registered' ON '{$db_prefix}forms' ('form_registered');
+CREATE INDEX '{$db_prefix}tokens_token_registered' ON '{$db_prefix}tokens' ('token_registered');
 
 CREATE TABLE '{$db_prefix}member_data'
 (
@@ -96,6 +96,10 @@ INSERT INTO '{$db_prefix}settings' ('variable', 'value') VALUES('enable_tasks', 
 INSERT INTO '{$db_prefix}settings' ('variable', 'value') VALUES('site_name', 'SnowCMS');
 INSERT INTO '{$db_prefix}settings' ('variable', 'value') VALUES('theme', 'default');
 INSERT INTO '{$db_prefix}settings' ('variable', 'value') VALUES('max_tasks', 2);
+INSERT INTO '{$db_prefix}settings' ('variable', 'value') VALUES('registration_enabled', 1);
+INSERT INTO '{$db_prefix}settings' ('variable', 'value') VALUES('captcha_width', 200);
+INSERT INTO '{$db_prefix}settings' ('variable', 'value') VALUES('captcha_height', 50);
+INSERT INTO '{$db_prefix}settings' ('variable', 'value') VALUES('captcha_num_chars', 6);
 
 CREATE TABLE '{$db_prefix}tasks'
 (

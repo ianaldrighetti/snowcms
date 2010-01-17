@@ -20,13 +20,12 @@
 if(!defined('IN_SNOW'))
   die;
 
-# Title: Logout Handler
-if(!function_exists('logout_process'))
+if(!function_exists('checkcookie_verify'))
 {
   /*
-    Function: logout_process
+    Function: checkcookie_verify
 
-    Logs you out of your account, as long as your session id is supplied.
+    Verifies that your login cookie was actually saved by the browser.
 
     Parameters:
       none
@@ -37,42 +36,38 @@ if(!function_exists('logout_process'))
     Note:
       This function is overloadable.
   */
-  function logout_process()
+  function checkcookie_verify()
   {
-    global $api, $base_url, $cookie_name, $member, $theme;
+    global $api, $base_url, $cookie_name, $core_dir, $theme;
 
-    # Not even logged in? Then you can't log out!
-    if($member->is_guest())
+    $api->run_hook('checkcookie_verify');
+
+    # This is a pretty simple check...
+    $cookie = isset($_COOKIE[$cookie_name]) ? $_COOKIE[$cookie_name] : '';
+    list($member_id) = explode('|', $cookie);
+
+    if(empty($cookie) || empty($_GET['id']) || $_GET['id'] != $member_id)
     {
-      header('Location: '. $base_url);
-      exit;
-    }
+      # The cookie didn't save :(
+      $api->add_filter('login_message', create_function('$value', '
+        return l(\'It appears your login cookie couldn\\\'t be saved. Please be sure you have cookies enabled in your browser settings and try again.\');'));
 
-    # Check that session identifier, make sure it is yours.
-    if(empty($_GET['sc']) || $_GET['sc'] != $member->session_id())
-    {
-      $api->run_hook('logout_failed');
+      $api->run_hook('checkcookie_failed');
 
-      $theme->set_title(l('An error has occurred'));
+      # Login view function exist?
+      $login_view_func = $api->apply_filter('login_view_function', 'login_view');
+      if(!function_exists($login_view_func))
+        require_once($api->apply_filter('login_view_path', $core_dir. '/login.php'));
+
       $theme->add_meta(array('name' => 'robots', 'content' => 'noindex'));
 
-      $theme->header();
-
-      echo '
-      <h1>', l('Logging out failed'), '</h1>
-      <p>', l('Sorry, but the supplied session identifier was invalid, so your request to be logged out failed. Please try again.'), '</p>';
-
-      $theme->footer();
+      $login_view_func();
       exit;
     }
 
-    $api->run_hook('logout_success');
+    $api->run_hook('checkcookie_success');
 
-    # Remove the cookie and session information.
-    setcookie($cookie_name, '', time() - 604800);
-    unset($_SESSION['member_id'], $_SESSION['member_pass']);
-
-    # Let's go home...
+    # Seemed to have worked, so let's go home!
     header('Location: '. $base_url);
     exit;
   }

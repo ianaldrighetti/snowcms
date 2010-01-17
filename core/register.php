@@ -21,4 +21,53 @@ if(!defined('IN_SNOW'))
   die;
 
 # Title: Registration Handler
+
+if(!function_exists('register_view'))
+{
+  /*
+    Function: register_view
+
+    Displays the registration form, that is if registration is enabled.
+
+    Parameters:
+      none
+
+    Returns:
+      void - Nothing is returned by this function.
+
+    Note:
+      This function is overloadable.
+  */
+  function register_view()
+  {
+    global $api, $base_url, $member, $settings, $theme;
+
+    $api->run_hook('register_view');
+
+    # Are you logged in? You don't need to register an account because you obviously have one!
+    if($member->is_logged())
+    {
+      header('Location: '. $base_url);
+      exit;
+    }
+
+    # Is registration enabled?
+    if(!$settings->get('registration_enabled', 'bool'))
+    {
+      $theme->set_title(l('Registration disabled'));
+      $theme->add_meta(array('name' => 'robots', 'content' => 'noindex'));
+
+      $api->run_hook('registration_disabled');
+
+      $theme->header();
+
+      echo '
+      <h1>', l('Registration disabled'), '</h1>
+      <p>', l('We apologize for the inconvience, but registration is currently not open to the public. Please check back at a later time.'), '</p>';
+
+      $theme->footer();
+      exit;
+    }
+  }
+}
 ?>
