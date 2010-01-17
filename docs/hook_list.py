@@ -12,7 +12,7 @@ Here is a simple list of hook names and where they are located, soon there will 
 """
 
 for line in open("hooks.txt"):
-  linepart = line.replace("../trunk/","").split(":")
+  linepart = line.replace("../trunk/","").replace("\\","").split(":")
   m = pat.match(linepart[1])
   if m:
     lp = linepart[1].strip().split("//")
