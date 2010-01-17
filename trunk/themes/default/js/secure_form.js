@@ -6,7 +6,7 @@ function secure_form(element_id)
   var input = document.createElement('input');
   input.type = 'hidden';
   input.name = 'secured_password';
-  input.value = typeof login_salt == 'undefined' ? SHA1.hash(element['username'].value.toLowerCase() + element['password'].value) : SHA1.hash(SHA1.hash(element['username'].value.toLowerCase() + element['password'].value) + login_salt);
+  input.value = typeof login_salt == 'undefined' ? SHA1(element['username'].value.toLowerCase() + element['password'].value) : SHA1(SHA1(element['username'].value.toLowerCase() + element['password'].value) + login_salt);
   element['password'].value = '';
 
   element.appendChild(input);
