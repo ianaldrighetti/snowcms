@@ -1,1 +1,3 @@
+python hook_list.py > ../trunk/hooks.txt
 ../../naturaldocs/NaturalDocs -i ../trunk/ -o HTML . -p .
+rm ../trunk/hooks.txt

@@ -4,7 +4,7 @@ Format: 1.4
 Title: SnowCMS
 SubTitle: Version 2.0
 
-Footer: Copyright (c) 2008-2009 SnowCMS Team
+Footer: Copyright (c) 2008-2010 SnowCMS Team
 
 # You can add a timestamp to your documentation like one of these:
 # Timestamp: Generated on month day, year
@@ -47,15 +47,22 @@ Group: Core  {
 
    File: API  (core/api.class.php)
    File: Clean Request  (core/clean_request.php)
+   File: Form  (core/form.class.php)
    File: HTTP  (core/http.class.php)
+   File: init_core  (core/core.php)
    File: Language  (core/l.php)
+   File: Login Handler  (core/login.php)
+   File: Logout Handler  (core/logout.php)
    File: Member  (core/member.class.php)
    File: Members  (core/members.class.php)
    File: Messages  (core/messages.class.php)
    File: Mitigate Globals  (core/mitigate_globals.php)
+   File: Registration Handler  (core/register.php)
    File: Session  (core/session.php)
    File: Settings  (core/settings.class.php)
+   File: Tasks  (core/tasks.class.php)
    File: Theme  (core/theme.class.php)
+   File: Upload  (core/upload.class.php)
    }  # Group: Core
 
 Group: Database  {
