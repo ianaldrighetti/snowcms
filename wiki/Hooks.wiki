@@ -4,26 +4,69 @@
 Here is a simple list of hook names and where they are located, soon there will be a more in depth updating of this list, such as including the parameters that are passed by these hooks, if any.
 
 ===Currently available===
-pre_start - [http://code.google.com/p/snowcms/source/browse/trunk/index.php /index.php]
-
-post_plugin_activation - [http://code.google.com/p/snowcms/source/browse/trunk/core/api.class.php /core/api.class.php]
-
-snow_exit - [http://code.google.com/p/snowcms/source/browse/trunk/core/api.class.php /core/api.class.php]
-
-sessions - [http://code.google.com/p/snowcms/source/browse/trunk/core/session.php /core/session.php]
-
-cookie_data - [http://code.google.com/p/snowcms/source/browse/trunk/core/member.class.php /core/member.class.php]
-
-cookie_empty - [http://code.google.com/p/snowcms/source/browse/trunk/core/member.class.php /core/member.class.php]
-
-login_query - [http://code.google.com/p/snowcms/source/browse/trunk/core/member.class.php /core/member.class.php]
-
-member_data_query - [http://code.google.com/p/snowcms/source/browse/trunk/core/member.class.php /core/member.class.php]
-
-post_login - [http://code.google.com/p/snowcms/source/browse/trunk/core/member.class.php /core/member.class.php]
-
-init_member - [http://code.google.com/p/snowcms/source/browse/trunk/core/member.class.php /core/member.class.php]
-
-translate - [http://code.google.com/p/snowcms/source/browse/trunk/core/l.php /core/l.php]
-
-save_settings - [http://code.google.com/p/snowcms/source/browse/trunk/core/settings.class.php /core/settings.class.php]
+captcha_display	plugins/captcha/captcha.php
+pre_start	index.php
+post_init_theme	core/theme.class.php
+checkcookie_verify	core/checkcookie.php
+checkcookie_failed	core/checkcookie.php
+checkcookie_success	core/checkcookie.php
+post_plugin_activation	core/api.class.php
+snow_exit	core/api.class.php
+messages_load	core/messages.class.php
+messages_load_array	core/messages.class.php
+messages_get	core/messages.class.php
+messages_get_array	core/messages.class.php
+messages_add	core/messages.class.php
+messages_add_data	core/messages.class.php
+messages_update	core/messages.class.php
+messages_update_allowed_columns	core/messages.class.php
+members_update_check_data	core/messages.class.php
+messages_delete	core/messages.class.php
+load_members	core/members.class.php
+load_members_array	core/members.class.php
+members_get	core/members.class.php
+post_members_get	core/members.class.php
+members_add	core/members.class.php
+members_add_default_data	core/members.class.php
+members_name_allowed	core/members.class.php
+members_email_allowed	core/members.class.php
+members_authenticate	core/members.class.php
+members_password_allowed	core/members.class.php
+members_update	core/members.class.php
+members_update_allowed_columns	core/members.class.php
+members_update_check_data	core/members.class.php
+members_delete	core/members.class.php
+post_members_delete	core/members.class.php
+translate	core/l.php
+register_view	core/register.php
+registration_disabled	core/register.php
+logout_failed	core/logout.php
+logout_success	core/logout.php
+database_data_seek	core/engines/mysql_result.engine.php
+database_fetch_array	core/engines/mysql_result.engine.php
+database_fetch_assoc	core/engines/mysql_result.engine.php
+database_fetch_object	core/engines/mysql_result.engine.php
+database_fetch_row	core/engines/mysql_result.engine.php
+database_field_name	core/engines/mysql_result.engine.php
+database_num_fields	core/engines/mysql_result.engine.php
+database_num_rows	core/engines/mysql_result.engine.php
+pre_query_exec	core/engines/mysql.engine.php
+post_query_exec	core/engines/mysql.engine.php
+database_types	core/engines/mysql.engine.php
+pre_insert_exec	core/engines/mysql.engine.php
+request_callbacks	core/http.class.php
+settings_get_types	core/settings.class.php
+settings_set_types	core/settings.class.php
+sessions	core/session.php
+login_view	core/login.php
+login_process	core/login.php
+login_process_token_invalid	core/login.php
+login_process_empty_fields	core/login.php
+login_process_member_nonexist	core/login.php
+login_process_check_custom	core/login.php
+login_process_wrong_password	core/login.php
+login_success	core/login.php
+cookie_data	core/member.class.php
+cookie_empty	core/member.class.php
+post_login	core/member.class.php
+init_member	core/member.class.php
