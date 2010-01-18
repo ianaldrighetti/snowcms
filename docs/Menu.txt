@@ -46,8 +46,8 @@ Footer: Copyright (c) 2008-2010 SnowCMS Team
 Group: Core  {
 
    File: API  (core/api.class.php)
+   File: checkcookie_verify  (core/checkcookie.php)
    File: Clean Request  (core/clean_request.php)
-   File: Form  (core/form.class.php)
    File: HTTP  (core/http.class.php)
    File: init_core  (core/core.php)
    File: Language  (core/l.php)
@@ -56,6 +56,7 @@ Group: Core  {
    File: Settings  (core/settings.class.php)
    File: Tasks  (core/tasks.class.php)
    File: Theme  (core/theme.class.php)
+   File: Tokens  (core/tokens.class.php)
    File: Upload  (core/upload.class.php)
    }  # Group: Core
 
@@ -77,6 +78,8 @@ Group: Database  {
    File: Load Database  (core/database.php)
    }  # Group: Database
 
+File: CAPTCHA  (plugins/captcha/captcha.php)
+File: CAPTCHA  (plugins/recaptcha/captcha.php)
 File: Hooks  (hooks.txt)
 
 Group: Index  {

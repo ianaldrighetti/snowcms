@@ -1,5 +1,10 @@
+../trunk/plugins/recaptcha/captcha.php:    $api->run_hook('captcha_display');
+../trunk/plugins/captcha/captcha.php:    $api->run_hook('captcha_display');
 ../trunk/index.php:$api->run_hook('pre_start');
 ../trunk/core/theme.class.php:  $api->run_hook('post_init_theme');
+../trunk/core/checkcookie.php:    $api->run_hook('checkcookie_verify');
+../trunk/core/checkcookie.php:      $api->run_hook('checkcookie_failed');
+../trunk/core/checkcookie.php:    $api->run_hook('checkcookie_success');
 ../trunk/core/api.class.php:      $api->run_hook('post_plugin_activation');
 ../trunk/core/api.class.php:    $api->run_hook(\'snow_exit\');
 ../trunk/core/messages.class.php:    $api->run_hook('messages_load', array(&$handled, $area_name, $area_id, $cur_page, $per_page, $order, $params));
@@ -28,6 +33,10 @@
 ../trunk/core/members.class.php:    $api->run_hook('members_delete', array(&$handled, $members));
 ../trunk/core/members.class.php:      $api->run_hook('post_members_delete', array($members));
 ../trunk/core/l.php:  $api->run_hook('translate', array(&$str, &$args));
+../trunk/core/register.php:    $api->run_hook('register_view');
+../trunk/core/register.php:      $api->run_hook('registration_disabled');
+../trunk/core/logout.php:      $api->run_hook('logout_failed');
+../trunk/core/logout.php:    $api->run_hook('logout_success');
 ../trunk/core/engines/mysql_result.engine.php:    $api->run_hook('database_data_seek', array($this->result, $row_num, &$return, &$current));
 ../trunk/core/engines/mysql_result.engine.php:    $api->run_hook('database_fetch_array', array($this->result, &$return, &$current));
 ../trunk/core/engines/mysql_result.engine.php:    $api->run_hook('database_fetch_assoc', array($this->result, &$return, &$current));
