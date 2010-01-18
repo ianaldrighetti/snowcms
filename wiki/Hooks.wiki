@@ -3,70 +3,267 @@
 
 Here is a simple list of hook names and where they are located, soon there will be a more in depth updating of this list, such as including the parameters that are passed by these hooks, if any.
 
-===Currently available===
-captcha_display	plugins/captcha/captcha.php
-pre_start	index.php
-post_init_theme	core/theme.class.php
-checkcookie_verify	core/checkcookie.php
-checkcookie_failed	core/checkcookie.php
-checkcookie_success	core/checkcookie.php
-post_plugin_activation	core/api.class.php
-snow_exit	core/api.class.php
-messages_load	core/messages.class.php
-messages_load_array	core/messages.class.php
-messages_get	core/messages.class.php
-messages_get_array	core/messages.class.php
-messages_add	core/messages.class.php
-messages_add_data	core/messages.class.php
-messages_update	core/messages.class.php
-messages_update_allowed_columns	core/messages.class.php
-members_update_check_data	core/messages.class.php
-messages_delete	core/messages.class.php
-load_members	core/members.class.php
-load_members_array	core/members.class.php
-members_get	core/members.class.php
-post_members_get	core/members.class.php
-members_add	core/members.class.php
-members_add_default_data	core/members.class.php
-members_name_allowed	core/members.class.php
-members_email_allowed	core/members.class.php
-members_authenticate	core/members.class.php
-members_password_allowed	core/members.class.php
-members_update	core/members.class.php
-members_update_allowed_columns	core/members.class.php
-members_update_check_data	core/members.class.php
-members_delete	core/members.class.php
-post_members_delete	core/members.class.php
-translate	core/l.php
-register_view	core/register.php
-registration_disabled	core/register.php
-logout_failed	core/logout.php
-logout_success	core/logout.php
-database_data_seek	core/engines/mysql_result.engine.php
-database_fetch_array	core/engines/mysql_result.engine.php
-database_fetch_assoc	core/engines/mysql_result.engine.php
-database_fetch_object	core/engines/mysql_result.engine.php
-database_fetch_row	core/engines/mysql_result.engine.php
-database_field_name	core/engines/mysql_result.engine.php
-database_num_fields	core/engines/mysql_result.engine.php
-database_num_rows	core/engines/mysql_result.engine.php
-pre_query_exec	core/engines/mysql.engine.php
-post_query_exec	core/engines/mysql.engine.php
-database_types	core/engines/mysql.engine.php
-pre_insert_exec	core/engines/mysql.engine.php
-request_callbacks	core/http.class.php
-settings_get_types	core/settings.class.php
-settings_set_types	core/settings.class.php
-sessions	core/session.php
-login_view	core/login.php
-login_process	core/login.php
-login_process_token_invalid	core/login.php
-login_process_empty_fields	core/login.php
-login_process_member_nonexist	core/login.php
-login_process_check_custom	core/login.php
-login_process_wrong_password	core/login.php
-login_success	core/login.php
-cookie_data	core/member.class.php
-cookie_empty	core/member.class.php
-post_login	core/member.class.php
-init_member	core/member.class.php
+===Currently available===captcha_display
+
+plugins/captcha/captcha.php
+$api->run_hook('captcha_display');
+pre_start
+
+index.php
+$api->run_hook('pre_start');
+post_init_theme
+
+core/theme.class.php
+$api->run_hook('post_init_theme');
+checkcookie_verify
+
+core/checkcookie.php
+$api->run_hook('checkcookie_verify');
+checkcookie_failed
+
+core/checkcookie.php
+$api->run_hook('checkcookie_failed');
+checkcookie_success
+
+core/checkcookie.php
+$api->run_hook('checkcookie_success');
+post_plugin_activation
+
+core/api.class.php
+$api->run_hook('post_plugin_activation');
+snow_exit
+
+core/api.class.php
+$api->run_hook('snow_exit');
+messages_load
+
+core/messages.class.php
+$api->run_hook('messages_load', array(&$handled, $area_name, $area_id, $cur_page, $per_page, $order, $params));
+messages_load_array
+
+core/messages.class.php
+$api->run_hook('messages_load_array', array(&$message, &$member_ids));
+messages_get
+
+core/messages.class.php
+$api->run_hook('messages_get', array(&$handled, $loaded_id));
+messages_get_array
+
+core/messages.class.php
+$api->run_hook('messages_get_array', array(&$message));
+messages_add
+
+core/messages.class.php
+$api->run_hook('messages_add', array(&$handled, $area_name, $area_id, $subject, $message, $options));
+messages_add_data
+
+core/messages.class.php
+$api->run_hook('messages_add_data', array(&$columns, &$data, $options));
+messages_update
+
+core/messages.class.php
+$api->run_hook('messages_update', array(&$handled, $area_name, $area_id, $message_id, $options));
+messages_update_allowed_columns
+
+core/messages.class.php
+$api->run_hook('messages_update_allowed_columns', array(&$allowed_columns));
+members_update_check_data
+
+core/messages.class.php
+$api->run_hook('members_update_check_data', array(&$handled, &$data));
+messages_delete
+
+core/messages.class.php
+$api->run_hook('messages_delete', array(&$handled, $area_name, $area_id, $messages));
+load_members
+
+core/members.class.php
+$api->run_hook('load_members', array(&$handled, $members));
+load_members_array
+
+core/members.class.php
+$api->run_hook('load_members_array', array(&$member, $row));
+members_get
+
+core/members.class.php
+$api->run_hook('members_get', array(&$member_data, $members));
+post_members_get
+
+core/members.class.php
+$api->run_hook('post_members_get', array(&$member_data, $members));
+members_add
+
+core/members.class.php
+$api->run_hook('members_add', array(&$handled, $member_name, $member_pass, $member_email, $options));
+members_add_default_data
+
+core/members.class.php
+$api->run_hook('members_add_default_data', array(&$data));
+members_name_allowed
+
+core/members.class.php
+$api->run_hook('members_name_allowed', array(&$handled, $member_name));
+members_email_allowed
+
+core/members.class.php
+$api->run_hook('members_email_allowed', array(&$handled, $member_email));
+members_authenticate
+
+core/members.class.php
+$api->run_hook('members_authenticate', array(&$authenticated, $member_name, $member_pass, $pass_hash));
+members_password_allowed
+
+core/members.class.php
+$api->run_hook('members_password_allowed', array(&$handled, $member_pass));
+members_update
+
+core/members.class.php
+$api->run_hook('members_update', array(&$handled, $member_id, $options));
+members_update_allowed_columns
+
+core/members.class.php
+$api->run_hook('members_update_allowed_columns', array(&$allowed_columns));
+members_update_check_data
+
+core/members.class.php
+$api->run_hook('members_update_check_data', array(&$handled, &$data));
+members_delete
+
+core/members.class.php
+$api->run_hook('members_delete', array(&$handled, $members));
+post_members_delete
+
+core/members.class.php
+$api->run_hook('post_members_delete', array($members));
+translate
+
+core/l.php
+$api->run_hook('translate', array(&$str, &$args));
+register_view
+
+core/register.php
+$api->run_hook('register_view');
+registration_disabled
+
+core/register.php
+$api->run_hook('registration_disabled');
+logout_failed
+
+core/logout.php
+$api->run_hook('logout_failed');
+logout_success
+
+core/logout.php
+$api->run_hook('logout_success');
+database_data_seek
+
+core/engines/mysql_result.engine.php
+$api->run_hook('database_data_seek', array($this->result, $row_num, &$return, &$current));
+database_fetch_array
+
+core/engines/mysql_result.engine.php
+$api->run_hook('database_fetch_array', array($this->result, &$return, &$current));
+database_fetch_assoc
+
+core/engines/mysql_result.engine.php
+$api->run_hook('database_fetch_assoc', array($this->result, &$return, &$current));
+database_fetch_object
+
+core/engines/mysql_result.engine.php
+$api->run_hook('database_fetch_object', array($this->result, &$return, &$current));
+database_fetch_row
+
+core/engines/mysql_result.engine.php
+$api->run_hook('database_fetch_row', array($this->result, &$return, &$current));
+database_field_name
+
+core/engines/mysql_result.engine.php
+$api->run_hook('database_field_name', array($this->result, $field_offset, &$return));
+database_num_fields
+
+core/engines/mysql_result.engine.php
+$api->run_hook('database_num_fields', array($this->result, &$return));
+database_num_rows
+
+core/engines/mysql_result.engine.php
+$api->run_hook('database_num_rows', array($this->result, &$return));
+pre_query_exec
+
+core/engines/mysql.engine.php
+$api->run_hook('pre_query_exec', array(&$db_query, &$db_vars, &$db_compat, &$hook_name, &$return));
+post_query_exec
+
+core/engines/mysql.engine.php
+$api->run_hook('post_query_exec', array(&$result, $db_query, $query_result, $this->result_class, $db_compat, $hook_name, $query_took, $mysql_errno, $mysql_error));
+database_types
+
+core/engines/mysql.engine.php
+$api->run_hook('database_types', array(&$datatypes));
+pre_insert_exec
+
+core/engines/mysql.engine.php
+$api->run_hook('pre_insert_exec', array(&$type, &$tbl_name, &$columns, &$data, &$keys));
+request_callbacks
+
+core/http.class.php
+$api->run_hook('request_callbacks', array(&$request_callbacks));
+settings_get_types
+
+core/settings.class.php
+$api->run_hook('settings_get_types', array(&$types));
+settings_set_types
+
+core/settings.class.php
+$api->run_hook('settings_set_types', array(&$types));
+sessions
+
+core/session.php
+$api->run_hook('sessions');
+login_view
+
+core/login.php
+$api->run_hook('login_view');
+login_process
+
+core/login.php
+$api->run_hook('login_process');
+login_process_token_invalid
+
+core/login.php
+$api->run_hook('login_process_token_invalid');
+login_process_empty_fields
+
+core/login.php
+$api->run_hook('login_process_empty_fields');
+login_process_member_nonexist
+
+core/login.php
+$api->run_hook('login_process_member_nonexist');
+login_process_check_custom
+
+core/login.php
+$api->run_hook('login_process_check_custom', array(&$login_success));
+login_process_wrong_password
+
+core/login.php
+$api->run_hook('login_process_wrong_password');
+login_success
+
+core/login.php
+$api->run_hook('login_success', array($row));
+cookie_data
+
+core/member.class.php
+$api->run_hook('cookie_data', array(&$member_id, &$passwrd));
+cookie_empty
+
+core/member.class.php
+$api->run_hook('cookie_empty', array(&$member_id, &$passwrd));
+post_login
+
+core/member.class.php
+$api->run_hook('post_login', array(&$member));
+init_member
+
+core/member.class.php
+$api->run_hook('init_member');
