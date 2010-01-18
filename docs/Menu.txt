@@ -79,7 +79,6 @@ Group: Database  {
    }  # Group: Database
 
 File: CAPTCHA  (plugins/captcha/captcha.php)
-File: CAPTCHA  (plugins/recaptcha/captcha.php)
 File: Hooks  (hooks.txt)
 
 Group: Index  {
