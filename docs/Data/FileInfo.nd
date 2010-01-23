@@ -38,9 +38,10 @@ PHP
 /home/antimatter15/Desktop/snowcms/trunk/core/member.class.php	1263772369	1	Member
 /home/antimatter15/Desktop/snowcms/trunk/core/upload.class.php	1263689088	1	Upload
 /home/antimatter15/Desktop/snowcms/trunk/core/core.php	1263772369	1	init_core
+/home/antimatter15/Desktop/snowcms/trunk/filters.txt	1264286870	1	Filters
 /home/antimatter15/Desktop/snowcms/trunk/core/members.class.php	1262635604	1	Members
 /home/antimatter15/Desktop/snowcms/trunk/core/mail.class.php	1261244534	0	/home/antimatter15/Desktop/snowcms/trunk/core/mail.class.php
 /home/antimatter15/Desktop/snowcms/trunk/config-sample.php	1259442443	0	/home/antimatter15/Desktop/snowcms/trunk/config-sample.php
-/home/antimatter15/Desktop/snowcms/trunk/hooks.txt	1263776030	1	Hooks
+/home/antimatter15/Desktop/snowcms/trunk/hooks.txt	1264286870	1	Hooks
 /home/antimatter15/Desktop/snowcms/trunk/core/clean_request.php	1261244534	1	Clean Request
 /home/antimatter15/Desktop/snowcms/trunk/themes/default/js/snowobj.js	1263749804	0	/home/antimatter15/Desktop/snowcms/trunk/themes/default/js/snowobj.js

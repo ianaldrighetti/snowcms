@@ -1,0 +1,13 @@
+../trunk/themes/default/implemented_theme.class.php:  <title>', $api->apply_filter('theme_title', (!empty($this->title) ? htmlchars($this->title). ' - ' : ''). (!empty($this->main_title) ? $this->main_title : '')), '</title>';
+../trunk/themes/default/implemented_theme.class.php:      <h2>', $api->apply_filter('theme_site_name', $settings->get('site_name')), '</h2>
+../trunk/themes/default/implemented_theme.class.php:      <p>', $api->apply_filter('theme_sub_title', 'The <span style="text-decoration: line-through;">best</span> worst theme on the Internets'), '</p>
+../trunk/themes/default/implemented_theme.class.php:    <div id="content">', $api->apply_filter('theme_pre_content', '');
+../trunk/themes/default/implemented_theme.class.php:    echo $api->apply_filter('theme_post_content', ''), '
+../trunk/themes/default/implemented_theme.class.php:      <p>', $api->apply_filter('theme_footer', l('Page created in %s seconds with %u queries.', round(microtime(true) - $start_time, 3), $db->num_queries). ' | '. l('Theme by %s.', ' <a href="http://www.sorenstudios.com/" target="_blank" title="Soren Studios">Soren Studios</a>'). ($settings->get('show_version', 'bool') ? ' | '. l('Powered by <a href="http://www.snowcms.com/" target="_blank" title="SnowCMS">SnowCMS</a> v%s', $settings->get('version')) : '')), '</p>
+../trunk/plugins/captcha/captcha.php:    $background = imagecolorallocate($image, $api->apply_filter('captcha_bg_red', 255), $api->apply_filter('captcha_bg_green', 255), $api->apply_filter('captcha_bg_blue', 255));
+../trunk/core/checkcookie.php:      $login_view_func = $api->apply_filter('login_view_function', 'login_view');
+../trunk/core/checkcookie.php:        require_once($api->apply_filter('login_view_path', $core_dir. '/login.php'));
+../trunk/core/login.php:    if(strlen($api->apply_filter('login_message', '')) > 0)
+../trunk/core/login.php:      <div id="', $api->apply_filter('login_message_id', 'login_error'), '">
+../trunk/core/login.php:        ', $api->apply_filter('login_message', ''), '
+../trunk/core/login.php:      <form id="login_form" name="login_form" action="', $api->apply_filter('login_action_url', $base_url. '/index.php?action=login2'), '" method="post" class="login_form" onsubmit="', $api->apply_filter('login_onsubmit', 'secure_form(\'login_form\');'), '">
