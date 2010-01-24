@@ -74,10 +74,10 @@ function SnowObj()
   this.json_encode = function(obj){
     //simple partial JSON encoder implementation
     //http://gist.github.com/gists/240659 stolen from me
-    
+
     if(window.JSON && JSON.stringify) return JSON.stringify(obj);
     var enc = arguments.callee; //for purposes of recursion
-    
+
     if(typeof obj == "boolean" || typeof obj == "number"){
         return obj+'' //should work...
     }else if(typeof obj == "string"){
@@ -144,6 +144,19 @@ function SnowObj()
     return str.replace(/^\s+|\s+$/g, '');
   };
 
+  this.truncate = function(element, maxlength)
+  {
+    if(typeof element.value != 'undefined')
+    {
+      if(element.value.length > maxlength)
+        element.value = element.value.substring(0, maxlength);
+
+      return true;
+    }
+    else
+      return false;
+  };
+
   this.xmlRequest = function()
   {
     var xmlRequest;
@@ -168,4 +181,5 @@ function SnowObj()
     return xmlRequest;
   };
 }
+
 s = new SnowObj();

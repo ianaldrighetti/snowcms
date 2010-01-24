@@ -19,8 +19,6 @@
 
 $start_time = microtime(true);
 
-ob_start();
-
 # Magic quotes, what a joke!!!
 if(function_exists('set_magic_quotes_runtime'))
   @set_magic_quotes_runtime(0);
@@ -36,6 +34,7 @@ define('IN_SNOW', true, true);
 
 # We want to see those errors...
 error_reporting(E_STRICT | E_ALL);
+
 # config.php not exist? A good sign SnowCMS isn't installed :P
 if(!file_exists('config.php'))
 {
@@ -64,6 +63,7 @@ load_api();
 # Just a hook before anything else major is done.
 $api->run_hook('pre_start');
 
+require($core_dir. '/compat.php');
 require($core_dir. '/settings.class.php');
 
 # Load up the settings :)
