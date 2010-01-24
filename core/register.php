@@ -51,6 +51,10 @@ if(!function_exists('register_view'))
       exit;
     }
 
+    # Let's get that form going!
+    $form = $api->load_class('Form');
+    $form->add('registration_form', 'register_member', $base_url. '/index.php?action=register2');
+
     # Is registration enabled?
     if(!$settings->get('registration_enabled', 'bool'))
     {
@@ -68,6 +72,16 @@ if(!function_exists('register_view'))
       $theme->footer();
       exit;
     }
+
+    $theme->set_title(l('Register'));
+
+    $theme->header();
+
+    echo '
+    <h1>', l('Register an account'), '</h1>
+    <p>', l('Here you can register an account on %s and get access to certain features that only registered members are allowed to use.', $settings->get('site_name')), '</p>';
+
+    $theme->footer();
   }
 }
 ?>

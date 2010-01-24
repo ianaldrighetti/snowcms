@@ -55,13 +55,13 @@ if(!function_exists('login_view'))
     $token = $api->load_class('Tokens');
     $token->add('login_form');
 
-    $theme->set_title(l('Login'));
+    $theme->set_title(l('Log in'));
     $theme->add_js_file(array('src' => $theme_url. '/default/js/secure_form.js'));
 
     $theme->header();
 
     echo '
-      <h1>', l('Login to your account'), '</h1>
+      <h1>', l('Log in to your account'), '</h1>
       <p>', l('Here you can login to your account, if you do not have an account, you can <a href="%s">register one</a>.', $base_url. '/index.php?action=register'), '</p>';
 
     # You can hook into this to display a message
