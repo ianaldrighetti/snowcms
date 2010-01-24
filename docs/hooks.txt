@@ -1,5 +1,6 @@
-../trunk/plugins/captcha/captcha.php:    $api->run_hook('captcha_display');
+../trunk/plugins/captcha/captcha.php:  $api->run_hook('captcha_display');
 ../trunk/index.php:$api->run_hook('pre_start');
+../trunk/core/form.class.php:    $api->run_hook($form_name);
 ../trunk/core/theme.class.php:  $api->run_hook('post_init_theme');
 ../trunk/core/checkcookie.php:    $api->run_hook('checkcookie_verify');
 ../trunk/core/checkcookie.php:      $api->run_hook('checkcookie_failed');
