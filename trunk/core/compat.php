@@ -50,9 +50,9 @@ if(!function_exists('json_encode'))
       {
         $values = array();
         foreach($value as $key => $val)
-          $values[] = '"'. __json_sanitize($key, $options). '": '. json_encode($val, $options);
+          $values[] = '"'. __json_sanitize($key, $options). '":'. json_encode($val, $options);
 
-        return '{'. implode(', ', $values). '}';
+        return '{'. implode(',', $values). '}';
       }
       else
       {
@@ -60,7 +60,7 @@ if(!function_exists('json_encode'))
         foreach($value as $val)
           $values[] = json_encode($val, $options);
 
-        return '['. implode(', ', $values);
+        return '['. implode(',', $values). ']';
       }
     }
     # How about a bool?

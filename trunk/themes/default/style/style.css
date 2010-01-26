@@ -112,7 +112,7 @@ body {
 	color: #fff;
 }
 
-.login_form fieldset
+fieldset
 {
   border: none;
 }
@@ -147,4 +147,26 @@ body {
   border: 2px solid #EE0000;
   text-align: center;
   color: #000000;
+}
+
+.label
+{
+  font-weight: bold;
+}
+
+.subtext
+{
+  font-size: 12px;
+}
+
+.td_left, .td_right
+{
+  text-align: left !important;
+}
+
+.buttons input
+{
+  margin-top: 10px !important;
+  font-size: 14px;
+  padding: 2px;
 }
