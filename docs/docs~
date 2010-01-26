@@ -1,3 +1,7 @@
 python hook_list.py > ../trunk/hooks.txt
-../../naturaldocs/NaturalDocs -i ../trunk/ -o HTML . -p .
+python filter_list.py > ../trunk/filters.txt
+cp doc_changes.css ../trunk/doc_changes.css
+../../naturaldocs/NaturalDocs -i ../trunk/ -o HTML . -p . -s Default doc_changes
 rm ../trunk/hooks.txt
+rm ../trunk/filters.txt
+#rm ../trunk/doc_changes.css

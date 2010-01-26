@@ -1,7 +1,7 @@
 import os, re
 os.system('grep --exclude=*php~ --exclude=*tmp --exclude=*svn* -r ">apply_filter" ../trunk/ > filters.txt')
 
-pat = re.compile(""".*['"](.*?)['"].*""")
+pat = re.compile(""".*?['"](.*?)['"].*""")
 
 print """
 title: Filters

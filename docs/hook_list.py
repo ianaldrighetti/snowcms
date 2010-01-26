@@ -16,7 +16,7 @@ for line in open("hooks.txt"):
   m = pat.match(linepart[1])
   if m:
     lp = linepart[1].strip().split("//")
-    print "Topic: ",m.group(1)
+    print "Hook: ",m.group(1)
     if len(lp) > 1:
       print lp[1]
     print linepart[0].strip()

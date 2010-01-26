@@ -58,29 +58,34 @@ Group: Core  {
    File: Theme  (core/theme.class.php)
    File: Tokens  (core/tokens.class.php)
    File: Upload  (core/upload.class.php)
+
+   Group: Members  {
+
+      File: Member  (core/member.class.php)
+      File: Members  (core/members.class.php)
+      File: Messages  (core/messages.class.php)
+      File: Login Handler  (core/login.php)
+      File: Logout Handler  (core/logout.php)
+      File: Session  (core/session.php)
+      File: Cookies  (no auto-title, core/checkcookie.php)
+      File: Registration Handler  (core/register.php)
+      }  # Group: Members
+
+   Group: Database  {
+
+      File: Database  (core/database.class.php)
+      File: Database Maintenance  (no auto-title, core/database_maintenance.class.php)
+      File: Database Result  (no auto-title, core/database_result.class.php)
+      File: Load Database  (core/database.php)
+      }  # Group: Database
+
    }  # Group: Core
 
-Group: Members  {
+Group: Plugins  {
 
-   File: Member  (core/member.class.php)
-   File: Members  (core/members.class.php)
-   File: Messages  (core/messages.class.php)
-   File: Login Handler  (core/login.php)
-   File: Logout Handler  (core/logout.php)
-   File: Session  (core/session.php)
-   File: checkcookie_verify  (core/checkcookie.php)
-   File: Registration Handler  (core/register.php)
-   }  # Group: Members
+   File: CAPTCHA  (plugins/captcha/captcha.php)
+   }  # Group: Plugins
 
-Group: Database  {
-
-   File: Database  (core/database.class.php)
-   File: Database Maintenance  (no auto-title, core/database_maintenance.class.php)
-   File: Database Result  (no auto-title, core/database_result.class.php)
-   File: Load Database  (core/database.php)
-   }  # Group: Database
-
-File: CAPTCHA  (plugins/captcha/captcha.php)
 File: Filters  (filters.txt)
 File: Hooks  (hooks.txt)
 
@@ -90,5 +95,7 @@ Group: Index  {
    Class Index: Classes
    Function Index: Functions
    Variable Index: Variables
+   Filter Index: Filters
+   Hook Index: Hooks
    }  # Group: Index
 

@@ -46,39 +46,47 @@ Footer: Copyright (c) 2008-2010 SnowCMS Team
 Group: Core  {
 
    File: API  (core/api.class.php)
-   File: checkcookie_verify  (core/checkcookie.php)
    File: Clean Request  (core/clean_request.php)
+   File: Compatibility functions  (core/compat.php)
+   File: Form  (core/form.class.php)
    File: HTTP  (core/http.class.php)
    File: init_core  (core/core.php)
    File: Language  (core/l.php)
    File: Mitigate Globals  (core/mitigate_globals.php)
-   File: Registration Handler  (core/register.php)
    File: Settings  (core/settings.class.php)
    File: Tasks  (core/tasks.class.php)
    File: Theme  (core/theme.class.php)
    File: Tokens  (core/tokens.class.php)
    File: Upload  (core/upload.class.php)
+
+   Group: Members  {
+
+      File: Member  (core/member.class.php)
+      File: Members  (core/members.class.php)
+      File: Messages  (core/messages.class.php)
+      File: Login Handler  (core/login.php)
+      File: Logout Handler  (core/logout.php)
+      File: Session  (core/session.php)
+      File: checkcookie_verify  (core/checkcookie.php)
+      File: Registration Handler  (core/register.php)
+      }  # Group: Members
+
+   Group: Database  {
+
+      File: Database  (core/database.class.php)
+      File: Database Maintenance  (no auto-title, core/database_maintenance.class.php)
+      File: Database Result  (no auto-title, core/database_result.class.php)
+      File: Load Database  (core/database.php)
+      }  # Group: Database
+
    }  # Group: Core
 
-Group: Members  {
+Group: Plugins  {
 
-   File: Member  (core/member.class.php)
-   File: Members  (core/members.class.php)
-   File: Messages  (core/messages.class.php)
-   File: Login Handler  (core/login.php)
-   File: Logout Handler  (core/logout.php)
-   File: Session  (core/session.php)
-   }  # Group: Members
+   File: CAPTCHA  (plugins/captcha/captcha.php)
+   }  # Group: Plugins
 
-Group: Database  {
-
-   File: Database  (core/database.class.php)
-   File: Database Maintenance  (no auto-title, core/database_maintenance.class.php)
-   File: Database Result  (no auto-title, core/database_result.class.php)
-   File: Load Database  (core/database.php)
-   }  # Group: Database
-
-File: CAPTCHA  (plugins/captcha/captcha.php)
+File: Filters  (filters.txt)
 File: Hooks  (hooks.txt)
 
 Group: Index  {
@@ -87,5 +95,7 @@ Group: Index  {
    Class Index: Classes
    Function Index: Functions
    Variable Index: Variables
+   Filter Index: Filters
+   Hook Index: Hooks
    }  # Group: Index
 

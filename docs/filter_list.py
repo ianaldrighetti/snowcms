@@ -35,7 +35,7 @@ for line in open("filters.txt"):
   m = pat.match(code)
   if m:
     lp = code.strip().split("//")
-    print "Topic: ",m.group(1)
+    print "Filter: ",m.group(1)
     if len(lp) > 1:
       print lp[1]
     code = lp[0]

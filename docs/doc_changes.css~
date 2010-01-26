@@ -1,0 +1,30 @@
+/*
+   IMPORTANT: If you're editing this file in the output directory of one of
+   your projects, your changes will be overwritten the next time you run
+   Natural Docs.  Instead, copy this file to your project directory, make your
+   changes, and you can use it with -s.  Even better would be to make a CSS
+   file in your project directory with only your changes, which you can then
+   use with -s [original style] [your changes].
+
+   On the other hand, if you're editing this file in the Natural Docs styles
+   directory, the changes will automatically be applied to all your projects
+   that use this style the next time Natural Docs is run on them.
+
+   This file is part of Natural Docs, which is Copyright (C) 2003-2008 Greg Valure
+   Natural Docs is licensed under the GPL
+*/
+
+
+.MGroup {
+    font-variant: small-caps; font-weight: bold;
+    margin: 1em 0 1em 10px;
+    }
+
+.MGroupContent {
+    font-variant: normal; font-weight: normal }
+
+.MGroup a:link,
+.MGroup a:hover,
+.MGroup a:visited { color: #545454; margin-right: 10px }
+.MGroup a:active { color: #A00000; margin-right: 10px }
+
