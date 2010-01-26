@@ -520,7 +520,7 @@ class Members
       # Password not hashed..? That's fine, I'll do it myself, then. :P
       if(empty($pass_hash))
       {
-        $member_pass = sha1(strtolower($member_name). $member_pass);
+        $member_pass = sha1(strtolower(htmlchars($member_name)). $member_pass);
         $pass_hash = true;
       }
 
@@ -582,14 +582,14 @@ class Members
     if($handled === null)
     {
       # Just a low setting? So must have at least 3 characters...
-      if($settings->get('password_security') == 1)
+      if($settings->get('password_security', 'int') == 1)
         $handled = strlen($member_pass) >= 3;
       # Must be at least 4 characters long and cannot contain their username ;)
-      elseif($settings->get('password_security') == 2)
+      elseif($settings->get('password_security', 'int') == 2)
         $handled = strlen($member_pass) >= 4 && stripos($member_pass, $member_name) === false;
       # At least 5 characters in length and must contain at least 1 number.
       else
-        $handled = strlen($member_pass) >= 5 && preg_match('~[0-9]+~', $member_pass);
+        $handled = strlen($member_pass) >= 5 && stripos($member_pass, $member_name) === false && preg_match('~[0-9]+~', $member_pass);
     }
 
     return !empty($handled);
