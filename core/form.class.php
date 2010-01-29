@@ -83,6 +83,14 @@ class Form
 
     Returns:
       bool - Returns true on success, false on failure.
+
+    Note:
+      Once the form is processed using <Form::process> (might I add, successfully,
+      so no errors from the data the user has submitted), an array containing the
+      sanitized and/or handled data will be passed to the callback (array(column => value)).
+      Also note that your callback is expected to return some value, other than
+      false, unless something went wrong as well. You could return something such
+      as an array of information, or just true :)
   */
   public function add($form_name, $form_callback, $form_action = null, $form_method = 'post')
   {
@@ -104,10 +112,14 @@ class Form
                                  'submit' => l('Submit'),
                                  'fields' => array(),
                                  'errors' => array(),
+                                 'hooked' => false,
                                );
 
     $token = $api->load_class('Tokens');
-    $token->add($form_name);
+
+    # Only recreate the token if it does not exist.
+    if(!$token->exists($form_name))
+      $token->add($form_name);
 
     # Our first field, a token!
     $this->add_field($form_name, 'form_token', array(
@@ -127,7 +139,6 @@ class Form
                                                   }'),
                                                  'save' => false,
                                                ));
-
     return true;
   }
 
@@ -231,42 +242,42 @@ class Form
                  If nothing is supplied, the name of the input/textarea will be used.
 
         type - The accepted types of a field are as follows (required):
-                 hidden - A hidden input, ooooo! I wonder what you want to hide?
+                 - hidden - A hidden input, ooooo! I wonder what you want to hide?
 
-                 int - An integer value.
+                 - int - An integer value.
 
-                 double - A double value.
+                 - double - A double value.
 
-                 string - A string value (input type="text")
+                 - string - A string value (input type="text")
 
-                 string-html - Same as above, but HTML tags are not sanitized with htmlchars.
+                 - string-html - Same as above, but HTML tags are not sanitized with htmlchars.
 
-                 text - A string value, however, it is a textarea.
+                 - text - A string value, however, it is a textarea.
 
-                 text-html - Same as above, but HTML tags are not sanitized with htmlchars.
+                 - text-html - Same as above, but HTML tags are not sanitized with htmlchars.
 
-                 password - A password field.
+                 - password - A password field.
 
-                 checkbox - A checkbox field.
+                 - checkbox - A checkbox field.
 
-                 select - An options list (<select>), you are then supposed to supply
-                          the options values.
+                 - select - An options list (<select>), you are then supposed to supply
+                            the options values.
 
-                 select-multi - An options list, but multiple values can be selected.
+                 - select-multi - An options list, but multiple values can be selected.
 
-                 function - This means the system will do no checking by itself, and
-                            all will be handled by the supplied function callback.
+                 - function - This means the system will do no checking by itself, and
+                              all will be handled by the supplied function callback.
 
-                 custom(-{type}) - Allows you to set a custom HTML value for the value index,
-                                   you are expected to form the input/textarea tag yourself,
-                                   however, you have to append -{TYPE} to the end of custom
-                                   which tells the system what kind of value to expect. If
-                                   that is not appended, you are required to supply a function
-                                   which handles the data before it is entered into the database.
-                                   Also note that the value will be handled as a callback.
+                 - custom(-{type}) - Allows you to set a custom HTML value for the value index,
+                                     you are expected to form the input/textarea tag yourself,
+                                     however, you have to append -{TYPE} to the end of custom
+                                     which tells the system what kind of value to expect. If
+                                     that is not appended, you are required to supply a function
+                                     which handles the data before it is entered into the database.
+                                     Also note that the value will be handled as a callback.
 
-                 full(-{type}) - Much like custom(-{type}), however, this one gives you full control
-                                 of a <td> tag which has an attribute of colspan="2".
+                 - full(-{type}) - Much like custom(-{type}), however, this one gives you full control
+                                   of a <td> tag which has an attribute of colspan="2".
 
         label - The label of the input (the text previous to the input/textarea), be sure
                 to run it through the l function! If nothing is supplied the column name
@@ -329,7 +340,7 @@ class Form
         cols - The number of columns in the textarea. Only valid for text and text-html.
 
       Just so you know, this is how each type will be saved to the database:
-        hidden - As is.
+        hidden - As is (See string).
         int - As is.
         double - As is.
         string - As is with HTML tags encoded.
@@ -556,11 +567,20 @@ class Form
     global $api;
 
     if(!$this->form_registered($form_name))
+    {
       echo l('The form "%s" does not exist.', htmlchars($form_name));
+      return;
+    }
 
     # Before we display the form, let's let yalls have at it.
     # So you can add, remove and edit fields and such :)
-    $api->run_hook($form_name);
+    # But of course only run the hook here if <Form::process> has
+    # yet to be called ;)
+    if(empty($this->forms[$form_name]['hooked']))
+    {
+      $api->run_hook($form_name);
+      $this->forms[$form_name]['hooked'] = true;
+    }
 
     # If you want to display the forms in your own special way, just hook into here :)
     $handled = null;
@@ -573,6 +593,23 @@ class Form
         <fieldset>
           <table width="90%" style="text-align: center; margin: 10px auto auto auto;">';
 
+      # Any errors? Those needs displayin'!
+      if(count($this->forms[$form_name]['errors']) > 0)
+      {
+        echo '
+          <tr>
+            <td>';
+
+        foreach($this->forms[$form_name]['errors'] as $error)
+          echo '
+              <p class="error">', $error, '</p>';
+
+        echo '
+            </td>
+          </tr>';
+      }
+
+      # Show the fields, you know, the things you enter stuff into.
       if(count($this->forms[$form_name]['fields']) > 0)
         foreach($this->forms[$form_name]['fields'] as $name => $field)
           # Make this simple, show it!
@@ -668,6 +705,219 @@ class Form
 
       echo '
             </tr>';
+    }
+  }
+
+  /*
+    Method: process
+
+    Actually processes and handles the submitting of the created forms.
+    This method handles the sanitization and error handling of the data
+    submitted by the user.
+
+    Parameters:
+      string $form_name - The name of the form.
+
+    Returns:
+      mixed - Returns false on failure, however, on success whatever the
+              forms callback is set to return will be returned on success.
+  */
+  public function process($form_name)
+  {
+    global $api;
+
+    if(!$this->form_registered($form_name))
+    {
+      echo l('The form "%s" does not exist.', htmlchars($form_name));
+      return;
+    }
+
+    # Run the hook, so you can make any modifications and what not to the form.
+    # Note: This is the same exact hook in <Form::show> it is just that when the
+    #       form is submitted, this method will be called before showing, so this
+    #       just needs to be done ;)
+    if(empty($this->forms[$form_name]['hooked']))
+    {
+      $api->run_hook($form_name);
+      $this->forms[$form_name]['hooked'] = true;
+    }
+
+    # Do you want the fun of handling this form? You be my guest!
+    $errors = null;
+    $handled = null;
+    $api->run_hook('form_process', array($form_name, $this->forms[$form_name], &$errors, &$handled));
+
+    if($handled !== null)
+    {
+      if(is_array($errors))
+        $this->forms[$form_name]['errors'] = $errors;
+
+      return !empty($handled);
+    }
+    else
+    {
+      # If the form wasn't actually submitted, then we couldn't process it right...
+      if(empty($_POST[$form_name]) || count($_POST) == 0 || count($this->forms[$form_name]['fields']) == 0)
+        return false;
+
+      # Now this is the super fun part, processing everything!!!
+      $processed = array();
+      foreach($this->forms[$form_name]['fields'] as $name => $field)
+      {
+        # Field disabled? Not supposed to be shown? Then you can't supply any information about this.
+        if(!empty($field['disabled']) || empty($field['show']))
+          continue;
+
+        # Is the POST field not even set? Well, we will set it then. To empty! ;)
+        if(empty($_POST[$name]))
+          $_POST[$name] = '';
+
+        # Any function to run, perhaps? Do so now.
+        if(!empty($field['function']) && is_callable($field['function']))
+        {
+          $error = '';
+          if(!$field['function']($_POST[$name], $form_name, $error))
+          {
+            # So something went wrong, did it?
+            $this->forms[$form_name]['errors'][] = $error;
+
+            # No need to continue, you said something was wrong!
+            continue;
+          }
+        }
+
+        # No passing this field to the forms callback? Then we're done!
+        if(empty($field['save']))
+          continue;
+
+        # Now it is time to check the data types of the submitted form data, woo!!!
+        # So, is it a string(-html), text(-html), password or a hidden field?
+        if(in_array($field['type'], array('string', 'string-html', 'text', 'text-html', 'password', 'hidden')))
+        {
+          # Set as a string field, in reality, anything can be a string.
+          if(!is_string($_POST[$name]))
+          {
+            $this->forms[$form_name]['errors'][] = l('The "%s" field must be a string.', htmlchars($this->forms[$form_name]['fields'][$name]['label']));
+            continue;
+          }
+
+          # Just for good measure ;)
+          $_POST[$name] = (string)$_POST[$name];
+
+          # But does it need encoding?!
+          if(in_array($field['type'], array('string', 'text', 'password', 'hidden')))
+            $_POST[$name] = htmlchars($_POST[$name]);
+        }
+        # How about an integer?
+        elseif($field['type'] == 'int')
+        {
+          # Temporarily type-cast the value to an integer, if it isn't the same, it isn't one.
+          if((string)$_POST[$name] != (string)(int)$_POST[$name])
+          {
+            $this->forms[$form_name]['errors'][] = l('The "%s" field must be an integer.', htmlchars($this->forms[$form_name]['fields'][$name]['label']));
+            continue;
+          }
+
+          $_POST[$name] = (int)$_POST[$name];
+        }
+        # A double?
+        elseif($field['type'] == 'double')
+        {
+          # Same as an integer...
+          if((string)$_POST[$name] != (string)(double)$_POST[$name])
+          {
+            # Just so you know, it says "must be a number." instead of "must be a double."
+            # because I don't think everybody could understand what double means, outside
+            # the computer world that is ;) Though I could be wrong.
+            $this->forms[$form_name]['errors'][] = l('The "%s" field must be a number.', htmlchars($this->forms[$form_name]['fields'][$name]['label']));
+            continue;
+          }
+
+          $_POST[$name] = (double)$_POST[$name];
+        }
+        # Could it be a checkbox?
+        elseif($field['type'] == 'checkbox')
+        {
+          # Simple :)
+          $_POST[$name] = !empty($_POST[$name]) ? 1 : 0;
+        }
+        # Select of some sort?
+        elseif($field['type'] == 'select' || $field['type'] == 'select-multi')
+        {
+          $is_multi = $field['type'] == 'select-multi';
+
+          $selected = array();
+          $options = array_keys($field['options']);
+
+          # Now to see which ones you selected, if any.
+          if(is_array($_POST[$name]) && count($_POST[$name]) > 0)
+            foreach($_POST[$name] as $option_key)
+              # Is it even a valid option?
+              if(in_array($option_key, $options))
+              {
+                $selected[] = $option_key;
+
+                if(isset($field['length']['max']) && count($selected) >= $field['length']['max'])
+                  break;
+              }
+          elseif(!$is_multi)
+            $selected[] = $_POST[$name];
+
+          # Join them all together, like one happy family! Of one ;D
+          $_POST[$name] = implode(',', $selected);
+        }
+
+        # Any length restrictions set?
+        if((isset($field['length']['min']) || isset($field['length']['max'])) && ($field['type'] == 'int' || $field['type'] == 'double'))
+        {
+          if(isset($field['length']['min']) && $_POST[$name] < $field['length']['min'])
+          {
+            $this->forms[$form_name]['errors'][] = l('The field "%s" must be at least %f.', $this->forms[$form_name]['fields'][$name]['label'], $field['length']['min']);
+            continue;
+          }
+          elseif(isset($field['length']['max']) && ($truncate = ($_POST[$name] > $field['length']['max'])) && empty($field['truncate']))
+          {
+            $this->forms[$form_name]['errors'][] = l('The field "%s" must be smaller than %f.', $this->forms[$form_name]['fields'][$name]['label'], $field['length']['max']);
+            continue;
+          }
+
+          if(!empty($truncate))
+            $_POST[$name] = $field['type'] == 'int' ? (int)$field['length']['max'] : (double)$field['length']['min'];
+        }
+        elseif((isset($field['length']['min']) || isset($field['length']['max'])) && in_array($field['type'], array('string', 'string-html', 'text', 'text-html', 'password', 'hidden')))
+        {
+          if(isset($field['length']['min']) && strlen($_POST[$name]) < $field['length']['min'])
+          {
+            $this->forms[$form_name]['errors'][] = l('The field "%s" must be at least %d characters long.', $this->forms[$form_name]['fields'][$name]['label'], $field['length']['min']);
+            continue;
+          }
+          elseif(isset($field['length']['max']) && $field['length']['max'] > -1 && ($truncate = (strlen($_POST[$name]) > $field['length']['max'])) && empty($field['truncate']))
+          {
+            $this->forms[$form_name]['errors'][] = l('The field "%s" must be smaller than %d characters.', $this->forms[$form_name]['fields'][$name]['label'], $field['length']['max']);
+            continue;
+          }
+
+          # Truncation needed/wanted?
+          if(!empty($truncate))
+            $_POST[$name] = substr($_POST[$name], 0, $field['length']['max']);
+        }
+
+        # If we got here, then everything is good, so add the value :)
+        $processed[$field['column']] = $_POST[$name];
+      }
+
+      # No errors? Then everything is good!
+      if(count($this->forms[$form_name]['errors']) == 0)
+      {
+        # Give the callback the processed information so they can do whatever ;)
+        # And return what it returned!!!
+        return $this->forms[$form_name]['callback']($processed);
+      }
+      else
+      {
+        # Form processing failed!!!
+        return false;
+      }
     }
   }
 }

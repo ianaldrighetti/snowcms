@@ -350,7 +350,7 @@ class Members
     if($handled === null)
     {
       # Make sure the name isn't too long, or too short!
-      if(mb_strlen($member_name) < 3 || mb_strlen($member_name) > 80)
+      if(mb_strlen($member_name) < 1 || mb_strlen($member_name) > 80)
         return false;
 
       # Lower it!!! (And htmlspecialchars it as well :P)

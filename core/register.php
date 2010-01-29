@@ -103,7 +103,33 @@ if(!function_exists('register_process'))
   */
   function register_process()
   {
+    global $api, $base_url, $member, $settings, $theme;
 
+    $api->run_hook('register_process');
+
+    # Already logged in? You don't need another account! ;)
+    if($member->is_logged())
+    {
+      header('Location: '. $base_url);
+      exit;
+    }
+
+    # Registration disabled? We will let register_view() handle that.
+    if(!$settings->get('registration_enabled', 'bool'))
+    {
+      register_view();
+      exit;
+    }
+
+    register_generate_form();
+    $form = $api->load_class('Form');
+
+    $form->process('registration_form');
+
+    echo '<pre>';
+    print_r($_POST);
+    echo "\r\n";
+    print_r($form);
   }
 }
 
@@ -126,6 +152,11 @@ if(!function_exists('register_generate_form'))
   function register_generate_form()
   {
     global $api, $base_url;
+    static $generated = false;
+
+    # Already been done? Don't need to do it again.
+    if(!empty($generated))
+      return;
 
     # Let's get that form going!
     $form = $api->load_class('Form');
@@ -197,7 +228,7 @@ if(!function_exists('register_generate_form'))
 
                                                              $members = $api->load_class(\'Members\');
 
-                                                             if($members->password_allowed($value))
+                                                             if($members->password_allowed($_POST[\'member_name\'], $value))
                                                                return true;
                                                              else
                                                              {
@@ -222,6 +253,9 @@ if(!function_exists('register_generate_form'))
                                                               ));
 
     # Add the agreement here... Eventually ;)
+
+    # Now it has been generated, as once is enough.
+    $generated = true;
   }
 }
 
@@ -231,7 +265,8 @@ if(!function_exists('register_member'))
     Function: register_member
 
     Parameters:
-      none
+      array $options - Receives the array containing all the new members
+                       options and what not, from <Form>.
 
     Returns:
       void - Nothing is returned by this function.
@@ -239,9 +274,10 @@ if(!function_exists('register_member'))
     Note:
       This function is overloadable.
   */
-  function register_member()
+  function register_member($options)
   {
-
+    echo '<pre>';
+    var_dump($options);
   }
 }
 ?>
