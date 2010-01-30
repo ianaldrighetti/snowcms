@@ -79,6 +79,7 @@ Group: Core  {
       File: Load Database  (core/database.php)
       }  # Group: Database
 
+   File: Variable functions  (core/func.php)
    }  # Group: Core
 
 Group: Plugins  {

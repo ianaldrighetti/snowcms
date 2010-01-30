@@ -1,0 +1,4 @@
+svn update ../
+./docs
+./add
+./commit
