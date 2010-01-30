@@ -17,10 +17,10 @@
 #                     File version: SnowCMS 2.0                         #
 #########################################################################
 
-# Title: Language
-
 if(!defined('IN_SNOW'))
   die;
+
+# Title: Language
 
 /*
   Function: l

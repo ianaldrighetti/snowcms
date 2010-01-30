@@ -20,18 +20,50 @@
 if(!defined('IN_SNOW'))
   die;
 
-/*
-  Dependency Name: plugins.snowcms.com/snowcms/captcha
-  Plugin Name: CAPTCHA
-  Author: SnowCMS
-  Version: 1.0
-  Dependencies:
-  Update URL: plugins.snowcms.com/snowcms/captcha
-  Description:
-    CAPTCHA is a plugin which allows you to integrate CAPTCHA
-    images into features of SnowCMS.
-*/
+# Title: CAPTCHA
 
 # Register the CAPTCHA image action.
 $api->add_action('captcha', 'captcha_display', dirname(__FILE__). '/captcha.php');
+
+# Hooks into the registration form which shows the CAPTCHA image!
+$api->add_hook('registration_form', 'add_captcha_field');
+
+/*
+  Function: add_captcha_field
+
+  This hook adds a CAPTCHA field to the registration form.
+
+  Parameters:
+    none
+
+  Returns:
+    void - Nothing is returned by this function.
+*/
+function add_captcha_field()
+{
+  global $api;
+
+  $form = $api->load_class('Form');
+
+  # Add our field which displays the CAPTCHA image.
+  $form->add_field('registration_form', 'captcha_text', array(
+                                                          'type' => 'custom-function',
+                                                          'label' => l('Image verification:'),
+                                                          'subtext' => l('In order to prevent spam, please enter the text you see inside the image. There are no zeros, and it is case-insensitive.'),
+                                                          'function' => create_function('$value, $form_name, &$error', '
+                                                            # Did you enter it right?
+                                                            if(isset($_SESSION[\'captcha_text\'][\'registration_form\']) && strtolower($_SESSION[\'captcha_text\'][\'registration_form\']) == strtolower($value))
+                                                              return true;
+                                                            else
+                                                            {
+                                                              $error = l(\'Image verification failed.\');
+                                                              return false;
+                                                            }'),
+                                                          'value' => create_function('', '
+                                                            global $base_url;
+
+                                                            return \'<p><img src="\'. $base_url. \'/index.php?action=captcha&amp;id=registration_form" alt="" title="\'. l(\'Image verification\'). \'" /></p><p><input type="text" name="captcha_text" value="" /></p>\';'),
+                                                          'save'=> false,
+                                                        ));
+}
 ?>

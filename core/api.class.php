@@ -905,7 +905,7 @@ function load_api()
     global $api;
 
     $api->run_hook(\'snow_exit\');
-    
+
     '));
 }
 ?>

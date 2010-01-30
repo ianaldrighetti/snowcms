@@ -403,6 +403,7 @@ class Form
       return false;
 
     # Before we validate the supplied, it might be custom!
+    $field['type'] = '';
     $options['type'] = strtolower($options['type']);
     $field['is_full'] = $options['type'] == 'full' || substr($options['type'], 0, 5) == 'full-';
     $field['is_custom'] = $options['type'] == 'custom' || substr($options['type'], 0, 7) == 'custom-' || $field['is_full'];
@@ -461,7 +462,7 @@ class Form
     $field['function'] = isset($options['function']) && is_callable($options['function']) ? $options['function'] : null;
 
     # Maybe a value? (Only encode the value if it isn't custom, as they need HTML ;))
-    $field['value'] = isset($options['value']) ? ($field['is_custom'] && is_callable($options['value']) ? $options['value'] : htmlchars($options['value'])) : '';
+    $field['value'] = isset($options['value']) ? ($field['is_custom'] && is_callable($options['value']) ? $options['value'] : (is_array($options['value']) ? $options['value'] : htmlchars($options['value']))) : '';
 
     # Disabled?
     $field['disabled'] = !empty($options['disabled']);
@@ -598,7 +599,7 @@ class Form
       {
         echo '
           <tr>
-            <td>';
+            <td colspan="2">';
 
         foreach($this->forms[$form_name]['errors'] as $error)
           echo '
@@ -676,7 +677,7 @@ class Form
                 if(count($field['options']))
                   foreach($field['options'] as $key => $value)
                     echo '
-                  <option value="', $key, '">', $value, '</option>';
+                  <option value="', $key, '"', ((!is_array($field['value']) && $field['value'] == $value) || (is_array($field['value']) && in_array($value, $field['value'])) ? ' selected="selected"' : ''), '>', $value, '</option>';
 
         echo '
                 </select>

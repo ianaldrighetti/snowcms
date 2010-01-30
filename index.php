@@ -63,12 +63,17 @@ load_api();
 # Just a hook before anything else major is done.
 $api->run_hook('pre_start');
 
-require($core_dir. '/compat.php');
+require($core_dir. '/time.php');
 require($core_dir. '/settings.class.php');
 
 # Load up the settings :)
 init_settings();
 
+require($core_dir. '/func.php');
+
+# Initialize the $func array.
+init_func();
+require($core_dir. '/compat.php');
 require($core_dir. '/clean_request.php');
 
 # We need to filter out some baaaad stuff, like any register_globals issues and other security things.

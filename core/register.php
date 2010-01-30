@@ -124,12 +124,12 @@ if(!function_exists('register_process'))
     register_generate_form();
     $form = $api->load_class('Form');
 
-    $form->process('registration_form');
+    $success = $form->process('registration_form');
 
-    echo '<pre>';
-    print_r($_POST);
-    echo "\r\n";
-    print_r($form);
+    # Processing failed? Then show the errors!
+    if($success === false)
+      # The register_view function will handle it nicely:
+      register_view();
   }
 }
 
@@ -188,29 +188,6 @@ if(!function_exists('register_generate_form'))
                                                            'value' => !empty($_REQUEST['member_name']) ? $_REQUEST['member_name'] : '',
                                                          ));
 
-    # Email address is important too!
-    $form->add_field('registration_form', 'member_email', array(
-                                                            'type' => 'string-html',
-                                                            'label' => l('Email:'),
-                                                            'subtext' => l('Please enter a valid email address.'),
-                                                            'length' => array(
-                                                                          'max' => 255,
-                                                                        ),
-                                                            'function' => create_function('$value, $form_name, &$error', '
-                                                              global $api;
-
-                                                              $members = $api->load_class(\'Members\');
-
-                                                              if($members->email_allowed($value))
-                                                                return true;
-                                                              else
-                                                              {
-                                                                $error = l(\'The supplied email address is already in use or not allowed.\');
-                                                                return false;
-                                                              }'),
-                                                            'value' => !empty($_REQUEST['member_email']) ? $_REQUEST['member_email'] : '',
-                                                          ));
-
     # Your password.
     $form->add_field('registration_form', 'member_pass', array(
                                                            'type' => 'password',
@@ -251,6 +228,28 @@ if(!function_exists('register_generate_form'))
                                                                 'subtext' => l('Please enter your password here again.'),
                                                                 'save' => false,
                                                               ));
+    # Email address is important too!
+    $form->add_field('registration_form', 'member_email', array(
+                                                            'type' => 'string-html',
+                                                            'label' => l('Email:'),
+                                                            'subtext' => l('Please enter a valid email address.'),
+                                                            'length' => array(
+                                                                          'max' => 255,
+                                                                        ),
+                                                            'function' => create_function('$value, $form_name, &$error', '
+                                                              global $api;
+
+                                                              $members = $api->load_class(\'Members\');
+
+                                                              if($members->email_allowed($value))
+                                                                return true;
+                                                              else
+                                                              {
+                                                                $error = l(\'The supplied email address is already in use or not allowed.\');
+                                                                return false;
+                                                              }'),
+                                                            'value' => !empty($_REQUEST['member_email']) ? $_REQUEST['member_email'] : '',
+                                                          ));
 
     # Add the agreement here... Eventually ;)
 
