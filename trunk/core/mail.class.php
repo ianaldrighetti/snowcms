@@ -19,4 +19,20 @@
 
 if(!defined('IN_SNOW'))
   die;
+
+# Title: Mail
+
+/*
+  Class: Mail
+
+  Another one of the numerous tools available in SnowCMS, the Mail class
+  handles emails. It is quite simple to use, and internally uses either
+  the mail() function or SMTP, but you don't have to worry about that!
+*/
+class Mail
+{
+  /*
+    Constructor: __construct
+  */
+}
 ?>

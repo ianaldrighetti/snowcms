@@ -36,9 +36,86 @@ if(!defined('IN_SNOW'))
 */
 function init_func()
 {
-  global $api, $func;
+  global $api, $func, $settings;
 
   $func = array();
+
+  # Enable multibyte strings (which we set to use UTF-8).
+  if($settings->get('enable_utf8', 'bool') && function_exists('mb_internal_encoding'))
+  {
+    # Set the internal encoding to UTF-8.
+    mb_internal_encoding('UTF-8');
+    mb_http_output(mb_internal_encoding());
+
+    # Handle the output buffer correctly.
+    $api->add_filter('output_callback', create_function('$value', '
+                                          return \'mb_output_handler\';'), 1);
+
+    # Setup the variable functions for use!
+    $func += array(
+      'parse_str' => 'mb_parse_str',
+      'mail' => 'mb_send_mail',
+      'stripos' => create_function('$haystack, $needle, $offset = 0', '
+                     # This function doesn\'t exist until PHP 5.2.0 >=
+                     if(function_exists(\'mb_stripos\'))
+                       return mb_stripos($haystack, $needle, $offset);
+                     else
+                       # Simple to emulate, really.
+                       return mb_strpos(mb_strtolower($haystack), mb_strtolower($needle), $offset);'),
+      'stristr' => create_function('$haystack, $needle, $part = false', '
+                     # Same as mb_stripos, this doesn\'t exist until 5.2.0 as well.
+                     if(function_exists(\'mb_stristr\'))
+                       return mb_stristr($haystack, $needle, $part);
+                     else
+                       # Pretty easy to emulate too.
+                       return mb_strstr(mb_strtolower($haystack), mb_strtolower($needle), $part);'),
+      'strlen' => 'mb_strlen',
+      'strpos' => 'mb_strpos',
+      'strrchr' => 'mb_strrchr',
+      'strrichr' => create_function('$haystack, $needle, $part = false', '
+                      if(function_exists(\'mb_strrichr\'))
+                        return mb_strrichr($haystack, $needle, $part);
+                      else
+                        return mb_strrchr(mb_strtolower($haystack), mb_strtolower($needle), $part);'),
+      'strripos' => create_function('$haystack, $needle, $offset = 0', '
+                      if(function_exists(\'mb_strripos\'))
+                        return mb_strripos($haystack, $needle, $offset);
+                      else
+                        return mb_strrpos(mb_strtolower($haystack), mb_strtolower($needle), $offset);'),
+      'strrpos' => 'mb_strrpos',
+      'strstr' => 'mb_strstr',
+      'strtolower' => 'mb_strtolower',
+      'strtoupper' => 'mb_strtoupper',
+      'ucwords' => create_function('$str', '
+                     # It may not have its own dedicated function, but this is good enough :P
+                     return mb_convert_case($str, MB_CASE_TITLE);'),
+      'substr_count' => 'mb_substr_count',
+      'substr' => 'mb_substr',
+    );
+  }
+  else
+  {
+    # Define all the same variable functions, just without mb_ in front, really.
+    $func += array(
+      'parse_str' => 'parse_str',
+      'mail' => 'mail',
+      'stripos' => 'stripos',
+      'stristr' => 'stristr',
+      'strlen' => 'strlen',
+      'strpos' => 'strpos',
+      'strrchr' => 'strrchr',
+      'strrichr' => create_function('$haystack, $needle, $part = false', '
+                      return strrchar(strtolower($haystack), strtolower($needle));'),
+      'strripos' => 'strripos',
+      'strrpos' => 'strrpos',
+      'strstr' => 'strstr',
+      'strtolower' => 'strtolower',
+      'strtoupper' => 'strtoupper',
+      'ucwords' => 'ucwords',
+      'substr_count' => 'substr_count',
+      'substr' => 'substr',
+    );
+  }
 
   $api->run_hook('post_init_func', array(&$func));
 }

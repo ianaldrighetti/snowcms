@@ -21,6 +21,7 @@ if(!defined('IN_SNOW'))
   die;
 
 # Title: CAPTCHA
+
 /*
   Function: captcha_display
 
@@ -44,6 +45,9 @@ function captcha_display()
   # Now, let's make sure that the server supports this, it uses GD...
   if(!function_exists('imagecreate'))
     die(l('Your server configuration does not support the <a href="%s">GD extension</a>.', 'http://www.php.net/gd'));
+  # We need an identifier for this CAPTCHA image.
+  elseif(empty($_GET['id']))
+    die(l('No CAPTCHA identifier was supplied, could not complete your request.'));
 
   # Do you have GD2? Then we can use imagecreatetruecolor.
   $gd_info = gd_info();
@@ -81,7 +85,10 @@ function captcha_display()
     $rand_str .= $chars[mt_rand(0, strlen($chars) - 1)];
 
   # Save it to their session, otherwise, this does no good!!!
-  $_SESSION['captcha_text'] = $rand_str;
+  if(!isset($_SESSION['captcha_text']) || !is_array($_SESSION['captcha_text']))
+    $_SESSION['captcha_text'] = array();
+
+  $_SESSION['captcha_text'][$_GET['id']] = $rand_str;
 
   # TrueType font support? If so you are AWESOME.
   if(function_exists('imagettftext'))

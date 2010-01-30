@@ -447,15 +447,66 @@ if(!class_exists('Member'))
     /*
       Method: data
 
+      An accessor for the members settings, options, whatever they set
+      specifically to their account.
+
       Parameters:
-        string $variable - The name of the data's variable.
+        string $variable - The name of the setting.
+        string $type - The data type to have the setting value
+                       returned as.
+        mixed $default - If the requested setting variable is not set
+                         then this value will be returned, as is.
 
       Returns:
-        string - Returns the value of the variable, NULL if the variable is not set.
+        mixed - Returns the value of the setting, NULL if the setting
+                 was not found.
+
+      Note:
+        The following data types are allowed:
+          bool, boolean - TRUE or FALSE, internally stored as 0 or 1, but just
+                          a note, 0 is turned into FALSE, anything else is TRUE.
+          int, integer - A whole number, you should know that! Anything other
+                         then a valid integer will be returned as 0.
+          float, double - You get the idea... If it isn't a valid float, then
+                          0 is returned.
+          string - The value is simply type casted to a string. (If nothing is
+                   supplied, it is seen as a string, or if the type is unknown.)
+          array, object - The value is ran through the unserialize function. If
+                          the array/object can't be read correctly, then FALSE
+                          is returned.
     */
-    public function data($variable)
+    public function data($variable, $type = 'string', $default = null)
     {
-      return isset($this->data[$variable]) ? $this->data[$variable] : null;
+      global $api;
+
+      $types = array(
+        'boolean' => create_function('$value', '
+                       return $value != 0;'),
+        'integer' => create_function('$value', '
+                       return (int)$value;'),
+        'float' => create_function('$value', '
+                     return (float)$value;'),
+        'string' => create_function('$value', '
+                      return (string)$value;'),
+        'array' => create_function('$value', '
+                     return @unserialize($value);'),
+      );
+
+      # Now some aliases :)
+      $types['bool'] = &$types['boolean'];
+      $types['int'] = &$types['integer'];
+      $types['double'] = &$types['float'];
+      $types['object'] = &$types['array'];
+
+      # Got a type? Go ahead.
+      $api->run_hook('settings_get_types', array(&$types));
+
+      # Type not set or unknown?
+      $type = strtolower($type);
+      if($type === null || !isset($types[$type]))
+        $type = 'string';
+
+      return !empty($variable) && is_string($variable) && isset($this->data[$variable]) ? $types[$type]($this->data[$variable]) : $default;
     }
   }
 }

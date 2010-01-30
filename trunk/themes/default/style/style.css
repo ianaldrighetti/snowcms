@@ -170,3 +170,9 @@ fieldset
   font-size: 14px;
   padding: 2px;
 }
+
+.error
+{
+  color: red;
+  padding: 5px 0px 5px 0px;
+}

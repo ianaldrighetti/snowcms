@@ -90,9 +90,11 @@ class Settings
     attribute.
 
     Parameters:
-      string $variable - The name of the setting
+      string $variable - The name of the setting.
       string $type - The data type to have the setting value
                      returned as.
+      mixed $default - If the requested setting variable is not set
+                       then this value will be returned, as is.
 
     Returns:
       mixed - Returns the value of the setting, NULL if the setting
@@ -112,7 +114,7 @@ class Settings
                         the array/object can't be read correctly, then FALSE
                         is returned.
   */
-  public function get($variable, $type = null)
+  public function get($variable, $type = null, $default = null)
   {
     global $api;
 
@@ -143,7 +145,7 @@ class Settings
     if($type === null || !isset($types[$type]))
       $type = 'string';
 
-    return !empty($variable) && is_string($variable) ? $types[$type](isset($this->settings[$variable]) ? $this->settings[$variable] : '') : null;
+    return !empty($variable) && is_string($variable) && isset($this->settings[$variable]) ? $types[$type]($this->settings[$variable]) : $default;
   }
 
   /*

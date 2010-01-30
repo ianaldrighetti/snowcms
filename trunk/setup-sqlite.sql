@@ -100,6 +100,7 @@ INSERT INTO '{$db_prefix}settings' ('variable', 'value') VALUES('registration_en
 INSERT INTO '{$db_prefix}settings' ('variable', 'value') VALUES('captcha_width', 200);
 INSERT INTO '{$db_prefix}settings' ('variable', 'value') VALUES('captcha_height', 50);
 INSERT INTO '{$db_prefix}settings' ('variable', 'value') VALUES('captcha_num_chars', 6);
+INSERT INTO '{$db_prefix}settings' ('variable', 'value') VALUES('enable_utf8', 6);
 
 CREATE TABLE '{$db_prefix}tasks'
 (
