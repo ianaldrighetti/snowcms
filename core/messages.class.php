@@ -78,7 +78,7 @@ class Messages
   */
   public function load($area_name, $area_id, $cur_page = 0, $per_page = 10, $order = 'asc', $params = array())
   {
-    global $api, $db;
+    global $api, $db, $func;
 
     $handled = null;
     $api->run_hook('messages_load', array(&$handled, $area_name, $area_id, $cur_page, $per_page, $order, $params));
@@ -103,7 +103,7 @@ class Messages
         foreach($params['extra'] as $variable => $value)
         {
           $str = serialize(array($variable => $value));
-          $db_vars['extra_'. $i] = substr($str, strpos($str, '{') + 1, -1);
+          $db_vars['extra_'. $i] = $func['substr']($str, $func['strpos']($str, '{') + 1, -1);
           $extra_search[] = 'extra LIKE \'%{string:extra_'. $i. '}%\'';
           $i++;
         }

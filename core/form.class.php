@@ -725,7 +725,7 @@ class Form
   */
   public function process($form_name)
   {
-    global $api;
+    global $api, $func;
 
     if(!$this->form_registered($form_name))
     {
@@ -887,12 +887,12 @@ class Form
         }
         elseif((isset($field['length']['min']) || isset($field['length']['max'])) && in_array($field['type'], array('string', 'string-html', 'text', 'text-html', 'password', 'hidden')))
         {
-          if(isset($field['length']['min']) && strlen($_POST[$name]) < $field['length']['min'])
+          if(isset($field['length']['min']) && $func['strlen']($_POST[$name]) < $field['length']['min'])
           {
             $this->forms[$form_name]['errors'][] = l('The field "%s" must be at least %d characters long.', $this->forms[$form_name]['fields'][$name]['label'], $field['length']['min']);
             continue;
           }
-          elseif(isset($field['length']['max']) && $field['length']['max'] > -1 && ($truncate = (strlen($_POST[$name]) > $field['length']['max'])) && empty($field['truncate']))
+          elseif(isset($field['length']['max']) && $field['length']['max'] > -1 && ($truncate = ($func['strlen']($_POST[$name]) > $field['length']['max'])) && empty($field['truncate']))
           {
             $this->forms[$form_name]['errors'][] = l('The field "%s" must be smaller than %d characters.', $this->forms[$form_name]['fields'][$name]['label'], $field['length']['max']);
             continue;
@@ -900,7 +900,7 @@ class Form
 
           # Truncation needed/wanted?
           if(!empty($truncate))
-            $_POST[$name] = substr($_POST[$name], 0, $field['length']['max']);
+            $_POST[$name] = $func['substr']($_POST[$name], 0, $field['length']['max']);
         }
 
         # If we got here, then everything is good, so add the value :)

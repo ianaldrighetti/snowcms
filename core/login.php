@@ -65,7 +65,7 @@ if(!function_exists('login_view'))
       <p>', l('Here you can login to your account, if you do not have an account, you can <a href="%s">register one</a>.', $base_url. '/index.php?action=register'), '</p>';
 
     # You can hook into this to display a message
-    if(strlen($api->apply_filter('login_message', '')) > 0)
+    if($func['strlen']($api->apply_filter('login_message', '')) > 0)
     {
       echo '
       <div id="', $api->apply_filter('login_message_id', 'login_error'), '">
@@ -211,7 +211,7 @@ if(!function_exists('login_process'))
     $login_success = false;
 
     # Is the secured_password field not empty? Cool, :)
-    if(!empty($_POST['secured_password']) && !empty($_SESSION['last_guest_rand_str']) && strlen($_POST['secured_password']) == 40 && $_POST['secured_password'] == sha1($row['member_pass']. $_SESSION['last_guest_rand_str']))
+    if(!empty($_POST['secured_password']) && !empty($_SESSION['last_guest_rand_str']) && $func['strlen']($_POST['secured_password']) == 40 && $_POST['secured_password'] == sha1($row['member_pass']. $_SESSION['last_guest_rand_str']))
       $login_success = true;
     # Maybe it is just plain text, pssssh!
     elseif(sha1($_POST['password']) == $row['member_pass'])

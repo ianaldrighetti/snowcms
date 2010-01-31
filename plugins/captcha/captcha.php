@@ -20,7 +20,7 @@
 if(!defined('IN_SNOW'))
   die;
 
-# Title: CAPTCHA
+# Title: Display
 
 /*
   Function: captcha_display

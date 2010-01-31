@@ -20,7 +20,7 @@
 if(!defined('IN_SNOW'))
   die;
 
-# Title: CAPTCHA
+# Title: Plugin
 
 # Register the CAPTCHA image action.
 $api->add_action('captcha', 'captcha_display', dirname(__FILE__). '/captcha.php');
@@ -41,7 +41,7 @@ $api->add_hook('registration_form', 'add_captcha_field');
 */
 function add_captcha_field()
 {
-  global $api;
+  global $api, $func;
 
   $form = $api->load_class('Form');
 
@@ -51,8 +51,10 @@ function add_captcha_field()
                                                           'label' => l('Image verification:'),
                                                           'subtext' => l('In order to prevent spam, please enter the text you see inside the image. There are no zeros, and it is case-insensitive.'),
                                                           'function' => create_function('$value, $form_name, &$error', '
+                                                            global $func;
+
                                                             # Did you enter it right?
-                                                            if(isset($_SESSION[\'captcha_text\'][\'registration_form\']) && strtolower($_SESSION[\'captcha_text\'][\'registration_form\']) == strtolower($value))
+                                                            if(isset($_SESSION[\'captcha_text\'][\'registration_form\']) && strtolower($_SESSION[\'captcha_text\'][\'registration_form\']) == $func[\'strtolower\']($value))
                                                               return true;
                                                             else
                                                             {
