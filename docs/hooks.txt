@@ -10,6 +10,7 @@
 ../trunk/core/checkcookie.php:    $api->run_hook('checkcookie_verify');
 ../trunk/core/checkcookie.php:      $api->run_hook('checkcookie_failed');
 ../trunk/core/checkcookie.php:    $api->run_hook('checkcookie_success');
+../trunk/core/errors.php:    $api->run_hook('error_handler', array(&$handled, $error_type, $error_message, $error_file, $error_line, $error_context));
 ../trunk/core/api.class.php:      $api->run_hook('post_plugin_activation');
 ../trunk/core/api.class.php:    $api->run_hook(\'snow_exit\');
 ../trunk/core/messages.class.php:    $api->run_hook('messages_load', array(&$handled, $area_name, $area_id, $cur_page, $per_page, $order, $params));
@@ -32,12 +33,21 @@
 ../trunk/core/members.class.php:    $api->run_hook('members_email_allowed', array(&$handled, $member_email));
 ../trunk/core/members.class.php:    $api->run_hook('members_authenticate', array(&$authenticated, $member_name, $member_pass, $pass_hash));
 ../trunk/core/members.class.php:    $api->run_hook('members_password_allowed', array(&$handled, $member_pass));
+../trunk/core/members.class.php:    $api->run_hook('members_rand_str', array(&$handled, $length, &$str));
 ../trunk/core/members.class.php:    $api->run_hook('members_update', array(&$handled, $member_id, $options));
 ../trunk/core/members.class.php:      $api->run_hook('members_update_allowed_columns', array(&$allowed_columns));
 ../trunk/core/members.class.php:      $api->run_hook('members_update_check_data', array(&$handled, &$data));
 ../trunk/core/members.class.php:    $api->run_hook('members_delete', array(&$handled, $members));
 ../trunk/core/members.class.php:      $api->run_hook('post_members_delete', array($members));
 ../trunk/core/l.php:  $api->run_hook('translate', array(&$str, &$args));
+../trunk/core/tasks.class.php:      $api->run_hook('tasks_construct', array(&$handled));
+../trunk/core/tasks.class.php:    $api->run_hook('tasks_add', array(&$handled, $name, $run_every, $func, $file, $enabled));
+../trunk/core/tasks.class.php:    $api->run_hook('tasks_update', array(&$handled, $name, $options));
+../trunk/core/tasks.class.php:    $api->run_hook('tasks_exists', array(&$handled, $name));
+../trunk/core/tasks.class.php:    $api->run_hook('tasks_delete', array(&$handled, $name));
+../trunk/core/tasks.class.php:    $api->run_hook('tasks_run', array(&$handled, $output_image));
+../trunk/core/tasks.class.php:      $api->run_hook('tasks_destruct', array(&$handled));
+../trunk/core/tasks.class.php:  $api->run_hook('post_init_tasks');
 ../trunk/core/register.php:    $api->run_hook('register_view');
 ../trunk/core/register.php:      $api->run_hook('registration_disabled');
 ../trunk/core/register.php:    $api->run_hook('register_process');
@@ -60,6 +70,7 @@
 ../trunk/core/http.class.php:    $api->run_hook('request_callbacks', array(&$request_callbacks));
 ../trunk/core/settings.class.php:    $api->run_hook('settings_get_types', array(&$types));
 ../trunk/core/settings.class.php:    $api->run_hook('settings_set_types', array(&$types));
+../trunk/core/settings.class.php:  $api->run_hook('post_init_settings');
 ../trunk/core/session.php:    $api->run_hook('sessions');
 ../trunk/core/login.php:    $api->run_hook('login_view');
 ../trunk/core/login.php:    $api->run_hook('login_process');
@@ -74,3 +85,4 @@
 ../trunk/core/member.class.php:      $api->run_hook('post_login', array(&$member));
 ../trunk/core/member.class.php:      $api->run_hook('settings_get_types', array(&$types));
 ../trunk/core/member.class.php:    $api->run_hook('init_member');
+../trunk/core/member.class.php:    $api->run_hook('post_init_member');
