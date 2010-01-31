@@ -228,7 +228,7 @@ class Members
   */
   public function add($member_name, $member_pass, $member_email, $options = array())
   {
-    global $api, $db, $member;
+    global $api, $db, $func, $member;
 
     # Allows a plugin to handle the creation of members themselves ;)
     # Set the handled parameter to an integer or FALSE, otherwise the
@@ -246,10 +246,10 @@ class Members
         return false;
 
       # How about a hash? (This hash will likely get changed eventually, but :P)
-      if(!empty($options['member_hash']) && (mb_strlen($options['member_hash']) == 0 || mb_strlen($options['member_hash']) > 16))
+      if(!empty($options['member_hash']) && (strlen($options['member_hash']) == 0 || strlen($options['member_hash']) > 16))
         return false;
       elseif(empty($options['member_hash']))
-        $options['member_hash'] = $this->rand_str(mt_rand(8, 16));
+        $options['member_hash'] = $this->rand_str(16);
 
       # Have you set a display name? Gotta check that!
       if(!empty($options['display_name']) && !$this->name_allowed($options['display_name']))
@@ -266,7 +266,7 @@ class Members
         $options['member_groups'] = array('member');
 
       # Registration time can be manually set, must be greater than 0 though :P
-      if(isset($options['member_registered']) && $options['member_registered'] > 0)
+      if(isset($options['member_registered']) && $options['member_registered'] <= 0)
         return false;
       elseif(!isset($options['member_registered']))
         $options['member_registered'] = time();
@@ -290,7 +290,7 @@ class Members
                     'member_acode' => 'string',
                   ),
                   array(
-                    htmlchars($member_name), sha1(strtolower(htmlchars($member_name)). $member_pass), $options['member_hash'],
+                    htmlchars($member_name), sha1($func['strtolower'](htmlchars($member_name)). $member_pass), $options['member_hash'],
                     htmlchars($options['display_name']), htmlchars($member_email), implode(',', $options['member_groups']),
                     $options['member_registered'], $options['member_ip'], $options['member_activated'],
                     $options['member_acode'],
@@ -341,7 +341,7 @@ class Members
   */
   public function name_allowed($member_name, $member_id = 0)
   {
-    global $api, $db, $settings;
+    global $api, $db, $func, $settings;
 
     # You know what to do, set it to a bool if you handle it ;)
     $handled = null;
@@ -350,14 +350,14 @@ class Members
     if($handled === null)
     {
       # Make sure the name isn't too long, or too short!
-      if(mb_strlen($member_name) < 1 || mb_strlen($member_name) > 80)
+      if($func['strlen']($member_name) < $settings->get('members_min_name_length', 'int', 3) || $func['strlen']($member_name) > $settings->get('members_max_name_length', 'int', 80))
         return false;
 
       # Lower it!!! (And htmlspecialchars it as well :P)
-      $member_name = mb_strtolower(htmlchars($member_name));
+      $member_name = $func['strtolower'](htmlchars($member_name));
 
       # First check to see if it is a reserved name...
-      $reserved_names = explode("\n", mb_strtolower($settings->get('reserved_names')));
+      $reserved_names = explode("\n", $func['strtolower']($settings->get('reserved_names', 'string')));
 
       if(count($reserved_names))
       {
@@ -366,7 +366,7 @@ class Members
           $reserved_name = trim($reserved_name);
 
           # Any wildcards?
-          if(mb_strpos($member_name, '*') !== false)
+          if($func['strpos']($member_name, '*') !== false)
           {
             if(preg_match('~^'. str_replace('*', '(?:.*?)?', $reserved_name). '$~i', $member_name))
               return false;
@@ -413,7 +413,7 @@ class Members
   */
   public function email_allowed($member_email, $member_id = 0)
   {
-    global $api, $db, $settings;
+    global $api, $db, $func, $settings;
 
     # You know what to do, set it to a bool if you handle it ;)
     $handled = null;
@@ -421,14 +421,14 @@ class Members
 
     if($handled === null)
     {
-      $member_email = strtolower(htmlchars($member_email));
+      $member_email = $func['strtolower'](htmlchars($member_email));
 
       # Check the email with regex!
       if(!preg_match('~^([a-z0-9._-](\+[a-z0-9])*)+@[a-z0-9.-]+\.[a-z]{2,6}$~i', $member_email))
         return false;
 
       # Now check disallowed emails...
-      $disallowed_emails = explode("\n", mb_strtolower($settings->get('disallowed_emails')));
+      $disallowed_emails = explode("\n", $func['strtolower']($settings->get('disallowed_emails', 'string')));
 
       if(count($disallowed_emails))
       {
@@ -442,7 +442,7 @@ class Members
       }
 
       # Maybe the domain is disallowed?
-      $disallowed_domains = explode("\n", mb_strtolower($settings->get('disallowed_email_domains')));
+      $disallowed_domains = explode("\n", $func['strtolower']($settings->get('disallowed_email_domains', 'string')));
 
       list(, $email_domain) = explode('@', $member_email);
 
@@ -453,7 +453,7 @@ class Members
           $disallowed_domain = trim($disallowed_domain);
 
           # Got any wildcards?
-          if(mb_strpos($disallowed_domain, '*') !== false)
+          if($func['strpos']($disallowed_domain, '*') !== false)
           {
             if(preg_match('~^'. str_replace('*', '(?:.*?)?', $disallowed_domain). '$~i', $email_domain))
               return false;
@@ -507,7 +507,7 @@ class Members
   */
   public function authenticate($member_name, $member_pass, $pass_hash = false)
   {
-    global $api, $db;
+    global $api, $db, $func;
 
     # You should get this idea by now :P
     $authenticated = null;
@@ -520,7 +520,7 @@ class Members
       # Password not hashed..? That's fine, I'll do it myself, then. :P
       if(empty($pass_hash))
       {
-        $member_pass = sha1(strtolower(htmlchars($member_name)). $member_pass);
+        $member_pass = sha1($func['strtolower'](htmlchars($member_name)). $member_pass);
         $pass_hash = true;
       }
 
@@ -574,7 +574,7 @@ class Members
   */
   public function password_allowed($member_name, $member_pass)
   {
-    global $api, $db, $settings;
+    global $api, $db, $func, $settings;
 
     $handled = null;
     $api->run_hook('members_password_allowed', array(&$handled, $member_pass));
@@ -583,13 +583,13 @@ class Members
     {
       # Just a low setting? So must have at least 3 characters...
       if($settings->get('password_security', 'int') == 1)
-        $handled = strlen($member_pass) >= 3;
+        $handled = $func['strlen']($member_pass) >= 3;
       # Must be at least 4 characters long and cannot contain their username ;)
       elseif($settings->get('password_security', 'int') == 2)
-        $handled = strlen($member_pass) >= 4 && stripos($member_pass, $member_name) === false;
+        $handled = $func['strlen']($member_pass) >= 4 && $func['stripos']($member_pass, $member_name) === false;
       # At least 5 characters in length and must contain at least 1 number.
       else
-        $handled = strlen($member_pass) >= 5 && stripos($member_pass, $member_name) === false && preg_match('~[0-9]+~', $member_pass);
+        $handled = $func['strlen']($member_pass) >= 5 && $func['stripos']($member_pass, $member_name) === false && preg_match('~[0-9]+~', $member_pass);
     }
 
     return !empty($handled);
@@ -611,20 +611,32 @@ class Members
   */
   public function rand_str($length = 0)
   {
-    if(empty($length) || $length < 1)
-      $length = mt_rand(1, 100);
+    global $api;
 
-    $chars = array(
-               'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z',
-               'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z',
-               '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '~', '!', '@', '#', '$', '%', '^', '*', '-', '_', '+', '=', '?',
-             );
-
+    # If for some very strange, unknown reason you want to do a random string, be my guest!
+    $handled = null;
     $str = '';
-    for($i = 0; $i < $length; $i++)
-      $str .= $chars[mt_rand(0, 74)];
+    $api->run_hook('members_rand_str', array(&$handled, $length, &$str));
 
-    return $str;
+    if($handled === null)
+    {
+      if(empty($length) || $length < 1)
+        $length = mt_rand(1, 100);
+
+      $chars = array(
+                 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z',
+                 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z',
+                 '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '~', '!', '@', '#', '$', '%', '^', '*', '-', '_', '+', '=', '?',
+               );
+
+      $str = '';
+      for($i = 0; $i < $length; $i++)
+        $str .= $chars[array_rand($chars)];
+
+      return $str;
+    }
+    else
+      return $str;
   }
 
   /*
@@ -665,7 +677,7 @@ class Members
   */
   public function update($member_id, $options)
   {
-    global $api, $db;
+    global $api, $db, $func;
 
     if(count($options) == 0)
       return false;
@@ -741,7 +753,7 @@ class Members
 
         # Now we need to hash the password, maybe!
         if(!empty($options['member_name']) && !empty($options['member_pass']))
-          $data['member_pass'] = sha1(strtolower($options['member_name']). $options['member_pass']);
+          $data['member_pass'] = sha1($func['strtolower']($options['member_name']). $options['member_pass']);
         elseif(empty($options['admin_override']) && ((!empty($options['member_name']) && empty($options['member_pass'])) || (empty($options['member_name']) && !empty($options['member_pass']))))
           return false;
         elseif(!empty($options['admin_override']))

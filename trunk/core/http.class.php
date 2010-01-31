@@ -286,7 +286,7 @@ class HTTP
   */
   public function request($url, $post_data = array(), $resume_from = 0, $filename = null)
   {
-    global $api;
+    global $api, $func;
 
     # Just incase...
     $url = ltrim($url);
@@ -339,7 +339,7 @@ class HTTP
 
       # Well, we have gone as far as we have, no it is up to you ;)
       return $callback(array(
-        'url' => substr(strtolower($url), 0, 8) == 'https://' && !$this->ssl_supported() ? 'http'. substr(strtolower($url), 5, strlen($url)) : $url,
+        'url' => ($func['substr']($func['strtolower']($url), 0, 8) == 'https://' && !$this->ssl_supported() ? 'http'). $func['substr']($func['strtolower']($url), 5, $func['strlen']($url)) : $url,
         'post_data' => array_merge($this->post_data, $post_data),
         'resume_from' => max((int)$resume_from, 0),
         'fp' => !empty($filename) ? $fp : null,
@@ -348,7 +348,7 @@ class HTTP
         'max_redirects' => $this->max_redirects,
         'include_header' => !empty($this->include_header),
         'http_version' => $this->http_version,
-        'port' => substr(strtolower($url), 0, 8) == 'https://' && $this->port == 80 && $this->ssl_supported() ? 443 : $this->port,
+        'port' => ($func['substr']($func['strtolower']($url), 0, 8) == 'https://' && $this->port == 80 && $this->ssl_supported() ? 443 : $this->port),
         'timeout' => $this->timeout,
         'user_agent' => $this->user_agent,
       ));
@@ -378,6 +378,8 @@ if(!function_exists('http_curl_request'))
   */
   function http_curl_request($request)
   {
+    global $func;
+
     if(!is_array($request))
       return false;
 
@@ -427,7 +429,7 @@ if(!function_exists('http_curl_request'))
       $data = http_curl_request($new_request);
 
       # Cheating..? Sure, but don't tell anyone xD
-      $data = substr($data, $request['resume_from'], strlen($data));
+      $data = $func['substr']($data, $request['resume_from'], $func['strlen']($data));
     }
 
     # Did you want this written to a file?
@@ -468,6 +470,8 @@ if(!function_exists('http_fsockopen_request'))
   */
   function http_fsockopen_request($request, $num_redirects = 0)
   {
+    global $func;
+
     if(!is_array($request))
       return false;
     elseif($num_redirects > $request['max_redirects'])
@@ -547,28 +551,28 @@ if(!function_exists('http_fsockopen_request'))
       foreach($raw_headers as $header)
       {
         $header = trim($header);
-        if(empty($header) || strpos($header, ':') === false)
+        if(empty($header) || $func['strpos']($header, ':') === false)
           continue;
 
         list($name, $content) = explode(':', $header, 2);
-        $headers[strtolower($name)] = trim($content);
+        $headers[$func['strtolower']($name)] = trim($content);
       }
 
     # So do we need to redirect, perhaps?
-    if(strpos($http_status, '302') !== false || strpos($http_status, '301') !== false || strpos($http_status, '307') !== false)
+    if($func['strpos']($http_status, '302') !== false || $func['strpos']($http_status, '301') !== false || $func['strpos']($http_status, '307') !== false)
       return !empty($headers['location']) ? http_fsockopen_request(array_merge($request, array('url' => $headers['location'], 'fp' => null)), $num_redirects + 1) : false;
 
     # Okay, well, if the transfer-encoding header is not set, then we can
     # just stop here, if not, we need to do a little bit extra.
-    if(!empty($headers['transfer-encoding']) && strtolower($headers['transfer-encoding']) == 'chunked')
+    if(!empty($headers['transfer-encoding']) && $func['strtolower']($headers['transfer-encoding']) == 'chunked')
     {
       list($hex, $data) = explode("\r\n", $data, 2);
 
       $new_data = '';
       while($hex != '0')
       {
-        $new_data .= substr($data, 0, hexdec($hex));
-        $data = ltrim(substr($data, hexdec($hex), strlen($data)));
+        $new_data .= $func['substr']($data, 0, hexdec($hex));
+        $data = ltrim($func['substr']($data, hexdec($hex), $func['strlen']($data)));
         list($hex, $data) = explode("\r\n", $data, 2);
       }
       $data = $new_data;

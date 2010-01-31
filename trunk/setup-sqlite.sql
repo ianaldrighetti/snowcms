@@ -98,6 +98,8 @@ INSERT INTO '{$db_prefix}settings' ('variable', 'value') VALUES('theme', 'defaul
 INSERT INTO '{$db_prefix}settings' ('variable', 'value') VALUES('max_tasks', 2);
 INSERT INTO '{$db_prefix}settings' ('variable', 'value') VALUES('registration_enabled', 1);
 INSERT INTO '{$db_prefix}settings' ('variable', 'value') VALUES('enable_utf8', 6);
+INSERT INTO '{$db_prefix}settings' ('variable', 'value') VALUES('members_min_name_length', 3);
+INSERT INTO '{$db_prefix}settings' ('variable', 'value') VALUES('members_max_name_length', 80);
 
 CREATE TABLE '{$db_prefix}tasks'
 (

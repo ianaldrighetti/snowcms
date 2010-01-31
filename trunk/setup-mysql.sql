@@ -103,7 +103,7 @@ CREATE TABLE `{$db_prefix}settings`
 
 INSERT INTO `{$db_prefix}settings` (`variable`, `value`) VALUES('show_version', 1),('version', '2.0 SVN'),('password_security', 1),('reserved_names', ''),('disallowed_emails', '');
 INSERT INTO `{$db_prefix}settings` (`variable`, `value`) VALUES('disallowed_email_domains', ''),('enable_tasks', 1),('site_name', 'SnowCMS'),('theme', 'default'),('max_tasks', 2);
-INSERT INTO `{$db_prefix}settings` (`variable`, `value`) VALUES('registration_enabled', 1),('enable_utf8', 1);
+INSERT INTO `{$db_prefix}settings` (`variable`, `value`) VALUES('registration_enabled', 1),('enable_utf8', 1),('members_min_name_length', 3),('members_max_name_length', 80);
 
 ----
 -- Need to do something?

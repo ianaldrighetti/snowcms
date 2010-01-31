@@ -45,7 +45,7 @@ class Tasks
   */
   public function __construct()
   {
-    global $api, $db;
+    global $api, $db, $settings;
 
     $this->queue = array();
 
@@ -58,7 +58,7 @@ class Tasks
       LIMIT {int:max_tasks}',
       array(
         'cur_time' => time(),
-        'max_tasks' => $settings->get('max_tasks', 'int'),
+        'max_tasks' => $settings->get('max_tasks', 'int', 1),
       ), 'tasks_query');
 
     if($result->num_rows() > 0)
@@ -96,7 +96,7 @@ function init_tasks()
 {
   global $api, $settings;
 
-  if($settings->get('enable_tasks') == 1)
+  if($settings->get('enable_tasks', 'bool'))
     $tasks = $api->load_class('Tasks');
 }
 ?>

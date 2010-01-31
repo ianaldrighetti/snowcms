@@ -106,7 +106,7 @@ if(!class_exists('Member'))
     */
     public function __construct()
     {
-      global $api, $cookie_name, $db;
+      global $api, $cookie_name, $db, $func;
 
       # Just define them, for now.
       $member_id = 0;
@@ -118,8 +118,8 @@ if(!class_exists('Member'))
       {
         list($member_id, $passwrd) = @explode('|', $_COOKIE[$cookie_name]);
 
-        $member_id = (string)$member_id == (string)(int)$member_id && (int)$member_id > 0 && strlen($passwrd) == 40 ? (int)$member_id : 0;
-        $passwrd = $member_id > 0 && strlen($passwrd) == 40 ? $passwrd : '';
+        $member_id = (string)$member_id == (string)(int)$member_id && (int)$member_id > 0 && $func['strlen']($passwrd) == 40 ? (int)$member_id : 0;
+        $passwrd = $member_id > 0 && $func['strlen']($passwrd) == 40 ? $passwrd : '';
 
         $api->run_hook('cookie_data', array(&$member_id, &$passwrd));
 

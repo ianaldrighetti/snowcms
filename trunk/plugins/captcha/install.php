@@ -20,6 +20,8 @@
 if(!defined('IN_SNOW'))
   die;
 
+# Title: Install
+
 /*
   Function: plugin_install
 

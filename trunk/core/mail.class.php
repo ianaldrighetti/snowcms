@@ -20,8 +20,6 @@
 if(!defined('IN_SNOW'))
   die;
 
-# Title: Mail
-
 /*
   Class: Mail
 
