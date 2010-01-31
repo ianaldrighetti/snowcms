@@ -1,13 +1,21 @@
-CREATE TABLE '{$db_prefix}tokens'
+CREATE TABLE '{$db_prefix}error_log'
 (
-  'session_id' VARCHAR(150) NOT NULL,
-  'token_name' VARCHAR(100) NOT NULL,
-  'token' VARCHAR(255) NOT NULL,
-  'token_registered' INT NOT NULL DEFAULT '0',
-  PRIMARY KEY ('session_id', 'token_name')
+  'error_id' INTEGER PRIMARY KEY,
+  'error_time' INT(10) NOT NULL DEFAULT '0',
+  'member_id' INT(11) NOT NULL DEFAULT '0',
+  'member_name' VARCHAR(80) NULL,
+  'member_ip' VARCHAR(150) NULL,
+  'error_type' VARCHAR(40) NULL,
+  'error_message' TEXT NULL,
+  'error_file' VARCHAR(255) NULL,
+  'error_line' INT(11) NOT NULL DEFAULT '0',
+  'error_url' VARCHAR(255) NULL
 );
 
-CREATE INDEX '{$db_prefix}tokens_token_registered' ON '{$db_prefix}tokens' ('token_registered');
+CREATE INDEX '{$db_prefix}error_log_error_time' ON '{$db_prefix}error_log' ('error_time');
+CREATE INDEX '{$db_prefix}error_log_member_name' ON '{$db_prefix}error_log' ('member_name');
+CREATE INDEX '{$db_prefix}error_log_member_ip' ON '{$db_prefix}error_log' ('member_ip');
+CREATE INDEX '{$db_prefix}error_log_error_type' ON '{$db_prefix}error_log' ('error_type');
 
 CREATE TABLE '{$db_prefix}member_data'
 (
@@ -100,6 +108,7 @@ INSERT INTO '{$db_prefix}settings' ('variable', 'value') VALUES('registration_en
 INSERT INTO '{$db_prefix}settings' ('variable', 'value') VALUES('enable_utf8', 6);
 INSERT INTO '{$db_prefix}settings' ('variable', 'value') VALUES('members_min_name_length', 3);
 INSERT INTO '{$db_prefix}settings' ('variable', 'value') VALUES('members_max_name_length', 80);
+INSERT INTO '{$db_prefix}settings' ('variable', 'value') VALUES('errors_log', 1);
 
 CREATE TABLE '{$db_prefix}tasks'
 (
@@ -116,3 +125,14 @@ CREATE TABLE '{$db_prefix}tasks'
 CREATE INDEX '{$db_prefix}tasks_last_ran' ON '{$db_prefix}tasks' ('last_ran');
 CREATE INDEX '{$db_prefix}tasks_queued' ON '{$db_prefix}tasks' ('queued');
 CREATE INDEX '{$db_prefix}tasks_enabled' ON '{$db_prefix}tasks' ('enabled');
+
+CREATE TABLE '{$db_prefix}tokens'
+(
+  'session_id' VARCHAR(150) NOT NULL,
+  'token_name' VARCHAR(100) NOT NULL,
+  'token' VARCHAR(255) NOT NULL,
+  'token_registered' INT NOT NULL DEFAULT '0',
+  PRIMARY KEY ('session_id', 'token_name')
+);
+
+CREATE INDEX '{$db_prefix}tokens_token_registered' ON '{$db_prefix}tokens' ('token_registered');

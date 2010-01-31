@@ -1,14 +1,23 @@
 ----
--- Holds registered tokens...
+-- Holds all the PHP errors which have occurred!
 ----
-CREATE TABLE `{$db_prefix}tokens`
+CREATE TABLE `{$db_prefix}error_log`
 (
-  `session_id` VARCHAR(150) NOT NULL,
-  `token_name` VARCHAR(100) NOT NULL,
-  `token` VARCHAR(255) NOT NULL,
-  `token_registered` INT(10) UNSIGNED NOT NULL DEFAULT '0',
-  PRIMARY KEY (`session_id`,`token_name`),
-  KEY (`token_registered`)
+  `error_id` INT(11) UNSIGNED NOT NULL AUTO_INCREMENT,
+  `error_time` INT(10) UNSIGNED NOT NULL DEFAULT '0',
+  `member_id` INT(11) UNSIGNED NOT NULL DEFAULT '0',
+  `member_name` VARCHAR(80) NOT NULL,
+  `member_ip` VARCHAR(150) NOT NULL,
+  `error_type` VARCHAR(40) NOT NULL,
+  `error_message` TEXT NOT NULL,
+  `error_file` VARCHAR(255) NOT NULL,
+  `error_line` INT(11) UNSIGNED NOT NULL DEFAULT '0',
+  `error_url` VARCHAR(255) NOT NULL,
+  PRIMARY KEY (`error_id`),
+  KEY (`error_time`),
+  KEY (`member_name`),
+  KEY (`member_ip`),
+  KEY (`error_type`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 
 ----
@@ -23,7 +32,7 @@ CREATE TABLE `{$db_prefix}member_data`
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 
 ----
---  The members table, holding, you guessed it! MEMBERS!
+-- The members table, holding, you guessed it! MEMBERS!
 ---
 CREATE TABLE `{$db_prefix}members`
 (
@@ -103,7 +112,7 @@ CREATE TABLE `{$db_prefix}settings`
 
 INSERT INTO `{$db_prefix}settings` (`variable`, `value`) VALUES('show_version', 1),('version', '2.0 SVN'),('password_security', 1),('reserved_names', ''),('disallowed_emails', '');
 INSERT INTO `{$db_prefix}settings` (`variable`, `value`) VALUES('disallowed_email_domains', ''),('enable_tasks', 1),('site_name', 'SnowCMS'),('theme', 'default'),('max_tasks', 2);
-INSERT INTO `{$db_prefix}settings` (`variable`, `value`) VALUES('registration_enabled', 1),('enable_utf8', 1),('members_min_name_length', 3),('members_max_name_length', 80);
+INSERT INTO `{$db_prefix}settings` (`variable`, `value`) VALUES('registration_enabled', 1),('enable_utf8', 1),('members_min_name_length', 3),('members_max_name_length', 80),('errors_log', 1);
 
 ----
 -- Need to do something?
@@ -121,6 +130,19 @@ CREATE TABLE `{$db_prefix}tasks`
   KEY (`last_ran`),
   KEY (`queued`),
   KEY (`enabled`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+
+----
+-- Holds registered tokens...
+----
+CREATE TABLE `{$db_prefix}tokens`
+(
+  `session_id` VARCHAR(150) NOT NULL,
+  `token_name` VARCHAR(100) NOT NULL,
+  `token` VARCHAR(255) NOT NULL,
+  `token_registered` INT(10) UNSIGNED NOT NULL DEFAULT '0',
+  PRIMARY KEY (`session_id`,`token_name`),
+  KEY (`token_registered`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 
 ----

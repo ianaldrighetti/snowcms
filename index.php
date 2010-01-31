@@ -53,6 +53,12 @@ require($core_dir. '/database.php');
 
 load_database();
 
+# Set the error handler as soon as possible!
+require($core_dir. '/errors.php');
+
+# Even though plugins can't overload this function, they can hook into it.
+set_error_handler('errors_handler');
+
 # Now that our database is loaded up, let's get the API started, very important you know?
 require($core_dir. '/api.class.php');
 
@@ -117,7 +123,7 @@ if((empty($_GET['action']) && empty($request_param)) || (!empty($_GET['action'])
     $theme->add_meta(array('name' => 'robots', 'content' => 'noindex'));
 
   # Use the default action in the settings...
-  $_GET['action'] = $settings->get('default_action');
+  $_GET['action'] = $settings->get('default_action', 'string', '');
   $request_param = null;
 }
 

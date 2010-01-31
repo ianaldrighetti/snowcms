@@ -365,10 +365,9 @@ abstract class Database
   */
   public function log_error($error_message, $is_fatal = false, $file = null, $line = 0)
   {
-
-    # !!! Error needs to be logged somewhere ;) If it can be, that is.
-    # !!! Once member system is implemented, only show the file and line
-    #     to administrators.
+    # If the errors_handler function exists, use that, otherwise, nothing we can do!
+    if(function_exists('errors_handler'))
+      errors_handler('database', $error_message, $file, $line);
 
     # Fatal error..?
     if(!empty($is_fatal) && ($error_message === 1 || $error_message === 2))
@@ -404,10 +403,9 @@ abstract class Database
   }
 
   /*
-    Method: log_error
+    Destructor: __destruct
 
     The destructor writes all the debugging text to a file, if any, upon this object being destructed.
-
   */
   public function __destruct()
   {
