@@ -43,7 +43,6 @@ if(!file_exists('config.php'))
 }
 
 require(dirname(__FILE__). '/config.php');
-
 require_once($core_dir. '/mitigate_globals.php');
 
 # register_globals is horrible, just plain bad...
@@ -73,6 +72,7 @@ require($core_dir. '/func.php');
 
 # Initialize the $func array.
 init_func();
+
 require($core_dir. '/compat.php');
 require($core_dir. '/clean_request.php');
 

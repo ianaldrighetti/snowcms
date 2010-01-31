@@ -97,9 +97,6 @@ INSERT INTO '{$db_prefix}settings' ('variable', 'value') VALUES('site_name', 'Sn
 INSERT INTO '{$db_prefix}settings' ('variable', 'value') VALUES('theme', 'default');
 INSERT INTO '{$db_prefix}settings' ('variable', 'value') VALUES('max_tasks', 2);
 INSERT INTO '{$db_prefix}settings' ('variable', 'value') VALUES('registration_enabled', 1);
-INSERT INTO '{$db_prefix}settings' ('variable', 'value') VALUES('captcha_width', 200);
-INSERT INTO '{$db_prefix}settings' ('variable', 'value') VALUES('captcha_height', 50);
-INSERT INTO '{$db_prefix}settings' ('variable', 'value') VALUES('captcha_num_chars', 6);
 INSERT INTO '{$db_prefix}settings' ('variable', 'value') VALUES('enable_utf8', 6);
 
 CREATE TABLE '{$db_prefix}tasks'
