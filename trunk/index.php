@@ -98,6 +98,11 @@ init_member();
 # Include our l() function for translation :)
 require($core_dir. '/l.php');
 
+# Tasks tool, don't wanna forget that!
+require($core_dir. '/tasks.class.php');
+
+init_tasks();
+
 require($core_dir. '/theme.class.php');
 
 # Initialize the theme!!!

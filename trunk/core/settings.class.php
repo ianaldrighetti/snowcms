@@ -260,5 +260,7 @@ function init_settings()
   global $api, $settings;
 
   $settings = $api->load_class('Settings');
+
+  $api->run_hook('post_init_settings');
 }
 ?>
