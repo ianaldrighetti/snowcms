@@ -540,6 +540,8 @@ if(!function_exists('init_member'))
     # Are you not logged in? Then we need to go a little something :)
     if($member->is_guest())
       $api->add_hook('post_init_theme', 'member_guest_login_prep');
+
+    $api->run_hook('post_init_member');
   }
 }
 
