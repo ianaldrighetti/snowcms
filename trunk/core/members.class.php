@@ -269,7 +269,7 @@ class Members
       if(isset($options['member_registered']) && $options['member_registered'] <= 0)
         return false;
       elseif(!isset($options['member_registered']))
-        $options['member_registered'] = time();
+        $options['member_registered'] = time_utc();
 
       # An IP?
       if(empty($options['member_ip']))

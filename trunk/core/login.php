@@ -238,10 +238,10 @@ if(!function_exists('login_process'))
     # So how long did you want to be remembered?
     # Forever?
     if(isset($_POST['session_length']) && $_POST['session_length'] == -1)
-      $cookie_expires = time() + 315360000;
+      $cookie_expires = time_utc() + 315360000;
     # A more specific time?
     elseif(!empty($_POST['session_length']) && (string)$_POST['session_length'] == (string)(int)$_POST['session_length'])
-      $cookies_expires = time() + (int)$_POST['session_length'];
+      $cookies_expires = time_utc() + (int)$_POST['session_length'];
     # Just until you close your browser?
     else
       $cookie_expires = 0;

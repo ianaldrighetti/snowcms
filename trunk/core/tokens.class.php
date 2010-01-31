@@ -55,7 +55,7 @@ class Tokens
       WHERE session_id = {string:session_id} AND token_registered >= {int:timeout}',
       array(
         'session_id' => $member->is_logged() ? 'member_id-'. $member->id() : 'ip'. $member->ip(),
-        'timeout' => time() - 86400,
+        'timeout' => time_utc() - 86400,
       ), 'token_load_registered_query');
 
     if($result->num_rows() > 0)
@@ -84,7 +84,7 @@ class Tokens
           DELETE FROM {db->prefix}tokens
           WHERE token_registered < {int:timeout}\',
           array(
-            \'timeout\' => time() - 86400,
+            \'timeout\' => time_utc() - 86400,
           ), \'token_delete_expired\');'));
   }
 
@@ -117,7 +117,7 @@ class Tokens
     # Add it to the current forms.
     $this->tokens[$name] = array(
                             'token' => $token,
-                            'registered' => time(),
+                            'registered' => time_utc(),
                             'is_new' => true,
                             'deleted' => false,
                           );
@@ -161,7 +161,7 @@ class Tokens
   */
   public function is_valid($name, $token, $max_age = 86400)
   {
-    return $this->exists($name) && $this->tokens[$name]['token'] == $token && ($this->tokens[$name]['registered'] + $max_age) >= time();
+    return $this->exists($name) && $this->tokens[$name]['token'] == $token && ($this->tokens[$name]['registered'] + $max_age) >= time_utc();
   }
 
   /*

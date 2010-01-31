@@ -373,7 +373,7 @@ class Messages
         'member_email' => isset($options['member_email']) ? $options['member_email'] : $member->email(),
         'member_ip' => isset($options['member_ip']) ? $options['member_ip'] : $member->ip(),
         'subject' => $subject,
-        'poster_time' => isset($options['poster_time']) ? $options['poster_time'] : time(),
+        'poster_time' => isset($options['poster_time']) ? $options['poster_time'] : time_utc(),
         'message' => !empty($options['message_type']) && !empty($options['dont_htmlchars_message']) ? $message : htmlchars($message),
         'message_type' => !empty($options['message_type']) ? $options['message_type'] : '',
         'message_status' => isset($options['message_status']) ? $options['message_status'] : 'approved',

@@ -57,7 +57,7 @@ class Tasks
       WHERE enabled = 1 AND ((last_ran + run_every) < {int:cur_time} OR queued = 1)
       LIMIT {int:max_tasks}',
       array(
-        'cur_time' => time(),
+        'cur_time' => time_utc(),
         'max_tasks' => $settings->get('max_tasks', 'int', 1),
       ), 'tasks_query');
 

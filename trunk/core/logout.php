@@ -69,7 +69,7 @@ if(!function_exists('logout_process'))
     $api->run_hook('logout_success');
 
     # Remove the cookie and session information.
-    setcookie($cookie_name, '', time() - 604800);
+    setcookie($cookie_name, '', time_utc() - 604800);
     unset($_SESSION['member_id'], $_SESSION['member_pass']);
 
     # Let's go home...
