@@ -52,10 +52,13 @@ Group: Core  {
    File: HTTP  (core/http.class.php)
    File: init_core  (core/core.php)
    File: Language  (core/l.php)
+   File: Mail  (core/mail.class.php)
    File: Mitigate Globals  (core/mitigate_globals.php)
    File: Settings  (core/settings.class.php)
+   File: SMTP  (core/smtp.class.php)
    File: Tasks  (core/tasks.class.php)
    File: Theme  (core/theme.class.php)
+   File: Time functions  (core/time.php)
    File: Tokens  (core/tokens.class.php)
    File: Upload  (core/upload.class.php)
 
@@ -85,6 +88,8 @@ Group: Core  {
 Group: Plugins  {
 
    File: CAPTCHA  (plugins/captcha/captcha.php)
+   File: CAPTCHA  (plugins/captcha/plugin.php)
+   File: plugin_install  (plugins/captcha/install.php)
    }  # Group: Plugins
 
 File: Filters  (filters.txt)

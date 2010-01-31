@@ -72,4 +72,5 @@
 ../trunk/core/member.class.php:        $api->run_hook('cookie_data', array(&$member_id, &$passwrd));
 ../trunk/core/member.class.php:        $api->run_hook('cookie_empty', array(&$member_id, &$passwrd));
 ../trunk/core/member.class.php:      $api->run_hook('post_login', array(&$member));
+../trunk/core/member.class.php:      $api->run_hook('settings_get_types', array(&$types));
 ../trunk/core/member.class.php:    $api->run_hook('init_member');
