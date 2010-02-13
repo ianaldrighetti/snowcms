@@ -101,51 +101,23 @@ class Settings
                was not found.
 
     Note:
-      The following data types are allowed:
-        bool, boolean - TRUE or FALSE, internally stored as 0 or 1, but just
-                        a note, 0 is turned into FALSE, anything else is TRUE.
-        int, integer - A whole number, you should know that! Anything other
-                       then a valid integer will be returned as 0.
-        float, double - You get the idea... If it isn't a valid float, then
-                        0 is returned.
-        string - The value is simply type casted to a string. (If nothing is
-                 supplied, it is seen as a string, or if the type is unknown.)
-        array, object - The value is ran through the unserialize function. If
-                        the array/object can't be read correctly, then FALSE
-                        is returned.
+      The data types supported vary depending upon plugins. Plugins can
+      add more data type by hooking into validation_construct, which
+      more information is available in <Validation::add_type>.
   */
   public function get($variable, $type = null, $default = null)
   {
     global $api;
 
-    $types = array(
-      'boolean' => create_function('$value', '
-                     return $value != 0;'),
-      'integer' => create_function('$value', '
-                     return (int)$value;'),
-      'float' => create_function('$value', '
-                   return (float)$value;'),
-      'string' => create_function('$value', '
-                    return (string)$value;'),
-      'array' => create_function('$value', '
-                   return @unserialize($value);'),
-    );
+    $validation = $api->load_class('Validation');
 
-    # Now some aliases :)
-    $types['bool'] = &$types['boolean'];
-    $types['int'] = &$types['integer'];
-    $types['double'] = &$types['float'];
-    $types['object'] = &$types['array'];
+    if(!empty($variable) && isset($this->settings[$variable]))
+    {
+      $value = $this->settings[$variable];
+      $valid = $validation->data($value, !empty($type) ? $type : 'string');
+    }
 
-    # Got a type? Go ahead.
-    $api->run_hook('settings_get_types', array(&$types));
-
-    # Type not set or unknown?
-    $type = strtolower($type);
-    if($type === null || !isset($types[$type]))
-      $type = 'string';
-
-    return !empty($variable) && is_string($variable) && isset($this->settings[$variable]) ? $types[$type]($this->settings[$variable]) : $default;
+    return !empty($valid) ? $value : $default;
   }
 
   /*
@@ -159,53 +131,41 @@ class Settings
       string $type - The data type of the supplied value.
 
     Returns:
-      void - Nothing is returned by this method.
+      bool - Returns true on success, false on failure. When it
+             fails, that means the value was not of the specified type.
 
     Note:
-      You can also pass ++ or -- as a string in the value parameter
-      to increment, or decrement the variables value.
-
-      The following types are allowed:
-        bool, boolean - Saved as a 1 (TRUE) or 0 (FALSE).
-        int, integer - Type-casted to an integer.
-        float, double - Type-casted to a float.
-        string - Type-casted as a string.
-        array, object - Passed through the serialize function.
+      The data types supported vary depending upon plugins. Plugins can
+      add more data type by hooking into validation_construct, which
+      more information is available in <Validation::add_type>.
   */
   public function set($variable, $value, $type = null)
   {
-    if(empty($variable) || !is_string($variable))
-      return;
+    global $api;
 
-    $types = array(
-      'boolean' => create_function('$value', '
-                     return $value ? 1 : 0;'),
-      'integer' => create_function('$value', '
-                     return (int)$value;'),
-      'float' => create_function('$value', '
-                   return (float)$value;'),
-      'string' => create_function('$value', '
-                    return (string)$value;'),
-      'array' => create_function('$value', '
-                   return @serialize($value);'),
-    );
+    # Incrementing/decrementing?
+    if(($value == '++' || $value == '--') && (!isset($this->settings[$variable]) || is_numeric($this->settings[$variable])))
+    {
+      # Change the current value, or make it, if it doesn't exist already.
+      $this->update_settings[$variable] = !isset($this->settings[$variable]) ? ($value == '++' ? 1 : -1) : ($value == '++' ? $this->settings[$variable] + 1 : $this->settings[$variable] - 1);
+      $this->settings[$variable] = $this->update_settings[$variable];
 
-    # Now some aliases :)
-    $types['bool'] = &$types['boolean'];
-    $types['int'] = &$types['integer'];
-    $types['double'] = &$types['float'];
-    $types['object'] = &$types['array'];
+      # We are done...
+      return true;
+    }
 
-    # Got a type? Go ahead.
-    $api->run_hook('settings_set_types', array(&$types));
+    $validation = $api->load_class('Validation');
 
-    # So the type not set or unknown?
-    $type = strtolower($type);
-    if($type == null || !isset($types[$type]))
-      $type = 'string';
+    # Make sure the data is valid.
+    $valid = $validation->data($value, !empty($type) ? $type : 'string');
 
-    $update_settings[$variable] = $types[$type]($value == '++' || $value == '--' ? ($value == '++' ? $settings[$variable] + 1 : $settings[$variable] - 1) : $value);
-    $settings[$variable] = $update_settings[$variable];
+    if(empty($valid))
+      return false;
+
+    $this->update_settings[$variable] = is_bool($value) ? (!empty($value) ? 1 : 0) : $value;
+    $this->settings[$variable] = $this->update_settings[$variable];
+
+    return true;
   }
 
   /*

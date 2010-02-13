@@ -107,7 +107,11 @@ class API
       return false;
 
     # Your hook is now registered :)
-    $this->hooked[$hook_name][] = array('callback' => $callback, 'importance' => max((int)$importance, 1), 'args' => empty($args) ? null : max((int)$args, 0));
+    $this->hooked[$hook_name][] = array(
+                                    'callback' => $callback,
+                                    'importance' => max((int)$importance, 1),
+                                    'args' => empty($args) ? null : max((int)$args, 0),
+                                  );
 
     return true;
   }
@@ -579,7 +583,7 @@ class API
     # Any parameters, perhaps?
     if(count($params) > 0 && is_callable(array($obj, '__construct')))
       call_user_func_array(array($obj, '__construct'), $params);
-    elseif(!is_callable(array($obj, '__construct')))
+    elseif(count($params) > 0 && !is_callable(array($obj, '__construct')))
       return false;
 
     # Did you want this globally accessible? If so, save it.

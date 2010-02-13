@@ -462,51 +462,23 @@ if(!class_exists('Member'))
                  was not found.
 
       Note:
-        The following data types are allowed:
-          bool, boolean - TRUE or FALSE, internally stored as 0 or 1, but just
-                          a note, 0 is turned into FALSE, anything else is TRUE.
-          int, integer - A whole number, you should know that! Anything other
-                         then a valid integer will be returned as 0.
-          float, double - You get the idea... If it isn't a valid float, then
-                          0 is returned.
-          string - The value is simply type casted to a string. (If nothing is
-                   supplied, it is seen as a string, or if the type is unknown.)
-          array, object - The value is ran through the unserialize function. If
-                          the array/object can't be read correctly, then FALSE
-                          is returned.
+        The data types supported vary depending upon plugins. Plugins can
+        add more data types by hooking into validation_construct, which
+        more information is available in <Validation::add_type>.
     */
-    public function data($variable, $type = 'string', $default = null)
+    public function data($variable, $type = null, $default = null)
     {
       global $api;
 
-      $types = array(
-        'boolean' => create_function('$value', '
-                       return $value != 0;'),
-        'integer' => create_function('$value', '
-                       return (int)$value;'),
-        'float' => create_function('$value', '
-                     return (float)$value;'),
-        'string' => create_function('$value', '
-                      return (string)$value;'),
-        'array' => create_function('$value', '
-                     return @unserialize($value);'),
-      );
+      $validation = $api->load_class('Validation');
 
-      # Now some aliases :)
-      $types['bool'] = &$types['boolean'];
-      $types['int'] = &$types['integer'];
-      $types['double'] = &$types['float'];
-      $types['object'] = &$types['array'];
+      if(!empty($variable) && isset($this->data[$variable]))
+      {
+        $value = $this->data[$variable];
+        $valid = $validation->data($value, !empty($type) ? $type : 'string');
+      }
 
-      # Got a type? Go ahead.
-      $api->run_hook('settings_get_types', array(&$types));
-
-      # Type not set or unknown?
-      $type = strtolower($type);
-      if($type === null || !isset($types[$type]))
-        $type = 'string';
-
-      return !empty($variable) && is_string($variable) && isset($this->data[$variable]) ? $types[$type]($this->data[$variable]) : $default;
+      return !empty($valid) ? $value : $default;
     }
   }
 }

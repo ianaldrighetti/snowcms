@@ -40,7 +40,7 @@ if(!function_exists('login_view'))
   */
   function login_view()
   {
-    global $api, $base_url, $member, $theme, $theme_url;
+    global $api, $base_url, $func, $member, $theme, $theme_url;
 
     $api->run_hook('login_view');
 
@@ -52,8 +52,8 @@ if(!function_exists('login_view'))
     }
 
     # Just a bit more security... CSRF security, that is!
-    $token = $api->load_class('Tokens');
-    $token->add('login_form');
+    //$token = $api->load_class('Tokens');
+    //$token->add('login_form');
 
     $theme->set_title(l('Log in'));
     $theme->add_js_file(array('src' => $theme_url. '/default/js/secure_form.js'));
@@ -73,7 +73,13 @@ if(!function_exists('login_view'))
       </div>';
     }
 
-    echo '
+    # Generate that lovely login form.
+    login_generate_form();
+    $form = $api->load_class('Form');
+
+    # We added the overall form, now we need to add
+    $form->show('login_form');
+    /*echo '
       <form id="login_form" name="login_form" action="', $api->apply_filter('login_action_url', $base_url. '/index.php?action=login2'), '" method="post" class="login_form" onsubmit="', $api->apply_filter('login_onsubmit', 'secure_form(\'login_form\');'), '">
         <fieldset>
           <table>
@@ -112,18 +118,18 @@ if(!function_exists('login_view'))
           </table>
         </fieldset>
         <input type="hidden" name="form_token" value="', $token->token('login_form'), '" />
-      </form>';
+      </form>';*/
 
     $theme->footer();
   }
 }
 
-if(!function_exists('login_process'))
+if(!function_exists('login_generate_form'))
 {
   /*
-    Function: login_process
+    Function: login_generate_form
 
-    Processes the data submitted by the login form.
+    Generates the login form.
 
     Parameters:
       none
@@ -134,9 +140,134 @@ if(!function_exists('login_process'))
     Note:
       This function is overloadable.
   */
-  function login_process()
+  function login_generate_form()
   {
-    global $api, $base_url, $cookie_name, $db, $theme, $member;
+    global $api, $base_url;
+    static $generated = false;
+
+    # Don't generate the form twice.
+    if(!empty($generated))
+      return;
+
+    # Add the core part first.
+    $form = $api->load_class('Form');
+    $form->add('login_form', array(
+                               'callback' => 'login_process',
+                               'action' => $api->apply_filter('login_action_url', $base_url. '/index.php?action=login2'),
+                               'method' => 'post',
+                               'submit' => l('Login'),
+                             ));
+
+    # Now the rest of the stuff.
+    $form->add_field('login_form', 'member_name', array(
+                                                    'type' => 'string',
+                                                    'label' => l('Username:'),
+                                                    'function' => create_function('&$value, $form_name, &$error', '
+                                                                    global $api, $db;
+
+                                                                    if(empty($value))
+                                                                    {echo \'uh oh\';
+                                                                      $api->run_hook(\'login_process_empty_username\');
+
+                                                                      $error = l(\'Please enter your username.\');
+                                                                      return false;
+                                                                    }
+
+                                                                    return true;'),
+                                                    'value' => !empty($_POST['member_name']) ? $_POST['member_name'] : '',
+                                                  ));
+
+    $form->add_field('login_form', 'member_pass', array(
+                                                    'type' => 'password',
+                                                    'label' => l('Password:'),
+                                                    'function' => create_function('&$value, $form_name, &$error', '
+                                                                    global $api, $db;
+
+                                                                    if(empty($value) && empty($_POST[\'secured_password\']))
+                                                                    {
+                                                                      $api->run_hook(\'login_process_empty_password\');
+
+                                                                      $error = l(\'Please enter your password.\');
+                                                                      return false;
+                                                                    }
+
+                                                                    return true;'),
+                                                  ));
+
+    $form->add_field('login_form', 'session_length', array(
+                                                       'type' => 'select',
+                                                       'label' => l('Stay logged in for'),
+                                                       'options' => array(
+                                                                      0 => l('This session'),
+                                                                      3600 => l('An hour'),
+                                                                      86400 => l('A day'),
+                                                                      604800 => l('A week'),
+                                                                      2419200 => l('A month'),
+                                                                      31536000 => l('A year'),
+                                                                      -1 => l('Forever'),
+                                                                    ),
+                                                       'value' => !empty($_REQUEST['session_length']) ? (int)$_REQUEST['session_length'] : -1,
+                                                     ));
+
+    # It has been generated, so don't generate it again!
+    $generated = true;
+  }
+}
+
+if(!function_exists('login_view2'))
+{
+  /*
+    Function: login_view2
+
+    Handles the submission of the login form.
+
+    Parameters:
+      none
+
+    Returns:
+      void - Nothing is returned by this function.
+
+    Note:
+      This function is overloadable.
+  */
+  function login_view2()
+  {
+    global $api;
+
+    # Generate the login form :)
+    login_generate_form();
+    $form = $api->load_class('Form');
+
+    # Process the form, and we are good to go!
+    # Unless it failed, of course.
+    if(!$form->process('login_form'))
+      # Let login_view() handle the displaying of errors.
+      login_view();
+  }
+}
+
+if(!function_exists('login_process'))
+{
+  /*
+    Function: login_process
+
+    Processes the data submitted by the login form.
+    This is the callback for the login form.
+
+    Parameters:
+      array $login - An array containing login information.
+      array &$errors - An array containing any errors which occurred
+                       while processing the login data.
+
+    Returns:
+      void - Nothing is returned by this function.
+
+    Note:
+      This function is overloadable.
+  */
+  function login_process($login, &$errors = array())
+  {
+    global $api, $base_url, $cookie_name, $db, $func, $theme, $member;
 
     $api->run_hook('login_process');
 

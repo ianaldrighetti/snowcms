@@ -136,7 +136,9 @@ function captcha_display()
     imageline($image, 0, (10 * $i) + mt_rand(-5, 5), $settings->get('captcha_width', 'int'), (10 * $i) + mt_rand(-5, 5), $colors[array_rand($colors)]);
 
   # Remove any previous headers so we can send out new ones!
-  ob_clean();
+  if(ob_get_length() > 0)
+    ob_clean();
+
   header('Pragma: no-cache');
   header('Content-Type: image/png');
 

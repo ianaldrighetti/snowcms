@@ -3,11 +3,24 @@ SHA1=function(l){function p(b,a){return b<<a|b>>>32-a}l+="";for(var n=Math,c=[
 function secure_form(element_id)
 {
   var element = s.id(element_id);
-  var input = document.createElement('input');
-  input.type = 'hidden';
-  input.name = 'secured_password';
-  input.value = typeof login_salt == 'undefined' ? SHA1(element['username'].value.toLowerCase() + element['password'].value) : SHA1(SHA1(element['username'].value.toLowerCase() + element['password'].value) + login_salt);
-  element['password'].value = '';
+  var input = null;
+  if(typeof element['secured_password'] != 'undefined')
+    input = element['secured_password'];
+  else
+  {
+    input = document.createElement('input');
+    input.type = 'hidden';
+    input.name = 'secured_password';
+  }
 
-  element.appendChild(input);
+  input.value = typeof login_salt == 'undefined' ? SHA1(element['member_name'].value.toLowerCase() + element['member_pass'].value) : SHA1(SHA1(element['member_name'].value.toLowerCase() + element['member_pass'].value) + login_salt);
+  element['member_pass'].value = '';
+
+  if(typeof element['secured_password'] == 'undefined')
+    element.appendChild(input);
 }
+
+s.onload(function()
+{
+  document.getElementById('login_form').onsubmit = function() { secure_form('login_form'); };
+});

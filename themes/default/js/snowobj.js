@@ -111,6 +111,24 @@ function SnowObj()
     }else return eval('(' + data + ')');
   }
 
+  this.onload = function(callback)
+  {
+    if(typeof window.onload != 'function')
+      window.onload = callback;
+    else
+    {
+      var prevCallback = window.onload;
+
+      window.onload = function()
+      {
+        if(prevCallback)
+          prevCallback();
+
+        callback();
+      };
+    }
+  };
+
   this.screenheight = function()
   {
     if(!this.is_ie)
