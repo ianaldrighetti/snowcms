@@ -136,3 +136,31 @@ CREATE TABLE '{$db_prefix}tokens'
 );
 
 CREATE INDEX '{$db_prefix}tokens_token_registered' ON '{$db_prefix}tokens' ('token_registered');
+
+CREATE TABLE '{$db_prefix}uploads'
+(
+  'area_name' VARCHAR(255) NOT NULL,
+  'area_id' INT NOT NULL,
+  'upload_id' INTEGER PRIMARY KEY,
+  'member_id' INT NOT NULL DEFAULT '0',
+  'member_name' VARCHAR(255) NULL,
+  'member_email' VARCHAR(255) NULL,
+  'member_ip' VARCHAR(150) NULL,
+  'modified_id' INT NOT NULL DEFAULT '0',
+  'modified_name' VARCHAR(255) NULL,
+  'modified_email' VARCHAR(255) NULL,
+  'modified_ip' VARCHAR(150) NULL,
+  'filename' VARCHAR(255) NOT NULL,
+  'file_ext' VARCHAR(100) NULL,
+  'filelocation' VARCHAR(255) NOT NULL,
+  'filesize' INT NOT NULL DEFAULT '0',
+  'downloads' INT NOT NULL DEFAULT '0',
+  'upload_type' VARCHAR(100) NULL,
+  'mime_type' VARCHAR(255) NULL,
+  'checksum' VARCHAR(40) NOT NULL
+);
+
+CREATE UNIQUE INDEX '{$db_prefix}uploads_area' ON '{$db_prefix}uploads' ('area_name', 'area_id', 'upload_id');
+CREATE INDEX '{$db_prefix}uploads_member_id' ON '{$db_prefix}uploads' ('member_id');
+CREATE INDEX '{$db_prefix}uploads_member_name' ON '{$db_prefix}uploads' ('member_name');
+CREATE INDEX '{$db_prefix}uploads_member_ip' ON '{$db_prefix}uploads' ('member_ip');

@@ -160,8 +160,11 @@ if(!function_exists('register_generate_form'))
 
     # Let's get that form going!
     $form = $api->load_class('Form');
-    $form->add('registration_form', 'register_member', $api->apply_filter('registration_submit_url', $base_url. '/index.php?action=register2'));
-    $form->set_submit('registration_form', l('Register account'));
+    $form->add('registration_form', array(
+                                      'callback' => 'register_member',
+                                      'action' => $api->apply_filter('register_action_url', $base_url. '/index.php?action=register2'),
+                                      'submit' => l('Register account'),
+                                    ));
 
     # Add the fields we need you to fill out.
     # Your requested member name, you know? That thing you use to login.
@@ -263,9 +266,12 @@ if(!function_exists('register_member'))
   /*
     Function: register_member
 
+    Processes the registration form information.
+
     Parameters:
       array $options - Receives the array containing all the new members
                        options and what not, from <Form>.
+      array &$errors
 
     Returns:
       void - Nothing is returned by this function.
@@ -273,7 +279,7 @@ if(!function_exists('register_member'))
     Note:
       This function is overloadable.
   */
-  function register_member($options)
+  function register_member($options, &$errors = array())
   {
     echo '<pre>';
     var_dump($options);

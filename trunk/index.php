@@ -69,9 +69,11 @@ load_api();
 $api->run_hook('pre_start');
 
 require($core_dir. '/time.php');
+require($core_dir. '/validation.class.php');
 require($core_dir. '/settings.class.php');
 
-# Load up the settings :)
+# Load up the validation and settings class :)
+init_validation();
 init_settings();
 
 require($core_dir. '/func.php');

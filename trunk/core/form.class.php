@@ -43,68 +43,42 @@ class Form
   }
 
   /*
-    Method: set_submit
-
-    Sets the text of the submit button on the specified form.
-
-    Parameters:
-      string $form_name - The name of the form.
-      string $submit - The text of the submit button (Be sure to run it through l!)
-
-    Returns:
-      bool - Returns true on success, false on failure.
-  */
-  public function set_submit($form_name, $submit)
-  {
-    if(!$this->form_registered($form_name))
-      return false;
-
-    # Save it and we're done!
-    $this->forms[$form_name]['submit'] = $submit;
-    return true;
-  }
-
-  /*
     Method: add
 
     Registers a new form.
 
     Parameters:
       string $form_name - The name of the form to create.
-      callback $form_callback - The callback which will be passed the values
-                                submitted by the form. The values will be passed
-                                after they have all be checked and properly handled.
-      string $form_action - The URL of the forms action, once
-                            it is submitted. If nothing is
-                            supplied, the current URL will be
-                            used instead.
-      string $form_method - How the browser should send the form
-                            either POST or GET.
+      array $options - An array of options containing information about the form.
 
     Returns:
       bool - Returns true on success, false on failure.
 
     Note:
+      The following $options indices are allowed:
+        callback - The callback which is passed all the form information.
+        action - The URL of where to submit the form.
+        method - Either POST or GET.
+        submit - The text on the submit button.
+
       Once the form is processed using <Form::process> (might I add, successfully,
       so no errors from the data the user has submitted), an array containing the
       sanitized and/or handled data will be passed to the callback (array(column => value)).
       Also note that your callback is expected to return some value, other than
       false, unless something went wrong as well. You could return something such
-      as an array of information, or just true :)
+      as an array of information, or just true :) But also, there is a second parameter
+      which is a reference parameter to an array, to which you can add more errors to
+      if there are any more errors which occurred while processing the form data.
   */
-  public function add($form_name, $form_callback, $form_action = null, $form_method = 'post')
+  public function add($form_name, $options)
   {
     global $api;
 
     # Form already registered by this name..? Is it not callable?
-    if($this->form_registered($form_name) || !is_callable($form_callback))
+    if($this->form_registered($form_name) || !is_callable($options['callback']))
       return false;
 
-    # Only get or post ;)
-    $form_method = strtolower($form_method);
-    if(!in_array($form_method, array('get', 'post')))
-      return false;
-
+    # We will use the edit method to add your options ;D
     $this->forms[$form_name] = array(
                                  'callback' => $form_callback,
                                  'action' => $form_action,
@@ -114,6 +88,21 @@ class Form
                                  'errors' => array(),
                                  'hooked' => false,
                                );
+
+    # Just some options set incase you don't.
+    $default_options = array(
+                        'callback' => null,
+                        'action' => null,
+                        'method' => 'post',
+                        'submit' => l('Submit'),
+                       );
+
+    $options = array_merge($default_options, is_array($options) ? $options : array());
+
+    # Told you! :D
+    if(!$this->edit($form_name, $options))
+      # Hmm, it didn't work... Maybe you ought to fix that? :P
+      return false;
 
     $token = $api->load_class('Tokens');
 
@@ -217,6 +206,10 @@ class Form
       $this->forms[$form_name]['method'] = strtolower($options['method']);
     elseif(isset($options['method']))
       return false;
+
+    # The text on the submit button, perhaps?
+    if(isset($options['submit']))
+      $this->forms[$form_name]['submit'] = $options['submit'];
 
     # If nothing caused false to be returned elsewhere, it worked!
     return true;
@@ -431,8 +424,8 @@ class Form
 
     # A length isn't required either, so let's see.
     $field['length'] = array(
-                         'min' => 0,
-                         'max' => -1,
+                         'min' => null,
+                         'max' =>null,
                        );
 
     if(!empty($options['length']['min']) && (string)$options['length']['min'] == (string)(int)$options['length']['min'])
@@ -592,32 +585,36 @@ class Form
       echo '
       <form action="', $this->forms[$form_name]['action'], '" method="', $this->forms[$form_name]['method'], '" class="', $form_name, '" id="', $form_name, '">
         <fieldset>
-          <table width="90%" style="text-align: center; margin: 10px auto auto auto;">';
+          <table>
+          <tr>
+            <td colspan="2" id="', $form_name, '_errors">';
 
       # Any errors? Those needs displayin'!
       if(count($this->forms[$form_name]['errors']) > 0)
       {
         echo '
-          <tr>
-            <td colspan="2">';
+              <div class="errors">';
 
         foreach($this->forms[$form_name]['errors'] as $error)
           echo '
-              <p class="error">', $error, '</p>';
+              <p>', $error, '</p>';
+
+        echo '
+              </div>';
+      }
 
         echo '
             </td>
           </tr>';
-      }
 
       # Show the fields, you know, the things you enter stuff into.
       if(count($this->forms[$form_name]['fields']) > 0)
         foreach($this->forms[$form_name]['fields'] as $name => $field)
           # Make this simple, show it!
-          $this->show_field($name, $field);
+          $this->show_field($form_name, $name, $field);
 
       echo '
-            <tr>
+            <tr id="', $form_name, '_submit">
               <td class="buttons" colspan="2"><input type="submit" name="', $form_name, '" value="', $this->forms[$form_name]['submit'], '" /></td>
             </tr>
           </table>
@@ -632,47 +629,48 @@ class Form
     Outputs a field according to the parameters supplied.
 
     Parameters:
+      string $form_name - The name of the form the field is within.
       string $name - The name of the field.
       array $field - All the fields options.
 
     Returns:
       void - Nothing is returned by this method.
   */
-  private function show_field($name, $field)
+  private function show_field($form_name, $name, $field)
   {
     global $api;
 
     # Do you want to do this?
     $handled = null;
-    $api->run_hook('form_show_field', array($name, $field, &$handled));
+    $api->run_hook('form_show_field', array(&$handled, $form_name, $name, $field));
 
     # Did someone else not handle it? Should it even be shown?
     if(empty($handled) && !empty($field['show']))
     {
       echo '
-            <tr>';
+            <tr id="', $form_name, '_', $name, '">';
 
       # Is the field hidden? Then showing something isn't very hidden, now is it? I didn't think so.
       if($field['type'] != 'hidden' && $field['type'] != 'full')
         echo '
-              <td class="td_left"><p class="label">', $field['label'], '</p>', !empty($field['subtext']) ? '<p class="subtext">'. $field['subtext']. '</p>' : '', '</td>';
+              <td id="', $form_name, '_', $name, '_left" class="td_left"><p class="label">', $field['label'], '</p>', !empty($field['subtext']) ? '<p class="subtext">'. $field['subtext']. '</p>' : '', '</td>';
 
       # Now here is the fun part! Actually displaying the fields.
       if(empty($field['is_custom']) && in_array($field['type'], array('int', 'double', 'string', 'string-html', 'password')))
       {
         echo '
-              <td class="td_right"><input type="', ($field['type'] == 'password' ? 'password' : 'text'), '" name="', $name, '" value="', $field['value'], '"', ($field['length']['max'] > 0 ? ' maxlength="'. $field['length']['max']. '"' : ''), (!empty($field['disabled']) ? ' disabled="disabled"' : ''), ' /></td>';
+              <td id="', $form_name, '_', $name, '_right" class="td_right"><input id="', $form_name, '_', $name, '_input" type="', ($field['type'] == 'password' ? 'password' : 'text'), '" name="', $name, '" value="', $field['value'], '"', ($field['length']['max'] > 0 ? ' maxlength="'. $field['length']['max']. '"' : ''), (!empty($field['disabled']) ? ' disabled="disabled"' : ''), ' /></td>';
       }
       elseif(empty($field['is_custom']) && in_array($field['type'], array('text', 'text-html')))
       {
         echo '
-              <td class="td_right"><textarea name="', $name, '"', ($field['length']['max'] > 0 ? ' onkeyup="s.truncate(this, '. $field['length']['max']. ');"' : ''), ($field['rows'] > 0 ? ' rows="'. $field['rows']. '"' : ''), ($field['cols'] > 0 ? ' cols="'. $field['cols']. '"' : ''), ($field['length']['max'] > 0 ? ' maxlength="'. $field['length']['max']. '"' : ''), (!empty($field['disabled']) ? ' disabled="disabled"' : ''), '>', $field['value'], '</textarea></td>';
+              <td id="', $form_name, '_', $name, '_right" class="td_right"><textarea id="', $form_name, '_', $name, '_input" name="', $name, '"', ($field['length']['max'] > 0 ? ' onkeyup="s.truncate(this, '. $field['length']['max']. ');"' : ''), ($field['rows'] > 0 ? ' rows="'. $field['rows']. '"' : ''), ($field['cols'] > 0 ? ' cols="'. $field['cols']. '"' : ''), ($field['length']['max'] > 0 ? ' maxlength="'. $field['length']['max']. '"' : ''), (!empty($field['disabled']) ? ' disabled="disabled"' : ''), '>', $field['value'], '</textarea></td>';
       }
       elseif(empty($field['is_custom']) && in_array($field['type'], array('select', 'select-multi')))
       {
         echo '
-              <td class="td_right">
-                <select name="', $name, '"', ($field['type'] == 'select-multi' ? ' multiple="multiple"' : ''), ($field['type'] == 'select-multi' && $field['rows'] > 0 ? ' size="'. $field['rows']. '"' : ''), ($field['length']['max'] > 0 ? ' maxlength="'. $field['length']['max']. '"' : ''), (!empty($field['disabled']) ? ' disabled="disabled"' : ''), '>';
+              <td id="', $form_name, '_', $name, '_right" class="td_right">
+                <select id="', $form_name, '_', $name, '_input" name="', $name, '"', ($field['type'] == 'select-multi' ? ' multiple="multiple"' : ''), ($field['type'] == 'select-multi' && $field['rows'] > 0 ? ' size="'. $field['rows']. '"' : ''), ($field['length']['max'] > 0 ? ' maxlength="'. $field['length']['max']. '"' : ''), (!empty($field['disabled']) ? ' disabled="disabled"' : ''), '>';
 
                 if(count($field['options']))
                   foreach($field['options'] as $key => $value)
@@ -686,22 +684,22 @@ class Form
       elseif(empty($field['is_custom']) && $field['type'] == 'checkbox')
       {
         echo '
-              <td class="td_right"><input type="checkbox" name="', $name, '" value="1"', (!empty($field['value']) ? ' checked="checked"' : ''), (!empty($field['disabled']) ? ' disabled="disabled"' : ''), ' /></td>';
+              <td id="', $form_name, '_', $name, '_right" class="td_right"><input id="', $form_name, '_', $name, '_input" type="checkbox" name="', $name, '" value="1"', (!empty($field['value']) ? ' checked="checked"' : ''), (!empty($field['disabled']) ? ' disabled="disabled"' : ''), ' /></td>';
       }
       elseif(empty($field['is_custom']) && $field['type'] == 'hidden')
       {
         echo '
-              <td class="hidden" colspan="2"><input type="hidden" name="', $name, '" value="', $field['value'], '"', (!empty($field['disabled']) ? ' disabled="disabled"' : ''), ' /></td>';
+              <td id="', $form_name, '_', $name, '_right" class="hidden" colspan="2"><input id="', $form_name, '_', $name, '_input" type="hidden" name="', $name, '" value="', $field['value'], '"', (!empty($field['disabled']) ? ' disabled="disabled"' : ''), ' /></td>';
       }
       elseif(empty($field['is_full']))
       {
         echo '
-              <td class="td_right">', (is_callable($field['value']) ? $field['value']() : $field['value']), '</td>';
+              <td id="', $form_name, '_', $name, '_right" class="td_right">', (is_callable($field['value']) ? $field['value']() : $field['value']), '</td>';
       }
       else
       {
         echo '
-              <td class="full" colspan="2">', (is_callable($field['value']) ? $field['value']() : $field['value']), '</td>';
+              <td id="', $form_name, '_', $name, '_right" class="full" colspan="2">', (is_callable($field['value']) ? $field['value']() : $field['value']), '</td>';
       }
 
       echo '
@@ -746,7 +744,7 @@ class Form
     # Do you want the fun of handling this form? You be my guest!
     $errors = null;
     $handled = null;
-    $api->run_hook('form_process', array($form_name, $this->forms[$form_name], &$errors, &$handled));
+    $api->run_hook('form_process', array(&$handled, $form_name, $this->forms[$form_name], &$errors));
 
     if($handled !== null)
     {
@@ -760,6 +758,12 @@ class Form
       # If the form wasn't actually submitted, then we couldn't process it right...
       if(empty($_POST[$form_name]) || count($_POST) == 0 || count($this->forms[$form_name]['fields']) == 0)
         return false;
+
+      # Reset the errors array, just incase.
+      $this->forms[$form_name]['errors'] = array();
+
+      # We will need the validation class, that is for sure!
+      $validation = $api->load_class('Validation');
 
       # Now this is the super fun part, processing everything!!!
       $processed = array();
@@ -796,45 +800,25 @@ class Form
         if(in_array($field['type'], array('string', 'string-html', 'text', 'text-html', 'password', 'hidden')))
         {
           # Set as a string field, in reality, anything can be a string.
-          if(!is_string($_POST[$name]))
+          if(!$validation->data($_POST[$name], 'string'))
           {
             $this->forms[$form_name]['errors'][] = l('The "%s" field must be a string.', htmlchars($this->forms[$form_name]['fields'][$name]['label']));
             continue;
           }
 
-          # Just for good measure ;)
-          $_POST[$name] = (string)$_POST[$name];
-
           # But does it need encoding?!
           if(in_array($field['type'], array('string', 'text', 'password', 'hidden')))
             $_POST[$name] = htmlchars($_POST[$name]);
         }
-        # How about an integer?
-        elseif($field['type'] == 'int')
+        # How about an integer or double?
+        elseif($field['type'] == 'int' || $field['type'] == 'double')
         {
           # Temporarily type-cast the value to an integer, if it isn't the same, it isn't one.
-          if((string)$_POST[$name] != (string)(int)$_POST[$name])
+          if(!$validation->data($_POST[$name], $field['type']))
           {
-            $this->forms[$form_name]['errors'][] = l('The "%s" field must be an integer.', htmlchars($this->forms[$form_name]['fields'][$name]['label']));
+            $this->forms[$form_name]['errors'][] = l('The "%s" field must be an '. ($field['type'] == 'int' ? 'integer' : 'number'). '.', htmlchars($this->forms[$form_name]['fields'][$name]['label']));
             continue;
           }
-
-          $_POST[$name] = (int)$_POST[$name];
-        }
-        # A double?
-        elseif($field['type'] == 'double')
-        {
-          # Same as an integer...
-          if((string)$_POST[$name] != (string)(double)$_POST[$name])
-          {
-            # Just so you know, it says "must be a number." instead of "must be a double."
-            # because I don't think everybody could understand what double means, outside
-            # the computer world that is ;) Though I could be wrong.
-            $this->forms[$form_name]['errors'][] = l('The "%s" field must be a number.', htmlchars($this->forms[$form_name]['fields'][$name]['label']));
-            continue;
-          }
-
-          $_POST[$name] = (double)$_POST[$name];
         }
         # Could it be a checkbox?
         elseif($field['type'] == 'checkbox')
@@ -852,7 +836,9 @@ class Form
 
           # Now to see which ones you selected, if any.
           if(is_array($_POST[$name]) && count($_POST[$name]) > 0)
+          {
             foreach($_POST[$name] as $option_key)
+            {
               # Is it even a valid option?
               if(in_array($option_key, $options))
               {
@@ -861,6 +847,8 @@ class Form
                 if(isset($field['length']['max']) && count($selected) >= $field['length']['max'])
                   break;
               }
+            }
+          }
           elseif(!$is_multi)
             $selected[] = $_POST[$name];
 
@@ -912,7 +900,22 @@ class Form
       {
         # Give the callback the processed information so they can do whatever ;)
         # And return what it returned!!!
-        return $this->forms[$form_name]['callback']($processed);
+        $errors = array();
+        $success = $this->forms[$form_name]['callback']($processed, $errors);
+
+        # Did it fail?
+        if($success === false)
+        {
+          # Any more errors? Add them.
+          if(count($errors))
+            foreach($errors as $error)
+              $this->forms[$form_name]['errors'][] = $error;
+
+          return false;
+        }
+        else
+          # We don't return just true, since the callback could return another value.
+          return $success;
       }
       else
       {
@@ -920,6 +923,38 @@ class Form
         return false;
       }
     }
+  }
+
+  /*
+    Method: json_process
+
+    This is almost identical to the <Form::process> method in every way,
+    except this method returns a JSON encoded string containing information
+    about the submission of the form. Check the notes for more information.
+
+    Parameters:
+      string $form_name - The name of the form.
+
+    Returns:
+      string - Returns a JSON-encoded string.
+
+    Note:
+      The JSON encoded string contains an array of the error messages which
+      occurred while processing the form.
+  */
+  public function json_process($form_name)
+  {
+    # Even though process does this, it echo's the data, which we don't want.
+    if(!$this->form_registered($form_name))
+    {
+      return json_encode(array(l('The form "%s" does not exist.', htmlchars($form_name))));
+    }
+
+    # Now process the form!
+    $this->process($form_name);
+
+    # Now return the JSON encoded string containing any errors, if any, of course!
+    return json_encode($this->forms[$form_name]['errors']);
   }
 }
 ?>
