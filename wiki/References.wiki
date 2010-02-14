@@ -1,23 +1,4 @@
 #summary A list of all the currently documented classes and functions in SnowCMS
 #labels Featured,Phase-Implementation
 
-  * /core/
-    * /engines/
-      * mysql.engine.php
-      * mysql_maintenance.engine.php
-      * mysql_result.engine.php
-    * api.class.php
-      * _class_ API
-      * _function_ load_api
-    * database.class.php _(abstract class)_
-    * database.php
-      * _function_ load_database
-    * database_maintenance.class.php _(abstract class)_
-    * database_result.class.php _(abstract class)_
-  * /plugins/
-  * /themes/
-  * config-sample.php
-  * index.php
-  * setup.php
-  * setup-mysql.sql
-  * setup-sqlite.sql
+To see information about the classes and functions of SnowCMS, [http://snowcms.googlecode.com/svn/docs/index.html check out the docs].
