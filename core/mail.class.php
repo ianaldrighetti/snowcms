@@ -62,7 +62,13 @@ class Mail
       $this->handler = new PHP_Mail();
     }
 
-    $this->options = array();
+    $this->options = array(
+                       'headers' => array(),
+                       'from' => $settings->get('site_email_address', 'string'),
+                       'is_html' => false,
+                       'priority' => 3,
+                       'charset' => 'utf-8',
+                     );
   }
 
   /*
@@ -123,9 +129,6 @@ class Mail
     }
     else
     {
-      if(!isset($this->options['headers']))
-        $this->options['headers'] = array();
-
       $this->options['headers'][strtoupper($header)] = $value;
       return true;
     }
@@ -212,9 +215,34 @@ class Mail
 
       # Alrighty then! Send the message and we are DONE!
       $handled = $this->handler->send($to, $subject, $message, $alt_message);
+
+      if(!empty($handled))
+        $this->close();
     }
 
     return !empty($handled);
+  }
+
+  /*
+    Method: close
+
+    Resets all options
+
+    Parameters:
+      none
+
+    Returns:
+      void - Nothing is returned by this method.
+  */
+  public function close()
+  {
+    $this->options = array(
+                       'headers' => array(),
+                       'from' => $settings->get('site_email_address', 'string'),
+                       'is_html' => false,
+                       'priority' => 3,
+                       'charset' => 'utf-8',
+                     );
   }
 
   /*

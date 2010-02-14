@@ -102,9 +102,11 @@ INSERT INTO '{$db_prefix}settings' ('variable', 'value') VALUES('disallowed_emai
 INSERT INTO '{$db_prefix}settings' ('variable', 'value') VALUES('disallowed_email_domains', '');
 INSERT INTO '{$db_prefix}settings' ('variable', 'value') VALUES('enable_tasks', 1);
 INSERT INTO '{$db_prefix}settings' ('variable', 'value') VALUES('site_name', 'SnowCMS');
+INSERT INTO '{$db_prefix}settings' ('variable', 'value') VALUES('site_email', '');
 INSERT INTO '{$db_prefix}settings' ('variable', 'value') VALUES('theme', 'default');
 INSERT INTO '{$db_prefix}settings' ('variable', 'value') VALUES('max_tasks', 2);
 INSERT INTO '{$db_prefix}settings' ('variable', 'value') VALUES('registration_enabled', 1);
+INSERT INTO '{$db_prefix}settings' ('variable', 'value') VALUES('registration_type', 0);
 INSERT INTO '{$db_prefix}settings' ('variable', 'value') VALUES('enable_utf8', 6);
 INSERT INTO '{$db_prefix}settings' ('variable', 'value') VALUES('members_min_name_length', 3);
 INSERT INTO '{$db_prefix}settings' ('variable', 'value') VALUES('members_max_name_length', 80);
@@ -116,6 +118,8 @@ INSERT INTO '{$db_prefix}settings' ('variable', 'value') VALUES('smtp_is_tls', 0
 INSERT INTO '{$db_prefix}settings' ('variable', 'value') VALUES('smtp_timeout', 5);
 INSERT INTO '{$db_prefix}settings' ('variable', 'value') VALUES('smtp_user', '');
 INSERT INTO '{$db_prefix}settings' ('variable', 'value') VALUES('smtp_pass', '');
+INSERT INTO '{$db_prefix}settings' ('variable', 'value') VALUES('mail_additional_parameters', '');
+INSERT INTO '{$db_prefix}settings' ('variable', 'value') VALUES('default_member_groups', 'member');
 
 CREATE TABLE '{$db_prefix}tasks'
 (

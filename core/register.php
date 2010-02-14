@@ -124,12 +124,34 @@ if(!function_exists('register_process'))
     register_generate_form();
     $form = $api->load_class('Form');
 
-    $success = $form->process('registration_form');
+    $member_id = $form->process('registration_form');
 
     # Processing failed? Then show the errors!
-    if($success === false)
+    if($member_id === false)
+    {
       # The register_view function will handle it nicely:
       register_view();
+      exit;
+    }
+    else
+    {
+      # Now just output a message ;)
+      $theme->set_title(l('Registration complete'));
+
+      $theme->header();
+
+      # Let's get some member information, shall we?
+      $members = $api->load_class('Members');
+      $members->load($member_id);
+
+      $member_info = $members->get($member_id);
+
+      echo '
+      <h1>', l('Registration successful'), '</h1>
+      <p>', l('Thank you for registering %s.', $member_info['name']), ' ', (!empty($member_info['is_activated']) ? l('You may now proceed to <a href="%s">log in to your account</a>.', $base_url. '/index.php?action=login') : ($settings->get('registration_type') == 1 ? l('The site requires an administrator to activate new accounts. You will receive an email once your account has been activated.') : ($settings->get('registration_type') == 2 ? l('The site requires you to activate your account via email, so check you email (%s) for your activation link.', $member_info['email']) : $api->apply_filter('registration_message_other', '')))), '</p>';
+
+      $theme->footer();
+    }
   }
 }
 
@@ -281,8 +303,56 @@ if(!function_exists('register_member'))
   */
   function register_member($options, &$errors = array())
   {
-    echo '<pre>';
-    var_dump($options);
+    global $api, $db, $settings;
+
+    $handled = null;
+    $api->run_hook('register_member', array(&$handled, $options, &$errors));
+
+    if($handled !== null)
+      return $handled;
+
+    # Sweet! Registration time!
+    # So we will need the Members class, super useful!
+    $members = $api->load_class('Members');
+
+    # A couple things, possibly.
+    $add_options = array(
+                     'member_groups' => explode(',', $settings->get('default_member_groups', 'string', 'member')),
+                     'member_activated' => $settings->get('registration_type', 'int', 0) == 0,
+                   );
+
+    # Got something to add, perhaps?
+    $api->run_hook('register_member_add_options', array(&$add_options, &$options, &$errors));
+
+    # Just incase if any hooks added any errors.
+    if(count($errors) > 0)
+      return false;
+
+    # Now add that member, or at least, try.
+    $member_id = $members->add($options['member_name'], $options['member_pass'], $options['member_email'], $add_options);
+
+    # Was it a success? Do we need to send an activation email?
+    if($member_id > 0 && $settings->get('registration_type', 'int', 0) == 2)
+    {
+      # Great! You get the wonders of email activation :P
+      # The activation code and what not has already been set, we just need to get it out.
+      $members->load($member_id);
+      $member_info = $members->get($member_id);
+
+      # We need the Mail class to do this, of course!
+      $mail = $api->load_class('Mail');
+
+      $handled = false;
+      $api->run_hook('register_member_send_email', array(&$handled, $mail, $member_info));
+
+      if(empty($handled))
+      {
+        $mail->send($member_info['email'], $api->apply_filter('register_member_email_subject', l('Account activation for %s', $settings->get('site_name', 'string'))), $api->apply_filter('register_member_email_body', l("Hello there %s, this email comes from %s.\r\n\r\nYou are receiving this email because someone has attempted to register an account on our site with your email address. If this was not you who did this, please disregard this email, no further actions are required.\r\n\r\nIf you did, however, request this account, please activate your account by clicking on the link below:\r\n%s/index.php?action=activate&id=%s&code=%s\r\n\r\nThank you for registering! Hope to see you around!", $member_info['name'], $base_url, $base_url, $member_info['id'], $member_info['acode'])), $api->apply_filter('register_member_alt_email', ''), $api->apply_filter('register_member_email_options', array()));
+      }
+    }
+
+    # Now return the member id.
+    return $member_id;
   }
 }
 ?>

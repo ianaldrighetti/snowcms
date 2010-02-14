@@ -115,7 +115,7 @@ class SMTP
       in order for this to possibly work, even then, the remote server needs
       to support TLS as well.
   */
-  public function connect($host, $port, $is_tls = false, $timeout = 5)
+  public function connect($host, $port = 25, $is_tls = false, $timeout = 5)
   {
     # Already connected to the server?
     if(!empty($this->con))
@@ -201,7 +201,7 @@ class SMTP
     Returns:
       bool - Returns true on success, false on failure.
   */
-  public function start_tls()
+  private function start_tls()
   {
     if(empty($this->con) || !function_exists('stream_socket_enable_crypto'))
       return false;
@@ -230,7 +230,7 @@ class SMTP
     Returns:
       bool - Returns true on success, false on failure.
   */
-  public function send_hello()
+  private function send_hello()
   {
     if(empty($this->con))
       return false;
@@ -429,8 +429,16 @@ class SMTP
   */
   public function send($to, $subject, $message, $alt_message = null)
   {
+    global $api;
+
     if(empty($this->con))
       return false;
+
+    $handled = null;
+    $api->run_hook('smtp_send_pre', array(&$handled, $to, $subject, $message, $alt_message, $this->con, $this->headers, $this->is_html, $this->priority, $this->charset));
+
+    if($handled !== null)
+      return !empty($handled);
 
     # Is the to parameter an array? That's fine, we will change that.
     if(is_array($to))
@@ -534,12 +542,17 @@ class SMTP
     if($this->is_html)
     {
       # It's a message with multiple parts! (HTML and alternative!)
-      $boundary = substr(str_shuffle('ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_abcdefghijklmnopqrstuvwxyz'), 0, 40);
+      $boundary = substr(str_shuffle('abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_'), 0, 40);
       $this->headers['CONTENT-TYPE'] = 'multipart/alternative; boundary="'. $boundary. '"';
 
       # No alternative message? That isn't good practice!
       if(empty($alt_message))
-        $alt_message = strip_tags($message);
+      {
+        $alt_message = $api->apply_filter('smtp_alt_message_create', $message);
+
+        if($alt_message == $message)
+          $alt_message = strip_tags($alt_message);
+      }
     }
 
     # Now format them all correctly.
@@ -548,7 +561,7 @@ class SMTP
       $headers[] = $header. ': '. $value;
 
     # Write them headers! Word wrap them too!
-    fwrite($this->con, wordwrap(implode("\r\n", $headers), 70). "\r\n\r\n");
+    fwrite($this->con, wordwrap($api->apply_filter('smtp_headers', implode("\r\n", $headers)), 70). "\r\n\r\n");
 
     # New lines are ended with \n not \r\n in the message. ;)
     $message = str_replace("\r\n", "\n", $message);
@@ -562,7 +575,7 @@ class SMTP
 
     # Here we go!!!
     if(!isset($boundary))
-      fwrite($this->con, "$message\r\n.\r\n");
+      fwrite($this->con, $api->apply_filter('smtp_message_body', "$message\r\n.\r\n"));
     else
     {
       # Take care of that alternative message too, it needs some lovin'.
@@ -578,7 +591,7 @@ class SMTP
       $body .= "--{$boundary}--\r\n.\r\n";
 
       # Take that server!
-      fwrite($this->con, $body);
+      fwrite($this->con, $api->apply_filter('smtp_multipart_body', $body));
     }
 
     # Was the message accepted?

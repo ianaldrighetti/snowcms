@@ -80,9 +80,9 @@ class Form
 
     # We will use the edit method to add your options ;D
     $this->forms[$form_name] = array(
-                                 'callback' => $form_callback,
-                                 'action' => $form_action,
-                                 'method' => $form_method,
+                                 'callback' => null,
+                                 'action' => null,
+                                 'method' => null,
                                  'submit' => l('Submit'),
                                  'fields' => array(),
                                  'errors' => array(),
