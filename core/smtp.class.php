@@ -20,8 +20,6 @@
 if(!defined('IN_SNOW'))
   die;
 
-# Title: SMTP
-
 /*
   Class: SMTP
 
@@ -332,7 +330,7 @@ class SMTP
     Note:
       $from MUST be ONLY an email address, you cannot supply My Name <address@host.com>,
       as that is not how the MAIL FROM header is setup. However, if you so please, you
-      can set the FROM header in that format using <SMTP::add_header>
+      can set the FROM header in that format using <SMTP::add_header>.
   */
   public function set_from($from)
   {
@@ -501,7 +499,228 @@ class SMTP
     if(empty($this->headers['DATE']))
       $this->headers['DATE'] = date('r');
 
-    # !!! Not done yet ;)
+    # Content-Type, especially if the message is HTML!
+    if(empty($this->headers['CONTENT-TYPE']))
+      $this->headers['CONTENT-TYPE'] = (!empty($this->is_html) ? 'text/html' : 'text/plain'). ';charset='. $this->charset;
+
+    # ME! ME! :P
+    if(empty($this->headers['MIME-VERSION']))
+      $this->headers['MIME-VERSION'] = '1.0';
+
+    # Any priority?
+    if(empty($this->headers['X-PRIORITY']))
+      $this->headers['X-PRIORITY'] = $this->priority;
+
+    if(empty($this->headers['X-MS-PRIORITY']))
+    {
+      if($this->priority == 1)
+        $priority = 'Highest';
+      elseif($this->priority == 2)
+        $priority = 'High';
+      elseif($this->priority == 3)
+        $priority = 'normal';
+      elseif($this->priority == 4)
+        $priority = 'belownormal';
+      else
+        $priority = 'low';
+
+      $this->headers['X-MS-PRIORITY'] = $priority;
+    }
+
+    # Set the X-Mailer! :)
+    $this->headers['X-MAILER'] = 'PHP/'. phpversion(). ' using SnowCMS';
+
+    # We just might need to change the Content-Type again, maybe.
+    if($this->is_html)
+    {
+      # It's a message with multiple parts! (HTML and alternative!)
+      $boundary = substr(str_shuffle('ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_abcdefghijklmnopqrstuvwxyz'), 0, 40);
+      $this->headers['CONTENT-TYPE'] = 'multipart/alternative; boundary="'. $boundary. '"';
+
+      # No alternative message? That isn't good practice!
+      if(empty($alt_message))
+        $alt_message = strip_tags($message);
+    }
+
+    # Now format them all correctly.
+    $headers = array();
+    foreach($this->headers as $header => $value)
+      $headers[] = $header. ': '. $value;
+
+    # Write them headers! Word wrap them too!
+    fwrite($this->con, wordwrap(implode("\r\n", $headers), 70). "\r\n\r\n");
+
+    # New lines are ended with \n not \r\n in the message. ;)
+    $message = str_replace("\r\n", "\n", $message);
+
+    # Wrap them words!
+    $message = wordwrap($message, 70);
+
+    # Just a little windows fix.
+    if(substr(PHP_OS, 0, 3) == 'WIN')
+      $message = str_replace("\n.", "\n..", $message);
+
+    # Here we go!!!
+    if(!isset($boundary))
+      fwrite($this->con, "$message\r\n.\r\n");
+    else
+    {
+      # Take care of that alternative message too, it needs some lovin'.
+      $alt_message = str_replace("\r\n", "\n", $alt_message);
+      $alt_message = wordwrap($alt_message, 70);
+
+      if(substr(PHP_OS, 0, 3) == 'WIN')
+        $alt_message = str_replace("\n.", "\n..", $alt_message);
+
+      # Put the whole message together.
+      $body = "--{$boundary}\r\nContent-Type: text/plain; charset={$this->charset}\r\n\r\n{$alt_message}\r\n\r\n";
+      $body .= "\r\n--{$boundary}\r\nContent-Type: text/html; charset={$this->charset}\r\n\r\n{$message}\r\n\r\n";
+      $body .= "--{$boundary}--\r\n.\r\n";
+
+      # Take that server!
+      fwrite($this->con, $body);
+    }
+
+    # Was the message accepted?
+    $reply_code = (int)substr($this->get_response(), 0, 3);
+
+    if($reply_code == 250)
+    {
+      # Woo! Close that connection, and we are done!
+      $this->close(true);
+      return true;
+    }
+    else
+    {
+      $this->errors[] = l('The server "%s" did not accept the email message.', htmlchars($this->host));
+      return false;
+    }
+  }
+
+  /*
+    Method: close
+
+    Closes the connection to the SMTP server, if any.
+
+    Parameters:
+      bool $quit - Whether or not to send the SMTP server the QUIT
+                   command before closing the connection.
+
+    Returns:
+      bool - Returns true on success, false on failure.
+  */
+  public function close($quit = false)
+  {
+    if(empty($this->con))
+      return false;
+
+    if(!empty($quit))
+    {
+      fwrite($this->con, "QUIT\r\n");
+      $this->get_response();
+    }
+
+    # Close the connection.
+    fclose($this->con);
+
+    # Now delete the rest of the information.
+    $this->host = null;
+    $this->port = 25;
+    $this->is_tls = false;
+    $this->timeout = 5;
+    $this->headers = array();
+    $this->is_html = false;
+    $this->priority = 3;
+    $this->charset = 'utf-8';
+    $this->errors = array();
+
+    return true;
+  }
+
+  /*
+    Method: set_html
+
+    Sets the message to allow HTML.
+
+    Parameters:
+      bool $is_html - Whether or not to allow HTML.
+
+    Returns:
+      bool - Returns true on success, false on failure.
+  */
+  public function set_html($is_html = true)
+  {
+    if(empty($this->con))
+      return false;
+
+    $this->is_html = !empty($is_html);
+    return true;
+  }
+
+  /*
+    Method: set_priority
+
+    Sets the X-PRIORITY and X-MS-PRIORITY header.
+
+    Parameters:
+      int $priority - A number 1 through 5, 1 being the most important
+                      and 5 being the least important.
+
+    Returns:
+      bool - Returns true on success, false on failure.
+  */
+  public function set_priority($priority = 3)
+  {
+    if(empty($this->con) || (string)$priority != (string)(int)$priority || $priority > 5 || $priority < 1)
+      return false;
+
+    $this->priority = (int)$priority;
+    return true;
+  }
+
+  /*
+    Method: set_charset
+
+    Sets the character set of the message.
+
+    Parameters:
+      string $charset
+
+    Returns:
+      bool - Returns true on success, false on failure.
+  */
+  public function set_charset($charset = 'utf-8')
+  {
+    if(empty($this->con) || empty($charset))
+      return false;
+
+    $this->charset = $charset;
+    return true;
+  }
+
+  /*
+    Method: error
+
+    Allows access to the errors which occurred while sending a message.
+
+    Parameters:
+      bool $last_error - Whether or not to return the last message, and the
+                         last message only. If false, all error messages are
+                         returned, however, if there are none, false is returned.
+
+    Returns:
+      mixed - Returns the last error message (if $last_error is true), an array
+              or false if there are no messages.
+  */
+  public function error($last_error = true)
+  {
+    if(count($this->errors) == 0)
+      return false;
+
+    if(!empty($last_error))
+      return $this->errors[count($this->errors) - 1];
+    else
+      return $this->errors;
   }
 }
 ?>

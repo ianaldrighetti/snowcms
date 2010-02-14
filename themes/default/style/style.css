@@ -8,6 +8,11 @@ body {
 	background: #F5F5F5;
 }
 
+input
+{
+  font-family: Georgia, Times, sans-serif;
+}
+
 #wrapper {
 	width: 935px;
 	height: 100%;
@@ -117,7 +122,8 @@ fieldset
   border: none;
 }
 
-.login_form input
+/* Login form CSS */
+#login_form input
 {
   font-size: 120%;
   width: 250px !important;
@@ -135,7 +141,7 @@ fieldset
   padding-right: 5px;
 }
 
-.label
+#login_form .label
 {
   font-weight: normal;
 }
@@ -152,7 +158,7 @@ fieldset
   padding: 2px;
 }
 
-#login_form .errors
+#login_error, #login_form .errors, #registration_form .errors
 {
   margin: 15px 10px 15px 10px;
   padding: 5px;
@@ -160,4 +166,37 @@ fieldset
   border: 2px solid #EE0000;
   text-align: center;
   color: #000000;
+}
+
+/* Registration form CSS */
+#registration_form
+{
+  text-align: center !important;
+  margin: 10px auto;
+}
+
+#registration_form .label
+{
+  font-weight: bold;
+}
+
+#registration_form .subtext
+{
+  font-size: 11px;
+}
+
+#registration_form .td_left
+{
+  text-align: left !important;
+}
+
+#registration_form input
+{
+  width: 200px;
+  font-size: 15px;
+}
+
+#registration_form input[type="submit"]
+{
+  font-weight: bold;
 }

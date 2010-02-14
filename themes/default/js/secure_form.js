@@ -13,7 +13,20 @@ function secure_form(element_id)
     input.name = 'secured_password';
   }
 
-  input.value = typeof login_salt == 'undefined' ? SHA1(element['member_name'].value.toLowerCase() + element['member_pass'].value) : SHA1(SHA1(element['member_name'].value.toLowerCase() + element['member_pass'].value) + login_salt);
+  // Make sure that cookies are enabled, or else there will be some major issues!!!
+  var rand_value = Math.floor(Math.random() * 999) + 1;
+  s.setcookie('login_cookie_check', rand_value, 7);
+
+  if(!s.cookie('login_cookie_check'))
+  {
+    // Cookies don't appear to be enabled, no login salt, sorry!
+    login_salt = null;
+  }
+  else
+    // Delete the cookie, we don't need it anymore :)
+    s.setcookie('login_cookie_check', null, -7);
+
+  input.value = typeof login_salt == 'undefined' || login_salt == null ? SHA1(element['member_name'].value.toLowerCase() + element['member_pass'].value) : SHA1(SHA1(element['member_name'].value.toLowerCase() + element['member_pass'].value) + login_salt);
   element['member_pass'].value = '';
 
   if(typeof element['secured_password'] == 'undefined')
