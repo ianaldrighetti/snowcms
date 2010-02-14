@@ -65,7 +65,7 @@ function errors_handler($error_type, $error_message, $error_file = null, $error_
       return false;
 
     # Just for the record, we need your IP!
-    $member_id = isset($member) && is_object($member) ? $member->id() : 0;
+    $member_id = (int)(isset($member) && is_object($member) ? $member->id() : 0);
     $member_name = isset($member) && is_object($member) ? $member->name() : '';
     $member_ip = isset($member) && is_object($member) ? $member->ip() : (isset($_SERVER['HTTP_X_FORWARDED_FOR']) ? $_SERVER['HTTP_X_FORWARDED_FOR'] : $_SERVER['REMOTE_ADDR']);
 
