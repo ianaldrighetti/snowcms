@@ -151,10 +151,14 @@ function SnowObj()
 
   this.setcookie = function(cookie_name, value, days)
   {
+    var cookieExpires = null;
     if(days)
-      var cookieExpires = (new Date()).setTime((new Date()).getTime() + (days * 86400000));
+    {
+      cookieExpires = new Date();
+      cookieExpires.setTime(cookieExpires.getTime() + (days * 86400000))
+    }
 
-    this.d.cookie = cookie_name + '=' + this.encode(value) + (!days ? '' : ('; expires=' + cookieExpires.toGMTString()));
+    this.d.cookie = cookie_name + '=' + this.encode(value) + (!days ? '' : ('; expires=' + cookieExpires.toUTCString()));
   };
 
   this.trim = function(str)

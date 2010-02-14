@@ -109,6 +109,13 @@ INSERT INTO '{$db_prefix}settings' ('variable', 'value') VALUES('enable_utf8', 6
 INSERT INTO '{$db_prefix}settings' ('variable', 'value') VALUES('members_min_name_length', 3);
 INSERT INTO '{$db_prefix}settings' ('variable', 'value') VALUES('members_max_name_length', 80);
 INSERT INTO '{$db_prefix}settings' ('variable', 'value') VALUES('errors_log', 1);
+INSERT INTO '{$db_prefix}settings' ('variable', 'value') VALUES('mail_handler', 'mail');
+INSERT INTO '{$db_prefix}settings' ('variable', 'value') VALUES('smtp_host', 'localhost');
+INSERT INTO '{$db_prefix}settings' ('variable', 'value') VALUES('smtp_port', 25);
+INSERT INTO '{$db_prefix}settings' ('variable', 'value') VALUES('smtp_is_tls', 0);
+INSERT INTO '{$db_prefix}settings' ('variable', 'value') VALUES('smtp_timeout', 5);
+INSERT INTO '{$db_prefix}settings' ('variable', 'value') VALUES('smtp_user', '');
+INSERT INTO '{$db_prefix}settings' ('variable', 'value') VALUES('smtp_pass', '');
 
 CREATE TABLE '{$db_prefix}tasks'
 (
