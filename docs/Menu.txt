@@ -83,6 +83,7 @@ Group: Core  {
       File: Load Database  (core/database.php)
       }  # Group: Database
 
+   File: Validation  (core/validation.class.php)
    File: Variable functions  (core/func.php)
    }  # Group: Core
 

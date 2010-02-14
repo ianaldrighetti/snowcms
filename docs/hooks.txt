@@ -2,14 +2,15 @@
 ../trunk/index.php:$api->run_hook('pre_start');
 ../trunk/core/form.class.php:      $api->run_hook($form_name);
 ../trunk/core/form.class.php:    $api->run_hook('form_show', array($form_name, $this->forms[$form_name], &$handled));
-../trunk/core/form.class.php:    $api->run_hook('form_show_field', array($name, $field, &$handled));
+../trunk/core/form.class.php:    $api->run_hook('form_show_field', array(&$handled, $form_name, $name, $field));
 ../trunk/core/form.class.php:      $api->run_hook($form_name);
-../trunk/core/form.class.php:    $api->run_hook('form_process', array($form_name, $this->forms[$form_name], &$errors, &$handled));
+../trunk/core/form.class.php:    $api->run_hook('form_process', array(&$handled, $form_name, $this->forms[$form_name], &$errors));
 ../trunk/core/theme.class.php:  $api->run_hook('post_init_theme');
 ../trunk/core/func.php:  $api->run_hook('post_init_func', array(&$func));
 ../trunk/core/checkcookie.php:    $api->run_hook('checkcookie_verify');
 ../trunk/core/checkcookie.php:      $api->run_hook('checkcookie_failed');
 ../trunk/core/checkcookie.php:    $api->run_hook('checkcookie_success');
+../trunk/core/validation.class.php:    $api->run_hook('validation_construct', array(&$this));
 ../trunk/core/errors.php:    $api->run_hook('error_handler', array(&$handled, $error_type, $error_message, $error_file, $error_line, $error_context));
 ../trunk/core/api.class.php:      $api->run_hook('post_plugin_activation');
 ../trunk/core/api.class.php:    $api->run_hook(\'snow_exit\');
@@ -68,11 +69,11 @@
 ../trunk/core/engines/mysql.engine.php:      $api->run_hook($hook_name, array(&$type, &$tbl_name, &$columns, &$data, &$keys));
 ../trunk/core/engines/mysql.engine.php:    $api->run_hook('pre_insert_exec', array(&$type, &$tbl_name, &$columns, &$data, &$keys));
 ../trunk/core/http.class.php:    $api->run_hook('request_callbacks', array(&$request_callbacks));
-../trunk/core/settings.class.php:    $api->run_hook('settings_get_types', array(&$types));
-../trunk/core/settings.class.php:    $api->run_hook('settings_set_types', array(&$types));
 ../trunk/core/settings.class.php:  $api->run_hook('post_init_settings');
 ../trunk/core/session.php:    $api->run_hook('sessions');
 ../trunk/core/login.php:    $api->run_hook('login_view');
+../trunk/core/login.php:                                                                      $api->run_hook(\'login_process_empty_username\');
+../trunk/core/login.php:                                                                      $api->run_hook(\'login_process_empty_password\');
 ../trunk/core/login.php:    $api->run_hook('login_process');
 ../trunk/core/login.php:      $api->run_hook('login_process_token_invalid');
 ../trunk/core/login.php:      $api->run_hook('login_process_empty_fields');
@@ -83,6 +84,5 @@
 ../trunk/core/member.class.php:        $api->run_hook('cookie_data', array(&$member_id, &$passwrd));
 ../trunk/core/member.class.php:        $api->run_hook('cookie_empty', array(&$member_id, &$passwrd));
 ../trunk/core/member.class.php:      $api->run_hook('post_login', array(&$member));
-../trunk/core/member.class.php:      $api->run_hook('settings_get_types', array(&$types));
 ../trunk/core/member.class.php:    $api->run_hook('init_member');
 ../trunk/core/member.class.php:    $api->run_hook('post_init_member');

@@ -7,9 +7,10 @@
 ../trunk/plugins/captcha/captcha.php:  $background = imagecolorallocate($image, $api->apply_filter('captcha_bg_red', 255), $api->apply_filter('captcha_bg_green', 255), $api->apply_filter('captcha_bg_blue', 255));
 ../trunk/core/checkcookie.php:      $login_view_func = $api->apply_filter('login_view_function', 'login_view');
 ../trunk/core/checkcookie.php:        require_once($api->apply_filter('login_view_path', $core_dir. '/login.php'));
-../trunk/core/register.php:    $form->add('registration_form', 'register_member', $api->apply_filter('registration_submit_url', $base_url. '/index.php?action=register2'));
+../trunk/core/register.php:                                      'action' => $api->apply_filter('register_action_url', $base_url. '/index.php?action=register2'),
 ../trunk/core/login.php:    if($func['strlen']($api->apply_filter('login_message', '')) > 0)
 ../trunk/core/login.php:      <div id="', $api->apply_filter('login_message_id', 'login_error'), '">
 ../trunk/core/login.php:        ', $api->apply_filter('login_message', ''), '
 ../trunk/core/login.php:      <form id="login_form" name="login_form" action="', $api->apply_filter('login_action_url', $base_url. '/index.php?action=login2'), '" method="post" class="login_form" onsubmit="', $api->apply_filter('login_onsubmit', 'secure_form(\'login_form\');'), '">
+../trunk/core/login.php:                               'action' => $api->apply_filter('login_action_url', $base_url. '/index.php?action=login2'),
 ../trunk/core/core.php:  ob_start($api->apply_filter('output_callback', null));
