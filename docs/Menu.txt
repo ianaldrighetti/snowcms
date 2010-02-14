@@ -55,6 +55,7 @@ Group: Core  {
    File: Language  (core/l.php)
    File: Mail  (core/mail.class.php)
    File: Mitigate Globals  (core/mitigate_globals.php)
+   File: PHP_Mail  (core/php_mail.class.php)
    File: Settings  (core/settings.class.php)
    File: SMTP  (core/smtp.class.php)
    File: Tasks  (core/tasks.class.php)

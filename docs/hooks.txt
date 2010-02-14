@@ -10,6 +10,7 @@
 ../trunk/core/checkcookie.php:    $api->run_hook('checkcookie_verify');
 ../trunk/core/checkcookie.php:      $api->run_hook('checkcookie_failed');
 ../trunk/core/checkcookie.php:    $api->run_hook('checkcookie_success');
+../trunk/core/php_mail.class.php:    $api->run_hook('php_mail_send_pre', array(&$handled, $to, $subject, $message, $alt_message, $this->options));
 ../trunk/core/validation.class.php:    $api->run_hook('validation_construct', array(&$this));
 ../trunk/core/errors.php:    $api->run_hook('error_handler', array(&$handled, $error_type, $error_message, $error_file, $error_line, $error_context));
 ../trunk/core/api.class.php:      $api->run_hook('post_plugin_activation');
@@ -41,6 +42,7 @@
 ../trunk/core/members.class.php:    $api->run_hook('members_delete', array(&$handled, $members));
 ../trunk/core/members.class.php:      $api->run_hook('post_members_delete', array($members));
 ../trunk/core/l.php:  $api->run_hook('translate', array(&$str, &$args));
+../trunk/core/smtp.class.php:    $api->run_hook('smtp_send_pre', array(&$handled, $to, $subject, $message, $alt_message, $this->con, $this->headers, $this->is_html, $this->priority, $this->charset));
 ../trunk/core/tasks.class.php:      $api->run_hook('tasks_construct', array(&$handled));
 ../trunk/core/tasks.class.php:    $api->run_hook('tasks_add', array(&$handled, $name, $run_every, $func, $file, $enabled));
 ../trunk/core/tasks.class.php:    $api->run_hook('tasks_update', array(&$handled, $name, $options));
@@ -49,9 +51,14 @@
 ../trunk/core/tasks.class.php:    $api->run_hook('tasks_run', array(&$handled, $output_image));
 ../trunk/core/tasks.class.php:      $api->run_hook('tasks_destruct', array(&$handled));
 ../trunk/core/tasks.class.php:  $api->run_hook('post_init_tasks');
+../trunk/core/mail.class.php:    $api->run_hook('mail_construct');
+../trunk/core/mail.class.php:    $api->run_hook('mail_send', array(&$handled, $to, $subject, $message, $alt_message, $options, $this->handler, $this->options));
 ../trunk/core/register.php:    $api->run_hook('register_view');
 ../trunk/core/register.php:      $api->run_hook('registration_disabled');
 ../trunk/core/register.php:    $api->run_hook('register_process');
+../trunk/core/register.php:    $api->run_hook('register_member', array(&$handled, $options, &$errors));
+../trunk/core/register.php:    $api->run_hook('register_member_add_options', array(&$add_options, &$options, &$errors));
+../trunk/core/register.php:      $api->run_hook('register_member_send_email', array(&$handled, $mail, $member_info));
 ../trunk/core/logout.php:      $api->run_hook('logout_failed');
 ../trunk/core/logout.php:    $api->run_hook('logout_success');
 ../trunk/core/engines/mysql_result.engine.php:    $api->run_hook('database_data_seek', array($this->result, $row_num, &$return, &$current));
@@ -75,11 +82,8 @@
 ../trunk/core/login.php:                                                                      $api->run_hook(\'login_process_empty_username\');
 ../trunk/core/login.php:                                                                      $api->run_hook(\'login_process_empty_password\');
 ../trunk/core/login.php:    $api->run_hook('login_process');
-../trunk/core/login.php:      $api->run_hook('login_process_token_invalid');
-../trunk/core/login.php:      $api->run_hook('login_process_empty_fields');
-../trunk/core/login.php:      $api->run_hook('login_process_member_nonexist');
-../trunk/core/login.php:      $api->run_hook('login_process_check_custom', array(&$login_success));
-../trunk/core/login.php:      $api->run_hook('login_process_wrong_password');
+../trunk/core/login.php:      $api->run_hook('login_process_check_custom', array(&$login_success, $login, &$errors));
+../trunk/core/login.php:      $api->run_hook('login_process_failed', array($login));
 ../trunk/core/login.php:    $api->run_hook('login_success', array($row));
 ../trunk/core/member.class.php:        $api->run_hook('cookie_data', array(&$member_id, &$passwrd));
 ../trunk/core/member.class.php:        $api->run_hook('cookie_empty', array(&$member_id, &$passwrd));
