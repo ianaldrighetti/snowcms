@@ -10,7 +10,7 @@ Here is a basic list of requirements, but they might not be all inclusive.
   * MySQL, a version number is unknown, v5 is recommended, but v4 could work. Soon we plan to introduce SQLite v2 support, and hopefully SQLite v3, PostgreSQL and SQL Server.
   * Here are others that aren't required, but recommended:
     * cURL (for downloading remote files, such as plugins, though fsockopen works too, cURL is better :-))
-    * mail() support (Not all hosts [free hosts] support the PHP mail function, it isn't required, as long as fsockopen works, SMTP can be used as well)
+    * mail() support (Not all hosts (free hosts) support the PHP mail function, it isn't required, as long as fsockopen works, SMTP can be used as well)
     * Zlib is _highly_ recommended, as it is used for the extraction of gzipped files, which is usually what plugins will be encased in, along with system updates.
     * JSON function support (From what I have seen, most hosts have this, but if not, don't worry! There are compatibility functions to emulate this, but of course, the ones built-in to PHP are always faster).
     * Safe mode OFF (No one likes safe mode...)
