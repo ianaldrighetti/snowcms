@@ -60,7 +60,7 @@ if(!function_exists('login_view'))
 
     echo '
       <h1>', l('Log in to your account'), '</h1>
-      <p>', l('Here you can login to your account, if you do not have an account, you can <a href="%s">register one</a>.', $base_url. '/index.php?action=register'), '</p>';
+      <p>', l('Here you can login to your account, if you do not have an account, you can <a href="%s">register one</a>. Did you forget your password? Request a new one <a href="%s">here</a>.', $base_url. '/index.php?action=register', $base_url. '/index.php?action=reminder'), '</p>';
 
     # You can hook into this to display a message
     if($func['strlen']($api->apply_filter('login_message', '')) > 0)
@@ -242,7 +242,7 @@ if(!function_exists('login_process'))
   */
   function login_process($login, &$errors = array())
   {
-    global $api, $base_url, $cookie_name, $db, $func, $theme, $member;
+    global $api, $base_url, $cookie_name, $db, $func, $settings, $theme, $member;
 
     $api->run_hook('login_process');
 
@@ -268,6 +268,18 @@ if(!function_exists('login_process'))
 
     # Now let's check that password!
     $row = $result->fetch_assoc();
+
+    # Your account not yet activated? No logging in then!
+    if($row['member_activated'] != 1)
+    {
+      # So, yeah!
+      if($row['member_activated'] == 11)
+        $errors[] = l('Your account has been disabled until you verify your new email address.');
+      else
+        $errors[] = l('Your account has not yet been activated.'. ($settings->get('registration_type', 'int') == 1 ? ' An administrator should approve your account shortly.' : ($settings->get('registration_type', 'int') == 2 ? ' Check your email for further instructions.' : '')));
+
+      return false;
+    }
 
     # No success as of yet.
     $login_success = false;

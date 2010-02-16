@@ -137,7 +137,6 @@ fieldset
 
 #login_form .td_left
 {
-  text-align: right !important;
   padding-right: 5px;
 }
 
@@ -158,7 +157,7 @@ fieldset
   padding: 2px;
 }
 
-#login_error, #login_form .errors, #registration_form .errors
+#login_error, #login_form .errors, #registration_form .errors, #resend_form .errors
 {
   margin: 15px 10px 15px 10px;
   padding: 5px;
@@ -199,4 +198,91 @@ fieldset
 #registration_form input[type="submit"]
 {
   font-weight: bold;
+}
+
+/* Activation form CSS */
+#activation_form table
+{
+  text-align: center !important;
+  margin: 10px auto auto auto;
+}
+
+#activation_form .td_left
+{
+  padding-right: 5px !important;
+}
+
+#activation_form .td_left, #activation_form .td_right
+{
+  text-align: left !important;
+}
+
+#activation_form input
+{
+  font-size: 120%;
+  width: 250px !important;
+}
+
+#activation_form .buttons input
+{
+  margin-top: 10px !important;
+  font-size: 14px;
+  padding: 2px;
+}
+
+#activation_error
+{
+  margin: 15px 10px 15px 10px;
+  padding: 5px;
+  background: #FFCCCC;
+  border: 2px solid #EE0000;
+  text-align: center;
+  color: #000000;
+}
+
+#activation_success
+{
+  margin: 15px 10px 15px 10px;
+  padding: 5px;
+  background: #A6D785;
+  border: 2px solid #458B00;
+  text-align: center;
+  color: #000000;
+}
+
+/* Resend form CSS */
+#resend_form table
+{
+  text-align: center !important;
+  margin: 10px auto;
+}
+
+#resend_form .td_left
+{
+  padding-right: 5px;
+}
+
+#resend_form .td_left, #resend_form .td_right
+{
+  text-align: left !important;
+}
+
+#resend_form .label
+{
+  font-weight: bold;
+}
+
+#resend_form .subtext
+{
+  font-size: 11px;
+}
+
+#resend_success
+{
+  margin: 15px 10px 15px 10px;
+  padding: 5px;
+  background: #A6D785;
+  border: 2px solid #458B00;
+  text-align: center;
+  color: #000000;
 }

@@ -66,11 +66,11 @@ if(!function_exists('logout_process'))
       exit;
     }
 
-    $api->run_hook('logout_success');
-
     # Remove the cookie and session information.
     setcookie($cookie_name, '', time_utc() - 604800);
     unset($_SESSION['member_id'], $_SESSION['member_pass']);
+
+    $api->run_hook('logout_success');
 
     # Let's go home...
     header('Location: '. $base_url);

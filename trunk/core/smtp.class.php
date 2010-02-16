@@ -178,7 +178,7 @@ class SMTP
       return false;
 
     $response = '';
-    while($data = fgets($this->con, 512))
+    while($data = @fgets($this->con, 515))
     {
       $response .= $data;
 
@@ -344,7 +344,7 @@ class SMTP
 
     if($reply_code == 250)
     {
-      $this->add_header('FROM', '<'. $from. '>');
+      $this->add_header('FROM', $from);
       return true;
     }
     else
