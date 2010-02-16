@@ -45,20 +45,22 @@ Footer: Copyright (c) 2008-2010 SnowCMS Team
 
 Group: Core  {
 
-   File: activate_view  (core/activate.php)
-   File: admin.php  (core/admin.php)
+   File: Account activation  (core/activate.php)
+   File: Admin switch  (core/admin.php)
    File: API  (core/api.class.php)
    File: Clean Request  (core/clean_request.php)
    File: Compatibility functions  (core/compat.php)
+   File: Core actions  (core/core.php)
    File: Error Handler  (core/errors.php)
    File: Form  (core/form.class.php)
    File: HTTP  (core/http.class.php)
-   File: init_core  (core/core.php)
    File: Language  (core/l.php)
    File: Mail  (core/mail.class.php)
    File: Mitigate Globals  (core/mitigate_globals.php)
+   File: Password reminder  (core/reminder.php)
    File: PHP_Mail  (core/php_mail.class.php)
-   File: resend.php  (core/resend.php)
+   File: Profile  (core/profile.php)
+   File: Resend activation email  (core/resend.php)
    File: Settings  (core/settings.class.php)
    File: SMTP  (core/smtp.class.php)
    File: Tasks  (core/tasks.class.php)
@@ -93,13 +95,14 @@ Group: Core  {
 
 Group: Plugins  {
 
+   File: CAPTCHA plugin  (plugins/captcha/plugin.php)
    File: Display  (plugins/captcha/captcha.php)
    File: Install  (plugins/captcha/install.php)
-   File: Plugin  (plugins/captcha/plugin.php)
    }  # Group: Plugins
 
 File: Filters  (filters.txt)
 File: Hooks  (hooks.txt)
+File: Secure login plugin  (plugins/securelogin/plugin.php)
 
 Group: Index  {
 
@@ -109,6 +112,5 @@ Group: Index  {
    Variable Index: Variables
    Filter Index: Filters
    Hook Index: Hooks
-   File Index: Files
    }  # Group: Index
 

@@ -90,7 +90,7 @@
 ../trunk/core/login.php:                                                                      $api->run_hook(\'login_process_empty_username\');
 ../trunk/core/login.php:                                                                      $api->run_hook(\'login_process_empty_password\');
 ../trunk/core/login.php:    $api->run_hook('login_process');
-../trunk/core/login.php:      $api->run_hook('login_process_check_custom', array(&$login_success, $login, &$errors));
+../trunk/core/login.php:      $api->run_hook('login_process_check_custom', array(&$login_success, $login, $row, &$errors));
 ../trunk/core/login.php:      $api->run_hook('login_process_failed', array($login));
 ../trunk/core/login.php:    $api->run_hook('login_success', array($row));
 ../trunk/core/member.class.php:        $api->run_hook('cookie_data', array(&$member_id, &$passwrd));
