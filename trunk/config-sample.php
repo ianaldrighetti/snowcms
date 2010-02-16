@@ -46,6 +46,7 @@ $plugin_dir = $base_dir. '/plugins';
 # The address of where your SnowCMS install is accessible (No trailing /!)
 $base_url = '';
 $theme_url = $base_url. '/themes';
+$plugin_url = $base_url. '/plugins';
 
 # What do you want to be the name of the cookie?
 $cookie_name = 'SCMS643';

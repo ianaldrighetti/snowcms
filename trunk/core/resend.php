@@ -20,6 +20,8 @@
 if(!defined('IN_SNOW'))
   die;
 
+# Title: Resend activation email
+
 if(!function_exists('resend_view'))
 {
   /*

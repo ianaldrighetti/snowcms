@@ -20,9 +20,9 @@
 if(!defined('IN_SNOW'))
   die;
 
-# Title: Time functions
-
 /*
+  Title: Time functions
+
   Function: time_utc
 
   Returns the current timestamp in UTC.

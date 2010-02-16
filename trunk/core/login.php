@@ -53,9 +53,6 @@ if(!function_exists('login_view'))
 
     $theme->set_title(l('Log in'));
 
-    # We need this to do our super cool password securererer-er! :P
-    $theme->add_js_file(array('src' => $theme_url. '/default/js/secure_form.js'));
-
     $theme->header();
 
     echo '
@@ -284,18 +281,15 @@ if(!function_exists('login_process'))
     # No success as of yet.
     $login_success = false;
 
-    # Is the secured_password field not empty? Cool, :)
-    if(!empty($_POST['secured_password']) && !empty($_SESSION['last_guest_rand_str']) && $func['strlen']($_POST['secured_password']) == 40 && $_POST['secured_password'] == sha1($row['member_pass']. $_SESSION['last_guest_rand_str']))
-      $login_success = true;
     # It could have been just SHA-1'd.
-    elseif($_POST['secured_password'] == $row['member_pass'])
+    if($_POST['secured_password'] == $row['member_pass'])
       $login_success = true;
     # Maybe it is just plain text, pssssh!
     elseif(sha1($func['strtolower']($login['member_name']). $login['member_pass']) == $row['member_pass'])
       $login_success = true;
     # You want to check something?
     else
-      $api->run_hook('login_process_check_custom', array(&$login_success, $login, &$errors));
+      $api->run_hook('login_process_check_custom', array(&$login_success, $login, $row, &$errors));
 
     # Failed to login? Sucks to be you.
     if(empty($login_success))

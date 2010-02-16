@@ -20,9 +20,9 @@
 if(!defined('IN_SNOW'))
   die;
 
-# Title: Variable functions
-
 /*
+  Title: Variable functions
+
   Function: init_func
 
   init_func initializes the the $func array which contains variable

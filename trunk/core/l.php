@@ -20,9 +20,9 @@
 if(!defined('IN_SNOW'))
   die;
 
-# Title: Language
-
 /*
+  Title: Language
+
   Function: l
   This function is simply passed the text string you want translated (in English!), and
   the translated string is returned. If no translation is available, the original string

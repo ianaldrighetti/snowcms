@@ -20,8 +20,11 @@
 if(!defined('IN_SNOW'))
   die;
 
-# Class: Database
-# The abstract class used by SQL engines.
+/*
+  Class: Database
+
+  This is the abstract class that SQL engines implement.
+*/
 abstract class Database
 {
   # Holds the database connection resource.

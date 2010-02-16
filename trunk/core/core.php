@@ -21,6 +21,8 @@ if(!defined('IN_SNOW'))
   die;
 
 /*
+  Title: Core actions
+
   Function: init_core
 
   Registers actions which are default "features", such as logging in/out,

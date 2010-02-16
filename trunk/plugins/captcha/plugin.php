@@ -20,7 +20,7 @@
 if(!defined('IN_SNOW'))
   die;
 
-# Title: Plugin
+# Title: CAPTCHA plugin
 
 # Register the CAPTCHA image action.
 $api->add_action('captcha', 'captcha_display', dirname(__FILE__). '/captcha.php');

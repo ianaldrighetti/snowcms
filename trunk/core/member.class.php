@@ -513,40 +513,7 @@ if(!function_exists('init_member'))
     if(!isset($member))
       $member = $api->load_class('Member');
 
-    # Are you not logged in? Then we need to go a little something :)
-    if($member->is_guest())
-      $api->add_hook('post_init_theme', 'member_guest_login_prep');
-
     $api->run_hook('post_init_member');
   }
-}
-
-/*
-  Function: member_guest_login_prep
-
-  If the current person browsing the site is a guest, then a random hash
-  needs to be generated which is used for salting their password before
-  they login, that is, if they do login.
-
-  Parameters:
-    none
-
-  Returns:
-    void - Nothing is returned by this function.
-*/
-function member_guest_login_prep()
-{
-  global $api, $theme;
-
-  # The Members class has a random string generator :)
-  $members = $api->load_class('Members');
-
-  # Do we need to store the last random string?
-  if(!empty($_SESSION['guest_rand_str']))
-    $_SESSION['last_guest_rand_str'] = $_SESSION['guest_rand_str'];
-
-  $_SESSION['guest_rand_str'] = $members->rand_str(mt_rand(20, 40));
-
-  $theme->add_js_var('login_salt', $_SESSION['guest_rand_str']);
 }
 ?>
