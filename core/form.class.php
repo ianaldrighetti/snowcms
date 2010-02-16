@@ -586,26 +586,26 @@ class Form
       <form action="', $this->forms[$form_name]['action'], '" method="', $this->forms[$form_name]['method'], '" class="', $form_name, '" id="', $form_name, '">
         <fieldset>
           <table>
-          <tr>
-            <td colspan="2" id="', $form_name, '_errors">';
+            <tr>
+              <td colspan="2" id="', $form_name, '_errors">';
 
       # Any errors? Those needs displayin'!
       if(count($this->forms[$form_name]['errors']) > 0)
       {
         echo '
-              <div class="errors">';
+                <div class="errors">';
 
         foreach($this->forms[$form_name]['errors'] as $error)
           echo '
-              <p>', $error, '</p>';
+                  <p>', $error, '</p>';
 
         echo '
-              </div>';
+                </div>';
       }
 
         echo '
-            </td>
-          </tr>';
+              </td>
+            </tr>';
 
       # Show the fields, you know, the things you enter stuff into.
       if(count($this->forms[$form_name]['fields']) > 0)

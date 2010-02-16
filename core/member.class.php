@@ -147,7 +147,7 @@ if(!class_exists('Member'))
             member_id AS id, member_name AS name, member_pass AS pass, member_hash AS hash, display_name,
             member_email AS email, member_groups AS groups, member_registered AS registered
           FROM {db->prefix}members
-          WHERE member_id = {int:member_id} AND member_activated > 0
+          WHERE member_id = {int:member_id} AND member_activated = 1
           LIMIT 1',
           array(
             'member_id' => $member_id,
@@ -380,25 +380,29 @@ if(!class_exists('Member'))
     */
     public function is_a($what)
     {
-      # Hold on there! If they are an administrator, they are EVERYTHING!!!
-      if($this->is_a('administrator') && (is_string($what) && strtolower($what) != 'administrator'))
+      # Before we check anything, we will check to see if you are an administrator, in which case
+      # you can do EVERYTHING! :)
+      if(in_array('administrator', $this->groups))
         return true;
 
-      if(!is_array($what))
+      # An array of groups?
+      if(is_array($what))
       {
-        $what = strtolower($what);
+        if(count($what) == 0)
+          return false;
 
-        # Is it in our array?
-        return in_array($what, $this->groups);
+        foreach($what as $group)
+          # When you have multiple groups, you must have
+          if(!$this->is_a($group))
+            return false;
+
+        # Nothing went wrong? Good, your all of what what is! ;)
+        return true;
       }
       else
       {
-        foreach($what as $w)
-          if(!$this->is_a($w))
-            return false;
-
-        # No objections? Good.
-        return true;
+        # Simple:
+        return in_array(strtolower($what), $this->groups);
       }
     }
 

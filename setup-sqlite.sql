@@ -120,6 +120,7 @@ INSERT INTO '{$db_prefix}settings' ('variable', 'value') VALUES('smtp_user', '')
 INSERT INTO '{$db_prefix}settings' ('variable', 'value') VALUES('smtp_pass', '');
 INSERT INTO '{$db_prefix}settings' ('variable', 'value') VALUES('mail_additional_parameters', '');
 INSERT INTO '{$db_prefix}settings' ('variable', 'value') VALUES('default_member_groups', 'member');
+INSERT INTO '{$db_prefix}settings' ('variable', 'value') VALUES('disable_admin_security', 0);
 
 CREATE TABLE '{$db_prefix}tasks'
 (

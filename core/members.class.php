@@ -801,6 +801,11 @@ class Members
 
           $handled = $result->success();
         }
+
+        # This member will need to be reloaded ;)
+        unset($this->loaded[$member_id]);
+
+        $api->run_hook('members_update_force_refresh', array($member_id));
       }
     }
 
@@ -878,6 +883,85 @@ class Members
     }
 
     return !empty($handled);
+  }
+
+  /*
+    Method: name_to_id
+
+    Converts a username to an ID.
+
+    Parameters:
+      mixed $name - The username to convert, this can also be an array
+                    of usernames as well.
+
+    Returns:
+      mixed - Returns an integer if one username is supplied, an associative
+              array containing the IDs (LOWER(name) => ID). The value of the
+              name will be false (for arrays or single lookups) if the name
+              was not found.
+
+    Note:
+      Please note that this looks up usernames, not display names!
+  */
+  public function name_to_id($name)
+  {
+    global $api, $db, $func;
+
+    # You might want to do this if you have your own member setup ;)
+    $handled = null;
+    $api->run_hook('member_name_to_id', array(&$handled, $name));
+
+    if($handled === null)
+    {
+      # Is it a bird, a plane, an array?!
+      if(!is_array($name))
+        # It's not an array, yet ;)
+        $name = array($name);
+
+      # Nothing? Bad!
+      if(count($name) == 0)
+        return false;
+
+      # Lowercase all the names.
+      foreach($name as $key => $value)
+        $name[$key] = $func['strtolower']($value);
+
+      # Simple in reality...
+      $result = $db->query('
+        SELECT
+          LOWER(member_name) AS name, member_id AS id
+        FROM {db->prefix}members
+        WHERE '. ($db->case_sensitive ? 'LOWER(member_name)' : 'member_name'). ' IN({string_array:names})',
+        array(
+          'names' => $name,
+        ), 'member_name_to_id_query');
+
+      # Now it gets different... We may just return the ID itself, no array.
+      if(count($name) == 1)
+      {
+        if($result->num_rows() == 0)
+          return false;
+
+        list(, $member_id) = $result->fetch_row();
+        return $member_id;
+      }
+      else
+      {
+        # Flip!!! :-)
+        $names = array_flip($name);
+
+        # For now, we will assume none were found.
+        foreach($names as $key => $name)
+          $names[$key] = false;
+
+        while($row = $result->fetch_assoc())
+          $names[$row['name']] = $row['id'];
+
+        return $names;
+      }
+    }
+
+    return $handled;
   }
 }
 ?>

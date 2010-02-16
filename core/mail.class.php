@@ -64,7 +64,7 @@ class Mail
 
     $this->options = array(
                        'headers' => array(),
-                       'from' => $settings->get('site_email_address', 'string'),
+                       'from' => $settings->get('site_email', 'string'),
                        'is_html' => false,
                        'priority' => 3,
                        'charset' => 'utf-8',
@@ -195,7 +195,7 @@ class Mail
       }
 
       # Set the FROM address.
-      $success = $this->handler->set_from($this->options['from']);
+      $success = $this->handler->set_from(!empty($this->options['from']) ? $this->options['from'] : $settings->get('site_email', 'string'));
 
       if(empty($success))
         return false;
@@ -236,9 +236,11 @@ class Mail
   */
   public function close()
   {
+    global $settings;
+
     $this->options = array(
                        'headers' => array(),
-                       'from' => $settings->get('site_email_address', 'string'),
+                       'from' => $settings->get('site_email', 'string'),
                        'is_html' => false,
                        'priority' => 3,
                        'charset' => 'utf-8',

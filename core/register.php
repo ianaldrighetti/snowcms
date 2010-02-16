@@ -303,7 +303,7 @@ if(!function_exists('register_member'))
   */
   function register_member($options, &$errors = array())
   {
-    global $api, $db, $settings;
+    global $api, $base_url, $db, $settings;
 
     $handled = null;
     $api->run_hook('register_member', array(&$handled, $options, &$errors));
@@ -333,26 +333,56 @@ if(!function_exists('register_member'))
 
     # Was it a success? Do we need to send an activation email?
     if($member_id > 0 && $settings->get('registration_type', 'int', 0) == 2)
-    {
-      # Great! You get the wonders of email activation :P
-      # The activation code and what not has already been set, we just need to get it out.
-      $members->load($member_id);
-      $member_info = $members->get($member_id);
-
-      # We need the Mail class to do this, of course!
-      $mail = $api->load_class('Mail');
-
-      $handled = false;
-      $api->run_hook('register_member_send_email', array(&$handled, $mail, $member_info));
-
-      if(empty($handled))
-      {
-        $mail->send($member_info['email'], $api->apply_filter('register_member_email_subject', l('Account activation for %s', $settings->get('site_name', 'string'))), $api->apply_filter('register_member_email_body', l("Hello there %s, this email comes from %s.\r\n\r\nYou are receiving this email because someone has attempted to register an account on our site with your email address. If this was not you who did this, please disregard this email, no further actions are required.\r\n\r\nIf you did, however, request this account, please activate your account by clicking on the link below:\r\n%s/index.php?action=activate&id=%s&code=%s\r\n\r\nThank you for registering! Hope to see you around!", $member_info['name'], $base_url, $base_url, $member_info['id'], $member_info['acode'])), $api->apply_filter('register_member_alt_email', ''), $api->apply_filter('register_member_email_options', array()));
-      }
-    }
+      register_send_email($member_id);
 
     # Now return the member id.
     return $member_id;
+  }
+}
+
+if(!function_exists('register_send_email'))
+{
+  /*
+    Function: register_send_email
+
+    Sends the activation email to the specified address with the
+    specified information.
+
+    Parameters:
+      string $member_id - The member's ID of who to send the email to.
+
+    Returns:
+      bool - Returns true if the email was successfully sent, false if not.
+
+    Note:
+      Just because the email was successfully sent, does not mean that the
+      email was successfully received by the address specified.
+  */
+  function register_send_email($member_id)
+  {
+    global $api, $base_url, $settings;
+
+    # Great! You get the wonders of email activation :P
+    # The activation code and what not has already been set, we just need to get it out.
+    $members = $api->load_class('Members');
+    $members->load($member_id);
+    $member_info = $members->get($member_id);
+
+    if(empty($member_info))
+      return false;
+
+    # We need the Mail class to do this, of course!
+    $mail = $api->load_class('Mail');
+
+    $handled = null;
+    $api->run_hook('register_member_send_email', array(&$handled, $mail, $member_info));
+
+    if($handled === null)
+    {
+      $handled = $mail->send($member_info['email'], $api->apply_filter('register_member_email_subject', l('Account activation for %s', $settings->get('site_name', 'string'))), $api->apply_filter('register_member_email_body', l("Hello there %s, this email comes from %s.\r\n\r\nYou are receiving this email because someone has attempted to register an account on our site with your email address. If this was not you who did this, please disregard this email, no further actions are required.\r\n\r\nIf you did, however, request this account, please activate your account by clicking on the link below:\r\n%s/index.php?action=activate&id=%s&code=%s\r\n\r\nThank you for registering! Hope to see you around!", $member_info['name'], $base_url, $base_url, $member_info['id'], $member_info['acode'])), $api->apply_filter('register_member_alt_email', ''), $api->apply_filter('register_member_email_options', array()));
+    }
+
+    return !empty($handled);
   }
 }
 ?>
