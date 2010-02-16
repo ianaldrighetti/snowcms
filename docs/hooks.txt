@@ -1,5 +1,6 @@
 ../trunk/plugins/captcha/captcha.php:  $api->run_hook('captcha_display');
 ../trunk/index.php:$api->run_hook('pre_start');
+../trunk/core/resend.php:    $api->run_hook('resend_view');
 ../trunk/core/form.class.php:      $api->run_hook($form_name);
 ../trunk/core/form.class.php:    $api->run_hook('form_show', array($form_name, $this->forms[$form_name], &$handled));
 ../trunk/core/form.class.php:    $api->run_hook('form_show_field', array(&$handled, $form_name, $name, $field));
@@ -15,6 +16,11 @@
 ../trunk/core/errors.php:    $api->run_hook('error_handler', array(&$handled, $error_type, $error_message, $error_file, $error_line, $error_context));
 ../trunk/core/api.class.php:      $api->run_hook('post_plugin_activation');
 ../trunk/core/api.class.php:    $api->run_hook(\'snow_exit\');
+../trunk/core/activate.php:    $api->run_hook('activate_view');
+../trunk/core/activate.php:          $api->run_hook('activation_member_already_activated', array($member_info));
+../trunk/core/activate.php:          $api->run_hook('activation_member_invalid_acode', array($member_info));
+../trunk/core/activate.php:          $api->run_hook('activation_member_success', array($member_info));
+../trunk/core/activate.php:        $api->run_hook('activation_member_nonexist');
 ../trunk/core/messages.class.php:    $api->run_hook('messages_load', array(&$handled, $area_name, $area_id, $cur_page, $per_page, $order, $params));
 ../trunk/core/messages.class.php:          $api->run_hook('messages_load_array', array(&$message, &$member_ids));
 ../trunk/core/messages.class.php:    $api->run_hook('messages_get', array(&$handled, $loaded_id));
@@ -39,8 +45,10 @@
 ../trunk/core/members.class.php:    $api->run_hook('members_update', array(&$handled, $member_id, $options));
 ../trunk/core/members.class.php:      $api->run_hook('members_update_allowed_columns', array(&$allowed_columns));
 ../trunk/core/members.class.php:      $api->run_hook('members_update_check_data', array(&$handled, &$data));
+../trunk/core/members.class.php:        $api->run_hook('members_update_force_refresh', array($member_id));
 ../trunk/core/members.class.php:    $api->run_hook('members_delete', array(&$handled, $members));
 ../trunk/core/members.class.php:      $api->run_hook('post_members_delete', array($members));
+../trunk/core/members.class.php:    $api->run_hook('member_name_to_id', array(&$handled, $name));
 ../trunk/core/l.php:  $api->run_hook('translate', array(&$str, &$args));
 ../trunk/core/smtp.class.php:    $api->run_hook('smtp_send_pre', array(&$handled, $to, $subject, $message, $alt_message, $this->con, $this->headers, $this->is_html, $this->priority, $this->charset));
 ../trunk/core/tasks.class.php:      $api->run_hook('tasks_construct', array(&$handled));
@@ -58,7 +66,7 @@
 ../trunk/core/register.php:    $api->run_hook('register_process');
 ../trunk/core/register.php:    $api->run_hook('register_member', array(&$handled, $options, &$errors));
 ../trunk/core/register.php:    $api->run_hook('register_member_add_options', array(&$add_options, &$options, &$errors));
-../trunk/core/register.php:      $api->run_hook('register_member_send_email', array(&$handled, $mail, $member_info));
+../trunk/core/register.php:    $api->run_hook('register_member_send_email', array(&$handled, $mail, $member_info));
 ../trunk/core/logout.php:      $api->run_hook('logout_failed');
 ../trunk/core/logout.php:    $api->run_hook('logout_success');
 ../trunk/core/engines/mysql_result.engine.php:    $api->run_hook('database_data_seek', array($this->result, $row_num, &$return, &$current));

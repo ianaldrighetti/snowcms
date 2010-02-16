@@ -45,6 +45,8 @@ Footer: Copyright (c) 2008-2010 SnowCMS Team
 
 Group: Core  {
 
+   File: activate_view  (core/activate.php)
+   File: admin.php  (core/admin.php)
    File: API  (core/api.class.php)
    File: Clean Request  (core/clean_request.php)
    File: Compatibility functions  (core/compat.php)
@@ -56,6 +58,7 @@ Group: Core  {
    File: Mail  (core/mail.class.php)
    File: Mitigate Globals  (core/mitigate_globals.php)
    File: PHP_Mail  (core/php_mail.class.php)
+   File: resend.php  (core/resend.php)
    File: Settings  (core/settings.class.php)
    File: SMTP  (core/smtp.class.php)
    File: Tasks  (core/tasks.class.php)
@@ -106,5 +109,6 @@ Group: Index  {
    Variable Index: Variables
    Filter Index: Filters
    Hook Index: Hooks
+   File Index: Files
    }  # Group: Index
 

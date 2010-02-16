@@ -5,6 +5,9 @@
 ../trunk/themes/default/implemented_theme.class.php:    echo $api->apply_filter('theme_post_content', ''), '
 ../trunk/themes/default/implemented_theme.class.php:      <p>', $api->apply_filter('theme_footer', l('Page created in %s seconds with %u queries.', round(microtime(true) - $start_time, 3), $db->num_queries). ' | '. l('Theme by %s.', ' <a href="http://www.sorenstudios.com/" target="_blank" title="Soren Studios">Soren Studios</a>'). ($settings->get('show_version', 'bool') ? ' | '. l('Powered by <a href="http://www.snowcms.com/" target="_blank" title="SnowCMS">SnowCMS</a> v%s', $settings->get('version')) : '')), '</p>
 ../trunk/plugins/captcha/captcha.php:  $background = imagecolorallocate($image, $api->apply_filter('captcha_bg_red', 255), $api->apply_filter('captcha_bg_green', 255), $api->apply_filter('captcha_bg_blue', 255));
+../trunk/core/resend.php:    if(strlen($api->apply_filter('resend_message', '')) > 0)
+../trunk/core/resend.php:      <div id="', $api->apply_filter('resend_message_id', 'resend_success'), '">
+../trunk/core/resend.php:        ', $api->apply_filter('resend_message', ''), '
 ../trunk/core/checkcookie.php:      $login_view_func = $api->apply_filter('login_view_function', 'login_view');
 ../trunk/core/checkcookie.php:        require_once($api->apply_filter('login_view_path', $core_dir. '/login.php'));
 ../trunk/core/php_mail.class.php:        $alt_message = $api->apply_filter('php_mail_alt_message_create', $message);
@@ -12,16 +15,20 @@
 ../trunk/core/php_mail.class.php:      $message = $api->apply_filter('php_mail_multipart_body', $body);
 ../trunk/core/php_mail.class.php:      $message = $api->apply_filter('php_mail_message_body', $message);
 ../trunk/core/php_mail.class.php:    $mail = $api->apply_filter('php_mail_function', isset($func['mail']) ? $func['mail'] : 'mail');
+../trunk/core/activate.php:    if(strlen($api->apply_filter('activation_message', '')) > 0)
+../trunk/core/activate.php:      <div id="', $api->apply_filter('activation_message_id', 'activation_error'), '">
+../trunk/core/activate.php:        ', $api->apply_filter('activation_message', ''), '
 ../trunk/core/smtp.class.php:        $alt_message = $api->apply_filter('smtp_alt_message_create', $message);
 ../trunk/core/smtp.class.php:    fwrite($this->con, wordwrap($api->apply_filter('smtp_headers', implode("\r\n", $headers)), 70). "\r\n\r\n");
 ../trunk/core/smtp.class.php:      fwrite($this->con, $api->apply_filter('smtp_message_body', "$message\r\n.\r\n"));
 ../trunk/core/smtp.class.php:      fwrite($this->con, $api->apply_filter('smtp_multipart_body', $body));
 ../trunk/core/register.php:      <p>', l('Thank you for registering %s.', $member_info['name']), ' ', (!empty($member_info['is_activated']) ? l('You may now proceed to <a href="%s">log in to your account</a>.', $base_url. '/index.php?action=login') : ($settings->get('registration_type') == 1 ? l('The site requires an administrator to activate new accounts. You will receive an email once your account has been activated.') : ($settings->get('registration_type') == 2 ? l('The site requires you to activate your account via email, so check you email (%s) for your activation link.', $member_info['email']) : $api->apply_filter('registration_message_other', '')))), '</p>';
 ../trunk/core/register.php:                                      'action' => $api->apply_filter('register_action_url', $base_url. '/index.php?action=register2'),
-../trunk/core/register.php:        $mail->send($member_info['email'], $api->apply_filter('register_member_email_subject', l('Account activation for %s', $settings->get('site_name', 'string'))), $api->apply_filter('register_member_email_body', l("Hello there %s, this email comes from %s.\r\n\r\nYou are receiving this email because someone has attempted to register an account on our site with your email address. If this was not you who did this, please disregard this email, no further actions are required.\r\n\r\nIf you did, however, request this account, please activate your account by clicking on the link below:\r\n%s/index.php?action=activate&id=%s&code=%s\r\n\r\nThank you for registering! Hope to see you around!", $member_info['name'], $base_url, $base_url, $member_info['id'], $member_info['acode'])), $api->apply_filter('register_member_alt_email', ''), $api->apply_filter('register_member_email_options', array()));
+../trunk/core/register.php:      $handled = $mail->send($member_info['email'], $api->apply_filter('register_member_email_subject', l('Account activation for %s', $settings->get('site_name', 'string'))), $api->apply_filter('register_member_email_body', l("Hello there %s, this email comes from %s.\r\n\r\nYou are receiving this email because someone has attempted to register an account on our site with your email address. If this was not you who did this, please disregard this email, no further actions are required.\r\n\r\nIf you did, however, request this account, please activate your account by clicking on the link below:\r\n%s/index.php?action=activate&id=%s&code=%s\r\n\r\nThank you for registering! Hope to see you around!", $member_info['name'], $base_url, $base_url, $member_info['id'], $member_info['acode'])), $api->apply_filter('register_member_alt_email', ''), $api->apply_filter('register_member_email_options', array()));
 ../trunk/core/login.php:    if($func['strlen']($api->apply_filter('login_message', '')) > 0)
 ../trunk/core/login.php:      <div id="', $api->apply_filter('login_message_id', 'login_error'), '">
 ../trunk/core/login.php:        ', $api->apply_filter('login_message', ''), '
 ../trunk/core/login.php:                               'action' => $api->apply_filter('login_action_url', $base_url. '/index.php?action=login2'),
 ../trunk/core/login.php:    setcookie($api->apply_filter('login_cookie_name', $cookie_name), $api->apply_filter('login_cookie_value', $row['member_id']. '|'. sha1($row['member_pass']. $row['member_hash'])), $cookie_expires);
 ../trunk/core/core.php:  ob_start($api->apply_filter('output_callback', null));
+../trunk/core/admin.php:    $allowed_groups = $api->apply_filter('admin_allowed_groups', array('administrator'));
