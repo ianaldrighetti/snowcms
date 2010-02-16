@@ -20,6 +20,8 @@
 if(!defined('IN_SNOW'))
   die;
 
+# Title: Cookie verification
+
 if(!function_exists('checkcookie_verify'))
 {
   /*

@@ -29,8 +29,6 @@ if(!defined('IN_SNOW'))
   did to variables like $_GET, $_POST, $_REQUEST, etc.
 */
 
-
-# This is a pluggable function, so make sure someone hasn't defined it already...
 if(!function_exists('clean_request'))
 {
   /*

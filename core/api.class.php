@@ -22,6 +22,7 @@ if(!defined('IN_SNOW'))
 
 /*
   Class: API
+
   This class is a major part of SnowCMS, it allows plugins (or flakes) to use hooks in various places
   which allow the plugins to add new features, or change how current features work as well.
 */

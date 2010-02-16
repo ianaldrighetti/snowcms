@@ -21,6 +21,7 @@ if(!defined('IN_SNOW'))
   die;
 
 # Title: Logout Handler
+
 if(!function_exists('logout_process'))
 {
   /*

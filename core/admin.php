@@ -20,6 +20,8 @@
 if(!defined('IN_SNOW'))
   die;
 
+# Title: Admin switch
+
 if(!function_exists('admin_switch'))
 {
   /*

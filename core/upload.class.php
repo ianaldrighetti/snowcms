@@ -22,6 +22,10 @@ if(!defined('IN_SNOW'))
 
 /*
   Class: Upload
+
+  Whenever any file is being uploaded by a user, this is the class to handle
+  it. The Upload class is another one of those numerous available tools to
+  make your development go a lot quicker.
 */
 class Upload
 {

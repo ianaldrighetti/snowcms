@@ -22,6 +22,7 @@ if(!defined('IN_SNOW'))
 
 /*
   Class: HTTP
+
   The HTTP class allows you to access remote files on the Internet.
   Makes it easier on you, and it also makes it better for end users
   otherwise some plugins may only support curl or fsockopen, but with

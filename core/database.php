@@ -24,7 +24,14 @@ if(!defined('IN_SNOW'))
 
 /*
   Function: load_database
-  Loads the database
+
+  Loads the proper SQL engine class into the $db variable.
+
+  Parameters:
+    none
+
+  Returns:
+    void - Nothing is returned by this function.
 */
 function load_database()
 {

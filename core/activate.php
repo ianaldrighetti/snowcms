@@ -20,6 +20,8 @@
 if(!defined('IN_SNOW'))
   die;
 
+# Title: Account activation
+
 if(!function_exists('activate_view'))
 {
   /*

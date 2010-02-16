@@ -19,4 +19,6 @@
 
 if(!defined('IN_SNOW'))
   die;
+
+# Title: Password reminder
 ?>

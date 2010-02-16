@@ -20,9 +20,9 @@
 if(!defined('IN_SNOW'))
   die;
 
-# Title: Error Handler
-
 /*
+  Title: Error Handler
+
   Function: errors_handler
 
   This is a function which is registered with <http://www.php.net/set_error_handler>,
