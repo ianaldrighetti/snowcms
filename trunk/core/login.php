@@ -57,7 +57,7 @@ if(!function_exists('login_view'))
 
     echo '
       <h1>', l('Log in to your account'), '</h1>
-      <p>', l('Here you can login to your account, if you do not have an account, you can <a href="%s">register one</a>. Did you forget your password? Request a new one <a href="%s">here</a>.', $base_url. '/index.php?action=register', $base_url. '/index.php?action=reminder'), '</p>';
+      <p>', l('Here you can log in to your account, if you do not have an account, you can <a href="%s">register one</a>. Did you forget your password? Request a new one <a href="%s">here</a>.', $base_url. '/index.php?action=register', $base_url. '/index.php?action=reminder'), '</p>';
 
     # You can hook into this to display a message
     if($func['strlen']($api->apply_filter('login_message', '')) > 0)
@@ -129,7 +129,7 @@ if(!function_exists('login_generate_form'))
                                                                     }
 
                                                                     return true;'),
-                                                    'value' => !empty($_POST['member_name']) ? $_POST['member_name'] : '',
+                                                    'value' => !empty($_REQUEST['member_name']) ? $_REQUEST['member_name'] : '',
                                                   ));
 
     $form->add_field('login_form', 'member_pass', array(
