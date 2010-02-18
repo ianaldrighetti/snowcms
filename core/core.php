@@ -57,7 +57,7 @@ function init_core()
   $api->add_action('register2', 'register_process', $core_dir. '/register.php');
   $api->add_action('resend', 'resend_view', $core_dir. '/resend.php');
   $api->add_action('reminder', 'reminder_view', $core_dir. '/reminder.php');
-  $api->add_action('reminder2', 'reminder_process', $core_dir. '/reminder.php');
+  $api->add_action('reminder2', 'reminder_view2', $core_dir. '/reminder.php');
 
   # Start output buffering.
   ob_start($api->apply_filter('output_callback', null));

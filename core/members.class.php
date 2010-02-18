@@ -668,8 +668,8 @@ class Members
                            that the administrator has set the option to require the member
                            to verify their new email address before it is changed.
         member_acode - An activation code for activating or reactivating their account.
-        data - An array containing nested arrays formatted in: array(variable => value).
-               These are added to the member_data table.
+        data - An array formatted as so: variable => value, simple, no? If you want to delete
+               a data variable for the specified member, set the value to false.
         admin_override - Set this to true if it is the administrator modifying the account, in
                          which case an activation code is generated (but it can be supplied) and
                          the members activation state changes to 11, and they are required to set
@@ -789,17 +789,39 @@ class Members
         if(!empty($member_data) && count($member_data) > 0 && ($handled === null || $handled))
         {
           $data = array();
+          $delete = array();
           foreach($member_data as $variable => $value)
-            $data[] = array($member_id, $variable, $value);
+          {
+            if($value !== false)
+              $data[] = array($member_id, $variable, $value);
+            else
+              $delete[] = $variable;
+          }
 
-          $result = $db->insert('replace', '{db->prefix}member_data',
-                      array(
-                        'member_id' => 'int', 'variable' => 'string-255', 'value' => 'string',
-                      ),
-                      $data,
-                      array('member_id'), 'members_update_data_query');
+          if(count($data) > 0)
+          {
+            $result = $db->insert('replace', '{db->prefix}member_data',
+                        array(
+                          'member_id' => 'int', 'variable' => 'string-255', 'value' => 'string',
+                        ),
+                        $data,
+                        array('member_id'), 'members_update_data_query');
 
-          $handled = $result->success();
+            $handled = $result->success();
+          }
+
+          if(count($delete) > 0)
+          {
+            $result = $db->query('
+              DELETE FROM {db->prefix}member_data
+              WHERE member_id = {int:member_id} AND variable IN({string_array:variables})',
+              array(
+                'member_id' => $member_id,
+                'variables' => $delete,
+              ), 'members_update_delete_data_query');
+
+            $handled = $result->success();
+          }
         }
 
         # This member will need to be reloaded ;)

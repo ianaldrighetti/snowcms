@@ -157,7 +157,7 @@ fieldset
   padding: 2px;
 }
 
-#login_error, #login_form .errors, #registration_form .errors, #resend_form .errors
+#login_error, #login_form .errors, #registration_form .errors, #resend_form .errors, #reminder_form .errors, #reset_password_form .errors
 {
   margin: 15px 10px 15px 10px;
   padding: 5px;
@@ -250,34 +250,34 @@ fieldset
   color: #000000;
 }
 
-/* Resend form CSS */
-#resend_form table
+/* Resend and reminder form CSS */
+#resend_form table, #reminder_form table, #reset_password_form table
 {
   text-align: center !important;
   margin: 10px auto;
 }
 
-#resend_form .td_left
+#resend_form .td_left, #reminder_form .td_left, #reset_password_form .td_left
 {
   padding-right: 5px;
 }
 
-#resend_form .td_left, #resend_form .td_right
+#resend_form .td_left, #resend_form .td_right, #reminder_form .td_left, #reminder_form .td_right, #reset_password_form .td_left, #reset_password_form .td_right
 {
   text-align: left !important;
 }
 
-#resend_form .label
+#resend_form .label, #reminder_form .label, #reset_password_form .label
 {
   font-weight: bold;
 }
 
-#resend_form .subtext
+#resend_form .subtext, #reminder_form .subtext, #reset_password_form .subtext
 {
   font-size: 11px;
 }
 
-#resend_success
+#resend_success, #reminder_success, #reset_password_success
 {
   margin: 15px 10px 15px 10px;
   padding: 5px;
