@@ -82,39 +82,4 @@ if(!function_exists('clean_request'))
     return $array;
   }
 }
-
-/*
-  Function: htmlchars
-
-  Encodes the supplied string with htmlspecialchars with ENT_QUOTES and UTF-8
-  as parameters. This function is here to simplify coding so you don't have to
-  repeatedly to ENT_QUOTES, 'UTF-8' over and over again! ;)
-
-  Parameters:
-    string $str - The string to encode.
-
-  Returns:
-    string - Returns the encoded string.
-*/
-function htmlchars($str)
-{
-  return htmlspecialchars($str, ENT_QUOTES, 'UTF-8');
-}
-
-/*
-  Function: htmlchars_decode
-
-  Decodes the supplied string with htmlspecialchars_decode with ENT_QUOTES
-  as parameters.
-
-  Parameters:
-    string $str - The string to decode.
-
-  Returns:
-    string - Returns the decoded string.
-*/
-function htmlchars_decode($str)
-{
-  return htmlspecialchars_decode($str, ENT_QUOTES);
-}
 ?>

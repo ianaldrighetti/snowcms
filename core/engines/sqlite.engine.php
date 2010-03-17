@@ -20,73 +20,83 @@
 if(!defined('IN_SNOW'))
   die;
 
-class MySQL extends Database
+class SQLite extends Database
 {
   public function connect()
   {
-    global $db_host, $db_name, $db_pass, $db_persist, $db_type, $db_user, $tbl_prefix;
+    # We only need the database host (path to database), whether you want a
+    # persistent connection, and the table prefix.
+    global $db_host, $db_persist, $tbl_prefix;
 
-    # Persistent connection or not?
+    # Make it persistent, or not?
     if(empty($db_persist))
-      $this->con = @mysql_connect($db_host, $db_user, $db_pass);
+      $this->con = @sqlite_open($db_host);
     else
-      $this->con = @mysql_pconnect($db_host, $db_user, $db_pass);
+      $this->con = @sqlite_popen($db_host);
 
-    # Fail to connect?
+    # Couldn't open the database?
     if(empty($this->con))
     {
-      # Show the message.
       $this->log_error(1, true);
       return false;
     }
 
-    # Select the database now ;)
-    $select_db = @mysql_select_db($db_name, $this->con);
-
-    # Failed to select the database..? That isn't good!
-    if(empty($select_db))
-      $this->log_error(2, true);
-
-    # Sweet, everything seems to be in order so far, set a couple other things others
-    # may need to use at a later time.
+    # All done, set a couple things, though.
     $this->prefix = $tbl_prefix;
-    $this->type = 'MySQL';
-    $this->case_sensitive = false;
-    $this->drop_if_exists = true;
-    $this->if_not_exists = true;
-    $this->extended_inserts = true;
+    $this->type = 'SQLite v2';
 
-    # Alright, we are done here.
+    # SQLite is case sensitive.
+    $this->case_sensitive = true;
+
+    # It doesn't support DROP IF EXISTS or IF NOT EXISTS, nor extended inserts...
+    $this->drop_if_exists = false;
+    $this->if_not_exists = false;
+    $this->extended_inserts = false;
+
+    # Set short columns on (Otherwise when you do joins, the table alias
+    # is prepended in the column name...)
+    @sqlite_query('PRAGMA short_column_names = 1', $this->con);
+
     return true;
   }
 
   public function close()
   {
-    return @mysql_close($this->con);
+    # SQLite's closing function returns nothing...
+    if(!empty($this->con))
+    {
+      @sqlite_close($this->con);
+      return true;
+    }
+    else
+      return false;
   }
 
   public function errno()
   {
-    return @mysql_errno($this->con);
+    return @sqlite_last_error($this->con);
   }
 
   public function error()
   {
-    return @mysql_error($this->con);
+    return @sqlite_error_string($this->errno());
   }
 
   public function escape($str, $htmlspecialchars = false)
   {
     global $func;
 
-    return @mysql_real_escape_string(!empty($htmlspecialchars) ? $func['htmlspecialchars']($str) : $str, $this->con);
+    return sqlite_escape_string(!empty($htmlspecialchars) ? $func['htmlspecialchars']($str) : $str);
   }
 
   public function unescape($str, $htmlspecialchars_decode = false)
   {
     global $func;
 
-    return !empty($htmlspecialchars_decode) ? $func['htmlspecialchars_decode'](stripslashes($str)) : stripslashes($str);
+    # Convert '' to '
+    $str = str_replace('\'\'', '\'', $str);
+
+    return !empty($htmlspecialchars_decode) ? $func['htmlspecialchars_decode']($str) : $str;
   }
 
   public function version()
@@ -94,11 +104,8 @@ class MySQL extends Database
     if(empty($this->con))
       return false;
 
-    $result = $db->query('
-      SELECT VERSION()');
-    list($version) = $result->fetch_row();
-
-    return $version;
+    # Easy enough...
+    return sqlite_libversion();
   }
 
   public function tables()
@@ -106,9 +113,13 @@ class MySQL extends Database
     if(empty($this->con))
       return false;
 
+    # The master table contains a list of tables and indexes.
     $result = $db->query('
-      SHOW TABLES');
+      SELECT
+        tbl_name
+      FROM sqlite_master WHERE type = \'table\'');
 
+    # Load'em up!
     $tables = array();
     while($row = $result->fetch_row())
       $tables[] = $row[0];
@@ -123,11 +134,11 @@ class MySQL extends Database
     if(empty($this->con))
       return false;
 
-    # Just incase, for some odd reason :P
+    # Just incase, you want to change something.
     if(!empty($hook_name))
       $api->run_hook($hook_name, array(&$db_query, &$db_vars, &$db_compat));
 
-    # debug set?
+    # Debugging?
     if(isset($db_vars['debug']))
     {
       $prev_debug = $this->debug;
@@ -136,12 +147,31 @@ class MySQL extends Database
       unset($db_vars['debug']);
     }
 
-    /*
+    # Figure out the command we are using, so we can be a tad more efficient.
+    $command = strtoupper(trim(substr(trim($db_query), 0, strpos(trim($db_query), ' '))));
 
-      In other databases such as SQLite, PostgreSQL, SQL Server, etc. anything that isn't
-      MySQL at this time would do any query fixing to make it parse right upon execution.
+    # Now for some SQLite changes..! FUN!
+    # SQLite does have support for UPDATE IGNORE, but it's UPDATE OR IGNORE...
+    if($command == 'UPDATE' && stripos($db_query, 'UPDATE IGNORE') !== false)
+      $db_query = str_ireplace('UPDATE IGNORE', 'UPDATE OR IGNORE', $db_query);
 
-    */
+    # SQLite is naughty, and doesn't support LIMIT's in UPDATE and DELETE queries...
+    if(($command == 'UPDATE' || $command == 'DELETE') && (preg_match('~UPDATE(?:.*?)SET~is', $db_query) == 1 || stripos($db_query, 'DELETE FROM') !== false) && preg_match('~(?:LIMIT\s+(?:\d+|%.*)(?:\s*,\s*(?:\d+|%.*))?)~i', $db_query, $matches) == 1)
+      $db_query = str_replace($matches[0], ' ', $db_query);
+
+    # ASC or DESC flag in a GROUP BY? Nope.
+    if($command == 'SELECT' && preg_match('~GROUP BY (.*?) (?:ASC|DESC)~', $db_query, $matches))
+      # So just remove the ASC or DESC...
+      $db_query = str_replace($matches[0], str_replace(array('ASC', 'DESC'), '', $matches[0]), $db_query);
+
+    # TRUNCATE? Nope. It's just a DELETE FROM.
+    if($command == 'TRUNCATE')
+      # It could be TRUNCATE TABLE though too, so check that.
+      $db_query = str_ireplace(stripos($db_query, 'TRUNCATE TABLE') !== false ? 'TRUNCATE TABLE' : 'TRUNCATE', 'DELETE FROM', $db_query);
+
+    # Any random function call? It's RANDOM() in SQLite.
+    if(preg_match('~RAND\((?:.*?)\)~', $db_query, $matches))
+      $db_query = str_replace($matches[0], 'RAND()', $db_query);
 
     # Let's use debug_backtrace() to find where this was called and what not ;)
     # Only if file and line aren't set already ;)
@@ -201,40 +231,41 @@ class MySQL extends Database
       }
     }
 
-    # For every query...
+    # For every query, you know, if there were a cache plugin :P
     $return = null;
     $api->run_hook('pre_query_exec', array(&$db_query, &$db_vars, &$db_compat, &$hook_name, &$return));
 
+    # Did you set anything?
     if(!empty($return))
       return $return;
 
-    # Woo!!! QUERY THAT DATABASE!
+    # Now run that query!
     $query_start = microtime(true);
-    $query_result = mysql_query(trim($db_query), $this->con);
+    $query_result = sqlite_query($db_query, $this->con, SQLITE_BOTH, $query_error);
     $query_took = round(microtime(true) - $query_start, 5);
 
-    # That is one more query!
     $this->num_queries++;
 
-    # Let's not call on it multiple times, mmk?
-    $mysql_errno = $this->errno();
-    $mysql_error = $this->error();
+    # Any errors? SQLite query errors won't be returned by errno() or error()...
+    $sqlite_errno = 0;
+    $sqlite_error = $query_error;
 
-    # Debug this query, perhaps?
+    # Debug this query?
     if(!empty($this->debug))
     {
-      $this->debug_text .= "Query:\r\n$db_query\r\nFile: $file\r\nLine: $line\r\nExecuted in $query_took seconds.\r\nError: ". (empty($query_result) ? '['. $mysql_errno. '] '. $mysql_error : 'None'). "\r\n\r\n";
+      $this->debug_text .= "Query:\r\n$db_query\r\nFile: $file\r\nLine: $line\r\nExecuted in $query_took seconds.\r\nError: ". (empty($query_result) ? $sqlite_error : 'None'). "\r\n\r\n";
       $this->debug = isset($prev_debug) ? $prev_debug : $this->debug;
     }
 
-    # An error occur?
+    # Did an error occur?
     if(empty($query_result))
-      $this->log_error('['. $mysql_errno. '] '. $mysql_error, true, $file, $line);
+      $this->log_error($sqlite_error, true, $file, $line);
 
-    # Put it in a MySQLResult Object ;)
-    $result = new $this->result_class($query_result, mysql_affected_rows($this->con), $db_compat == 'insert' ? mysql_insert_id($this->con) : 0, $mysql_errno, $mysql_error, $this->num_queries - 1);
+    # We shall return the result in an SQLiteResult Object.
+    $result = new $this->result_class($query_result, sqlite_changes($this->con), $db_compat == 'insert' ? sqlite_last_insert_rowid($this->con) : 0, $sqlite_errno, $sqlite_error, $this->num_queries - 1);
 
-    $api->run_hook('post_query_exec', array(&$result, $db_query, $query_result, $this->result_class, $db_compat, $hook_name, $query_took, $mysql_errno, $mysql_error));
+    # Maybe you want to cache it or something..?
+    $api->run_hook('post_query_exec', array(&$result, $db_query, $query_result, $this->result_class, $db_compat, $hook_name, $query_took, $sqlite_errno, $sqlite_error));
 
     return $result;
   }
@@ -339,75 +370,7 @@ class MySQL extends Database
 
     return implode(', ', $new_value);
   }
-
-  public function insert($type, $tbl_name, $columns, $data, $keys = array(), $hook_name = null)
-  {
-    global $api;
-
-    if(empty($this->con))
-      return false;
-
-    if(!empty($hook_name))
-      $api->run_hook($hook_name, array(&$type, &$tbl_name, &$columns, &$data, &$keys));
-
-    $api->run_hook('pre_insert_exec', array(&$type, &$tbl_name, &$columns, &$data, &$keys));
-
-    # Let's get where you called us from!
-    $backtrace = debug_backtrace();
-    $file = realpath($backtrace[0]['file']);
-    $line = (int)$backtrace[0]['line'];
-    unset($backtrace);
-
-    $type = strtolower($type);
-
-    # We only support insert, ignore and replace.
-    if(!in_array($type, array('insert', 'ignore', 'replace')))
-      $this->log_error('Unknown insert type '. $type, true, $file, $line);
-
-    # Replace {db->prefix} and {db_prefix} with $this->prefix
-    $tbl_name = strtr($tbl_name, array('{db->prefix}' => $this->prefix, '{db_prefix}' => $this->prefix));
-
-    # Just an array, and not an array inside an array? We'll fix that...
-    if(!isset($data[0]) || !is_array($data[0]))
-      $data = array($data);
-
-    # The number of columns :)
-    $num_columns = count($columns);
-
-    # Now get the column names, quite useful you know :)
-    $column_names = array_keys($columns);
-
-    # Now we can get all the rows ready :)
-    $rows = array();
-    foreach($data as $row_index => $row)
-    {
-      # Not enough data?
-      if($num_columns != count($row))
-        $this->log_error('Number of columns doesn\'t match the number of supplied columns in row #'. ($row_index + 1), true, $file, $line);
-
-      # Save the values to an array, all sanitized and what not, of course!
-      $values = array();
-      foreach($row as $index => $value)
-        $values[] = $this->var_sanitize($column_names[$index], $columns[$column_names[$index]], $value, $file, $line);
-
-      # Add those values to our rows now :)
-      $rows[] = '('. implode(', ', $values). ')';
-    }
-
-    $inserts = array(
-      'insert' => 'INSERT',
-      'ignore' => 'INSERT IGNORE',
-      'replace' => 'REPLACE',
-    );
-
-    # Construct the query, MySQL suports extended inserts! Hip hip! HURRAY!
-    $db_query = $inserts[$type]. ' INTO `'. $tbl_name. '` (`'. implode('`, `', $column_names). '`) VALUES'. implode(', ', $rows);
-
-    # Let query handle it XD! (passes insert in db compat to let you know
-    # if you don't have to do anything at all, which you shouldn't!!!
-    return $this->query($db_query, array(), null, 'insert');
-  }
 }
 
-$db_class = 'MySQL';
+$db_class = 'SQLite';
 ?>
