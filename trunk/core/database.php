@@ -50,10 +50,6 @@ function load_database()
     if(!empty($db_class) && !empty($db_result_class) && class_exists($db_class) && class_exists($db_result_class))
     {
       $db = new $db_class($db_result_class);
-
-      # One last check, then we are done :D
-      if(!$db->connect())
-        $db->log_error(1, true);
     }
     else
       die(!empty($db_class) || !empty($db_result_class) ? '$db_class or $db_result_class was not specified in the SQL engine files!' : 'The classes specified in $db_class or $db_result_class were not found!');

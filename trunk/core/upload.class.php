@@ -38,7 +38,7 @@ class Upload
   }
 
   /*
-    Method: add_upload
+    Method: add
 
     Adds the specified upload to the uploads table.
 
@@ -57,6 +57,22 @@ class Upload
       int - Returns the uploads identifier which is specific to the specified area name
             and id (Meaning their can be multiple upload_id's that are 1, but in different
             areas). However, if it failed, false will be returned.
+
+    Note:
+      The following options are supported:
+        member_id - The id of the member of whom the upload was added by, defaults
+                    to the current user.
+        member_name - The name of the member of whom the upload was added by, defaults
+                      to the current user.
+        member_email - The email of the member of whom the upload was added by, defaults
+                       to the current user.
+        member_ip - The IP address of the member of whom the upload was added by, defaults
+                    to the current user.
+        modified_id - See member_id.
+        modified_name - See member_name.
+        modified_email - See member_email.
+        modified_ip - See member_ip.
+        filename
   */
 }
 ?>
