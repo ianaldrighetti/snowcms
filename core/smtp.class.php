@@ -435,7 +435,7 @@ class SMTP
       return false;
 
     $handled = null;
-    $api->run_hook('smtp_send_pre', array(&$handled, $to, $subject, $message, $alt_message, $this->con, $this->headers, $this->is_html, $this->priority, $this->charset));
+    $api->run_hooks('smtp_send_pre', array(&$handled, $to, $subject, $message, $alt_message, $this->con, $this->headers, $this->is_html, $this->priority, $this->charset));
 
     if($handled !== null)
       return !empty($handled);
@@ -548,7 +548,7 @@ class SMTP
       # No alternative message? That isn't good practice!
       if(empty($alt_message))
       {
-        $alt_message = $api->apply_filter('smtp_alt_message_create', $message);
+        $alt_message = $api->apply_filters('smtp_alt_message_create', $message);
 
         if($alt_message == $message)
           $alt_message = strip_tags($alt_message);
@@ -561,7 +561,7 @@ class SMTP
       $headers[] = $header. ': '. $value;
 
     # Write them headers! Word wrap them too!
-    fwrite($this->con, wordwrap($api->apply_filter('smtp_headers', implode("\r\n", $headers)), 70). "\r\n\r\n");
+    fwrite($this->con, wordwrap($api->apply_filters('smtp_headers', implode("\r\n", $headers)), 70). "\r\n\r\n");
 
     # New lines are ended with \n not \r\n in the message. ;)
     $message = str_replace("\r\n", "\n", $message);
@@ -575,7 +575,7 @@ class SMTP
 
     # Here we go!!!
     if(!isset($boundary))
-      fwrite($this->con, $api->apply_filter('smtp_message_body', "$message\r\n.\r\n"));
+      fwrite($this->con, $api->apply_filters('smtp_message_body', "$message\r\n.\r\n"));
     else
     {
       # Take care of that alternative message too, it needs some lovin'.
@@ -591,7 +591,7 @@ class SMTP
       $body .= "--{$boundary}--\r\n.\r\n";
 
       # Take that server!
-      fwrite($this->con, $api->apply_filter('smtp_multipart_body', $body));
+      fwrite($this->con, $api->apply_filters('smtp_multipart_body', $body));
     }
 
     # Was the message accepted?

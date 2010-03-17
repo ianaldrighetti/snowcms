@@ -136,7 +136,7 @@ class SQLite extends Database
 
     # Just incase, you want to change something.
     if(!empty($hook_name))
-      $api->run_hook($hook_name, array(&$db_query, &$db_vars, &$db_compat));
+      $api->run_hooks($hook_name, array(&$db_query, &$db_vars, &$db_compat));
 
     # Debugging?
     if(isset($db_vars['debug']))
@@ -233,7 +233,7 @@ class SQLite extends Database
 
     # For every query, you know, if there were a cache plugin :P
     $return = null;
-    $api->run_hook('pre_query_exec', array(&$db_query, &$db_vars, &$db_compat, &$hook_name, &$return));
+    $api->run_hooks('pre_query_exec', array(&$db_query, &$db_vars, &$db_compat, &$hook_name, &$return));
 
     # Did you set anything?
     if(!empty($return))
@@ -265,7 +265,7 @@ class SQLite extends Database
     $result = new $this->result_class($query_result, sqlite_changes($this->con), $db_compat == 'insert' ? sqlite_last_insert_rowid($this->con) : 0, $sqlite_errno, $sqlite_error, $this->num_queries - 1);
 
     # Maybe you want to cache it or something..?
-    $api->run_hook('post_query_exec', array(&$result, $db_query, $query_result, $this->result_class, $db_compat, $hook_name, $query_took, $sqlite_errno, $sqlite_error));
+    $api->run_hooks('post_query_exec', array(&$result, $db_query, $query_result, $this->result_class, $db_compat, $hook_name, $query_took, $sqlite_errno, $sqlite_error));
 
     return $result;
   }
@@ -297,7 +297,7 @@ class SQLite extends Database
       'text_array' => 'sanitize_string_array',
     );
 
-    $api->run_hook('database_types', array(&$datatypes));
+    $api->run_hooks('database_types', array(&$datatypes));
 
     # Is the datatype defined?
     if(!isset($datatypes[$datatype]))

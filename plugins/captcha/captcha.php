@@ -40,7 +40,7 @@ function captcha_display()
 {
   global $api, $settings;
 
-  $api->run_hook('captcha_display');
+  $api->run_hooks('captcha_display');
 
   # Now, let's make sure that the server supports this, it uses GD...
   if(!function_exists('imagecreate'))
@@ -58,7 +58,7 @@ function captcha_display()
     $image = imagecreate($settings->get('captcha_width', 'int'), $settings->get('captcha_height', 'int'));
 
   # Make our background color.
-  $background = imagecolorallocate($image, $api->apply_filter('captcha_bg_red', 255), $api->apply_filter('captcha_bg_green', 255), $api->apply_filter('captcha_bg_blue', 255));
+  $background = imagecolorallocate($image, $api->apply_filters('captcha_bg_red', 255), $api->apply_filters('captcha_bg_green', 255), $api->apply_filters('captcha_bg_blue', 255));
 
   # Apply the color.
   imagefill($image, 0, 0, $background);

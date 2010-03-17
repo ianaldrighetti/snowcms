@@ -572,13 +572,13 @@ class Form
     # yet to be called ;)
     if(empty($this->forms[$form_name]['hooked']))
     {
-      $api->run_hook($form_name);
+      $api->run_hooks($form_name);
       $this->forms[$form_name]['hooked'] = true;
     }
 
     # If you want to display the forms in your own special way, just hook into here :)
     $handled = null;
-    $api->run_hook('form_show', array($form_name, $this->forms[$form_name], &$handled));
+    $api->run_hooks('form_show', array($form_name, $this->forms[$form_name], &$handled));
 
     if(empty($handled))
     {
@@ -642,7 +642,7 @@ class Form
 
     # Do you want to do this?
     $handled = null;
-    $api->run_hook('form_show_field', array(&$handled, $form_name, $name, $field));
+    $api->run_hooks('form_show_field', array(&$handled, $form_name, $name, $field));
 
     # Did someone else not handle it? Should it even be shown?
     if(empty($handled) && !empty($field['show']))
@@ -737,14 +737,14 @@ class Form
     #       just needs to be done ;)
     if(empty($this->forms[$form_name]['hooked']))
     {
-      $api->run_hook($form_name);
+      $api->run_hooks($form_name);
       $this->forms[$form_name]['hooked'] = true;
     }
 
     # Do you want the fun of handling this form? You be my guest!
     $errors = null;
     $handled = null;
-    $api->run_hook('form_process', array(&$handled, $form_name, $this->forms[$form_name], &$errors));
+    $api->run_hooks('form_process', array(&$handled, $form_name, $this->forms[$form_name], &$errors));
 
     if($handled !== null)
     {

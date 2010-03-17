@@ -42,7 +42,7 @@ if(!function_exists('resend_view'))
   {
     global $api, $base_url, $member, $settings, $theme;
 
-    $api->run_hook('resend_view');
+    $api->run_hooks('resend_view');
 
     if($member->is_logged())
     {
@@ -102,11 +102,11 @@ if(!function_exists('resend_view'))
       <h1>', l('Resend your activation email'), '</h1>
       <p>', l('If for some reason you didn\'t receive your activation email, you can request to have it resent by entering your username below.'), '</p>';
 
-    if(strlen($api->apply_filter('resend_message', '')) > 0)
+    if(strlen($api->apply_filters('resend_message', '')) > 0)
     {
       echo '
-      <div id="', $api->apply_filter('resend_message_id', 'resend_success'), '">
-        ', $api->apply_filter('resend_message', ''), '
+      <div id="', $api->apply_filters('resend_message_id', 'resend_success'), '">
+        ', $api->apply_filters('resend_message', ''), '
       </div>';
     }
 

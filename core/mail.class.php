@@ -44,7 +44,7 @@ class Mail
   {
     global $api, $core_dir, $settings;
 
-    $api->run_hook('mail_construct');
+    $api->run_hooks('mail_construct');
 
     # SMTP or plain ol' mail()?
     if(strtolower($settings->get('mail_handler', 'string')) == 'smtp')
@@ -173,7 +173,7 @@ class Mail
     # email actually gets sent through an automated task (<Tasks>). But, you know, you
     # didn't hear it from me! :-)
     $handled = null;
-    $api->run_hook('mail_send', array(&$handled, $to, $subject, $message, $alt_message, $options, $this->handler, $this->options));
+    $api->run_hooks('mail_send', array(&$handled, $to, $subject, $message, $alt_message, $options, $this->handler, $this->options));
 
     if($handled === null)
     {

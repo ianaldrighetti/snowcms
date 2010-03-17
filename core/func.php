@@ -123,7 +123,7 @@ function init_func()
     );
   }
 
-  $api->run_hook('post_init_func', array(&$func));
+  $api->run_hooks('post_init_func', array(&$func));
 }
 
 /*

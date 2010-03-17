@@ -66,7 +66,7 @@ require($core_dir. '/api.class.php');
 load_api();
 
 # Just a hook before anything else major is done.
-$api->run_hook('pre_start');
+$api->run_hooks('pre_start');
 
 require($core_dir. '/time.php');
 require($core_dir. '/validation.class.php');
@@ -115,50 +115,33 @@ require($core_dir. '/core.php');
 
 init_core();
 
-# Get the request parameter name... If any.
-if(count($_GET) > 0 && !isset($_GET['action']))
-  $request_param = key($_GET);
+# Now it is time to check and see if an event is being requested.
+if(!empty($_SERVER['QUERY_STRING']))
+  # One is, but is it registered? Let's see!
+  $event = $api->return_event($_SERVER['QUERY_STRING']);
+else
+  # We shall use the default event!
+  $event = $api->return_event($settings->get('default_event', 'string', ''));
 
-# Whether or not their is an action in the address, there is still some sort of
-# action going on, whether you like it or not! If there is no action (or a valid one)
-# in the address, we will spoof it...
-if((empty($_GET['action']) && empty($request_param)) || (!empty($_GET['action']) && !$api->action_registered($_GET['action'])) || (!empty($request_param) && !$api->request_param_registered($request_param)))
+# So did we get an event, or not? If not, that's bad news!!!
+if(!empty($event))
 {
-  # Now if there is an action in the URL, that means it is invalid, and we
-  # don't want spiders to index that crap, do we?
-  if(!empty($_GET['action']) || !empty($request_param))
-    $theme->add_meta(array('name' => 'robots', 'content' => 'noindex'));
+  # The event exists! Awesome!
+  # Include the right file, if we need too.
+  if(!empty($event['filename']) && !is_callable($event['callback']))
+    require_once($event['filename']);
 
-  # Use the default action in the settings...
-  $_GET['action'] = $settings->get('default_action', 'string', '');
-  $request_param = null;
-}
-
-# Do the requested action, if it exists :P
-if(!empty($_GET['action']) && $api->action_registered($_GET['action']))
-{
-  $action = $api->return_action($_GET['action']);
-
-  if(!empty($action[1]) && !is_callable($action[0]))
-    require_once($action[1]);
-
-  $action[0]();
-}
-elseif(!empty($request_param))
-{
-  # Cool, a custom request parameter :P
-  $request = $api->return_request_param($request_param);
-
-  if(!empty($request[1]) && !is_callable($request[0]))
-    require_once($request[1]);
-
-  $request[0]();
+  # Now call on the callback, after all, that's what it's for!
+  call_user_func($event['callback']);
 }
 else
 {
-  # Uh oh, no action, so it is the home page!!!
-  $theme->set_title(l('An error has occurred'));
+  # There is an event request, but none to go with it, so add a noindex robots tag
+  # just incase, we don't want anything to index this since it doesn't exist!
   $theme->add_meta(array('name' => 'robots', 'content' => 'noindex'));
+
+  # Now show an UH OH! page.
+  $theme->set_title(l('An error has occurred'));
 
   $theme->header();
 

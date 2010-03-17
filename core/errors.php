@@ -55,7 +55,7 @@ function errors_handler($error_type, $error_message, $error_file = null, $error_
   # Sorry, we can only do this if the API class has been declared and instantiated.
   $handled = null;
   if(isset($api) && is_object($api))
-    $api->run_hook('error_handler', array(&$handled, $error_type, $error_message, $error_file, $error_line, $error_context));
+    $api->run_hooks('error_handler', array(&$handled, $error_type, $error_message, $error_file, $error_line, $error_context));
 
   # Not handled? We will do it then! That is, if it's enabled.
   if($handled === null && isset($settings) && is_object($settings) && $settings->get('errors_log', 'bool'))

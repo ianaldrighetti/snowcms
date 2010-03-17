@@ -23,7 +23,7 @@ if(!defined('IN_SNOW'))
 # Title: CAPTCHA plugin
 
 # Register the CAPTCHA image action.
-$api->add_action('captcha', 'captcha_display', dirname(__FILE__). '/captcha.php');
+$api->add_event('action=captcha', 'captcha_display', dirname(__FILE__). '/captcha.php');
 
 # Hooks into the registration form which shows the CAPTCHA image!
 $api->add_hook('registration_form', 'add_captcha_field');

@@ -567,6 +567,6 @@ function init_theme()
   $theme->add_js_var('theme_url', $theme_url);
 
   # You can hook into here to add all your theme stuffs (<link>'s, js vars, js files, etc).
-  $api->run_hook('post_init_theme');
+  $api->run_hooks('post_init_theme');
 }
 ?>

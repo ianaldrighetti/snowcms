@@ -121,7 +121,7 @@ if(!class_exists('Member'))
         $member_id = (string)$member_id == (string)(int)$member_id && (int)$member_id > 0 && $func['strlen']($passwrd) == 40 ? (int)$member_id : 0;
         $passwrd = $member_id > 0 && $func['strlen']($passwrd) == 40 ? $passwrd : '';
 
-        $api->run_hook('cookie_data', array(&$member_id, &$passwrd));
+        $api->run_hooks('cookie_data', array(&$member_id, &$passwrd));
 
         # Only set this if the data was previously empty.
         if(empty($_SESSION['member_id']) || empty($_SESSION['member_pass']))
@@ -131,7 +131,7 @@ if(!class_exists('Member'))
         }
       }
       else
-        $api->run_hook('cookie_empty', array(&$member_id, &$passwrd));
+        $api->run_hooks('cookie_empty', array(&$member_id, &$passwrd));
 
       # Are you trying to steal someone else's session? Tisk tisk tisk! I just won't put up with that :P
       if(!empty($_SESSION['member_id']) && !empty($_SESSION['passwrd']) && ($_SESSION['member_id'] != $member_id || $_SESSION['member_pass'] != $passwrd))
@@ -195,7 +195,7 @@ if(!class_exists('Member'))
 
       # Don't think I did a good enough job at logging in the member? FINE! :P
       $member = array();
-      $api->run_hook('post_login', array(&$member));
+      $api->run_hooks('post_login', array(&$member));
 
       if(count($member) > 0)
       {
@@ -507,13 +507,13 @@ if(!function_exists('init_member'))
   {
     global $api, $member;
 
-    $api->run_hook('init_member');
+    $api->run_hooks('init_member');
 
     # Have you not set $member yet? We will then.
     if(!isset($member))
       $member = $api->load_class('Member');
 
-    $api->run_hook('post_init_member');
+    $api->run_hooks('post_init_member');
   }
 }
 ?>

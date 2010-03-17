@@ -172,7 +172,7 @@ class PHP_Mail
     global $api, $func, $settings;
 
     $handled = null;
-    $api->run_hook('php_mail_send_pre', array(&$handled, $to, $subject, $message, $alt_message, $this->options));
+    $api->run_hooks('php_mail_send_pre', array(&$handled, $to, $subject, $message, $alt_message, $this->options));
 
     if($handled !== null)
       return !empty($handled);
@@ -220,7 +220,7 @@ class PHP_Mail
       # No alternative message? That isn't a good idea!
       if(empty($alt_message))
       {
-        $alt_message = $api->apply_filter('php_mail_alt_message_create', $message);
+        $alt_message = $api->apply_filters('php_mail_alt_message_create', $message);
 
         if($alt_message == $message)
           $alt_message = strip_tags($alt_message);
@@ -233,7 +233,7 @@ class PHP_Mail
       $headers[] = $header. ': '. $value;
 
     # Implode! Implode! :0
-    $headers = wordwrap($api->apply_filter('php_mail_headers', implode("\r\n", $headers)), 70);
+    $headers = wordwrap($api->apply_filters('php_mail_headers', implode("\r\n", $headers)), 70);
 
     # Messages end with a \n not \r\n... Weird.
     $message = wordwrap(str_replace("\r\n", "\n", $message), 70);
@@ -256,12 +256,12 @@ class PHP_Mail
       $body .= "\r\n--{$boundary}\r\nContent-Type: text/html; charset={$this->options['charset']}\r\n\r\n{$message}\r\n\r\n";
       $body .= "--{$boundary}--\r\n.\r\n";
 
-      $message = $api->apply_filter('php_mail_multipart_body', $body);
+      $message = $api->apply_filters('php_mail_multipart_body', $body);
     }
     else
-      $message = $api->apply_filter('php_mail_message_body', $message);
+      $message = $api->apply_filters('php_mail_message_body', $message);
 
-    $mail = $api->apply_filter('php_mail_function', isset($func['mail']) ? $func['mail'] : 'mail');
+    $mail = $api->apply_filters('php_mail_function', isset($func['mail']) ? $func['mail'] : 'mail');
 
     # Now it is time to send it with the appropriate function.
     $sent = $mail($to, $subject, $message, $headers, $settings->get('mail_additional_parameters', 'string', ''));

@@ -42,7 +42,7 @@ if(!function_exists('login_view'))
   {
     global $api, $base_url, $func, $member, $theme, $theme_url;
 
-    $api->run_hook('login_view');
+    $api->run_hooks('login_view');
 
     # Are you already logged in? If you are, you don't need this!
     if($member->is_logged())
@@ -60,11 +60,11 @@ if(!function_exists('login_view'))
       <p>', l('Here you can log in to your account, if you do not have an account, you can <a href="%s">register one</a>. Did you forget your password? Request a new one <a href="%s">here</a>.', $base_url. '/index.php?action=register', $base_url. '/index.php?action=reminder'), '</p>';
 
     # You can hook into this to display a message
-    if($func['strlen']($api->apply_filter('login_message', '')) > 0)
+    if($func['strlen']($api->apply_filters('login_message', '')) > 0)
     {
       echo '
-      <div id="', $api->apply_filter('login_message_id', 'login_error'), '">
-        ', $api->apply_filter('login_message', ''), '
+      <div id="', $api->apply_filters('login_message_id', 'login_error'), '">
+        ', $api->apply_filters('login_message', ''), '
       </div>';
     }
 
@@ -108,7 +108,7 @@ if(!function_exists('login_generate_form'))
     $form = $api->load_class('Form');
     $form->add('login_form', array(
                                'callback' => 'login_process',
-                               'action' => $api->apply_filter('login_action_url', $base_url. '/index.php?action=login2'),
+                               'action' => $api->apply_filters('login_action_url', $base_url. '/index.php?action=login2'),
                                'method' => 'post',
                                'submit' => l('Login'),
                              ));
@@ -122,7 +122,7 @@ if(!function_exists('login_generate_form'))
 
                                                                     if(empty($value))
                                                                     {echo \'uh oh\';
-                                                                      $api->run_hook(\'login_process_empty_username\');
+                                                                      $api->run_hooks(\'login_process_empty_username\');
 
                                                                       $error = l(\'Please enter a username.\');
                                                                       return false;
@@ -140,7 +140,7 @@ if(!function_exists('login_generate_form'))
 
                                                                     if(empty($value) && empty($_POST[\'secured_password\']))
                                                                     {
-                                                                      $api->run_hook(\'login_process_empty_password\');
+                                                                      $api->run_hooks(\'login_process_empty_password\');
 
                                                                       $error = l(\'Please enter a password.\');
                                                                       return false;
@@ -241,7 +241,7 @@ if(!function_exists('login_process'))
   {
     global $api, $base_url, $cookie_name, $db, $func, $settings, $theme, $member;
 
-    $api->run_hook('login_process');
+    $api->run_hooks('login_process');
 
     # So you got the stuff, but is it the right stuff? Let's see!
     $result = $db->query('
@@ -289,12 +289,12 @@ if(!function_exists('login_process'))
       $login_success = true;
     # You want to check something?
     else
-      $api->run_hook('login_process_check_custom', array(&$login_success, $login, $row, &$errors));
+      $api->run_hooks('login_process_check_custom', array(&$login_success, $login, $row, &$errors));
 
     # Failed to login? Sucks to be you.
     if(empty($login_success))
     {
-      $api->run_hook('login_process_failed', array($login));
+      $api->run_hooks('login_process_failed', array($login));
       $errors[] = l('Invalid username or password supplied.');
 
       return false;
@@ -313,12 +313,12 @@ if(!function_exists('login_process'))
 
     # Set the cookie, a chocolate chip cookie :) No one likes oatmeal cookies, they are nasty...
     # Oh yeah, and give the password a touch of salt, :D Take that HTTP sniffers!
-    setcookie($api->apply_filter('login_cookie_name', $cookie_name), $api->apply_filter('login_cookie_value', $row['member_id']. '|'. sha1($row['member_pass']. $row['member_hash'])), $cookie_expires);
+    setcookie($api->apply_filters('login_cookie_name', $cookie_name), $api->apply_filters('login_cookie_value', $row['member_id']. '|'. sha1($row['member_pass']. $row['member_hash'])), $cookie_expires);
 
     $_SESSION['member_id'] = (int)$row['member_id'];
     $_SESSION['member_pass'] = sha1($row['member_pass']. $row['member_hash']);
 
-    $api->run_hook('login_success', array($row));
+    $api->run_hooks('login_success', array($row));
 
     return (int)$row['member_id'];
   }
