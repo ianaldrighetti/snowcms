@@ -52,7 +52,7 @@ if(!function_exists('logout_process'))
     # Check that session identifier, make sure it is yours.
     if(empty($_GET['sc']) || $_GET['sc'] != $member->session_id())
     {
-      $api->run_hook('logout_failed');
+      $api->run_hooks('logout_failed');
 
       $theme->set_title(l('An error has occurred'));
       $theme->add_meta(array('name' => 'robots', 'content' => 'noindex'));
@@ -71,7 +71,7 @@ if(!function_exists('logout_process'))
     setcookie($cookie_name, '', time_utc() - 604800);
     unset($_SESSION['member_id'], $_SESSION['member_pass']);
 
-    $api->run_hook('logout_success');
+    $api->run_hooks('logout_success');
 
     # Let's go home...
     header('Location: '. $base_url);

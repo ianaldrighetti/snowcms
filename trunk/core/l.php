@@ -50,7 +50,7 @@ function l($str)
     $args = func_get_args();
 
   # CAN HAZ TRANSLATION?
-  $api->run_hook('translate', array(&$str, &$args));
+  $api->run_hooks('translate', array(&$str, &$args));
 
   # Hmm, any warrant for calling sprintf?
   if(func_num_args() > 1)

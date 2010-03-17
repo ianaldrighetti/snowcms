@@ -221,6 +221,6 @@ function init_settings()
 
   $settings = $api->load_class('Settings');
 
-  $api->run_hook('post_init_settings');
+  $api->run_hooks('post_init_settings');
 }
 ?>

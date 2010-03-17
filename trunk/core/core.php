@@ -46,20 +46,20 @@ function init_core()
   # We have a couple default actions of our own :) (Remember, you can register
   # these actions before they are registered here! :) But also all these functions
   # are overloadable, so simply define them before this too!!!)
-  $api->add_action('activate', 'activate_view', $core_dir. '/activate.php');
-  $api->add_action('admin', 'admin_switch', $core_dir. '/admin.php');
-  $api->add_action('checkcookie', 'checkcookie_verify', $core_dir. '/checkcookie.php');
-  $api->add_action('login', 'login_view', $core_dir. '/login.php');
-  $api->add_action('login2', 'login_view2', $core_dir. '/login.php');
-  $api->add_action('logout', 'logout_process', $core_dir. '/logout.php');
-  $api->add_action('profile', 'profile_switch', $core_dir. '/profile.php');
-  $api->add_action('register', 'register_view', $core_dir. '/register.php');
-  $api->add_action('register2', 'register_process', $core_dir. '/register.php');
-  $api->add_action('resend', 'resend_view', $core_dir. '/resend.php');
-  $api->add_action('reminder', 'reminder_view', $core_dir. '/reminder.php');
-  $api->add_action('reminder2', 'reminder_view2', $core_dir. '/reminder.php');
+  $api->add_event('action=activate', 'activate_view', $core_dir. '/activate.php');
+  $api->add_event('action=admin', 'admin_switch', $core_dir. '/admin.php');
+  $api->add_event('action=checkcookie', 'checkcookie_verify', $core_dir. '/checkcookie.php');
+  $api->add_event('action=login', 'login_view', $core_dir. '/login.php');
+  $api->add_event('action=login2', 'login_view2', $core_dir. '/login.php');
+  $api->add_event('action=logout', 'logout_process', $core_dir. '/logout.php');
+  $api->add_event('action=profile', 'profile_switch', $core_dir. '/profile.php');
+  $api->add_event('action=register', 'register_view', $core_dir. '/register.php');
+  $api->add_event('action=register2', 'register_process', $core_dir. '/register.php');
+  $api->add_event('action=resend', 'resend_view', $core_dir. '/resend.php');
+  $api->add_event('action=reminder', 'reminder_view', $core_dir. '/reminder.php');
+  $api->add_event('action=reminder2', 'reminder_view2', $core_dir. '/reminder.php');
 
   # Start output buffering.
-  ob_start($api->apply_filter('output_callback', null));
+  ob_start($api->apply_filters('output_callback', null));
 }
 ?>

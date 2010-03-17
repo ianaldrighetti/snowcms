@@ -42,7 +42,7 @@ if(!function_exists('checkcookie_verify'))
   {
     global $api, $base_url, $cookie_name, $core_dir, $theme;
 
-    $api->run_hook('checkcookie_verify');
+    $api->run_hookss('checkcookie_verify');
 
     # This is a pretty simple check...
     $cookie = isset($_COOKIE[$cookie_name]) ? $_COOKIE[$cookie_name] : '';
@@ -54,12 +54,12 @@ if(!function_exists('checkcookie_verify'))
       $api->add_filter('login_message', create_function('$value', '
         return l(\'It appears your login cookie couldn\\\'t be saved. Please be sure you have cookies enabled in your browser settings and try again.\');'));
 
-      $api->run_hook('checkcookie_failed');
+      $api->run_hooks('checkcookie_failed');
 
       # Login view function exist?
-      $login_view_func = $api->apply_filter('login_view_function', 'login_view');
+      $login_view_func = $api->apply_filters('login_view_function', 'login_view');
       if(!function_exists($login_view_func))
-        require_once($api->apply_filter('login_view_path', $core_dir. '/login.php'));
+        require_once($api->apply_filters('login_view_path', $core_dir. '/login.php'));
 
       $theme->add_meta(array('name' => 'robots', 'content' => 'noindex'));
 
@@ -67,7 +67,7 @@ if(!function_exists('checkcookie_verify'))
       exit;
     }
 
-    $api->run_hook('checkcookie_success');
+    $api->run_hooks('checkcookie_success');
 
     # Seemed to have worked, so let's go home!
     header('Location: '. $base_url);

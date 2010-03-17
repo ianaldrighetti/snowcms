@@ -81,7 +81,7 @@ class Messages
     global $api, $db, $func;
 
     $handled = null;
-    $api->run_hook('messages_load', array(&$handled, $area_name, $area_id, $cur_page, $per_page, $order, $params));
+    $api->run_hooks('messages_load', array(&$handled, $area_name, $area_id, $cur_page, $per_page, $order, $params));
 
     if($handled === null)
     {
@@ -201,7 +201,7 @@ class Messages
           $member_ids[] = $row['modified_id'];
 
           # Do you want to do something? Go ahead!!! (Like, oh say parse message if there is a message_type ;))
-          $api->run_hook('messages_load_array', array(&$message, &$member_ids));
+          $api->run_hooks('messages_load_array', array(&$message, &$member_ids));
 
           if(!empty($message))
           {
@@ -244,7 +244,7 @@ class Messages
     global $api;
 
     $handled = null;
-    $api->run_hook('messages_get', array(&$handled, $loaded_id));
+    $api->run_hooks('messages_get', array(&$handled, $loaded_id));
 
     if($handled === null)
     {
@@ -274,7 +274,7 @@ class Messages
           $message['modifier'] = array_merge($message['modifier'], array('is_guest' => true, 'is_member' => false));
 
         # Do you have some weird thing to do before we give this message out?
-        $api->run_hook('messages_get_array', array(&$message));
+        $api->run_hooks('messages_get_array', array(&$message));
 
         $handled = $message;
       }
@@ -345,7 +345,7 @@ class Messages
     global $api, $db, $member;
 
     $handled = null;
-    $api->run_hook('messages_add', array(&$handled, $area_name, $area_id, $subject, $message, $options));
+    $api->run_hooks('messages_add', array(&$handled, $area_name, $area_id, $subject, $message, $options));
 
     if($handled === null)
     {
@@ -381,7 +381,7 @@ class Messages
       );
 
       # Maybe you wanted to add something (Or change something!)?
-      $api->run_hook('messages_add_data', array(&$columns, &$data, $options));
+      $api->run_hooks('messages_add_data', array(&$columns, &$data, $options));
 
       # Serialize that extra array first!
       $data['extra'] = serialize(is_array($data['extra']) ? $data['extra'] : array());
@@ -421,7 +421,7 @@ class Messages
       return false;
 
     $handled = null;
-    $api->run_hook('messages_update', array(&$handled, $area_name, $area_id, $message_id, $options));
+    $api->run_hooks('messages_update', array(&$handled, $area_name, $area_id, $message_id, $options));
 
     if($handled === null)
     {
@@ -460,7 +460,7 @@ class Messages
         'extra' => 'string',
       );
 
-      $api->run_hook('messages_update_allowed_columns', array(&$allowed_columns));
+      $api->run_hooks('messages_update_allowed_columns', array(&$allowed_columns));
 
       $data = array();
       foreach($allowed_columns as $column => $type)
@@ -470,7 +470,7 @@ class Messages
           $data[$column] = $options[$column];
       }
 
-      $api->run_hook('members_update_check_data', array(&$handled, &$data));
+      $api->run_hooks('members_update_check_data', array(&$handled, &$data));
 
       # Did you not like the data..? (Was something wrong..?)
       if($handled !== false)
@@ -547,7 +547,7 @@ class Messages
     }
 
     $handled = null;
-    $api->run_hook('messages_delete', array(&$handled, $area_name, $area_id, $messages));
+    $api->run_hooks('messages_delete', array(&$handled, $area_name, $area_id, $messages));
 
     if($handled === null)
     {

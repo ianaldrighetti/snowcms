@@ -125,7 +125,7 @@ class MySQL extends Database
 
     # Just incase, for some odd reason :P
     if(!empty($hook_name))
-      $api->run_hook($hook_name, array(&$db_query, &$db_vars, &$db_compat));
+      $api->run_hooks($hook_name, array(&$db_query, &$db_vars, &$db_compat));
 
     # debug set?
     if(isset($db_vars['debug']))
@@ -203,7 +203,7 @@ class MySQL extends Database
 
     # For every query...
     $return = null;
-    $api->run_hook('pre_query_exec', array(&$db_query, &$db_vars, &$db_compat, &$hook_name, &$return));
+    $api->run_hooks('pre_query_exec', array(&$db_query, &$db_vars, &$db_compat, &$hook_name, &$return));
 
     if(!empty($return))
       return $return;
@@ -234,7 +234,7 @@ class MySQL extends Database
     # Put it in a MySQLResult Object ;)
     $result = new $this->result_class($query_result, mysql_affected_rows($this->con), $db_compat == 'insert' ? mysql_insert_id($this->con) : 0, $mysql_errno, $mysql_error, $this->num_queries - 1);
 
-    $api->run_hook('post_query_exec', array(&$result, $db_query, $query_result, $this->result_class, $db_compat, $hook_name, $query_took, $mysql_errno, $mysql_error));
+    $api->run_hooks('post_query_exec', array(&$result, $db_query, $query_result, $this->result_class, $db_compat, $hook_name, $query_took, $mysql_errno, $mysql_error));
 
     return $result;
   }
@@ -266,7 +266,7 @@ class MySQL extends Database
       'text_array' => 'sanitize_string_array',
     );
 
-    $api->run_hook('database_types', array(&$datatypes));
+    $api->run_hooks('database_types', array(&$datatypes));
 
     # Is the datatype defined?
     if(!isset($datatypes[$datatype]))
@@ -348,9 +348,9 @@ class MySQL extends Database
       return false;
 
     if(!empty($hook_name))
-      $api->run_hook($hook_name, array(&$type, &$tbl_name, &$columns, &$data, &$keys));
+      $api->run_hooks($hook_name, array(&$type, &$tbl_name, &$columns, &$data, &$keys));
 
-    $api->run_hook('pre_insert_exec', array(&$type, &$tbl_name, &$columns, &$data, &$keys));
+    $api->run_hooks('pre_insert_exec', array(&$type, &$tbl_name, &$columns, &$data, &$keys));
 
     # Let's get where you called us from!
     $backtrace = debug_backtrace();

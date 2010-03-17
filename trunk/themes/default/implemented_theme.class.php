@@ -42,7 +42,7 @@ class Implemented_Theme extends Theme
   ', $this->generate_tag('meta', $meta);
 
     echo '
-  <title>', $api->apply_filter('theme_title', (!empty($this->title) ? htmlchars($this->title). ' - ' : ''). (!empty($this->main_title) ? $this->main_title : '')), '</title>';
+  <title>', $api->apply_filters('theme_title', (!empty($this->title) ? htmlchars($this->title). ' - ' : ''). (!empty($this->main_title) ? $this->main_title : '')), '</title>';
 
     # Links
     if(count($this->links))
@@ -75,8 +75,8 @@ class Implemented_Theme extends Theme
 <body>
   <div id="wrapper">
     <div id="header">
-      <h2>', $api->apply_filter('theme_site_name', $settings->get('site_name')), '</h2>
-      <p>', $api->apply_filter('theme_sub_title', 'The <span style="text-decoration: line-through;">best</span> worst theme on the Internets'), '</p>
+      <h2>', $api->apply_filters('theme_site_name', $settings->get('site_name')), '</h2>
+      <p>', $api->apply_filters('theme_sub_title', 'The <span style="text-decoration: line-through;">best</span> worst theme on the Internets'), '</p>
       <div id="menu-outer">
         <div id="menu-inner">
           <ul id="menu">
@@ -86,20 +86,20 @@ class Implemented_Theme extends Theme
         </div>
       </div>
     </div>
-    <div id="content">', $api->apply_filter('theme_pre_content', '');
+    <div id="content">', $api->apply_filters('theme_pre_content', '');
   }
 
   public function footer()
   {
     global $api, $db, $settings, $start_time;
 
-    echo $api->apply_filter('theme_post_content', ''), '
+    echo $api->apply_filters('theme_post_content', ''), '
     </div>
     <div id="sidebar">
       Right Column
     </div>
     <div id="footer">
-      <p>', $api->apply_filter('theme_footer', l('Page created in %s seconds with %u queries.', round(microtime(true) - $start_time, 3), $db->num_queries). ' | '. l('Theme by %s.', ' <a href="http://www.sorenstudios.com/" target="_blank" title="Soren Studios">Soren Studios</a>'). ($settings->get('show_version', 'bool') ? ' | '. l('Powered by <a href="http://www.snowcms.com/" target="_blank" title="SnowCMS">SnowCMS</a> v%s', $settings->get('version')) : '')), '</p>
+      <p>', $api->apply_filters('theme_footer', l('Page created in %s seconds with %u queries.', round(microtime(true) - $start_time, 3), $db->num_queries). ' | '. l('Theme by %s.', ' <a href="http://www.sorenstudios.com/" target="_blank" title="Soren Studios">Soren Studios</a>'). ($settings->get('show_version', 'bool') ? ' | '. l('Powered by <a href="http://www.snowcms.com/" target="_blank" title="SnowCMS">SnowCMS</a> v%s', $settings->get('version')) : '')), '</p>
     </div>
     <div style="clear: both;">
     </div>

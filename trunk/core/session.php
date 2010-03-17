@@ -57,7 +57,7 @@ if(!function_exists('init_session'))
     @ini_set('session.use_only_cookies', 1);
 
     # Maybe you have something to add?
-    $api->run_hook('sessions');
+    $api->run_hooks('sessions');
 
     # Now start the session.
     session_start();

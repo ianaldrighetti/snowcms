@@ -87,7 +87,7 @@ class Members
     # set the handled parameter to a bool, otherwise, if it is null, this method
     # will just do it itself!!! :P
     $handled = null;
-    $api->run_hook('load_members', array(&$handled, $members));
+    $api->run_hooks('load_members', array(&$handled, $members));
 
     if($handled === null && count($members) > 0)
     {
@@ -129,7 +129,7 @@ class Members
                       );
 
             # Got something to add?
-            $api->run_hook('load_members_array', array(&$member, $row));
+            $api->run_hooks('load_members_array', array(&$member, $row));
 
             $this->loaded[$row['member_id']] = $member;
           }
@@ -185,7 +185,7 @@ class Members
       # You want to do the loading? Set the member_data variable to something other
       # than -1, otherwise, this method will get the data itself. Set member_data to
       # null if that member has not been loaded.
-      $api->run_hook('members_get', array(&$member_data, $members));
+      $api->run_hooks('members_get', array(&$member_data, $members));
 
       if($member_data == -1 && isset($this->loaded[$members]))
         $member_data = $this->loaded[$members];
@@ -193,7 +193,7 @@ class Members
         $member_data = null;
 
       # Wanna touch it?
-      $api->run_hook('post_members_get', array(&$member_data, $members));
+      $api->run_hooks('post_members_get', array(&$member_data, $members));
 
       return $member_data === null ? false : $member_data;
     }
@@ -234,7 +234,7 @@ class Members
     # Set the handled parameter to an integer or FALSE, otherwise the
     # system will handle the creation of the member.
     $handled = null;
-    $api->run_hook('members_add', array(&$handled, $member_name, $member_pass, $member_email, $options));
+    $api->run_hooks('members_add', array(&$handled, $member_name, $member_pass, $member_email, $options));
 
     if($handled === null)
     {
@@ -305,7 +305,7 @@ class Members
 
         # If you want to add data, do:
         # $data[] = array(varible, value)
-        $api->run_hook('members_add_default_data', array(&$data));
+        $api->run_hooks('members_add_default_data', array(&$data));
 
         # Anything?
         if(count($data) > 0)
@@ -345,7 +345,7 @@ class Members
 
     # You know what to do, set it to a bool if you handle it ;)
     $handled = null;
-    $api->run_hook('members_name_allowed', array(&$handled, $member_name));
+    $api->run_hooks('members_name_allowed', array(&$handled, $member_name));
 
     if($handled === null)
     {
@@ -417,7 +417,7 @@ class Members
 
     # You know what to do, set it to a bool if you handle it ;)
     $handled = null;
-    $api->run_hook('members_email_allowed', array(&$handled, $member_email));
+    $api->run_hooks('members_email_allowed', array(&$handled, $member_email));
 
     if($handled === null)
     {
@@ -511,7 +511,7 @@ class Members
 
     # You should get this idea by now :P
     $authenticated = null;
-    $api->run_hook('members_authenticate', array(&$authenticated, $member_name, $member_pass, $pass_hash));
+    $api->run_hooks('members_authenticate', array(&$authenticated, $member_name, $member_pass, $pass_hash));
 
     if($authenticated === null)
     {
@@ -577,7 +577,7 @@ class Members
     global $api, $db, $func, $settings;
 
     $handled = null;
-    $api->run_hook('members_password_allowed', array(&$handled, $member_pass));
+    $api->run_hooks('members_password_allowed', array(&$handled, $member_pass));
 
     if($handled === null)
     {
@@ -616,7 +616,7 @@ class Members
     # If for some very strange, unknown reason you want to do a random string, be my guest!
     $handled = null;
     $str = '';
-    $api->run_hook('members_rand_str', array(&$handled, $length, &$str));
+    $api->run_hooks('members_rand_str', array(&$handled, $length, &$str));
 
     if($handled === null)
     {
@@ -683,7 +683,7 @@ class Members
       return false;
 
     $handled = null;
-    $api->run_hook('members_update', array(&$handled, $member_id, $options));
+    $api->run_hooks('members_update', array(&$handled, $member_id, $options));
 
     if($handled === null)
     {
@@ -719,7 +719,7 @@ class Members
         'member_acode' => 'string-40',
       );
 
-      $api->run_hook('members_update_allowed_columns', array(&$allowed_columns));
+      $api->run_hooks('members_update_allowed_columns', array(&$allowed_columns));
 
       $data = array();
       foreach($allowed_columns as $column => $type)
@@ -730,7 +730,7 @@ class Members
       }
 
       # Let's let you check the data (just incase ;)) first...
-      $api->run_hook('members_update_check_data', array(&$handled, &$data));
+      $api->run_hooks('members_update_check_data', array(&$handled, &$data));
 
       # If a hook didn't change handled, we can do our stuff :P
       if($handled !== false)
@@ -827,7 +827,7 @@ class Members
         # This member will need to be reloaded ;)
         unset($this->loaded[$member_id]);
 
-        $api->run_hook('members_update_force_refresh', array($member_id));
+        $api->run_hooks('members_update_force_refresh', array($member_id));
       }
     }
 
@@ -854,7 +854,7 @@ class Members
     global $api, $db;
 
     $handled = null;
-    $api->run_hook('members_delete', array(&$handled, $members));
+    $api->run_hooks('members_delete', array(&$handled, $members));
 
     if($handled === null)
     {
@@ -901,7 +901,7 @@ class Members
 
       $handled = $result->success();
 
-      $api->run_hook('post_members_delete', array($members));
+      $api->run_hooks('post_members_delete', array($members));
     }
 
     return !empty($handled);
@@ -931,7 +931,7 @@ class Members
 
     # You might want to do this if you have your own member setup ;)
     $handled = null;
-    $api->run_hook('member_name_to_id', array(&$handled, $name));
+    $api->run_hooks('member_name_to_id', array(&$handled, $name));
 
     if($handled === null)
     {

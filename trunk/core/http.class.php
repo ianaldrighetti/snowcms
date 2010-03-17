@@ -318,7 +318,7 @@ class HTTP
     );
 
     # Well, want to add anything...?
-    $api->run_hook('request_callbacks', array(&$request_callbacks));
+    $api->run_hooks('request_callbacks', array(&$request_callbacks));
 
     # Find what will be handling our request :)
     if(!empty($request_callbacks))

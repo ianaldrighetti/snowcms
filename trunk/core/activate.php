@@ -43,7 +43,7 @@ if(!function_exists('activate_view'))
   {
     global $api, $base_url, $member, $settings, $theme;
 
-    $api->run_hook('activate_view');
+    $api->run_hooks('activate_view');
 
     # Are you logged in? Then why would you need to activate another account?
     if($member->is_logged())
@@ -93,7 +93,7 @@ if(!function_exists('activate_view'))
                                                  global $base_url;
 
                                                  return l(\'It appears that the specified member is already activated. If this is your account, you can <a href="%s">login</a> now.\', $base_url. \'/index.php?action=login\');'));
-          $api->run_hook('activation_member_already_activated', array($member_info));
+          $api->run_hooks('activation_member_already_activated', array($member_info));
 
           $_REQUEST['name'] = $member_info['username'];
         }
@@ -102,7 +102,7 @@ if(!function_exists('activate_view'))
         {
           $api->add_filter('activation_message', create_function('$value', '
                                                    return l(\'The supplied activation code is invalid.\');'));
-          $api->run_hook('activation_member_invalid_acode', array($member_info));
+          $api->run_hooks('activation_member_invalid_acode', array($member_info));
 
           $_REQUEST['name'] = $member_info['username'];
         }
@@ -120,7 +120,7 @@ if(!function_exists('activate_view'))
                                                      global $base_url;
 
                                                      return l(\'Your account has been successfully activated. You may now proceed to <a href="%s">login</a>.\', $base_url. \'/index.php?action=login\');'));
-          $api->run_hook('activation_member_success', array($member_info));
+          $api->run_hooks('activation_member_success', array($member_info));
 
           $_REQUEST['name'] = '';
           $_REQUEST['code'] = '';
@@ -131,7 +131,7 @@ if(!function_exists('activate_view'))
         # It appears that member does not exist... Interesting.
         $api->add_filter('activation_message', create_function('$value', '
                                                  return l(\'It appears that the specified member does not exist. Please try again.\');'));
-        $api->run_hook('activation_member_nonexist');
+        $api->run_hooks('activation_member_nonexist');
       }
     }
 
@@ -147,11 +147,11 @@ if(!function_exists('activate_view'))
       <h1>', l('Activate your account'), '</h1>
       <p>', l('If your account has not yet been activated, you can enter your activation information here. If you have yet to receive your activation email, you can <a href="%s">request for it to be resent</a>.', $base_url. '/index.php?action=resend'), '</p>';
 
-    if(strlen($api->apply_filter('activation_message', '')) > 0)
+    if(strlen($api->apply_filters('activation_message', '')) > 0)
     {
       echo '
-      <div id="', $api->apply_filter('activation_message_id', 'activation_error'), '">
-        ', $api->apply_filter('activation_message', ''), '
+      <div id="', $api->apply_filters('activation_message_id', 'activation_error'), '">
+        ', $api->apply_filters('activation_message', ''), '
       </div>';
     }
 

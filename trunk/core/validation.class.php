@@ -136,7 +136,7 @@ class Validation
                                   return false;'));
 
     # Here is a wise place to add your types... :P
-    $api->run_hook('validation_construct', array(&$this));
+    $api->run_hooks('validation_construct', array(&$this));
   }
 
   /*

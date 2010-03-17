@@ -23,96 +23,97 @@ if(!defined('IN_SNOW'))
 /*
   Class: API
 
-  This class is a major part of SnowCMS, it allows plugins (or flakes) to use hooks in various places
-  which allow the plugins to add new features, or change how current features work as well.
+  This class is a major part of SnowCMS, it allows plugins (or flakes) to
+  use hooks in various places which allow the plugins to add new features,
+  or change how current features work as well.
 */
 class API
 {
-  # Variable: hooked
-  # An array containing callbacks that have hooked themselves through the API...
-  private $hooked;
+  # Variable: hooks
+  # Contains all the registered hooks to the specified actions.
+  private $hooks;
 
-  # Variable: hooked_actions
-  # Another array containing actions plugins have registered (allows ?action=REGISTERED_ACTION)
-  private $hooked_actions;
+  # Variable: filters
+  # Contains all the registered filters to the specified tags.
+  private $filters;
 
-  # Variable: hooked_subactions
-  # Yup, thats right, an array containing sub-actions plugins can register on actions
-  # Please note that sub-actions only work if the plugin that registered the action
-  # uses this sub-action API
-  private $hooked_subactions;
+  # Variable: count
+  # Keeps track of how many times, if any, an action or tag has been called.
+  private $count;
+
+  # Variable: events
+  # All query string events are kept here.
+  private $events;
 
   # Variable: groups
-  # Registered groups, permission hook, in other words.
   private $groups;
 
   # Variable: objects
-  # Holds objects which have been loaded :)
   private $objects;
-
-  # Variable: request_params
-  # An array containing registered request parameters (Like page for ?page=)
-  private $request_params;
-
-  # Variable: filters
-  # Holds registered filter callbacks...
-  private $filters;
 
   /*
     Constructor: __construct
+
+    Parameters:
+      none
   */
   public function __construct()
   {
-    # Just turn all our attributes into empty arrays.
-    $this->hooked = array();
-    $this->hooked_actions = array();
-    $this->hooked_subactions = array();
-    $this->groups = array();
-    $this->objects = array();
-    $this->request_params = array();
+    # Just set them all to an array...
+    $this->hooks = array();
     $this->filters = array();
+    $this->count = array(
+                     'actions' => array(),
+                     'tags' => array(),
+                   );
+    $this->events = array();
+    $this->groups = array(
+      'administrator' => 'Administrator',
+      'member' => 'Member',
+    );
+    $this->objects = array();
   }
 
   /*
     Method: add_hook
 
-    Adds a callback on the specified hook name. The callback is called on when the hook is ran.
+    Adds a hook to be ran once the specified action occurs.
 
     Parameters:
-      string $hook_name - The name of the hook you want to have the callback associated with.
-      callback $callback - The callback (like a function name or create_function()) to be called
-                           when the system runs the specified $hook_name.
-      int $importance - The importance (or priority) of the callback supplied. The lower the number
-                        the sooner it will be executed over others hooking into the same hook.
-      int $args - The number of arguments that your callback expects, default is null, which means
-                  that as many arguments as the hook at run time has, that is as many as your callback
-                  will receive. If you specify more arguments than the hook supplies, null will be supplied
-                  in the place of unspecified arguments.
+      string $action_name - The action to attach the hook to.
+      callback $callback - The callback to have ran once the action occurs.
+      int $importance - Allows you to set when your hook is ran, compared to
+                        others hooks added to the same action. The smaller
+                        the number the more important the hook is.
+      int $accepted_args - The number of arguments your hook expects to receive
+                           from the action, if any. If you keep this to the
+                           default (null), all available arguments will be passed.
 
     Returns:
-     bool - TRUE if your hook was registered successfully, FALSE on failure, which means that
-            a hook has already been registered with that callback in that hook group.
+      bool - Returns true if the hook was added successfully, false if the hook
+             already exists, or if the callback was not callable.
 
     Note:
-       You can view a list of available hooks at Google Code <http://code.google.com/p/snowcms/wiki/Hooks>
-
+      If you supply accepted args as a large number than is actually passed by the
+      specified action, the parameters that are "out of range" will receive null.
   */
-  public function add_hook($hook_name, $callback, $importance = 10, $args = null)
+  public function add_hook($action_name, $callback, $importance = 10, $accepted_args = null)
   {
-    # Hook not in our hooked array?
-    if(!isset($this->hooked[$hook_name]))
-      $this->hooked[$hook_name] = array();
-
-    # Not callable or the callback already registered?
-    if(!is_callable($callback) || $this->hook_registered($hook_name, $callback))
+    if(empty($action_name) || !is_callable($callback) || $this->hook_exists($action_name, $callback))
       return false;
 
-    # Your hook is now registered :)
-    $this->hooked[$hook_name][] = array(
-                                    'callback' => $callback,
-                                    'importance' => max((int)$importance, 1),
-                                    'args' => empty($args) ? null : max((int)$args, 0),
-                                  );
+    # Is the action not set in the array yet? Let's do it now! ;)
+    if(!isset($this->hooks[$action_name]))
+    {
+      $this->hooks[$action_name] = array();
+    }
+
+    # Add the hook, and its now ready to go!
+    $this->hooks[$action_name][] = array(
+                                     'callback' => $callback,
+                                     'importance' => max(intval($importance), 1),
+                                     'accepted_args' => empty($accepted_args) ? null : max(intval($accepted_args), 0),
+                                   );
 
     return true;
   }
@@ -120,121 +121,152 @@ class API
   /*
     Method: remove_hook
 
-    Removes the specified callback from the specified hook.
+    Removes the hook from the specified action.
 
     Parameters:
-      string $hook_name - The hook name to remove the specified callback from.
-      string $callback - The callback to remove from the specified hook.
+      string $action_name - The name of the action to remove the hook from.
+      callback $callback - The callback of the hook to remove from the action.
 
     Returns:
-      bool - TRUE if the callback was removed, FALSE if the callback wasn't found.
+      bool - Returns true if the hook was removed successfully, false if the
+             hook was not found.
   */
-  public function remove_hook($hook_name, $callback)
+  public function remove_hook($action_name, $callback)
   {
-    # Can't remove a hook if it doesn't exist, right?
-    if(!isset($this->hooked[$hook_name]) || count($this->hooked[$hook_name]))
+    # We can't delete a hook from an action that has no hooks, can we?
+    if(empty($action_name) || !is_callable($callback) || !isset($this->hooks[$action_name]) || count($this->hooks[$action_name]) == 0)
       return false;
 
-    # Let's try to find it, shall we?
-    foreach($this->hooked[$hook_name] as $key => $hook)
+    foreach($this->hooks[$action_name] as $key => $hook)
+    {
       if($hook['callback'] == $callback)
       {
-        unset($this->hooked[$hook_name][$key]);
+        # We can't just delete it, we need to make sure all the keys are sequential,
+        # otherwise, when the action is ran and the hooks sorted, things would get
+        # all screwed up, which we don't want! ;)
+        $array = array();
+        $array_size = count($this->hooks[$action_name]);
+        for($i = 0; $i < $array_size; $i++)
+        {
+          # Do the keys match? Then skip!
+          if($key == $i)
+            continue;
+
+          # Otherwise, add it to the new array.
+          $array[] = $this->hooks[$action_name][$i];
+        }
+
+        # Now save our change, before exiting.
+        $this->hooks[$action_name] = $array;
+
         return true;
       }
+    }
 
+    # Sorry, didn't find it.
     return false;
   }
 
   /*
-    Method: hook_registered
+    Method: run_hooks
 
-    Allows you to check if a callback is already registered in the specified hook name.
-
-    Parameters:
-      string $hook_name - The hook name to search for $callback in.
-      callback $callback - The callback to search for in $hook_name.
-
-    Returns:
-     bool - Returns TRUE if the callback is already registered in the specified hook,
-                   FALSE if not.
-
-  */
-  public function hook_registered($hook_name, $callback)
-  {
-    # That hook not even made in the hooked array? Definitely a no!
-    if(!isset($this->hooked[$hook_name]) || count($this->hooked[$hook_name]) == 0)
-      return false;
-
-    foreach($this->hooked[$hook_name] as $key => $hook)
-      if($hook['callback'] == $callback)
-        return true;
-
-    return false;
-  }
-
-  /*
-    Method: run_hook
-
-    Runs the specified hook, along with running the registered callbacks of the hook.
+    Runs the hooks which are registered to the specified action.
 
     Parameters:
-      string $hook_name - The name of the hook you are executing.
-      mixed $args - Either a single argument or an array of arguments.
+      string $action_name - The action to run.
+      mixed $args - Either a single argument, or an array of arguments.
 
     Returns:
-     void - Nothing is returned.
+      void - Nothing is returned by this method.
 
     Note:
-       If you want to allow hooks to change something variable wise, pass the variable
-          as a reference parameter (&$var) INSIDE an array! Otherwise you will get a
-          E_DEPRECATED error!
-
+      If you want to allow hooks to change the value of a variable, you must
+      pass the variable as a reference inside an array, otherwise you will
+      receive an E_DEPRECATED error!
   */
-  public function run_hook($hook_name, $args = null)
+  public function run_hooks($action_name, $args = null)
   {
-    # No registered callbacks for this hook? Don't waste the time! :)
-    if(!isset($this->hooked[$hook_name]) || count($this->hooked[$hook_name]) == 0)
+    # Increment the counter, for this action, even if no hooks are ran.
+    $this->count['actions'][$action_name] = isset($this->count['actions'][$action_name]) ? $this->count['actions'][$action_name] + 1 : 1;
+
+    # No hooks to run?
+    if(!isset($this->hooks[$action_name]) || count($this->hooks[$action_name]) == 0)
       return;
 
-    # Sort the hooks array by importance :) That is, if there is more than 1!
-    if(count($this->hooked[$hook_name]) > 1)
-      $this->sort($this->hooked[$hook_name]);
+    # Sort the hooks by importance, if there is more than 1!
+    if(count($this->hooks[$action_name]) > 1)
+      $this->sort($this->hooks[$action_name]);
 
+    # Not an array? I'll make it one!
     if(!is_array($args))
       $args = array($args);
 
-    # No need to count parameters over and over and over again, is there?
+    # No need to count the number of parameters over and over again, right?
     $num_args = count($args);
 
-    # Now run all the hooks!
-    foreach($this->hooked[$hook_name] as $hook)
+    # Now run all the hooks.
+    foreach($this->hooks[$action_name] as $hook)
     {
-      # All parameters?
-      if($hook['args'] === null)
-        call_user_func_array($hook['callback'], $args);
-      # More parameters than we have?
-      elseif($hook['args'] > $num_args)
-        call_user_func_array($hook['callback'], array_merge($args, array_fill($num_args, $num_args - $hook['args'], null)));
-      else
-        call_user_func_array($hook['callback'], array_slice($args, 0, $hook['args']));
+      $passed_args = $args;
+
+      # Do you want more than we have..?
+      if($hook['accepted_args'] > $num_args)
+      {
+        for($i = 0; $i < $hook['accepted_args'] - $num_args; $i++)
+          $passed_args[] = null;
+      }
+      elseif($hook['accepted_args'] < $num_args)
+        $passed_args = array_slice($passed_args, 0, $hook['accepted_args']);
+
+      call_user_func_array($hook['callback'], $passed_args);
     }
+  }
+
+  /*
+    Method: hook_exists
+
+    Checks to see if the hook is registered on the specified action.
+
+    Parameters:
+      string $action_name - The action to search for the hook.
+      callback $callback - The callback to find.
+
+    Returns:
+      bool - Returns true if the hook is registered to the specified action,
+             false if the hook was not found.
+  */
+  public function hook_exists($action_name, $callback)
+  {
+    if(empty($action_name) || !isset($this->hooks[$action_name]) || count($this->hooks[$action_name]) == 0)
+      return false;
+
+    foreach($this->hooks[$action_name] as $hook)
+    {
+      if($hook['callback'] == $callback)
+      {
+        # Here it is!
+        return true;
+      }
+    }
+
+    # Not found, sorry.
+    return false;
   }
 
   /*
     Method: sort
 
-    Used to sort the hooked array in order of importance.
+    Sorts the supplied array by the importance key, using the insertion
+    using the insertion sort algorithm. Used to sort hooks and filters.
 
     Parameters:
-      array $array - The array to sort by the index 'importance'
+      array &$array - The array to sort by the importance key.
 
     Returns:
-     array - Returns the sorted array
+      void - Nothing is returned by this method.
 
     Note:
-       Original function available at <http://mschat.net/forum/index.php?topic=1609.0>
-
+      Original function available at <http://mschat.net/forum/index.php?topic=1609.0>.
   */
   private function sort(&$array)
   {
@@ -256,215 +288,426 @@ class API
   }
 
   /*
-    Method: add_action
+    Method: add_filter
 
-    Adds an action through the API, adding an action allows plugins to add actions accessible through index.php.
-    For example, say you add the action help, callback of view_help and the file help.php, whenever someone would
-    access the page index.php?action=help the file help.php would be included and the function view_help would be
-    executed.
+    Adds a filter to the specified tag, which when the tag is ran, the filter
+    callback is passed the tag value.
 
     Parameters:
-      string $action_name - The action name you want to register.
-      callback $callback - The callback to be called (duh :P) when the action is accessed.
-      string $file - The file to include before executing the callback, if null is supplied, no
-                     file is executed.
+      string $tag_name - The tag to add the filter to.
+      callback $callback - The filter callback.
+      int $importance - The importance of this filter compared to other filters
+                        added to the same tag. The lower the number, the sooner
+                        the filter is ran.
 
     Returns:
-     bool - TRUE is returned if the action was successfully added, FALSE if not, which means that
-                   that action is already registered (check out the method remove_action) or that
-                   the supplied callback was not valid.
-
+      bool - Returns true if the filter is added successfully, false if not.
   */
-  public function add_action($action_name, $callback, $file = null)
+  public function add_filter($tag_name, $callback, $importance = 10)
   {
-    # You can't register an action if it already exists, silly pants! :P and that the callback is,
-    # well, callable and that the file exists (if any...)
-    if($this->action_registered($action_name) || (empty($file) && !is_callable($callback)) || (!empty($file) && !file_exists($file)))
+    if(empty($tag_name) || !is_callable($callback) || $this->filter_exists($tag_name, $callback))
       return false;
 
-    # Everything appears to be in order.
-    $this->hooked_actions[$action_name] = array($callback, $file);
+    # Do we need to create this tags array?
+    if(!isset($this->filters[$tag_name]))
+    {
+      $this->filters[$tag_name] = array();
+    }
+
+    # Add it, and we're done.
+    $this->filters[$tag_name][] = array(
+                                    'callback' => $callback,
+                                    'importance' => max(intval($importance), 1),
+                                  );
+
     return true;
   }
 
   /*
-    Method: remove_action
+    Method: remove_filter
 
-    Removes the specified action.
+    Removes the filter from the specified tag.
 
     Parameters:
-      string $action_name - The action to remove.
+      string $tag_name - The tag to remove the filter from.
+      callback $callback - The callback of the filter.
 
     Returns:
-     bool - TRUE if the action was successfully removed, FALSE on failure, meaning that
-                   the action wasn't registered.
-
+      bool - Returns true if the filter was removed, false if it was not found.
   */
-  public function remove_action($action_name)
+  public function remove_filter($tag_name, $callback)
   {
-    # Can't remove something that isn't there, either.
-    if(!$this->action_registered($action_name))
+    if(empty($tag_name) || !is_callable($callback) || !isset($this->filters[$tag_name]) || count($this->filters[$tag_name]) == 0)
       return false;
 
-    unset($this->hooked_actions[$action_name]);
+    foreach($this->filters as $key => $filter)
+    {
+      if($filter['callback'] == $callback)
+      {
+        # If we found it, we need to make a new array, and exclude the one to
+        # be removed, otherwise we will have sorting issues ;)
+        $array = array();
+        $array_size = count($this->filters[$tag_name]);
+        for($i = 0; $i < $array_size; $i++)
+        {
+          if($key == $i)
+            # This is the one we don't want, so skip!
+            continue;
+
+          $array[] = $this->filters[$tag_name][$i];
+        }
+
+        $this->filters[$tag_name] = $array;
+        return true;
+      }
+    }
+
+    # Didn't find it, sorry.
+    return false;
+  }
+
+  /*
+    Method: apply_filters
+
+    Applies all the filters registered to the specified tag.
+
+    Parameters:
+      string $tag_name - The tag name to run.
+      mixed $value - The value to pass to the filters.
+
+    Returns:
+      mixed - Returns the, possibly, filtered value.
+  */
+  public function apply_filters($tag_name, $value)
+  {
+    # Increment the counter for this filter, that's one more, after all ;)
+    $this->count['tags'][$tag_name] = isset($this->count['tags'][$tag_name]) ? $this->count['tags'][$tag_name] + 1 : 1;
+
+    # No filters? Just return the value.
+    if(!isset($this->filters[$tag_name]) || count($this->filters[$tag_name]) == 0)
+      return $value;
+
+    # Sort the filters, just maybe.
+    if(count($this->filters[$tag_name]) > 1)
+      $this->sort($this->filters[$tag_name]);
+
+    foreach($this->filters[$tag_name] as $filter)
+    {
+      # Simple enough, really ;)
+      $value = call_user_func($filter['callback'], $value);
+    }
+
+    return $value;
+  }
+
+  /*
+    Method: filter_exists
+
+    Checks to see if the filter is registered with the specified tag.
+
+    Parameters:
+      string $tag_name - The name of the tag to check in.
+      callback $callback - The callback to find.
+
+    Returns:
+      bool - Returns true if the callback was found, false if not.
+  */
+  public function filter_exists($tag_name, $callback)
+  {
+    if(empty($tag_name) || !isset($this->filters[$tag_name]) || count($this->filters[$tag_name]) == 0)
+      return false;
+
+    foreach($this->filters[$tag_name] as $filter)
+    {
+      if($filter['callback'] == $callback)
+      {
+        # Here it is!
+        return true;
+      }
+    }
+
+    # Not found, sorry.
+    return false;
+  }
+
+  /*
+    Method: add_event
+
+    Adds a query string event with a callback to be executed once the event occurs.
+
+    Parameters:
+      string $query_string - The query string that should be matched in order to
+                             execute the supplied callback.
+      callback $callback - The callback to associate with the event.
+      string $filename - The file which is included before the callback is executed.
+                         Not required unless the callback is not callable...
+
+    Returns:
+      bool - Returns true if the event was added successfully, false if the event
+             already exists.
+
+    Note:
+      What is an event? Say you want to have doMyAwesomeThing function called
+      when someone accesses $base_url/index.php?action=awesome, you would supply
+      action=awesome as the query string. Previously, SnowCMS had separate methods
+      to do such a thing with actions, sub actions, and request parameters, but
+      now all of that is handled via events. All callbacks are expected to accept
+      one parameter, the value of the request parameter (such as VALUE in action=VALUE).
+
+      You can also specify wild cards, say you want to have blog_view_article called
+      when $base_url/index.php?blog={Some ID}, your query string would be blog=* and
+      whatever the value of blog is, it will be passed as a parameter, as is.
+
+      This also allows the ability to do such things as
+      action=someExisting&another=action, what will occur is if the whole query string
+      is not found, the last part of the query string is chopped off (in this case,
+      &another=action) and another check would occur with just action=someExisting,
+      and if it was found, the callback would be executed.
+
+      All callbacks are expected to return a boolean value, true if everything was
+      done as should, false, if for some reason, everything was not properly executed.
+      If the function does return false, the next callback (the one below it, with the
+      last bit of the query string chopped off) would be executed.
+
+      Also note that you cannot add an event such as blog=* and then add another event
+      called blog=help, this would cause an already exists error. Same goes for the other
+      way around, if blog=help were added, then blog=* were added, an error would occur.
+
+      DO NOT URL encode the query string, and also DO NOT use &amp; as a separator, you
+      must use just &.
+
+      Query strings are CASE SENSITIVE! so action=something is not the same as Action=something!
+  */
+  public function add_event($query_string, $callback, $filename = null)
+  {
+    # Is the callback not callable? Does the file not exist? Does the event already exist?
+    if(empty($query_string) || (empty($filename) && !is_callable($callback)) || (!empty($filename) && !file_exists($filename)) || $this->event_exists($query_string) || !($query = $this->parse_query($query_string)))
+      return false;
+
+    $events = &$this->events;
+    $count = count($query);
+    $current = 0;
+
+    # Now the fun part, adding the event :P
+    foreach($query as $key => $value)
+    {
+      # Does the key exist?
+      if(!isset($events[$key]) || !is_array($events[$key]))
+        # Then make it!
+        $events[$key] = array(
+                          'values' => array(),
+                          'sub' => array(),
+                        );
+
+      # Do we have another one next? Or is this it?
+      if($current + 1 == $count)
+      {
+        # This is it!
+        $events[$key]['values'][$value] = array(
+                                            'callback' => $callback,
+                                            'filename' => $filename,
+                                          );
+      }
+      else
+      {
+        # Nope, we have to keep going ;)
+        $events = &$events[$key]['sub'];
+      }
+
+      $current++;
+    }
+
     return true;
   }
 
   /*
-    Method: action_registered
+    Method: remove_event
 
-    Checks to see if the specified action is registered.
+    Removes the specified event.
 
     Parameters:
-      string $action_name - The action name to check.
+      string $query_string -The query string to remove.
 
     Returns:
-     bool - TRUE if the action is registered, FALSE if not.
-
+      bool - Returns true if the query string was removed, false if it was not found.
   */
-  public function action_registered($action_name)
+  public function remove_event($query_string)
   {
-    return isset($this->hooked_actions[$action_name]);
+    if(!($query = $this->parse_query($query_string)))
+      return false;
+
+    $events = &$this->events;
+    $count = count($query);
+    $current = 0;
+
+    # Traverse through the array, fun!
+    foreach($query as $key => $value)
+    {
+      # Are we there yet? :P
+      if($current + 1 == $count)
+      {
+        # Is it set, not empty, I mean... If it isn't it doesn't exist. BREAK!
+        if(empty($events[$key]['values'][$value]['callback']))
+          break;
+
+        # Found it, delete it, done!
+        unset($events[$key]['values'][$value]);
+        return true;
+      }
+      else
+      {
+        # Nope.
+        $events = &$events[$key]['sub'];
+      }
+
+      $current++;
+    }
+
+    # Did you get out here? Then it didn't exist, so it wasn't deleted!
+    return false;
   }
 
   /*
-    Method: return_action
+    Method: return_event
 
-    Returns the requested action, the first index contains the callback, the second contains the file
-    to be included before calling on the callback, unless it is null. However, if you leave the action
-    name parameter blank, all registered actions are returned.
+    Returns a registered events information according to the query string supplied.
+    The best matching event will be returned.
 
     Parameters:
-      string $action_name - The action name to return information about.
+      string $query_string - The query string to get the event of.
 
     Returns:
-     array - Returns the array containing a callback and file to include before calling on the
-                    the callback, however, FALSE is returned if the action does not exist.
-
+      array - Returns an array containing the callback, false on failure to find
+              a match.
   */
-  public function return_action($action_name = null)
+  public function return_event($query_string)
   {
-    if(empty($action_name))
-      return $this->hooked_actions;
+    if(!($query = $this->parse_query($query_string)))
+      return false;
+
+    # Keep track of the last known working event, right now, nothing!
+    $event = null;
+
+    $events = &$this->events;
+    foreach($query as $key => $value)
+    {
+      # Does this have a working callback?
+      if(!empty($events[$key]['values'][$value]['callback']))
+        $event = $events[$key]['values'][$value];
+
+      # Move on to the next...
+      $events = &$events[$key]['sub'];
+    }
+
+    # Is the event not null? Then we found one! Otherwise, nope.
+    return !empty($event) ? $event : false;
+  }
+
+  /*
+    Method: event_exists
+
+    Checks to see if the specified event exists.
+
+    Parameters:
+      string $query_string - The query string which would trigger the event.
+
+    Returns:
+      bool - Returns true if the event exists, false if not.
+  */
+  public function event_exists($query_string)
+  {
+    if(!($query = $this->parse_query($query_string)))
+      return true;
+
+    $events = &$this->events;
+    $count = count($query);
+    $current = 0;
+
+    # Traverse through the array, fun!
+    foreach($query as $key => $value)
+    {
+      # Are we there yet? :P
+      if($current + 1 == $count)
+      {
+        # Is it set, not empty, I mean... If it isn't it doesn't exist. So you can set it.
+        if(empty($events[$key]['values'][$value]['callback']))
+          return false;
+
+        # Nope, it exists, you can't set it.
+        return true;
+      }
+      else
+      {
+        # Nope.
+        $events = &$events[$key]['sub'];
+      }
+
+      $current++;
+    }
+
+    # Didn't find it, so have fun!
+    return false;
+  }
+
+  /*
+    Method: parse_query
+
+    Parses the specified query into an array.
+
+    Parameters:
+      string $query_string - The query string to parse.
+
+    Returns:
+      array - Returns the parsed query on success, false on failure.
+  */
+  private function parse_query($query_string)
+  {
+    if(empty($query_string) || strpos($query_string, '=') === false)
+      return false;
+
+    # Separate by the ampersands first...
+    $queries = explode('&', $query_string);
+    $parsed = array();
+    foreach($queries as $query)
+    {
+      # Now by the equals sign.
+      @list($key, $value) = explode('=', $query, 2);
+
+      # Is the value empty? Skip!
+      if(strlen(trim($value)) == 0)
+        continue;
+
+      $parsed[$key] = $value;
+    }
+
+    # Empty? Not good either!
+    if(count($parsed) == 0)
+      return false;
     else
-      return isset($this->hooked_actions[$action_name]) ? $this->hooked_actions[$action_name] : false;
-  }
-
-  /*
-    Method: add_subaction
-
-    Registers the specified sub-action to the action.
-
-    Parameters:
-      string $action_name - The action name you want to register the subaction with.
-      string $subaction_name - The subaction name you want to register.
-      callback $callback - The callback to be called (duh :P) when the subaction is accessed.
-      string $file - The file to include before executing the callback, if null is supplied, no
-                     file is executed.
-
-    Returns:
-     bool - TRUE is returned if the subaction was successfully added, FALSE if not, which means that
-                   that subaction is already registered (check out the method remove_subaction).
-
-  */
-  public function add_subaction($action_name, $subaction_name, $callback, $file = null)
-  {
-    # Sub-action already registered?
-    if($this->subaction_registered($action_name, $subaction_name))
-      return false;
-
-    $this->hooked_subactions[$action_name][$subaction_name] = array($callback, $file);
-    return true;
-  }
-
-  /*
-    Method: remove_subaction
-
-    Removes the specified sub-action from the action.
-
-    Parameters:
-      string $action_name - The action from which you want to remove.
-      string $subaction_name - The sub-action you want to remove.
-
-    Returns:
-     bool - TRUE if the sub-action was successfully removed, FALSE on failure, meaning that
-                   the sub-action wasn't registered.
-
-  */
-  public function remove_subaction($action_name, $subaction_name)
-  {
-    if(!$this->subaction_registered($action_name, $subaction_name))
-      return false;
-
-    unset($this->hooked_subactions[$action_name][$subaction_name]);
-    return true;
-  }
-
-  /*
-    Method: subaction_registered
-
-    Checks to see if the specified sub-action is registered in the action.
-
-    Parameters:
-      string $action_name - The action name to check within.
-      string $subaction_name - The sub-action to check to see if it is registered.
-
-    Returns:
-     bool - TRUE if the subaction is registered, FALSE if not.
-
-  */
-  public function subaction_registered($action_name, $subaction_name)
-  {
-    return isset($this->hooked_subactions[$action_name][$subaction_name]);
-  }
-
-  /*
-    Method: return_subaction
-
-    Returns the requested subaction, the first index contains the callback, the second contains the file
-    to be included before calling on the callback, unless it is null. However, if you leave the subaction
-    name parameter blank, all registered subactions of action are returned.
-
-    Parameters:
-      string $action_name - The action name to return retrieve subaction information about.
-      string $subaction_name - The subaction to return information about.
-
-    Returns:
-     array - Returns the array containing a callback and file to include before calling on the
-                    the callback, however, FALSE is returned if the subaction does not exist.
-
-  */
-  public function return_subaction($action_name, $subaction_name = null)
-  {
-    if(empty($subaction_name))
-      return $this->hooked_subactions[$action_name];
-    else
-      return isset($this->hooked_subactions[$action_name][$subaction_name]) ? $this->hooked_subactions[$action_name][$subaction_name] : false;
+      return $parsed;
   }
 
   /*
     Method: add_group
 
-    Allows plugins to add (register) a group that members can have assigned to them, that way these plugins
-    can use permissions for any features they may add.
+    Adds a group which can be assigned to members, which can be used by plugins
+    for permission checking with $member->is_a('group_identifier');
 
     Parameters:
-      string $group_identifier - This is the identifier which is saved in the member_groups column of the table.
-                                 Say you had a group named Page Manager, a good group identifier would be
-                                 page_manager. When checking to see if the member was assigned that group you
-                                 would simply do $member->is_a('page_manager')
-      string $group_name - The actual display name of this group, such as Page Manager. You should pass this name
-                            through the l() function before passing it on to this method.
+      string $group_identifier - The groups identifier, which is stored in the
+                                 members database, an example for a page manager
+                                 would be page_manager.
+      string $group_name - The label for the group. Such as Page manager, which
+                           should be passed through the l() function before using
+                           it in this method.
 
     Returns:
-     bool - Returns TRUE if the group was added successfully, FALSE if the group is already registered or if for
-            some reason the group identifier or group name are not strings.
-
+      bool - Returns true if the group was added successfully, false if not.
   */
   public function add_group($group_identifier, $group_name)
   {
-    # Can't add a group over another, nor can you have information which aren't strings! :P
-    if($this->group_registered($group_identifier) || !is_string($group_identifier) || !is_string($group_name))
+    # Does the group already exist? Too bad!
+    if($this->group_exists($group_identifier) || !is_string($group_identifier) || !is_string($group_name))
       return false;
 
     $this->groups[strtolower($group_identifier)] = $group_name;
@@ -474,375 +717,187 @@ class API
   /*
     Method: remove_group
 
-    Removes the specified group identifier from the registered groups.
+    Removes the specified group from the list of registered groups.
 
     Parameters:
-      string $group_identifier - The group to remove.
+      string $group_identifier - The group identifier to remove.
 
     Returns:
-     bool - Returns TRUE if the group was successfully removed, FALSE on failure.
-
+      bool - Returns true if the group was removed successfully, false if not.
   */
   public function remove_group($group_identifier)
   {
-    # You can't remove the group administrator or member...
-    if(!$this->group_registered($group_identifier) || in_array(strtolower($group_identifier), array('administrator', 'member')))
+    $group_identifier = strtolower($group_identifier);
+
+    # Does it not exist? Then we can't remove it! Nor can you remove the member or administrator group, silly!
+    if(!$this->group_exists($group_identifier) || $group_identifier == 'administrator' || $group_identifier == 'member')
       return false;
 
-    unset($this->groups[strtolower($group_identifier)]);
+    # Simply unset it!
+    unset($this->groups[$group_identifier]);
     return true;
   }
 
   /*
-    Method: group_registered
+    Method: group_exists
 
-    Checks to see if the specified group is registered.
+    Checks to see if the specified group exists.
 
     Parameters:
       string $group_identifier - The group identifier to check.
 
     Returns:
-     bool - Returns TRUE if the group is registered, FALSE if not.
-
+      bool - Returns true if the group exists, false if not.
   */
-  public function group_registered($group_identifier)
+  public function group_exists($group_identifier)
   {
-    # Did I mention that you can't register the group administrator or member? Silly me!
-    return !in_array(strtolower($group_identifier), array('administrator', 'member')) ? isset($this->groups[strtolower($group_identifier)]) : true;
+    # Simple enough, right?
+    return isset($this->groups[strtolower($group_identifier)]);
   }
 
   /*
     Method: return_group
 
-    Returns the specified group name, or if no group identifier is supplied, all
-    groups are returned.
+    Returns either the group name, or an array of all the registered groups.
 
     Parameters:
-      string $group_identifier - The group identifier.
+      string $group_identifier - The group identifier to have the name returned.
 
     Returns:
-     mixed - An array is returned (containing all registered groups), a string containing
-                    the groups name, or FALSE if the group is not registered.
-
+      mixed - Returns a string containing the groups name if the group identifier
+              was specified, and false if the group identifier was not found. If
+              the group identifier was omitted, then all groups, in an associative
+              array (group_identifier => group_name) is returned.
   */
   public function return_group($group_identifier = null)
   {
+    # No group specified? Then all groups will be returned!
     if(empty($group_identifier))
       return asort($this->groups, SORT_STRING);
-    elseif(!$this->group_registered($group_identifier))
-      return false;
-    else
+    # How about a specific group?
+    elseif($this->group_exists($group_identifier))
       return $this->groups[strtolower($group_identifier)];
+    # The group doesn't exist!
+    else
+      return false;
   }
 
   /*
     Method: load_class
 
+    Loads the specified class and returns the object. If the new parameter is set
+    to false, then the same object can be obtained through loading the same class
+    by calling on this method again.
+
     Parameters:
-      string $class_name - The name of the class you want to load. If $filename is not
-                           specified $core_dir/lower($class_name).class.php is attempted to be
-                           opened.
-      array $params - An array of parameters you want to pass during the construction of
-                      $class_name. (The class must have __construct defined)
-      string $filename - The file where $class_name exists. Defaults to null.
-      bool $new - If set to true, the object returned will NOT be saved to the objects attribute
-                  and won't be taken from that attribute if the same object has already been
-                  instantiated on this page load. If FALSE, you will obtain a globally accessible
-                  object (Recommended for classes such as Messages, Members, etc).
+      string $class_name - The name of the class to load.
+      array $params - An array of parameters you want to pass to the __construct
+                      method once the class has been instantiated.
+      string $filename - The name of the where the class is defined, if the file
+                         is not specified, then $core_dir/lower($class_name).class.php
+                         is assumed.
+      bool $new - If set to true, a new and private object will be returned, if false,
+                  a reference will be stored in the API class which can be obtained
+                  later by loading the same class.
 
     Returns:
-      Object - Returns the instantiated Object of $class_name, however, if the file was
-               not found or the class did not exist, FALSE is returned.
+      object - Returns the instantiated object of the specified class, however, if
+               the file was not found or the class did not exist, false is returned.
   */
   public function load_class($class_name, $params = array(), $filename = null, $new = false)
   {
     global $core_dir;
 
-    # If you don't want a new object, and one exists, we will just return the one we have :)
-    if(empty($new) && isset($this->objects[strtolower(basename($class_name))]))
-      return $this->objects[strtolower(basename($class_name))];
+    # Don't want a new object? Does it already exist? Great! You can have this one :)
+    if(empty($new) && isset($this->objects[strtolower($class_name)]))
+      return $this->objects[strtolower($class_name)];
 
-    # Does the class not exist? No file? We will assume it is in {CLASS_NAME}.class.php
-    if(!class_exists($class_name) && empty($filename))
-      $filename = $core_dir. '/'. strtolower(basename($class_name)). '.class.php';
-
-    # Does the class not exist, and the file doesn't either?!
-    if(!class_exists($class_name) && !file_exists($filename))
-      return false;
-
-    # Only include the file if the class doesn't exist, otherwise we might have a problem.
+    # Does the class not exist already? Then load up the file.
     if(!class_exists($class_name))
-      require_once($filename);
+    {
+      # Is the file name not specified?
+      if(empty($filename))
+        $filename = $core_dir. '/'. strtolower($class_name). '.class.php';
 
-    # Wow, class STILL not exist? Nothing we can do...
-    if(!class_exists($class_name))
-      return false;
+      # Does the file not exist..?!
+      if(!file_exists($filename))
+        return false;
+      else
+        require_once($filename);
 
-    # Declare and instantiate! Woo!
+      # The class still doesn't exist? Tisk tisk!
+      if(!class_exists($class_name))
+        return false;
+    }
+
+    # Instantiate that class.
     $obj = new $class_name();
 
-    # Any parameters, perhaps?
+    # Any parameters?
     if(count($params) > 0 && is_callable(array($obj, '__construct')))
       call_user_func_array(array($obj, '__construct'), $params);
-    elseif(count($params) > 0 && !is_callable(array($obj, '__construct')))
+    elseif(count($params) > 0)
       return false;
 
-    # Did you want this globally accessible? If so, save it.
+    # Not your own "private" object? Then we shall store it!
     if(empty($new))
-      $this->objects[strtolower(basename($class_name))] = $obj;
+      $this->objects[strtolower($class_name)] = $obj;
 
+    # Now we're done!
     return $obj;
-  }
-
-  /*
-    Method: add_request_param
-
-    Adds a request parameter to watch for. Allows for URL's such as ?page=PAGE_ID
-    or ?topic=TOPIC_ID and such.
-
-    Parameters:
-      string $request_param - The name of the request parameter to watch for.
-      callback $callback - The callback to call when this request parameter is used
-                           in a URL.
-      string $file - The file to include before calling $callback, if any.
-
-    Returns:
-      bool - Returns TRUE on success, FALSE on failure.
-
-    Note:
-      Please note that if the action parameter is found in the URL, that any registered
-      request parameters won't be checked for. For example, doing index.php?topic=1&action=delete
-      will ignore the topic=1 parameter and view it as an action request.
-  */
-  public function add_request_param($request_param, $callback, $file = null)
-  {
-    if(empty($request_param) || !is_string($request_param) || (!empty($file) && !file_exists($file)) || $this->request_param_registered($request_param))
-      return false;
-
-    $this->request_params[$request_param] = array($callback, $file);
-    return true;
-  }
-
-  /*
-    Method: remove_request_param
-
-    Parameters:
-      string $request_param - The name of the request parameter to remove.
-
-    Returns:
-      bool - Returns TRUE on success, FALSE on failure.
-  */
-  public function remove_request_param($request_param)
-  {
-    if(!$this->request_param_registered($request_param))
-      return false;
-
-    unset($this->request_params[$request_param]);
-    return true;
-  }
-
-  /*
-    Method: request_param_registered
-
-    Checks to see if the supplied request parameter exists.
-
-    Parameters:
-      string $request_param - The name of the request parameter to check.
-
-    Returns:
-      bool - Returns TRUE if the request parameter exists, FALSE if not.
-  */
-  public function request_param_registered($request_param)
-  {
-    return is_string($request_param) ? isset($this->request_params[$request_param]) : false;
-  }
-
-  /*
-    Method: return_request_param
-
-    Parameters:
-      string $request_param - The request parameter to return the information about.
-                              If nothing is supplied, all the registered request
-                              parameters are returned.
-
-    Returns:
-      array - An array containing the callback and file (if any) of the request parameter.
-  */
-  public function return_request_param($request_param = null)
-  {
-    if(empty($request_param))
-      return $this->request_params;
-    else
-      return $this->request_param_registered($request_param) ? $this->request_params[$request_param] : false;
-  }
-
-  /*
-    Method: add_filter
-
-    Much like hooks, filters work in almost the same way, except they just modify
-    the value of a string.
-
-    Parameters:
-      string $filter_name - The name of the filter to add the callback to.
-      callback $callback - The callback to have called when the filter name
-                           is applied.
-      int $importance - The importance (or priority) of the callback supplied. The lower the number
-                        the sooner it will be executed over others hooking into the same hook.
-
-    Returns:
-      bool - Returns TRUE on success, FALSE on failure.
-
-    Note:
-      All callbacks are expected to accept 1 parameter, the value they are applying a filter to,
-      the callback is also expected to return the value that was changed (if at all) in the callback.
-  */
-  public function add_filter($filter_name, $callback, $importance = 10)
-  {
-    # Can't add your callback if it is already registered, or invalid, for that matter.
-    if($this->filter_registered($filter_name, $callback) || !is_string($filter_name) || !is_callable($callback))
-      return false;
-    elseif(!isset($this->filters[$filter_name]))
-      $this->filters[$filter_name] = array();
-
-    $this->filters[$filter_name][] = array(
-                                       'callback' => $callback,
-                                       'importance' => $importance,
-                                     );
-
-    return true;
-  }
-
-  /*
-    Method: remove_filter
-
-    Removes the specified filter callback from the filter name.
-
-    Parameters:
-      string $filter_name - The name of the filter.
-      callback $callback - The callback to have removed.
-
-    Returns:
-      bool - Returns TRUE on success, FALSE on failure.
-  */
-  public function remove_filter($filter_name, $callback)
-  {
-    # This filter not even have its own array? Or nothing in it? Then nothing can be in it!
-    if(!isset($this->filters[$filter_name]) || count($this->filters[$filter_name]) == 0)
-      return false;
-
-    foreach($this->filters[$filter_name] as $key => $filter)
-      if($filter['callback'] == $callback)
-      {
-        unset($this->filters[$filter_name][$key]);
-        return true;
-      }
-
-    return false;
-  }
-
-  /*
-    Method: filter_registered
-
-    Checks to see if the supplied callback is already registered with the filter name.
-
-    Parameters:
-      string $filter_name - The name of the filter the callback is registered to.
-      callback $callback - The callback to check.
-
-    Returns:
-      bool - Returns TRUE if the callback is registered to the supplied filter name,
-             FALSE if not.
-  */
-  public function filter_registered($filter_name, $callback)
-  {
-    # Not even set, or nothing in it? Definitely can't be registered :P
-    if(!isset($this->filters[$filter_name]) || count($this->filters[$filter_name]) == 0)
-      return false;
-
-    foreach($this->filters[$filter_name] as $filter)
-      if($filter['callback'] == $callback)
-        return true;
-
-    # Out of the loop and nothing? Then nothing...
-    return false;
-  }
-
-  /*
-    Method: apply_filter
-
-    Applies all the registered filters to the supplied string.
-
-    Parameters:
-      string $filter_name - The name of the filter to apply to the value.
-      string $value - The string to have filters applied to.
-
-    Returns:
-      string - Returns the value with the filters applied.
-  */
-  public function apply_filter($filter_name, $value)
-  {
-    # No filters? Well then, take your dang value! :P
-    if(!isset($this->filters[$filter_name]) || count($this->filters[$filter_name]) == 0)
-      return $value;
-
-    # Needs sorting?
-    if(count($this->filters[$filter_name]) > 1)
-      $this->sort($this->filters[$filter_name]);
-
-    # Apply all them filters!
-    foreach($this->filters[$filter_name] as $filter)
-      $value = call_user_func($filter['callback'], $value);
-
-    # Now return it :)
-    return $value;
   }
 }
 
 /*
   Function: load_api
-  Instaniates the API class into the $api variable and loads all enabled plugins.
+
+  Instantiates the API class, and also loads all enabled plugins.
+
+  Parameters:
+    none
+
+  Returns:
+    void - Nothing is returned by this function.
 */
 function load_api()
 {
   global $api, $db, $plugin_dir;
 
-  # Oh yeah, now we're talkin'! Get the API instantiated! XD
+  # Instantiate the API class.
   $api = new API();
 
-  # Get our activated plugins :)
+  # Find all activated plugins, that way we can load them up.
   $result = $db->query('
     SELECT
       dependency_name, dependency_names, dependencies, directory
     FROM {db->prefix}plugins
-    WHERE runtime_error = 0 AND is_activated = 1
+    WHERE is_activated = 1 AND runtime_error = 0
     ORDER BY dependencies DESC');
 
-  # Any plugins activated, otherwise, don't do this :)
+  # Are there any activated plugins?
   if($result->num_rows() > 0)
   {
-    # Just incase the right file (plugin.php) doesn't exist in the plugins directory,
-    # keep it in an array so we can stop those from running next time :P
+    # Just incase the plugin doesn't actually work right, we will hold them all
+    # here, they are considered bad if our check for the plugin.php file fails.
     $bad_plugins = array();
 
-    # Holds the plugins dependency name and directory... Allows us to check that
-    # a plugins dependencies are all met (Because some people are silly and mess
-    # with their database!)
+    # The plugins array, on the other hand, is good. This is where all the plugins
+    # information, such as dependencies are held.
     $plugins = array();
 
-    # Get all those plugins going :)
     while($row = $result->fetch_assoc())
     {
+      # Check for that required plugin.php file.
       if(!file_exists($plugin_dir. '/'. $row['directory']. '/plugin.php'))
-        # Mark it for 'runtime error'
+        # Mark it for a 'runtime error'
         $bad_plugins[] = $row['dependency_name'];
       else
-        # Simply add it for now...
+        # Add the plugin, for now.
         $plugins[strtolower($row['dependency_name'])] = array($plugin_dir. '/'. $row['directory']. '/plugin.php', explode(',', strtolower($row['dependency_names'])));
     }
 
-    # Any bad plugins?
+    # Did we find any bad plugins?
     if(count($bad_plugins) > 0)
-    {
       $db->query('
         UPDATE {db->prefix}plugins
         SET runtime_error = 1
@@ -850,45 +905,50 @@ function load_api()
         array(
           'bad_plugins' => $bad_plugins,
         ));
-    }
 
-    # Now we can get to business :D
+    # Now for the actual loading of the plugins!
     if(count($plugins))
     {
-      # Another bad plugins array, this time if their dependencies weren't met.
+      # Another bad plugins array, but this time if their dependency requirements
+      # were not met, though they shouldn't have been enabled if they weren't!
       $bad_plugins = array();
 
       foreach($plugins as $dependency => $plugin)
       {
-        # Any dependencies? Make sure they will be met.
+        # Does this plugin have dependencies? Let's check!
         if(count($plugin[1]) > 0)
         {
-          $continue = true;
+          # Don't continue just yet.
+          $continue = false;
 
           foreach($plugin[1] as $dependency)
           {
             $dependency = trim($dependency);
+
             if(empty($dependency))
               continue;
             elseif(!isset($plugins[$dependency]))
             {
+              # This is a bad plugin!
               $bad_plugins[] = $dependency;
-              $continue = false;
+              $continue = true;
               break;
             }
           }
 
-          if(!$continue)
+          # Do we need to continue on to the next plugin?
+          if(!empty($continue))
             continue;
         }
 
-        # Well, if it is all good, load the plugin ;)
+        # Well well, load the plugin if nothing is wrong!
         require_once($plugin[0]);
       }
 
+      # Any bad plugins found?
       if(count($bad_plugins) > 0)
-      {
-        # Mark it as errorsome, this time with a 2, meaning dependencies weren't met :P
+        # Mark them with a 'runtime error', but this time with the number 2, which
+        # means the dependencies weren't met.
         $db->query('
           UPDATE {db->prefix}plugins
           SET runtime_error = 2
@@ -896,12 +956,11 @@ function load_api()
           array(
             'bad_plugins' => $bad_plugins,
           ));
-      }
 
       # Alright, one of our first hooks! :D Just a simple one that plugins can hook
       # into when all plugins have been included (Really meant for plugins that are
       # depended upon, so they can have hooks and what not, confusing :P)
-      $api->run_hook('post_plugin_activation');
+      $api->run_hooks('post_plugin_activation');
     }
   }
 
@@ -909,7 +968,7 @@ function load_api()
   register_shutdown_function(create_function('', '
     global $api;
 
-    $api->run_hook(\'snow_exit\');
+    $api->run_hooks(\'snow_exit\');
 
     '));
 }

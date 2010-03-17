@@ -57,7 +57,7 @@ class Tasks
     {
       # Want to do this? Less work for me! ;)
       $handled = false;
-      $api->run_hook('tasks_construct', array(&$handled));
+      $api->run_hooks('tasks_construct', array(&$handled));
 
       if(empty($handled))
       {
@@ -119,7 +119,7 @@ class Tasks
         }
 
         # Register an action for running tasks :)
-        $api->add_action('tasks', array($this, 'run'));
+        $api->add_event('action=tasks', array($this, 'run'));
 
         # Register the save method to be called before shutdown ;)
         $api->add_hook('snow_exit', array($this, 'save'));
@@ -160,7 +160,7 @@ class Tasks
       return false;
 
     $handled = null;
-    $api->run_hook('tasks_add', array(&$handled, $name, $run_every, $func, $file, $enabled));
+    $api->run_hooks('tasks_add', array(&$handled, $name, $run_every, $func, $file, $enabled));
 
     # Did you do the deed?
     if($handled === null)
@@ -212,7 +212,7 @@ class Tasks
       return false;
 
     $handled = null;
-    $api->run_hook('tasks_update', array(&$handled, $name, $options));
+    $api->run_hooks('tasks_update', array(&$handled, $name, $options));
 
     if($handled === null)
     {
@@ -267,7 +267,7 @@ class Tasks
       return false;
 
     $handled = null;
-    $api->run_hook('tasks_exists', array(&$handled, $name));
+    $api->run_hooks('tasks_exists', array(&$handled, $name));
 
     if($handled === null)
     {
@@ -297,7 +297,7 @@ class Tasks
       return false;
 
     $handled = null;
-    $api->run_hook('tasks_delete', array(&$handled, $name));
+    $api->run_hooks('tasks_delete', array(&$handled, $name));
 
     if($handled === null)
     {
@@ -330,7 +330,7 @@ class Tasks
       return;
 
     $handled = null;
-    $api->run_hook('tasks_run', array(&$handled, $output_image));
+    $api->run_hooks('tasks_run', array(&$handled, $output_image));
 
     if($handled === null)
     {
@@ -433,7 +433,7 @@ class Tasks
     if($settings->get('enable_tasks', 'bool'))
     {
       $handled = null;
-      $api->run_hook('tasks_destruct', array(&$handled));
+      $api->run_hooks('tasks_destruct', array(&$handled));
 
       if($handled === null && count($this->tasks) > 0)
       {
@@ -487,6 +487,6 @@ function init_tasks()
 
   $tasks = $api->load_class('Tasks');
 
-  $api->run_hook('post_init_tasks');
+  $api->run_hooks('post_init_tasks');
 }
 ?>

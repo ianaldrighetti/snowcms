@@ -45,7 +45,7 @@ if(!function_exists('admin_switch'))
 
     # First things first, are you even allowed to view the Admin CP?
     # Plugins can add more groups through the admin_allowed_groups filter.
-    $allowed_groups = $api->apply_filter('admin_allowed_groups', array('administrator'));
+    $allowed_groups = $api->apply_filters('admin_allowed_groups', array('administrator'));
 
     if(count($allowed_groups) > 0)
       foreach($allowed_groups as $group)

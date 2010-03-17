@@ -42,7 +42,7 @@ if(!function_exists('register_view'))
   {
     global $api, $base_url, $member, $settings, $theme;
 
-    $api->run_hook('register_view');
+    $api->run_hooks('register_view');
 
     # Are you logged in? You don't need to register an account because you obviously have one!
     if($member->is_logged())
@@ -57,7 +57,7 @@ if(!function_exists('register_view'))
       $theme->set_title(l('Registration disabled'));
       $theme->add_meta(array('name' => 'robots', 'content' => 'noindex'));
 
-      $api->run_hook('registration_disabled');
+      $api->run_hooks('registration_disabled');
 
       $theme->header();
 
@@ -105,7 +105,7 @@ if(!function_exists('register_process'))
   {
     global $api, $base_url, $member, $settings, $theme;
 
-    $api->run_hook('register_process');
+    $api->run_hooks('register_process');
 
     # Already logged in? You don't need another account! ;)
     if($member->is_logged())
@@ -148,7 +148,7 @@ if(!function_exists('register_process'))
 
       echo '
       <h1>', l('Registration successful'), '</h1>
-      <p>', l('Thank you for registering %s.', $member_info['name']), ' ', (!empty($member_info['is_activated']) ? l('You may now proceed to <a href="%s">log in to your account</a>.', $base_url. '/index.php?action=login') : ($settings->get('registration_type') == 1 ? l('The site requires an administrator to activate new accounts. You will receive an email once your account has been activated.') : ($settings->get('registration_type') == 2 ? l('The site requires you to activate your account via email, so check you email (%s) for your activation link.', $member_info['email']) : $api->apply_filter('registration_message_other', '')))), '</p>';
+      <p>', l('Thank you for registering %s.', $member_info['name']), ' ', (!empty($member_info['is_activated']) ? l('You may now proceed to <a href="%s">log in to your account</a>.', $base_url. '/index.php?action=login') : ($settings->get('registration_type') == 1 ? l('The site requires an administrator to activate new accounts. You will receive an email once your account has been activated.') : ($settings->get('registration_type') == 2 ? l('The site requires you to activate your account via email, so check you email (%s) for your activation link.', $member_info['email']) : $api->apply_filters('registration_message_other', '')))), '</p>';
 
       $theme->footer();
     }
@@ -184,7 +184,7 @@ if(!function_exists('register_generate_form'))
     $form = $api->load_class('Form');
     $form->add('registration_form', array(
                                       'callback' => 'register_member',
-                                      'action' => $api->apply_filter('register_action_url', $base_url. '/index.php?action=register2'),
+                                      'action' => $api->apply_filters('register_action_url', $base_url. '/index.php?action=register2'),
                                       'submit' => l('Register account'),
                                     ));
 
@@ -306,7 +306,7 @@ if(!function_exists('register_member'))
     global $api, $base_url, $db, $settings;
 
     $handled = null;
-    $api->run_hook('register_member', array(&$handled, $options, &$errors));
+    $api->run_hooks('register_member', array(&$handled, $options, &$errors));
 
     if($handled !== null)
       return $handled;
@@ -322,7 +322,7 @@ if(!function_exists('register_member'))
                    );
 
     # Got something to add, perhaps?
-    $api->run_hook('register_member_add_options', array(&$add_options, &$options, &$errors));
+    $api->run_hooks('register_member_add_options', array(&$add_options, &$options, &$errors));
 
     # Just incase if any hooks added any errors.
     if(count($errors) > 0)
@@ -375,11 +375,11 @@ if(!function_exists('register_send_email'))
     $mail = $api->load_class('Mail');
 
     $handled = null;
-    $api->run_hook('register_member_send_email', array(&$handled, $mail, $member_info));
+    $api->run_hooks('register_member_send_email', array(&$handled, $mail, $member_info));
 
     if($handled === null)
     {
-      $handled = $mail->send($member_info['email'], $api->apply_filter('register_member_email_subject', l('Account activation for %s', $settings->get('site_name', 'string'))), $api->apply_filter('register_member_email_body', l("Hello there %s, this email comes from %s.\r\n\r\nYou are receiving this email because someone has attempted to register an account on our site with your email address. If this was not you who did this, please disregard this email, no further actions are required.\r\n\r\nIf you did, however, request this account, please activate your account by clicking on the link below:\r\n%s/index.php?action=activate&id=%s&code=%s\r\n\r\nThank you for registering! Hope to see you around!", $member_info['name'], $base_url, $base_url, $member_info['id'], $member_info['acode'])), $api->apply_filter('register_member_alt_email', ''), $api->apply_filter('register_member_email_options', array()));
+      $handled = $mail->send($member_info['email'], $api->apply_filters('register_member_email_subject', l('Account activation for %s', $settings->get('site_name', 'string'))), $api->apply_filters('register_member_email_body', l("Hello there %s, this email comes from %s.\r\n\r\nYou are receiving this email because someone has attempted to register an account on our site with your email address. If this was not you who did this, please disregard this email, no further actions are required.\r\n\r\nIf you did, however, request this account, please activate your account by clicking on the link below:\r\n%s/index.php?action=activate&id=%s&code=%s\r\n\r\nThank you for registering! Hope to see you around!", $member_info['name'], $base_url, $base_url, $member_info['id'], $member_info['acode'])), $api->apply_filters('register_member_alt_email', ''), $api->apply_filters('register_member_email_options', array()));
     }
 
     return !empty($handled);

@@ -29,7 +29,7 @@ class MySQL_Result extends Database_Result
     # Got something to do?
     $return = null;
     $current = $this->current;
-    $api->run_hook('database_data_seek', array($this->result, $row_num, &$return, &$current));
+    $api->run_hooks('database_data_seek', array($this->result, $row_num, &$return, &$current));
     $this->current = $current;
 
     return $return === null ? mysql_data_seek($this->result, $row_num) : $return;
@@ -41,7 +41,7 @@ class MySQL_Result extends Database_Result
 
     $return = null;
     $current = $this->current;
-    $api->run_hook('database_fetch_array', array($this->result, &$return, &$current));
+    $api->run_hooks('database_fetch_array', array($this->result, &$return, &$current));
     $this->current = $current;
 
     return $return === null ? mysql_fetch_array($this->result) : $return;
@@ -53,7 +53,7 @@ class MySQL_Result extends Database_Result
 
     $return = null;
     $current = $this->current;
-    $api->run_hook('database_fetch_assoc', array($this->result, &$return, &$current));
+    $api->run_hooks('database_fetch_assoc', array($this->result, &$return, &$current));
     $this->current = $current;
 
     return $return === null ? mysql_fetch_assoc($this->result) : $return;
@@ -65,7 +65,7 @@ class MySQL_Result extends Database_Result
 
     $return = null;
     $current = $this->current;
-    $api->run_hook('database_fetch_object', array($this->result, &$return, &$current));
+    $api->run_hooks('database_fetch_object', array($this->result, &$return, &$current));
     $this->current = $current;
 
     return $return === null ? mysql_fetch_object($this->result) : $return;
@@ -77,7 +77,7 @@ class MySQL_Result extends Database_Result
 
     $return = null;
     $current = $this->current;
-    $api->run_hook('database_fetch_row', array($this->result, &$return, &$current));
+    $api->run_hooks('database_fetch_row', array($this->result, &$return, &$current));
     $this->current = $current;
 
     return $return === null ? mysql_fetch_row($this->result) : $return;
@@ -88,7 +88,7 @@ class MySQL_Result extends Database_Result
     global $api;
 
     $return = null;
-    $api->run_hook('database_field_name', array($this->result, $field_offset, &$return));
+    $api->run_hooks('database_field_name', array($this->result, $field_offset, &$return));
 
     return $return === null ? mysql_field_name($this->result, $field_offset) : $return;
   }
@@ -106,7 +106,7 @@ class MySQL_Result extends Database_Result
     global $api;
 
     $return = null;
-    $api->run_hook('database_num_fields', array($this->result, &$return));
+    $api->run_hooks('database_num_fields', array($this->result, &$return));
 
     return $return === null ? mysql_num_fields($this->result) : $return;
   }
@@ -116,7 +116,7 @@ class MySQL_Result extends Database_Result
     global $api;
 
     $return = null;
-    $api->run_hook('database_num_rows', array($this->result, &$return));
+    $api->run_hooks('database_num_rows', array($this->result, &$return));
 
     return $return === null ? mysql_num_rows($this->result) : $return;
   }
