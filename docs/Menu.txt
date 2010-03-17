@@ -63,6 +63,7 @@ Group: Core  {
    File: Resend activation email  (core/resend.php)
    File: Settings  (core/settings.class.php)
    File: SMTP  (core/smtp.class.php)
+   File: Tar  (core/tar.class.php)
    File: Tasks  (core/tasks.class.php)
    File: Theme  (core/theme.class.php)
    File: Time functions  (core/time.php)
