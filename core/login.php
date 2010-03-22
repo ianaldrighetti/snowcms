@@ -121,7 +121,7 @@ if(!function_exists('login_generate_form'))
                                                                     global $api, $db;
 
                                                                     if(empty($value))
-                                                                    {echo \'uh oh\';
+                                                                    {
                                                                       $api->run_hooks(\'login_process_empty_username\');
 
                                                                       $error = l(\'Please enter a username.\');

@@ -46,7 +46,11 @@ class API
   private $events;
 
   # Variable: groups
+  # All the registered groups reside here.
   private $groups;
+
+  # Variable: menu
+  private $menu;
 
   # Variable: objects
   private $objects;
@@ -70,6 +74,10 @@ class API
     $this->groups = array(
       'administrator' => 'Administrator',
       'member' => 'Member',
+    );
+    $this->menu = array(
+      'all' => array(),
+      'admin' => array(),
     );
     $this->objects = array();
   }
@@ -451,8 +459,7 @@ class API
       when someone accesses $base_url/index.php?action=awesome, you would supply
       action=awesome as the query string. Previously, SnowCMS had separate methods
       to do such a thing with actions, sub actions, and request parameters, but
-      now all of that is handled via events. All callbacks are expected to accept
-      one parameter, the value of the request parameter (such as VALUE in action=VALUE).
+      now all of that is handled via events.
 
       You can also specify wild cards, say you want to have blog_view_article called
       when $base_url/index.php?blog={Some ID}, your query string would be blog=* and
@@ -502,10 +509,18 @@ class API
       # Do we have another one next? Or is this it?
       if($current + 1 == $count)
       {
-        # This is it!
+        # This is it! But can we add it..? We can't if it is a wildcard
+        # and there is anything in it.
+        if($value == '*' && count($events[$key]['values']) > 0)
+          return false;
+        # Nor can we add the value if the current value is a wildcard.
+        elseif($value != '*' && isset($events[$key]['values']['*']))
+          return false;
+
         $events[$key]['values'][$value] = array(
                                             'callback' => $callback,
                                             'filename' => $filename,
+                                            'accept_param' => $value == '*',
                                           );
       }
       else
@@ -592,8 +607,8 @@ class API
     foreach($query as $key => $value)
     {
       # Does this have a working callback?
-      if(!empty($events[$key]['values'][$value]['callback']))
-        $event = $events[$key]['values'][$value];
+      if(!empty($events[$key]['values'][$value]['callback']) || ($wildcard = !empty($events[$key]['values']['*'])))
+        $event = $events[$key]['values'][empty($wildcard) ? $value : '*'];
 
       # Move on to the next...
       $events = &$events[$key]['sub'];
@@ -630,7 +645,7 @@ class API
       if($current + 1 == $count)
       {
         # Is it set, not empty, I mean... If it isn't it doesn't exist. So you can set it.
-        if(empty($events[$key]['values'][$value]['callback']))
+        if(empty($events[$key]['values'][$value]['callback']) && empty($events[$key]['values']['*']['callback']))
           return false;
 
         # Nope, it exists, you can't set it.
@@ -781,6 +796,15 @@ class API
     else
       return false;
   }
+
+  /*
+    Method: add_menu_item
+
+    Adds a link to the menu.
+
+    Parameters:
+      string $category
+  */
 
   /*
     Method: load_class

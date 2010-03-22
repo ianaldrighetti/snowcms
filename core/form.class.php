@@ -56,9 +56,15 @@ class Form
 
     Note:
       The following $options indices are allowed:
+        accept-charset - Specifies the supported character sets, defaults to utf-8.
+        action - The URL of where to send the form data to once submitted.
         callback - The callback which is passed all the form information.
-        action - The URL of where to submit the form.
-        method - Either POST or GET.
+        enctype - Specifies how the form data will be encoded when being sent.
+                  If a file field is added, the enctype is automatically changed
+                  to multipart/form-data.
+        id - The unique HTML id for the tag. Defaults to the form name.
+        method - The way the form should be submitted, either POST or GET, defaults
+                 to POST.
         submit - The text on the submit button.
 
       Once the form is processed using <Form::process> (might I add, successfully,
@@ -75,34 +81,30 @@ class Form
     global $api;
 
     # Form already registered by this name..? Is it not callable?
-    if($this->form_registered($form_name) || !is_callable($options['callback']))
+    if($this->form_exists($form_name) || !is_callable($options['callback']))
       return false;
 
     # We will use the edit method to add your options ;D
     $this->forms[$form_name] = array(
-                                 'callback' => null,
+                                 'accept-charset' => 'utf-8',
                                  'action' => null,
-                                 'method' => null,
-                                 'submit' => l('Submit'),
-                                 'fields' => array(),
+                                 'callback' => null,
+                                 'enctype' => null,
                                  'errors' => array(),
+                                 'fields' => array(),
                                  'hooked' => false,
+                                 'id' => $form_name,
+                                 'method' => 'post',
+                                 'submit' => l('Submit'),
                                );
-
-    # Just some options set incase you don't.
-    $default_options = array(
-                        'callback' => null,
-                        'action' => null,
-                        'method' => 'post',
-                        'submit' => l('Submit'),
-                       );
-
-    $options = array_merge($default_options, is_array($options) ? $options : array());
 
     # Told you! :D
     if(!$this->edit($form_name, $options))
+    {
       # Hmm, it didn't work... Maybe you ought to fix that? :P
+      unset($this->forms[$form_name]);
       return false;
+    }
 
     $token = $api->load_class('Tokens');
 
@@ -144,7 +146,7 @@ class Form
   */
   public function remove($form_name)
   {
-    if(!$this->form_registered($form_name))
+    if(!$this->form_exists($form_name))
       return false;
 
     unset($this->forms[$form_name]);
@@ -152,7 +154,7 @@ class Form
   }
 
   /*
-    Method: form_registered
+    Method: form_exists
 
     Checks to see if the specified form name is in use.
 
@@ -162,7 +164,7 @@ class Form
     Returns:
       bool - Returns true if the form is registered, false if not.
   */
-  public function form_registered($form_name)
+  public function form_exists($form_name)
   {
     return isset($this->forms[$form_name]);
   }
@@ -188,18 +190,30 @@ class Form
   public function edit($form_name, $options)
   {
     # Can't edit something that doesn't exist, now can we?
-    if(!$this->form_registered($form_name))
+    if(!$this->form_exists($form_name))
       return false;
 
-    # Editing the callback? Make sure it is callable.
+    # Editing the charset? Simply check if it is set or not.
+    if(isset($options['accept-charset']))
+      $this->forms[$form_name]['accept-charset'] = $options['accept-charset'];
+
+    # The action?
+    if(isset($options['action']))
+      $this->forms[$form_name]['action'] = $options['action'];
+
+    # How about the callback? Make sure it is callable.
     if(isset($options['callback']) && is_callable($options['callback']))
       $this->forms[$form_name]['callback'] = $options['callback'];
     elseif(isset($options['callback']))
       return false;
 
-    # The action?
-    if(isset($options['action']))
-      $this->forms[$form_name]['action'] = $options['action'];
+    # The encoding type, maybe?
+    if(isset($options['enctype']))
+      $this->forms[$form_name]['enctype'] = $options['enctype'];
+
+    # The HTML id? Good :)
+    if(isset($options['id']))
+      $this->forms[$form_name]['id'] = $options['id'];
 
     # How about the method of transporation? ;) Only get or post.
     if(isset($options['method']) && in_array(strtolower($options['method']), array('get', 'post')))
@@ -245,18 +259,24 @@ class Form
 
                  - string-html - Same as above, but HTML tags are not sanitized with htmlchars.
 
-                 - text - A string value, however, it is a textarea.
+                 - textarea - A string value, however, it is a textarea.
 
-                 - text-html - Same as above, but HTML tags are not sanitized with htmlchars.
+                 - textarea-html - Same as above, but HTML tags are not sanitized with htmlchars.
 
                  - password - A password field.
 
                  - checkbox - A checkbox field.
 
+                 - checkbox-multi - A list of multiple checkboxes.
+
                  - select - An options list (<select>), you are then supposed to supply
                             the options values.
 
                  - select-multi - An options list, but multiple values can be selected.
+
+                 - radio - A list of radio buttons.
+
+                 - file - A file field.
 
                  - function - This means the system will do no checking by itself, and
                               all will be handled by the supplied function callback.
@@ -302,7 +322,7 @@ class Form
                   or array('yes' => 'Yes', 'no' => 'No'), the index being the value in the
                   database, and the value being the value displayed in the options list.
 
-        function - A function callback, which is required if the type if function but optional
+        function - A function callback, which is required if the type is function but optional
                    if it is anything else. This function will be called before (if any) any
                    system checking is done. Three parameter will be supplied, which is the value
                    (make sure you make it a reference parameter that way you can modify it), the
@@ -338,21 +358,24 @@ class Form
         double - As is.
         string - As is with HTML tags encoded.
         string-html - As is.
-        text - As is with HTML tags encoded.
-        text-html - As is.
+        textarea - As is with HTML tags encoded.
+        textarea-html - As is.
         password - As is.
         checkbox - 0 for unchecked, 1 for checked.
+        checkbox-multi - See select.
         select - The index of the option value. For example:
                    options = array('This setting', 'Another setting')
                  If "Another setting" was chosen, 1 would be stored in the database
                  as that is its index, however, you can do 'another' => 'Another setting'
                  and "another" would be stored in the database.
         select-multi - As is above, except each selected option will be comma delimited.
+        radio - The selected options key will be passed.
+        file - The array from the $_FILES array will be passed.
   */
   public function add_field($form_name, $name, $options = array())
   {
     # The form not registered? Is this field name already specified?
-    if(!$this->form_registered($form_name) || $this->field_registered($form_name, $name))
+    if(!$this->form_exists($form_name) || $this->field_exists($form_name, $name))
       return false;
 
     # Validate that puppy!
@@ -364,6 +387,10 @@ class Form
 
     # Add it.
     $this->forms[$form_name]['fields'][$name] = $field;
+
+    # If the type of the field is a file, change the encoding type to the right one.
+    if($field['type'] == 'file')
+      $this->forms[$form_name]['enctype'] = 'multipart/form-data';
 
     return true;
   }
@@ -384,91 +411,90 @@ class Form
   private function validate_field($name, $options)
   {
     # Holds all of our stoof :)
-    $field = array();
+    $field = array(
+      # The column where the data will be saved, possibly.
+      'column' => !empty($options['column']) ? $options['column'] : $name,
 
-    # A column specified? Use that, otherwise, the supplied field name.
-    $field['column'] = !empty($options['column']) ? $options['column'] : $name;
+      # Whether or not the field is disabled, readonly, should even be shown or saved.
+      'disabled' => isset($options['disabled']) ? !empty($options['disabled']) : false,
+      'readonly' => isset($options['readonly']) ? !empty($options['readonly']) : false,
+      'show' => isset($options['show']) ? !empty($options['show']) : true,
+      'save' => isset($options['save']) ? !empty($options['save']) : true,
+      'size' => isset($options['size']) && (int)$options['size'] > 0 ? (int)$options['size'] : null,
+      'type' => strtolower($options['type']),
+      'is_custom' => false,
+      'is_full' => false,
+      'function' => isset($options['function']) ? $options['function'] : false,
 
+      # The label and subtext of the field, which are good ideas :)
+      'label' => isset($options['label']) ? $options['label'] : (!empty($options['column']) ? $options['column'] : $name),
+      'subtext' => isset($options['subtext']) ? $options['subtext'] : '',
+
+      # A little popup with more information, maybe?
+      'popup' => !empty($options['popup']),
+      'length' => array(
+                    'min' => isset($options['length']['min']) && (int)$options['length']['min'] > -1 ? (int)$options['length']['min'] : null,
+                    'max' => isset($options['length']['max']) && (int)$options['length']['max'] > 0 ? (int)$options['length']['max'] : null,
+                  ),
+      'truncate' => !empty($options['truncate']),
+      'options' => isset($options['options']) && is_array($options['options']) ? $options['options'] : false,
+      'value' => isset($options['value']) ? $options['value'] : null,
+      'rows' => isset($options['rows']) && (int)$options['rows'] > 0 ? $options['rows'] : null,
+      'cols' => isset($options['cols']) && (int)$options['cols'] > 0 ? $options['cols'] : null,
+
+      # HTML id?
+      'id' => isset($options['id']) ? $options['id'] : false,
+    );
+
+    # Now it is time to do some checking!
     # Here is an array containing all the recognized types.
-    $allowed_types = array('hidden', 'int', 'double', 'string', 'string-html', 'text', 'text-html', 'password', 'checkbox', 'select', 'select-multi', 'function', 'custom');
+    $allowed_types = array('hidden', 'int', 'double', 'string', 'string-html', 'textarea', 'textarea-html', 'password', 'checkbox', 'checkbox-multi', 'select', 'select-multi', 'radio', 'file', 'function', 'custom', 'full');
 
-    if(empty($options['type']))
+    # No type? No field!
+    if(empty($field['type']))
       return false;
 
-    # Before we validate the supplied, it might be custom!
-    $field['type'] = '';
-    $options['type'] = strtolower($options['type']);
-    $field['is_full'] = $options['type'] == 'full' || substr($options['type'], 0, 5) == 'full-';
-    $field['is_custom'] = $options['type'] == 'custom' || substr($options['type'], 0, 7) == 'custom-' || $field['is_full'];
+    # Before we validate the supplied type, check to see if it is full or custom...
+    $field['is_full'] = $field['type'] == 'full' || substr($field['type'], 0, 5) == 'full-';
+    $field['is_custom'] = $field['type'] == 'custom' || substr($field['type'], 0, 7) == 'custom-' || $field['is_full'];
 
     if($field['is_custom'] && !$field['is_full'] && strlen($field['type']) > 7)
-      $options['type'] = substr($options['type'], 7, strlen($options['type']) - 7);
+      $field['type'] = substr($field['type'], 7, strlen($field['type']) - 7);
+    elseif($field['is_full'] && strlen($field['type']) > 5)
+      $field['type'] = subtr($field['type'], 5, strlen($field['type']) - 5);
 
-    if($field['is_full'] && strlen($field['type']) > 5)
-      $options['type'] = subtr($options['type'], 5, strlen($options['type']) - 5);
-
-    # So, is it valid?
-    if(in_array($options['type'], $allowed_types))
-      $field['type'] = $options['type'];
-    elseif(empty($field['is_custom']) && $field['type'] != 'full')
+    # So, is it a valid type?
+    if(!in_array($field['type'], $allowed_types))
       return false;
 
-    # Label isn't required, but, c'mon, its a good idea ;)
-    $field['label'] = isset($options['label']) ? $options['label'] : $field['column'];
+    # Is your minimum length larger than your maximum?
+    if($field['length']['min'] !== null && $field['length']['max'] !== null && $field['length']['min'] > $field['length']['max'])
+      return false;
 
-    # Same goes for subtext.
-    $field['subtext'] = isset($options['subtext']) ? $options['subtext'] : '';
-
-    # How about a popup? More information never hurt anyone. I think.
-    $field['popup'] = !empty($options['popup']);
-
-    # A length isn't required either, so let's see.
-    $field['length'] = array(
-                         'min' => null,
-                         'max' =>null,
-                       );
-
-    if(!empty($options['length']['min']) && (string)$options['length']['min'] == (string)(int)$options['length']['min'])
-      $field['length']['min'] = (int)$options['length']['min'];
-
-    if(!empty($options['length']['max']) && (string)$options['length']['max'] == (string)(int)$options['length']['max'])
-      $field['length']['max'] = (int)$options['length']['max'];
-
-    # To truncate, or to not truncate, that is the question!
-    $field['truncate'] = !empty($options['truncate']);
-
-    # We only need options if your fields type is select or select-multi.
+    # We only need options if your fields type is checkbox-multi, select, select-multi or radio.
     if($field['type'] == 'select' || $field['type'] == 'select-multi')
     {
-      # Nothing supplied?!
-      if(!isset($options['options']) || !is_array($options['options']))
+      # Nothing supplied (Well, no array at all, at least)?!
+      if($field['options'] === false)
         return false;
 
-      $field['options'] = $options['options'];
-
+      # Make it safe!
       if(count($field['options']))
         foreach($field['options'] as $key => $value)
           $field['options'][$key] = htmlchars($value);
+
+      # Is the value set and is it not one that is available..?
+      if($field['value'] !== null && !isset($field['options'][$field['value']]))
+        # We will just unset it then.
+        $field['value'] = null;
     }
 
-    # A function, perhaps?
-    $field['function'] = isset($options['function']) && is_callable($options['function']) ? $options['function'] : null;
+    # Check the function, make sure it is callable if set, and if it is required or not.
+    if(($field['function'] == false && $field['type'] == 'function') || ($field['function'] !== false && !is_callable($field['function'])))
+      return false;
 
-    # Maybe a value? (Only encode the value if it isn't custom, as they need HTML ;))
-    $field['value'] = isset($options['value']) ? ($field['is_custom'] && is_callable($options['value']) ? $options['value'] : (is_array($options['value']) ? $options['value'] : htmlchars($options['value']))) : '';
-
-    # Disabled?
-    $field['disabled'] = !empty($options['disabled']);
-
-    # Should we show/handle this field at all?
-    $field['show'] = isset($options['show']) ? !empty($options['show']) : true;
-
-    # Pass it to the callback?
-    $field['save'] = isset($options['save']) ? !empty($options['save']) : true;
-
-    # Rows, columns?
-    $field['rows'] = isset($options['rows']) && (string)$options['rows'] == (string)(int)$options['rows'] ? (int)$options['rows'] : 0;
-    $field['cols'] = isset($options['cols']) && (string)$options['cols'] == (string)(int)$options['cols'] ? (int)$options['cols'] : 0;
+    # Do we need to encode the value?
+    $field['value'] = isset($field['value']) ? ($field['is_custom'] && is_callable($field['value']) ? $field['value'] : (is_array($field['value']) ? $field['value'] : htmlchars($field['value']))) : '';
 
     # Woo! We are done!
     return $field;
@@ -488,7 +514,7 @@ class Form
   */
   public function remove_field($form_name, $name)
   {
-    if(!$this->field_registered($form_name, $name))
+    if(!$this->field_exists($form_name, $name))
       return false;
 
     unset($this->forms[$form_name]['fields'][$name]);
@@ -496,7 +522,7 @@ class Form
   }
 
   /*
-    Method: field_registered
+    Method: field_exists
 
     Checks to see if the supplied field is registered on the
     specified form.
@@ -505,7 +531,7 @@ class Form
       string $form_name - The name of the form.
       string $name - The name of the field.
   */
-  public function field_registered($form_name, $name)
+  public function field_exists($form_name, $name)
   {
     return isset($this->forms[$form_name]['fields'][$name]);
   }
@@ -528,7 +554,7 @@ class Form
   public function edit_field($form_name, $name, $options)
   {
     # The field not registered? Then you certainly can't edit what isn't there!
-    if(!$this->field_registered($form_name, $name))
+    if(!$this->field_exists($form_name, $name))
       return false;
 
     # Get the current options, merge the new ones and validate them. If validation
@@ -560,7 +586,7 @@ class Form
   {
     global $api;
 
-    if(!$this->form_registered($form_name))
+    if(!$this->form_exists($form_name))
     {
       echo l('The form "%s" does not exist.', htmlchars($form_name));
       return;
@@ -582,20 +608,41 @@ class Form
 
     if(empty($handled))
     {
+      # Make life just a little bit simple, shall we?
+      $form = $this->forms[$form_name];
+
+      if(empty($form['id']))
+        $form['id'] = $form_name;
+
       echo '
-      <form action="', $this->forms[$form_name]['action'], '" method="', $this->forms[$form_name]['method'], '" class="', $form_name, '" id="', $form_name, '">
+      <form', (!empty($form['accept-charset']) ? ' accept-charset="'. $form['accept-charset']. '"' : ''), ' action="', $form['action'], '" class="form"', (!empty($form['enctype']) ? ' enctype="'. $form['enctype']. '"' : ''), ' id="', $form['id'], '" method="', $form['method'], '">
         <fieldset>
           <table>
             <tr>
-              <td colspan="2" id="', $form_name, '_errors">';
+              <td class="message_td" colspan="2" id="', $form['id'], '_message">';
 
-      # Any errors? Those needs displayin'!
-      if(count($this->forms[$form_name]['errors']) > 0)
+      # Any errors? Those need displayin'!
+      if(strlen($api->apply_filters($form_name. '_message', '')) > 0)
+      {
+        echo '
+                <div class="message">
+                  ', $api->apply_filters($form_name. '_message', ''), '
+                </div>';
+      }
+
+        echo '
+              </td>
+            </tr>
+            <tr>
+              <td class="errors_td" colspan="2" id="', $form['id'], '_errors">';
+
+      # Any errors? Those need displayin'!
+      if(count($form['errors']) > 0)
       {
         echo '
                 <div class="errors">';
 
-        foreach($this->forms[$form_name]['errors'] as $error)
+        foreach($form['errors'] as $error)
           echo '
                   <p>', $error, '</p>';
 
@@ -608,14 +655,14 @@ class Form
             </tr>';
 
       # Show the fields, you know, the things you enter stuff into.
-      if(count($this->forms[$form_name]['fields']) > 0)
-        foreach($this->forms[$form_name]['fields'] as $name => $field)
+      if(count($form['fields']) > 0)
+        foreach($form['fields'] as $name => $field)
           # Make this simple, show it!
           $this->show_field($form_name, $name, $field);
 
       echo '
-            <tr id="', $form_name, '_submit">
-              <td class="buttons" colspan="2"><input type="submit" name="', $form_name, '" value="', $this->forms[$form_name]['submit'], '" /></td>
+            <tr id="', $form['id'], '_submit">
+              <td class="buttons" colspan="2"><input type="submit" name="', $form_name, '" value="', $form['submit'], '" /></td>
             </tr>
           </table>
         </fieldset>
@@ -647,59 +694,81 @@ class Form
     # Did someone else not handle it? Should it even be shown?
     if(empty($handled) && !empty($field['show']))
     {
+      $form = $this->forms[$form_name];
+
       echo '
-            <tr id="', $form_name, '_', $name, '">';
+            <tr class="form_field" id="', $form['id'], '_', $name, '">';
 
       # Is the field hidden? Then showing something isn't very hidden, now is it? I didn't think so.
       if($field['type'] != 'hidden' && $field['type'] != 'full')
         echo '
-              <td id="', $form_name, '_', $name, '_left" class="td_left"><p class="label">', $field['label'], '</p>', !empty($field['subtext']) ? '<p class="subtext">'. $field['subtext']. '</p>' : '', '</td>';
+              <td id="', $form['id'], '_', $name, '_left" class="td_left"><p class="label">', $field['label'], '</p>', !empty($field['subtext']) ? '<p class="subtext">'. $field['subtext']. '</p>' : '', '</td>';
 
       # Now here is the fun part! Actually displaying the fields.
-      if(empty($field['is_custom']) && in_array($field['type'], array('int', 'double', 'string', 'string-html', 'password')))
+      if(empty($field['is_custom']))
       {
+        # No need to repeat this over and over again, is there?
         echo '
-              <td id="', $form_name, '_', $name, '_right" class="td_right"><input id="', $form_name, '_', $name, '_input" type="', ($field['type'] == 'password' ? 'password' : 'text'), '" name="', $name, '" value="', $field['value'], '"', ($field['length']['max'] > 0 ? ' maxlength="'. $field['length']['max']. '"' : ''), (!empty($field['disabled']) ? ' disabled="disabled"' : ''), ' /></td>';
-      }
-      elseif(empty($field['is_custom']) && in_array($field['type'], array('text', 'text-html')))
-      {
-        echo '
-              <td id="', $form_name, '_', $name, '_right" class="td_right"><textarea id="', $form_name, '_', $name, '_input" name="', $name, '"', ($field['length']['max'] > 0 ? ' onkeyup="s.truncate(this, '. $field['length']['max']. ');"' : ''), ($field['rows'] > 0 ? ' rows="'. $field['rows']. '"' : ''), ($field['cols'] > 0 ? ' cols="'. $field['cols']. '"' : ''), ($field['length']['max'] > 0 ? ' maxlength="'. $field['length']['max']. '"' : ''), (!empty($field['disabled']) ? ' disabled="disabled"' : ''), '>', $field['value'], '</textarea></td>';
-      }
-      elseif(empty($field['is_custom']) && in_array($field['type'], array('select', 'select-multi')))
-      {
-        echo '
-              <td id="', $form_name, '_', $name, '_right" class="td_right">
-                <select id="', $form_name, '_', $name, '_input" name="', $name, '"', ($field['type'] == 'select-multi' ? ' multiple="multiple"' : ''), ($field['type'] == 'select-multi' && $field['rows'] > 0 ? ' size="'. $field['rows']. '"' : ''), ($field['length']['max'] > 0 ? ' maxlength="'. $field['length']['max']. '"' : ''), (!empty($field['disabled']) ? ' disabled="disabled"' : ''), '>';
+              <td id="', $form['id'], '_', $name, '_right" class="td_right">';
+
+        # Strings, integers, doubles, passwords, etc.
+        if(in_array($field['type'], array('int', 'double', 'string', 'string-html', 'password')))
+          echo '<input class="input_generic" id="', (!empty($field['id']) ? $field['id']. ' ' : ''), $form['id'], '_', $name, '_input" type="', ($field['type'] == 'password' ? 'password' : 'text'), '" name="', $name, '" value="', $field['value'], '"', ($field['length']['max'] > 0 ? ' maxlength="'. $field['length']['max']. '"' : ''), (!empty($field['disabled']) ? ' disabled="disabled"' : ''), (!empty($field['readonly']) ? ' readonly="readonly"' : ''), ' />';
+        # Text areas! Woo.
+        elseif(substr($field['type'], 0, 8) == 'textarea')
+          echo '<textarea class="input_textarea" id="', (!empty($field['id']) ? $field['id']. ' ' : ''), $form['id'], '_', $name, '_input" name="', $name, '"', ($field['length']['max'] > 0 ? ' onkeyup="s.truncate(this, '. $field['length']['max']. ');"' : ''), ($field['rows'] > 0 ? ' rows="'. $field['rows']. '"' : ''), ($field['cols'] > 0 ? ' cols="'. $field['cols']. '"' : ''), ($field['length']['max'] > 0 ? ' maxlength="'. $field['length']['max']. '"' : ''), (!empty($field['disabled']) ? ' disabled="disabled"' : ''), (!empty($field['readonly']) ? ' readonly="readonly"' : ''), '>', $field['value'], '</textarea>';
+        elseif(substr($field['type'], 0, 8) == 'checkbox')
+        {
+          # Multiple, perhaps?
+          if(substr($field['type'], -5, 5) == 'multi')
+          {
+            # Display them ALL!
+            if(count($field['options']))
+              foreach($field['options'] as $key => $label)
+                echo '<label><input class="input_checkbox" id="', $form['id'], '_', $name, '_input" type="checkbox" name="', $name, '[', $key, ']" value="1"', (!empty($field['value']) && $field['value'] == $key ? ' checked="checked"' : ''), (!empty($field['disabled']) ? ' disabled="disabled"' : ''), (!empty($field['readonly']) ? ' readonly="readonly"' : ''), ' /> ', $label, '</label><br />';
+          }
+          else
+            # Nope, just a lonesome one! :(
+            echo '<input class="input_checkbox" id="', $form['id'], '_', $name, '_input" type="checkbox" name="', $name, '" value="1"', (!empty($field['value']) ? ' checked="checked"' : ''), (!empty($field['disabled']) ? ' disabled="disabled"' : ''), (!empty($field['readonly']) ? ' readonly="readonly"' : ''), ' />';
+        }
+        elseif(substr($field['type'], 0, 6) == 'select')
+        {
+          echo '<select class="input_select" id="', $form['id'], '_', $name, '_input" name="', $name, '"', ($field['type'] == 'select-multi' ? ' multiple="multiple"' : ''), ($field['type'] == 'select-multi' && $field['rows'] > 0 ? ' size="'. $field['rows']. '"' : ''), (!empty($field['disabled']) ? ' disabled="disabled"' : ''), '>';
 
                 if(count($field['options']))
                   foreach($field['options'] as $key => $value)
                     echo '
-                  <option value="', $key, '"', ((!is_array($field['value']) && $field['value'] == $value) || (is_array($field['value']) && in_array($value, $field['value'])) ? ' selected="selected"' : ''), '>', $value, '</option>';
+                  <option value="', $key, '"', ((!is_array($field['value']) && $field['value'] == $key) || (is_array($field['value']) && in_array($key, $field['value'])) ? ' selected="selected"' : ''), '>', $value, '</option>';
 
-        echo '
-                </select>
-              </td>';
-      }
-      elseif(empty($field['is_custom']) && $field['type'] == 'checkbox')
-      {
-        echo '
-              <td id="', $form_name, '_', $name, '_right" class="td_right"><input id="', $form_name, '_', $name, '_input" type="checkbox" name="', $name, '" value="1"', (!empty($field['value']) ? ' checked="checked"' : ''), (!empty($field['disabled']) ? ' disabled="disabled"' : ''), ' /></td>';
-      }
-      elseif(empty($field['is_custom']) && $field['type'] == 'hidden')
-      {
-        echo '
-              <td id="', $form_name, '_', $name, '_right" class="hidden" colspan="2"><input id="', $form_name, '_', $name, '_input" type="hidden" name="', $name, '" value="', $field['value'], '"', (!empty($field['disabled']) ? ' disabled="disabled"' : ''), ' /></td>';
+          echo '</select>';
+        }
+        elseif($field['type'] == 'hidden')
+        {
+          echo '<input id="', $form['id'], '_', $name, '_input" type="hidden" name="', $name, '" value="', $field['value'], '"', (!empty($field['disabled']) ? ' disabled="disabled"' : ''), ' />';
+        }
+        elseif($field['type'] == 'radio')
+        {
+          # Display the list of radio buttons.
+          if(count($field['options']))
+            foreach($field['options'] as $key => $label)
+              echo '<label><input class="input_radio" id="', $form['id'], '_', $name, '_input" type="radio" name="', $name, '" value="', $key, '"', (!empty($field['value']) && $field['value'] == $key ? ' checked="checked"' : ''), (!empty($field['disabled']) ? ' disabled="disabled"' : ''), (!empty($field['readonly']) ? ' readonly="readonly"' : ''), ' /> ', $label, '</label><br />';
+        }
+        elseif($field['type'] == 'file')
+        {
+          echo '<input class="input_file" id="', $form['id'], '_', $name, '_input" type="file" name="', $name, '" value="', $field['value'], '"', (!empty($field['disabled']) ? ' disabled="disabled"' : ''), (!empty($field['readonly']) ? ' readonly="readonly"' : ''), ' />';
+        }
+
+        echo '</td>';
       }
       elseif(empty($field['is_full']))
       {
         echo '
-              <td id="', $form_name, '_', $name, '_right" class="td_right">', (is_callable($field['value']) ? $field['value']() : $field['value']), '</td>';
+              <td id="', $form['id'], '_', $name, '_right" class="td_right">', (is_callable($field['value']) ? $field['value']() : $field['value']), '</td>';
       }
       else
       {
         echo '
-              <td id="', $form_name, '_', $name, '_right" class="full" colspan="2">', (is_callable($field['value']) ? $field['value']() : $field['value']), '</td>';
+              <td id="', $form['id'], '_', $name, '_right" class="full" colspan="2">', (is_callable($field['value']) ? $field['value']() : $field['value']), '</td>';
       }
 
       echo '
@@ -725,7 +794,7 @@ class Form
   {
     global $api, $func;
 
-    if(!$this->form_registered($form_name))
+    if(!$this->form_exists($form_name))
     {
       echo l('The form "%s" does not exist.', htmlchars($form_name));
       return;
@@ -797,7 +866,7 @@ class Form
 
         # Now it is time to check the data types of the submitted form data, woo!!!
         # So, is it a string(-html), text(-html), password or a hidden field?
-        if(in_array($field['type'], array('string', 'string-html', 'text', 'text-html', 'password', 'hidden')))
+        if(in_array($field['type'], array('string', 'string-html', 'textarea', 'textarea-html', 'password', 'hidden')))
         {
           # Set as a string field, in reality, anything can be a string.
           if(!$validation->data($_POST[$name], 'string'))
@@ -807,7 +876,7 @@ class Form
           }
 
           # But does it need encoding?!
-          if(in_array($field['type'], array('string', 'text', 'password', 'hidden')))
+          if(in_array($field['type'], array('string', 'textarea', 'password', 'hidden')))
             $_POST[$name] = htmlchars($_POST[$name]);
         }
         # How about an integer or double?
@@ -855,6 +924,49 @@ class Form
           # Join them all together, like one happy family! Of one ;D
           $_POST[$name] = implode(',', $selected);
         }
+        elseif($field['type'] == 'checkbox-multi')
+        {
+          # The keys hold the values, in this case :)
+          $checked = array();
+          $options = array_keys($field['options']);
+
+          if(is_array($_POST[$name]) && count($_POST[$name]) > 0)
+          {
+            foreach($_POST[$name] as $key => $dummy)
+            {echo $key, ' - ';
+              # Is it even a valid option?
+              if(in_array($key, $options))
+              {
+                $checked[] = $key;
+
+                if(isset($field['length']['max']) && count($checked) >= $field['length']['max'])
+                  break;
+              }
+            }
+          }
+
+          $_POST[$name] = implode(',', $checked);
+        }
+        elseif($field['type'] == 'radio')
+        {
+          # Just make sure the option you selected is valid ;)
+          if(!in_array($_POST[$name], array_keys($field['options'])))
+            $_POST[$name] = '';
+        }
+        elseif($field['type'] == 'file')
+        {
+          # We will start with nope, its invalid ;)
+          $_POST[$name] = false;
+
+          # Is the right $_FILES index set?
+          if(isset($_FILES[$name]))
+          {
+            # Make sure it is an actually uploaded file.
+            if(is_uploaded_file($_FILES[$name]['tmp_name']))
+              # We'll set it in the post field P:
+              $_POST[$name] = $_FILES[$name];
+          }
+        }
 
         # Any length restrictions set?
         if((isset($field['length']['min']) || isset($field['length']['max'])) && ($field['type'] == 'int' || $field['type'] == 'double'))
@@ -873,7 +985,7 @@ class Form
           if(!empty($truncate))
             $_POST[$name] = $field['type'] == 'int' ? (int)$field['length']['max'] : (double)$field['length']['min'];
         }
-        elseif((isset($field['length']['min']) || isset($field['length']['max'])) && in_array($field['type'], array('string', 'string-html', 'text', 'text-html', 'password', 'hidden')))
+        elseif((isset($field['length']['min']) || isset($field['length']['max'])) && in_array($field['type'], array('string', 'string-html', 'textarea', 'textarea-html', 'password', 'hidden')))
         {
           if(isset($field['length']['min']) && $func['strlen']($_POST[$name]) < $field['length']['min'])
           {
@@ -945,7 +1057,7 @@ class Form
   public function json_process($form_name)
   {
     # Even though process does this, it echo's the data, which we don't want.
-    if(!$this->form_registered($form_name))
+    if(!$this->form_exists($form_name))
     {
       return json_encode(array(l('The form "%s" does not exist.', htmlchars($form_name))));
     }

@@ -157,7 +157,7 @@ fieldset
   padding: 2px;
 }
 
-#login_error, #login_form .errors, #registration_form .errors, #resend_form .errors, #reminder_form .errors, #reset_password_form .errors
+.form .errors
 {
   margin: 15px 10px 15px 10px;
   padding: 5px;
@@ -168,13 +168,13 @@ fieldset
 }
 
 /* Registration form CSS */
-#registration_form
+.form table
 {
   text-align: center !important;
   margin: 10px auto;
 }
 
-#registration_form .label
+.form .label
 {
   font-weight: bold;
 }

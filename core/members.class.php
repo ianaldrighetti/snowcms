@@ -545,7 +545,13 @@ class Members
         if($member_pass == $row['member_pass'] || (!empty($pass_hash) && $pass_hash !== true && $member_pass == sha1($row['member_pass']. $pass_hash)))
           return true;
         else
-          return false;
+        {
+          # Maybe you would like to check..?
+          $authenticated = false;
+          $api->run_hooks('members_authenticate_other', array(&$authenticated, $member_name, $member_pass, $pass_hash, $row));
+
+          return !empty($authenticated);
+        }
       }
       else
         # We got nothing!
