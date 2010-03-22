@@ -42,7 +42,7 @@ if(!function_exists('checkcookie_verify'))
   {
     global $api, $base_url, $cookie_name, $core_dir, $theme;
 
-    $api->run_hookss('checkcookie_verify');
+    $api->run_hooks('checkcookie_verify');
 
     # This is a pretty simple check...
     $cookie = isset($_COOKIE[$cookie_name]) ? $_COOKIE[$cookie_name] : '';

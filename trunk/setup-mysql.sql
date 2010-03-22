@@ -1,7 +1,7 @@
 ----
 -- Holds all the PHP errors which have occurred!
 ----
-CREATE TABLE `{$db_prefix}error_log`
+CREATE TABLE `{db->prefix}error_log`
 (
   `error_id` INT(11) UNSIGNED NOT NULL AUTO_INCREMENT,
   `error_time` INT(10) UNSIGNED NOT NULL DEFAULT '0',
@@ -23,7 +23,7 @@ CREATE TABLE `{$db_prefix}error_log`
 ----
 -- Holds members extra information, this is what a plugin should use to store extra member stuffs!
 ----
-CREATE TABLE `{$db_prefix}member_data`
+CREATE TABLE `{db->prefix}member_data`
 (
   `member_id` INT(11) UNSIGNED NOT NULL,
   `variable` VARCHAR(255) NOT NULL,
@@ -34,7 +34,7 @@ CREATE TABLE `{$db_prefix}member_data`
 ----
 -- The members table, holding, you guessed it! MEMBERS!
 ---
-CREATE TABLE `{$db_prefix}members`
+CREATE TABLE `{db->prefix}members`
 (
   `member_id` INT(11) UNSIGNED NOT NULL AUTO_INCREMENT,
   `member_name` VARCHAR(80) NOT NULL,
@@ -56,7 +56,7 @@ CREATE TABLE `{$db_prefix}members`
 ----
 -- Used via the Messages API
 ----
-CREATE TABLE `{$db_prefix}messages`
+CREATE TABLE `{db->prefix}messages`
 (
   `area_name` VARCHAR(255) NOT NULL,
   `area_id` INT(11) UNSIGNED NOT NULL,
@@ -86,7 +86,7 @@ CREATE TABLE `{$db_prefix}messages`
 ----
 -- This is where currently enabled plugins are held
 ----
-CREATE TABLE `{$db_prefix}plugins`
+CREATE TABLE `{db->prefix}plugins`
 (
   `dependency_name` VARCHAR(255) NOT NULL,
   `dependency_names` TEXT NOT NULL,
@@ -103,23 +103,23 @@ CREATE TABLE `{$db_prefix}plugins`
 ----
 -- A table holding various settings and what not xD
 ----
-CREATE TABLE `{$db_prefix}settings`
+CREATE TABLE `{db->prefix}settings`
 (
   `variable` VARCHAR(255) NOT NULL,
   `value` TEXT NOT NULL,
   PRIMARY KEY (`variable`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 
-INSERT INTO `{$db_prefix}settings` (`variable`, `value`) VALUES('show_version', 1),('version', '2.0 SVN'),('password_security', 1),('reserved_names', ''),('disallowed_emails', ''),('default_event', '');
-INSERT INTO `{$db_prefix}settings` (`variable`, `value`) VALUES('disallowed_email_domains', ''),('enable_tasks', 1),('site_name', 'SnowCMS'),('site_email', ''),('theme', 'default'),('max_tasks', 2);
-INSERT INTO `{$db_prefix}settings` (`variable`, `value`) VALUES('registration_enabled', 1),('registration_type', 0),('enable_utf8', 1),('members_min_name_length', 3),('members_max_name_length', 80),('errors_log', 1);
-INSERT INTO `{$db_prefix}settings` (`variable`, `value`) VALUES('mail_handler', 'mail'),('smtp_host', 'localhost'),('smtp_port', 25),('smtp_is_tls', 0),('smtp_timeout', 5),('smtp_user', ''),('smtp_pass', '');
-INSERT INTO `{$db_prefix}settings` (`variable`, `value`) VALUES('mail_additional_parameters', ''),('default_member_groups', 'member'),('disable_admin_security', 0);
+INSERT INTO `{db->prefix}settings` (`variable`, `value`) VALUES('show_version', 1),('version', '2.0 SVN'),('password_security', 1),('reserved_names', ''),('disallowed_emails', ''),('default_event', '');
+INSERT INTO `{db->prefix}settings` (`variable`, `value`) VALUES('disallowed_email_domains', ''),('enable_tasks', 1),('site_name', 'SnowCMS'),('site_email', ''),('theme', 'default'),('max_tasks', 2);
+INSERT INTO `{db->prefix}settings` (`variable`, `value`) VALUES('registration_enabled', 1),('registration_type', 0),('enable_utf8', 1),('members_min_name_length', 3),('members_max_name_length', 80),('errors_log', 1);
+INSERT INTO `{db->prefix}settings` (`variable`, `value`) VALUES('mail_handler', 'mail'),('smtp_host', 'localhost'),('smtp_port', 25),('smtp_is_tls', 0),('smtp_timeout', 5),('smtp_user', ''),('smtp_pass', '');
+INSERT INTO `{db->prefix}settings` (`variable`, `value`) VALUES('mail_additional_parameters', ''),('default_member_groups', 'member'),('disable_admin_security', 0),('admin_login_timeout', 15);
 
 ----
 -- Need to do something?
 ----
-CREATE TABLE `{$db_prefix}tasks`
+CREATE TABLE `{db->prefix}tasks`
 (
   `task_name` VARCHAR(255) NOT NULL,
   `last_ran` INT(10) UNSIGNED NOT NULL DEFAULT '0',
@@ -137,7 +137,7 @@ CREATE TABLE `{$db_prefix}tasks`
 ----
 -- Holds registered tokens...
 ----
-CREATE TABLE `{$db_prefix}tokens`
+CREATE TABLE `{db->prefix}tokens`
 (
   `session_id` VARCHAR(150) NOT NULL,
   `token_name` VARCHAR(100) NOT NULL,
@@ -150,7 +150,7 @@ CREATE TABLE `{$db_prefix}tokens`
 ----
 -- Holds uploaded files, well, the files information that is.
 ----
-CREATE TABLE `{$db_prefix}uploads`
+CREATE TABLE `{db->prefix}uploads`
 (
   `area_name` VARCHAR(255) NOT NULL,
   `area_id` INT(11) UNSIGNED NOT NULL,

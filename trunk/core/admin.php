@@ -22,13 +22,15 @@ if(!defined('IN_SNOW'))
 
 # Title: Admin switch
 
-if(!function_exists('admin_switch'))
+if(!function_exists('admin_prepend'))
 {
   /*
-    Function: admin_switch
+    Function: admin_prepend
 
-    This is the core of the Admin CP, it routes all requests to their
-    proper location.
+    With events there is no switch function which all administrative
+    sections branch off from, and we would rather not require each
+    plugin to have to check and see if the user needs to authenticate
+    themselves again. So it is done here, via a hook :).
 
     Parameters:
       none
@@ -39,9 +41,9 @@ if(!function_exists('admin_switch'))
     Note:
       This function is overloadable.
   */
-  function admin_switch()
+  function admin_prepend()
   {
-    global $api, $member, $theme;
+    global $api, $core_dir, $member, $settings, $theme;
 
     # First things first, are you even allowed to view the Admin CP?
     # Plugins can add more groups through the admin_allowed_groups filter.
@@ -72,6 +74,14 @@ if(!function_exists('admin_switch'))
 
     # We may require you to enter a password, for security reasons!
     admin_prompt_password();
+
+    # You seem to be authenticated, and now we can switch over to the admin theme :)
+    require_once($core_dir. '/admin/theme.class.php');
+
+    $theme = $api->load_class($api->apply_filters('admin_theme_class', 'Admin_Theme'), $settings->get('site_name', 'string'));
+
+    # You can make changes to the theme and what not now :)
+    $api->run_hooks('admin_prepend_authenticated');
   }
 }
 
@@ -81,7 +91,7 @@ if(!function_exists('admin_prompt_required'))
     Function: admin_prompt_required
 
     Checks to see if the user needs to verify their session with
-    their account password.
+    their account password. Useful for AJAX kind of things, ;).
 
     Parameters:
       none
@@ -95,7 +105,14 @@ if(!function_exists('admin_prompt_required'))
   */
   function admin_prompt_required()
   {
-    # !!! TODO
+    global $api, $member, $settings;
+
+    # Check to see if your last check has now timed out, quite simple really! But
+    # if you for some strange reason have it disabled, nevermind!
+    if(!$settings->get('disable_admin_security', 'bool', false) && (empty($_SESSION[$member->session_id(). '_password_prompted']) || ((int)$_SESSION[$member->session_id(). '_password_prompted'] + ($settings->get('admin_login_timeout', 'int', 15) * 60)) < time_utc()))
+      return true;
+
+    # Your good, for now!
     return false;
   }
 }
@@ -112,7 +129,7 @@ if(!function_exists('admin_prompt_password'))
     Hint hint ;)
 
     Parameters:
-      string $password - The users plain text, SHA-1'd or secured password,
+      string $password - The users plain text or SHA-1'd,
                          if left blank, the form is displayed.
 
     Returns:
@@ -120,7 +137,125 @@ if(!function_exists('admin_prompt_password'))
   */
   function admin_prompt_password($password = null)
   {
+    global $api, $member, $settings, $theme;
 
+    # Is it time for you to re-enter your password?
+    if(admin_prompt_required())
+    {
+      # Generate the login form.
+      admin_prompt_generate_form();
+
+      $form = $api->load_class('Form');
+
+      # Has the form been submitted? Process it!
+      if(isset($_POST['admin_prompt_form']))
+      {
+        $success = $form->process('admin_prompt_form');
+
+        # Did they pass?
+        if(!empty($success))
+          # Yup, no need to continue!
+          return;
+      }
+
+      $theme->set_title(l('Login'));
+
+      $theme->header();
+
+      echo '
+      <h1>', l('Login'), '</h1>
+      <p>', l('For security purposes, please enter your account password below. This is done to help make sure that you are who you say you are.'), '</p>';
+
+      $form->show('admin_prompt_form');
+
+      $theme->footer();
+
+      # Don't execute anything else.
+      exit;
+    }
+  }
+}
+
+if(!function_exists('admin_prompt_generate_form'))
+{
+  /*
+    Function: admin_prompt_generate_form
+
+    Generates the form which displays the administrative security prompt.
+
+    Parameters:
+      none
+
+    Returns:
+      void - Nothing is returned by this function.
+
+    Note:
+      This function is overloadable.
+  */
+  function admin_prompt_generate_form()
+  {
+    global $api;
+
+    # Create the form so you can enter your password.
+    $form = $api->load_class('Form');
+
+    $form->add('admin_prompt_form', array(
+                                      'action' => '',
+                                      'callback' => 'admin_prompt_handle',
+                                      'submit' => l('Login'),
+                                    ));
+
+    $form->add_field('admin_prompt_form', 'password', array(
+                                                        'type' => 'password',
+                                                        'label' => l('Password:'),
+                                                      ));
+  }
+}
+
+if(!function_exists('admin_prompt_handle'))
+{
+  /*
+    Function: admin_prompt_handle
+
+    Handles the verification of the supplied administrator password.
+
+    Parameters:
+      array $data
+      array &$errors
+
+    Returns:
+      bool - Returns true if the supplied password was correct, false if not.
+
+    Note:
+      This function is overloadable.
+  */
+  function admin_prompt_handle($data, &$errors = array())
+  {
+    global $api, $func, $member;
+
+    # No password? Pfft.
+    if(empty($data['password']) || $func['strlen']($data['password']) == 0)
+    {
+      $errors[] = l('Please enter your password.');
+      return false;
+    }
+
+    # The Members class has a useful method called authenticate :)
+    $members = $api->load_class('Members');
+
+    # Pretty simple to do. There are a couple hooks in that method, fyi.
+    if($members->authenticate($member->name(), $data['password']))
+    {
+      # Set the last time you verified in your session information ;)
+      $_SESSION[$member->session_id(). '_password_prompted'] = time_utc();
+
+      return true;
+    }
+    else
+    {
+      $errors[] = l('Incorrect password supplied.');
+      return false;
+    }
   }
 }
 ?>

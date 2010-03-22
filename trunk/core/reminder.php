@@ -43,7 +43,7 @@ if(!function_exists('reminder_view'))
   {
     global $api, $base_url, $member, $settings, $theme;
 
-    $api->run_hook('reminder_view');
+    $api->run_hooks('reminder_view');
 
     if($member->is_logged())
     {

@@ -132,7 +132,11 @@ if(!empty($event))
     require_once($event['filename']);
 
   # Now call on the callback, after all, that's what it's for!
-  call_user_func($event['callback']);
+  # Pass the last value of the $_GET array, if it needs to be.
+  if(empty($event['accept_param']))
+    call_user_func($event['callback']);
+  else
+    call_user_func($event['callback'], end($_GET));
 }
 else
 {

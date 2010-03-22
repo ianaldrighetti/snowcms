@@ -47,7 +47,7 @@ function init_core()
   # these actions before they are registered here! :) But also all these functions
   # are overloadable, so simply define them before this too!!!)
   $api->add_event('action=activate', 'activate_view', $core_dir. '/activate.php');
-  $api->add_event('action=admin', 'admin_switch', $core_dir. '/admin.php');
+  $api->add_event('action=admin', 'admin_home', $core_dir. '/admin/home.php');
   $api->add_event('action=checkcookie', 'checkcookie_verify', $core_dir. '/checkcookie.php');
   $api->add_event('action=login', 'login_view', $core_dir. '/login.php');
   $api->add_event('action=login2', 'login_view2', $core_dir. '/login.php');
@@ -61,5 +61,13 @@ function init_core()
 
   # Start output buffering.
   ob_start($api->apply_filters('output_callback', null));
+
+  # Check to see if admin_prepend needs to be called.
+  if(substr($_SERVER['QUERY_STRING'], 0, 12) == 'action=admin')
+  {
+    require_once($core_dir. '/admin.php');
+
+    admin_prepend();
+  }
 }
 ?>
