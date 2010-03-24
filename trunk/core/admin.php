@@ -76,7 +76,7 @@ if(!function_exists('admin_prepend'))
     admin_prompt_password();
 
     # You seem to be authenticated, and now we can switch over to the admin theme :)
-    require_once($core_dir. '/admin/theme.class.php');
+    require_once($core_dir. '/admin/admin_theme.class.php');
 
     $theme = $api->load_class($api->apply_filters('admin_theme_class', 'Admin_Theme'), $settings->get('site_name', 'string'));
 

@@ -803,8 +803,235 @@ class API
     Adds a link to the menu.
 
     Parameters:
-      string $category
+      string $category - The category of where the link will be in.
+      array $options - An array containing the links options.
+
+    Returns:
+      bool - Returns true if the link is added successfully, false
+             if not.
+
+    Note:
+      The following indexes are supported for the $options parameter:
+        href - The destination (URL) of the link.
+        name - The name of the anchor to link to (if href supplied, this is ignored,
+               and vice versa).
+        rel - Specifies the relationship between the current document
+              and the one it is linking to. For example, if nofollow was
+              supplied, then bots (Google, Bing, etc.) will not follow
+              the link (well, they will, but it won't help them).
+        class - Specifies a CSS class name(s) for the link.
+        id - A unique HTML id for the tag.
+        style - Inline styling.
+        title - A mouseover text.
+        content - The actual content between the tags which is linked.
+        extra - Any extra information (which could be a string, array, etc).
+        position - A number (starting at zero), specifying at which position
+                   the link should be inserted at in the list. If 0 is supplied,
+                   the link will be placed in the front, if none supplied,
+                   the link will be added to the end. Please note that when
+                   links are retrieved they are not sorted by this number,
+                   they are sorted once it is added. So if you add two links
+                   at position 0, the first link will be second and the next
+                   will be first.
+
+      By the way. In order to add a link to the admin menu, simply set the
+      category as action=admin. To put the link into a category, simply supply
+      the categories label in the extra field as a string, if it doesn't exist,
+      it will be created.
   */
+  public function add_menu_item($category, $options)
+  {
+    # No category? No options..? No href or name? No content?
+    if(empty($category) || !is_array($options) || count($options) == 0 || (!isset($options['href']) && !isset($options['name'])) || empty($options['content']))
+      # Then I can't add the link!
+      return false;
+
+    # If you have an href and a name, the name goes buh bye!
+    if(isset($options['href']) && isset($options['name']))
+      unset($options['name']);
+
+    # Only allow certain attributes, delete the rest.
+    $allowed_indexes = array('href', 'name', 'rel', 'class', 'id', 'style', 'title', 'content', 'extra', 'position');
+    foreach($options as $key => $value)
+      if(!in_array($key, $allowed_indexes))
+      {
+        # Not allowed, so simply delete it.
+        unset($options[$key]);
+      }
+
+    # Is the category not yet created? Then do so!
+    if(!isset($this->menu[$category]))
+      $this->menu[$category] = array();
+
+    # Are you going to make my life easy..? :)
+    if(!isset($options['position']) || (string)$options['position'] != (string)(int)$options['position'] || (int)$options['position'] < 0 || count($this->menu[$category]) == 0)
+      # Yes, thank you!!!
+      $this->menu[$category][] = $options;
+    else
+    {
+      $position = (int)$options['position'];
+
+      # We don't need that index anymore...
+      unset($options['position']);
+
+      # If the position you want to put it at is bigger than the array,
+      # just place it in the back!
+      if($position >= count($this->menu[$category]))
+        $this->menu[$category][] = $options;
+      else
+      {
+        # Move them all over to a temporary array!
+        $menu = array();
+        $length = count($this->menu[$category]);
+
+        for($i = 0; $i < $length; $i++)
+        {
+          # Is this where you want it to be placed?
+          if($i == $position)
+            $menu[] = $options;
+
+          $menu[] = $this->menu[$category][$i];
+        }
+
+        # Copy the new one over.
+        $this->menu[$category] = $menu;
+      }
+    }
+
+    # We're done!
+    return true;
+  }
+
+  /*
+    Method: remove_menu_item
+
+    Removes the specified menu item(s) by key.
+
+    Parameters:
+      string $search - The value of which you are searching for,
+                       if found, it will be deleted.
+      string $category - The category to search. If none supplied,
+                         all categories will be searched.
+      string $index - The index you want to search by, either href,
+                      name, rel, class, id, style, title or content.
+                      Defaults to content.
+      bool $case_sensitive - Whether or not the search is case sensitive.
+
+    Returns:
+      int - Returns the number of menu items removed.
+  */
+  public function remove_menu_item($search, $category = null, $index = 'content', $case_sensitive = false)
+  {
+    global $func;
+
+    # Make sure the index you are searching by is allowed.
+    $index = strtolower($index);
+    if(!in_array($index, array('href', 'name', 'rel', 'class', 'id', 'style', 'title', 'content')))
+      # None deleted! :P
+      return 0;
+
+    # All categories?
+    if(empty($category))
+    {
+      # We will keep track of the number of deleted menu items here.
+      $deleted = 0;
+
+      if(count($this->menu) > 0)
+      {
+        foreach($this->menu as $key => $value)
+        {
+          # We will let this method do the stuff :P
+          $deleted += $this->remove_menu_item($search, $key, $index, !empty($case_sensitive));
+        }
+      }
+
+      return $deleted;
+    }
+    else
+    {
+      # Does this category even exist?
+      if(!isset($this->menu[$category]))
+        return 0;
+
+      $deleted = 0;
+      if(count($this->menu[$category]) > 0)
+      {
+        # Make this a tad easier.
+        $compare_func = !empty($case_sensitive) ? create_function('$value', 'return $value;') : $func['strtolower'];
+
+        # No need to continually do this, right?
+        $search = $compare_func($search);
+
+        foreach($this->menu[$category] as $key => $value)
+        {
+          if($search == $compare_func($value[$index]))
+          {
+            # Remove it!
+            unset($this->menu[$category][$key]);
+            $deleted++;
+          }
+        }
+
+        # If any were deleted, we may need to tidy up the indexing order :)
+        if($deleted > 0)
+        {
+          $menu = array();
+          foreach($this->menu[$category] as $value)
+            $menu[] = $value;
+
+          $this->menu[$category] = $menu;
+        }
+      }
+
+      return $deleted;
+    }
+  }
+
+  /*
+    Method: return_menu_items
+
+    Returns the menu items requested.
+
+    Parameters:
+      string $category - The category of links to return, if any.
+
+    Returns:
+      array - Returns an array containing the links, false if the
+              category does not exist.
+
+    Note:
+      If the $category parameter is not supplied (null), then the
+      whole menu attribute is returned, containing an array who's
+      initial indexes specify the category the links are in, however,
+      if false, all the links will be congregated into one array.
+  */
+  public function return_menu_items($category = null)
+  {
+    # Just return them all? Alright.
+    if($category === null)
+      return $this->menu;
+    elseif($category === false)
+    {
+      $menu = array();
+
+      # Loop through them all! If any!
+      if(count($this->menu) > 0)
+      {
+        foreach($this->menu as $value)
+        {
+          if(count($value) > 0)
+          {
+            foreach($value as $sub_value)
+              $menu[] = $sub_value;
+          }
+        }
+      }
+
+      return $menu;
+    }
+    else
+      return isset($this->menu[$category]) ? $this->menu[$category] : false;
+  }
 
   /*
     Method: load_class
