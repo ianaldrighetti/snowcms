@@ -122,7 +122,8 @@ INSERT INTO '{db->prefix}settings' ('variable', 'value') VALUES('smtp_pass', '')
 INSERT INTO '{db->prefix}settings' ('variable', 'value') VALUES('mail_additional_parameters', '');
 INSERT INTO '{db->prefix}settings' ('variable', 'value') VALUES('default_member_groups', 'member');
 INSERT INTO '{db->prefix}settings' ('variable', 'value') VALUES('disable_admin_security', 0);
-INSERT INTO '{db->prefix}settings' ('variable', 'value') ('admin_login_timeout', 15);
+INSERT INTO '{db->prefix}settings' ('variable', 'value') VALUES('admin_login_timeout', 15);
+INSERT INTO '{db->prefix}settings' ('variable', 'value') VALUES('admin_news_fetch_every', 43200);
 
 CREATE TABLE '{db->prefix}tasks'
 (

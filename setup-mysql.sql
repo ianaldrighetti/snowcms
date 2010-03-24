@@ -114,7 +114,7 @@ INSERT INTO `{db->prefix}settings` (`variable`, `value`) VALUES('show_version', 
 INSERT INTO `{db->prefix}settings` (`variable`, `value`) VALUES('disallowed_email_domains', ''),('enable_tasks', 1),('site_name', 'SnowCMS'),('site_email', ''),('theme', 'default'),('max_tasks', 2);
 INSERT INTO `{db->prefix}settings` (`variable`, `value`) VALUES('registration_enabled', 1),('registration_type', 0),('enable_utf8', 1),('members_min_name_length', 3),('members_max_name_length', 80),('errors_log', 1);
 INSERT INTO `{db->prefix}settings` (`variable`, `value`) VALUES('mail_handler', 'mail'),('smtp_host', 'localhost'),('smtp_port', 25),('smtp_is_tls', 0),('smtp_timeout', 5),('smtp_user', ''),('smtp_pass', '');
-INSERT INTO `{db->prefix}settings` (`variable`, `value`) VALUES('mail_additional_parameters', ''),('default_member_groups', 'member'),('disable_admin_security', 0),('admin_login_timeout', 15);
+INSERT INTO `{db->prefix}settings` (`variable`, `value`) VALUES('mail_additional_parameters', ''),('default_member_groups', 'member'),('disable_admin_security', 0),('admin_login_timeout', 15),('admin_news_fetch_every', 43200);
 
 ----
 -- Need to do something?

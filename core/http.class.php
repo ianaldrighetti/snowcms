@@ -92,7 +92,7 @@ class HTTP
     $this->set_http_version(empty($http_version) || (string)$http_version != (string)(float)$http_version ? 1.1 : $http_version);
     $this->set_port(empty($port) || (string)$port != (string)(int)$port ? 80 : $port);
     $this->set_timeout(5);
-    $this->set_user_agent(empty($user_agent) || !is_string($user_agent) ? 'SnowCMS ' .((bool)$settings->get('show_version') ? 'v'. $settings->get('version') : ''). '/PHP'. ((bool)$settings->get('show_version') ? 'v'. PHP_VERSION : '') : $user_agent);
+    $this->set_user_agent(empty($user_agent) || !is_string($user_agent) ? 'SnowCMS ' .($settings->get('show_version', 'bool', false) ? 'v'. $settings->get('version', 'string') : ''). '/PHP'. ($settings->get('show_version', 'bool', false) ? 'v'. PHP_VERSION : '') : $user_agent);
   }
 
   /*
@@ -340,7 +340,7 @@ class HTTP
 
       # Well, we have gone as far as we have, no it is up to you ;)
       return $callback(array(
-        'url' => ($func['substr']($func['strtolower']($url), 0, 8) == 'https://' && !$this->ssl_supported() ? 'http'). $func['substr']($func['strtolower']($url), 5, $func['strlen']($url)) : $url,
+        'url' => ($func['substr']($func['strtolower']($url), 0, 8) == 'https://' && !$this->ssl_supported() ? 'http'. $func['substr']($func['strtolower']($url), 5, $func['strlen']($url)) : $url),
         'post_data' => array_merge($this->post_data, $post_data),
         'resume_from' => max((int)$resume_from, 0),
         'fp' => !empty($filename) ? $fp : null,

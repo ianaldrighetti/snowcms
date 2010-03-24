@@ -519,11 +519,12 @@ abstract class Theme
     Parameters:
       string $name - The name of the HTML tag, like meta, link, etc.
       array $attributes - Attributes of the HTML tag.
+      bool $self_closing - Whether or not the tag is self closing.
 
     Returns:
       string - Returns the formed tag.
   */
-  protected function generate_tag($name, $attributes)
+  protected function generate_tag($name, $attributes, $self_closing = true)
   {
     if(empty($name))
       return false;
@@ -535,12 +536,15 @@ abstract class Theme
       $attr = array();
 
       foreach($attributes as $name => $value)
-        $attr[] = $name. '="'. addcslashes($value, '"'). '"';
+      {
+        if(!empty($value))
+          $attr[] = $name. '="'. addcslashes($value, '"'). '"';
+      }
 
       $tag .= ' '. implode(' ', $attr);
     }
 
-      return ($tag. ' />');
+      return ($tag. (!empty($self_closing) ? ' />' : '>'));
   }
 }
 

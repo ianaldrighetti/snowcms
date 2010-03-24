@@ -47,7 +47,7 @@ function init_core()
   # these actions before they are registered here! :) But also all these functions
   # are overloadable, so simply define them before this too!!!)
   $api->add_event('action=activate', 'activate_view', $core_dir. '/activate.php');
-  $api->add_event('action=admin', 'admin_home', $core_dir. '/admin/home.php');
+  $api->add_event('action=admin', 'admin_home', $core_dir. '/admin/admin_home.php');
   $api->add_event('action=checkcookie', 'checkcookie_verify', $core_dir. '/checkcookie.php');
   $api->add_event('action=login', 'login_view', $core_dir. '/login.php');
   $api->add_event('action=login2', 'login_view2', $core_dir. '/login.php');
