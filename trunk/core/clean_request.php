@@ -82,4 +82,23 @@ if(!function_exists('clean_request'))
     return $array;
   }
 }
+
+/*
+  Function: redirect
+
+  Redirects the browser to the specified URL.
+
+  Parameters:
+    string $url - The URL to redirect to.
+
+  Returns:
+    void - Nothing is returned by this function.
+*/
+function redirect($url)
+{
+  # Simply clear all headers, and redirect.
+  @ob_clean();
+  header('Location: '. $url);
+  exit;
+}
 ?>

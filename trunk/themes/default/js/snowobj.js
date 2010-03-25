@@ -11,6 +11,40 @@ function SnowObj()
   this.is_chrome = user_agent.indexOf('Chrome') != -1;
   this.is_webkit = this.is_safari || this.is_chrome || user_agent.indexOf('Konqueror') != -1;
 
+  this.ajax = function(request_url, post_data)
+  {
+    var xmlObject = this.xmlRequest();
+
+    // Do the open thing...
+    xmlObject.open(post_data ? 'POST' : 'GET', request_url, false);
+    xmlObject.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
+    xmlObject.send(post_data ? post_data : '');
+
+    return xmlObject.responseText;
+  };
+
+  this.ajaxCallback = function(request_url, callback, post_data)
+  {
+    var xmlObject = this.xmlRequest();
+
+    // Set our function :P
+    xmlObject.onreadystatechange = function()
+    {
+      // Lets check how its going :P
+      if(xmlObject.readyState == 4)
+      {
+        callback(xmlObject.responseText);
+      }
+      else
+        return false;
+    };
+
+    // Give it the URL and stuff...
+    xmlObject.open(post_data ? 'POST' : 'GET', request_url, true);
+    xmlObject.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
+    xmlObject.send(post_data ? post_data : '');
+  };
+
   this.cookie = function(cookie_name)
   {
     var cookies = this.d.cookie;
@@ -108,7 +142,9 @@ function SnowObj()
     if(serialize)
     {
       return this.json_encode(data)
-    }else return eval('(' + data + ')');
+    }
+    else
+      return eval('(' + data + ')');
   }
 
   this.onload = function(callback)

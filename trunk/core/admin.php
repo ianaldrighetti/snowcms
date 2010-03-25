@@ -57,31 +57,69 @@ if(!function_exists('admin_prepend'))
           break;
         }
 
-    if(empty($allowed))
+    # You could be making an ajax request (Oh yeah, did I mention any ajax
+    # requests dealing with control panel stuff should be prepended by
+    # action=admin&sa=ajax{rest of your stuff}? It should be!!!)
+    if(substr($_SERVER['QUERY_STRING'], 0, 20) == 'action=admin&sa=ajax')
     {
-      $theme->set_title(l('Access denied'));
-      $theme->add_meta(array('name' => 'robots', 'content' => 'noindex'));
+      # So it's an ajax request!
+      # Is an administrative prompt required?
+      if(admin_prompt_required())
+      {
+        # You sending us a password? Cool!
+        if(isset($_POST['admin_password']))
+        {
+          # Did it work?
+          if(!admin_prompt_password($_POST['admin_password']))
+          {
+            # Nope :(
+            echo json_encode(array('error' => l('Incorrect password'), 'admin_prompt_required' => true));
+            exit;
+          }
+        }
+        else
+        {
+          # Yes, it is.
+          echo json_encode(array('error' => l('Your session has timed out'), 'admin_prompt_required' => true));
+          exit;
+        }
+      }
 
-      $theme->header();
+      # Are you not allowed? Sorry!
+      if(empty($allowed))
+      {
+        echo json_encode(array('error' => l('Access denied')));
+        exit;
+      }
+    }
+    else
+    {
+      if(empty($allowed))
+      {
+        $theme->set_title(l('Access denied'));
+        $theme->add_meta(array('name' => 'robots', 'content' => 'noindex'));
 
-      echo '
-      <h1>', l('Access denied'), '</h1>
-      <p>', l('Sorry, but you are not allowed to access the page you have requested.'), '</p>';
+        $theme->header();
 
-      $theme->footer();
-      exit;
+        echo '
+        <h1>', l('Access denied'), '</h1>
+        <p>', l('Sorry, but you are not allowed to access the page you have requested.'), '</p>';
+
+        $theme->footer();
+        exit;
+      }
+
+      # We may require you to enter a password, for security reasons!
+      admin_prompt_password();
+
+      # You seem to be authenticated, and now we can switch over to the admin theme :)
+      require_once($core_dir. '/admin/admin_theme.class.php');
+
+      $theme = $api->load_class($api->apply_filters('admin_theme_class', 'Admin_Theme'), l('Control Panel'). ' - '. $settings->get('site_name', 'string'));
     }
 
-    # We may require you to enter a password, for security reasons!
-    admin_prompt_password();
-
-    # You seem to be authenticated, and now we can switch over to the admin theme :)
-    require_once($core_dir. '/admin/admin_theme.class.php');
-
-    $theme = $api->load_class($api->apply_filters('admin_theme_class', 'Admin_Theme'), $settings->get('site_name', 'string'));
-
     # You can make changes to the theme and what not now :)
-    $api->run_hooks('admin_prepend_authenticated');
+    $api->run_hooks('admin_prepend_authenticated', array('ajax' => substr($_SERVER['QUERY_STRING'], 0, 20) == 'action=admin&sa=ajax'));
   }
 }
 
@@ -109,7 +147,7 @@ if(!function_exists('admin_prompt_required'))
 
     # Check to see if your last check has now timed out, quite simple really! But
     # if you for some strange reason have it disabled, nevermind!
-    if(!$settings->get('disable_admin_security', 'bool', false) && (empty($_SESSION[$member->session_id(). '_password_prompted']) || ((int)$_SESSION[$member->session_id(). '_password_prompted'] + ($settings->get('admin_login_timeout', 'int', 15) * 60)) < time_utc()))
+    if(!$settings->get('disable_admin_security', 'bool', false) && (empty($_SESSION['admin_password_prompted']) || ((int)$_SESSION['admin_password_prompted'] + ($settings->get('admin_login_timeout', 'int', 15) * 60)) < time_utc()))
       return true;
 
     # Your good, for now!
@@ -133,7 +171,9 @@ if(!function_exists('admin_prompt_password'))
                          if left blank, the form is displayed.
 
     Returns:
-      void - Nothing is returned by this function.
+      mixed - This function returns nothing if password is null,
+              otherwise it returns a bool, true if the password
+              was correct, false if not.
   */
   function admin_prompt_password($password = null)
   {
@@ -142,6 +182,20 @@ if(!function_exists('admin_prompt_password'))
     # Is it time for you to re-enter your password?
     if(admin_prompt_required())
     {
+      # Did you supply a password?
+      if($password !== null)
+      {
+        $errors = array();
+        if(admin_prompt_handle(array('password' => $password), $errors))
+        {
+          return true;
+        }
+        else
+        {
+          return false;
+        }
+      }
+
       # Generate the login form.
       admin_prompt_generate_form();
 
@@ -247,7 +301,7 @@ if(!function_exists('admin_prompt_handle'))
     if($members->authenticate($member->name(), $data['password']))
     {
       # Set the last time you verified in your session information ;)
-      $_SESSION[$member->session_id(). '_password_prompted'] = time_utc();
+      $_SESSION['admin_password_prompted'] = time_utc();
 
       return true;
     }
