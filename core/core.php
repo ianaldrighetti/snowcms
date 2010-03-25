@@ -48,6 +48,10 @@ function init_core()
   # are overloadable, so simply define them before this too!!!)
   $api->add_event('action=activate', 'activate_view', $core_dir. '/activate.php');
   $api->add_event('action=admin', 'admin_home', $core_dir. '/admin/admin_home.php');
+  $api->add_event('action=admin&sa=about', 'admin_about', $core_dir. '/admin/admin_home.php');
+  $api->add_event('action=admin&sa=settings', 'admin_settings', $core_dir. '/admin/admin_settings.php');
+  $api->add_event('action=admin&sa=update', 'admin_update', $core_dir. '/admin/admin_update.php');
+  $api->add_event('action=admin&sa=ajax&id=update', 'admin_update_ajax', $core_dir. '/admin/admin_update.php');
   $api->add_event('action=checkcookie', 'checkcookie_verify', $core_dir. '/checkcookie.php');
   $api->add_event('action=login', 'login_view', $core_dir. '/login.php');
   $api->add_event('action=login2', 'login_view2', $core_dir. '/login.php');
@@ -63,7 +67,8 @@ function init_core()
   ob_start($api->apply_filters('output_callback', null));
 
   # Check to see if admin_prepend needs to be called.
-  if(substr($_SERVER['QUERY_STRING'], 0, 12) == 'action=admin')
+  reset($_GET);
+  if(key($_GET) == 'action' && current($_GET) == 'admin')
   {
     require_once($core_dir. '/admin.php');
 

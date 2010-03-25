@@ -702,7 +702,7 @@ class Form
       # Is the field hidden? Then showing something isn't very hidden, now is it? I didn't think so.
       if($field['type'] != 'hidden' && $field['type'] != 'full')
         echo '
-              <td id="', $form['id'], '_', $name, '_left" class="td_left"><p class="label">', $field['label'], '</p>', !empty($field['subtext']) ? '<p class="subtext">'. $field['subtext']. '</p>' : '', '</td>';
+              <td id="', $form['id'], '_', $name, '_left" class="td_left"><p class="label"><label for="', $form['id'], '_', $name, '_input">', $field['label'], '</label></p>', !empty($field['subtext']) ? '<p class="subtext">'. $field['subtext']. '</p>' : '', '</td>';
 
       # Now here is the fun part! Actually displaying the fields.
       if(empty($field['is_custom']))

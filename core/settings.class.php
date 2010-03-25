@@ -144,7 +144,7 @@ class Settings
     global $api;
 
     # Incrementing/decrementing?
-    if(($value == '++' || $value == '--') && (!isset($this->settings[$variable]) || is_numeric($this->settings[$variable])))
+    if(($value === '++' || $value === '--') && (!isset($this->settings[$variable]) || is_numeric($this->settings[$variable])))
     {
       # Change the current value, or make it, if it doesn't exist already.
       $this->update_settings[$variable] = !isset($this->settings[$variable]) ? ($value == '++' ? 1 : -1) : ($value == '++' ? $this->settings[$variable] + 1 : $this->settings[$variable] - 1);
