@@ -49,9 +49,11 @@ function init_core()
   $api->add_event('action=activate', 'activate_view', $core_dir. '/activate.php');
   $api->add_event('action=admin', 'admin_home', $core_dir. '/admin/admin_home.php');
   $api->add_event('action=admin&sa=about', 'admin_about', $core_dir. '/admin/admin_home.php');
+  $api->add_event('action=admin&sa=ajax&id=update', 'admin_update_ajax', $core_dir. '/admin/admin_update.php');
+  $api->add_event('action=admin&sa=members_add', 'admin_members_add', $core_dir. '/admin/admin_members.php');
+  $api->add_event('action=admin&sa=members_settings', 'admin_members_settings', $core_dir. '/admin/admin_members.php');
   $api->add_event('action=admin&sa=settings', 'admin_settings', $core_dir. '/admin/admin_settings.php');
   $api->add_event('action=admin&sa=update', 'admin_update', $core_dir. '/admin/admin_update.php');
-  $api->add_event('action=admin&sa=ajax&id=update', 'admin_update_ajax', $core_dir. '/admin/admin_update.php');
   $api->add_event('action=checkcookie', 'checkcookie_verify', $core_dir. '/checkcookie.php');
   $api->add_event('action=login', 'login_view', $core_dir. '/login.php');
   $api->add_event('action=login2', 'login_view2', $core_dir. '/login.php');

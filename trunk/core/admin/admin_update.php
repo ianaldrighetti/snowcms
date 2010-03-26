@@ -20,7 +20,7 @@
 if(!defined('IN_SNOW'))
   die;
 
-# Title: Control Panel System Update
+# Title: Control Panel - System Update
 
 if(!function_exists('admin_update'))
 {

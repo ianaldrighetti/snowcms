@@ -237,6 +237,12 @@ class Admin_Theme extends Theme
       border: none;
     }
 
+    .form table
+    {
+      margin: auto;
+      text-align: center !important;
+    }
+
     .form .td_left
     {
       width: 75%;
@@ -265,6 +271,26 @@ class Admin_Theme extends Theme
     .form .buttons
     {
       text-align: center !important;
+    }
+
+    .form .errors
+    {
+      margin: 15px 10px 15px 10px;
+      padding: 5px;
+      background: #FFCCCC;
+      border: 2px solid #EE0000;
+      text-align: center;
+      color: #000000;
+    }
+
+    .form .message
+    {
+      margin: 15px 10px 15px 10px;
+      padding: 5px;
+      background: #A6D785;
+      border: 2px solid #458B00;
+      text-align: center;
+      color: #000000;
     }
   </style>';
 

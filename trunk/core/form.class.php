@@ -621,7 +621,7 @@ class Form
             <tr>
               <td class="message_td" colspan="2" id="', $form['id'], '_message">';
 
-      # Any errors? Those need displayin'!
+      # Any messages? Like a success message. Put it here! :P
       if(strlen($api->apply_filters($form_name. '_message', '')) > 0)
       {
         echo '
