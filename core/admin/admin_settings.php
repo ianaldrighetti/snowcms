@@ -48,12 +48,8 @@ if(!function_exists('admin_settings'))
 
     # Submitting the form? Alright.
     if(!empty($_POST['admin_settings_form']))
-    {
       # We shall process it!
       $form->process('admin_settings_form');
-
-      redirect($base_url. '/index.php?action=admin&sa=settings');
-    }
 
     $theme->set_title(l('System Settings'));
 
@@ -137,7 +133,6 @@ if(!function_exists('admin_settings_generate_form'))
                                                            'length' => array(
                                                                          'min' => 0,
                                                                        ),
-                                                           'disabled' => !$settings->get('enable_tasks', 'bool'),
                                                            'value' => $settings->get('max_tasks', 'int'),
                                                          ));
 
@@ -265,6 +260,9 @@ if(!function_exists('admin_settings_handle'))
   {
     global $api, $settings;
 
+    # We will need to update the values so we don't have to redirect.
+    $form = $api->load_class('Form');
+
     # Loop through all the settings and save them!
     foreach($data as $variable => $value)
     {
@@ -277,7 +275,13 @@ if(!function_exists('admin_settings_handle'))
       }
 
       # Set it :)
-      $settings->set($variable, $value, is_numeric($value) ? 'int' : 'string');
+      $settings->set($variable, $value, 'string');
+
+      # Update the value, unless it is the SMTP password!
+      if($variable != 'smtp_pass')
+        $form->edit_field('admin_settings_form', $variable, array(
+                                                              'value' => $value,
+                                                            ));
     }
 
     return true;

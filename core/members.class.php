@@ -366,7 +366,7 @@ class Members
           $reserved_name = trim($reserved_name);
 
           # Any wildcards?
-          if($func['strpos']($member_name, '*') !== false)
+          if($func['strpos']($reserved_name, '*') !== false)
           {
             if(preg_match('~^'. str_replace('*', '(?:.*?)?', $reserved_name). '$~i', $member_name))
               return false;
@@ -410,6 +410,8 @@ class Members
                        from your search, give it here ;) Default is 0, which
                        is to search all members.
 
+    Returns:
+      bool - Returns true if the email address is allowed, false if not.
   */
   public function email_allowed($member_email, $member_id = 0)
   {
@@ -436,29 +438,13 @@ class Members
         {
           $disallowed_email = trim($disallowed_email);
 
-          if($member_email == $disallowed_email)
-            return false;
-        }
-      }
-
-      # Maybe the domain is disallowed?
-      $disallowed_domains = explode("\n", $func['strtolower']($settings->get('disallowed_email_domains', 'string')));
-
-      list(, $email_domain) = explode('@', $member_email);
-
-      if(count($disallowed_domains))
-      {
-        foreach($disallowed_domains as $disallowed_domain)
-        {
-          $disallowed_domain = trim($disallowed_domain);
-
-          # Got any wildcards?
-          if($func['strpos']($disallowed_domain, '*') !== false)
+          # Any wildcards?
+          if($func['strpos']($disallowed_email, '*') !== false)
           {
-            if(preg_match('~^'. str_replace('*', '(?:.*?)?', $disallowed_domain). '$~i', $email_domain))
+            if(preg_match('~^'. str_replace('*', '(?:.*?)?', $disallowed_email). '$~i', $member_email))
               return false;
           }
-          elseif($email_domain == $disallowed_domain)
+          elseif($member_email == $disallowed_email)
             return false;
         }
       }
