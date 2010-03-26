@@ -65,6 +65,11 @@ class Admin_Theme extends Theme
       border-radius: 3px;
     }
 
+    textarea
+    {
+      font-size: 90%;
+    }
+
     #header
     {
       width: 100%;

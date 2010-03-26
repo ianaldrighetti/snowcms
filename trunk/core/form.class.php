@@ -461,7 +461,7 @@ class Form
     if($field['is_custom'] && !$field['is_full'] && strlen($field['type']) > 7)
       $field['type'] = substr($field['type'], 7, strlen($field['type']) - 7);
     elseif($field['is_full'] && strlen($field['type']) > 5)
-      $field['type'] = subtr($field['type'], 5, strlen($field['type']) - 5);
+      $field['type'] = substr($field['type'], 5, strlen($field['type']) - 5);
 
     # So, is it a valid type?
     if(!in_array($field['type'], $allowed_types))
@@ -700,7 +700,7 @@ class Form
             <tr class="form_field" id="', $form['id'], '_', $name, '">';
 
       # Is the field hidden? Then showing something isn't very hidden, now is it? I didn't think so.
-      if($field['type'] != 'hidden' && $field['type'] != 'full')
+      if($field['type'] != 'hidden' && empty($field['is_full']))
         echo '
               <td id="', $form['id'], '_', $name, '_left" class="td_left"><p class="label"><label for="', $form['id'], '_', $name, '_input">', $field['label'], '</label></p>', !empty($field['subtext']) ? '<p class="subtext">'. $field['subtext']. '</p>' : '', '</td>';
 
@@ -843,7 +843,7 @@ class Form
           continue;
 
         # Is the POST field not even set? Well, we will set it then. To empty! ;)
-        if(empty($_POST[$name]))
+        if(!isset($_POST[$name]))
           $_POST[$name] = '';
 
         # Any function to run, perhaps? Do so now.

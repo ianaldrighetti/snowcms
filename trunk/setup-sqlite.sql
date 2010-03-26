@@ -99,7 +99,6 @@ INSERT INTO '{db->prefix}settings' ('variable', 'value') VALUES('version', '2.0 
 INSERT INTO '{db->prefix}settings' ('variable', 'value') VALUES('password_security', 1);
 INSERT INTO '{db->prefix}settings' ('variable', 'value') VALUES('reserved_names', '');
 INSERT INTO '{db->prefix}settings' ('variable', 'value') VALUES('disallowed_emails', '');
-INSERT INTO '{db->prefix}settings' ('variable', 'value') VALUES('disallowed_email_domains', '');
 INSERT INTO '{db->prefix}settings' ('variable', 'value') VALUES('default_event', '');
 INSERT INTO '{db->prefix}settings' ('variable', 'value') VALUES('enable_tasks', 1);
 INSERT INTO '{db->prefix}settings' ('variable', 'value') VALUES('site_name', 'SnowCMS');

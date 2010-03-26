@@ -186,7 +186,7 @@ if(!function_exists('admin_prompt_password'))
       if($password !== null)
       {
         $errors = array();
-        if(admin_prompt_handle(array('password' => $password), $errors))
+        if(admin_prompt_handle(array('admin_verification_password' => $password), $errors))
         {
           return true;
         }
@@ -297,7 +297,7 @@ if(!function_exists('admin_prompt_handle'))
     global $api, $func, $member;
 
     # No password? Pfft.
-    if(empty($data['password']) || $func['strlen']($data['password']) == 0)
+    if(empty($data['admin_verification_password']) || $func['strlen']($data['admin_verification_password']) == 0)
     {
       $errors[] = l('Please enter your password.');
       return false;
@@ -307,7 +307,7 @@ if(!function_exists('admin_prompt_handle'))
     $members = $api->load_class('Members');
 
     # Pretty simple to do. There are a couple hooks in that method, fyi.
-    if($members->authenticate($member->name(), $data['password']))
+    if($members->authenticate($member->name(), $data['admin_verification_password']))
     {
       # Set the last time you verified in your session information ;)
       $_SESSION['admin_password_prompted'] = time_utc();
