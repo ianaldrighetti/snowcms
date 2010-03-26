@@ -259,10 +259,19 @@ if(!function_exists('admin_prompt_generate_form'))
                                       'submit' => l('Login'),
                                     ));
 
-    $form->add_field('admin_prompt_form', 'password', array(
-                                                        'type' => 'password',
-                                                        'label' => l('Password:'),
-                                                      ));
+    $form->add_field('admin_prompt_form', 'admin_verification_password', array(
+                                                                           'type' => 'password',
+                                                                           'label' => l('Password:'),
+                                                                         ));
+
+    # Let's add all the post data you were entering before ;)
+    foreach($_POST as $key => $value)
+    {
+      $form->add_field('admin_prompt_form', $key, array(
+                                                    'type' => 'hidden',
+                                                    'value' => $value,
+                                                  ));
+    }
   }
 }
 

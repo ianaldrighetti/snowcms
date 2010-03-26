@@ -20,7 +20,7 @@
 if(!defined('IN_SNOW'))
   die;
 
-# Title: Control Panel Home
+# Title: Control Panel - Home
 
 if(!function_exists('admin_home'))
 {

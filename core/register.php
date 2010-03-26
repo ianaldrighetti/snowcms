@@ -191,7 +191,7 @@ if(!function_exists('register_generate_form'))
     # Add the fields we need you to fill out.
     # Your requested member name, you know? That thing you use to login.
     $form->add_field('registration_form', 'member_name', array(
-                                                           'type' => 'string-html',
+                                                           'type' => 'string',
                                                            'label' => l('Choose username:'),
                                                            'subtext' => l('Used to log in to your account.'),
                                                            'length' => array(
@@ -238,7 +238,7 @@ if(!function_exists('register_generate_form'))
 
                                                                if($security == 1)
                                                                  $error = l(\'Your password must be at least 3 characters long.\');
-                                                               elseif($security == 1)
+                                                               elseif($security == 2)
                                                                  $error = l(\'Your password must be at least 4 characters long and cannot contain your username.\');
                                                                else
                                                                  $error = l(\'Your password must be at least 5 characters long, cannot contain your username and contain at least 1 number.\');
@@ -255,7 +255,7 @@ if(!function_exists('register_generate_form'))
                                                               ));
     # Email address is important too!
     $form->add_field('registration_form', 'member_email', array(
-                                                            'type' => 'string-html',
+                                                            'type' => 'string',
                                                             'label' => l('Email:'),
                                                             'subtext' => l('Please enter a valid email address.'),
                                                             'length' => array(

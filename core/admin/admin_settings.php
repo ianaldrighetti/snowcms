@@ -20,7 +20,7 @@
 if(!defined('IN_SNOW'))
   die;
 
-# Title: Admin Settings
+# Title: Control Panel - Settings
 
 if(!function_exists('admin_settings'))
 {
@@ -41,7 +41,7 @@ if(!function_exists('admin_settings'))
   */
   function admin_settings()
   {
-    global $api, $theme;
+    global $api, $base_url, $theme;
 
     admin_settings_generate_form();
     $form = $api->load_class('Form');
@@ -125,7 +125,7 @@ if(!function_exists('admin_settings_generate_form'))
     $form->add_field('admin_settings_form', 'enable_tasks', array(
                                                               'type' => 'checkbox',
                                                               'label' => l('Enable tasks:'),
-                                                              'subtext' => l('If enabled, scheduled tasks will be allowed to run, this is not ran by a cron, but by people browsing your site.'),
+                                                              'subtext' => l('If enabled, scheduled tasks will be allowed to run, this is not run by a cron, but by people browsing your site.'),
                                                               'value' => $settings->get('enable_tasks', 'int'),
                                                             ));
 

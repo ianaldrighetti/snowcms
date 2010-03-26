@@ -686,7 +686,7 @@ class API
     foreach($queries as $query)
     {
       # Now by the equals sign.
-      @list($key, $value) = explode('=', $query, 2);
+      list($key, $value) = @explode('=', $query, 2);
 
       # Is the value empty? Skip!
       if(strlen(trim($value)) == 0)
@@ -788,7 +788,10 @@ class API
   {
     # No group specified? Then all groups will be returned!
     if(empty($group_identifier))
-      return asort($this->groups, SORT_STRING);
+    {
+      asort($this->groups, SORT_STRING);
+      return $this->groups;
+    }
     # How about a specific group?
     elseif($this->group_exists($group_identifier))
       return $this->groups[strtolower($group_identifier)];
