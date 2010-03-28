@@ -98,4 +98,70 @@ if(!function_exists('admin_update_ajax'))
                      ));
   }
 }
+
+if(!function_exists('admin_update_system'))
+{
+  /*
+    Function: admin_update_system
+
+    By calling on this function, the process of updating begins.
+    There are three steps, the first being the downloading of the
+    update (and checking its integrity), the second is extracting
+    the update from the tarball (and gzip, if the system supports
+    it), and lastly, the application of the update.
+
+    Parameters:
+      none
+
+    Returns:
+      void - Nothing is returned by this function.
+
+    Note:
+      This function is overloadable.
+
+      This function is meant to be called via an AJAX request.
+  */
+  function admin_update_system()
+  {
+    global $api, $base_dir, $settings;
+
+    # There is no stopping now!
+    ignore_user_abort(true);
+    @set_time_limit(600);
+
+    # Which step are you on?
+    if(empty($_GET['step']))
+    {
+      echo json_encode(array('error' => l('No update step specified!')));
+      exit;
+    }
+    elseif($_GET['step'] == 1)
+    {
+      # Check to see if there is a need to update the system.
+      $http = $api->load_class('HTTP');
+      $latest_info = @unserialize($http->request($api->apply_filters('admin_update_version_url', 'http://download.snowcms.com/news/v2.x-line/latest.php'). '?version='. $settings->get('version', 'string')));
+
+      if(empty($latest_info['uptodate']))
+      {
+        # Looks like you do need to update your system.
+        # Let's download it!
+        if($http->request($api->apply_filters('admin_update_download_url', 'http://download.snowcms.com/updates/'). $latest_info['version']. '.tar'. (function_exists('gzinflate') ? '.gz' : ''), array(), 0, $base_dir. '/'. $latest_info['version']. '.tar'. (function_exists('gzinflate') ? '.gz' : '')))
+        {
+          echo json_encode(array('text' => l('The update was downloaded successfully.'),'file' => ($api->apply_filters('admin_update_download_url', 'http://download.snowcms.com/updates/'). $latest_info['version']. '.tar'. (function_exists('gzinflate') ? '.gz' : '')), 'next_step' => 2));
+          exit;
+        }
+        else
+        {
+          echo json_encode(array('error' => l('Failed to download the update.'), 'next_step' => false));
+          exit;
+        }
+      }
+      else
+      {
+        echo json_encode(array('error' => l('Your system is already up to date.')));
+        exit;
+      }
+    }
+  }
+}
 ?>
