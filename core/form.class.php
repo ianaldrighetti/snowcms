@@ -420,13 +420,8 @@ class Form
     if(!isset($position) || $position === null)
       $this->forms[$form_name]['fields'][$name] = $field;
     else
-    {
-      # Delete the old one...
-      unset($this->forms[$form_name]['fields'][$name]);
-
       # Insert it at the right place ;D
       $this->forms[$form_name]['fields'] = array_insert($this->forms[$form_name]['fields'], $field, $position, $name);
-    }
 
     # If the type of the field is a file, change the encoding type to the right one.
     if($field['type'] == 'file')
@@ -619,8 +614,13 @@ class Form
     if(!isset($position) || $position === null)
       $this->forms[$form_name]['fields'][$name] = $field;
     else
+    {
+      # Delete the older one.
+      unset($this->forms[$form_name]['fields'][$name]);
+
       # Insert it at the right place ;D
-      $this->forms[$form_name]['fields'] = array_insert($this->forms[$form_name]['fields'], $field, $position);
+      $this->forms[$form_name]['fields'] = array_insert($this->forms[$form_name]['fields'], $field, $position, $name);
+    }
 
     # If the type of the field is a file, change the encoding type to the right one.
     if($field['type'] == 'file')

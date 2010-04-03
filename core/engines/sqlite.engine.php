@@ -427,16 +427,31 @@ class SQLite extends Database
 
     $inserts = array(
       'insert' => 'INSERT',
-      'ignore' => 'INSERT IGNORE',
-      'replace' => 'REPLACE',
+      'ignore' => 'INSERT OR IGNORE',
+      'replace' => 'INSERT OR REPLACE',
     );
 
-    # Construct the query, SQLite suports extended inserts! Hip hip! HURRAY!
-    $db_query = $inserts[$type]. ' INTO `' .$tbl_name. '` (`'. implode('`, `', $column_names). '`) VALUES'. implode(', ', $rows);
+    $affected_rows = 0;
+    $insert_id = 0;
+    $errno = 0;
+    $error = '';
+    $query_num = -1;
 
-    # Let query handle it XD! (passes insert in db compat to let you know
-    # if you don't have to do anything at all, which you shouldn't!!!
-    return $this->query($db_query, array(), null, 'insert');
+    # SQLite doesn't support extended inserts, so we have to play a little game ;)
+    foreach($rows as $row)
+    {
+      $db_query = $inserts[$type]. ' INTO \'' .$tbl_name. '\' (\''. implode('\', \'', $column_names). '\') VALUES'. $row;
+
+      $result = $this->query($db_query, array(), null, 'insert');
+      $affected_rows += $result->affected_rows();
+      $insert_id = $result->insert_id();
+      $errno = $result->errno();
+      $error = $result->error();
+      $query_num = $result->query_num();
+    }
+
+    # Make a fake result object containing the combined stuff.
+    return new $this->result_class(true, $affected_rows, $insert_id, $errno, $error, $query_num);
   }
 }
 

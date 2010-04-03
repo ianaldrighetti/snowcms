@@ -160,4 +160,107 @@ function htmlchars_decode($str)
 {
   return htmlspecialchars_decode($str, ENT_QUOTES);
 }
+
+if(!function_exists('create_pagination'))
+{
+  /*
+    Function: create_pagination
+
+    Creates a pagination... You know, those things that allow you to go to
+    the next page and what not ;-).
+
+    Parameters:
+      string $tpl_url - The URL which will have &page={NUM} appended to.
+      int &$start - The starting page, this is to be obtained from $_GET['page'].
+                    This is a reference parameter, after the pagination is generated
+                    this is meant to be put into a query in the LIMIT $start,PER_PAGE
+                    clause.
+      int $num_items - The total number of items.
+      int $per_page - The number of items to display per page.
+
+    Returns:
+      string - Returns the string containing the generated pagination.
+
+    Note:
+      This function is overloadable.
+  */
+  function pagination_create($tpl_url, &$start, $num_items, $per_page = 10)
+  {
+    # So how many pages total..?
+    $total_pages = ceil((int)($num_items == 0 ? 1 : $num_items) / (int)$per_page);
+
+    # Make sure start is an integer... At least make it one.
+    $start = (int)$start;
+
+    # We can't have a page less then one,
+    # or greater then total_pages ;)
+    if($start < 1)
+      $start = 1;
+    elseif($start > $total_pages)
+      $start = $total_pages;
+
+    # So start... Make an array holding all our stuffs.
+    $index = array();
+
+    # So the << First :) Though we may not link it
+    # if we are on the first page.
+    $index[] = '<span class="pagination_first">'. ($start != 1 ? '<a href="'. $tpl_url. '">' : ''). l('&laquo;&laquo; First'). ($start != 1 ? '</a>' : ''). '</span>';
+
+    # Now the < which is the previous one... Don't link
+    # it if thats where we are :P
+    $index[] = '<span class="pagination_prev">'. ($start != 1 ? '<a href="'. (($start - 1) > 1 ? $tpl_url. '&page='. ($start - 1) : $tpl_url). '">' : ''). l('&laquo; Previous'). ($start != 1 ? '</a>' : ''). '</span>';
+
+    # So now the page numbers...
+    if($total_pages < 6)
+    {
+      # Hmm... Less then 5 :P
+      $page_start = 1;
+      $page_end = $total_pages;
+    }
+    elseif($start - 2 < 1)
+    {
+      # We are gonna go from 1 to 5 ;)
+      $page_start = 1;
+      $page_end = 5;
+    }
+    elseif($start + 2 <= $total_pages)
+    {
+      # Somewhere in between...
+      $page_start = $start - 2;
+      $page_end = $start + 2;
+    }
+    else
+    {
+      # The end of the line...
+      # Some weird buggy that needs fixing...
+      $page_start = ($start == ($total_pages - 1) ? $start - 3 : $start - 4);
+      $page_end = $total_pages;
+    }
+
+    # So now that we have our numbers, for loop :D
+    for($page = $page_start; $page < ($page_end + 1); $page++)
+    {
+      # So add the page number... Also, don't link the page number
+      # if thats where we are at ;) oh, ya and, don't add &page=
+      # to the end of our template url if its page one :)
+      $index[] = '<span class="pagination_page'. ($page == $start ? ' pagination_current' : ''). '">'. ($page != $start ? '<a href="'. ($page != 1 ? $tpl_url. '&page='. $page : $tpl_url). '">' : ''). $page. ($page != $start ? '</a>' : ''). '</span>';
+    }
+
+    # Almost done :D!
+    # So add the > which is the next one ;)
+    # Don't link it if thats our current page...
+    $index[] = '<span class="pagination_next">'. ($start < $total_pages ? '<a href="'. $tpl_url. '&page='. ($start + 1). '">' : ''). l('Next &raquo;'). ($start < $total_pages ? '</a>' : ''). '</span>';
+
+    # Now the Last >> Of course, don't link it if thats where we are.
+    $index[] = '<span class="pagination_last">'. ($start < $total_pages ? '<a href="'. $tpl_url. '&page='. $total_pages. '">' : ''). l('Last &raquo;&raquo;'). ($start < $total_pages ? '</a>' : ''). '</span>';
+
+    # And we are done with the hard stuffs, yay.
+    # So before we implode the stuff, take away 1 from
+    # start, then multiply it by per_page. What for? For LIMIT clauses :D
+    $start = ($start - 1) * $per_page;
+
+    # Return it imploded...
+    return implode(' ', $index);
+  }
+}
 ?>
