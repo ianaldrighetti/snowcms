@@ -83,13 +83,24 @@ class Admin_Theme extends Theme
       margin: 0px auto;
     }
 
-    #header #container h1
+    #header #container #text
     {
       float: left;
-      padding-top: 20px;
+      padding-top: 10px;
+    }
+
+    #header #container #text h1
+    {
       color: #FFFFFF;
       font-weight: normal;
       font-size: 150%;
+    }
+
+    #header #container #text h3
+    {
+      font-size: 90%;
+      font-weight: normal;
+      color: #FFFFFF;
     }
 
     #header #container #member_info
@@ -342,7 +353,10 @@ class Admin_Theme extends Theme
 <body>
 <div id="header">
   <div id="container">
-    <h1>', $settings->get('site_name', 'string'), ': ', l('Control Panel'), '</h1>
+    <div id="text">
+      <h1>', $settings->get('site_name', 'string'), '</h1>
+      <h3>', l('Control Panel'), '</h3>
+    </div>
 
     <div id="member_info">
       <p>', l('Hello, <a href="%s" title="View your profile">%s</a>.', $base_url. '/index.php?action=profile', $member->display_name()), '</p>

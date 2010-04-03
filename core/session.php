@@ -44,7 +44,7 @@ if(!function_exists('init_session'))
   */
   function init_session()
   {
-    global $api;
+    global $api, $settings;
 
     # Are sessions set to automatically start upon load? Turn it off :P
     if(@ini_get('session.auto_start') == 1)
