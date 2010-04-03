@@ -431,7 +431,7 @@ class SQLite extends Database
       'replace' => 'REPLACE',
     );
 
-    # Construct the query, MySQL suports extended inserts! Hip hip! HURRAY!
+    # Construct the query, SQLite suports extended inserts! Hip hip! HURRAY!
     $db_query = $inserts[$type]. ' INTO `' .$tbl_name. '` (`'. implode('`, `', $column_names). '`) VALUES'. implode(', ', $rows);
 
     # Let query handle it XD! (passes insert in db compat to let you know
