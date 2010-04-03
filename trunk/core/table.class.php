@@ -130,11 +130,20 @@ class Table
       return false;
 
     # The primary column identifier, not necessarily important, but can be!
-    if(!empty($options['primary']))
+    if(isset($options['primary']))
       $this->tables[$tbl_name]['primary'] = $options['primary'];
 
     # Some options, only if there is a primary key defined!
-    if(
+    if(!empty($this->tables[$tbl_name]['primary']) && isset($options['options']) && is_array($options['options']))
+      $this->tables[$tbl_name]['options'] = $options['options'];
+    elseif(isset($options['options']))
+      return false;
+
+    # How about the callback? Changing that?
+    if(!empty($this->tables[$tbl_name]['primary']) && isset($options['callback']) && is_callable($options['callback']))
+      $this->tables[$tbl_name]['callback'] = $options['callback'];
+    elseif(isset($options['callback']))
+      return false;
 
     return true;
   }
@@ -182,15 +191,19 @@ class Table
     Returns the specified tables information.
 
     Parameters:
-      string $tbl_name - The name of the table.
+      string $tbl_name - The name of the table. If left null, all tables will
+                         be returned.
 
     Returns:
       mixed - Returns false if the specified table does not exist, but
               an array containing the tables information if it exists.
   */
-  public function return_table($tbl_name)
+  public function return_table($tbl_name = null)
   {
-    return $this->table_exists($tbl_name) ? $this->tables[$tbl_name] : false;
+    if(!empty($tbl_name) && !$this->table_exists($tbl_name))
+      return false;
+
+    return empty($name) ? $this->tables : $this->tables[$tbl_name];
   }
 
   /*
@@ -232,5 +245,162 @@ class Table
                    the current row result set, and return a string
                    which will be displayed in that specific column.
                    Required if column is not specified.
+        position - The position at which to place the column (0 -> [NUM COLS] - 1).
+                   If you were, for example, to add a column at position 0
+                   then another at position 0, the last column added would
+                   be first, and the first added would be second.
+  */
+  public function add_column($tbl_name, $column, $options)
+  {
+    # Does this column already exist? Silly!
+    if(!$this->table_exists($tbl_name) || $this->column_exists($tbl_name, $column))
+      return false;
+
+    # Did you specify a position?
+    if(isset($options['position']))
+    {
+      $position = (string)$options['position'] == (string)(int)$options['position'] ? (int)$options['position'] : null;
+      unset($options['position']);
+    }
+
+    # We will validate the column.
+    $options = $this->validate_column($column, $options);
+
+    # Hm, didn't work. Good luck with that!
+    if(empty($options))
+      return false;
+
+    # Add it! Maybe...
+    if(!isset($position) || $position === null)
+      $this->tables[$tbl_name]['columns'][$column] = $options;
+    else
+      # Insert it..!
+      $this->tables[$tbl_name]['columns'] = array_insert($this->tables[$tbl_name]['columns'], $options, $position, $column);
+
+    return true;
+  }
+
+  /*
+    Method: edit_column
+
+    Edits the specified column.
+
+    Parameters:
+      string $tbl_name - The name of the table the column is in.
+      string $column - The name of the column to edit.
+      array $options - An array containing new options.
+
+    Returns:
+      bool - Returns true if the column was updated successfully, false if not.
+  */
+  public function edit_column($tbl_name, $column, $options)
+  {
+    if(!$this->column_exists($tbl_name, $column))
+      return false;
+
+    # Did you specify a position?
+    if(isset($options['position']))
+    {
+      $position = (string)$options['position'] == (string)(int)$options['position'] ? (int)$options['position'] : null;
+      unset($options['position']);
+    }
+
+    # We will validate the column. To apply the changes, simply merge the old options.
+    $options = $this->validate_column(array_merge($this->tables[$tbl_name]['columns'][$column], $options));
+
+    # Hm, didn't work. Good luck with that!
+    if(empty($options))
+      return false;
+
+    # Add it! Maybe...
+    if(!isset($position) || $position === null)
+      $this->tables[$tbl_name]['columns'][$column] = $options;
+    else
+    {
+      # Delete the old one.
+      unset($this->tables[$tbl_name]['columns'][$column]);
+
+      # Insert it..! Again.
+      $this->tables[$tbl_name]['columns'] = array_insert($this->tables[$tbl_name]['columns'], $options, $position, $column);
+    }
+
+    return true;
+  }
+
+  /*
+    Method: validate_column
+
+    Validates all the columns information.
+
+    Parameters:
+      array $options - The column options to be validated.
+
+    Returns:
+      array - Returns the validated column options, false on failure.
+  */
+  private function validate_column($options)
+  {
+
+  }
+
+  /*
+    Method: column_exists
+
+    Checks whether or not the specified column exists.
+
+    Parameters:
+      string $tbl_name - The name of the table the column is in.
+      string $column - The name of the column to check the existence of.
+
+    Returns:
+      bool - Returns true if the column exists, false if not.
+  */
+  public function column_exists($tbl_name, $column)
+  {
+    return isset($this->tables[$tbl_name]['columns'][$column]);
+  }
+
+  /*
+    Method: remove
+
+    Removes the specified column from the table.
+
+    Parameters:
+      string $tbl_name - The name of the table to remove the column from.
+      string $column - The name of the column to remove.
+
+    Returns:
+      bool - Returns true if the column was moved, false if not.
+  */
+  public function remove($tbl_name, $column)
+  {
+    if(!$this->column_exists($tbl_name, $column))
+      return false;
+
+    unset($this->tables[$tbl_name]['columns'][$column]);
+    return true;
+  }
+
+  /*
+    Method: return_column
+
+    Returns the columns information.
+
+    Parameters:
+      string $tbl_name - The name of the table column is in.
+      string $column - The name of the column to get the information of.
+                       Leave this null in order to have all columns returned.
+
+    Returns:
+      array - Returns the array containing the information, false if the table
+              doesn't exist.
+  */
+  public function return_column($tbl_name, $column = null)
+  {
+    if(!empty($column) && !$this->column_exists($tbl_name, $column))
+      return false;
+
+    return empty($column) ? $this->tables[$tbl_name]['columns'] : $this->tables[$tbl_name]['columns'][$column];
+  }
 }
 ?>

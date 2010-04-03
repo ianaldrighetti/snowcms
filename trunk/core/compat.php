@@ -145,4 +145,77 @@ if(!function_exists('json_encode'))
     return $value;
   }
 }
+
+/*
+  Function: array_insert
+
+  Inserts an item at the specified index.
+
+  Parameters:
+    array $array - The array to insert the item into.
+    mixed $item - The item to insert.
+    int $position - The position at which to insert item.
+    string $key
+
+  Returns:
+    array - Returns the new array with item inserted at the specified position.
+
+  Note:
+    If you are inserting the item into an associative array, you must
+    specify the $key parameter, which is the key of the inserted item!
+*/
+function array_insert($array, $item, $index, $key = null)
+{
+  $index = (int)$index;
+  $length = count($array);
+
+  # Is it an associative array?
+  if($key === null)
+  {
+    # Maybe we can just plop it at the end..?
+    if($index >= $length)
+      $array[] = $item;
+    else
+    {
+      $new_array = array();
+
+      for($i = 0; $i < $length; $i++)
+      {
+        # The right index to insert item at?
+        if($i == $index)
+          $new_array[] = $item;
+
+        $new_array[] = $array[$i];
+      }
+
+      $array = $new_array;
+    }
+  }
+  else
+  {
+    # Can't have two of the same indexes, sorry!
+    if(isset($array[$key]))
+      return false;
+    elseif($index >= $length)
+      $array[$key] = $item;
+    else
+    {
+      # Interesting... :P
+      $new_array = array();
+      $current = 0;
+
+      foreach($array as $akey => $avalue)
+      {
+        if($current == $index)
+          $new_array[$key] = $item;
+
+        $new_array[$akey] = $avalue;
+      }
+
+      $array = $new_array;
+    }
+  }
+
+  return $array;
+}
 ?>

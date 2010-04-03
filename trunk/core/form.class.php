@@ -230,6 +230,26 @@ class Form
   }
 
   /*
+    Method: return_form
+
+    Returns the specified form and all of its information.
+
+    Parameters:
+      string $form_name - The name of the form. Leave this set to null in
+                          order to return all forms.
+
+    Returns:
+      array - Returns the forms information, false if the form doesn't exist.
+  */
+  public function return_form($form_name = null)
+  {
+    if(!empty($form_name) && !$this->form_exists($form_name))
+      return false;
+
+    return empty($form_name) ? $this->forms : $this->forms[$form_name];
+  }
+
+  /*
     Method: add_field
 
     Adds a field to the specified form.
@@ -352,6 +372,10 @@ class Form
 
         cols - The number of columns in the textarea. Only valid for text and text-html.
 
+        position - The position at which to place the field (0 -> [NUM FIELDS] - 1). Say you add one field
+                   at position 0, and then another at position 0, the second field will be first, and the
+                   first field added will be second. If not supplied, it will be added to the end.
+
       Just so you know, this is how each type will be saved to the database:
         hidden - As is (See string).
         int - As is.
@@ -378,6 +402,13 @@ class Form
     if(!$this->form_exists($form_name) || $this->field_exists($form_name, $name))
       return false;
 
+    # Any position..?
+    if(isset($options['position']))
+    {
+      $position = (string)$options['position'] == (string)(int)$options['position'] ? (int)$options['position'] : null;
+      unset($options['position']);
+    }
+
     # Validate that puppy!
     $field = $this->validate_field($name, $options);
 
@@ -385,8 +416,17 @@ class Form
     if($field === false)
       return false;
 
-    # Add it.
-    $this->forms[$form_name]['fields'][$name] = $field;
+    # Add it. But maybe not so fast!
+    if(!isset($position) || $position === null)
+      $this->forms[$form_name]['fields'][$name] = $field;
+    else
+    {
+      # Delete the old one...
+      unset($this->forms[$form_name]['fields'][$name]);
+
+      # Insert it at the right place ;D
+      $this->forms[$form_name]['fields'] = array_insert($this->forms[$form_name]['fields'], $field, $position, $name);
+    }
 
     # If the type of the field is a file, change the encoding type to the right one.
     if($field['type'] == 'file')
@@ -557,6 +597,13 @@ class Form
     if(!$this->field_exists($form_name, $name))
       return false;
 
+    # Any position..?
+    if(isset($options['position']))
+    {
+      $position = (string)$options['position'] == (string)(int)$options['position'] ? (int)$options['position'] : null;
+      unset($options['position']);
+    }
+
     # Get the current options, merge the new ones and validate them. If validation
     # fails, we just won't actually update them :P
     $field = $this->validate_field($name, array_merge($this->forms[$form_name]['fields'][$name], $options));
@@ -568,7 +615,40 @@ class Form
     # So it worked, sweet.
     $this->forms[$form_name]['fields'][$name] = $field;
 
+    # So it worked, sweet. Edit the new field. But maybe not so fast!
+    if(!isset($position) || $position === null)
+      $this->forms[$form_name]['fields'][$name] = $field;
+    else
+      # Insert it at the right place ;D
+      $this->forms[$form_name]['fields'] = array_insert($this->forms[$form_name]['fields'], $field, $position);
+
+    # If the type of the field is a file, change the encoding type to the right one.
+    if($field['type'] == 'file')
+      $this->forms[$form_name]['enctype'] = 'multipart/form-data';
+
     return true;
+  }
+
+  /*
+    Method: return_field
+
+    Returns the specified fields information.
+
+    Parameters:
+      string $form_name - The name of the form the field is in.
+      string $name - The name of the field. Leave this null in order to have
+                     all the fields returned.
+
+    Returns:
+      array - Returns the array containing the fields information, false if
+              the specified field doesn't exist.
+  */
+  public function return_field($form_name, $name = null)
+  {
+    if(!$this->field_exists($form_name, $name) || (empty($name) && $this->form_exists($form_name)))
+      return false;
+
+    return empty($name) ? $this->forms[$form_name]['fields'] : $this->forms[$form_name]['fields'][$name];
   }
 
   /*
