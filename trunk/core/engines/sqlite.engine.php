@@ -370,6 +370,74 @@ class SQLite extends Database
 
     return implode(', ', $new_value);
   }
+
+  public function insert($type, $tbl_name, $columns, $data, $keys = array(), $hook_name = null)
+  {
+    global $api;
+
+    if(empty($this->con))
+      return false;
+
+    if(!empty($hook_name))
+      $api->run_hooks($hook_name, array(&$type, &$tbl_name, &$columns, &$data, &$keys));
+
+    $api->run_hooks('pre_insert_exec', array(&$type, &$tbl_name, &$columns, &$data, &$keys));
+
+    # Let's get where you called us from!
+    $backtrace = debug_backtrace();
+    $file = realpath($backtrace[0]['file']);
+    $line = (int)$backtrace[0]['line'];
+    unset($backtrace);
+
+    $type = strtolower($type);
+
+    # We only support insert, ignore and replace.
+    if(!in_array($type, array('insert', 'ignore', 'replace')))
+      $this->log_error('Unknown insert type '. $type, true, $file, $line);
+
+    # Replace {db->prefix} and {db_prefix} with $this->prefix
+    $tbl_name = strtr($tbl_name, array('{db->prefix}' => $this->prefix, '{db_prefix}' => $this->prefix));
+
+    # Just an array, and not an array inside an array? We'll fix that...
+    if(!isset($data[0]) || !is_array($data[0]))
+      $data = array($data);
+
+    # The number of columns :)
+    $num_columns = count($columns);
+
+    # Now get the column names, quite useful you know :)
+    $column_names = array_keys($columns);
+
+    # Now we can get all the rows ready :)
+    $rows = array();
+    foreach($data as $row_index => $row)
+    {
+      # Not enough data?
+      if($num_columns != count($row))
+        $this->log_error('Number of columns doesn\'t match the number of supplied columns in row #'. ($row_index + 1), true, $file, $line);
+
+      # Save the values to an array, all sanitized and what not, of course!
+      $values = array();
+      foreach($row as $index => $value)
+        $values[] = $this->var_sanitize($column_names[$index], $columns[$column_names[$index]], $value, $file, $line);
+
+      # Add those values to our rows now :)
+      $rows[] = '('. implode(', ', $values). ')';
+    }
+
+    $inserts = array(
+      'insert' => 'INSERT',
+      'ignore' => 'INSERT IGNORE',
+      'replace' => 'REPLACE',
+    );
+
+    # Construct the query, MySQL suports extended inserts! Hip hip! HURRAY!
+    $db_query = $inserts[$type]. ' INTO `' .$tbl_name. '` (`'. implode('`, `', $column_names). '`) VALUES'. implode(', ', $rows);
+
+    # Let query handle it XD! (passes insert in db compat to let you know
+    # if you don't have to do anything at all, which you shouldn't!!!
+    return $this->query($db_query, array(), null, 'insert');
+  }
 }
 
 $db_class = 'SQLite';
