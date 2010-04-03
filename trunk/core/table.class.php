@@ -71,10 +71,17 @@ class Table
                   If this is set, callback is required.
         callback - The callback which will take the selected action (identifier)
                    and an array containing the selected rows identifier (primary).
+        sort - An array containing the column (in the table) and the sorting order
+               (either ASC or DESC) for the default sorting order is none is being
+               done manually by the user viewing the table. Ex: array('member_id', 'desc')
+        per_page - The number of items to display per page. Defaults to 25.
+
+      Do NOT add any ORDER BY or LIMIT clauses in the query! This will cause the query
+      to not work. This is all done automatically.
   */
   public function add($tbl_name, $options = array())
   {
-    if($this->table_exists($tbl_name) || empty($db_query) || !is_array($db_vars))
+    if($this->table_exists($tbl_name) || empty($options['db_query']) || (isset($options['db_vars']) && !is_array($options['db_vars'])))
       return false;
 
     # Make the array, which we will edit ;)
@@ -85,6 +92,8 @@ class Table
                                  'primary' => null,
                                  'options' => array(),
                                  'callback' => null,
+                                 'sort' => array(),
+                                 'per_page' => 25,
                                );
 
     # Now try to edit it.
@@ -143,6 +152,17 @@ class Table
     if(!empty($this->tables[$tbl_name]['primary']) && isset($options['callback']) && is_callable($options['callback']))
       $this->tables[$tbl_name]['callback'] = $options['callback'];
     elseif(isset($options['callback']))
+      return false;
+
+    # Sorting..?
+    if(!empty($options['sort']) && is_array($options['sort']))
+      $this->tables[$tbl_name]['sort'] = $options['sort'];
+    elseif(isset($options['sort']))
+      return false;
+
+    if(isset($options['per_page']) && (string)$options['per_page'] == (string)(int)$options['per_page'])
+      $this->tables[$tbl_name]['per_page'] = (int)$options['per_page'];
+    elseif(isset($options['per_page']))
       return false;
 
     return true;
@@ -306,7 +326,7 @@ class Table
     }
 
     # We will validate the column. To apply the changes, simply merge the old options.
-    $options = $this->validate_column(array_merge($this->tables[$tbl_name]['columns'][$column], $options));
+    $options = $this->validate_column($column, array_merge($this->tables[$tbl_name]['columns'][$column], $options));
 
     # Hm, didn't work. Good luck with that!
     if(empty($options))
@@ -333,14 +353,21 @@ class Table
     Validates all the columns information.
 
     Parameters:
+      string $name - The name of the column being validated.
       array $options - The column options to be validated.
 
     Returns:
       array - Returns the validated column options, false on failure.
   */
-  private function validate_column($options)
+  private function validate_column($name, $options)
   {
-
+    return array(
+             'column' => !empty($options['column']) ? $options['column'] : null,
+             'label' => !empty($options['label']) ? $options['label'] : $name,
+             'title' => !empty($options['title']) ? $options['title'] : '',
+             'sortable' => !empty($options['column']) ? (isset($options['sortable']) ? !empty($options['sortable']) : true) : false,
+             'function' => isset($options['function']) && is_callable($options['function']) ? $options['function'] : false,
+           );
   }
 
   /*
@@ -361,7 +388,7 @@ class Table
   }
 
   /*
-    Method: remove
+    Method: remove_column
 
     Removes the specified column from the table.
 
@@ -372,7 +399,7 @@ class Table
     Returns:
       bool - Returns true if the column was moved, false if not.
   */
-  public function remove($tbl_name, $column)
+  public function remove_column($tbl_name, $column)
   {
     if(!$this->column_exists($tbl_name, $column))
       return false;
@@ -401,6 +428,58 @@ class Table
       return false;
 
     return empty($column) ? $this->tables[$tbl_name]['columns'] : $this->tables[$tbl_name]['columns'][$column];
+  }
+
+  /*
+    Method: show
+
+    Shows the specified table.
+
+    Parameters:
+      string $tbl_name - The name of the table to display.
+
+    Returns:
+      void - Nothing is returned by this method.
+  */
+  public function show($tbl_name)
+  {
+    if(!$this->table_exists($tbl_name))
+    {
+      echo l('The table "%s" doesn\'t exist.', htmlchars($tbl_name));
+      return;
+    }
+
+    echo '
+      <table id="', $tbl_name, '" class="table">';
+
+    # Make things a bit easier ;)
+    $table = $this->tables[$tbl_name];
+
+    # Any columns to actually display, anyways?
+    if(count($table['columns']))
+    {
+      echo '
+        <tr class="columns">';
+
+      foreach($table['columns'] as $column)
+      {
+        echo '
+          <th', (!empty($column['title']) ? ' title="'. $column['title']. '"' : ''), '>', $column['label'], '</th>';
+      }
+
+      echo '
+        </tr>';
+
+      # Now try the query, and see if it actually works ;)
+    }
+    else
+    {
+      echo '
+        <td class="errors">', l('No columns added.'), '</td>';
+    }
+
+    echo '
+      </table>';
   }
 }
 ?>

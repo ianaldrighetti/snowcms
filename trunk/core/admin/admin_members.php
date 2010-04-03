@@ -462,4 +462,90 @@ if(!function_exists('admin_members_settings_handle'))
     return true;
   }
 }
+
+if(!function_exists('admin_members_manage'))
+{
+  /*
+    Function: admin_members_manage
+
+    Provides the interface for the management of members.
+
+    Parameters:
+      none
+
+    Returns:
+      void - Nothing is returned by this function.
+
+    Note:
+      This function is overloadable.
+  */
+  function admin_members_manage()
+  {
+    global $api, $base_url, $theme;
+
+    # Generate our table ;)
+    admin_members_manage_generate_table();
+    $table = $api->load_class('Table');
+
+    $theme->set_title(l('Manage Members'));
+
+    $theme->header();
+
+    echo '
+  <h1><img src="', $base_url, '/core/admin/icons/manage_members-small.png" alt="" /> ', l('Manage Members'), '</h1>
+  <p>', l('All existing members can be managed here, such as editing, deleting, approving, etc.'), '</p>';
+
+    $table->show('admin_members_manage_table');
+
+    $theme->footer();
+  }
+}
+
+if(!function_exists('admin_members_manage_generate_table'))
+{
+  /*
+    Function: admin_members_manage_generate_table
+
+    Generates the table which displays currently existing members.
+
+    Parameters:
+      none
+
+    Returns:
+      void - Nothing is returned by this function.
+
+    Note:
+      This function is overloadable.
+  */
+  function admin_members_manage_generate_table()
+  {
+    global $api;
+
+    $table = $api->load_class('Table');
+
+    $table->add('admin_members_manage_table', array(
+                                                'db_query' => '
+                                                                SELECT
+                                                                  member_id, member_name
+                                                                FROM {db->prefix}members',
+                                                'db_vars' => array(),
+                                                'primary' => 'member_id',
+                                                'sort' => array('member_id', 'asc')
+                                              ));
+
+    # Their member id!
+    $table->add_column('admin_members_manage_table', 'member_id', array(
+                                                                    'column' => 'member_id',
+                                                                    'label' => 'ID',
+                                                                    'title' => 'Member ID',
+                                                                  ));
+
+    # Name too!
+    $table->add_column('admin_members_manage_table', 'member_name', array(
+                                                                      'column' => 'member_name',
+                                                                      'label' => 'Name',
+                                                                      'title' => 'Member name',
+                                                                    ));
+  }
+}
 ?>
