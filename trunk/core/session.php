@@ -50,14 +50,31 @@ if(!function_exists('init_session'))
     if(@ini_get('session.auto_start') == 1)
       session_write_close();
 
+    # Custom session save path..? Make sure it is readable and writeable.
+    if(strlen($settings->get('session.save_path', 'string', '')) > 0 && is_writeable($settings->get('session.save_path', 'string')) && is_readable($settings->get('session.save_path', 'string')))
+      @ini_set('session.save_path', $settings->get('session.save_path', 'string'));
+
     # Use cookies, mmm...
     @ini_set('session.use_cookies', 1);
+
+    # Increase the GC probability a bit.
+    @ini_set('session.gc_divisor', $settings->get('session.gc_divisor', 'int', 0) > 0 ? $settings->get('session.gc_divisor', 'int') : 200);
+
+    # Extend the lifetime of the sessions.
+    @ini_set('session.gc_maxlifetime', $settings->get('session.gc_maxlifetime', 'int', 0) > 0 ? $settings->get('session.gc_maxlifetime', 'int') : 3600);
+
+    # Along with the cookie itself.
+    @ini_set('session.cookie_lifetime', time_utc() + 432000);
 
     # And use ONLY cookies! Otherwise people can do that ?PHPSESSID attack crap...
     @ini_set('session.use_only_cookies', 1);
 
-    # Maybe you have something to add?
-    $api->run_hooks('sessions');
+    # Only allow the cookie to be accessed via HTTP, not something like JavaScript.
+    # Though, not all browsers currently support it.
+    @ini_set('session.cookie_httponly', 1);
+
+    # Maybe you have something to add, or change?
+    $api->run_hooks('init_session');
 
     # Now start the session.
     session_start();
