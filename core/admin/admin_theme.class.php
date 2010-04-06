@@ -308,6 +308,54 @@ class Admin_Theme extends Theme
       text-align: center;
       color: #000000;
     }
+
+    .table
+    {
+      width: 100% !important;
+      margin: 5px auto 5px auto;
+    }
+
+    .table .header
+    {
+      text-align: right !important;
+    }
+
+    .table th
+    {
+      text-align: left !important;
+    }
+
+    .table .columns
+    {
+      background: #3465A7;
+      color: #FFFFFF;
+    }
+
+    .table .columns a
+    {
+      color: #FFFFFF;
+      text-decoration: none;
+    }
+
+    .table .columns a:hover
+    {
+      text-decoration: underline;
+    }
+
+    .table .tr_0
+    {
+      background: #E6E8FA;
+    }
+
+    .table .tr_1
+    {
+      background: #F5F5F5;
+    }
+
+    .pagination
+    {
+      font-size: 80%;
+    }
   </style>';
 
     # Any meta tags?

@@ -123,6 +123,9 @@ INSERT INTO '{db->prefix}settings' ('variable', 'value') VALUES('default_member_
 INSERT INTO '{db->prefix}settings' ('variable', 'value') VALUES('disable_admin_security', 0);
 INSERT INTO '{db->prefix}settings' ('variable', 'value') VALUES('admin_login_timeout', 15);
 INSERT INTO '{db->prefix}settings' ('variable', 'value') VALUES('admin_news_fetch_every', 43200);
+INSERT INTO '{db->prefix}settings' ('variable', 'value') VALUES('date_format', '%B %d, %Y');
+INSERT INTO '{db->prefix}settings' ('variable', 'value') VALUES('time_format', '%I:%M:%S %p');
+INSERT INTO '{db->prefix}settings' ('variable', 'value') VALUES('datetime_format', '%B %d, %Y, %I:%M:%S %p');
 
 CREATE TABLE '{db->prefix}tasks'
 (

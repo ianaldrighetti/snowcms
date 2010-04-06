@@ -52,8 +52,6 @@ function time_utc()
     int $timestamp - A UTC timestamp.
     string $format - Either datetime to include both the date and time,
                      date for only date or time for only time.
-    double $timezone - If set, this timezone offset will be used, and not
-                       the current members.
     bool $today_yesterday - Set to true if you want the time for be formatted
                             like Today at {TIME} or Yesterday at {TIME}, false
                             if no matter what, to just display a date.
@@ -66,21 +64,55 @@ function time_utc()
 */
 if(!function_exists('timeformat'))
 {
-  function timeformat($timestamp = 0, $format = 'datetime', $timezone = null, $today_yesterday = true)
+  function timeformat($timestamp = 0, $format = 'datetime', $today_yesterday = true)
   {
     global $api, $member, $settings;
+
+    $return = null;
+    $api->run_hooks('timeformat', array(&$return, $timestamp, $format, $today_yesterday));
+
+    # Did the hooks do anything?
+    if(!empty($return))
+      return $return;
+
+    # Is the format acceptable?
+    $format = strtolower($format);
+    if(!in_array($format, array('datetime', 'date', 'time')))
+      return false;
 
     # No timestamp specified? We will use the current time then!
     if(empty($timestamp))
       $timestamp = time_utc();
 
-    # No timezone set? We will change that ;)
-    if(empty($timezone))
-      $timezone = $member->is_logged() ? $member->data('timezone', 'double', 0) : $settings->get('timezone', 'double', 0);
+    # Want to change the time, perhaps? Timezone, maybe? :P
+    $timestamp = $api->apply_filters('timeformat_timestamp', $timestamp);
 
-    $timestamp += $timezone * 3600;
+    # Do you want that fancy Today at or Yesterday at stuff? : )
+    if(!empty($today_yesterday))
+    {
+      # We need to get the current time.
+      $cur_time = $api->apply_filters('timeformat_timestamp', time_utc());
 
-    # !!!
+      # Get useful information.
+      $cur_time = getdate($cur_time);
+      $supplied = getdate($timestamp);
+
+      # Is it today?
+      $is_today = $supplied['yday'] == $cur_time['yday'] && $supplied['year'] == $cur_time['year'];
+
+      # How about yesterday?
+      $is_yesterday = ($supplied['yday'] == $cur['yday'] - 1 && $supplied['year'] == $cur_time['year']) || ($cur['yday'] == 0 && $supplied['year'] == $cur_time['year'] - 1 && $supplied['mday'] == 31 && $supplied['mon'] == 12);
+
+      # So was it today or yesterday?
+      if($is_today || $is_yesterday)
+      {
+        # For the date format, we just return Today or Yesterday ;)
+        return '<strong>'. ($is_today ? l('Today') : l('Yesterday')). '</strong>'. ($format != 'date' ? ' '. l('at'). ' '. strftime($settings->get('time_format', 'string', '%I:%M:%S %p'), $timestamp) : '');
+      }
+    }
+
+    # Nothing special, huh?
+    return strftime($settings->get($format. '_format', 'string'), $timestamp);
   }
 }
 ?>

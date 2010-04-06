@@ -184,7 +184,7 @@ if(!function_exists('create_pagination'))
     Note:
       This function is overloadable.
   */
-  function pagination_create($tpl_url, &$start, $num_items, $per_page = 10)
+  function create_pagination($tpl_url, &$start, $num_items, $per_page = 10)
   {
     # So how many pages total..?
     $total_pages = ceil((int)($num_items == 0 ? 1 : $num_items) / (int)$per_page);
@@ -260,7 +260,7 @@ if(!function_exists('create_pagination'))
     $start = ($start - 1) * $per_page;
 
     # Return it imploded...
-    return implode(' ', $index);
+    return '<span class="pagination">'. implode(' ', $index). '</span>';
   }
 }
 ?>

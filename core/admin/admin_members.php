@@ -519,33 +519,61 @@ if(!function_exists('admin_members_manage_generate_table'))
   */
   function admin_members_manage_generate_table()
   {
-    global $api;
+    global $api, $base_url;
 
     $table = $api->load_class('Table');
 
     $table->add('admin_members_manage_table', array(
                                                 'db_query' => '
                                                                 SELECT
-                                                                  member_id, member_name
+                                                                  member_id, member_name, display_name, member_email, member_groups, member_registered, member_activated
                                                                 FROM {db->prefix}members',
                                                 'db_vars' => array(),
                                                 'primary' => 'member_id',
-                                                'sort' => array('member_id', 'asc')
+                                                'sort' => array('member_id', 'asc'),
+                                                'base_url' => $base_url. '/index.php?action=admin&sa=members_manage',
+                                                'cellpadding' => '4px',
+                                                'options' => array(
+                                                               'activate' => 'Activate',
+                                                               'deactivate' => 'Deactivate',
+                                                             ),
                                               ));
 
     # Their member id!
     $table->add_column('admin_members_manage_table', 'member_id', array(
                                                                     'column' => 'member_id',
-                                                                    'label' => 'ID',
-                                                                    'title' => 'Member ID',
+                                                                    'label' => l('ID'),
+                                                                    'title' => l('Member ID'),
                                                                   ));
 
     # Name too!
     $table->add_column('admin_members_manage_table', 'member_name', array(
-                                                                      'column' => 'member_name',
-                                                                      'label' => 'Name',
-                                                                      'title' => 'Member name',
+                                                                      'column' => 'display_name',
+                                                                      'label' => l('Member name'),
+                                                                      'title' => l('Member name'),
                                                                     ));
+
+    # How about that email? :P
+    $table->add_column('admin_members_manage_table', 'member_email', array(
+                                                                       'column' => 'member_email',
+                                                                       'label' => l('Email address'),
+                                                                     ));
+
+    # Is their account activated..?
+    $table->add_column('admin_members_manage_table', 'member_activated', array(
+                                                                           'column' => 'member_activated',
+                                                                           'label' => l('Activated'),
+                                                                           'function' => create_function('$row', '
+                                                                                           return $row[\'member_activated\'] == 0 ? l(\'No\') : l(\'Yes\');'),
+                                                                         ));
+
+    # Registered date?
+    $table->add_column('admin_members_manage_table', 'member_registered', array(
+                                                                            'column' => 'member_registered',
+                                                                            'label' => l('Registered'),
+                                                                            'function' => create_function('$row', '
+                                                                                            return timeformat($row[\'member_registered\']);'),
+                                                                          ));
   }
 }
 ?>
