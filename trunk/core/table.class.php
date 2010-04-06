@@ -71,10 +71,11 @@ class Table
                   If this is set, callback is required.
         callback - The callback which will take the selected action (identifier)
                    and an array containing the selected rows identifier (primary).
-        sort - An array containing the column (in the table) and the sorting order
+        sort - An array containing the column id and the sorting order
                (either ASC or DESC) for the default sorting order is none is being
                done manually by the user viewing the table. Ex: array('member_id', 'desc')
         per_page - The number of items to display per page. Defaults to 25.
+        base_url - The base URL of the table.
 
       Do NOT add any ORDER BY or LIMIT clauses in the query! This will cause the query
       to not work. This is all done automatically.
@@ -94,6 +95,9 @@ class Table
                                  'callback' => null,
                                  'sort' => array(),
                                  'per_page' => 25,
+                                 'base_url' => null,
+                                 'cellpadding' => '0px',
+                                 'cellspacing' => '0px',
                                );
 
     # Now try to edit it.
@@ -164,6 +168,15 @@ class Table
       $this->tables[$tbl_name]['per_page'] = (int)$options['per_page'];
     elseif(isset($options['per_page']))
       return false;
+
+    if(isset($options['base_url']))
+      $this->tables[$tbl_name]['base_url'] = $options['base_url'];
+
+    if(isset($options['cellpadding']))
+      $this->tables[$tbl_name]['cellpadding'] = $options['cellpadding'];
+
+    if(isset($options['cellspacing']))
+      $this->tables[$tbl_name]['cellspacing'] = $options['cellspacing'];
 
     return true;
   }
@@ -443,43 +456,152 @@ class Table
   */
   public function show($tbl_name)
   {
+    global $api, $db;
+
     if(!$this->table_exists($tbl_name))
     {
       echo l('The table "%s" doesn\'t exist.', htmlchars($tbl_name));
       return;
     }
 
-    echo '
-      <table id="', $tbl_name, '" class="table">';
+    # Do any changes!
+    $api->run_hooks($tbl_name);
 
     # Make things a bit easier ;)
     $table = $this->tables[$tbl_name];
 
+    echo '
+      <div class="table">
+        <table id="', $tbl_name, '" class="table" cellpadding="', $table['cellpadding'], '" cellspacing="', $table['cellspacing'], '">';
+
     # Any columns to actually display, anyways?
     if(count($table['columns']))
     {
-      echo '
-        <tr class="columns">';
+      # Is anything being sorted..?
+      if(!empty($_GET['sort']))
+      {
+        # Is the sort valid..?
+        if(!empty($table['columns'][$_GET['sort']]['sortable']))
+        {
+          $sort_by = 'ORDER BY '. $table['columns'][$_GET['sort']]['column']. ' '. (isset($_GET['order']) && in_array($_GET['order'], array('asc', 'desc')) ? ($_GET['order'] == 'asc' ? 'ASC' : 'DESC') : 'ASC');
+          $sort = htmlspecialchars($_GET['sort']);
+          $order = (isset($_GET['order']) && in_array($_GET['order'], array('asc', 'desc')) ? ($_GET['order'] == 'asc' ? 'ASC' : 'DESC') : 'ASC');
+        }
+      }
 
-      foreach($table['columns'] as $column)
+      # The default sort, perhaps?
+      if(!isset($sort_by) && is_array($table['sort']) && count($table['sort']) == 2)
+      {
+        $sort_by = 'ORDER BY '. $table['columns'][$table['sort'][0]]['column']. ' '. (strtolower($table['sort'][1]) == 'asc' ? 'ASC' : 'DESC');
+        $sort = $table['sort'][0];
+        $order = strtolower($table['sort'][1]) == 'asc' ? 'asc' : 'desc';
+      }
+      elseif(!isset($sort_by))
+      {
+        # No sort, so sad! :(
+        $sort_by = '';
+        $sort = '';
+        $order = '';
+      }
+
+      # We need to do two queries, one to see how many rows will be returned,
+      # and another for the actual data...
+      $result = $db->query('
+                  SELECT
+                    COUNT(*)
+                  '. substr($table['db_query'], stripos($table['db_query'], 'FROM')),
+                  $table['db_vars'], $tbl_name. '_count_query');
+
+      list($rows) = $result->fetch_row();
+
+      # Where are we starting?
+      $start = isset($_GET['page']) ? $_GET['page'] : 1;
+
+      # Create our pagination!!!
+      $pagination = create_pagination('test.com', $start, $rows, $table['per_page']);
+
+      $page = ceil(($start + 1 * $table['per_page']) / $table['per_page']);
+
+      # Will we be having a checkbox on the side of each row?
+      $display_checkbox = is_array($table['options']) && count($table['options']) > 0;
+
+      # Output the pagination!
+      echo '
+          <tr class="header">
+            <td colspan="', count($table['columns']), '">', $pagination, '</td>
+          </tr>';
+
+      # Now we may output the column headers.
+      echo '
+          <tr class="columns">';
+
+      if($display_checkbox)
+        echo '
+            <th>&nbsp;</th>';
+
+      foreach($table['columns'] as $column_id => $column)
       {
         echo '
-          <th', (!empty($column['title']) ? ' title="'. $column['title']. '"' : ''), '>', $column['label'], '</th>';
+            <th', (!empty($column['title']) ? ' title="'. $column['title']. '"' : ''), '>', ($column['sortable'] ? '<a href="'. $table['base_url']. '&amp;sort='. $column_id. '&amp;order='. (!empty($_GET['order']) && ($_GET['order'] == 'asc' || $_GET['order'] == 'desc') ? ($_GET['order'] == 'asc' ? 'desc' : 'asc') : 'asc'). '&amp;page='. $page. '">' : ''), $column['label'], ($column['sortable'] ? '</a>' : ''), '</th>';
       }
 
       echo '
-        </tr>';
+          </tr>';
 
-      # Now try the query, and see if it actually works ;)
+      # Now to query the real data!
+      $result = $db->query(
+                       $table['db_query']. '
+                       '. $sort_by. '
+                       LIMIT '. (int)$start. ','. (int)$table['per_page'],
+                       $table['db_vars'], $tbl_name. '_query');
+
+      $tr_num = 0;
+      while($row = $result->fetch_assoc())
+      {
+        echo '
+          <tr class="tr_', ($tr_num == 0 ? $tr_num++ : $tr_num--), '">';
+
+        if($display_checkbox)
+          echo '
+            <td><input type="checkbox" name="selected[]" value="', isset($row[$table['primary']]) ? $row[$table['primary']] : '', '" /></td>';
+
+        # Show each individual column!!!
+        foreach($table['columns'] as $column_id => $column)
+        {
+          echo '
+            <td>', is_callable($column['function']) ? $column['function']($row) : (isset($row[$column['column']]) ? $row[$column['column']] : ''), '</td>';
+        }
+
+        echo '
+          </tr>';
+      }
+
+      if($display_checkbox)
+      {
+        echo '
+          <tr class="options">
+            <td colspan="', count($table['columns']) + 1, '">', l('With selected:'), ' <select name="', $tbl_name, '_option">
+                                                                                         <option></option>';
+
+         foreach($table['options'] as $value => $label)
+            echo '
+                                                                                         <option value="', $value, '">', $label, '</option>';
+
+        echo '
+                                                                                       </select>
+          </td>
+          </tr>';
+      }
     }
     else
     {
       echo '
-        <td class="errors">', l('No columns added.'), '</td>';
+          <td class="errors">', l('No columns added.'), '</td>';
     }
 
     echo '
-      </table>';
+        </table>
+      </div>';
   }
 }
 ?>
