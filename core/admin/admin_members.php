@@ -481,13 +481,16 @@ if(!function_exists('admin_members_manage'))
   */
   function admin_members_manage()
   {
-    global $api, $base_url, $theme;
+    global $api, $base_url, $theme, $theme_url;
 
     # Generate our table ;)
     admin_members_manage_generate_table();
     $table = $api->load_class('Table');
 
     $theme->set_title(l('Manage Members'));
+
+    $theme->add_js_var('delete_confirm', l('Are you sure you want to delete the selected members?\\r\\nThis cannot be undone!'));
+    $theme->add_js_file(array('src' => $theme_url. '/default/js/members_manage.js'));
 
     $theme->header();
 
@@ -536,6 +539,7 @@ if(!function_exists('admin_members_manage_generate_table'))
                                                 'options' => array(
                                                                'activate' => 'Activate',
                                                                'deactivate' => 'Deactivate',
+                                                               'delete' => 'Delete',
                                                              ),
                                               ));
 
@@ -551,6 +555,10 @@ if(!function_exists('admin_members_manage_generate_table'))
                                                                       'column' => 'display_name',
                                                                       'label' => l('Member name'),
                                                                       'title' => l('Member name'),
+                                                                      'function' => create_function('$row', '
+                                                                                      global $base_url;
+
+                                                                                      return l(\'<a href="%s/index.php?action=admin&amp;sa=members_manage&amp;id=%s" title="Edit %s\\\'s account">%s</a>\', $base_url, $row[\'member_id\'], $row[\'display_name\'], $row[\'display_name\']);'),
                                                                     ));
 
     # How about that email? :P
@@ -574,6 +582,117 @@ if(!function_exists('admin_members_manage_generate_table'))
                                                                             'function' => create_function('$row', '
                                                                                             return timeformat($row[\'member_registered\']);'),
                                                                           ));
+  }
+}
+
+if(!function_exists('admin_members_manage_edit'))
+{
+  /*
+    Function: admin_members_manage_edit
+
+    Provides the interface to edit the specified user and their information.
+
+    Parameters:
+      int $member_id - The id of the member to edit.
+
+    Returns:
+      void - Nothing is returned by this function.
+
+    Note:
+      This function is overloadable.
+  */
+  function admin_members_manage_edit($member_id)
+  {
+    global $api, $theme;
+
+    # We will need the Members class, that's for sure!
+    $members = $api->load_class('Members');
+
+    $members->load($member_id);
+    $member_info = $members->get($member_id);
+
+    # Does the member exist?
+    if($member_info === false)
+    {
+      $theme->set_title(l('Edit member'));
+
+      $theme->header();
+
+      echo '
+  <h1>', l('An error has occurred'), '</h1>
+  <p>', l('It appears that the member you are trying to edit does not exist.'), '</p>';
+
+      $theme->footer();
+    }
+    else
+    {
+      # Generate the form for the specified member!
+      admin_members_manage_edit_generate_form($member_id);
+      $form = $api->load_class('Form');
+
+      $theme->set_title(l('Editing member "%s"', $member_info['name']));
+
+      $theme->header();
+
+      echo '
+  <h1>', l('Editing member "%s"', $member_info['name']), '</h1>
+  <p>', l('Changes can be made to the account "%s" here.', $member_info['name']), '</p>';
+
+      $form->show('members_edit_'. $member_id);
+
+      $theme->footer();
+    }
+  }
+}
+
+if(!function_exists('admin_members_manage_edit_generate_form'))
+{
+  /*
+    Function: admin_members_manage_edit_generate_form
+
+    Parameters:
+      int $member_id - The id of the member being edited.
+
+    Returns:
+      void - Nothing is returned by this function.
+
+    Note:
+      This function is overloadable.
+  */
+  function admin_members_manage_edit_generate_form($member_id)
+  {
+    global $api;
+
+    $form = $api->load_class('Form');
+
+    # Create the form.
+    $form->add('members_edit_'. $member_id, array(
+                                              'action' => $base_url. '/index.php?action=admin&amp;sa=members_manage&amp;id='. $member_id,
+                                              'callback' => 'admin_members_manage_edit_handle',
+                                              'method' => 'post',
+                                              'submit' => l('Edit'),
+                                            ));
+  }
+}
+
+if(!function_exists('admin_members_manage_edit_handle'))
+{
+  /*
+    Function: admin_members_manage_edit_handle
+
+    Parameters:
+      array $data
+      array &$errors
+
+    Returns:
+      bool - Returns true if the member was successfully edited, false if not.
+
+    Note:
+      This function is overloadable.
+  */
+  function admin_members_manage_edit_handle($data, &$errors = array())
+  {
+    global $api;
   }
 }
 ?>

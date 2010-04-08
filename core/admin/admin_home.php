@@ -40,7 +40,7 @@ if(!function_exists('admin_home'))
   */
   function admin_home()
   {
-    global $api, $base_url, $func, $settings, $theme;
+    global $api, $base_url, $func, $member, $settings, $theme;
 
     $api->run_hooks('admin_home');
 
@@ -156,18 +156,28 @@ if(!function_exists('admin_home'))
                           'title' => l('System settings'),
                           'src' => $base_url. '/core/admin/icons/settings.png',
                           'label' => l('Settings'),
+                          'show' => $member->is_a('administrator'),
                         ),
                         array(
                           'href' => $base_url. '/index.php?action=admin&amp;sa=update',
                           'title' => l('Check for updates'),
                           'src' => $base_url. '/core/admin/icons/update.png',
                           'label' => l('Update'),
+                          'show' => $member->is_a('administrator'),
                         ),
                         array(
                           'href' => $base_url. '/index.php?action=admin&amp;sa=about',
                           'title' => l('About SnowCMS'),
                           'src' => $base_url. '/core/admin/icons/about.png',
                           'label' => l('About'),
+                          'show' => $member->is_a('administrator'),
+                        ),
+                        array(
+                          'href' => $base_url. '/index.php?action=admin&amp;sa=error_log',
+                          'title' => l('View the error log'),
+                          'src' => $base_url. '/core/admin/icons/error_log.png',
+                          'label' => l('Errors'),
+                          'show' => $member->is_a('administrator'),
                         ),
                       ),
       l('Members') => array(
@@ -176,18 +186,21 @@ if(!function_exists('admin_home'))
                           'title' => l('Add a new member'),
                           'src' => $base_url. '/core/admin/icons/add_member.png',
                           'label' => l('Add'),
+                          'show' => $member->is_a('administrator'),
                         ),
                         array(
                           'href' => $base_url. '/index.php?action=admin&amp;sa=members_manage',
                           'title' => l('Manage existing members'),
                           'src' => $base_url. '/core/admin/icons/manage_members.png',
                           'label' => l('Manage'),
+                          'show' => $member->is_a('administrator'),
                         ),
                         array(
                           'href' => $base_url. '/index.php?action=admin&amp;sa=members_settings',
                           'title' => l('Member settings'),
                           'src' => $base_url. '/core/admin/icons/member_settings.png',
                           'label' => l('Settings'),
+                          'show' => $member->is_a('administrator'),
                         ),
                       ),
       l('Plugins') => array(
@@ -196,12 +209,14 @@ if(!function_exists('admin_home'))
                           'title' => l('Add a new plugin'),
                           'src' => $base_url. '/core/admin/icons/add_plugin.png',
                           'label' => l('Add'),
+                          'show' => $member->is_a('administrator'),
                         ),
                         array(
                           'href' => $base_url. '/index.php?action=admin&amp;sa=plugins_manage',
                           'title' => l('Manage plugins'),
                           'src' => $base_url. '/core/admin/icons/manage_plugins.png',
                           'label' => l('Manage'),
+                          'show' => $member->is_a('administrator'),
                         ),
                       ),
     );
@@ -211,6 +226,19 @@ if(!function_exists('admin_home'))
 
     if(is_array($icons) && count($icons) > 0)
     {
+      # Remove any that don't need showing, though.
+      $tmp = array();
+      foreach($icons as $header => $icon)
+      {
+        foreach($icon as $key => $info)
+          if(empty($info['show']))
+            unset($icon[$key]);
+
+        if(count($icon) > 0)
+          $tmp[$header] = $icon;
+      }
+      $icons = $tmp;
+
       $first = true;
       foreach($icons as $header => $icon)
       {
@@ -286,7 +314,14 @@ function admin_about()
   <h3>', l('Developers'), '</h3>
   <p>', l('The following people are currently, or have been previously, major contributors to the <a href="http://www.snowcms.com/" title="SnowCMS">SnowCMS</a> project, we thank them for all their help!'), '</p>
   <ul>
-    <li>Ian Aldrighetti (aldo) - Lead Developer of SnowCMS v0.7, 1.0 and 2.0</li>
+    <li>Ian Aldrighetti (aldo) - ', l('Lead Developer of SnowCMS v0.7, 1.0 and 2.0'), '</li>
+  </ul>
+
+  <h3>', l('Credits'), '</h3>
+  <p>', l('There are a few places where SnowCMS used the works of others, and this section is dedicated to their credit!'), '</p>
+  <ul>
+    <li>', l('Admin Control Panel icons from the <a href="http://tango.freedesktop.org/" title="Tango Desktop Project" target="_blank">Tango Desktop Project</a>.'), '</li>
+    <li>', l('Admin Control Panel inspired by the <a href="http://www.jaws-project.com/" title="Jaws Project" target="_blank">Jaws Project</a>.'), '</li>
   </ul>';
 
   $theme->footer();

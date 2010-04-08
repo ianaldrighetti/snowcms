@@ -352,6 +352,11 @@ class Admin_Theme extends Theme
       background: #F5F5F5;
     }
 
+    .table .options
+    {
+      text-align: right !important;
+    }
+
     .pagination
     {
       font-size: 80%;
