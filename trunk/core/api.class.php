@@ -509,14 +509,6 @@ class API
       # Do we have another one next? Or is this it?
       if($current + 1 == $count)
       {
-        # This is it! But can we add it..? We can't if it is a wildcard
-        # and there is anything in it.
-        if($value == '*' && count($events[$key]['values']) > 0)
-          return false;
-        # Nor can we add the value if the current value is a wildcard.
-        elseif($value != '*' && isset($events[$key]['values']['*']))
-          return false;
-
         $events[$key]['values'][$value] = array(
                                             'callback' => $callback,
                                             'filename' => $filename,
@@ -607,8 +599,8 @@ class API
     foreach($query as $key => $value)
     {
       # Does this have a working callback?
-      if(!empty($events[$key]['values'][$value]['callback']) || ($wildcard = !empty($events[$key]['values']['*'])))
-        $event = $events[$key]['values'][empty($wildcard) ? $value : '*'];
+      if(($found = !empty($events[$key]['values'][$value]['callback'])) || ($wildcard = !empty($events[$key]['values']['*'])))
+        $event = $events[$key]['values'][!empty($found) ? $value : '*'];
 
       # Move on to the next...
       $events = &$events[$key]['sub'];

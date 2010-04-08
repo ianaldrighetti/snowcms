@@ -91,17 +91,17 @@ if(!function_exists('timeformat'))
     if(!empty($today_yesterday))
     {
       # We need to get the current time.
-      $cur_time = $api->apply_filters('timeformat_timestamp', time_utc());
+      $cur_time_time = $api->apply_filters('timeformat_timestamp', time_utc());
 
       # Get useful information.
-      $cur_time = getdate($cur_time);
+      $cur_time = getdate($cur_time_time);
       $supplied = getdate($timestamp);
 
       # Is it today?
-      $is_today = $supplied['yday'] == $cur_time['yday'] && $supplied['year'] == $cur_time['year'];
+      $is_today = $supplied['yday'] == $cur_time_time['yday'] && $supplied['year'] == $cur_time_time['year'];
 
       # How about yesterday?
-      $is_yesterday = ($supplied['yday'] == $cur['yday'] - 1 && $supplied['year'] == $cur_time['year']) || ($cur['yday'] == 0 && $supplied['year'] == $cur_time['year'] - 1 && $supplied['mday'] == 31 && $supplied['mon'] == 12);
+      $is_yesterday = ($supplied['yday'] == $cur_time['yday'] - 1 && $supplied['year'] == $cur_time_time['year']) || ($cur_time['yday'] == 0 && $supplied['year'] == $cur_time_time['year'] - 1 && $supplied['mday'] == 31 && $supplied['mon'] == 12);
 
       # So was it today or yesterday?
       if($is_today || $is_yesterday)
