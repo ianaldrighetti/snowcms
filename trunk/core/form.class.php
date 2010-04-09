@@ -519,7 +519,26 @@ class Form
           $field['options'][$key] = htmlchars($value);
 
       # Is the value set and is it not one that is available..?
-      if($field['value'] !== null && !isset($field['options'][$field['value']]))
+      if(is_array($field['value']))
+      {
+        # A bit different for array values ;)
+        if(count($field['value']))
+        {
+          foreach($field['value'] as $key)
+          {
+            # Is this specific option not existent?
+            if(!isset($field['options'][$key]))
+              # Delete it!
+              unset($field['value'][$key]);
+          }
+
+          if(count($field['value']) == 0)
+            $field['value'] = null;
+        }
+        else
+          $field['value'] = null;
+      }
+      elseif($field['value'] !== null && !isset($field['options'][$field['value']]))
         # We will just unset it then.
         $field['value'] = null;
     }

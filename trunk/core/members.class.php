@@ -120,6 +120,7 @@ class Members
                         'password' => $row['member_pass'],
                         'hash' => $row['member_hash'],
                         'email' => $row['member_email'],
+                        'groups' => explode(',', $row['member_groups']),
                         'member_groups' => explode(',', $row['member_groups']),
                         'registered' => $row['member_registered'],
                         'ip' => $row['member_ip'],

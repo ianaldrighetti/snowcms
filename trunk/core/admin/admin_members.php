@@ -196,7 +196,7 @@ if(!function_exists('admin_members_add_generate_form'))
                                                                  'subtext' => l('Select any other member groups you want to be applied to the user. If you checked the administrator box, this will be ignored.'),
                                                                  'options' => $groups,
                                                                  'rows' => 4,
-                                                                 'value' => !empty($_POST['member_groups']) ? explode(',', $_POST['member_groups']) : '',
+                                                                 'value' => !empty($_POST['member_groups']) ? $_POST['member_groups'] : '',
                                                                ));
   }
 }
@@ -661,8 +661,10 @@ if(!function_exists('admin_members_manage_edit_generate_form'))
   */
   function admin_members_manage_edit_generate_form($member_id)
   {
-    global $api;
+    global $api, $base_url;
 
+    $members = $api->load_class('Members');
+    $member_info = $members->get($member_id);
     $form = $api->load_class('Form');
 
     # Create the form.
@@ -672,6 +674,74 @@ if(!function_exists('admin_members_manage_edit_generate_form'))
                                               'method' => 'post',
                                               'submit' => l('Edit'),
                                             ));
+
+    # Display name..?
+    $form->add_field('members_edit_'. $member_id, 'display_name', array(
+                                                                    'type' => 'string',
+                                                                    'label' => l('Display name:'),
+                                                                    'value' => !empty($_POST['display_name']) ? $_POST['display_name'] : $member_info['name'],
+                                                                  ));
+
+    # Email address, woo!
+    $form->add_field('members_edit_'. $member_id, 'member_email', array(
+                                                                    'type' => 'string',
+                                                                    'label' => l('Email address:'),
+                                                                    'value' => !empty($_POST['member_email']) ? $_POST['member_email'] : $member_info['email'],
+                                                                  ));
+
+    # Change the password? Why not!
+    $form->add_field('members_edit_'. $member_id, 'member_pass', array(
+                                                                   'type' => 'password',
+                                                                   'label' => l('Password:'),
+                                                                   'subtext' => l('Leave blank if you don\'t want to change the password.'),
+                                                                   'function' => create_function('$value, $form_name, &$error', '
+
+                                                                                   if(!empty($value) && (empty($_POST[\'verify_pass\']) || $_POST[\'verify_pass\'] != $value))
+                                                                                   {
+                                                                                     $error = l(\'The supplied passwords don\\\'t match.\');
+                                                                                     return false;
+                                                                                   }
+                                                                                   else
+                                                                                     return true;'),
+                                                                   'value' => '',
+                                                                 ));
+
+    # We will need you to verify that ;)
+    $form->add_field('members_edit_'. $member_id, 'verify_pass', array(
+                                                                   'type' => 'password',
+                                                                   'label' => l('Verify password:'),
+                                                                   'subtext' => l('Just to make sure, re-enter the password.'),
+                                                                   'value' => '',
+                                                                 ));
+
+    # Are they an administrator?
+    $form->add_field('members_edit_'. $member_id, 'is_administrator', array(
+                                                                        'type' => 'checkbox',
+                                                                        'label' => l('Administrator?'),
+                                                                        'subtext' => l('If checked, the member will be an administrator, otherwise they will be just a member and additional groups can be selected below.'),
+                                                                        'value' => !empty($_POST['is_administrator']) ? $_POST['is_administrator'] : in_array('administrator', $member_info['groups']),
+                                                                      ));
+
+    # Additional groups?
+    $groups = $api->return_group();
+
+    # Remove administrator and the member group.
+    unset($groups['administrator'], $groups['member']);
+    $form->add_field('members_edit_'. $member_id, 'member_groups', array(
+                                                                     'type' => 'select-multi',
+                                                                     'label' => l('Additional member groups:'),
+                                                                     'subtext' => l('Select any additional groups the member should be in, ignored if the member is an administrator.'),
+                                                                     'options' => $groups,
+                                                                     'rows' => 4,
+                                                                     'value' => !empty($_POST['member_groups']) ? $_POST['member_groups'] : $member_info['groups'],
+                                                                   ));
+
+    # Should the account be activated? ;)
+    $form->add_field('members_edit_'. $member_id, 'member_activated', array(
+                                                                        'type' => 'checkbox',
+                                                                        'label' => l('Account activated:'),
+                                                                        'value' => !empty($_POST['member_activated']) ? $_POST['member_activated'] : $member_info['is_activated'],
+                                                                      ));
   }
 }
 
