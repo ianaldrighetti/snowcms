@@ -45,22 +45,10 @@ if(!function_exists('admin_prepend'))
   {
     global $api, $core_dir, $member, $settings, $theme;
 
-    # First things first, are you even allowed to view the Admin CP?
-    # Plugins can add more groups through the admin_allowed_groups filter.
-    $allowed_groups = $api->apply_filters('admin_allowed_groups', array('administrator'));
-
-    if(count($allowed_groups) > 0)
-      foreach($allowed_groups as $group)
-        if($member->is_a($group))
-        {
-          $allowed = true;
-          break;
-        }
-
     # You could be making an ajax request (Oh yeah, did I mention any ajax
     # requests dealing with control panel stuff should be prepended by
     # action=admin&sa=ajax{rest of your stuff}? It should be!!!)
-    if(substr($_SERVER['QUERY_STRING'], 0, 20) == 'action=admin&sa=ajax')
+    if($member->can('access_admin_cp') && substr($_SERVER['QUERY_STRING'], 0, 20) == 'action=admin&sa=ajax')
     {
       # So it's an ajax request!
       # Is an administrative prompt required?
@@ -94,20 +82,10 @@ if(!function_exists('admin_prepend'))
     }
     else
     {
-      if(empty($allowed))
-      {
-        $theme->set_title(l('Access denied'));
-        $theme->add_meta(array('name' => 'robots', 'content' => 'noindex'));
-
-        $theme->header();
-
-        echo '
-        <h1>', l('Access denied'), '</h1>
-        <p>', l('Sorry, but you are not allowed to access the page you have requested.'), '</p>';
-
-        $theme->footer();
-        exit;
-      }
+      # Not allowed to access the Admin Control Panel?
+      if(!$member->can('access_admin_cp'))
+        # There's a function for that. :P
+        admin_access_denied();
 
       # We may require you to enter a password, for security reasons!
       admin_prompt_password();
@@ -319,6 +297,43 @@ if(!function_exists('admin_prompt_handle'))
       $errors[] = l('Incorrect password supplied.');
       return false;
     }
+  }
+}
+
+if(!function_exists('admin_access_denied'))
+{
+  /*
+    Function: admin_access_denied
+
+    Shows an error screen denying the member access to the page they requested.
+
+    Parameters:
+      string $title - The title of the page, defaults to Access denied
+      string $message - The error message to display, defaults to "Sorry,
+                        but you are not allowed to access the page you have requested."
+
+    Returns:
+      void - Nothing is returned by this function.
+
+    Note:
+      This function is overloadable.
+  */
+  function admin_access_denied($title = null, $message = null)
+  {
+    global $theme;
+
+    $theme->set_title(!empty($title) ? $title : l('Access denied'));
+
+    $theme->header();
+
+    echo '
+    <h1>', $title, '</h1>
+    <p>', $message, '</p>';
+
+    $theme->footer();
+
+    # Exit!
+    exit;
   }
 }
 ?>

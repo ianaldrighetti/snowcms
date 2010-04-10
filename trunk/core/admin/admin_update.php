@@ -40,7 +40,14 @@ if(!function_exists('admin_update'))
   */
   function admin_update()
   {
-    global $api, $base_url, $settings, $theme, $theme_url;
+    global $api, $base_url, $member, $settings, $theme, $theme_url;
+
+    $api->run_hooks('admin_update');
+
+    # Can you update the system?
+    if(!$member->can('update_system'))
+      # That's what I thought!
+      admin_access_denied();
 
     $api->run_hooks('admin_update');
 
@@ -83,7 +90,15 @@ if(!function_exists('admin_update_ajax'))
   */
   function admin_update_ajax()
   {
-    global $api, $settings;
+    global $api, $member, $settings;
+
+    $api->run_hooks('admin_update_ajax');
+
+    if(!$member->can('update_system'))
+    {
+      echo json_encode(array('error' => l('Access denied.')));
+      exit;
+    }
 
     $http = $api->load_class('HTTP');
 
@@ -123,7 +138,15 @@ if(!function_exists('admin_update_system'))
   */
   function admin_update_system()
   {
-    global $api, $base_dir, $settings;
+    global $api, $base_dir, $member, $settings;
+
+    $api->run_hooks('admin_update_system');
+
+    if(!$member->can('update_system'))
+    {
+      echo json_encode(array('error' => l('Access denied.')));
+      exit;
+    }
 
     # There is no stopping now!
     ignore_user_abort(true);

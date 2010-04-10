@@ -75,6 +75,12 @@ if(!class_exists('Member'))
     # other registered groups which are done via the <API>
     private $groups;
 
+    # Variable: permissions
+    # Contains the permissions the member has based on all the groups
+    # they are in. However, if the member is an administrator, this
+    # array will always be empty as they can do anything.
+    private $permissions;
+
     # Variable: data
     # Contains an array of members data, such as options and other
     # various settings which are contained with the {db->prefix}member_data
@@ -185,6 +191,41 @@ if(!class_exists('Member'))
             if($result->num_rows() > 0)
               while($row = $result->fetch_assoc())
                 $this->data[$row['variable']] = $row['value'];
+
+            # Time to load up their permissions based on groups.
+            # However, if they are an administrator, don't bother!
+            if(!$this->is_admin())
+            {
+              $result = $db->query('
+                          SELECT
+                            group_id, permission, allow
+                          FROM {db->prefix}permissions
+                          WHERE group_id IN({string_array:groups})',
+                          array(
+                            'groups' => $this->groups,
+                          ), 'member_permission_query');
+
+              # Get ready to load'em up!
+              $this->permissions = array();
+
+              # You can also explicitly deny permissions as well.
+              $deny = array();
+              while($row = $result->fetch_assoc())
+              {
+                # -1 means denied, no matter what!
+                if($row['status'] == -1)
+                  $deny[] = $row['permission'];
+                else
+                  # If status is 1, give them the permission, however, if they can't
+                  # use the previous permission unless the permission isn't set yet.
+                  $this->permissions[$row['permission']] = $row['status'] == 1 ? true : (isset($this->permissions[$row['permission']]) ? !empty($this->permissions[$row['permission']]) : false);
+              }
+
+              # Any denied permissions? As we need to apply those.
+              if(count($deny) > 0)
+                foreach($deny as $permission)
+                  $this->permissions[$permission] = false;
+            }
           }
         }
       }
@@ -207,13 +248,14 @@ if(!class_exists('Member'))
         $this->email = isset($member['email']) ? $member['email'] : $this->email;
         $this->registered = isset($member['registered']) ? $member['registered'] : $this->registered;
         $this->groups = isset($member['groups']) ? @explode(',', $member['groups']) : $this->groups;
+        $this->permissions = isset($member['permissions']) ? $member['permissions'] : $this->permissions;
       }
 
       # The session id not set yet? or is it old..?
       if(empty($_SESSION['session_id']) || empty($_SESSION['session_assigned']) || ((int)$_SESSION['session_assigned'] + 86400) < time_utc())
       {
         $rand = mt_rand(1, 2);
-        $_SESSION['session_id'] = sha1(($rand == 1 ? session_id() : ''). substr(str_shuffle('abcdefghijklmnopqrstuvwxyz1234567890-_'), 0, mt_rand(16, 32)). ($rand == 2 ? session_id() : ''));
+        $_SESSION['session_id'] = sha1(($rand == 1 ? session_id() : ''). substr(str_shuffle('abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890-_'), 0, mt_rand(16, 32)). ($rand == 2 ? session_id() : ''));
         $_SESSION['session_assigned'] = time_utc();
       }
 
@@ -446,6 +488,52 @@ if(!class_exists('Member'))
     public function is_admin()
     {
       return $this->is_a('administrator');
+    }
+
+    /*
+      Method: can
+
+      Returns whether or not the member can execute the specified permission.
+
+      Parameters:
+        mixed $permission - The permission(s) to check. If an array of permissions
+                            are supplied, if even one permission is denied, then
+                            false will be returned. In order for an array of
+                            permissions to return true is if the member has permission
+                            to do all the supplied.
+
+      Returns:
+        bool - Returns true if the member has the permission, false if not.
+    */
+    public function can($permission)
+    {
+      # Hold on! Are you an administrator? If so, you can do ANYTHING!
+      if($this->is_admin())
+        return true;
+
+      # An array of permissions?
+      if(is_array($permission))
+      {
+        # Make sure there are any to check.
+        if(count($permission))
+        {
+          foreach($permission as $p)
+            # Can you?
+            if(!$this->can($permission))
+              return false;
+
+          # If we are still going, that means all permissions were allowed.
+          return true;
+        }
+        else
+          # Sure, you can do nothing.
+          return true;
+      }
+      else
+      {
+        # A single, lonesome permission! So sad :-(
+        return !empty($this->permissions[$permission]);
+      }
     }
 
     /*

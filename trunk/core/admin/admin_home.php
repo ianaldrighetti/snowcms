@@ -44,6 +44,10 @@ if(!function_exists('admin_home'))
 
     $api->run_hooks('admin_home');
 
+    # Can you even access the Admin Control Panel..?
+    if(!$member->can('access_admin_cp'))
+      admin_access_denied();
+
     # Do we need to fetch the news from the SnowCMS site..?
     $handled = false;
     $api->run_hooks('admin_fetch_news', array(&$handled, 'http://download.snowcms.com/news/v2.x-line/news.php'));
@@ -148,7 +152,6 @@ if(!function_exists('admin_home'))
   <div id="main">';
 
     # Now it is time to display all the icons and what not on the Control Panel home.
-    # !!! TODO: Don't show certain icons depending on groups.
     $icons = array(
       l('SnowCMS') => array(
                         array(
@@ -156,28 +159,28 @@ if(!function_exists('admin_home'))
                           'title' => l('System settings'),
                           'src' => $base_url. '/core/admin/icons/settings.png',
                           'label' => l('Settings'),
-                          'show' => $member->is_a('administrator'),
+                          'show' => $member->can('manage_system_settings'),
                         ),
                         array(
                           'href' => $base_url. '/index.php?action=admin&amp;sa=update',
                           'title' => l('Check for updates'),
                           'src' => $base_url. '/core/admin/icons/update.png',
                           'label' => l('Update'),
-                          'show' => $member->is_a('administrator'),
+                          'show' => $member->can('update_system'),
                         ),
                         array(
                           'href' => $base_url. '/index.php?action=admin&amp;sa=about',
                           'title' => l('About SnowCMS'),
                           'src' => $base_url. '/core/admin/icons/about.png',
                           'label' => l('About'),
-                          'show' => $member->is_a('administrator'),
+                          'show' => true,
                         ),
                         array(
                           'href' => $base_url. '/index.php?action=admin&amp;sa=error_log',
                           'title' => l('View the error log'),
                           'src' => $base_url. '/core/admin/icons/error_log.png',
                           'label' => l('Errors'),
-                          'show' => $member->is_a('administrator'),
+                          'show' => $member->can('view_error_log'),
                         ),
                       ),
       l('Members') => array(
@@ -186,21 +189,35 @@ if(!function_exists('admin_home'))
                           'title' => l('Add a new member'),
                           'src' => $base_url. '/core/admin/icons/add_member.png',
                           'label' => l('Add'),
-                          'show' => $member->is_a('administrator'),
+                          'show' => $member->can('add_new_member'),
                         ),
                         array(
                           'href' => $base_url. '/index.php?action=admin&amp;sa=members_manage',
                           'title' => l('Manage existing members'),
                           'src' => $base_url. '/core/admin/icons/manage_members.png',
                           'label' => l('Manage'),
-                          'show' => $member->is_a('administrator'),
+                          'show' => $member->can('manage_members'),
+                        ),
+                        array(
+                          'href' => $base_url. '/index.php?action=admin&amp;sa=members_search',
+                          'title' => l('Search for members'),
+                          'src' => $base_url. '/core/admin/icons/member_search.png',
+                          'label' => l('Search'),
+                          'show' => $member->can('search_members'),
                         ),
                         array(
                           'href' => $base_url. '/index.php?action=admin&amp;sa=members_settings',
                           'title' => l('Member settings'),
                           'src' => $base_url. '/core/admin/icons/member_settings.png',
                           'label' => l('Settings'),
-                          'show' => $member->is_a('administrator'),
+                          'show' => $member->can('manage_member_settings'),
+                        ),
+                        array(
+                          'href' => $base_url. '/index.php?action=admin&amp;sa=members_permissions',
+                          'title' => l('Set member group permissions'),
+                          'src' => $base_url. '/core/admin/icons/permissions.png',
+                          'label' => l('Permissions'),
+                          'show' => $member->can('manage_permissions'),
                         ),
                       ),
       l('Plugins') => array(
@@ -209,14 +226,14 @@ if(!function_exists('admin_home'))
                           'title' => l('Add a new plugin'),
                           'src' => $base_url. '/core/admin/icons/add_plugin.png',
                           'label' => l('Add'),
-                          'show' => $member->is_a('administrator'),
+                          'show' => $member->can('add_plugins'),
                         ),
                         array(
                           'href' => $base_url. '/index.php?action=admin&amp;sa=plugins_manage',
                           'title' => l('Manage plugins'),
                           'src' => $base_url. '/core/admin/icons/manage_plugins.png',
                           'label' => l('Manage'),
-                          'show' => $member->is_a('administrator'),
+                          'show' => $member->can('manage_plugins'),
                         ),
                       ),
     );

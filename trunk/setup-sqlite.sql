@@ -72,6 +72,14 @@ CREATE INDEX '{db->prefix}messages_modified_time' ON '{db->prefix}messages' ('mo
 CREATE INDEX '{db->prefix}messages_message_status' ON '{db->prefix}messages' ('message_status');
 CREATE INDEX '{db->prefix}messages_extra' ON '{db->prefix}messages' ('extra');
 
+CREATE TABLE '{db->prefix}permissions'
+(
+  'group_id' VARCHAR(255) NOT NULL,
+  'permission' VARCHAR(255) NOT NULL,
+  'status' SMALLINT NOT NULL DEFAULT '1',
+  PRIMARY KEY ('group_id', 'permission')
+);
+
 CREATE TABLE '{db->prefix}plugins'
 (
   'dependency_name' VARCHAR(255) NOT NULL,
