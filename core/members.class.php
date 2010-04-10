@@ -873,7 +873,7 @@ class Members
       # Now delete those members!
       $result = $db->query('
         DELETE FROM {db->prefix}members
-        WHERE member_id IN({array_int:members})
+        WHERE member_id IN({int_array:members})
         LIMIT {int:member_count}',
         array(
           'members' => $members,
@@ -886,7 +886,7 @@ class Members
         # Now delete their data in the member_data table.
         $result = $db->query('
           DELETE FROM {db->prefix}member_data
-          WHERE member_id IN({array_int:members})',
+          WHERE member_id IN({int_array:members})',
           array(
             'members' => $members,
           ), 'members_delete_query_data');

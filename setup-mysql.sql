@@ -84,6 +84,17 @@ CREATE TABLE `{db->prefix}messages`
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 
 ----
+-- All permissions here! ;)
+----
+CREATE TABLE `{db->prefix}permissions`
+(
+  `group_id` VARCHAR(128) NOT NULL,
+  `permission` VARCHAR(128) NOT NULL,
+  `status` TINYINT(1) NOT NULL DEFAULT '1',
+  PRIMARY KEY (`group_id`, `permission`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+
+----
 -- This is where currently enabled plugins are held
 ----
 CREATE TABLE `{db->prefix}plugins`

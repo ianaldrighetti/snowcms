@@ -293,6 +293,7 @@ class Table
                    the current row result set, and return a string
                    which will be displayed in that specific column.
                    Required if column is not specified.
+        width - The width of the td element in the table.
         position - The position at which to place the column (0 -> [NUM COLS] - 1).
                    If you were, for example, to add a column at position 0
                    then another at position 0, the last column added would
@@ -395,6 +396,7 @@ class Table
              'title' => !empty($options['title']) ? $options['title'] : '',
              'sortable' => !empty($options['column']) ? (isset($options['sortable']) ? !empty($options['sortable']) : true) : false,
              'function' => isset($options['function']) && is_callable($options['function']) ? $options['function'] : false,
+             'width' => !empty($options['width']) ? $options['width'] : '',
            );
   }
 
@@ -484,6 +486,13 @@ class Table
 
     # Make things a bit easier ;)
     $table = $this->tables[$tbl_name];
+
+    # Are you submitting some option? If so, do it now!
+    if(!empty($_POST[$tbl_name. '_submit']) && is_callable($table['callback']))
+    {
+      # You got it ;)
+      call_user_func($table['callback'], $_POST[$tbl_name. '_option'], $_POST['selected']);
+    }
 
     # Are there any options? If there are, we will need to make a form!!!
     $is_options = is_array($table['options']) && count($table['options']) > 0;
@@ -587,7 +596,7 @@ class Table
         foreach($table['columns'] as $column_id => $column)
         {
           echo '
-            <td>', is_callable($column['function']) ? $column['function']($row) : (isset($row[$column['column']]) ? $row[$column['column']] : ''), '</td>';
+            <td', (!empty($column['width']) ? ' width="'. $column['width']. '"' : ''), '>', is_callable($column['function']) ? $column['function']($row) : (isset($row[$column['column']]) ? $row[$column['column']] : ''), '</td>';
         }
 
         echo '
