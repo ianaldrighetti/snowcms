@@ -90,7 +90,7 @@ var indexSectionsWithContent = {
       "Z": false
       },
    "Filters": {
-      "Symbols": false,
+      "Symbols": true,
       "Numbers": false,
       "A": true,
       "B": false,
@@ -104,7 +104,7 @@ var indexSectionsWithContent = {
       "J": false,
       "K": false,
       "L": true,
-      "M": false,
+      "M": true,
       "N": false,
       "O": true,
       "P": true,
@@ -150,7 +150,7 @@ var indexSectionsWithContent = {
       "Z": false
       },
    "Hooks": {
-      "Symbols": false,
+      "Symbols": true,
       "Numbers": false,
       "A": true,
       "B": false,
