@@ -42,6 +42,7 @@ $base_dir = defined('__DIR__') ? __DIR__ : dirname(__FILE__);
 $core_dir = $base_dir. '/core';
 $theme_dir = $base_dir. '/themes';
 $plugin_dir = $base_dir. '/plugins';
+$upload_dir = $base_dir. '/uploads';
 
 # The address of where your SnowCMS install is accessible (No trailing /!)
 $base_url = '';
