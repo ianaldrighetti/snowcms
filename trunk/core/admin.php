@@ -43,7 +43,126 @@ if(!function_exists('admin_prepend'))
   */
   function admin_prepend()
   {
-    global $api, $core_dir, $member, $settings, $theme;
+    global $api, $base_url, $core_dir, $icons, $member, $settings, $theme;
+
+    if($member->can('access_admin_cp'))
+    {
+      # Generate all the icons, done here as it is used in other places than just the control panel home.
+      $icons = array(
+        l('SnowCMS') => array(
+                          array(
+                            'id' => 'system_settings',
+                            'href' => $base_url. '/index.php?action=admin&amp;sa=settings',
+                            'title' => l('System settings'),
+                            'src' => $base_url. '/core/admin/icons/settings.png',
+                            'label' => l('Settings'),
+                            'show' => $member->can('manage_system_settings'),
+                          ),
+                          array(
+                            'id' => 'system_update',
+                            'href' => $base_url. '/index.php?action=admin&amp;sa=update',
+                            'title' => l('Check for updates'),
+                            'src' => $base_url. '/core/admin/icons/update.png',
+                            'label' => l('Update'),
+                            'show' => $member->can('update_system'),
+                          ),
+                          array(
+                            'id' => 'system_about',
+                            'href' => $base_url. '/index.php?action=admin&amp;sa=about',
+                            'title' => l('About SnowCMS'),
+                            'src' => $base_url. '/core/admin/icons/about.png',
+                            'label' => l('About'),
+                            'show' => true,
+                          ),
+                          array(
+                            'id' => 'system_error_log',
+                            'href' => $base_url. '/index.php?action=admin&amp;sa=error_log',
+                            'title' => l('View the error log'),
+                            'src' => $base_url. '/core/admin/icons/error_log.png',
+                            'label' => l('Errors'),
+                            'show' => $member->can('view_error_log'),
+                          ),
+                        ),
+        l('Members') => array(
+                          array(
+                            'id' => 'members_add',
+                            'href' => $base_url. '/index.php?action=admin&amp;sa=members_add',
+                            'title' => l('Add a new member'),
+                            'src' => $base_url. '/core/admin/icons/add_member.png',
+                            'label' => l('Add'),
+                            'show' => $member->can('add_new_member'),
+                          ),
+                          array(
+                            'id' => 'members_manage',
+                            'href' => $base_url. '/index.php?action=admin&amp;sa=members_manage',
+                            'title' => l('Manage existing members'),
+                            'src' => $base_url. '/core/admin/icons/manage_members.png',
+                            'label' => l('Manage'),
+                            'show' => $member->can('manage_members'),
+                          ),
+                          array(
+                            'id' => 'members_search',
+                            'href' => $base_url. '/index.php?action=admin&amp;sa=members_search',
+                            'title' => l('Search for members'),
+                            'src' => $base_url. '/core/admin/icons/member_search.png',
+                            'label' => l('Search'),
+                            'show' => $member->can('search_members'),
+                          ),
+                          array(
+                            'id' => 'members_settings',
+                            'href' => $base_url. '/index.php?action=admin&amp;sa=members_settings',
+                            'title' => l('Member settings'),
+                            'src' => $base_url. '/core/admin/icons/member_settings.png',
+                            'label' => l('Settings'),
+                            'show' => $member->can('manage_member_settings'),
+                          ),
+                          array(
+                            'id' => 'members_permissions',
+                            'href' => $base_url. '/index.php?action=admin&amp;sa=members_permissions',
+                            'title' => l('Set member group permissions'),
+                            'src' => $base_url. '/core/admin/icons/permissions.png',
+                            'label' => l('Permissions'),
+                            'show' => $member->can('manage_permissions'),
+                          ),
+                        ),
+        l('Plugins') => array(
+                          array(
+                            'id' => 'plugins_add',
+                            'href' => $base_url. '/index.php?action=admin&amp;sa=plugins_add',
+                            'title' => l('Add a new plugin'),
+                            'src' => $base_url. '/core/admin/icons/add_plugin.png',
+                            'label' => l('Add'),
+                            'show' => $member->can('add_plugins'),
+                          ),
+                          array(
+                            'id' => 'plugins_manage',
+                            'href' => $base_url. '/index.php?action=admin&amp;sa=plugins_manage',
+                            'title' => l('Manage plugins'),
+                            'src' => $base_url. '/core/admin/icons/manage_plugins.png',
+                            'label' => l('Manage'),
+                            'show' => $member->can('manage_plugins'),
+                          ),
+                        ),
+      );
+
+      # You can make changes via this filter:
+      $icons = $api->apply_filters('admin_icons', $icons);
+
+      # Remove any that don't need showing, though.
+      $tmp = array();
+      foreach($icons as $header => $icon)
+      {
+        foreach($icon as $key => $info)
+          if(empty($info['show']))
+            unset($icon[$key]);
+
+        if(count($icon) > 0)
+          $tmp[$header] = $icon;
+      }
+
+      # Put it back :P
+      $icons = $tmp;
+    }
 
     # You could be making an ajax request (Oh yeah, did I mention any ajax
     # requests dealing with control panel stuff should be prepended by
@@ -322,7 +441,13 @@ if(!function_exists('admin_access_denied'))
   {
     global $theme;
 
-    $theme->set_title(!empty($title) ? $title : l('Access denied'));
+    if(empty($title))
+      $title = l('Access denied');
+
+    if(empty($message))
+      $message = l('Sorry, but you are not allowed to access the page you have requested.');
+
+    $theme->set_title($title);
 
     $theme->header();
 

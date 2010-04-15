@@ -470,6 +470,46 @@ class Members
   }
 
   /*
+    Method: password_allowed
+
+    Checks to see if the supplied password is allowed.
+
+    Parameters:
+      string $member_name - The login name of the member you are
+                            checking the password of.
+      string $member_pass - The password to check.
+
+    Returns:
+      bool - Returns TRUE if the password is allowed, FALSE if not.
+
+    Note:
+      The supplied password parameter should NOT be hashed, it should
+      be the password in its original (unhashed) form.
+  */
+  public function password_allowed($member_name, $member_pass)
+  {
+    global $api, $db, $func, $settings;
+
+    $handled = null;
+    $api->run_hooks('members_password_allowed', array(&$handled, $member_pass));
+
+    if($handled === null)
+    {
+      # Just a low setting? So must have at least 3 characters...
+      if($settings->get('password_security', 'int') == 1)
+        $handled = $func['strlen']($member_pass) >= 3;
+      # Must be at least 4 characters long and cannot contain their username ;)
+      elseif($settings->get('password_security', 'int') == 2)
+        $handled = $func['strlen']($member_pass) >= 4 && $func['stripos']($member_pass, $member_name) === false;
+      # At least 5 characters in length and must contain at least 1 number.
+      else
+        $handled = $func['strlen']($member_pass) >= 5 && $func['stripos']($member_pass, $member_name) === false && preg_match('~[0-9]+~', $member_pass);
+    }
+
+    return !empty($handled);
+  }
+
+  /*
     Method: authenticate
 
     This method takes a login name and a password, and checks to see if the supplied
@@ -549,46 +589,6 @@ class Members
   }
 
   /*
-    Method: password_allowed
-
-    Checks to see if the supplied password is allowed.
-
-    Parameters:
-      string $member_name - The login name of the member you are
-                            checking the password of.
-      string $member_pass - The password to check.
-
-    Returns:
-      bool - Returns TRUE if the password is allowed, FALSE if not.
-
-    Note:
-      The supplied password parameter should NOT be hashed, it should
-      be the password in its original (unhashed) form.
-  */
-  public function password_allowed($member_name, $member_pass)
-  {
-    global $api, $db, $func, $settings;
-
-    $handled = null;
-    $api->run_hooks('members_password_allowed', array(&$handled, $member_pass));
-
-    if($handled === null)
-    {
-      # Just a low setting? So must have at least 3 characters...
-      if($settings->get('password_security', 'int') == 1)
-        $handled = $func['strlen']($member_pass) >= 3;
-      # Must be at least 4 characters long and cannot contain their username ;)
-      elseif($settings->get('password_security', 'int') == 2)
-        $handled = $func['strlen']($member_pass) >= 4 && $func['stripos']($member_pass, $member_name) === false;
-      # At least 5 characters in length and must contain at least 1 number.
-      else
-        $handled = $func['strlen']($member_pass) >= 5 && $func['stripos']($member_pass, $member_name) === false && preg_match('~[0-9]+~', $member_pass);
-    }
-
-    return !empty($handled);
-  }
-
-  /*
     Method: rand_str
 
     Generates a random as long as the supplied length.
@@ -650,19 +650,29 @@ class Members
                       MUST be supplied, otherwise, the update will fail (Password must
                       not be hashed yet), their member name must be supplied if their password
                       is changed.
+
         member_pass - The users new password.
+
         member_hash - A salt that the authentication cookie is hashed with.
+
         display_name - The members display name.
+
         member_email - The members email address.
+
         member_groups - An array containing the members groups.
+
         member_ip - The IP of the member.
+
         member_activated - The current status of the member. 0 means unactivated, 1 means
                            activated and 11 means that the member changed their email and
                            that the administrator has set the option to require the member
                            to verify their new email address before it is changed.
+
         member_acode - An activation code for activating or reactivating their account.
+
         data - An array formatted as so: variable => value, simple, no? If you want to delete
                a data variable for the specified member, set the value to false.
+
         admin_override - Set this to true if it is the administrator modifying the account, in
                          which case an activation code is generated (but it can be supplied) and
                          the members activation state changes to 11, and they are required to set
@@ -743,6 +753,20 @@ class Members
           return false;
         elseif((isset($data['member_groups']) && !is_array($data['member_groups'])) || (isset($data['member_groups']) && (!in_array('member', $data['member_groups']) && !in_array('administrator', $data['member_groups']))))
           return false;
+
+        # Remove any blank groups.
+        if(isset($data['member_groups']) && count($data['member_groups']) > 0)
+        {
+          $member_groups = array();
+          foreach($data['member_groups'] as $group_id)
+          {
+            if(strlen(trim($group_id)) > 0)
+              $member_groups[] = $group_id;
+          }
+
+          # There, all done :-)
+          $data['member_groups'] = $member_groups;
+        }
 
         # Now we need to hash the password, maybe!
         if(!empty($options['member_name']) && !empty($options['member_pass']))

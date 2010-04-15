@@ -52,6 +52,10 @@ class API
   # Variable: menu
   private $menu;
 
+  # Variable: classes
+  # Holds registered classes, which are not located within the core directory.
+  private $classes;
+
   # Variable: objects
   private $objects;
 
@@ -79,6 +83,7 @@ class API
       'all' => array(),
       'admin' => array(),
     );
+    $this->classes = array();
     $this->objects = array();
   }
 
@@ -1029,6 +1034,67 @@ class API
   }
 
   /*
+    Method: add_class
+
+    Registers a class in the API to allow the class to be loaded with <API::load_class>
+    without needing to specify the classes file location if the class file is not located
+    within the core directory.
+
+    Parameters:
+      string $class - The name of the class in the file.
+      string $filename - The name of the file the class is located in.
+
+    Returns:
+      bool - Returns true on success, false if the class already exists.
+  */
+  public function add_class($class, $filename)
+  {
+    if($this->class_exists($class) || !file_exists($filename) || !is_file($filename))
+      return false;
+
+    $this->classes[strtolower($class)] = $filename;
+    return true;
+  }
+
+  /*
+    Method: remove_class
+
+    Removes the specified class from the list of registered classes.
+
+    Parameters:
+      string $class - The name of the class to remove.
+
+    Returns:
+      bool - Returns true if the class was removed, false if the class was
+             not registered.
+  */
+  public function remove_class($class)
+  {
+    # A bit hard to remove a class which isn't registered.
+    if(!$this->class_exists($class))
+      return false;
+
+    unset($this->classes[strtolower($class)]);
+    return true;
+  }
+
+  /*
+    Method: class_exists
+
+    Checks to see whether or not the specified class is registered.
+
+    Parameters:
+      string $class - The name of the class.
+
+    Returns:
+      bool - Returns true if the class is registered, false if not.
+  */
+  public function class_exists($class)
+  {
+    return isset($this->classes[strtolower($class)]);
+  }
+
+  /*
     Method: load_class
 
     Loads the specified class and returns the object. If the new parameter is set
@@ -1061,6 +1127,11 @@ class API
     # Does the class not exist already? Then load up the file.
     if(!class_exists($class_name))
     {
+      # Hmm, is this a registered class?
+      if($this->class_exists($class_name))
+        # Use the file name from the registered class.
+        $filename = $this->classes[strtolower($class_name)];
+
       # Is the file name not specified?
       if(empty($filename))
         $filename = $core_dir. '/'. strtolower($class_name). '.class.php';
