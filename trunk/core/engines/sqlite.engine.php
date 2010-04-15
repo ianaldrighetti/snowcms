@@ -288,13 +288,17 @@ class SQLite extends Database
     $datatypes = array(
       'float' => 'sanitize_float',
       'float_array' => 'sanitize_float_array',
+      'array_float' => 'sanitize_float_array',
       'int' => 'sanitize_int',
       'int_array' => 'sanitize_int_array',
+      'array_int' => 'sanitize_int_array',
       'raw' => 'sanitize_raw',
       'string' => 'sanitize_string',
       'string_array' => 'sanitize_string_array',
+      'array_string' => 'sanitize_string_array',
       'text' => 'sanitize_string',
       'text_array' => 'sanitize_string_array',
+      'array_text' => 'sanitize_string_array',
     );
 
     $api->run_hooks('database_types', array(&$datatypes));
