@@ -28,6 +28,8 @@ class Admin_Theme extends Theme
 
     $this->add_js_file(array('src' => $theme_url. '/default/js/snowobj.js'));
     $this->add_js_var('base_url', $base_url);
+
+    $this->set_current_area(null);
   }
 
   public function header()
@@ -243,6 +245,16 @@ class Admin_Theme extends Theme
       text-decoration: underline;
     }
 
+    #version
+    {
+      float: left;
+    }
+
+    #jump_to
+    {
+      float: right;
+    }
+
     .break
     {
       clear: both;
@@ -424,16 +436,51 @@ class Admin_Theme extends Theme
 
   public function footer()
   {
-    global $api, $db, $settings, $start_time;
+    global $api, $base_url, $db, $icons, $settings, $start_time;
 
     echo $api->apply_filters('admin_theme_post_content', ''), '
 </div>
 <div id="footer">
-  <p>', l('Powered by <a href="http://www.snowcms.com/" target="_blank" title="SnowCMS">SnowCMS</a> v%s.', $settings->get('version', 'string')), '</p>
-  <p>', l('Page created in %s seconds with %u queries.', round(microtime(true) - $start_time, 3), $db->num_queries), '</p>
+  <div id="version">
+    <p>', l('Powered by <a href="http://www.snowcms.com/" target="_blank" title="SnowCMS">SnowCMS</a> v%s.', $settings->get('version', 'string')), '</p>
+    <p>', l('Page created in %s seconds with %u queries.', round(microtime(true) - $start_time, 3), $db->num_queries), '</p>
+  </div>
+  <div id="jump_to">
+    <form action="#" method="post" onsubmit="return false;">
+      <select name="jump_to_select" onchange="this.form.go.click();">
+        <option value="">', l('Control Panel'), '</option>';
+
+    # Anything we need to display? :P
+    foreach($icons as $icon_group => $icon)
+    {
+      echo '
+        <optgroup label="', $icon_group, '">';
+
+      foreach($icon as $i)
+      {
+        echo '
+          <option value="', urlencode(htmlspecialchars_decode($i['href'])), '"', (!empty($i['id']) && $this->current_area == $i['id'] ? ' selected="selected"' : ''), '>', $i['label'], '</option>';
+      }
+
+      echo '
+        </optgroup>';
+    }
+
+    echo '
+      </select>
+      <input type="button" name="go" title="Go" value="Go" onclick="if(this.form.jump_to_select.value == \'\') { location.href = \'', $base_url, '/index.php?action=admin\'; } else { location.href = decodeURIComponent(this.form.jump_to_select.value); }" />
+    </form>
+  </div>
+  <div class="break">
+  </div>
 </div>
 </body>
 </html>';
+  }
+
+  public function set_current_area($area)
+  {
+    $this->current_area = $area;
   }
 }
 ?>

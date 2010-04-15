@@ -54,6 +54,8 @@ if(!function_exists('admin_update'))
     # We will need some JavaScript.
     $theme->add_js_file(array('src' => $theme_url. '/default/js/admin_update.js'));
 
+    $theme->set_current_area('system_update');
+
     $theme->set_title(l('Update'));
 
     $theme->header();

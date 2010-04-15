@@ -198,7 +198,7 @@ if(!class_exists('Member'))
             {
               $result = $db->query('
                           SELECT
-                            group_id, permission, allow
+                            group_id, permission, status
                           FROM {db->prefix}permissions
                           WHERE group_id IN({string_array:groups})',
                           array(

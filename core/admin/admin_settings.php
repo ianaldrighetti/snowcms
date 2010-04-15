@@ -57,6 +57,8 @@ if(!function_exists('admin_settings'))
       # We shall process it!
       $form->process('admin_settings_form');
 
+    $theme->set_current_area('system_settings');
+
     $theme->set_title(l('System Settings'));
 
     $theme->header();
@@ -330,6 +332,8 @@ if(!function_exists('admin_error_log'))
     # Generate the table which we will use to display the errors.
     admin_error_log_generate_table();
     $table = $api->load_class('Table');
+
+    $theme->set_current_area('system_error_log');
 
     $theme->set_title(l('Error log'));
 

@@ -53,6 +53,8 @@ if(!function_exists('admin_members_add'))
     if(!empty($_POST['admin_members_add_form']))
       $form->process('admin_members_add_form');
 
+    $theme->set_current_area('members_add');
+
     $theme->set_title(l('Add a new member'));
 
     $theme->header();
@@ -295,6 +297,8 @@ if(!function_exists('admin_members_settings'))
       # Save all the data.
       $form->process('admin_members_settings_form');
 
+    $theme->set_current_area('members_settings');
+
     $theme->set_title(l('Member settings'));
 
     $theme->header();
@@ -507,6 +511,8 @@ if(!function_exists('admin_members_manage'))
     admin_members_manage_generate_table();
     $table = $api->load_class('Table');
 
+    $theme->set_current_area('members_manage');
+
     $theme->set_title(l('Manage Members'));
 
     $theme->add_js_var('delete_confirm', l('Are you sure you want to delete the selected members?\\r\\nThis cannot be undone!'));
@@ -692,6 +698,8 @@ if(!function_exists('admin_members_manage_edit'))
       # Nope...
       admin_access_denied();
 
+    $theme->set_current_area('members_manage');
+
     # We will need the Members class, that's for sure!
     $members = $api->load_class('Members');
 
@@ -716,6 +724,10 @@ if(!function_exists('admin_members_manage_edit'))
       # Generate the form for the specified member!
       admin_members_manage_edit_generate_form($member_id);
       $form = $api->load_class('Form');
+
+      # Process the form? Perhaps?
+      if(isset($_POST['members_edit_'. $member_id]))
+        $form->process('members_edit_'. $member_id);
 
       $theme->set_title(l('Editing member "%s"', $member_info['name']));
 
@@ -767,6 +779,18 @@ if(!function_exists('admin_members_manage_edit_generate_form'))
                                                                     'type' => 'string',
                                                                     'label' => l('Display name:'),
                                                                     'value' => !empty($_POST['display_name']) ? $_POST['display_name'] : $member_info['name'],
+                                                                    'function' => create_function('$value, $form_name, &$error', '
+                                                                                    global $api;
+
+                                                                                    $members = $api->load_class(\'Members\');
+
+                                                                                    if($members->name_allowed($value, $_GET[\'id\']))
+                                                                                      return true;
+                                                                                    else
+                                                                                    {
+                                                                                      $error = l(\'The supplied display name is not allowed or in use by another member.\');
+                                                                                      return false;
+                                                                                    }'),
                                                                   ));
 
     # Email address, woo!
@@ -774,6 +798,18 @@ if(!function_exists('admin_members_manage_edit_generate_form'))
                                                                     'type' => 'string',
                                                                     'label' => l('Email address:'),
                                                                     'value' => !empty($_POST['member_email']) ? $_POST['member_email'] : $member_info['email'],
+                                                                    'function' => create_function('$value, $form_name, &$error', '
+                                                                                    global $api;
+
+                                                                                    $members = $api->load_class(\'Members\');
+
+                                                                                    if($members->email_allowed($value, $_GET[\'id\']))
+                                                                                      return true;
+                                                                                    else
+                                                                                    {
+                                                                                      $error = l(\'The supplied email address is not allowed or in use by another member.\');
+                                                                                      return false;
+                                                                                    }'),
                                                                   ));
 
     # Change the password? Why not!
@@ -782,14 +818,25 @@ if(!function_exists('admin_members_manage_edit_generate_form'))
                                                                    'label' => l('Password:'),
                                                                    'subtext' => l('Leave blank if you don\'t want to change the password.'),
                                                                    'function' => create_function('$value, $form_name, &$error', '
+                                                                                   global $api;
 
                                                                                    if(!empty($value) && (empty($_POST[\'verify_pass\']) || $_POST[\'verify_pass\'] != $value))
                                                                                    {
                                                                                      $error = l(\'The supplied passwords don\\\'t match.\');
                                                                                      return false;
                                                                                    }
-                                                                                   else
-                                                                                     return true;'),
+                                                                                   elseif(!empty($value) && !empty($_POST[\'verify_pass\']))
+                                                                                   {
+                                                                                     $members = $api->load_class(\'Members\');
+
+                                                                                     if(!$members->password_allowed($_POST[\'display_name\'], $value))
+                                                                                     {
+                                                                                       $error = l(\'The supplied password is not allowed.\');
+                                                                                       return false;
+                                                                                     }
+                                                                                   }
+
+                                                                                   return true;'),
                                                                    'value' => '',
                                                                  ));
 
@@ -850,6 +897,80 @@ if(!function_exists('admin_members_manage_edit_handle'))
   function admin_members_manage_edit_handle($data, &$errors = array())
   {
     global $api;
+
+    # We will most certainly need the Members class!
+    $members = $api->load_class('Members');
+
+    # And to update the values!
+    $form = $api->load_class('Form');
+
+    $members->load($_GET['id']);
+    $member_info = $members->get($_GET['id']);
+
+    # Alright, set our options that are updated.
+    if($member_info['display_name'] != $data['display_name'])
+    {
+      $options['display_name'] = $data['display_name'];
+      $form->edit_field('members_edit_'. $_GET['id'], 'display_name', array(
+                                                                        'value' => $data['display_name'],
+                                                                      ));
+    }
+
+    if($member_info['email'] != $data['member_email'])
+    {
+      $options['member_email'] = $data['member_email'];
+      $form->edit_field('members_edit_'. $_GET['id'], 'member_email', array(
+                                                                        'value' => $data['member_email'],
+                                                                      ));
+    }
+
+    if(!empty($data['member_pass']))
+    {
+      # Changing the password needs the member name too.
+      $options['member_name'] = $member_info['username'];
+      $options['member_pass'] = $data['member_pass'];
+    }
+
+    if(!empty($data['is_administrator']))
+    {
+      $options['member_groups'] = array('administrator');
+      $form->edit_field('members_edit_'. $_GET['id'], 'is_administrator', array(
+                                                                            'value' => 1,
+                                                                          ));
+
+    }
+    elseif(empty($data['is_administrator']))
+    {
+      $options['member_groups'] = array('member');
+      $form->edit_field('members_edit_'. $_GET['id'], 'is_administrator', array(
+                                                                            'value' => 0,
+                                                                          ));
+
+      $data['member_groups'] = explode(',', $data['member_groups']);
+
+      if(count($data['member_groups']) > 0)
+      {
+        foreach($data['member_groups'] as $member_group)
+          $options['member_groups'][] = $member_group;
+      }
+
+      $form->edit_field('members_edit_'. $_GET['id'], 'member_groups', array(
+                                                                         'value' => $data['member_groups'],
+                                                                       ));
+    }
+
+    if($member_info['is_activated'] != $data['member_activated'])
+    {
+      $options['member_activated'] = !empty($data['member_activated']);
+      $form->edit_field('members_edit_'. $_GET['id'], 'member_activated', array(
+                                                                            'value' => !empty($data['member_activated']),
+                                                                          ));
+    }
+
+    # Now update the member!
+    $members->update($_GET['id'], $options);
+
+    return true;
   }
 }
 
@@ -878,6 +999,8 @@ if(!function_exists('admin_members_manage_permissions'))
     # Do you have the permission to edit permissions!?
     if(!$member->can('manage_permissions'))
       admin_access_denied();
+
+    $theme->set_current_area('members_permissions');
 
     $theme->set_title(l('Manage permissions'));
 
@@ -930,6 +1053,8 @@ if(!function_exists('admin_members_manage_group_permissions'))
 
     if(!$member->can('manage_permissions'))
       admin_access_denied();
+
+    $theme->set_current_area('members_permissions');
 
     # Check to see if the specified group even exists!
     if(!$api->return_group($group_id))
