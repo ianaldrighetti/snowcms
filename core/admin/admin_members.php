@@ -679,7 +679,7 @@ if(!function_exists('admin_members_manage_edit'))
     Provides the interface to edit the specified user and their information.
 
     Parameters:
-      int $member_id - The id of the member to edit.
+      none
 
     Returns:
       void - Nothing is returned by this function.
@@ -687,9 +687,11 @@ if(!function_exists('admin_members_manage_edit'))
     Note:
       This function is overloadable.
   */
-  function admin_members_manage_edit($member_id)
+  function admin_members_manage_edit()
   {
     global $api, $member, $theme;
+
+    $member_id = $_GET['id'];
 
     $api->run_hooks('admin_members_manage_edit', array($member_id));
 
@@ -1037,7 +1039,7 @@ if(!function_exists('admin_members_manage_group_permissions'))
     An interface for actually editing group permissions.
 
     Parameters:
-      string $group_id - The group id that is being edited.
+      none
 
     Returns:
       void - Nothing is returned by this function.
@@ -1045,9 +1047,11 @@ if(!function_exists('admin_members_manage_group_permissions'))
     Note:
       This function is overloadable.
   */
-  function admin_members_manage_group_permissions($group_id)
+  function admin_members_manage_group_permissions()
   {
     global $api, $base_url, $member, $theme;
+
+    $group_id = $_GET['grp'];
 
     $api->run_hooks('admin_members_manage_group_permissions');
 

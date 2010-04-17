@@ -124,7 +124,7 @@ if(!function_exists('admin_update_apply'))
     Handles the updating of the system to the specified version.
 
     Parameters:
-      string $version - The version of SnowCMS to update too.
+      none
 
     Returns:
       void - Nothing is returned by this function.
@@ -132,9 +132,11 @@ if(!function_exists('admin_update_apply'))
     Note:
       This function is overloadable.
   */
-  function admin_update_apply($version)
+  function admin_update_apply()
   {
     global $api, $base_url, $member, $settings, $theme, $theme_url;
+
+    $version = $_GET['apply'];
 
     $api->run_hooks('admin_update_system');
 
