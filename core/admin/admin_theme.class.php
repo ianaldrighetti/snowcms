@@ -398,7 +398,7 @@ class Admin_Theme extends Theme
 
       foreach($this->js_vars as $variable => $value)
         echo '
-    var ', $variable, ' = ', is_numeric($value) ? $value : '"'. addcslashes($value, '"'). '"', ';';
+    var ', $variable, ' = ', $value, ';';
 
       echo '
   // ]]></script>';

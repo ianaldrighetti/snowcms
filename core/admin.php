@@ -191,13 +191,6 @@ if(!function_exists('admin_prepend'))
           exit;
         }
       }
-
-      # Are you not allowed? Sorry!
-      if(empty($allowed))
-      {
-        echo json_encode(array('error' => l('Access denied')));
-        exit;
-      }
     }
     else
     {

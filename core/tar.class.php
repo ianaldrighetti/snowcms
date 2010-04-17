@@ -321,8 +321,11 @@ class Tar
 
         # Now, is it a directory, or a file?
         if($file['is_dir'])
-          # Make that directory, and we are done.
-          @mkdir($file['name']);
+        {
+          # Make that directory, and we are done. If we need to.
+          if(!file_exists($file['name']))
+            @mkdir($file['name']);
+        }
         else
         {
           # It's a file, super fun!

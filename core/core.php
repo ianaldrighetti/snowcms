@@ -50,7 +50,7 @@ function init_core()
   $api->add_event('action=admin', 'admin_home', $core_dir. '/admin/admin_home.php');
   $api->add_event('action=admin&sa=about', 'admin_about', $core_dir. '/admin/admin_home.php');
   $api->add_event('action=admin&sa=ajax&id=update', 'admin_update_ajax', $core_dir. '/admin/admin_update.php');
-  $api->add_event('action=admin&sa=ajax&id=update&step=1', 'admin_update_system', $core_dir. '/admin/admin_update.php');
+  $api->add_event('action=admin&sa=update&apply=*', 'admin_update_apply', $core_dir. '/admin/admin_update.php');
   $api->add_event('action=admin&sa=error_log', 'admin_error_log', $core_dir. '/admin/admin_settings.php');
   $api->add_event('action=admin&sa=members_add', 'admin_members_add', $core_dir. '/admin/admin_members.php');
   $api->add_event('action=admin&sa=members_manage', 'admin_members_manage', $core_dir. '/admin/admin_members.php');
