@@ -210,7 +210,7 @@ if(!function_exists('admin_update_apply_step'))
   */
   function admin_update_apply_step($step)
   {
-    global $api, $base_dir, $member, $settings;
+    global $api, $base_dir, $base_url, $member, $settings;
 
     $step = (int)$step;
     $version = !empty($_GET['apply']) ? basename($_GET['apply']) : $settings->get('version', 'string');
@@ -377,9 +377,32 @@ if(!function_exists('admin_update_apply_step'))
             # Now copy!!!
             while(!feof($new_fp))
               fwrite($fp, fread($new_fp, 4096));
+
+            fclose($fp);
+            fclose($new_fp);
           }
         }
       }
+    }
+    elseif($step == 5)
+    {
+      # Now it is time to finalize everything.
+      # Such as removing the update folder.
+      recursive_unlink($base_dir. '/update/');
+
+      # And the update package.
+      unlink($base_dir. '/'. $filename);
+
+      # Now to execute the update file. If any.
+      if(file_exists($base_dir. '/update.php'))
+      {
+        require_once($base_dir. '/update.php');
+
+        # Now delete it. We don't need it anymore!
+        unlink($base_dir. '/update.php');
+      }
+
+      $response['message'] = '<span style="color: green;">'. l('You have successfully updated to v%s.', $settings->get('version', 'string')). '</span> <a href="'. $base_url. '/index.php?action=admin&amp;sa=update">'. l('Check for updates'). '</a>.';
     }
 
     return $response;
@@ -468,5 +491,45 @@ function get_listing_implode($array)
   }
 
   return $tmp;
+}
+
+/*
+  Function: recursive_unlink
+
+  Deletes everything in the specified directory, including the
+  directory itself.
+
+  Parameters:
+    string $path
+
+  Returns:
+    void - Nothing is returned by this function.
+*/
+function recursive_unlink($path)
+{
+  if(!file_exists($path))
+    return true;
+  elseif(is_file($path))
+    unlink($path);
+  else
+  {
+    $files = scandir($path);
+
+    if(count($files) > 0)
+    {
+      foreach($files as $file)
+      {
+        if($file == '.' || $file == '..')
+          continue;
+
+        if(is_dir($path. '/'. $file))
+          recursive_unlink($path. '/'. $file);
+        else
+          unlink($path. '/'. $file);
+      }
+    }
+
+    rmdir($path);
+  }
 }
 ?>

@@ -77,6 +77,8 @@ function copy_update()
         }
 
         s.id('copy_status').innerHTML = '<p style="color: green;">' + l['copy success'] + '</p>';
+
+        execute_update();
       }
     });
 
@@ -91,12 +93,37 @@ function copy_update()
   element.appendChild(div);
 }
 
-
-
 function copy_file(filename)
 {
   s.id('copy_status').innerHTML = '<p><span style="font-weight: bold;">' + l['currently copying'] + '</span> ' + filename + '</p>';
   s.ajax(base_url + '/index.php?action=admin&sa=update&apply=' + version + '&step=4', 'filename=' + encodeURIComponent(filename));
+}
+
+function execute_update()
+{
+  s.ajaxCallback(base_url + '/index.php?action=admin&sa=update&apply=' + version + '&step=5', function(response)
+    {
+      var response = s.json(response);
+
+      if(response['error'].length > 0)
+      {
+        s.id('execute_status').innerHTML = '<p style="color: red; font-weight: bold;">' + response['error'] + '</p>';
+      }
+      else
+      {
+        s.id('execute_status').innerHTML = '<p>' + response['message'] + '</p>';
+      }
+    });
+
+  var h3 = document.createElement('h3');
+  h3.innerHTML = l['executing'];
+
+  var div = document.createElement('div');
+  div.id = 'execute_status';
+  div.innerHTML = '<p style="font-style: italic;">' + l['please wait'] + '</p>';
+
+  element.appendChild(h3);
+  element.appendChild(div);
 }
 
 if(start_update == -1)
