@@ -136,7 +136,7 @@ if(!empty($event))
   if(empty($event['accept_param']))
     call_user_func($event['callback']);
   else
-    call_user_func($event['callback'], end($_GET));
+    call_user_func($event['callback']);
 }
 else
 {
