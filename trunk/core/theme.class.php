@@ -279,10 +279,10 @@ abstract class Theme
   */
   public function add_js_var($variable, $value)
   {
-    if(empty($variable) || !is_string($variable) || (!is_string($value) && !is_int($value) && !is_float($value)) || $this->js_var_exists($variable))
+    if(empty($variable) || $this->js_var_exists($variable))
       return false;
 
-    $this->js_vars[$variable] = $value;
+    $this->js_vars[$variable] = json_encode($value);
     return true;
   }
 

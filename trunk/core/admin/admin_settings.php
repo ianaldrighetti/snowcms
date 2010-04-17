@@ -258,6 +258,29 @@ if(!function_exists('admin_settings_generate_form'))
                                                                             'subtext' => l('Any additional PHP mail() function parameters (the $additional_parameters parameter).'),
                                                                             'value' => $settings->get('mail_additional_parameters', 'string'),
                                                                           ));
+
+    # Time formatting information!
+    $form->add_field('admin_settings_form', 'date_format', array(
+                                                             'type' => 'string-html',
+                                                             'label' => l('Date format:'),
+                                                             'subtext' => l('Date only format. See the <a href="http://www.php.net/strftime" title="PHP: strftime function">strftime</a> documentation for more formatting information.'),
+                                                             'value' => $settings->get('date_format', 'string'),
+                                                           ));
+
+    $form->add_field('admin_settings_form', 'time_format', array(
+                                                             'type' => 'string-html',
+                                                             'label' => l('Time format:'),
+                                                             'subtext' => l('Time only format. See the <a href="http://www.php.net/strftime" title="PHP: strftime function">strftime</a> documentation for more formatting information.'),
+                                                             'value' => $settings->get('time_format', 'string'),
+                                                           ));
+
+    $form->add_field('admin_settings_form', 'datetime_format', array(
+                                                                 'type' => 'string-html',
+                                                                 'label' => l('Date and time format:'),
+                                                                 'subtext' => l('Date and time format. See the <a href="http://www.php.net/strftime" title="PHP: strftime function">strftime</a> documentation for more formatting information.'),
+                                                                 'value' => $settings->get('datetime_format', 'string'),
+                                                               ));
+
   }
 }
 
