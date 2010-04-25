@@ -130,7 +130,7 @@ class Members
                       );
 
             # Got something to add?
-            $api->run_hooks('load_members_array', array(&$member, $row));
+            $api->run_hooks('members_load_array', array(&$member, $row));
 
             $this->loaded[$row['member_id']] = $member;
           }
