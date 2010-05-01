@@ -294,8 +294,18 @@ if(!function_exists('admin_members_settings'))
 
     # Time to save?
     if(!empty($_POST['admin_members_settings_form']))
+    {
       # Save all the data.
-      $form->process('admin_members_settings_form');
+      if(isset($_GET['ajax']))
+      {
+        echo $form->json_process('admin_members_settings_form');
+        exit;
+      }
+      else
+      {
+        $form->process('admin_members_settings_form');
+      }
+    }
 
     $theme->set_current_area('members_settings');
 
@@ -331,12 +341,13 @@ if(!function_exists('admin_members_settings_generate_form'))
   */
   function admin_members_settings_generate_form()
   {
-    global $api, $settings;
+    global $api, $base_url, $settings;
 
     $form = $api->load_class('Form');
 
     $form->add('admin_members_settings_form', array(
-                                                'action' => '',
+                                                'action' => $base_url. '/index.php?action=admin&sa=members_settings',
+                                                'ajax_submit' => true,
                                                 'callback' => 'admin_members_settings_handle',
                                                 'submit' => l('Save settings'),
                                               ));
@@ -395,7 +406,7 @@ if(!function_exists('admin_members_settings_generate_form'))
                                                                                              ),
                                                                                   'function' => create_function('$value, $form_name, &$error', '
 
-                                                                                                  if((int)$value < (int)$_POST[\'members_mmin_name_length\'])
+                                                                                                  if((int)$value < (int)$_POST[\'members_min_name_length\'])
                                                                                                   {
                                                                                                     return false;
                                                                                                   }
@@ -1332,22 +1343,24 @@ if(!function_exists('admin_members_permissions_handle'))
       }
     }
 
-    # Simple enough! Replace the values in the database!!!
+    # Get all of our rows built :-).
+    $rows = array();
     foreach($data as $permission => $status)
     {
-      $db->insert('replace', '{db->prefix}permissions',
-        array(
-          'group_id' => 'string-128', 'permission' => 'string-128', 'status' => 'int',
-        ),
-        array(
-          $group_id, $permission, $status,
-        ),
-        array('group_id', 'permission'), 'permissions_handle_query');
+      $rows[] = array($group_id, $permission, $status);
 
       $form->edit_field(strtolower($group_id). '_permissions', $permission, array(
                                                                               'value' => $status,
                                                                             ));
     }
+
+    # Now save the new permissions.
+    $db->insert('replace', '{db->prefix}permissions',
+      array(
+        'group_id' => 'string-128', 'permission' => 'string-128', 'status' => 'int',
+      ),
+      $rows,
+      array('group_id', 'permission'), 'permissions_handle_query');
 
     return true;
   }

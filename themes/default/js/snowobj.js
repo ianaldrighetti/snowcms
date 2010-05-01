@@ -197,6 +197,49 @@ function SnowObj()
     this.d.cookie = cookie_name + '=' + this.encode(value) + (!days ? '' : ('; expires=' + cookieExpires.toUTCString()));
   };
 
+  this.submitform = function(form_name, form, fields)
+  {
+    s.id(form_name + '_errors').innerHTML = '';
+
+    // Time to send the form data.
+    var data = [];
+    for(var i = 0; i < fields.length; i++)
+    {
+      data[i] = fields[i] + '=' + this.encode(form[fields[i]].value);
+    }
+
+    data[data.length] = form_name + '=ajax';
+
+    // Disable the save button.
+    var saveText = form[form_name].value;
+    form[form_name].disabled = 'disabled';
+    form[form_name].value = form_saving;
+
+    s.ajaxCallback(form.action.indexOf('?') > -1 ? form.action + '&ajax=1' : form.action + '?ajax=1', function(response)
+      {
+        var response = s.json(response);
+
+        if(response.length > 0)
+        {
+          var div = document.createElement('div');
+          div.className = 'errors';
+
+          for(var i = 0; i < response.length; i++)
+          {
+            var p = document.createElement('p');
+            p.innerHTML = response[i];
+
+            div.appendChild(p);
+          }
+
+          s.id(form_name + '_errors').appendChild(div);
+        }
+
+        form[form_name].value = saveText;
+        form[form_name].disabled = '';
+      }, data.join('&'));
+  };
+
   this.trim = function(str)
   {
     return str.replace(/^\s+|\s+$/g, '');
