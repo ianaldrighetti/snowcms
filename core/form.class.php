@@ -113,23 +113,23 @@ class Form
       $token->add($form_name);
 
     # Our first field, a token!
-    $this->add_field($form_name, 'form_token', array(
-                                                 'type' => 'hidden',
-                                                 'value' => $token->token($form_name),
-                                                 'function' => create_function('$value, $form_name, &$error', '
-                                                   global $api;
+    $this->add_field($form_name, $form_name. '_form_token', array(
+                                                              'type' => 'hidden',
+                                                              'value' => $token->token($form_name),
+                                                              'function' => create_function('$value, $form_name, &$error', '
+                                                                              global $api;
 
-                                                   $token = $api->load_class(\'Tokens\');
+                                                                              $token = $api->load_class(\'Tokens\');
 
-                                                   if($token->is_valid($form_name, $value))
-                                                    return true;
-                                                  else
-                                                  {
-                                                    $error = l(\'Your security key is invalid. Please resubmit the form.\');
-                                                    return false;
-                                                  }'),
-                                                 'save' => false,
-                                               ));
+                                                                              if($token->is_valid($form_name, $value))
+                                                                                return true;
+                                                                              else
+                                                                              {
+                                                                                $error = l(\'Your security key is invalid. Please resubmit the form.\');
+                                                                                return false;
+                                                                              }'),
+                                                              'save' => false,
+                                                            ));
     return true;
   }
 
@@ -319,7 +319,7 @@ class Form
         subtext - A description which is put below the label. (Optional)
 
         popup - Supply true if there is a popup (which should contain a more comprehensive
-                set of information) that can be displayed. Apply a filter to help_{$column}.
+                set of information) that can be displayed. Apply a filter to popup_{$column}.
                 Defaults to false.
 
         length - An array of length restrictions. Ex: array('min' => 10, 'max' => 100). If
@@ -784,7 +784,7 @@ class Form
   */
   private function show_field($form_name, $name, $field)
   {
-    global $api;
+    global $api, $base_url, $theme_url;
 
     # Do you want to do this?
     $handled = null;
@@ -801,7 +801,7 @@ class Form
       # Is the field hidden? Then showing something isn't very hidden, now is it? I didn't think so.
       if($field['type'] != 'hidden' && empty($field['is_full']))
         echo '
-              <td id="', $form['id'], '_', $name, '_left" class="td_left"><p class="label"><label for="', $form['id'], '_', $name, '_input">', $field['label'], '</label></p>', !empty($field['subtext']) ? '<p class="subtext">'. $field['subtext']. '</p>' : '', '</td>';
+              <td id="', $form['id'], '_', $name, '_left" class="td_left"><p class="label">', (!empty($field['popup']) ? '<a href="javascript:void(0);" onclick="formPopup = window.open(\''. $base_url. '/index.php?action=popup&amp;id=popup_'. $name. '\', \'formPopup\', \'location=no,menubar=no,status=no,titlebar=yes,height=300px,width=300px,directories=no\'); formPopup.focus();"><img src="'. $api->apply_filters('form_popup_image_url', $theme_url. '/default/style/images/admincp/about-small.png'). '" alt="" title="'. l('More information'). '" /></a> ' : ''). '<label for="', $form['id'], '_', $name, '_input">', $field['label'], '</label></p>', !empty($field['subtext']) ? '<p class="subtext">'. $field['subtext']. '</p>' : '', '</td>';
 
       # Now here is the fun part! Actually displaying the fields.
       if(empty($field['is_custom']))

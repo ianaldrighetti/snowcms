@@ -222,7 +222,7 @@ function admin_about()
   $theme->header();
 
   echo '
-  <h1><img src="', $base_url, '/core/admin/icons/about-small.png" alt="" /> ', l('About SnowCMS'), '</h1>
+  <h1><img src="', $theme->url(), '/about-small.png" alt="" /> ', l('About SnowCMS'), '</h1>
   <p>', l('SnowCMS is a light, powerful and free content management system, otherwise known as a CMS. It has a powerful plugin system allowing you to have minor changes made to your site, or large features such as a forum, blog, or both! By default SnowCMS only has a member management and plugin system, meaning you can have your site with as few or as many features as you want, and nothing more. SnowCMS is written in the popular language <abbr title="PHP: Hypertext Preprocessor">PHP</abbr> and uses MySQL or SQLite for storage.'), '</p>
   <br />
   <p>', l('SnowCMS is released under the <a href="http://www.gnu.org/licenses/quick-guide-gplv3.html" title="GNU General Public License v3">GPL v3</a> license, meaning you are free to use, modify and redistribute SnowCMS if you so please. While you do have those freedoms, please keep in mind that a lot of work was put into SnowCMS by the <a href="http://www.snowcms.com/">SnowCMS Developer Team</a>, but also no warranty is provided by this software, nor are we or anyone else responsible for anything that may occur while using this system.'), '</p>

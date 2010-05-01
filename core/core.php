@@ -71,6 +71,7 @@ function init_core()
   $api->add_event('action=resend', 'resend_view', $core_dir. '/resend.php');
   $api->add_event('action=reminder', 'reminder_view', $core_dir. '/reminder.php');
   $api->add_event('action=reminder2', 'reminder_view2', $core_dir. '/reminder.php');
+  $api->add_event('action=popup', 'core_popup');
 
   # Start output buffering.
   ob_start($api->apply_filters('output_callback', null));
@@ -82,6 +83,58 @@ function init_core()
     require_once($core_dir. '/admin.php');
 
     admin_prepend();
+  }
+}
+
+if(!function_exists('core_popup'))
+{
+  /*
+    Function: core_popup
+
+    Displays the popup dialog content of the specified popup.
+
+    Parameters:
+      none
+
+    Returns:
+      void - Nothing is returned by this function.
+
+    Note:
+      To make a popup, simply apply a filter to popup_{ID_HERE}, for example
+      if the popup identifier is timeformat, apply a filter to popup_timeformat.
+      Be sure that if the popup information should only be available to a certain
+      member group, check using the <Member::is_a> method before applying the
+      filter.
+  */
+  function core_popup()
+  {
+    global $api, $func;
+
+    if(empty($_GET['id']))
+      die(l('No popup identifier supplied.'));
+
+    # Collect the popup information.
+    $popup = $api->apply_filters('popup_'. $_GET['id'], array('title' => '', 'content'));
+
+    # We need title and content for the popup.
+    if(empty($popup['title']) || empty($popup['content']))
+      die(l('Invalid popup identifier'));
+
+    # Now simply output the popup.
+    echo '<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+  <title>', $func['htmlspecialchars']($popup['title']), '</title>
+  <style type="text/css">
+    ', $api->apply_filters('core_popup_css', 'body { background: #FFFFFF; font-family: Tahoma, Arial, sans-serif; font-size: 90%; }
+h1 { font-size: 115%; color: #3465A7; margin-top: 15px; }'), '
+  </style>
+</head>
+<body>
+  <h1>', $func['htmlspecialchars']($popup['title']), '</h1>
+  ', $popup['content'], '
+</body>
+</html>';
   }
 }
 ?>

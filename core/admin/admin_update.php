@@ -61,7 +61,7 @@ if(!function_exists('admin_update'))
     $theme->header();
 
     echo '
-  <h1><img src="', $base_url, '/core/admin/icons/update-small.png" alt="" /> ', l('Check for updates'), '</h1>
+  <h1><img src="', $theme->url(), '/update-small.png" alt="" /> ', l('Check for updates'), '</h1>
   <p>', l('Just as with computers, it is a good idea to ensure that your system is up to date to make sure that you are not vulnerable to any security issues, or just to fix any bugs in the system.'), '</p>
   <br />
   <p>Your version: <span id="your_version">', $settings->get('version', 'string'), '</span></p>
@@ -172,7 +172,7 @@ if(!function_exists('admin_update_apply'))
     $theme->header();
 
     echo '
-  <h1><img src="', $base_url, '/core/admin/icons/update-small.png" alt="" /> ', l('Apply update v%s', $version), '</h1>';
+  <h1><img src="', $theme->url(), '/update-small.png" alt="" /> ', l('Apply update v%s', $version), '</h1>';
 
   if(version_compare($settings->get('version', 'string'), $version) > -1)
   {

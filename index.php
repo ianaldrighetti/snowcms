@@ -117,11 +117,15 @@ init_core();
 
 # Now it is time to check and see if an event is being requested.
 if(!empty($_SERVER['QUERY_STRING']))
+{
   # One is, but is it registered? Let's see!
   $event = $api->return_event($_SERVER['QUERY_STRING']);
+}
 else
+{
   # We shall use the default event!
   $event = $api->return_event($settings->get('default_event', 'string', ''));
+}
 
 # So did we get an event, or not? If not, that's bad news!!!
 if(!empty($event))
@@ -129,14 +133,12 @@ if(!empty($event))
   # The event exists! Awesome!
   # Include the right file, if we need too.
   if(!empty($event['filename']) && !is_callable($event['callback']))
+  {
     require_once($event['filename']);
+  }
 
   # Now call on the callback, after all, that's what it's for!
-  # Pass the last value of the $_GET array, if it needs to be.
-  if(empty($event['accept_param']))
-    call_user_func($event['callback']);
-  else
-    call_user_func($event['callback']);
+  call_user_func($event['callback']);
 }
 else
 {
