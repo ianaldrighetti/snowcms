@@ -19,13 +19,13 @@ input
 	min-height: 100%;
 	margin: 0px auto;
 	padding-left: 44px;
-	background: url('bodybg.png') repeat-y;
+	background: url('images/bodybg.png') repeat-y;
 }
 
 #header {
 	width: 835px;
 	height: 175px;
-	background: url('colorbg.png') no-repeat;
+	background: url('images/colorbg.png') no-repeat;
 }
 
 #header h2 {
@@ -65,7 +65,7 @@ input
 	width: 100px;
 	height: 30px;
 	margin-right: 0;
-	background: url('linkbg.png') repeat-x;
+	background: url('images/linkbg.png') repeat-x;
 	padding: 5px 15px;
 }
 
@@ -102,7 +102,7 @@ input
 #footer {
 	width: 835px;
 	height: 24px;
-	background: #1e262c url('colorbg.png') no-repeat;
+	background: #1e262c url('images/colorbg.png') no-repeat;
 	clear: both;
 	font-size: 0.7em;
 	color: #fff;

@@ -307,7 +307,7 @@ class HTTP
     $request_callbacks = array(
       array(
         'test' => create_function('', '
-                    return !function_exists(\'curl_exec\');'),
+                    return function_exists(\'curl_exec\');'),
         'callback' => 'http_curl_request',
       ),
       array(

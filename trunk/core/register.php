@@ -321,6 +321,13 @@ if(!function_exists('register_member'))
                      'member_activated' => $settings->get('registration_type', 'int', 0) == 0,
                    );
 
+    # Hmm, is it administrative approval?
+    if($settings->get('registration_type', 'int', 0) == 1)
+    {
+      # Set their activation code to admin_approval.
+      $add_options['member_acode'] = 'admin_approval';
+    }
+
     # Got something to add, perhaps?
     $api->run_hooks('register_member_add_options', array(&$add_options, &$options, &$errors));
 
@@ -383,6 +390,74 @@ if(!function_exists('register_send_email'))
     }
 
     return !empty($handled);
+  }
+}
+
+if(!function_exists('register_send_welcome_email'))
+{
+  /*
+    Function: register_send_welcome_email
+
+    Sends a welcome email to the specified members.
+
+    Parameters:
+      mixed $member_id - Either a single member id, or an array containing
+                         multiple member id's.
+
+    Returns:
+      bool - Returns true on success, false on failure.
+  */
+  function register_send_welcome_email($member_id)
+  {
+    global $api, $base_url, $settings;
+
+    if(!is_array($member_id))
+      $member_id = array($member_id);
+
+    # Validation is useful :)
+    $validation = $api->load_class('Validation');
+
+    # So is it an array of integers?
+    if(!$validation->data($member_id, 'formatted', 'int'))
+    {
+      # Nope, it is NOT!
+      return false;
+    }
+    else
+    {
+      # Load up their information, namely their email addresses.
+      $members = $api->load_class('Members');
+      $members->load($member_id);
+      $members_info = $members->get($member_id);
+
+      # We will need that Mail class, as you know, we need to send some email ;)
+      $mail = $api->load_class('Mail');
+
+      $handled = null;
+      $api->run_hooks('register_welcome_member_send_email', array(&$handled, $mail, $member_info));
+
+      if($handled !== null)
+      {
+        return !empty($handled);
+      }
+
+      # Now time to send those emails!
+      if(count($members_info))
+      {
+        # Now dispatch them emails!
+        foreach($members_info as $member_info)
+        {
+          $mail->send($member_info['email'], $api->apply_filters('register_welcome_member_email_subject', l('Welcome to %s', $settings->get('site_name', 'string'))), $api->apply_filters('register_welcome_member_email_body', l("Hello there %s, this email comes from %s.\r\n\r\nYou are receiving this email because your account on %s is now activated, and you can now log in to your account. If you never registered an account on %s, please disregard this email.\r\n\r\nIf you did, however, you can now log in to your account at %s/index.php?action=login&member_name=%s\r\n\r\nThank you for registering! Hope to see you around!", $member_info['name'], $base_url, $settings->get('site_name', 'string'), $settings->get('site_name', 'string'), $base_url, urlencode($member_info['username']))), $api->apply_filters('register_welcome_member_alt_email', ''), $api->apply_filters('register_welcome_member_email_options', array()));
+        }
+
+        return true;
+      }
+      else
+      {
+        # Or not.
+        return false;
+      }
+    }
   }
 }
 ?>

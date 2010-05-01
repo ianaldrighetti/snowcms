@@ -68,7 +68,7 @@ if(!function_exists('activate_view'))
 
     # It should use a form in reality, but since this can be done through a URL
     # that wouldn't be the best solution. So we will hand make it, in this case!
-    if((!empty($_REQUEST['id']) || !empty($_REQUEST['name'])) && !empty($_REQUEST['code']))
+    if((!empty($_REQUEST['id']) || !empty($_REQUEST['name'])) && !empty($_REQUEST['code']) && $_REQUEST['code'] != 'admin_approval')
     {
       # We will be needing this. That's for sure :P
       $members = $api->load_class('Members');

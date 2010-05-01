@@ -60,7 +60,7 @@ if(!function_exists('admin_members_add'))
     $theme->header();
 
     echo '
-  <h1><img src="', $base_url, '/core/admin/icons/add_member-small.png" alt="" /> ', l('Add a new member'), '</h1>
+  <h1><img src="', $theme->url(), '/add_member-small.png" alt="" /> ', l('Add a new member'), '</h1>
   <p>', l('If registration is enabled, guests on your site can create their own member, but if you need to create a new member, you can do so here.'), '</p>';
 
     $form->show('admin_members_add_form');
@@ -304,7 +304,7 @@ if(!function_exists('admin_members_settings'))
     $theme->header();
 
     echo '
-  <h1><img src="', $base_url, '/core/admin/icons/member_settings-small.png" alt="" /> ', l('Member settings'), '</h1>
+  <h1><img src="', $theme->url(), '/member_settings-small.png" alt="" /> ', l('Member settings'), '</h1>
   <p>', l('Member settings can be managed here, which includes setting the registration mode, or disabling it all together.'), '</p>';
 
     $form->show('admin_members_settings_form');
@@ -521,7 +521,7 @@ if(!function_exists('admin_members_manage'))
     $theme->header();
 
     echo '
-  <h1><img src="', $base_url, '/core/admin/icons/manage_members-small.png" alt="" /> ', l('Manage Members'), '</h1>
+  <h1><img src="', $theme->url(), '/manage_members-small.png" alt="" /> ', l('Manage Members'), '</h1>
   <p>', l('All existing members can be managed here, such as editing, deleting, approving, etc.'), '</p>';
 
     $table->show('admin_members_manage_table');
@@ -631,7 +631,7 @@ if(!function_exists('admin_members_manage_table_handle'))
   */
   function admin_members_manage_table_handle($action, $selected)
   {
-    global $api, $db;
+    global $api, $core_dir, $db;
 
     # No point on executing anything if nothing was selected.
     if(!is_array($selected) || count($selected) == 0)
@@ -640,29 +640,78 @@ if(!function_exists('admin_members_manage_table_handle'))
     # Activating accounts?
     if($action == 'activate')
     {
-      # Make them activated!
-      $db->query('
-        UPDATE {db->prefix}members
-        SET member_activated = 1
-        WHERE member_id IN({int_array:selected})',
-        array(
-          'selected' => $selected,
-        ), 'admin_members_activate_query');
+      # A different member system?
+      $handled = false;
+      $api->run_hooks('admin_members_manage_handle_activate', array(&$handled, 'activate', $selected));
+
+      # So do we need to do it ourselves?
+      if(empty($handled))
+      {
+        # Maybe we need to send them welcome emails (if administrative approval
+        # was on at the time of their registration).
+        $members = $api->load_class('Members');
+        $members->load($selected);
+        $members_info = $members->get($selected);
+
+        if(count($members_info) > 0)
+        {
+          # Their activation code is admin_approval if they need an email.
+          $send = array();
+          foreach($members_info as $member_info)
+          {
+            if($member_info['acode'] == 'admin_approval')
+            {
+              # So they will need one!
+              $send[] = $member_info['id'];
+            }
+          }
+
+          # Did any need it..?
+          if(count($send) > 0)
+          {
+            # Yup... The function to send them is in the register.php file.
+            if(!function_exists('register_send_welcome_email'))
+            {
+              require_once($core_dir. '/register.php');
+            }
+
+            # Simple :-), I like it!
+            register_send_welcome_email($send);
+          }
+        }
+
+        # Make them activated (delete their activation code, too)!
+        $db->query('
+          UPDATE {db->prefix}members
+          SET member_activated = 1, member_acode = \'\'
+          WHERE member_id IN({int_array:selected}) AND member_activated != 1',
+          array(
+            'selected' => $selected,
+          ), 'admin_members_activate_query');
+      }
     }
     # Deactivating? Alright.
     elseif($action == 'deactivate')
     {
-      # Turn 'em off!
-      $db->query('
-        UPDATE {db->prefix}members
-        SET member_activated = 0
-        WHERE member_id IN({int_array:selected})',
-        array(
-          'selected' => $selected,
-        ), 'admin_members_deactivate_query');
+      $handled = false;
+      $api->run_hooks('admin_members_manage_handle_deactivate', array(&$handled, 'deactivate', $selected));
+
+      if(empty($handled))
+      {
+        # Turn 'em off!
+        $db->query('
+          UPDATE {db->prefix}members
+          SET member_activated = 0
+          WHERE member_id IN({int_array:selected}) AND member_activated != 0',
+          array(
+            'selected' => $selected,
+          ), 'admin_members_deactivate_query');
+      }
     }
     elseif($action == 'delete')
     {
+      # No need for a hook here for other member systems, that's in <Members::delete>!
+
       # I guess you want to delete them. That's your problem ;)
       # Luckily, the Members class can handle all this!
       $members = $api->load_class('Members');
@@ -898,7 +947,7 @@ if(!function_exists('admin_members_manage_edit_handle'))
   */
   function admin_members_manage_edit_handle($data, &$errors = array())
   {
-    global $api;
+    global $api, $core_dir;
 
     # We will most certainly need the Members class!
     $members = $api->load_class('Members');
@@ -969,6 +1018,19 @@ if(!function_exists('admin_members_manage_edit_handle'))
                                                                           ));
     }
 
+    # Do we need to send a welcome email?
+    if($member_info['acode'] == 'admin_approval')
+    {
+      $options['member_acode'] = '';
+
+      if(!function_exists('register_send_welcome_email'))
+      {
+        require_once($core_dir. '/register.php');
+      }
+
+      register_send_welcome_email($member_info['id']);
+    }
+
     # Now update the member!
     $members->update($_GET['id'], $options);
 
@@ -1009,10 +1071,11 @@ if(!function_exists('admin_members_manage_permissions'))
     $theme->header();
 
     echo '
-  <h1><img src="', $base_url, '/core/admin/icons/permissions-small.png" alt="" /> ', l('Manage permissions'), '</h1>
+  <h1><img src="', $theme->url(), '/permissions-small.png" alt="" /> ', l('Manage permissions'), '</h1>
   <p>', l('The permissions of member groups can all be modified here. Simply click on the member group below to edit their permissions.'), '</p>';
 
-    $groups = $api->return_group();
+    # Add the guest group.
+    $groups = array_merge(array('guest' => l('Guest')), $api->return_group());
 
     # Remove the administrator group, as administrators are ALL POWERFUL!
     unset($groups['administrator']);
@@ -1061,7 +1124,7 @@ if(!function_exists('admin_members_manage_group_permissions'))
     $theme->set_current_area('members_permissions');
 
     # Check to see if the specified group even exists!
-    if(!$api->return_group($group_id))
+    if(!$api->return_group($group_id) && strtolower($group_id) != 'guest')
     {
       $theme->set_title(l('An error has occurred'));
 
@@ -1076,22 +1139,22 @@ if(!function_exists('admin_members_manage_group_permissions'))
     else
     {
       # Time to generate that form!
-      admin_members_permissions_generate_form(strtolower($api->return_group($group_id)). '_permissions', $group_id);
+      admin_members_permissions_generate_form($group_id. '_permissions', $group_id);
       $form = $api->load_class('Form');
 
-      if(!empty($_POST[strtolower($api->return_group($group_id)). '_permissions']))
+      if(!empty($_POST[$group_id. '_permissions']))
         # Process the form!
-        $form->process(strtolower($api->return_group($group_id)). '_permissions');
+        $form->process($group_id. '_permissions');
 
       $theme->set_title(l('Managing %s permissions', $api->return_group($group_id)));
 
       $theme->header();
 
       echo '
-    <h1><img src="', $base_url, '/core/admin/icons/permissions-small.png" alt="" /> ', l('Managing %s permissions', $api->return_group($group_id)), '</h1>
+    <h1><img src="', $theme->url(), '/permissions-small.png" alt="" /> ', l('Managing %s permissions', $api->return_group($group_id)), '</h1>
     <p>', l('Changes to member groups permissions can be applied here. If deny is selected, no matter what other groups the member may be in, the permission will be denied. If disallow is selected and another one of the member groups they are in allows the permission, the disallow will be overridden. <a href="%s" title="Back to Manage Permissions">Back to Manage Permissions</a>.', $base_url. '/index.php?action=admin&amp;sa=members_permissions'), '</p>';
 
-      $form->show(strtolower($api->return_group($group_id)). '_permissions');
+      $form->show($group_id. '_permissions');
 
       $theme->footer();
     }
@@ -1254,6 +1317,20 @@ if(!function_exists('admin_members_permissions_handle'))
 
     # We will need to update the value in the form.
     $form = $api->load_class('Form');
+
+    # Sorry guests, there are certain permissions you just cannot have!!!
+    if($group_id == 'guest')
+    {
+      # You can add more DENIED permissions via the guest_denied_permissions hook ;)
+      # (Sorry, but I will not allow plugins to remove denied permissions, at least built in functionality)
+      $denied = array_merge(array('manage_system_settings', 'update_system', 'view_error_log', 'add_new_member', 'manage_members', 'search_members', 'manage_member_settings', 'manage_permissions', 'add_plugins', 'manage_plugins'), $api->apply_filters('denied_guest_permissions', array()));
+
+      foreach($denied as $deny)
+      {
+        # Deny it by giving it a -1.
+        $data[$deny] = -1;
+      }
+    }
 
     # Simple enough! Replace the values in the database!!!
     foreach($data as $permission => $status)
