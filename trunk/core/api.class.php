@@ -1391,6 +1391,12 @@ function load_api()
 {
   global $api, $db, $plugin_dir;
 
+  ob_start();
+
+  # Register a shutdown function, which calls on a function to see if the
+  # error was fatal, if it was, and caused by a plugin, it will be disabled :)
+  register_shutdown_function('api_catch_fatal');
+
   # Instantiate the API class.
   $api = new API();
 
@@ -1505,8 +1511,77 @@ function load_api()
   register_shutdown_function(create_function('', '
     global $api;
 
-    $api->run_hooks(\'snow_exit\');
+    $api->run_hooks(\'snow_exit\');'));
+}
 
-    '));
+/*
+  Function: api_catch_fatal
+
+  Just incase somethings goes horribly wrong with a plugin (a fatal error),
+  this function will handle the disabling of the plugin, and refreshing the
+  page so it appears as it never happened!
+
+  Parameters:
+    none
+
+  Returns:
+    void - Nothing is returned by this function.
+*/
+function api_catch_fatal()
+{
+  global $db, $plugin_dir;
+
+  $last_error = error_get_last();
+
+  # Parse error? That's what we are looking for, after all!
+  if($last_error['type'] == E_PARSE)
+  {
+    # Did it come from the plugin directory?
+    if(substr($last_error['file'], 0, strlen($plugin_dir)) == realpath($plugin_dir))
+    {
+      # Yes it did, now we need to obtain the plugins information.
+      $path = explode(strtoupper(substr(PHP_OS, 0, 3)) == 'WIN' ? '\\' : '/', realpath(dirname($last_error['file'])));
+      $length = count($path);
+
+      for($i = $length - 1; $i > 0; $i--)
+      {
+        # Keep trying to find the plugin.ini file...
+        $cur_path = implode(strtoupper(substr(PHP_OS, 0, 3)) == 'WIN' ? '\\' : '/', $path);
+
+        if(file_exists($cur_path. '/plugin.ini'))
+        {
+          $plugin = parse_ini_file($cur_path. '/plugin.ini', true);
+
+          # Is the dependency name in there?
+          if(isset($plugin['plugin']['dependency name']))
+          {
+            # We do, so disable that dern thing!
+            $db->query('
+              UPDATE {db->prefix}plugins
+              SET runtime_error = 3
+              WHERE dependency_name = {string:dependency_name}
+              LIMIT 1',
+              array(
+                'dependency_name' => $plugin['plugin']['dependency name'],
+              ));
+
+            # Redirect, maybe.
+            if(!isset($_SESSION['last_error_fix']) || ((int)$_SESSION['last_error_fix'] + 10) < time())
+            {
+              $_SESSION['last_error_fix'] = time();
+
+              ob_clean();
+              header('Location: '. $base_url. $_SERVER['REQUEST_URI']);
+              exit;
+            }
+          }
+
+          break;
+        }
+
+        unset($path[$i]);
+      }
+    }
+  }
 }
 ?>

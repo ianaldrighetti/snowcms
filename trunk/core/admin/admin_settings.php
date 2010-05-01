@@ -54,8 +54,19 @@ if(!function_exists('admin_settings'))
 
     # Submitting the form? Alright.
     if(!empty($_POST['admin_settings_form']))
-      # We shall process it!
-      $form->process('admin_settings_form');
+    {
+      # We shall process it! But through AJAX?
+      if(isset($_GET['ajax']))
+      {
+        echo $form->json_process('admin_settings_form');
+        exit;
+      }
+      else
+      {
+        # Just regular ol' submitting ;)
+        $form->process('admin_settings_form');
+      }
+    }
 
     $theme->set_current_area('system_settings');
 
@@ -91,12 +102,13 @@ if(!function_exists('admin_settings_generate_form'))
   */
   function admin_settings_generate_form()
   {
-    global $api, $settings, $theme_dir;
+    global $api, $base_url, $settings, $theme_dir;
 
     $form = $api->load_class('Form');
 
     $form->add('admin_settings_form', array(
-                                        'action' => '',
+                                        'action' => $base_url. '/index.php?action=admin&sa=settings',
+                                        'ajax_submit' => true,
                                         'callback' => 'admin_settings_handle',
                                         'submit' => l('Save settings'),
                                       ));

@@ -58,6 +58,8 @@ class Form
       The following $options indices are allowed:
         accept-charset - Specifies the supported character sets, defaults to utf-8.
         action - The URL of where to send the form data to once submitted.
+        ajax_submit - Whether or not (if the browser supports it) to submit the form
+                      via AJAX, defaults to false.
         callback - The callback which is passed all the form information.
         enctype - Specifies how the form data will be encoded when being sent.
                   If a file field is added, the enctype is automatically changed
@@ -88,6 +90,7 @@ class Form
     $this->forms[$form_name] = array(
                                  'accept-charset' => 'utf-8',
                                  'action' => null,
+                                 'ajax_submit' => false,
                                  'callback' => null,
                                  'enctype' => null,
                                  'errors' => array(),
@@ -182,13 +185,12 @@ class Form
       bool - Returns true on success, false on failure.
 
     Note:
-      Allowed options:
-        callback - The callback of the form.
-        action - The URL to submit the form to.
-        method - Either GET or POST.
+      For options to set, see <Form::add>.
   */
   public function edit($form_name, $options)
   {
+    global $theme;
+
     # Can't edit something that doesn't exist, now can we?
     if(!$this->form_exists($form_name))
       return false;
@@ -200,6 +202,17 @@ class Form
     # The action?
     if(isset($options['action']))
       $this->forms[$form_name]['action'] = $options['action'];
+
+    # Want to submit it via AJAX?
+    if(isset($options['ajax_submit']))
+    {
+      $this->forms[$form_name]['ajax_submit'] = !empty($options['ajax_submit']);
+
+      if(!empty($options['ajax_submit']))
+      {
+        $theme->add_js_var('form_saving', l('Saving...'));
+      }
+    }
 
     # How about the callback? Make sure it is callable.
     if(isset($options['callback']) && is_callable($options['callback']))
@@ -714,7 +727,7 @@ class Form
         $form['id'] = $form_name;
 
       echo '
-      <form', (!empty($form['accept-charset']) ? ' accept-charset="'. $form['accept-charset']. '"' : ''), ' action="', $form['action'], '" class="form"', (!empty($form['enctype']) ? ' enctype="'. $form['enctype']. '"' : ''), ' id="', $form['id'], '" method="', $form['method'], '">
+      <form', (!empty($form['accept-charset']) ? ' accept-charset="'. $form['accept-charset']. '"' : ''), ' action="', $form['action'], '" class="form"', (!empty($form['enctype']) ? ' enctype="'. $form['enctype']. '"' : ''), ' id="', $form['id'], '" method="', $form['method'], '"', (!empty($form['ajax_submit']) ? ' onsubmit="s.submitform('. str_replace('"', '\'', json_encode($form_name)). ', this, '. str_replace('"', '\'', json_encode(array_keys($form['fields']))). '); return false;"' : ''), '>
         <fieldset>
           <table>
             <tr>
@@ -1072,12 +1085,12 @@ class Form
         {
           if(isset($field['length']['min']) && $_POST[$name] < $field['length']['min'])
           {
-            $this->forms[$form_name]['errors'][] = l('The field "%s" must be at least %f.', $this->forms[$form_name]['fields'][$name]['label'], $field['length']['min']);
+            $this->forms[$form_name]['errors'][] = l('The field "%s" must be no smaller than %'. ($field['type'] == 'int' ? 'd' : 'f'). '.', $this->forms[$form_name]['fields'][$name]['label'], $field['length']['min']);
             continue;
           }
           elseif(isset($field['length']['max']) && ($truncate = ($_POST[$name] > $field['length']['max'])) && empty($field['truncate']))
           {
-            $this->forms[$form_name]['errors'][] = l('The field "%s" must be smaller than %f.', $this->forms[$form_name]['fields'][$name]['label'], $field['length']['max']);
+            $this->forms[$form_name]['errors'][] = l('The field "%s" must be no larger than %'. ($field['type'] == 'int' ? 'd' : 'f'). '.', $this->forms[$form_name]['fields'][$name]['label'], $field['length']['max']);
             continue;
           }
 
@@ -1088,12 +1101,12 @@ class Form
         {
           if(isset($field['length']['min']) && $func['strlen']($_POST[$name]) < $field['length']['min'])
           {
-            $this->forms[$form_name]['errors'][] = l('The field "%s" must be at least %d characters long.', $this->forms[$form_name]['fields'][$name]['label'], $field['length']['min']);
+            $this->forms[$form_name]['errors'][] = l('The field "%s" must be no less than %d characters.', $this->forms[$form_name]['fields'][$name]['label'], $field['length']['min']);
             continue;
           }
           elseif(isset($field['length']['max']) && $field['length']['max'] > -1 && ($truncate = ($func['strlen']($_POST[$name]) > $field['length']['max'])) && empty($field['truncate']))
           {
-            $this->forms[$form_name]['errors'][] = l('The field "%s" must be smaller than %d characters.', $this->forms[$form_name]['fields'][$name]['label'], $field['length']['max']);
+            $this->forms[$form_name]['errors'][] = l('The field "%s" must be no longer than %d characters.', $this->forms[$form_name]['fields'][$name]['label'], $field['length']['max']);
             continue;
           }
 

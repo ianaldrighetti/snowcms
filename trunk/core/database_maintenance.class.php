@@ -76,14 +76,14 @@ abstract class Database_Maintenance
       string $table - The table to generate the CREATE TABLE command for.
       bool $drop_if_exists - Whether or not to include DROP TABLE IF EXISTS `$table` command before  the
                              the CREATE TABLE. (Be sure the database supports such a command)
-      string $file - The file to append the command to, unless $file is empty.
+      string $fp - The file pointer to write the command to.
 
     Returns:
      mixed - Could return a string containing the command ($file empty) or a bool containing
-                    whether or not the command was successfully written to $file
+             whether or not the command was successfully written to $fp.
 
   */
-  abstract public function table_sql($table, $drop_if_exists = true, $file = null);
+  abstract public function table_sql($table, $drop_if_exists = false, $fp = null);
 
   /*
     Method: insert_sql
@@ -101,14 +101,14 @@ abstract class Database_Maintenance
                    include a LIMIT clause in your SELECT * query.
       int $rows - The number of rows to retrieve from the SELECT * query (LIMIT $start, $rows). If this is false,
                   don't include a LIMIT clause in your SELECT * query.
-      string $file - The file to append the data to, unless $file is empty.
+      string $fp - The file pointer to write the data commands to.
 
     Returns:
      mixed - Could return a string containing the data ($file empty) or a bool containing
-                    whether or not the data was successfully written to $file.
+             whether or not the data was successfully written to $fp.
 
   */
-  abstract public function insert_sql($table, $extended_inserts = true, $rows_per_insert = 10, $start = false, $rows = false, $file = null);
+  abstract public function insert_sql($table, $extended_inserts = false, $rows_per_insert = 10, $start = false, $rows = false, $fp = null);
 
   /*
     Method: create_table

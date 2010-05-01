@@ -73,6 +73,9 @@ function init_core()
   $api->add_event('action=reminder2', 'reminder_view2', $core_dir. '/reminder.php');
   $api->add_event('action=popup', 'core_popup');
 
+  # Stop output buffering which was started in the <load_api> function.
+  ob_end_clean();
+
   # Start output buffering.
   ob_start($api->apply_filters('output_callback', null));
 
