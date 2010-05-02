@@ -473,7 +473,7 @@ class Table
   */
   public function show($tbl_name)
   {
-    global $api, $db;
+    global $api, $db, $theme;
 
     if(!$this->table_exists($tbl_name))
     {
@@ -562,11 +562,11 @@ class Table
 
       if($is_options)
         echo '
-            <th>&nbsp;</th>';
+            <th><input type="checkbox" name="check_all_none" title="', l('Select all/none'), '" onclick="s.checkallnone(this);" /></th>';
 
       foreach($table['columns'] as $column_id => $column)
         echo '
-            <th', (!empty($column['title']) ? ' title="'. $column['title']. '"' : ''), '>', ($column['sortable'] ? '<a href="'. $table['base_url']. '&amp;sort='. $column_id. '&amp;order='. (!empty($order) && $sort == $column_id && ($order == 'ASC' || $order == 'DESC') ? ($order == 'ASC' ? 'desc' : 'asc') : 'asc'). '&amp;page='. $page. '">' : ''), $column['label'], ($column['sortable'] ? '</a>' : ''), '</th>';
+            <th', (!empty($column['title']) ? ' title="'. $column['title']. '"' : ''), '>', ($column['sortable'] ? '<a href="'. $table['base_url']. '&amp;sort='. $column_id. '&amp;order='. (!empty($order) && $sort == $column_id && ($order == 'ASC' || $order == 'DESC') ? ($order == 'ASC' ? 'desc' : 'asc') : 'asc'). '&amp;page='. $page. '">' : ''), $column['label'], ($column['sortable'] ? (!empty($order) && $sort == $column_id ? ' <img src="'. $theme->url(). '/style/images/'. ($order == 'ASC' ? 'arrow_up.png' : 'arrow_down.png'). '" alt="" />' : ''). '</a>' : ''), '</th>';
 
       echo '
           </tr>';

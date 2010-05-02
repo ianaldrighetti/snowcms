@@ -39,13 +39,24 @@ function plugin_install()
 
   # All we need to do is set a couple settings.
   # That is, unless they already exist. In which case, we won't bother them!
+  if($settings->get('captcha_enable', 'int', -1) == -1)
+  {
+    $settings->set('captcha_enable', 1);
+  }
+
   if($settings->get('captcha_width', 'int', 0) == 0)
+  {
     $settings->set('captcha_width', 200);
+  }
 
   if($settings->get('captcha_height', 'int', 0) == 0)
+  {
     $settings->set('captcha_height', 50);
+  }
 
   if($settings->get('captcha_num_chars', 'int', 0) == 0)
+  {
     $settings->set('captcha_num_chars', 6);
+  }
 }
 ?>

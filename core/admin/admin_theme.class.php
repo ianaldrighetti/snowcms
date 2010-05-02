@@ -373,6 +373,11 @@ class Admin_Theme extends Theme
     {
       font-size: 80%;
     }
+
+    .bold
+    {
+      font-weight: bold;
+    }
   </style>';
 
     # Any meta tags?

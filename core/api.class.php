@@ -1389,13 +1389,17 @@ class API
 */
 function load_api()
 {
-  global $api, $db, $plugin_dir;
+  global $api, $db, $loading_plugins, $plugin_dir;
 
   ob_start();
 
   # Register a shutdown function, which calls on a function to see if the
   # error was fatal, if it was, and caused by a plugin, it will be disabled :)
   register_shutdown_function('api_catch_fatal');
+
+  # We are about to load the plugins!
+  # (fyi, this is used to help api_catch_fatal, specifically for PHP 5.2.0 <)
+  $loading_plugins = true;
 
   # Instantiate the API class.
   $api = new API();
@@ -1507,6 +1511,9 @@ function load_api()
     }
   }
 
+  # We have now loaded all plugins.
+  $loading_plugins = false;
+
   # Simple hook, something you can hook onto if you want to do something right before SnowCMS stops executing.
   register_shutdown_function(create_function('', '
     global $api;
@@ -1529,9 +1536,45 @@ function load_api()
 */
 function api_catch_fatal()
 {
-  global $db, $plugin_dir;
+  global $db, $loading_plugins, $plugin_dir;
 
-  $last_error = error_get_last();
+  # Not loading plugins?
+  if(empty($loading_plugins))
+    return;
+
+  # Only PHP 5.2.0 >= supports error_get_last :/
+  if(!function_exists('error_get_last'))
+  {
+    $last_error = error_get_last();
+  }
+  else
+  {
+    # Which means we need to do it in another way!!!
+    $error_string = ob_get_contents();
+
+    # Is it a parse error?
+    if(stripos($error_string, 'parse error') !== false)
+    {
+      # Now that we know it is a parse error, try to get the path.
+      $last_error = array(
+                      'type' => E_PARSE,
+                      'file' => null,
+                    );
+
+      $path = substr(trim(substr($error_string, stripos($error_string, ' in '))), 3);
+
+      # Remove the on line #, and we got it!
+      $path = trim(substr($path, 0, strripos($path, 'on line')));
+
+      # Any HTML? We don't want that!
+      if(stripos($path, '<b>') !== false)
+      {
+        $path = strtr($path, array('<b>' => '', '</b>' => ''));
+      }
+
+      $last_error['file'] = $path;
+    }
+  }
 
   # Parse error? That's what we are looking for, after all!
   if($last_error['type'] == E_PARSE)

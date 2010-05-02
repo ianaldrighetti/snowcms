@@ -86,7 +86,7 @@ if(!function_exists('admin_prepend'))
                             'title' => l('View the error log'),
                             'src' =>$theme->url(). '/error_log.png',
                             'label' => l('Errors'),
-                            'show' => $member->can('view_error_log'),
+                            'show' => $member->can('view_error_log') && $settings->get('errors_log', 'bool'),
                           ),
                         ),
         l('Members') => array(
@@ -147,6 +147,14 @@ if(!function_exists('admin_prepend'))
                             'src' =>$theme->url(). '/manage_plugins.png',
                             'label' => l('Manage'),
                             'show' => $member->can('manage_plugins'),
+                          ),
+                          array(
+                            'id' => 'plugins_settings',
+                            'href' => $base_url. '/index.php?action=admin&amp;sa=plugins_settings',
+                            'title' => l('Manage plugin settings'),
+                            'src' => $theme->url(). '/plugins_settings.png',
+                            'label' => l('Settings'),
+                            'show' => $member->can('manage_plugin_settings'),
                           ),
                         ),
       );

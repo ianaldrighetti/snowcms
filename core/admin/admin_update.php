@@ -49,8 +49,6 @@ if(!function_exists('admin_update'))
       # That's what I thought!
       admin_access_denied();
 
-    $api->run_hooks('admin_update');
-
     # We will need some JavaScript.
     $theme->add_js_file(array('src' => $theme_url. '/default/js/admin_update.js'));
 
