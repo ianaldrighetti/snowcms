@@ -45,6 +45,20 @@ function SnowObj()
     xmlObject.send(post_data ? post_data : '');
   };
 
+  this.checkallnone = function(element)
+  {
+    // Get all the checkboxes...
+    var checkboxes = element.parentNode.parentNode.parentNode.getElementsByTagName('input');
+
+    for(var i = 0; i < checkboxes.length; i++)
+    {
+      if(checkboxes[i].name == 'selected[]')
+      {
+        checkboxes[i].checked = element.checked;
+      }
+    }
+  }
+
   this.cookie = function(cookie_name)
   {
     var cookies = this.d.cookie;
@@ -62,8 +76,8 @@ function SnowObj()
           // Trim it up..!
           var temp = this.trim(cookies[cookie]);
 
-          if(decodeURIComponent(this.trim(temp).substr(0, this.trim(temp).indexOf('='))) == cookie_name)
-            return decodeURIComponent(temp.substr(temp.indexOf('=') + 1, temp.length));
+          if(this.decode(this.trim(temp).substr(0, this.trim(temp).indexOf('='))) == cookie_name)
+            return this.decode(temp.substr(temp.indexOf('=') + 1, temp.length));
         }
 
         // Nothing huh?
@@ -73,7 +87,7 @@ function SnowObj()
       {
         // Only one cookie? Its gotta be this or nothing!!!
         if(cookies.substr(0, cookie_name.length) == cookie_name)
-          return decodeURIComponent(cookies.substr(cookie_name.length + 1, cookies.length));
+          return this.decode(cookies.substr(cookie_name.length + 1, cookies.length));
         else
           return false;
       }
@@ -99,41 +113,69 @@ function SnowObj()
     return document.getElementById(element_id);
   };
 
+  this.in_array = function(needle, haystack)
+  {
+    for(index in haystack)
+    {
+      // Did we find it?
+      if(haystack[index] == needle)
+      {
+        // We sure did!
+        return true;
+      }
+    }
+
+    // We did not :/
+    return false;
+  };
+
   this.is_array = function(checkObject)
   {
     // Thanks to: http://ajaxian.com/archives/isarray-why-is-it-so-bloody-hard-to-get-right
-    return Object.prototype.toString.call(checkObject) === '[object Array]' ? true : false;
+    return Object.prototype.toString.call(checkObject) === '[object Array]';
   };
 
-  this.json_encode = function(obj){
-    //simple partial JSON encoder implementation
-    //http://gist.github.com/gists/240659 stolen from me
+  this.json_encode = function(obj)
+  {
+    // Simple partial JSON encoder implementation
+    // http://gist.github.com/gists/240659 stolen from me
 
-    if(window.JSON && JSON.stringify) return JSON.stringify(obj);
+    if(window.JSON && JSON.stringify)
+      return JSON.stringify(obj);
+
     var enc = arguments.callee; //for purposes of recursion
 
-    if(typeof obj == "boolean" || typeof obj == "number"){
-        return obj+'' //should work...
-    }else if(typeof obj == "string"){
-      //a large portion of this is stolen from Douglas Crockford's json2.js
-      return '"'+
-            obj.replace(
-              /[\\\"\x00-\x1f\x7f-\x9f\u00ad\u0600-\u0604\u070f\u17b4\u17b5\u200c-\u200f\u2028-\u202f\u2060-\u206f\ufeff\ufff0-\uffff]/g
-            , function (a) {
-              return '\\u' + ('0000' + a.charCodeAt(0).toString(16)).slice(-4);
-            })
-            +'"'; //note that this isn't quite as purtyful as the usualness
-    }else if(this.is_array(obj)){
-      for(var i = 0; i < obj.length; i++){
-        obj[i] = enc(obj[i]); //encode every sub-thingy on top
+    if(typeof obj == 'boolean' || typeof obj == 'number')
+    {
+        return obj.toString();
+    }
+    else if(typeof obj == 'string')
+    {
+      // A large portion of this is used from Douglas Crockford's json2.js
+      return '"'+ obj.replace(/[\\\"\x00-\x1f\x7f-\x9f\u00ad\u0600-\u0604\u070f\u17b4\u17b5\u200c-\u200f\u2028-\u202f\u2060-\u206f\ufeff\ufff0-\uffff]/g,
+                              function(a)
+                              {
+                                return '\\u' + ('0000' + a.charCodeAt(0).toString(16)).slice(-4);
+                              }) + '"';
+    }
+    else if(this.is_array(obj))
+    {
+      for(var i = 0; i < obj.length; i++)
+      {
+        obj[i] = enc(obj[i]);
       }
-      return "["+obj.join(",")+"]";
-    }else{
-      var pairs = []; //pairs will be stored here
-      for(var k in obj){ //loop through thingys
-        pairs.push(enc(k)+":"+enc(obj[k])); //key: value
+
+      return '[' + obj.join(',') + ']';
+    }
+    else
+    {
+      var pairs = [];
+      for(var k in obj)
+      {
+        pairs.push(enc(k) + ':' + enc(obj[k]));
       }
-      return "{"+pairs.join(",")+"}" //wrap in the braces
+
+      return '{' + pairs.join(',') + '}';
     }
   }
 
@@ -144,13 +186,17 @@ function SnowObj()
       return this.json_encode(data)
     }
     else
+    {
       return eval('(' + data + ')');
+    }
   }
 
   this.onload = function(callback)
   {
     if(typeof window.onload != 'function')
+    {
       window.onload = callback;
+    }
     else
     {
       var prevCallback = window.onload;
@@ -168,21 +214,33 @@ function SnowObj()
   this.screenheight = function()
   {
     if(!this.is_ie)
+    {
       return window.innerHeight;
+    }
     else if(typeof document.documentElement.clientHeight != 'undefined')
+    {
       return document.documentElement.clientHeight;
+    }
     else
+    {
       return document.getElementsByTagName('body')[0].clientHeight;
+    }
   };
 
   this.screenwidth = function()
   {
     if(!this.is_ie)
+    {
       return window.innerWidth;
+    }
     else if (typeof document.documentElement.clientWidth != 'undefined')
+    {
       return document.documentElement.clientWidth;
+    }
     else
+    {
       return document.getElementsByTagName('body')[0].clientWidth;
+    }
   };
 
   this.setcookie = function(cookie_name, value, days)
@@ -199,13 +257,43 @@ function SnowObj()
 
   this.submitform = function(form_name, form, fields)
   {
+    if(!s.id(form_name))
+    {
+      // The form doesn't appear to exist :/
+      return true;
+    }
+
     s.id(form_name + '_errors').innerHTML = '';
+    s.id(form_name + '_message').innerHTML = '';
 
     // Time to send the form data.
     var data = [];
     for(var i = 0; i < fields.length; i++)
     {
-      data[i] = fields[i] + '=' + this.encode(form[fields[i]].value);
+      // A checkbox, perhaps?
+      if(form[fields[i]].type == 'checkbox')
+      {
+        data[data.length] = fields[i] + '=' + (form[fields[i]].checked ? 1 : 0);
+      }
+      else if(form[fields[i]].type == 'select-multiple')
+      {
+        for(var j = 0; j < form[fields[i]].options.length; j++)
+        {
+          if(form[fields[i]].options[j].selected)
+          {
+            data[data.length] = fields[i] + '[]=' + this.encode(form[fields[i]].options[j].value);
+          }
+        }
+      }
+      else if(form[fields[i]].type == 'file')
+      {
+        // Sorry, we don't do files! (Returning true will make the form submit.
+        return true;
+      }
+      else
+      {
+        data[data.length] = fields[i] + '=' + this.encode(form[fields[i]].value);
+      }
     }
 
     data[data.length] = form_name + '=ajax';
@@ -215,24 +303,90 @@ function SnowObj()
     form[form_name].disabled = 'disabled';
     form[form_name].value = form_saving;
 
-    s.ajaxCallback(form.action.indexOf('?') > -1 ? form.action + '&ajax=1' : form.action + '?ajax=1', function(response)
+    s.ajaxCallback((form.action.indexOf('?') > -1 ? form.action + '&ajax=1' : form.action + '?ajax=1') + '&time=' + (new Date).getTime(), function(response)
       {
         var response = s.json(response);
 
-        if(response.length > 0)
+        // Errors? Perhaps.
+        if(response['errors'].length > 0)
         {
           var div = document.createElement('div');
           div.className = 'errors';
 
-          for(var i = 0; i < response.length; i++)
+          for(var i = 0; i < response['errors'].length; i++)
           {
             var p = document.createElement('p');
-            p.innerHTML = response[i];
+            p.innerHTML = response['errors'][i];
 
             div.appendChild(p);
           }
 
           s.id(form_name + '_errors').appendChild(div);
+        }
+
+        // You could be displaying a message too, maybe.
+        if(response['message'].length > 0)
+        {
+          var div = document.createElement('div');
+          div.className = 'message';
+          div.innerHTML = response['message'];
+
+          s.id(form_name + '_message').appendChild(div);
+        }
+
+        // Update to the new values ;-)
+        for(index in response['values'])
+        {
+          if(typeof form[index].type != 'undefined')
+          {
+            // What's your type? ;-)
+            if(form[index].type == 'text' || form[index].type == 'password' || form[index].type == 'hidden' || form[index].type == 'textarea')
+            {
+              // Simple, that's what!
+              form[index].value = response['values'][index]['value'];
+            }
+            else if(form[index].type == 'checkbox')
+            {
+              // Checkboxes are pretty simple too.
+              form[index].checked = response['values'][index]['value'] == 1 ? 'checked' : '';
+            }
+            else if(form[index].type == 'select-one')
+            {
+              for(var i = 0; i < form[index].options.length; i++)
+              {
+                // To select, or not to select? That is the question!
+                if(form[index].options[i].value == response['values'][index]['value'])
+                {
+                  form[index].options[i].selected = 'selected';
+                }
+              }
+            }
+            else if(form[index].type == 'select-multiple')
+            {
+              var selected = response['values'][index].value.toString().split(',');
+
+              for(var i = 0; i < form[index].options.length; i++)
+              {
+                form[index].options[i].selected = '';
+
+                for(var j = 0; j < selected.length; j++)
+                {
+                  if(form[index].options[i].value == selected[j])
+                  {
+                    form[index].options[i].selected = 'selected';
+                  }
+                }
+              }
+            }
+            else
+            {
+              alert(form[index].type);
+            }
+          }
+          else
+          {
+            alert(index);
+          }
         }
 
         form[form_name].value = saveText;

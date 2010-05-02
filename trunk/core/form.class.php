@@ -84,7 +84,9 @@ class Form
 
     # Form already registered by this name..? Is it not callable?
     if($this->form_exists($form_name) || !is_callable($options['callback']))
+    {
       return false;
+    }
 
     # We will use the edit method to add your options ;D
     $this->forms[$form_name] = array(
@@ -150,7 +152,9 @@ class Form
   public function remove($form_name)
   {
     if(!$this->form_exists($form_name))
+    {
       return false;
+    }
 
     unset($this->forms[$form_name]);
     return true;
@@ -193,15 +197,21 @@ class Form
 
     # Can't edit something that doesn't exist, now can we?
     if(!$this->form_exists($form_name))
+    {
       return false;
+    }
 
     # Editing the charset? Simply check if it is set or not.
     if(isset($options['accept-charset']))
+    {
       $this->forms[$form_name]['accept-charset'] = $options['accept-charset'];
+    }
 
     # The action?
     if(isset($options['action']))
+    {
       $this->forms[$form_name]['action'] = $options['action'];
+    }
 
     # Want to submit it via AJAX?
     if(isset($options['ajax_submit']))
@@ -216,27 +226,41 @@ class Form
 
     # How about the callback? Make sure it is callable.
     if(isset($options['callback']) && is_callable($options['callback']))
+    {
       $this->forms[$form_name]['callback'] = $options['callback'];
+    }
     elseif(isset($options['callback']))
+    {
       return false;
+    }
 
     # The encoding type, maybe?
     if(isset($options['enctype']))
+    {
       $this->forms[$form_name]['enctype'] = $options['enctype'];
+    }
 
     # The HTML id? Good :)
     if(isset($options['id']))
+    {
       $this->forms[$form_name]['id'] = $options['id'];
+    }
 
     # How about the method of transporation? ;) Only get or post.
     if(isset($options['method']) && in_array(strtolower($options['method']), array('get', 'post')))
+    {
       $this->forms[$form_name]['method'] = strtolower($options['method']);
+    }
     elseif(isset($options['method']))
+    {
       return false;
+    }
 
     # The text on the submit button, perhaps?
     if(isset($options['submit']))
+    {
       $this->forms[$form_name]['submit'] = $options['submit'];
+    }
 
     # If nothing caused false to be returned elsewhere, it worked!
     return true;
@@ -257,7 +281,9 @@ class Form
   public function return_form($form_name = null)
   {
     if(!empty($form_name) && !$this->form_exists($form_name))
+    {
       return false;
+    }
 
     return empty($form_name) ? $this->forms : $this->forms[$form_name];
   }
@@ -413,7 +439,9 @@ class Form
   {
     # The form not registered? Is this field name already specified?
     if(!$this->form_exists($form_name) || $this->field_exists($form_name, $name))
+    {
       return false;
+    }
 
     # Any position..?
     if(isset($options['position']))
@@ -427,18 +455,26 @@ class Form
 
     # Did you do something you shouldn't have? Tisk tisk!
     if($field === false)
+    {
       return false;
+    }
 
     # Add it. But maybe not so fast!
     if(!isset($position) || $position === null)
+    {
       $this->forms[$form_name]['fields'][$name] = $field;
+    }
     else
+    {
       # Insert it at the right place ;D
       $this->forms[$form_name]['fields'] = array_insert($this->forms[$form_name]['fields'], $field, $position, $name);
+    }
 
     # If the type of the field is a file, change the encoding type to the right one.
     if($field['type'] == 'file')
+    {
       $this->forms[$form_name]['enctype'] = 'multipart/form-data';
+    }
 
     return true;
   }
@@ -500,36 +536,52 @@ class Form
 
     # No type? No field!
     if(empty($field['type']))
+    {
       return false;
+    }
 
     # Before we validate the supplied type, check to see if it is full or custom...
     $field['is_full'] = $field['type'] == 'full' || substr($field['type'], 0, 5) == 'full-';
     $field['is_custom'] = $field['type'] == 'custom' || substr($field['type'], 0, 7) == 'custom-' || $field['is_full'];
 
     if($field['is_custom'] && !$field['is_full'] && strlen($field['type']) > 7)
+    {
       $field['type'] = substr($field['type'], 7, strlen($field['type']) - 7);
+    }
     elseif($field['is_full'] && strlen($field['type']) > 5)
+    {
       $field['type'] = substr($field['type'], 5, strlen($field['type']) - 5);
+    }
 
     # So, is it a valid type?
     if(!in_array($field['type'], $allowed_types))
+    {
       return false;
+    }
 
     # Is your minimum length larger than your maximum?
     if($field['length']['min'] !== null && $field['length']['max'] !== null && $field['length']['min'] > $field['length']['max'])
+    {
       return false;
+    }
 
     # We only need options if your fields type is checkbox-multi, select, select-multi or radio.
     if($field['type'] == 'select' || $field['type'] == 'select-multi')
     {
       # Nothing supplied (Well, no array at all, at least)?!
       if($field['options'] === false)
+      {
         return false;
+      }
 
       # Make it safe!
       if(count($field['options']))
+      {
         foreach($field['options'] as $key => $value)
+        {
           $field['options'][$key] = htmlchars($value);
+        }
+      }
 
       # Is the value set and is it not one that is available..?
       if(is_array($field['value']))
@@ -541,19 +593,27 @@ class Form
           {
             # Is this specific option not existent?
             if(!isset($field['options'][$key]))
+            {
               # Delete it!
               unset($field['value'][$key]);
+            }
           }
 
           if(count($field['value']) == 0)
+          {
             $field['value'] = null;
+          }
         }
         else
+        {
           $field['value'] = null;
+        }
       }
       elseif($field['value'] !== null && !isset($field['options'][$field['value']]))
+      {
         # We will just unset it then.
         $field['value'] = null;
+      }
     }
 
     # Check the function, make sure it is callable if set, and if it is required or not.
@@ -582,7 +642,9 @@ class Form
   public function remove_field($form_name, $name)
   {
     if(!$this->field_exists($form_name, $name))
+    {
       return false;
+    }
 
     unset($this->forms[$form_name]['fields'][$name]);
     return true;
@@ -622,7 +684,9 @@ class Form
   {
     # The field not registered? Then you certainly can't edit what isn't there!
     if(!$this->field_exists($form_name, $name))
+    {
       return false;
+    }
 
     # Any position..?
     if(isset($options['position']))
@@ -637,14 +701,18 @@ class Form
 
     # Did YOU fail? :P
     if($field === false)
+    {
       return false;
+    }
 
     # So it worked, sweet.
     $this->forms[$form_name]['fields'][$name] = $field;
 
     # So it worked, sweet. Edit the new field. But maybe not so fast!
     if(!isset($position) || $position === null)
+    {
       $this->forms[$form_name]['fields'][$name] = $field;
+    }
     else
     {
       # Delete the older one.
@@ -678,9 +746,34 @@ class Form
   public function return_field($form_name, $name = null)
   {
     if(!$this->field_exists($form_name, $name) || (empty($name) && $this->form_exists($form_name)))
+    {
       return false;
+    }
 
     return empty($name) ? $this->forms[$form_name]['fields'] : $this->forms[$form_name]['fields'][$name];
+  }
+
+  /*
+    Method: num_fields
+
+    Returns the total number of fields in the specified form.
+
+    Parameters:
+      string $form_name - The name of the form.
+
+    Returns:
+      int - Returns the number of fields in the specified form.
+  */
+  public function num_fields($form_name)
+  {
+    # There certainly are none in a form which doesn't exist!
+    if(!$this->form_exists($form_name))
+    {
+      return false;
+    }
+
+    # Count them! Simple!
+    return count($this->forms[$form_name]['fields']);
   }
 
   /*
@@ -724,7 +817,9 @@ class Form
       $form = $this->forms[$form_name];
 
       if(empty($form['id']))
+      {
         $form['id'] = $form_name;
+      }
 
       echo '
       <form', (!empty($form['accept-charset']) ? ' accept-charset="'. $form['accept-charset']. '"' : ''), ' action="', $form['action'], '" class="form"', (!empty($form['enctype']) ? ' enctype="'. $form['enctype']. '"' : ''), ' id="', $form['id'], '" method="', $form['method'], '"', (!empty($form['ajax_submit']) ? ' onsubmit="s.submitform('. str_replace('"', '\'', json_encode($form_name)). ', this, '. str_replace('"', '\'', json_encode(array_keys($form['fields']))). '); return false;"' : ''), '>
@@ -755,8 +850,10 @@ class Form
                 <div class="errors">';
 
         foreach($form['errors'] as $error)
+        {
           echo '
                   <p>', $error, '</p>';
+        }
 
         echo '
                 </div>';
@@ -768,9 +865,13 @@ class Form
 
       # Show the fields, you know, the things you enter stuff into.
       if(count($form['fields']) > 0)
+      {
         foreach($form['fields'] as $name => $field)
+        {
           # Make this simple, show it!
           $this->show_field($form_name, $name, $field);
+        }
+      }
 
       echo '
             <tr id="', $form['id'], '_submit">
@@ -813,8 +914,10 @@ class Form
 
       # Is the field hidden? Then showing something isn't very hidden, now is it? I didn't think so.
       if($field['type'] != 'hidden' && empty($field['is_full']))
+      {
         echo '
               <td id="', $form['id'], '_', $name, '_left" class="td_left"><p class="label">', (!empty($field['popup']) ? '<a href="javascript:void(0);" onclick="formPopup = window.open(\''. $base_url. '/index.php?action=popup&amp;id=popup_'. $name. '\', \'formPopup\', \'location=no,menubar=no,status=no,titlebar=yes,height=300px,width=300px,directories=no\'); formPopup.focus();"><img src="'. $api->apply_filters('form_popup_image_url', $theme_url. '/default/style/images/admincp/about-small.png'). '" alt="" title="'. l('More information'). '" /></a> ' : ''). '<label for="', $form['id'], '_', $name, '_input">', $field['label'], '</label></p>', !empty($field['subtext']) ? '<p class="subtext">'. $field['subtext']. '</p>' : '', '</td>';
+      }
 
       # Now here is the fun part! Actually displaying the fields.
       if(empty($field['is_custom']))
@@ -825,10 +928,14 @@ class Form
 
         # Strings, integers, doubles, passwords, etc.
         if(in_array($field['type'], array('int', 'double', 'string', 'string-html', 'password')))
+        {
           echo '<input class="input_generic" id="', (!empty($field['id']) ? $field['id']. ' ' : ''), $form['id'], '_', $name, '_input" type="', ($field['type'] == 'password' ? 'password' : 'text'), '" name="', $name, '" value="', $field['value'], '"', ($field['length']['max'] > 0 ? ' maxlength="'. $field['length']['max']. '"' : ''), (!empty($field['disabled']) ? ' disabled="disabled"' : ''), (!empty($field['readonly']) ? ' readonly="readonly"' : ''), ' />';
+        }
         # Text areas! Woo.
         elseif(substr($field['type'], 0, 8) == 'textarea')
+        {
           echo '<textarea class="input_textarea" id="', (!empty($field['id']) ? $field['id']. ' ' : ''), $form['id'], '_', $name, '_input" name="', $name, '"', ($field['length']['max'] > 0 ? ' onkeyup="s.truncate(this, '. $field['length']['max']. ');"' : ''), ($field['rows'] > 0 ? ' rows="'. $field['rows']. '"' : ''), ($field['cols'] > 0 ? ' cols="'. $field['cols']. '"' : ''), ($field['length']['max'] > 0 ? ' maxlength="'. $field['length']['max']. '"' : ''), (!empty($field['disabled']) ? ' disabled="disabled"' : ''), (!empty($field['readonly']) ? ' readonly="readonly"' : ''), '>', $field['value'], '</textarea>';
+        }
         elseif(substr($field['type'], 0, 8) == 'checkbox')
         {
           # Multiple, perhaps?
@@ -836,21 +943,31 @@ class Form
           {
             # Display them ALL!
             if(count($field['options']))
+            {
               foreach($field['options'] as $key => $label)
+              {
                 echo '<label><input class="input_checkbox" id="', $form['id'], '_', $name, '_input" type="checkbox" name="', $name, '[', $key, ']" value="1"', (!empty($field['value']) && $field['value'] == $key ? ' checked="checked"' : ''), (!empty($field['disabled']) ? ' disabled="disabled"' : ''), (!empty($field['readonly']) ? ' readonly="readonly"' : ''), ' /> ', $label, '</label><br />';
+              }
+            }
           }
           else
+          {
             # Nope, just a lonesome one! :(
             echo '<input class="input_checkbox" id="', $form['id'], '_', $name, '_input" type="checkbox" name="', $name, '" value="1"', (!empty($field['value']) ? ' checked="checked"' : ''), (!empty($field['disabled']) ? ' disabled="disabled"' : ''), (!empty($field['readonly']) ? ' readonly="readonly"' : ''), ' />';
+          }
         }
         elseif(substr($field['type'], 0, 6) == 'select')
         {
           echo '<select class="input_select" id="', $form['id'], '_', $name, '_input" name="', $name, '"', ($field['type'] == 'select-multi' ? ' multiple="multiple"' : ''), ($field['type'] == 'select-multi' && $field['rows'] > 0 ? ' size="'. $field['rows']. '"' : ''), (!empty($field['disabled']) ? ' disabled="disabled"' : ''), '>';
 
                 if(count($field['options']))
+                {
                   foreach($field['options'] as $key => $value)
+                  {
                     echo '
                   <option value="', $key, '"', ((!is_array($field['value']) && $field['value'] == $key) || (is_array($field['value']) && in_array($key, $field['value'])) ? ' selected="selected"' : ''), '>', $value, '</option>';
+                  }
+                }
 
           echo '</select>';
         }
@@ -938,7 +1055,9 @@ class Form
     {
       # If the form wasn't actually submitted, then we couldn't process it right...
       if(empty($_POST[$form_name]) || count($_POST) == 0 || count($this->forms[$form_name]['fields']) == 0)
+      {
         return false;
+      }
 
       # Reset the errors array, just incase.
       $this->forms[$form_name]['errors'] = array();
@@ -952,11 +1071,15 @@ class Form
       {
         # Field disabled? Not supposed to be shown? Then you can't supply any information about this.
         if(!empty($field['disabled']) || empty($field['show']))
+        {
           continue;
+        }
 
         # Is the POST field not even set? Well, we will set it then. To empty! ;)
         if(!isset($_POST[$name]))
+        {
           $_POST[$name] = '';
+        }
 
         # Any function to run, perhaps? Do so now.
         if(!empty($field['function']) && is_callable($field['function']))
@@ -974,7 +1097,9 @@ class Form
 
         # No passing this field to the forms callback? Then we're done!
         if(empty($field['save']))
+        {
           continue;
+        }
 
         # Now it is time to check the data types of the submitted form data, woo!!!
         # So, is it a string(-html), text(-html), password or a hidden field?
@@ -989,7 +1114,9 @@ class Form
 
           # But does it need encoding?!
           if(in_array($field['type'], array('string', 'textarea', 'password', 'hidden')))
+          {
             $_POST[$name] = htmlchars($_POST[$name]);
+          }
         }
         # How about an integer or double?
         elseif($field['type'] == 'int' || $field['type'] == 'double')
@@ -1026,12 +1153,16 @@ class Form
                 $selected[] = $option_key;
 
                 if(isset($field['length']['max']) && count($selected) >= $field['length']['max'])
+                {
                   break;
+                }
               }
             }
           }
           elseif(!$is_multi)
+          {
             $selected[] = $_POST[$name];
+          }
 
           # Join them all together, like one happy family! Of one ;D
           $_POST[$name] = implode(',', $selected);
@@ -1045,14 +1176,16 @@ class Form
           if(is_array($_POST[$name]) && count($_POST[$name]) > 0)
           {
             foreach($_POST[$name] as $key => $dummy)
-            {echo $key, ' - ';
+            {
               # Is it even a valid option?
               if(in_array($key, $options))
               {
                 $checked[] = $key;
 
                 if(isset($field['length']['max']) && count($checked) >= $field['length']['max'])
+                {
                   break;
+                }
               }
             }
           }
@@ -1063,7 +1196,9 @@ class Form
         {
           # Just make sure the option you selected is valid ;)
           if(!in_array($_POST[$name], array_keys($field['options'])))
+          {
             $_POST[$name] = '';
+          }
         }
         elseif($field['type'] == 'file')
         {
@@ -1075,8 +1210,10 @@ class Form
           {
             # Make sure it is an actually uploaded file.
             if(is_uploaded_file($_FILES[$name]['tmp_name']))
+            {
               # We'll set it in the post field P:
               $_POST[$name] = $_FILES[$name];
+            }
           }
         }
 
@@ -1095,7 +1232,9 @@ class Form
           }
 
           if(!empty($truncate))
+          {
             $_POST[$name] = $field['type'] == 'int' ? (int)$field['length']['max'] : (double)$field['length']['min'];
+          }
         }
         elseif((isset($field['length']['min']) || isset($field['length']['max'])) && in_array($field['type'], array('string', 'string-html', 'textarea', 'textarea-html', 'password', 'hidden')))
         {
@@ -1112,7 +1251,9 @@ class Form
 
           # Truncation needed/wanted?
           if(!empty($truncate))
+          {
             $_POST[$name] = $func['substr']($_POST[$name], 0, $field['length']['max']);
+          }
         }
 
         # If we got here, then everything is good, so add the value :)
@@ -1132,14 +1273,20 @@ class Form
         {
           # Any more errors? Add them.
           if(count($errors))
+          {
             foreach($errors as $error)
+            {
               $this->forms[$form_name]['errors'][] = $error;
+            }
+          }
 
           return false;
         }
         else
+        {
           # We don't return just true, since the callback could return another value.
           return $success;
+        }
       }
       else
       {
@@ -1168,6 +1315,8 @@ class Form
   */
   public function json_process($form_name)
   {
+    global $api;
+
     # Even though process does this, it echo's the data, which we don't want.
     if(!$this->form_exists($form_name))
     {
@@ -1177,8 +1326,70 @@ class Form
     # Now process the form!
     $this->process($form_name);
 
+    $response = array(
+                  'errors' => $this->forms[$form_name]['errors'],
+                  'message' => '',
+                  'values' => array(),
+                );
+
+    # How about a message? :)
+    $response['message'] = $api->apply_filters($form_name. '_message', '');
+
+    # Add all the new values...
+    foreach($this->forms[$form_name]['fields'] as $field_name => $field)
+    {
+      $response['values'][$field_name] = array('type' => $field['type'], 'value' => $field['value']);
+    }
+
     # Now return the JSON encoded string containing any errors, if any, of course!
-    return json_encode($this->forms[$form_name]['errors']);
+    return json_encode($response);
+  }
+
+  /*
+    Method: run_hooks
+
+    Runs any hooks for the specified form.
+
+    Parameters:
+      string $form_name - The name of the form.
+
+    Returns:
+      bool - Returns true if the hooks were ran, false if they were already
+             ran or if the form doesn't exist.
+
+    Note:
+      Useful for using in conjunction with <Form::num_fields> when checking how
+      many fields are there, even before the <Form::show> or <Form::process>
+      is called.
+
+      Yes, I bet you are thinking, "Why not just call on $api->run_hooks($form_name);
+      ourselves?!?", which is a good question. You most certainly could, but you never
+      know, in the future these hooks could pass more parameters, and you would need
+      to then update your code, when you could have just used this :-P. Just leave it
+      at, "It's not a good idea."
+  */
+  public function run_hooks($form_name)
+  {
+    global $api;
+
+    # Doesn't exist? We won't run them! ;-)
+    if(!$this->form_exists($form_name))
+    {
+      return false;
+    }
+
+    # Of course, we don't want to run the hook multiple times! That would be bad!
+    if(empty($this->forms[$form_name]['hooked']))
+    {
+      $api->run_hooks($form_name);
+      $this->forms[$form_name]['hooked'] = true;
+      return true;
+    }
+    else
+    {
+      # Already ran them ;-)
+      return false;
+    }
   }
 }
 ?>

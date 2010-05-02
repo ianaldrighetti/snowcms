@@ -50,8 +50,21 @@ if(!function_exists('admin_members_add'))
     admin_members_add_generate_form();
     $form = $api->load_class('Form');
 
+    # Adding the member?
     if(!empty($_POST['admin_members_add_form']))
-      $form->process('admin_members_add_form');
+    {
+      if(isset($_GET['ajax']))
+      {
+        # Through AJAX? How fancy!
+        echo $form->json_process('admin_members_add_form');
+        exit;
+      }
+      else
+      {
+        # How boring :P
+        $form->process('admin_members_add_form');
+      }
+    }
 
     $theme->set_current_area('members_add');
 
@@ -87,12 +100,13 @@ if(!function_exists('admin_members_add_generate_form'))
   */
   function admin_members_add_generate_form()
   {
-    global $api;
+    global $api, $base_url;
 
     $form = $api->load_class('Form');
 
     $form->add('admin_members_add_form', array(
-                                          'action' => '',
+                                          'action' => $base_url. '/index.php?action=admin&sa=members_add',
+                                          'ajax_submit' => true,
                                           'callback' => 'admin_members_add_handle',
                                           'submit' => 'Add member',
                                          ));
@@ -236,7 +250,9 @@ if(!function_exists('admin_members_add_handle'))
 
     # Did you want them to be an administrator?
     if(!empty($data['is_administrator']))
+    {
       $groups = array('administrator');
+    }
     else
     {
       $groups = array('member');
@@ -244,7 +260,9 @@ if(!function_exists('admin_members_add_handle'))
       if(!empty($data['member_groups']))
       {
         foreach(explode(',', $data['member_groups']) as $group_id)
+        {
           $groups[] = $group_id;
+        }
       }
     }
 
@@ -486,6 +504,9 @@ if(!function_exists('admin_members_settings_handle'))
                                                                     'value' => $value,
                                                                   ));
     }
+
+    $api->add_filter('admin_members_settings_form_message', create_function('$value', '
+                                                              return l(\'Member settings have been successfully updated.\');'));
 
     return true;
   }
@@ -789,7 +810,17 @@ if(!function_exists('admin_members_manage_edit'))
 
       # Process the form? Perhaps?
       if(isset($_POST['members_edit_'. $member_id]))
-        $form->process('members_edit_'. $member_id);
+      {
+        if(isset($_GET['ajax']))
+        {
+          echo $form->json_process('members_edit_'. $member_id);
+          exit;
+        }
+        else
+        {
+          $form->process('members_edit_'. $member_id);
+        }
+      }
 
       $theme->set_title(l('Editing member "%s"', $member_info['name']));
 
@@ -831,6 +862,7 @@ if(!function_exists('admin_members_manage_edit_generate_form'))
     # Create the form.
     $form->add('members_edit_'. $member_id, array(
                                               'action' => $base_url. '/index.php?action=admin&amp;sa=members_manage&amp;id='. $member_id,
+                                              'ajax_submit' => true,
                                               'callback' => 'admin_members_manage_edit_handle',
                                               'method' => 'post',
                                               'submit' => l('Edit'),
@@ -970,7 +1002,7 @@ if(!function_exists('admin_members_manage_edit_handle'))
     $member_info = $members->get($_GET['id']);
 
     # Alright, set our options that are updated.
-    if($member_info['display_name'] != $data['display_name'])
+    if($member_info['name'] != $data['display_name'])
     {
       $options['display_name'] = $data['display_name'];
       $form->edit_field('members_edit_'. $_GET['id'], 'display_name', array(
@@ -1044,6 +1076,9 @@ if(!function_exists('admin_members_manage_edit_handle'))
 
     # Now update the member!
     $members->update($_GET['id'], $options);
+
+    $api->add_filter('members_edit_'. $_GET['id']. '_message', create_function('$value', '
+                                                                 return l(\'The account has been successfully updated.\');'));
 
     return true;
   }
@@ -1154,8 +1189,19 @@ if(!function_exists('admin_members_manage_group_permissions'))
       $form = $api->load_class('Form');
 
       if(!empty($_POST[$group_id. '_permissions']))
-        # Process the form!
-        $form->process($group_id. '_permissions');
+      {
+        if(isset($_GET['ajax']))
+        {
+          # Using AJAX? Well aren't you Mr. Fancy Pants!
+          echo $form->json_process($group_id. '_permissions');
+          exit;
+        }
+        else
+        {
+          # Process the form! The boring way!
+          $form->process($group_id. '_permissions');
+        }
+      }
 
       $theme->set_title(l('Managing %s permissions', $api->return_group($group_id)));
 
@@ -1191,13 +1237,14 @@ if(!function_exists('admin_members_permissions_generate_form'))
   */
   function admin_members_permissions_generate_form($form_name, $group_id)
   {
-    global $api, $db;
+    global $api, $base_url, $db;
 
     $form = $api->load_class('Form');
 
     # Add our form, before we do anything else, of course!
     $form->add($form_name, array(
-                             'action' => '',
+                             'action' => $base_url. '/index.php?action=admin&sa=members_permissions&grp='. $_GET['grp'],
+                             'ajax_submit' => true,
                              'callback' => 'admin_members_permissions_handle',
                              'method' => 'post',
                              'submit' => l('Save'),
@@ -1251,6 +1298,11 @@ if(!function_exists('admin_members_permissions_generate_form'))
                        'permission' => 'manage_plugins',
                        'label' => l('Manage plugins:'),
                        'subtext' => l('Which includes activating, deactivating and updating of plugins.'),
+                     ),
+                     array(
+                       'permission' => 'manage_plugin_settings',
+                       'label' => l('Manage plugin settings:'),
+                       'subtext' => l('Allow the group to manage miscellaneous plugin settings (Not recommended, as plugins can add various settings).'),
                      ),
                    );
 
@@ -1334,7 +1386,7 @@ if(!function_exists('admin_members_permissions_handle'))
     {
       # You can add more DENIED permissions via the guest_denied_permissions hook ;)
       # (Sorry, but I will not allow plugins to remove denied permissions, at least built in functionality)
-      $denied = array_merge(array('manage_system_settings', 'update_system', 'view_error_log', 'add_new_member', 'manage_members', 'search_members', 'manage_member_settings', 'manage_permissions', 'add_plugins', 'manage_plugins'), $api->apply_filters('denied_guest_permissions', array()));
+      $denied = array_merge(array('manage_system_settings', 'update_system', 'view_error_log', 'add_new_member', 'manage_members', 'search_members', 'manage_member_settings', 'manage_permissions', 'add_plugins', 'manage_plugins', 'manage_plugin_settings'), $api->apply_filters('denied_guest_permissions', array()));
 
       foreach($denied as $deny)
       {
@@ -1361,6 +1413,11 @@ if(!function_exists('admin_members_permissions_handle'))
       ),
       $rows,
       array('group_id', 'permission'), 'permissions_handle_query');
+
+    $api->add_filter(strtolower($group_id). '_permissions_message', create_function('$value', '
+                                                                      global $api;
+
+                                                                      return l(\'%s permissions have been updated successfully.\', ($_GET[\'grp\'] == \'guest\' ? l(\'Guest\') : $api->return_group($_GET[\'grp\'])));'));
 
     return true;
   }

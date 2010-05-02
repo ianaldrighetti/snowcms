@@ -50,7 +50,9 @@ if(!function_exists('json_encode'))
       {
         $values = array();
         foreach($value as $key => $val)
+        {
           $values[] = '"'. __json_sanitize($key, $options). '":'. json_encode($val, $options);
+        }
 
         return '{'. implode(',', $values). '}';
       }
@@ -58,7 +60,9 @@ if(!function_exists('json_encode'))
       {
         $values = array();
         foreach($value as $val)
+        {
           $values[] = json_encode($val, $options);
+        }
 
         return '['. implode(',', $values). ']';
       }
@@ -97,8 +101,12 @@ if(!function_exists('json_encode'))
   function __json_flat_array($array)
   {
     foreach($array as $key => $value)
+    {
       if(!is_int($key))
+      {
         return false;
+      }
+    }
 
     return true;
   }
@@ -131,16 +139,24 @@ if(!function_exists('json_encode'))
 
     # Anything special?
     if($options & JSON_HEX_TAG)
+    {
       $value = strtr($value, array('<' => '\u003C', '>' => '\u003E'));
+    }
 
     if($options & JSON_HEX_AMP)
+    {
       $value = strtr($value, array('&' => '\u0026'));
+    }
 
     if($options & JSON_HEX_APOS)
+    {
       $value = strtr($value, array('\'' => '\u0027'));
+    }
 
     if($options & JSON_HEX_QUOT)
+    {
       $value = strtr($value, array('"' => '\u0022'));
+    }
 
     return $value;
   }
@@ -174,7 +190,9 @@ function array_insert($array, $item, $index, $key = null)
   {
     # Maybe we can just plop it at the end..?
     if($index >= $length)
+    {
       $array[] = $item;
+    }
     else
     {
       $new_array = array();
@@ -195,9 +213,13 @@ function array_insert($array, $item, $index, $key = null)
   {
     # Can't have two of the same indexes, sorry!
     if(isset($array[$key]))
+    {
       return false;
+    }
     elseif($index >= $length)
+    {
       $array[$key] = $item;
+    }
     else
     {
       # Interesting... :P
@@ -217,5 +239,13 @@ function array_insert($array, $item, $index, $key = null)
   }
 
   return $array;
+}
+
+# Some constants that aren't defined until PHP 5.3.0
+if(!defined('E_DEPRECATED'))
+{
+  # So for a bit of compatibility, let's define them ;)
+  define('E_DEPRECATED', 8192);
+  define('E_USER_DEPRECATED', 16384);
 }
 ?>

@@ -236,7 +236,7 @@ function admin_about()
   <h3>', l('Credits'), '</h3>
   <p>', l('There are a few places where SnowCMS used the works of others, and this section is dedicated to their credit!'), '</p>
   <ul>
-    <li>', l('Admin Control Panel icons from the <a href="http://tango.freedesktop.org/" title="Tango Desktop Project" target="_blank">Tango Desktop Project</a>.'), '</li>
+    <li>', l('Admin Control Panel icons from the <a href="http://kde-look.org/content/show.php/Oxygen+Icons?content=74184" title="Oxygen Icon set" target="_blank">Oxygen Icon set</a>.'), '</li>
     <li>', l('Admin Control Panel inspired by the <a href="http://www.jaws-project.com/" title="Jaws Project" target="_blank">Jaws Project</a>.'), '</li>
   </ul>';
 
