@@ -51,6 +51,7 @@ Group: Core  {
 
       File: Control Panel - Home  (core/admin/admin_home.php)
       File: Control Panel - Members  (core/admin/admin_members.php)
+      File: Control Panel - Plugins  (core/admin/admin_plugins.php)
       File: Control Panel - Settings  (core/admin/admin_settings.php)
       File: Control Panel - System Update  (core/admin/admin_update.php)
       }  # Group: Admin

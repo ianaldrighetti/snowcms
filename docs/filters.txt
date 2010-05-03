@@ -1,5 +1,6 @@
 ../trunk/plugins/captcha/captcha.php:  $background = imagecolorallocate($image, $api->apply_filters('captcha_bg_red', 255), $api->apply_filters('captcha_bg_green', 255), $api->apply_filters('captcha_bg_blue', 255));
-../trunk/core/admin.php:      $theme = $api->load_class($api->apply_filters('admin_theme_class', 'Admin_Theme'), l('Control Panel'). ' - '. $settings->get('site_name', 'string'));
+../trunk/core/admin.php:    $theme = $api->load_class($api->apply_filters('admin_theme_class', 'Admin_Theme'), array(l('Control Panel'). ' - '. $settings->get('site_name', 'string'), $api->apply_filters('admin_theme_image_url', $theme_url. '/default/style/images/admincp')));
+../trunk/core/admin.php:      $icons = $api->apply_filters('admin_icons', $icons);
 ../trunk/core/smtp.class.php:        $alt_message = $api->apply_filters('smtp_alt_message_create', $message);
 ../trunk/core/smtp.class.php:    fwrite($this->con, wordwrap($api->apply_filters('smtp_headers', implode("\r\n", $headers)), 70). "\r\n\r\n");
 ../trunk/core/smtp.class.php:      fwrite($this->con, $api->apply_filters('smtp_message_body', "$message\r\n.\r\n"));
@@ -7,6 +8,8 @@
 ../trunk/core/time.php:    $timestamp = $api->apply_filters('timeformat_timestamp', $timestamp);
 ../trunk/core/time.php:      $cur_time_time = $api->apply_filters('timeformat_timestamp', time_utc());
 ../trunk/core/core.php:  ob_start($api->apply_filters('output_callback', null));
+../trunk/core/core.php:    $popup = $api->apply_filters('popup_'. $_GET['id'], array('title' => '', 'content'));
+../trunk/core/core.php:    ', $api->apply_filters('core_popup_css', 'body { background: #FFFFFF; font-family: Tahoma, Arial, sans-serif; font-size: 90%; }
 ../trunk/core/login.php:    if($func['strlen']($api->apply_filters('login_message', '')) > 0)
 ../trunk/core/login.php:      <div id="', $api->apply_filters('login_message_id', 'login_error'), '">
 ../trunk/core/login.php:        ', $api->apply_filters('login_message', ''), '
@@ -15,18 +18,18 @@
 ../trunk/core/admin/admin_members.php:    $types = $api->apply_filters('registration_types', array(
 ../trunk/core/admin/admin_members.php:    $levels = $api->apply_filters('password_security_levels', array(
 ../trunk/core/admin/admin_members.php:    $permissions = $api->apply_filters('member_group_permissions', $permissions);
+../trunk/core/admin/admin_members.php:      $denied = array_merge(array('manage_system_settings', 'update_system', 'view_error_log', 'add_new_member', 'manage_members', 'search_members', 'manage_member_settings', 'manage_permissions', 'add_plugins', 'manage_plugins', 'manage_plugin_settings'), $api->apply_filters('denied_guest_permissions', array()));
 ../trunk/core/admin/admin_settings.php:                                                              'options' => $api->apply_filters('admin_mail_handler', array(
 ../trunk/core/admin/admin_theme.class.php:  <title>', $api->apply_filters('theme_title', (!empty($this->title) ? htmlchars($this->title). ' - ' : ''). (!empty($this->main_title) ? $this->main_title : '')), '</title>';
 ../trunk/core/admin/admin_theme.class.php:<div id="content">', $api->apply_filters('admin_theme_pre_content', '');
 ../trunk/core/admin/admin_theme.class.php:    echo $api->apply_filters('admin_theme_post_content', ''), '
 ../trunk/core/admin/admin_update.php:    $latest_version = $http->request($api->apply_filters('admin_update_version_url', 'http://download.snowcms.com/news/v2.x-line/latest.php'));
 ../trunk/core/admin/admin_update.php:    $latest_info = @unserialize($http->request($api->apply_filters('admin_update_version_url', 'http://download.snowcms.com/news/v2.x-line/latest.php'). '?version='. $settings->get('version', 'string')));
-../trunk/core/admin/admin_update.php:      $latest_info = @unserialize($http->request($api->apply_filters('admin_update_version_url', 'http://download.snowcms.com/news/v2.x-line/latest.php'). '?version='. $settings->get('version', 'string')));
-../trunk/core/admin/admin_update.php:        if($http->request($api->apply_filters('admin_update_download_url', 'http://download.snowcms.com/updates/'). $latest_info['version']. '.tar'. (function_exists('gzinflate') ? '.gz' : ''), array(), 0, $base_dir. '/'. $latest_info['version']. '.tar'. (function_exists('gzinflate') ? '.gz' : '')))
-../trunk/core/admin/admin_update.php:          echo json_encode(array('text' => l('The update was downloaded successfully.'),'file' => ($api->apply_filters('admin_update_download_url', 'http://download.snowcms.com/updates/'). $latest_info['version']. '.tar'. (function_exists('gzinflate') ? '.gz' : '')), 'next_step' => 2));
+../trunk/core/admin/admin_update.php:      $download_url = $api->apply_filters('admin_update_url', 'http://download.snowcms.com/updates/'. $filename);
+../trunk/core/admin/admin_update.php:      $checksum_download_url = $api->apply_filters('admin_update_checksum_url', 'http://download.snowcms.com/updates/'. $filename. '.chksum');
 ../trunk/core/admin/admin_home.php:      $fetched_news = $http->request($api->apply_filters('admin_news_url', 'http://download.snowcms.com/news/v2.x-line/news.php'));
 ../trunk/core/admin/admin_home.php:    $notifications = $api->apply_filters('admin_notifications', array());
-../trunk/core/admin/admin_home.php:    $icons = $api->apply_filters('admin_icons', $icons);
+../trunk/core/upload.class.php:        echo $api->apply_filters('upload_download_file', fread($fp, 8192));
 ../trunk/core/checkcookie.php:      $login_view_func = $api->apply_filters('login_view_function', 'login_view');
 ../trunk/core/checkcookie.php:        require_once($api->apply_filters('login_view_path', $core_dir. '/login.php'));
 ../trunk/core/reminder.php:    if(strlen($api->apply_filters('reminder_message', '')) > 0)
@@ -45,9 +48,12 @@
 ../trunk/core/php_mail.class.php:    $mail = $api->apply_filters('php_mail_function', isset($func['mail']) ? $func['mail'] : 'mail');
 ../trunk/core/form.class.php:      if(strlen($api->apply_filters($form_name. '_message', '')) > 0)
 ../trunk/core/form.class.php:                  ', $api->apply_filters($form_name. '_message', ''), '
+../trunk/core/form.class.php:              <td id="', $form['id'], '_', $name, '_left" class="td_left"><p class="label">', (!empty($field['popup']) ? '<a href="javascript:void(0);" onclick="formPopup = window.open(\''. $base_url. '/index.php?action=popup&amp;id=popup_'. $name. '\', \'formPopup\', \'location=no,menubar=no,status=no,titlebar=yes,height=300px,width=300px,directories=no\'); formPopup.focus();"><img src="'. $api->apply_filters('form_popup_image_url', $theme_url. '/default/style/images/admincp/about-small.png'). '" alt="" title="'. l('More information'). '" /></a> ' : ''). '<label for="', $form['id'], '_', $name, '_input">', $field['label'], '</label></p>', !empty($field['subtext']) ? '<p class="subtext">'. $field['subtext']. '</p>' : '', '</td>';
+../trunk/core/form.class.php:    $response['message'] = $api->apply_filters($form_name. '_message', '');
 ../trunk/core/register.php:      <p>', l('Thank you for registering %s.', $member_info['name']), ' ', (!empty($member_info['is_activated']) ? l('You may now proceed to <a href="%s">log in to your account</a>.', $base_url. '/index.php?action=login') : ($settings->get('registration_type') == 1 ? l('The site requires an administrator to activate new accounts. You will receive an email once your account has been activated.') : ($settings->get('registration_type') == 2 ? l('The site requires you to activate your account via email, so check you email (%s) for your activation link.', $member_info['email']) : $api->apply_filters('registration_message_other', '')))), '</p>';
 ../trunk/core/register.php:                                      'action' => $api->apply_filters('register_action_url', $base_url. '/index.php?action=register2'),
 ../trunk/core/register.php:      $handled = $mail->send($member_info['email'], $api->apply_filters('register_member_email_subject', l('Account activation for %s', $settings->get('site_name', 'string'))), $api->apply_filters('register_member_email_body', l("Hello there %s, this email comes from %s.\r\n\r\nYou are receiving this email because someone has attempted to register an account on our site with your email address. If this was not you who did this, please disregard this email, no further actions are required.\r\n\r\nIf you did, however, request this account, please activate your account by clicking on the link below:\r\n%s/index.php?action=activate&id=%s&code=%s\r\n\r\nThank you for registering! Hope to see you around!", $member_info['name'], $base_url, $base_url, $member_info['id'], $member_info['acode'])), $api->apply_filters('register_member_alt_email', ''), $api->apply_filters('register_member_email_options', array()));
+../trunk/core/register.php:          $mail->send($member_info['email'], $api->apply_filters('register_welcome_member_email_subject', l('Welcome to %s', $settings->get('site_name', 'string'))), $api->apply_filters('register_welcome_member_email_body', l("Hello there %s, this email comes from %s.\r\n\r\nYou are receiving this email because your account on %s is now activated, and you can now log in to your account. If you never registered an account on %s, please disregard this email.\r\n\r\nIf you did, however, you can now log in to your account at %s/index.php?action=login&member_name=%s\r\n\r\nThank you for registering! Hope to see you around!", $member_info['name'], $base_url, $settings->get('site_name', 'string'), $settings->get('site_name', 'string'), $base_url, urlencode($member_info['username']))), $api->apply_filters('register_welcome_member_alt_email', ''), $api->apply_filters('register_welcome_member_email_options', array()));
 ../trunk/themes/default/implemented_theme.class.php:  <title>', $api->apply_filters('theme_title', (!empty($this->title) ? htmlchars($this->title). ' - ' : ''). (!empty($this->main_title) ? $this->main_title : '')), '</title>';
 ../trunk/themes/default/implemented_theme.class.php:      <h2>', $api->apply_filters('theme_site_name', $settings->get('site_name')), '</h2>
 ../trunk/themes/default/implemented_theme.class.php:      <p>', $api->apply_filters('theme_sub_title', 'The <span style="text-decoration: line-through;">best</span> worst theme on the Internets'), '</p>
