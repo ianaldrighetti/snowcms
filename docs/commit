@@ -1,1 +1,7 @@
+svn propset svn:mime-type text/html */*/*/*/*/*.html
+svn propset svn:mime-type text/html */*/*/*/*.html
+svn propset svn:mime-type text/html */*/*/*.html
+svn propset svn:mime-type text/html */*/*.html
+svn propset svn:mime-type text/html */*.html
+svn propset svn:mime-type text/html *.html
 svn commit -m "Updated API Documentation"
