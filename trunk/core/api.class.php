@@ -1389,7 +1389,7 @@ class API
 */
 function load_api()
 {
-  global $api, $db, $loading_plugins, $plugin_dir;
+  global $api, $core_dir, $db, $loading_plugins, $plugin_dir;
 
   ob_start();
 
@@ -1403,6 +1403,10 @@ function load_api()
 
   # Instantiate the API class.
   $api = new API();
+
+  # Load up plugin_load and plugin_list (we don't really use it here, but hey
+  # it's for other people too!)
+  require_once($core_dir. '/plugin.php');
 
   # Find all activated plugins, that way we can load them up.
   $result = $db->query('
@@ -1536,7 +1540,7 @@ function load_api()
 */
 function api_catch_fatal()
 {
-  global $db, $loading_plugins, $plugin_dir;
+  global $db, $core_dir, $loading_plugins, $plugin_dir;
 
   # Not loading plugins?
   if(empty($loading_plugins))
@@ -1559,6 +1563,7 @@ function api_catch_fatal()
       $last_error = array(
                       'type' => E_PARSE,
                       'file' => null,
+                      'message' => $error_string,
                     );
 
       $path = substr(trim(substr($error_string, stripos($error_string, ' in '))), 3);
@@ -1607,6 +1612,15 @@ function api_catch_fatal()
               array(
                 'dependency_name' => $plugin['plugin']['dependency name'],
               ));
+
+            # Log the error.
+            if(!function_exists('errors_handler'))
+            {
+              require_once($core_dir. '/errors.php');
+            }
+
+            # Well, now log the error.
+            errors_handler($last_error['type'], $last_error['message'], $last_error['file'], null);
 
             # Redirect, maybe.
             if(!isset($_SESSION['last_error_fix']) || ((int)$_SESSION['last_error_fix'] + 10) < time())

@@ -72,6 +72,7 @@ abstract class Theme
   */
   public function __construct($main_title = null, $url = null)
   {
+    # Initiate the attributes.
     $this->title = null;
     $this->url = null;
     $this->links = array();
@@ -79,11 +80,17 @@ abstract class Theme
     $this->js_files = array();
     $this->meta = array();
 
+    # Setting the main title?
     if(!empty($main_title))
+    {
       $this->set_main_title($main_title);
+    }
 
+    # How about the URL to the themes folder?
     if(!empty($url))
+    {
       $this->set_url($url);
+    }
 
     # Our first meta tag!
     $this->add_meta(array('http-equiv' => 'Content-Type', 'content' => 'text/html; charset=utf-8'));
@@ -95,65 +102,82 @@ abstract class Theme
   /*
     Method: set_main_title
 
+    Sets the main title of the page.
+
     Parameters:
       string $main_title - What to set the sites main title to.
 
     Returns:
-      bool - Returns TRUE on success, FALSE on failure.
+      bool - Returns true on success, false on failure.
   */
   public function set_main_title($main_title)
   {
-    if(!empty($main_title) && is_string($main_title))
+    # Make sure the title isn't empty.
+    if(!empty($main_title))
     {
       $this->main_title = $main_title;
       return false;
     }
     else
+    {
       return false;
+    }
   }
 
   /*
     Method: set_title
 
+    Sets the title of the specific page.
+
     Parameters:
       string $title - What to set the pages title to.
 
     Returns:
-      bool - Returns TRUE on success, FALSE on failure.
+      bool - Returns true on success, false on failure.
   */
   public function set_title($title)
   {
-    if(!empty($title) && is_string($title))
+    # Don't set it to nothing!
+    if(!empty($title))
     {
       $this->title = $title;
       return true;
     }
     else
+    {
       return false;
+    }
   }
 
   /*
     Method: set_url
 
+    Sets the URL of the current theme, with no trailing /!
+
     Parameters:
       string $url - The URL of the current themes base directory (No trailing /!)
 
     Returns:
-      bool - Returns TRUE on success, FALSE on failure.
+      bool - Returns true on success, false on failure.
   */
   public function set_url($url)
   {
-    if(!empty($url) && is_string($url))
+    # Can't have an empty URL, well, except if you never set it.
+    if(!empty($url))
     {
       $this->url = $url;
       return true;
     }
     else
+    {
       return false;
+    }
   }
 
   /*
     Method: main_title
+
+    Returns the current main title.
 
     Parameters:
       none
@@ -169,6 +193,8 @@ abstract class Theme
   /*
     Method: title
 
+    Returns the current title of the page.
+
     Parameters:
       none
 
@@ -182,6 +208,8 @@ abstract class Theme
 
   /*
     Method: url
+
+    Returns the URL of the theme.
 
     Parameters:
       none
@@ -197,25 +225,35 @@ abstract class Theme
   /*
     Method: add_link
 
+    Adds a <link> tag to the header of the theme.
+
     Parameters:
       array $link - An associative array (attribute => value) containing all
                     the attributes of an link tag.
 
     Returns:
-      bool - Returns TRUE on success, FALSE on failure.
+      bool - Returns true on success, false on failure.
   */
   public function add_link($link)
   {
     # Is href not set, link not an array, that link already exist?!?
     if(count($link) == 0 || empty($link['href']) || !is_array($link) || $this->link_exists($link['href']) || count($link) > 15)
+    {
       return false;
+    }
 
     # Make sure you don't have more attributes than allowed...
     $allowed_attributes = array('charset', 'href', 'hreflang', 'media', 'rel', 'rev', 'target', 'type', 'class', 'dir', 'id', 'lang', 'style', 'title', 'xml:lang');
     foreach($link as $attr => $value)
+    {
+      # Did we find an attribute which wasn't allowed? Uh oh!
       if(!in_array($attr, $allowed_attributes))
+      {
         return false;
+      }
+    }
 
+    # Still going? That means it's okay! ;-)
     $this->links[] = $link;
     return true;
   }
@@ -223,45 +261,67 @@ abstract class Theme
   /*
     Method: link_exists
 
+    Checks to see if there is already a link in the header to the specified
+    URL.
+
     Parameters:
       string $link_href - The href of the link to check.
 
     Returns:
-      bool - Returns TRUE if the link containing that href already exists,
-             FALSE if not.
+      bool - Returns true if the link containing that href already exists,
+             false if not.
   */
   public function link_exists($link_href)
   {
-    if(empty($link_href) || !is_string($link_href) || count($this->links) == 0)
+    # No need to search if the URL is blank or if there are no links!
+    if(empty($link_href) || count($this->links) == 0)
+    {
       return false;
+    }
 
+    # Look through them all.
     foreach($this->links as $key => $link)
+    {
+      # Did we find it?
       if($link['href'] == $link_href)
+      {
+        # Yup, we found it, so it exists!
         return true;
+      }
+    }
 
+    # Still going? Then we didn't find it.
     return false;
   }
 
   /*
     Method: remove_link
 
+    Removes the specified link from the header of the theme.
+
     Parameters:
       string $link_href - The href of the link to remove.
 
     Returns:
-      bool - Returns TRUE if the link was removed, FALSE if not.
+      bool - Returns true if the link was removed, false if not.
   */
   public function remove_link($link_href)
   {
-    if(empty($link_href) || !is_string($link_href) || count($this->links) == 0 || !$this->link_exists($link_href))
+    # Empty URL? No links? Doesn't exist? Then we can't remove it, can we?!
+    if(empty($link_href) || count($this->links) == 0 || !$this->link_exists($link_href))
+    {
       return false;
+    }
 
     foreach($this->links as $key => $link)
+    {
+      # I think we found it, if they match!
       if($link['href'] == $link_href)
       {
         unset($this->links[$key]);
         return true;
       }
+    }
 
     # This should never happen o.O
     return false;
@@ -270,18 +330,24 @@ abstract class Theme
   /*
     Method: add_js_var
 
+    Adds a JavaScript variable to the header of the theme.
+
     Parameters:
       string $variable - The name of the JavaScript variable to define.
       mixed $value - The value of the variable. Can either be a string, int or float.
 
     Returns:
-      bool - Returns TRUE on success, FALSE on failure.
+      bool - Returns true on success, false on failure.
   */
   public function add_js_var($variable, $value)
   {
+    # You need a variable name, but if the variable already exists...
     if(empty($variable) || $this->js_var_exists($variable))
+    {
       return false;
+    }
 
+    # JSON encode the value :D
     $this->js_vars[$variable] = json_encode($value);
     return true;
   }
@@ -289,31 +355,40 @@ abstract class Theme
   /*
     Method: js_var_exists
 
+    Checks to see if the specified JavaScript variable exists.
+
     Parameters:
       string $variable - The name of the JavaScript variable to check.
 
     Returns:
-      bool - Returns TRUE if the variable exists, FALSE if not.
+      bool - Returns true if the variable exists, false if not.
   */
   public function js_var_exists($variable)
   {
-    return !empty($variable) && is_string($variable) && isset($this->js_vars[$variable]);
+    # A simple check, really.
+    return isset($this->js_vars[$variable]);
   }
 
   /*
     Method: remove_js_var
 
+    Removes the specified JavaScript variable
+
     Parameters:
       string $variable - The name of the JavaScript variable to remove.
 
     Returns:
-      bool - Returns TRUE on success, FALSE on failure.
+      bool - Returns true on success, false on failure.
   */
   public function remove_js_var($variable)
   {
-    if(empty($variable) || !is_string($variable) || !$this->js_var_exists($variable))
+    # We cannot remove something that doesn't exist, can we?
+    if(!$this->js_var_exists($variable))
+    {
       return false;
+    }
 
+    # Simple enough, just unset it.
     unset($this->js_vars[$variable]);
     return true;
   }
@@ -321,30 +396,42 @@ abstract class Theme
   /*
     Method: add_js_file
 
+    Adds a JavaScript file to the header of the theme.
+
     Parameters:
       array $script - Contains the attributes of the script tag.
 
     Returns:
-      bool - Returns TRUE on success, FALSE on failure.
+      bool - Returns true on success, false on failure.
   */
   public function add_js_file($script)
   {
+    # We require you give us at least the source (src) of the script.
     if(empty($script) || !is_array($script) || empty($script['src']) || $this->js_file_exists($script['src']))
+    {
       return false;
+    }
 
     # No type? Add it ourselves :P
     if(empty($script['type']))
       $script['type'] = 'text/javascript';
 
+    # No language? JavaScript then... Of course.
     if(empty($script['language']))
       $script['language'] = 'JavaScript';
 
     # Let's make sure you aren't throwing some random crap in...
     $allowed_attributes = array('type', 'charset', 'defer', 'src', 'language');
     foreach($script as $attr => $value)
+    {
+      # Did you add an attribute which doesn't exist? Tisk tisk!
       if(!in_array($attr, $allowed_attributes))
+      {
         return false;
+      }
+    }
 
+    # If false was never returned, everything is okay.
     $this->js_files[] = $script;
     return true;
   }
@@ -352,44 +439,65 @@ abstract class Theme
   /*
     Method: js_file_exists
 
+    Checks to see if the specified JavaScript file exists.
+
     Parameters:
       string $script_src - The script source (The URL of the JS file).
 
     Returns:
-      bool - Returns TRUE if the js file exists, FALSE if not.
+      bool - Returns true if the js file exists, false if not.
   */
   public function js_file_exists($script_src)
   {
-    if(empty($script_src) || !is_string($script_src) || count($this->js_files) == 0)
+    # No src? No JavaScript files currently? Then it definitely won't exist.
+    if(empty($script_src) || count($this->js_files) == 0)
+    {
       return false;
+    }
 
+    # Try to find the file.
     foreach($this->js_files as $js)
+    {
+      # Do the src's match?
       if($js['src'] == $script_src)
+      {
         return true;
+      }
+    }
 
+    # Nope, didn't find one.
     return false;
   }
 
   /*
     Method: remove_js_file
 
+    Removes the specified JavaScript file.
+
     Parameters:
       string $script_src - The script source (The URL of the JS file).
 
     Returns:
-      bool - Returns TRUE on success, FALSE on failure.
+      bool - Returns true on success, false on failure.
   */
   public function remove_js_file($script_src)
   {
-    if(empty($script_src) || !is_string($script_src) || count($this->js_files) == 0 || !$this->js_file_exists($script_src))
+    # Does the JavaScript file not exist? Then we can't remove it.
+    if(!$this->js_file_exists($script_src))
+    {
       return false;
+    }
 
+    # Hmm, let's looks, as we need the key of the index to delete it.
     foreach($this->js_files as $key => $js)
+    {
       if($js['src'] == $script_src)
       {
+        # Found it!
         unset($this->js_files[$key]);
         return true;
       }
+    }
 
     # This shouldn't happen o.O
     return false;
@@ -398,25 +506,38 @@ abstract class Theme
   /*
     Method: add_meta
 
+    Adds a meta tag to the themes header.
+
     Parameters:
       array $meta - An array containing the meta tags information.
 
     Returns:
-      bool - Returns TRUE on success, FALSE on failure.
+      bool - Returns true on success, false on failure.
   */
   public function add_meta($meta)
   {
+    # No information given? Or no essential information given? Then sorry, can't add it!
     if(empty($meta) || !is_array($meta) || count($meta) == 0 || ((isset($meta['name']) || isset($meta['http-equiv'])) && $this->meta_exists(isset($meta['name']) ? $meta['name'] : $meta['http-equiv'])))
+    {
       return false;
+    }
+    # You can only have a name OR http-equiv value, not both!
     elseif(!empty($meta['name']) && !empty($meta['http-equiv']))
+    {
       return false;
-
+    }
 
     $allowed_attributes = array('content', 'http-equiv', 'name', 'scheme', 'dir', 'lang', 'xml:lang');
     foreach($meta as $attr => $value)
+    {
+      # You trying to add some funky attribute? Sorry.
       if(!in_array($attr, $allowed_attributes))
+      {
         return false;
+      }
+    }
 
+    # Looks like it is okay, add it!
     $this->meta[] = $meta;
     return true;
   }
@@ -424,44 +545,64 @@ abstract class Theme
   /*
     Method: meta_exists
 
+    Checks to see if the specified meta tag exists.
+
     Parameters:
       string $name - The name of the tag (or http-equiv).
 
     Returns:
-      bool - Returns TRUE if the meta tag exists, FALSE if not.
+      bool - Returns true if the meta tag exists, false if not.
   */
   public function meta_exists($name)
   {
-    if(empty($name) || !is_string($name) || count($this->meta) == 0)
+    # No name supplied?
+    if(empty($name) || count($this->meta) == 0)
+    {
       return false;
+    }
 
     foreach($this->meta as $meta)
+    {
+      # Check both the name and http-equiv value of the meta tag.
       if((isset($meta['name']) && $meta['name'] == $name) || (isset($meta['http-equiv']) && $meta['http-equiv'] == $name))
+      {
         return true;
+      }
+    }
 
+    # Sorry, doesn't exist. Or am I sorry? ;-)
     return false;
   }
 
   /*
     Method: remove_meta
 
+    Removes the specified meta tag.
+
     Parameters:
       string $name - The name of the tag (or http-equiv).
 
     Returns:
-      bool - Returns TRUE on success, FALSE on failure.
+      bool - Returns true on success, false on failure.
   */
   public function remove_meta($name)
   {
+    # Can't remove something that doesn't exist, at least, in the real world.
     if(!$this->meta_exists($name))
+    {
       return false;
+    }
 
     foreach($this->meta as $key => $meta)
+    {
+      # Search for it!
       if((isset($meta['name']) && $meta['name'] == $name) || (isset($meta['http-equiv']) && $meta['http-equiv'] == $name))
       {
+        # Remove it and we are done.
         unset($this->meta[$key]);
         return true;
       }
+    }
 
     # Should never happen :/
     return false;
@@ -482,7 +623,9 @@ abstract class Theme
   */
   protected function init()
   {
-
+    # Blank? Yup... As nothing is here by default, but if your theme has anything special
+    # to add or do at startup, redefine this method in your class and the __construct
+    # will call it after all attribute initialization is completed.
   }
 
   /*
@@ -526,25 +669,34 @@ abstract class Theme
   */
   protected function generate_tag($name, $attributes, $self_closing = true)
   {
+    # Kinda need the name of a tag.
     if(empty($name))
+    {
       return false;
+    }
 
-    $tag = '<'. $name;
+    # Start to generate the tag.
+    $tag = '<'. strtolower($name);
 
+    # Any attributes to add? Maybe, maybe not.
     if(is_array($attributes) && count($attributes) > 0)
     {
       $attr = array();
 
       foreach($attributes as $name => $value)
       {
+        # As long as they aren't empty, add them.
         if(!empty($value))
           $attr[] = $name. '="'. addcslashes($value, '"'). '"';
       }
 
+      # Now add them to the tag.
       $tag .= ' '. implode(' ', $attr);
     }
 
-      return ($tag. (!empty($self_closing) ? ' />' : '>'));
+    # Now finally, return the tag, either self closing, or not!
+    # You can finish the rest if you don't have a self closing tag ;-)
+    return ($tag. (!empty($self_closing) ? ' />' : '>'));
   }
 }
 
@@ -561,12 +713,19 @@ abstract class Theme
 */
 function init_theme()
 {
-  global $api, $base_url, $settings, $theme, $theme_dir, $theme_url;
+  global $api, $base_url, $core_dir, $settings, $theme, $theme_dir, $theme_url;
 
-  require_once($theme_dir. '/'. $settings->get('theme'). '/implemented_theme.class.php');
-  $theme = $api->load_class('Implemented_Theme', array($settings->get('site_name'), $theme_url. '/'. $settings->get('theme')));
+  # Load up <theme_load> and <theme_list> :-)
+  require_once($core_dir. '/theme.php');
 
+  # Load the Implemented_Theme class...
+  require_once($theme_dir. '/'. $settings->get('theme', 'string', 'default'). '/implemented_theme.class.php');
+  $theme = $api->load_class('Implemented_Theme', array($settings->get('site_name', 'string'), $theme_url. '/'. $settings->get('theme', 'string', 'default')));
+
+  # Be sure that the snowobj.js file is in all themes.
   $theme->add_js_file(array('src' => $theme_url. '/default/js/snowobj.js'));
+
+  # Along with  JavaScript variables containing the base URL and theme URL.
   $theme->add_js_var('base_url', $base_url);
   $theme->add_js_var('theme_url', $theme_url);
 

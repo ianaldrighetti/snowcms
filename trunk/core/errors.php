@@ -50,7 +50,7 @@ if(!defined('IN_SNOW'))
 */
 function errors_handler($error_type, $error_message, $error_file = null, $error_line = 0, $error_context = array())
 {
-  global $api, $db, $member, $settings;
+  global $api, $api_force_log, $db, $member, $settings;
 
   # Sorry, we can only do this if the API class has been declared and instantiated.
   $handled = null;
@@ -58,7 +58,7 @@ function errors_handler($error_type, $error_message, $error_file = null, $error_
     $api->run_hooks('error_handler', array(&$handled, $error_type, $error_message, $error_file, $error_line, $error_context));
 
   # Not handled? We will do it then! That is, if it's enabled.
-  if($handled === null && isset($settings) && is_object($settings) && $settings->get('errors_log', 'bool'))
+  if($handled === null && ((isset($settings) && is_object($settings) && $settings->get('errors_log', 'bool')) || !empty($api_force_log)))
   {
     # In order to stop any possible recursion, don't log errors coming from this file.
     if(substr($error_file, strlen($error_file) - 10, strlen($error_file)) == 'errors.php')
