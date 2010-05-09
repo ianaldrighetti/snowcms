@@ -1304,6 +1304,16 @@ if(!function_exists('admin_members_permissions_generate_form'))
                        'label' => l('Manage plugin settings:'),
                        'subtext' => l('Allow the group to manage miscellaneous plugin settings (Not recommended, as plugins can add various settings).'),
                      ),
+                     array(
+                       'permission' => 'view_other_profiles',
+                       'label' => l('View other profiles:'),
+                       'subtext' => l('Should they be allowed to view other members profiles? (Not recommended for guests)'),
+                     ),
+                     array(
+                       'permission' => 'edit_other_profiles',
+                       'label' => l('Edit other profiles:'),
+                       'subtext' => l(''),
+                     ),
                    );
 
     # So yeah, add your permissions!

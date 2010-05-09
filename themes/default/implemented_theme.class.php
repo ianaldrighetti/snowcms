@@ -79,9 +79,25 @@ class Implemented_Theme extends Theme
       <p>', $api->apply_filters('theme_sub_title', 'The <span style="text-decoration: line-through;">best</span> worst theme on the Internets'), '</p>
       <div id="menu-outer">
         <div id="menu-inner">
-          <ul id="menu">
-            <li>Home</li>
-            <li>About</li>
+          <ul id="menu">';
+
+    # Load up the menu items, that is, if there are any.
+    $menu_items = $api->return_menu_items('main');
+
+    if(count($menu_items) > 0)
+    {
+      foreach($menu_items as $item)
+      {
+        # We won't give it the content or extra stuff, but we need the content, at least.
+        $content = $item['content'];
+        unset($item['content'], $item['extra']);
+
+        echo '
+            <li>', $theme->generate_tag('a', $item, false), $content, '</a></li>';
+      }
+    }
+
+    echo '
           </ul>
         </div>
       </div>

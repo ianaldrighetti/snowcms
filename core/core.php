@@ -69,7 +69,8 @@ function init_core()
   $api->add_event('action=login', 'login_view', $core_dir. '/login.php');
   $api->add_event('action=login2', 'login_view2', $core_dir. '/login.php');
   $api->add_event('action=logout', 'logout_process', $core_dir. '/logout.php');
-  $api->add_event('action=profile', 'profile_switch', $core_dir. '/profile.php');
+  $api->add_event('action=profile', 'profile_view', $core_dir. '/profile.php');
+  $api->add_event('action=profile&id=*', 'profile_view', $core_dir. '/profile.php');
   $api->add_event('action=register', 'register_view', $core_dir. '/register.php');
   $api->add_event('action=register2', 'register_process', $core_dir. '/register.php');
   $api->add_event('action=resend', 'resend_view', $core_dir. '/resend.php');
