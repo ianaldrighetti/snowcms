@@ -811,6 +811,20 @@ class Tar
   }
 
   /*
+    Method: is_open
+
+    Parameters:
+      none
+
+    Returns:
+      bool - Returns true if a tarball is open, false if not.
+  */
+  public function is_open()
+  {
+    return !empty($this->mode);
+  }
+
+  /*
     Destructor: __destruct
   */
   public function __destruct()
