@@ -42,7 +42,7 @@ abstract class Database_Maintenance
                              should not be created, as this method will do that)
 
     Returns:
-     bool - TRUE if the table was successfully backed up, FALSE on failure.
+     bool - true if the table was successfully backed up, false on failure.
 
   */
   abstract public function backup_table($table, $backup_table);
@@ -56,7 +56,7 @@ abstract class Database_Maintenance
       string - The table to optimize.
 
     Returns:
-     bool - TRUE on success, FALSE on failure.
+     bool - true on success, false on failure.
 
     Note:
        If the database system has a command that optimizes the whole database (Ex: SQLite)
@@ -69,7 +69,7 @@ abstract class Database_Maintenance
     Method: table_sql
 
     Generates the CREATE TABLE command for the specified table, if $file is specified,
-    append that data to the specified file and return a bool (TRUE on success, FALSE on failure),
+    append that data to the specified file and return a bool (true on success, false on failure),
     otherwise return the string containing the CREATE TABLE.
 
     Parameters:
@@ -118,7 +118,7 @@ abstract class Database_Maintenance
     Parameters:
       string $table - The name of the table to create.
       array $columns - An array of columns which contains each columns information. Ex:
-                       $columns = array('col_name' => array('type' => 'int', 'length' => 10, 'attributes' => 'unsigned', 'null' => false, 'auto_increment' => true), 'another_col' => array(...))
+                       $columns = array('col_name' => array('type' => 'int', 'length' => 10, 'attributes' => 'unsigned', 'null' => false, 'default' => 'Default value', 'auto_increment' => true), 'another_col' => array(...))
                        Note:
        Make note that any MySQL datatype could be used in type, so if you get a MySQL only supported datatype, use a similar one of equal or greater capabilities.
                              attributes could be UNSIGNED, ZEROFILL or BINARY.
@@ -137,7 +137,7 @@ abstract class Database_Maintenance
                        )
       string $on_exists - What to do if the table you want to create already exists.
                           Options:
-                            fail - False is returned signifying table creation failed.
+                            fail - false is returned signifying table creation failed.
                             overwrite - Drops the old table (And it's data!!!) and replaces it with the newer one.
                             update - Adds the columns that weren't found to the table.
 
@@ -153,17 +153,32 @@ abstract class Database_Maintenance
       string $table - The name of the table to alter.
       array $column - An array containing column/index information.
       string $type - The type of alteration which is being done, which can
-                     be either 'column' or 'index'
-      string $location - If the column does not exist, where should it be placed?
-                         This can either be at_first, ar_end or a column name
-                         (if a column name is supplied, the column you are adding will
-                         be added after it). However, you can also specify 'fail'
-                         which if the column already exists, this method will return FALSE.
+                     be either column, primary, unique, fulltext or key.
+      string $location - Where should the column be placed? This can either be at_first,
+                         at_end, null (for don't move it) or a column name (if a column
+                         name is supplied, the column you are adding will be added after it).
+      string $on_exists - What to do if the column you want to modify already exists,
+                          if fail, then if the column exists, altering will fail, or
+                          overwrite, in which the old columns declaration will be overwritten.
 
     Returns:
-      bool - Returns TRUE if the column/index was added/updated successfully, FALSE
+      bool - Returns true if the column/index was added/updated successfully, false
              on failure.
+
+    Note:
+      The column parameter array accepts the following indexes:
+        name - The name of the column (either to create or modify, or the name of the index).
+        new_name - The new name of the column (only if the column already exists).
+        type - The data type of the column.
+        length - The data length of the column.
+        attributes - Any attributes of the column, such as UNSIGNED, ZEROFILL or BINARY.
+        null - Whether or not the column is NULL (true) or NOT NULL (false).
+        default - The default value for the table.
+        auto_increment - Whether or not the field is set to auto increment.
+        columns - The name of the columns to create the index on (only available if type is
+                  primary, unique or key).
+        drop - Set this to true if you want to drop the specified column/index.
   */
-  abstract public function alter_table($table, $column, $type = 'column', $location = 'at_end');
+  abstract public function alter_table($table, $column, $type = 'column', $location = 'at_end', $on_exists = 'fail');
 }
 ?>
