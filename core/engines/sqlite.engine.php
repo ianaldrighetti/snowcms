@@ -30,9 +30,13 @@ class SQLite extends Database
 
     # Make it persistent, or not?
     if(empty($db_persist))
+    {
       $this->con = @sqlite_open($db_host);
+    }
     else
+    {
       $this->con = @sqlite_popen($db_host);
+    }
 
     # Couldn't open the database?
     if(empty($this->con))
@@ -69,7 +73,9 @@ class SQLite extends Database
       return true;
     }
     else
+    {
       return false;
+    }
   }
 
   public function errno()
@@ -102,7 +108,9 @@ class SQLite extends Database
   public function version()
   {
     if(empty($this->con))
+    {
       return false;
+    }
 
     # Easy enough...
     return sqlite_libversion();
@@ -111,7 +119,9 @@ class SQLite extends Database
   public function tables()
   {
     if(empty($this->con))
+    {
       return false;
+    }
 
     # The master table contains a list of tables and indexes.
     $result = $db->query('
@@ -122,9 +132,22 @@ class SQLite extends Database
     # Load'em up!
     $tables = array();
     while($row = $result->fetch_row())
+    {
       $tables[] = $row[0];
+    }
 
     return $tables;
+  }
+
+  public function columns($table)
+  {
+    if(empty($this->con))
+    {
+      return false;
+    }
+
+    # !!! TODO
+    return false;
   }
 
   public function query($db_query, $db_vars = array(), $hook_name = null, $db_compat = null, $file = null, $line = 0)
@@ -132,11 +155,29 @@ class SQLite extends Database
     global $api;
 
     if(empty($this->con))
+    {
       return false;
+    }
+
+    $return = null;
+    $api->run_hooks('pre_parse_query', array(&$db_query, &$db_vars, &$hook_name, &$db_compat, &$file, &$line, &$return));
+
+    if($return !== null)
+    {
+      return $return;
+    }
 
     # Just incase, you want to change something.
     if(!empty($hook_name))
-      $api->run_hooks($hook_name, array(&$db_query, &$db_vars, &$db_compat));
+    {
+      $return = null;
+      $api->run_hooks($hook_name, array(&$db_query, &$db_vars, &$hook_name, &$db_compat, &$file, &$line, &$return));
+
+      if($return !== null)
+      {
+        return $return;
+      }
+    }
 
     # Debugging?
     if(isset($db_vars['debug']))
@@ -153,25 +194,35 @@ class SQLite extends Database
     # Now for some SQLite changes..! FUN!
     # SQLite does have support for UPDATE IGNORE, but it's UPDATE OR IGNORE...
     if($command == 'UPDATE' && stripos($db_query, 'UPDATE IGNORE') !== false)
+    {
       $db_query = str_ireplace('UPDATE IGNORE', 'UPDATE OR IGNORE', $db_query);
+    }
 
     # SQLite is naughty, and doesn't support LIMIT's in UPDATE and DELETE queries...
     if(($command == 'UPDATE' || $command == 'DELETE') && (preg_match('~UPDATE(?:.*?)SET~is', $db_query) == 1 || stripos($db_query, 'DELETE FROM') !== false) && preg_match('~(?:LIMIT\s+(?:\d+|%.*)(?:\s*,\s*(?:\d+|%.*))?)~i', $db_query, $matches) == 1)
+    {
       $db_query = str_replace($matches[0], ' ', $db_query);
+    }
 
     # ASC or DESC flag in a GROUP BY? Nope.
     if($command == 'SELECT' && preg_match('~GROUP BY (.*?) (?:ASC|DESC)~', $db_query, $matches))
+    {
       # So just remove the ASC or DESC...
       $db_query = str_replace($matches[0], str_replace(array('ASC', 'DESC'), '', $matches[0]), $db_query);
+    }
 
     # TRUNCATE? Nope. It's just a DELETE FROM.
     if($command == 'TRUNCATE')
+    {
       # It could be TRUNCATE TABLE though too, so check that.
       $db_query = str_ireplace(stripos($db_query, 'TRUNCATE TABLE') !== false ? 'TRUNCATE TABLE' : 'TRUNCATE', 'DELETE FROM', $db_query);
+    }
 
     # Any random function call? It's RANDOM() in SQLite.
     if(preg_match('~RAND\((?:.*?)\)~', $db_query, $matches))
+    {
       $db_query = str_replace($matches[0], 'RAND()', $db_query);
+    }
 
     # Let's use debug_backtrace() to find where this was called and what not ;)
     # Only if file and line aren't set already ;)
@@ -186,7 +237,7 @@ class SQLite extends Database
     $db_query = strtr($db_query, array('{db->prefix}' => $this->prefix, '{db_prefix}' => $this->prefix));
 
     # Any possible variables that may need replacing? (Don't do this if it is an insert, or things could get ugly)
-    if(strpos($db_query, '{') !== false && $db_compat != 'insert')
+    if(strpos($db_query, '{') !== false && ($db_compat != 'insert' || $db_compat == 'no_parse'))
     {
       # Find all the variables.
       preg_match_all('~{[\w-]+:\w+}~', $db_query, $matches);
@@ -223,21 +274,26 @@ class SQLite extends Database
 
         # Did we get any undefined variables? :/
         if(count($undefined) > 0)
+        {
           $this->log_error('Undefined database variables <em>'. implode('</em>, <em>', $undefined). '</em>', true, $file, $line);
+        }
 
         # Maybe replace the variables in the query?
         if(count($replacements))
+        {
           $db_query = strtr($db_query, $replacements);
+        }
       }
     }
 
-    # For every query, you know, if there were a cache plugin :P
+    # For every query...
     $return = null;
     $api->run_hooks('pre_query_exec', array(&$db_query, &$db_vars, &$db_compat, &$hook_name, &$return));
 
-    # Did you set anything?
     if(!empty($return))
+    {
       return $return;
+    }
 
     # Now run that query!
     $query_start = microtime(true);
@@ -259,7 +315,9 @@ class SQLite extends Database
 
     # Did an error occur?
     if(empty($query_result))
+    {
       $this->log_error($sqlite_error, true, $file, $line);
+    }
 
     # We shall return the result in an SQLiteResult Object.
     $result = new $this->result_class($query_result, sqlite_changes($this->con), $db_compat == 'insert' ? sqlite_last_insert_rowid($this->con) : 0, $sqlite_errno, $sqlite_error, $this->num_queries - 1);
@@ -289,6 +347,9 @@ class SQLite extends Database
       'float' => 'sanitize_float',
       'float_array' => 'sanitize_float_array',
       'array_float' => 'sanitize_float_array',
+      'identifier' => 'sanitize_identifier',
+      'identifier_array' => 'sanitize_identifier_array',
+      'array_identifier' => 'sanitize_identifier_array',
       'int' => 'sanitize_int',
       'int_array' => 'sanitize_int_array',
       'array_int' => 'sanitize_int_array',
@@ -305,7 +366,9 @@ class SQLite extends Database
 
     # Is the datatype defined?
     if(!isset($datatypes[$datatype]))
+    {
       $this->log_error('Undefined data type <string>'. strtoupper($datatype). '</strong>.', true, $file, $line);
+    }
 
     # Return the sanitized value...
     return is_callable(array($this, $datatypes[$datatype])) ? $this->$datatypes[$datatype]($var_name, $value, $file, $line) : $datatypes[$datatype]($var_name, $value, $file, $line);
@@ -315,7 +378,9 @@ class SQLite extends Database
   {
     # Make sure it is of the right type :)
     if((string)$value !== (string)(float)$value)
+    {
       $this->log_error('Wrong data type, float expected ('. $var_name. ')', true, $file, $line);
+    }
 
     return (string)(float)$value;
   }
@@ -324,12 +389,42 @@ class SQLite extends Database
   {
     # Not an array? Well, it can't be an array of floats then can it?
     if(!is_array($value))
+    {
       $this->log_error('Wrong data type, array expected ('. $var_name. ')', true, $file, $line);
+    }
 
     $new_value = array();
     if(count($value))
+    {
       foreach($value as $v)
+      {
         $new_value[] = $this->sanitize_float($var_name, $v, $file, $line);
+      }
+    }
+
+    return implode(', ', $new_value);
+  }
+
+  protected function sanitize_identifier($var_name, $value, $file, $line)
+  {
+    return '\''. $value. '\'';
+  }
+
+  protected function sanitize_identifier_array($var_name, $value, $file, $line)
+  {
+    if(!is_array($value))
+    {
+      $this->log_error('Wrong data type, array expected ('. $var_name. ')', true, $file, $line);
+    }
+
+    $new_value = array();
+    if(count($value))
+    {
+      foreach($value as $v)
+      {
+        $new_value[] = $this->sanitize_identifier($var_name, $v, $file, $line);
+      }
+    }
 
     return implode(', ', $new_value);
   }
@@ -338,7 +433,9 @@ class SQLite extends Database
   {
     # Mmmm, inty!
     if((string)$value !== (string)(int)$value)
+    {
       $this->log_error('Wrong data type, integer expected ('. $var_name. ')', true, $file, $line);
+    }
 
     return (string)(int)$value;
   }
@@ -346,12 +443,18 @@ class SQLite extends Database
   protected function sanitize_int_array($var_name, $value, $file, $line)
   {
     if(!is_array($value))
+    {
       $this->log_error('Wrong data type, array expected ('. $var_name. ')', true, $file, $line);
+    }
 
     $new_value = array();
     if(count($value))
+    {
       foreach($value as $v)
+      {
         $new_value[] = $this->sanitize_int($var_name, $v, $file, $line);
+      }
+    }
 
     return implode(', ', $new_value);
   }
@@ -365,12 +468,18 @@ class SQLite extends Database
   protected function sanitize_string_array($var_name, $value, $file, $line)
   {
     if(!is_array($value))
+    {
       $this->log_error('Wrong data type, array expected ('. $var_name. ')', true, $file, $line);
+    }
 
     $new_value = array();
     if(count($value))
+    {
       foreach($value as $v)
+      {
         $new_value[] = $this->sanitize_string($var_name, $v, $file, $line);
+      }
+    }
 
     return implode(', ', $new_value);
   }
@@ -380,12 +489,16 @@ class SQLite extends Database
     global $api;
 
     if(empty($this->con))
+    {
       return false;
+    }
+
+    $api->run_hooks('pre_insert_exec', array(&$type, &$tbl_name, &$columns, &$data, &$keys, &$hook_name));
 
     if(!empty($hook_name))
-      $api->run_hooks($hook_name, array(&$type, &$tbl_name, &$columns, &$data, &$keys));
-
-    $api->run_hooks('pre_insert_exec', array(&$type, &$tbl_name, &$columns, &$data, &$keys));
+    {
+      $api->run_hooks($hook_name, array(&$type, &$tbl_name, &$columns, &$data, &$keys, &$hook_name));
+    }
 
     # Let's get where you called us from!
     $backtrace = debug_backtrace();
@@ -397,14 +510,18 @@ class SQLite extends Database
 
     # We only support insert, ignore and replace.
     if(!in_array($type, array('insert', 'ignore', 'replace')))
+    {
       $this->log_error('Unknown insert type '. $type, true, $file, $line);
+    }
 
     # Replace {db->prefix} and {db_prefix} with $this->prefix
     $tbl_name = strtr($tbl_name, array('{db->prefix}' => $this->prefix, '{db_prefix}' => $this->prefix));
 
     # Just an array, and not an array inside an array? We'll fix that...
     if(!isset($data[0]) || !is_array($data[0]))
+    {
       $data = array($data);
+    }
 
     # The number of columns :)
     $num_columns = count($columns);
@@ -418,12 +535,16 @@ class SQLite extends Database
     {
       # Not enough data?
       if($num_columns != count($row))
+      {
         $this->log_error('Number of columns doesn\'t match the number of supplied columns in row #'. ($row_index + 1), true, $file, $line);
+      }
 
       # Save the values to an array, all sanitized and what not, of course!
       $values = array();
       foreach($row as $index => $value)
+      {
         $values[] = $this->var_sanitize($column_names[$index], $columns[$column_names[$index]], $value, $file, $line);
+      }
 
       # Add those values to our rows now :)
       $rows[] = '('. implode(', ', $values). ')';

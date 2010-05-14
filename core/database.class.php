@@ -27,46 +27,56 @@ if(!defined('IN_SNOW'))
 */
 abstract class Database
 {
+  # Variable: con
   # Holds the database connection resource.
   public $con = null;
 
+  # Variable: prefix
   # Holds the table prefix, such as snow_
   public $prefix = null;
 
+  # Variable: type
   # The type of database, for example: MySQL, SQLite, PostgreSQL, etc.
   public $type = null;
 
+  # Variable: case_sensitive
   # Is the database system case sensitive? Some are, some aren't. Be sure
-  # that you set this to TRUE if the database is case sensitive, or very bad
+  # that you set this to true if the database is case sensitive, or very bad
   # things could occur!!! (Set to true, just incase ;))
   public $case_sensitive = true;
 
+  # Variable: num_queries
   # The number of queries executed so far, right now, none!
   public $num_queries = 0;
 
+  # Variable: drop_if_exists
   # Does your database type support DROP TABLE IF EXISTS?
   public $drop_if_exists = false;
 
+  # Variable: if_not_exists
   # How about CREATE TABLE IF NOT EXISTS?
   public $if_not_exists = false;
 
+  # Variable: extended_inserts
   # Can the database handle extended inserts?
   public $extended_inserts = false;
 
+  # Variable: debug
   # Is the database in a forced debug mode?
   public $debug = false;
 
+  # Variable: result_class
   # The result class which query and insert return (global $db_result_class in connect()).
   public $result_class = null;
 
+  # Variable: debug_text
   # Holds all the debugging stuff which gets written to a file when the object is destructed.
   protected $debug_text = '';
 
   /*
-    :
+    Constructor: __construct
 
     This constructor simply takes the database result's class name and saves it to the result_class attribute.
-
   */
   public function __construct($db_result_class = null)
   {
@@ -79,13 +89,13 @@ abstract class Database
     Connects to the SQL database or server.
 
     Parameters:
+      none
 
     Returns:
-     bool - Returns TRUE if the connection was a success, FALSE if connection failed.
+     bool - Returns true if the connection was a success, false if connection failed.
 
     Note:
-       To get the database information, simply global the variables, such as $db_host, $db_name, $db_user, $db_passwd, $db_prefix, etc.
-
+      To get the database information, simply global the variables, such as $db_host, $db_name, $db_user, $db_passwd, $db_prefix, etc.
   */
   abstract public function connect();
 
@@ -95,10 +105,10 @@ abstract class Database
     Closes the connection to the SQL database or server.
 
     Parameters:
+      none
 
     Returns:
-     bool - Returns TRUE if the connection was successfully closed, FALSE otherwise.
-
+     bool - Returns true if the connection was successfully closed, false otherwise.
   */
   abstract public function close();
 
@@ -108,10 +118,10 @@ abstract class Database
     Returns the error number of which occurred from the last database method called, if any.
 
     Parameters:
+      none
 
     Returns:
-     int - Returns the last error number, 0 if none.
-
+      int - Returns the last error number, 0 if none.
   */
   abstract public function errno();
 
@@ -121,10 +131,10 @@ abstract class Database
     Returns the error string from the last SELECT, UPDATE, INSERT, etc. query.
 
     Parameters:
+      none
 
     Returns:
      string - Returns the last error string, an empty string if no errors occurred.
-
   */
   abstract public function error();
 
@@ -139,7 +149,6 @@ abstract class Database
 
     Returns:
      string - Returns the sanitized string.
-
   */
   abstract public function escape($str, $htmlspecialchars = false);
 
@@ -154,7 +163,6 @@ abstract class Database
 
     Returns:
      string - Returns the unescaped string.
-
   */
   abstract public function unescape($str, $htmlspecialchars_decode = false);
 
@@ -164,24 +172,41 @@ abstract class Database
     Returns a string containing the databases version (Like MySQL 5.0.11).
 
     Parameters:
+      none
 
     Returns:
      string - Returns the version of the databases version number.
-
   */
   abstract public function version();
 
   /*
-      Method: tables
+    Method: tables
+
     Returns an array containing all the tables in the database.
 
     Parameters:
+      none
 
     Returns:
      array - Returns an array containing all the tables in the database.
-
   */
   abstract public function tables();
+
+  /*
+    Method: columns
+
+    Returns an array containing all the columns in the specified table,
+    and only the columns names, this is just like <Database::tables>,
+    except for columns, of course.
+
+    Parameters:
+      string $table - The name of the table to fetch the column names from.
+
+    Returns:
+      array - Returns an array containing all the columns of the specified table,
+              false if the table does not exist.
+  */
+  abstract public function columns($table);
 
   /*
     Method: query
@@ -202,7 +227,6 @@ abstract class Database
 
     Returns:
      {Database_Result} - Returns an object with methods such as fetch_assoc, num_rows, etc.
-
   */
   abstract public function query($db_query, $db_vars = array(), $hook_name = null, $db_compat = null, $file = null, $line = 0);
 
@@ -234,18 +258,17 @@ abstract class Database
             text_array - an alias of string_array.
 
     More information about databasing can be found at http://code.google.com/p/snowcms/wiki/Databasing
-
   */
   abstract protected function var_sanitize($var_name, $datatype, $value, $file, $line);
 
   /*
     Method: sanitize_float
+
     All the following methods are helper methods of var_sanitize. They all get passed
     the variable name, value, file name and line number. These helper methods are expected
     to properly sanitize the value according to the variables datatype. If the value given
     is not able to be sanitized properly, you must call on the database method log_error
     fatally.
-
   */
   abstract protected function sanitize_float($var_name, $value, $file, $line);
 
@@ -259,10 +282,30 @@ abstract class Database
     to properly sanitize the value according to the variables datatype. If the value given
     is not able to be sanitized properly, you must call on the database method log_error
     fatally.
-
   */
   abstract protected function sanitize_float_array($var_name, $value, $file, $line);
 
+  /*
+    Method: sanitize_identifier
+
+    All the following methods are helper methods of var_sanitize. They all get passed
+    the variable name, value, file name and line number. These helper methods are expected
+    to properly sanitize the value according to the variables datatype. If the value given
+    is not able to be sanitized properly, you must call on the database method log_error
+    fatally.
+  */
+  abstract protected function sanitize_identifier($var_name, $value, $file, $line);
+
+  /*
+    Method: sanitize_identifier_array
+
+    All the following methods are helper methods of var_sanitize. They all get passed
+    the variable name, value, file name and line number. These helper methods are expected
+    to properly sanitize the value according to the variables datatype. If the value given
+    is not able to be sanitized properly, you must call on the database method log_error
+    fatally.
+  */
+  abstract protected function sanitize_identifier_array($var_name, $value, $file, $line);
 
   /*
     Method: sanitize_int
@@ -272,7 +315,6 @@ abstract class Database
     to properly sanitize the value according to the variables datatype. If the value given
     is not able to be sanitized properly, you must call on the database method log_error
     fatally.
-
   */
   abstract protected function sanitize_int($var_name, $value, $file, $line);
 
@@ -285,7 +327,6 @@ abstract class Database
     to properly sanitize the value according to the variables datatype. If the value given
     is not able to be sanitized properly, you must call on the database method log_error
     fatally.
-
   */
   abstract protected function sanitize_int_array($var_name, $value, $file, $line);
 
@@ -298,7 +339,6 @@ abstract class Database
     to properly sanitize the value according to the variables datatype. If the value given
     is not able to be sanitized properly, you must call on the database method log_error
     fatally.
-
   */
   abstract protected function sanitize_string($var_name, $value, $file, $line);
 
@@ -311,7 +351,6 @@ abstract class Database
     to properly sanitize the value according to the variables datatype. If the value given
     is not able to be sanitized properly, you must call on the database method log_error
     fatally.
-
   */
   abstract protected function sanitize_string_array($var_name, $value, $file, $line);
 
@@ -346,7 +385,6 @@ abstract class Database
        It is recommended for running the query through the database that you use the query method, simply pass the method the
           file and line the insert method was called on to query, also, set the db_compat parameter in query to insert, return
           query's result.
-
   */
   abstract public function insert($type, $tbl_name, $columns, $data, $keys = array(), $hook_name = null);
 
@@ -364,7 +402,6 @@ abstract class Database
 
     Returns:
      void - Nothing is returned by this method.
-
   */
   public function log_error($error_message, $is_fatal = false, $file = null, $line = 0)
   {
