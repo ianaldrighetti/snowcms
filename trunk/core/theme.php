@@ -52,11 +52,12 @@ function theme_load($path)
   }
 
   # Load the information from the theme.ini file.
-  $ini = parse_ini_file($path. '/theme.ini');
+  $ini = parse_ini_file($path. '/theme.ini', true);
 
   return array(
             'name' => $ini['theme']['name'],
             'author' => $ini['theme']['author'],
+            'website' => isset($ini['theme']['website']) ? $ini['theme']['website'] : false,
             'version' => $ini['theme']['version'],
             'update_url' => $ini['theme']['update url'],
             'description' => $ini['theme']['description'],

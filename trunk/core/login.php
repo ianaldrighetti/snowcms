@@ -59,15 +59,6 @@ if(!function_exists('login_view'))
       <h1>', l('Log in to your account'), '</h1>
       <p>', l('Here you can log in to your account, if you do not have an account, you can <a href="%s">register one</a>. Did you forget your password? Request a new one <a href="%s">here</a>.', $base_url. '/index.php?action=register', $base_url. '/index.php?action=reminder'), '</p>';
 
-    # You can hook into this to display a message
-    if($func['strlen']($api->apply_filters('login_message', '')) > 0)
-    {
-      echo '
-      <div id="', $api->apply_filters('login_message_id', 'login_error'), '">
-        ', $api->apply_filters('login_message', ''), '
-      </div>';
-    }
-
     # Generate that lovely login form.
     login_generate_form();
     $form = $api->load_class('Form');
@@ -102,7 +93,9 @@ if(!function_exists('login_generate_form'))
 
     # Don't generate the form twice.
     if(!empty($generated))
+    {
       return;
+    }
 
     # Add the core part first.
     $form = $api->load_class('Form');
@@ -195,6 +188,7 @@ if(!function_exists('login_view2'))
       header('Location: '. $base_url);
       exit;
     }
+
     # Generate the login form :)
     login_generate_form();
     $form = $api->load_class('Form');
@@ -271,9 +265,13 @@ if(!function_exists('login_process'))
     {
       # So, yeah!
       if($row['member_activated'] == 11)
+      {
         $errors[] = l('Your account has been disabled until you verify your new email address.');
+      }
       else
+      {
         $errors[] = l('Your account has not yet been activated.'. ($settings->get('registration_type', 'int') == 1 ? ' An administrator should approve your account shortly.' : ($settings->get('registration_type', 'int') == 2 ? ' Check your email for further instructions.' : '')));
+      }
 
       return false;
     }
@@ -281,15 +279,16 @@ if(!function_exists('login_process'))
     # No success as of yet.
     $login_success = false;
 
-    # It could have been just SHA-1'd.
-    if($_POST['secured_password'] == $row['member_pass'])
-      $login_success = true;
     # Maybe it is just plain text, pssssh!
-    elseif(sha1($func['strtolower']($login['member_name']). $login['member_pass']) == $row['member_pass'])
+    if(sha1($func['strtolower']($login['member_name']). $login['member_pass']) == $row['member_pass'])
+    {
       $login_success = true;
+    }
     # You want to check something?
     else
+    {
       $api->run_hooks('login_process_check_custom', array(&$login_success, $login, $row, &$errors));
+    }
 
     # Failed to login? Sucks to be you.
     if(empty($login_success))
@@ -303,13 +302,19 @@ if(!function_exists('login_process'))
     # So how long did you want to be remembered?
     # Forever?
     if(isset($login['session_length']) && $login['session_length'] == -1)
+    {
       $cookie_expires = time_utc() + 315360000;
+    }
     # A more specific time?
     elseif(!empty($login['session_length']))
+    {
       $cookies_expires = time_utc() + $login['session_length'];
+    }
     # Just until you close your browser?
     else
+    {
       $cookie_expires = 0;
+    }
 
     # Set the cookie, a chocolate chip cookie :) No one likes oatmeal cookies, they are nasty...
     # Oh yeah, and give the password a touch of salt, :D Take that HTTP sniffers!

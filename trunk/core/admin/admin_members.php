@@ -1258,6 +1258,11 @@ if(!function_exists('admin_members_permissions_generate_form'))
                        'subtext' => '', # Subtext too, if you want.
                      ),
                      array(
+                       'permission' => 'manage_themes',
+                       'label' => l('Manage themes:'),
+                       'subtext' => l('Allow the group to select the site theme, download and upload themes to the site.'),
+                     ),
+                     array(
                        'permission' => 'update_system',
                        'label' => l('Update system:'),
                        'subtext' => l('Whether or not they can update SnowCMS.'),
@@ -1396,7 +1401,7 @@ if(!function_exists('admin_members_permissions_handle'))
     {
       # You can add more DENIED permissions via the guest_denied_permissions hook ;)
       # (Sorry, but I will not allow plugins to remove denied permissions, at least built in functionality)
-      $denied = array_merge(array('manage_system_settings', 'update_system', 'view_error_log', 'add_new_member', 'manage_members', 'search_members', 'manage_member_settings', 'manage_permissions', 'add_plugins', 'manage_plugins', 'manage_plugin_settings'), $api->apply_filters('denied_guest_permissions', array()));
+      $denied = array_merge(array('manage_system_settings', 'manage_themes', 'update_system', 'view_error_log', 'add_new_member', 'manage_members', 'search_members', 'manage_member_settings', 'manage_permissions', 'add_plugins', 'manage_plugins', 'manage_plugin_settings'), $api->apply_filters('denied_guest_permissions', array()));
 
       foreach($denied as $deny)
       {

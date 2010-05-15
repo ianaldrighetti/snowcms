@@ -94,32 +94,48 @@ class Upload
     $api->run_hooks('upload_add', array(&$handled, $area_name, $area_id, $file, $options));
 
     if($handled !== null)
+    {
       return $handled;
+    }
 
     if(empty($area_name) || empty($file['tmp_name']))
+    {
       return false;
+    }
 
     # Before we do too much, make sure the file is an uploaded file.
     if(is_uploaded_file($file['tmp_name']))
     {
       # Set some of our options if you didn't.
       if(!isset($options['upload_time']))
+      {
         $options['upload_time'] = time_utc();
+      }
 
       if(!isset($options['member_id']))
+      {
         $options['member_id'] = $member->id();
+      }
 
       if(!isset($options['member_name']))
+      {
         $options['member_name'] = $member->name();
+      }
 
       if(!isset($options['member_email']))
+      {
         $options['member_email'] = $member->email();
+      }
 
       if(!isset($options['member_ip']))
+      {
         $options['member_ip'] = $member->ip();
+      }
 
       if(empty($options['filename']))
+      {
         $options['filename'] = $file['name'];
+      }
 
       $options['filename'] = basename($options['filename']);
 
@@ -127,27 +143,46 @@ class Upload
       if(strpos($options['filename'], '.') !== false)
       {
         $tmp = explode('.', $options['filename']);
-        $options['file_ext'] = $tmp[count($tmp) - 1];
+        $options['file_ext'] = strtolower(array_pop($tmp));
       }
       else
+      {
         $options['file_ext'] = '';
+      }
 
       # Specified the number of downloads?
       if(!isset($options['downloads']) || (string)$options['downloads'] != (string)(int)$options['downloads'] || (int)$options['downloads'] < 0)
+      {
         $options['downloads'] = 0;
+      }
 
       if(empty($options['mime_type']))
       {
         # Should we use the File Info extension?
         if(function_exists('finfo_file'))
         {
-          $ff = finfo_open(FILEINFO_MIME, $settings->get('finfo_magic_file', 'string', null));
+          $ff = finfo_open(FILEINFO_MIME, $settings->get('finfo_magic_file', 'string', substr(PHP_OS, 0, 3) == 'WIN' ? 'C:\Program Files\PHP\magic' : '/usr/share/misc/file/magic.mgc'));
           $options['mime_type'] = finfo_file($ff, $file['tmp_name']);
           finfo_close($ff);
         }
         else
-           # Use the older, alternative.
-           $options['mime_type'] = mime_content_type($file['tmp_name']);
+        {
+          # Use the older, alternative.
+          $options['mime_type'] = mime_content_type($file['tmp_name']);
+
+          # The compat function built into SnowCMS determines the type via the files name,
+          # for the time being at least, so attempt it again. Maybe.
+          if($options['mime_type'] == 'application/octet-stream')
+          {
+            $options['mime_type'] = mime_content_type($options['filename']);
+
+            # Failed? Give it back the old type.
+            if(empty($options['mime_type']))
+            {
+              $options['mime_type'] = 'appliction/octet-stream';
+            }
+          }
+        }
       }
 
       $members = $api->load_class('Members');
@@ -157,7 +192,9 @@ class Upload
 
       # Make sure the file doesn't exist.
       while(file_exists($upload_dir. '/'. $options['filelocation']))
+      {
         $options['filelocation'] = sha1(mt_rand(1, 1000). $options['filename']. microtime(true). $members->rand_str(10));
+      }
 
       # Get the file size and the checksum of the file.
       $options['filesize'] = filesize($file['tmp_name']);
@@ -168,7 +205,7 @@ class Upload
       $api->run_hooks('upload_add_options', array(&$options));
 
       # Now move the file to the right location.
-      if(!empty($allow_file) && move_uploaded_file($file['tmp_name'], $options['filelocation']))
+      if(!empty($allow_file) && move_uploaded_file($file['tmp_name'], $upload_dir. '/'. $options['filelocation']))
       {
         # Save the information into the database.
         $result = $db->insert('insert', '{db->prefix}uploads',
@@ -184,7 +221,7 @@ class Upload
             $options['member_id'], $options['member_name'], $options['member_email'],
             $options['member_ip'], $options['filename'], $options['file_ext'],
             $options['filelocation'], $options['filesize'], $options['downloads'],
-            $options['upload_type'], $options['mime_type'], $options['checksum'],
+            isset($options['upload_type']) ? $options['upload_type'] : '', $options['mime_type'], $options['checksum'],
           ),
           array(), 'upload_insert_query');
 
@@ -236,15 +273,21 @@ class Upload
     $api->run_hooks('upload_remove', array(&$handled, $area_name, $area_id, $upload_id));
 
     if($handled !== null)
+    {
       return $handled;
+    }
 
     if(empty($area_name))
+    {
       return false;
+    }
 
     # An array of stuff?
     if(!is_array($upload_id))
+    {
       # Nope, so make it one.
       $upload_id = array($upload_id);
+    }
 
     # We need to get the files information, first.
     # That way we can delete the files.
@@ -346,10 +389,14 @@ class Upload
     $api->run_hooks('upload_edit', array(&$handled, $area_name, $area_id, $upload_id, $options));
 
     if($handled !== null)
+    {
       return $handled;
+    }
 
     if(empty($area_name))
+    {
       return false;
+    }
 
     # Get the current information.
     $result = $db->query('
@@ -365,7 +412,9 @@ class Upload
       ), 'upload_edit_select_query');
 
     if($result->num_rows() == 0)
+    {
       return false;
+    }
 
     # These are the columns which can be edited.
     $columns = array(
@@ -390,19 +439,29 @@ class Upload
 
     # Set a couple default values, if not yet set.
     if(!isset($options['modified_time']))
+    {
       $options['modified_time'] = time_utc();
+    }
 
     if(!isset($options['modified_id']))
+    {
       $options['modified_id'] = $member->id();
+    }
 
     if(!isset($options['modified_name']))
+    {
       $options['modified_name'] = $member->name();
+    }
 
     if(!isset($options['modified_email']))
+    {
       $options['modified_email'] = $member->email();
+    }
 
     if(!isset($options['modified_ip']))
+    {
       $options['modified_ip'] = $member->ip();
+    }
 
     # Any changes, perhaps?
     $api->run_hooks('upload_edit_values', array(&$columns, &$options));
@@ -436,7 +495,9 @@ class Upload
       return $result->success();
     }
     else
+    {
       return true;
+    }
   }
 
   /*
@@ -458,37 +519,55 @@ class Upload
     global $api, $db, $upload_dir;
 
     if(empty($area_name) || empty($upload_id))
+    {
       return false;
+    }
 
     # Didn't give us an array? We will make it one!
     if(!is_array($upload_id))
+    {
       $upload_id = array($upload_id);
+    }
 
     if(count($upload_id) > 0)
     {
       foreach($upload_id as $key => $id)
+      {
         if((int)$id > 0)
+        {
           $upload_id[$key] = (int)$id;
+        }
         else
+        {
           unset($upload_id[$key]);
+        }
+      }
 
       # We don't want to load the same thing multiple times.
       $upload_id = array_unique($upload_id);
 
       if(count($upload_id) == 0)
+      {
         return false;
+      }
     }
 
     $handled = null;
     $api->run_hooks('upload_load', array(&$handled, $area_name, $area_id, $upload_id));
 
     if($handled !== null)
+    {
       return $handled;
+    }
 
     # Unset all uploads that we already loaded.
     foreach($upload_id as $key => $id)
+    {
       if(isset($this->loaded[$area_name][$area_id][$upload_id]))
+      {
         unset($upload_id[$key]);
+      }
+    }
 
     $result = $db->query('
                 SELECT
@@ -507,7 +586,9 @@ class Upload
     if($result->num_rows() > 0)
     {
       if(!isset($this->loaded[$area_name][$area_id]))
+      {
         $this->loaded[$area_name][$area_id] = array();
+      }
 
       while($row = $result->fetch_assoc())
       {
@@ -576,45 +657,65 @@ class Upload
     global $api;
 
     if(empty($area_name) || empty($upload_id))
+    {
       return false;
+    }
 
     # Didn't give us an array? We will make it one!
     if(!is_array($upload_id))
+    {
       $upload_id = array($upload_id);
+    }
 
     if(count($upload_id) > 0)
     {
       foreach($upload_id as $key => $id)
+      {
         if((int)$id > 0)
+        {
           $upload_id[$key] = (int)$id;
+        }
         else
+        {
           unset($upload_id[$key]);
+        }
+      }
 
       # We don't want to load the same thing multiple times.
       if(count($upload_id) > 1)
+      {
         $upload_id = array_unique($upload_id);
+      }
 
       if(count($upload_id) == 0)
+      {
         return false;
+      }
     }
 
     $handled = null;
     $api->run_hooks('upload_get', array(&$handled, $area_name, $area_id, $upload_id));
 
     if($handled !== null)
+    {
       return $handled;
+    }
 
     # Sure, we turned the singleton into an array, but now we will check
     # to see if you only wanted one upload ;)
     if(count($upload_id) == 1)
+    {
       return isset($this->loaded[$area_name][$area_id][$upload_id[array_rand($upload_id)]]) ? $this->loaded[$area_name][$area_id][$upload_id[array_rand($upload_id)]] : false;
+    }
     else
     {
       $uploads = array();
 
       # Pretty easy ;)
       foreach($upload_id as $id)
+      {
         $uploads[$id] = $this->get($id);
+      }
 
       return $uploads;
     }
@@ -639,31 +740,40 @@ class Upload
   */
   public function download($area_name, $area_id, $upload_id, $return = false)
   {
-    global $api;
+    global $api, $db;
 
     $handled = null;
     $api->run_hooks('upload_download', array(&$handled, $area_name, $area_id, $upload_id, $return));
 
     if($handled !== null)
+    {
       return $handled;
+    }
 
     # Has this been loaded?
     $upload = $this->get($area_name, $area_id, $upload_id);
 
     if(empty($upload))
+    {
       return false;
+    }
 
     # Pretty simple if you just want the files contents.
     if(!empty($return))
+    {
       return file_exists($upload['file']['location']) ? file_get_contents($upload['file']['location']) : false;
+    }
     else
     {
       # Clear the output buffer...
       @ob_clean();
+      @ob_end_flush();
 
       # An ETag will be useful.
       if(file_exists($upload['file']['location']))
+      {
         $etag = '"'. sha1($upload['file']['checksum']. filemtime($upload['file']['location'])). '"';
+      }
 
       # Check to make sure the file exists.
       if(!file_exists($upload['file']['location']))
@@ -705,9 +815,10 @@ class Upload
 
       $api->run_hooks('upload_download_pre_headers', array($upload));
 
+      header('Content-Type: '. $upload['file']['mime']);
+      header('Content-Length: '. $upload['file']['size']);
       header('Last-Modified: '. gmdate('D, d M Y H:i:s', filemtime($upload['file']['location'])));
       header('ETag: '. $etag);
-      header('Content-Type: '. $upload['file']['mime']);
       header('Content-Disposition: '. (isset($_GET['inline']) ? 'inline' : 'attachment'). '; filename="'. $upload['file']['name']. '"');
 
       # If you want to do something now, do it.
@@ -716,9 +827,12 @@ class Upload
       # Open the file for reading!
       $fp = fopen($upload['file']['location'], 'rb');
 
+      @set_time_limit(0);
       while(!feof($fp))
       {
-        echo $api->apply_filters('upload_download_file', fread($fp, 8192));
+        echo fread($fp, 8192);
+
+        flush();
       }
 
       fclose($fp);

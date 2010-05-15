@@ -50,7 +50,6 @@ if(!function_exists('admin_prepend'))
 
     $theme = $api->load_class($api->apply_filters('admin_theme_class', 'Admin_Theme'), array(l('Control Panel'). ' - '. $settings->get('site_name', 'string'), $api->apply_filters('admin_theme_image_url', $theme_url. '/default/style/images/admincp')));
 
-
     if($member->can('access_admin_cp'))
     {
       # Generate all the icons, done here as it is used in other places than just the control panel home.
@@ -60,15 +59,23 @@ if(!function_exists('admin_prepend'))
                             'id' => 'system_settings',
                             'href' => $base_url. '/index.php?action=admin&amp;sa=settings',
                             'title' => l('System settings'),
-                            'src' =>$theme->url(). '/settings.png',
+                            'src' => $theme->url(). '/settings.png',
                             'label' => l('Settings'),
                             'show' => $member->can('manage_system_settings'),
+                          ),
+                          array(
+                            'id' => 'manage_themes',
+                            'href' => $base_url. '/index.php?action=admin&amp;sa=themes',
+                            'title' => l('Manage themes'),
+                            'src' => $theme->url(). '/manage_themes.png',
+                            'label' => l('Themes'),
+                            'show' => $member->can('manage_themes'),
                           ),
                           array(
                             'id' => 'system_update',
                             'href' => $base_url. '/index.php?action=admin&amp;sa=update',
                             'title' => l('Check for updates'),
-                            'src' =>$theme->url(). '/update.png',
+                            'src' => $theme->url(). '/update.png',
                             'label' => l('Update'),
                             'show' => $member->can('update_system'),
                           ),
@@ -76,7 +83,7 @@ if(!function_exists('admin_prepend'))
                             'id' => 'system_about',
                             'href' => $base_url. '/index.php?action=admin&amp;sa=about',
                             'title' => l('About SnowCMS'),
-                            'src' =>$theme->url(). '/about.png',
+                            'src' => $theme->url(). '/about.png',
                             'label' => l('About'),
                             'show' => true,
                           ),
@@ -84,7 +91,7 @@ if(!function_exists('admin_prepend'))
                             'id' => 'system_error_log',
                             'href' => $base_url. '/index.php?action=admin&amp;sa=error_log',
                             'title' => l('View the error log'),
-                            'src' =>$theme->url(). '/error_log.png',
+                            'src' => $theme->url(). '/error_log.png',
                             'label' => l('Errors'),
                             'show' => $member->can('view_error_log') && $settings->get('errors_log', 'bool'),
                           ),
@@ -94,7 +101,7 @@ if(!function_exists('admin_prepend'))
                             'id' => 'members_add',
                             'href' => $base_url. '/index.php?action=admin&amp;sa=members_add',
                             'title' => l('Add a new member'),
-                            'src' =>$theme->url(). '/add_member.png',
+                            'src' => $theme->url(). '/add_member.png',
                             'label' => l('Add'),
                             'show' => $member->can('add_new_member'),
                           ),
@@ -102,7 +109,7 @@ if(!function_exists('admin_prepend'))
                             'id' => 'members_manage',
                             'href' => $base_url. '/index.php?action=admin&amp;sa=members_manage',
                             'title' => l('Manage existing members'),
-                            'src' =>$theme->url(). '/manage_members.png',
+                            'src' => $theme->url(). '/manage_members.png',
                             'label' => l('Manage'),
                             'show' => $member->can('manage_members'),
                           ),
@@ -110,7 +117,7 @@ if(!function_exists('admin_prepend'))
                             'id' => 'members_search',
                             'href' => $base_url. '/index.php?action=admin&amp;sa=members_search',
                             'title' => l('Search for members'),
-                            'src' =>$theme->url(). '/member_search.png',
+                            'src' => $theme->url(). '/member_search.png',
                             'label' => l('Search'),
                             'show' => $member->can('search_members'),
                           ),
@@ -118,7 +125,7 @@ if(!function_exists('admin_prepend'))
                             'id' => 'members_settings',
                             'href' => $base_url. '/index.php?action=admin&amp;sa=members_settings',
                             'title' => l('Member settings'),
-                            'src' =>$theme->url(). '/member_settings.png',
+                            'src' => $theme->url(). '/member_settings.png',
                             'label' => l('Settings'),
                             'show' => $member->can('manage_member_settings'),
                           ),
@@ -126,7 +133,7 @@ if(!function_exists('admin_prepend'))
                             'id' => 'members_permissions',
                             'href' => $base_url. '/index.php?action=admin&amp;sa=members_permissions',
                             'title' => l('Set member group permissions'),
-                            'src' =>$theme->url(). '/permissions.png',
+                            'src' => $theme->url(). '/permissions.png',
                             'label' => l('Permissions'),
                             'show' => $member->can('manage_permissions'),
                           ),
@@ -136,7 +143,7 @@ if(!function_exists('admin_prepend'))
                             'id' => 'plugins_add',
                             'href' => $base_url. '/index.php?action=admin&amp;sa=plugins_add',
                             'title' => l('Add a new plugin'),
-                            'src' =>$theme->url(). '/add_plugin.png',
+                            'src' => $theme->url(). '/add_plugin.png',
                             'label' => l('Add'),
                             'show' => $member->can('add_plugins'),
                           ),
@@ -144,7 +151,7 @@ if(!function_exists('admin_prepend'))
                             'id' => 'plugins_manage',
                             'href' => $base_url. '/index.php?action=admin&amp;sa=plugins_manage',
                             'title' => l('Manage plugins'),
-                            'src' =>$theme->url(). '/manage_plugins.png',
+                            'src' => $theme->url(). '/manage_plugins.png',
                             'label' => l('Manage'),
                             'show' => $member->can('manage_plugins'),
                           ),
@@ -247,7 +254,9 @@ if(!function_exists('admin_prompt_required'))
     # Check to see if your last check has now timed out, quite simple really! But
     # if you for some strange reason have it disabled, nevermind!
     if(!$settings->get('disable_admin_security', 'bool', false) && (empty($_SESSION['admin_password_prompted']) || ((int)$_SESSION['admin_password_prompted'] + ($settings->get('admin_login_timeout', 'int', 15) * 60)) < time_utc()))
+    {
       return true;
+    }
 
     # Your good, for now!
     return false;

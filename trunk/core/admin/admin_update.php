@@ -366,10 +366,10 @@ if(!function_exists('admin_update_apply_step'))
           # Is it not a directory?
           if(!is_dir($base_dir. '/update/'. $filename))
           {
-            $fp = fopen($base_dir. '/'. $filename, 'wt');
+            $fp = fopen($base_dir. '/'. $filename, 'wb');
             flock($fp, LOCK_EX);
 
-            $new_fp = fopen($base_dir. '/update/'. $filename, 'rt');
+            $new_fp = fopen($base_dir. '/update/'. $filename, 'rb');
             flock($new_fp, LOCK_SH);
 
             # Now copy!!!
