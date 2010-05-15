@@ -291,7 +291,7 @@ class Tar
     # Does the destination exist? Is it a directory?
     if(!file_exists($destination))
     {
-      $made = mkdir($destination);
+      $made = mkdir($destination, 0755, true);
 
       if(empty($made))
         # We tried, but it failed! :(

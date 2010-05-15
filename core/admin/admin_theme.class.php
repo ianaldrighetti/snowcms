@@ -204,6 +204,28 @@ class Admin_Theme extends Theme
       width: 590px;
     }
 
+    #content .theme_list a
+    {
+      display: block;
+      width: 250px;
+      height: 150px;
+      padding: 5px;
+      text-align: center;
+      font-size: 90%;
+      text-decoration: none;
+      border: 1px solid #FFFFFF;
+      color: #000000;
+    }
+
+    #content .theme_list a:hover
+    {
+      -moz-border-radius: 5px;
+      -webkit-border-radius: 5px;
+      border-radius: 5px;
+      border: 1px solid #C9C9C9;
+      background: #EDEDED;
+    }
+
     #content #main .icons a
     {
       display: block;
@@ -217,7 +239,7 @@ class Admin_Theme extends Theme
       color: #000000;
     }
 
-    #content #main .icons a:hover
+    #content .icons a:hover
     {
       -moz-border-radius: 5px;
       -webkit-border-radius: 5px;
@@ -365,6 +387,11 @@ class Admin_Theme extends Theme
     }
 
     .table .options
+    {
+      text-align: right !important;
+    }
+
+    .table .filters
     {
       text-align: right !important;
     }

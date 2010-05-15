@@ -49,6 +49,8 @@ if(!function_exists('admin_plugins_add'))
       # That's what I thought!
       admin_access_denied();
 
+    $theme->set_current_area('plugins_add');
+
     $theme->set_title(l('Add plugin'));
 
     $theme->header();

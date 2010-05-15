@@ -84,7 +84,7 @@ class Implemented_Theme extends Theme
     # Load up the menu items, that is, if there are any.
     $menu_items = $api->return_menu_items('main');
 
-    if(count($menu_items) > 0)
+    if(!empty($menu_items) && count($menu_items) > 0)
     {
       foreach($menu_items as $item)
       {
