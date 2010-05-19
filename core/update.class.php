@@ -406,7 +406,106 @@ class Update
     else
     {
       # Time to copy! Woo!
+      # That is, if the file exists...
+      if(!file_exists($path. '/'. $filename))
+      {
+        return false;
+      }
+
+      # Create the directory, if need be.
+      $dirname = dirname($new_path. '/'. $filename);
+      if(!file_exists($dirname))
+      {
+        @mkdir($dirname, 0755, true);
+      }
+
+      # Is it not a directory? Must be a file we need to copy then.
+      if(!is_dir($path. '/'. $filename))
+      {
+        # Open up the file to be copied into in write and binary mode.
+        $fp = fopen($new_path. '/'. $filename, 'wb');
+
+        # Failed to open? :-(
+        if(empty($fp))
+        {
+          return false;
+        }
+
+        # It's mine!
+        flock($fp, LOCK_EX);
+
+        # Now the file we will get the data from.
+        $new_fp = fopen($path. '/'. $filename, 'rb');
+
+        # Failed to open? :-(
+        if(empty($new_fp))
+        {
+          return false;
+        }
+
+        flock($new_fp, LOCK_SH);
+
+        # Now copy that data over :-)
+        while(!feof($new_fp))
+        {
+          fwrite($fp, fread($new_fp, 8192));
+        }
+
+        # We are done with these now.
+        fclose($fp);
+        fclose($new_fp);
+
+        # It was done successfully!
+        return true;
+      }
+      else
+      {
+        # Just incase :P
+        if(!file_exists($new_path. '/'. $filename))
+        {
+          return @mkdir($new_path. '/'. $filename);
+        }
+      }
     }
+  }
+
+  /*
+    Method: finish
+
+    Finishes the update process, which includes deleting the directory
+    and the files which were copied over to their new respective locations,
+    running the update.php file in the new paths base directory (if any, if
+    there isn't an update.php file, it won't be ran, of course, once it is
+    ran, however, it will be deleted).
+
+    Parameters:
+      string $path - The base path of where the update files are located.
+      string $new_path - The new base path of where the file should be copied.
+
+    Returns:
+      bool - Returns true if the update process was successfully finished, false
+             if it was not.
+  */
+  public function finish($path, $new_path)
+  {
+    # Remove all files and folders in the update location.
+    if(!recursive_unlink($path))
+    {
+      return false;
+    }
+
+    # Any update file? Run it then!
+    if(file_exists($new_path. '/update.php'))
+    {
+      # We run it by simply including it.
+      require_once($new_path. '/update.php');
+
+      # Now remove it.
+      @unlink($new_path. '/update.php');
+    }
+
+    # Alright! All done!
+    return true;
   }
 }
 ?>
