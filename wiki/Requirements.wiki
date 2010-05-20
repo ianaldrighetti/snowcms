@@ -7,6 +7,7 @@ Currently SnowCMS is still under active development, but a little information on
 
 Here is a basic list of requirements, but they might not be all inclusive.
   * PHP 5 is a must, there is no PHP 4 support, and none is planned, after all, PHP 5 has been out for a very long time, if your host is still running PHP 4, you should be running away, screaming like a crazy person :-P.
+  * The [http://www.php.net/manual/en/book.xml.php XML Parser] extension is required, it is enabled in PHP 5 by default, but hey, you might have a sucky host!
   * MySQL, a version number is unknown, v5 is recommended, but v4 could work. Soon we plan to introduce SQLite v2 support, and hopefully SQLite v3, PostgreSQL and SQL Server.
   * Here are others that aren't required, but recommended:
     * cURL (for downloading remote files, such as plugins, though fsockopen works too, cURL is better :-))
