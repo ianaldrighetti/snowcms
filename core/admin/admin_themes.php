@@ -149,7 +149,7 @@ if(!function_exists('admin_themes'))
   </table>
 
   <h1>', l('Install a theme'), '</h1>
-  <p>', l('Below you can specify a file to upload or a URL at which to download a theme (tarballs and gzipped tarballs only).'), '</p>';
+  <p>', l('Below you can specify a file to upload or a URL at which to download a theme (zip, tar and tar.gz only).'), '</p>';
 
     $form->show('install_theme_form');
 
@@ -196,7 +196,7 @@ if(!function_exists('admin_themes_generate_form'))
                                                           'type' => 'string',
                                                           'label' => l('From a URL:'),
                                                           'subtext' => l('Enter the URL of the theme you want to download and install.'),
-                                                          'value' => !empty($_POST['theme_url']) ? $_POST['theme_url'] : 'http://',
+                                                          'value' => 'http://',
                                                         ));
   }
 }
@@ -222,93 +222,139 @@ if(!function_exists('admin_themes_handle'))
   {
     global $api, $theme_dir;
 
-    # Did you want to upload a theme?
-    if(!empty($data['theme_file']) && is_array($data['theme_file']))
-    {
-      # Looks like you uploaded something, let's see what we can do!
-      # First make a temporary file name.
-      $filename = $theme_dir. '/'. uniqid('theme_'). '.tmp';
+    # Make a temporary file name which will be used for either downloading or uploading.
+    $filename = $theme_dir. '/'. uniqid('theme_'). '.tmp';
 
+    # Downloading a theme, are we?
+    if(!empty($data['theme_url']) && strtolower($data['theme_url']) != 'http://')
+    {
+      # We will need the HTTP class.
+      $http = $api->load_class('HTTP');
+
+      # Now attempt to download it.
+      if(!$http->request($data['theme_url'], array(), 0, $filename))
+      {
+        # Sorry, but it appears that didn't work!
+        $errors[] = l('Failed to download the theme from "%s"', htmlchars($data['theme_url']));
+        return false;
+      }
+
+      # We want the name of the file...
+      $name = basename($data['theme_url']);
+    }
+    # Did you want to upload a theme?
+    elseif(!empty($data['theme_file']) && is_array($data['theme_file']))
+    {
       # Now attempt to move the file.
       if(move_uploaded_file($data['theme_file']['tmp_name'], $filename))
       {
-        # It ought to be a tarball ;-)
-        $tar = $api->load_class('Tar');
-        if($tar->open($filename))
-        {
-          if($tar->is_gzipped())
-          {
-            $tar->ungzip();
-          }
-        }
-
-        # Use the original file name to extract the theme too.
+        # Keep the original file name...
         $name = $data['theme_file']['name'];
-
-        # Remove any file extension.
-        if(strpos($name, '.') !== false)
-        {
-          $tmp = explode('.', $name);
-
-          # Remove the last part.
-          array_pop($tmp);
-
-          # Maybe even another part if it is tar.
-          if(strtolower($tmp[count($tmp) - 1]) == 'tar')
-          {
-            array_pop($tmp);
-          }
-
-          $name = implode('.', $tmp);
-        }
-
-        if($tar->extract($theme_dir. '/'. $name))
-        {
-          # You would think we would be done, but we are not! Now let's check to make sure it
-          # is actually a valid, theme, because if it is not, delete it!
-          if(theme_load($theme_dir. '/'. $name) !== false)
-          {
-            # theme_load will only return an array if the supplied directory
-            # contains a valid theme (implemented_theme.class.php and such).
-            $api->add_filter('install_theme_form_message', create_function('$value', '
-                                                             return l(\'The theme was installed successfully.\');'));
-
-            return true;
-          }
-          else
-          {
-            # Nope, it doesn't have the right stuff, so delete it!
-            recursive_unlink($theme_dir. '/'. $name);
-
-            # And send an error!
-            $errors[] = l('The uploaded theme was not valid.');
-          }
-        }
-        else
-        {
-          $errors[] = l('Failed to extract the theme.');
-        }
-
-        # We are done with it, delete it!
-        $tar->close();
-        @unlink($filename);
       }
-      else
-      {
-        # Uh oh! Didn't work!
-        $errors[] = l('Failed to move the uploaded theme to the theme directory.');
-      }
-    }
-    elseif(!empty($data['theme_url']) && strtolower($data['theme_url']) != 'http://')
-    {
-
     }
     else
     {
       $errors[] = l('No file or URL specified.');
+      return false;
     }
 
-    return false;
+    # Get the file extension ;-) We will use the base name as the directory
+    # to put the new theme in.
+    if(strpos($name, '.') !== false)
+    {
+      $tmp = explode('.', $name);
+
+      # Remove the last one.
+      array_pop($tmp);
+
+      # Though if there is tar, we want that gone too.
+      if($tmp[count($tmp) - 1] == 'tar')
+      {
+        # POP!
+        array_pop($tmp);
+      }
+
+      # Put it back together!!!
+      $name = implode('.', $tmp);
+    }
+
+    # If the directory we will end up putting the theme in exists, we need
+    # to fix that :P
+    if(file_exists($theme_dir. '/'. $name))
+    {
+      $copy = 1;
+      while(file_exists($theme_dir. '/'. $name. ' ('. $copy. ')'))
+      {
+        # Just keep on moving along.
+        $copy++;
+      }
+
+      # Alright, change the name.
+      $name .= ' ('. $copy. ')';
+    }
+
+    # Could be a zip, so let's try that! (Well, and it's detection is a bit better)
+    $zip = $api->load_class('Zip');
+    $tar = $api->load_class('Tar');
+    if($zip->open($filename))
+    {
+      # Looks like it is time to extract!!!
+      if(!$zip->extract($theme_dir. '/'. $name))
+      {
+        # Hmm, that isn't good.
+        $errors[] = l('Failed to extract the theme from the zip archive.');
+        return false;
+      }
+
+      $zip->close();
+    }
+    elseif($tar->open($filename))
+    {
+      # Time to extract it, or at least, try!
+      # First the gzip, if it is gzippped.
+      if($tar->is_gzipped() && !$tar->ungzip())
+      {
+        $errors[] = l('Failed to extract the theme from the gzip archive.');
+        return false;
+      }
+      # Now the tarball itself.
+      elseif(!$tar->extract($theme_dir. '/'. $name))
+      {
+        $errors[] = l('Failed to extract the theme from the tar archive.');
+        return false;
+      }
+
+      # We are done!
+      $tar->close();
+    }
+    else
+    {
+      # Wasn't anything we can handle. FAIL.
+      unlink($filename);
+      $errors[] = l('The file was not a zip, tar or tar.gz.');
+      return false;
+    }
+
+    # Remove the downloaded/uploaded file.
+    unlink($filename);
+
+    # Make sure the theme we just extracted is actually a theme... We can check
+    # that through theme_load.
+    if(theme_load($theme_dir. '/'. $name) === false)
+    {
+      # Woops! It isn't valid. Delete it now.
+      recursive_unlink($theme_dir. '/'. $name);
+
+      $errors[] = l('The supplied theme was invalid.');
+      return false;
+    }
+
+    # It's a theme, thats for sure. So show a success message.
+    $api->add_filter('install_theme_form_message', create_function('$value', '
+                                                     return l(\'The theme was installed successfully.\');'));
+
+    # Seemed to have worked!
+    return true;
   }
 }
 ?>

@@ -361,7 +361,7 @@ class Tar
     {
       foreach($this->files as $file)
       {
-        # Prepend the the destination to the file name!
+        # Prepend the destination to the file name!
         $file['name'] = $destination. '/'. $file['name'];
 
         # Safe mode on..?
@@ -376,7 +376,7 @@ class Tar
           # Make that directory, and we are done. If we need to.
           if(!file_exists($file['name']))
           {
-            @mkdir($file['name']);
+            @mkdir($file['name'], 0755, true);
           }
         }
         else
@@ -407,6 +407,8 @@ class Tar
               $left -= $left >= 8192 ? 8192 : $left;
             }
           }
+
+          fclose($fp);
         }
       }
 

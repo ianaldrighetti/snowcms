@@ -324,19 +324,25 @@ class HTTP
     if(!empty($request_callbacks))
     {
       foreach($request_callbacks as $request_callback)
+      {
         if($request_callback['test']())
         {
           $callback = $request_callback['callback'];
           break;
         }
+      }
 
       # Nothing found..? What a shame...
       if(empty($callback))
+      {
         return false;
+      }
 
       # You wanted this written to a file?
       if(!empty($filename))
+      {
         $fp = fopen($filename, $resume_from > 0 ? 'ab' : 'wb');
+      }
 
       # Well, we have gone as far as we have, no it is up to you ;)
       return $callback(array(
@@ -355,7 +361,9 @@ class HTTP
       ));
     }
     else
+    {
       return false;
+    }
   }
 }
 

@@ -65,7 +65,7 @@ if(!function_exists('admin_members_manage'))
     $theme->header();
 
     echo '
-  <h1><img src="', $theme->url(), '/manage_members-small.png" alt="" /> ', l('Manage Members'), '</h1>
+  <h1><img src="', $theme->url(), '/members_manage-small.png" alt="" /> ', l('Manage Members'), '</h1>
   <p>', l('All existing members can be managed here, such as editing, deleting, approving, etc.'), '</p>';
 
     $table->show('admin_members_manage_table');
@@ -341,7 +341,7 @@ if(!function_exists('admin_members_manage_edit'))
       $theme->header();
 
       echo '
-  <h1>', l('Editing member "%s"', $member_info['name']), '</h1>
+  <h1><img src="', $theme->url(), '/members_manage-small.png" alt="" /> ', l('Editing member "%s"', $member_info['name']), '</h1>
   <p>', l('Changes can be made to the account "%s" here.', $member_info['name']), '</p>';
 
       $form->show('members_edit_'. $member_id);

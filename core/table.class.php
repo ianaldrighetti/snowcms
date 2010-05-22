@@ -573,7 +573,7 @@ class Table
     if(!empty($_POST[$tbl_name. '_submit']) && is_callable($table['callback']))
     {
       # You got it ;)
-      call_user_func($table['callback'], $_POST[$tbl_name. '_option'], $_POST['selected']);
+      call_user_func($table['callback'], $_POST[$tbl_name. '_option'], isset($_POST['selected']) ? $_POST['selected'] : array());
     }
 
     # Are there any options? If there are, we will need to make a form!!!

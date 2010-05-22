@@ -219,7 +219,7 @@ if(!function_exists('admin_home'))
 */
 function admin_about()
 {
-  global $api, $base_url, $theme;
+  global $api, $base_url, $db, $theme;
 
   $theme->set_current_area('system_about');
 
@@ -244,8 +244,218 @@ function admin_about()
   <ul>
     <li>', l('Admin Control Panel icons from the <a href="http://kde-look.org/content/show.php/Oxygen+Icons?content=74184" title="Oxygen Icon set" target="_blank">Oxygen Icon set</a>.'), '</li>
     <li>', l('Admin Control Panel inspired by the <a href="http://www.jaws-project.com/" title="Jaws Project" target="_blank">Jaws Project</a>.'), '</li>
-  </ul>';
+  </ul>
+
+  <h1 style="margin-top: 20px;"><img src="', $theme->url(), '/about-small.png" alt="" /> ', l('System information'), '</h1>
+  <p><strong>Operating system:</strong> ', admin_get_os_information(), '</p>
+  <p><strong>Server software:</strong> ', admin_get_software_information(), '</p>
+  <p><strong>PHP version:</strong> ', PHP_VERSION, '</p>
+  <p><strong>Database:</strong> ', $db->type, '</p>
+  <p><strong>Database version:</strong> ', $db->version(), '</p>';
 
   $theme->footer();
+}
+
+if(!function_exists('admin_get_os_information'))
+{
+  /*
+    Function: admin_get_os_information
+
+    Returns a string containing the operating systems information, as much
+    as possible.
+
+    Parameters:
+      none
+
+    Returns:
+      string - Returns a string containing the operating systems information.
+
+    Note:
+      This function is overloadable.
+
+      This may not work as well on Linux as it does Windows, if anyone has
+      improvements for getting all the possible Linux information, please do tell :-)
+  */
+  function admin_get_os_information()
+  {
+    # Check if we're dealing with Windows.
+    if(substr(PHP_OS, 0, 3) == 'WIN')
+    {
+      # Chek if there's a version string and if so, save it in $ver.
+      if($ver = @shell_exec('ver'))
+      {
+        # Get the version number from the version string.
+        $version = explode('.', preg_replace('/^.*\[.*?([0-9.]+)\].*$/s', '$1', $ver));
+
+        # Get the build number.
+        $build = isset($version[2]) ? $version[2] : 0;
+
+        # The version pack version number.
+        $sp = isset($version[3]) ? $version[3] : $build;
+
+        # The version and build number in the one string.
+        $version_build = (isset($version[0]) ? (int)$version[0] : 0). '.'. (isset($version[1]) ? (int)$version[1] : 0). '.'. substr($build, 0, 1);
+
+        # The version number, without the build number
+        $version = (isset($version[0]) ? (int)$version[0] : 0). '.'. (isset($version[1]) ? (int)$version[1] : 0);
+
+        # Get the possible Windows version names.
+        $versions = array(
+          '1.01' => 'Windows 1.01',
+          '2.03' => 'Windows 2.03',
+          '2.11' => 'Windows 2.11',
+          '3.0' => 'Windows 3.0',
+          '3.1' => 'Windows 3.1',
+          '3.11' => 'Windows 3.11',
+          '3.2' => 'Windows 3.2',
+          '3.5' => 'Windows NT 3.5',
+          '3.51' => 'Windows NT 3.51',
+          '4.0' => 'Windows 95',
+          '4.0.1' => 'Windows NT 4.0',
+          '4.10' => 'Windows 98',
+          '4.10.2' => 'Windows 98 SE',
+          '4.90' => 'Windows ME',
+          '5.0' => 'Windows 2000',
+          '5.1' => 'Windows XP',
+          '5.2' => 'Windows Server 2003',
+          '5.2.4' => 'Windows Home Server',
+          '6.0' => 'Windows Vista',
+          '6.1' => 'Windows 7',
+        );
+
+        # Check for Vista SP1
+        if($version == '6.0' && $sp == '6001')
+        {
+          $sp = ' SP1';
+        }
+        # Vista SP2
+        elseif($version == '6.0' && $sp == '6002')
+        {
+          $sp = ' SP2';
+        }
+        # Check for XP SP1
+        elseif(($version == '5.1' || $version == '5.2') && ($sp == '1089' || $sp == '1070'))
+        {
+          $sp = ' SP1';
+        }
+        # XP SP2
+        elseif(($version == '5.1' || $version == '5.2') && $sp == '2180')
+        {
+          $sp = ' SP2';
+        }
+        # XP SP3
+        elseif(($version == '5.1' || $version == '5.2') && $sp == '5512')
+        {
+          $sp = ' SP3';
+        }
+        # Okay, so no service pack.
+        else
+        {
+          $sp = '';
+        }
+
+        # Might be determined by the build number.
+        if(isset($versions[$version_build]))
+        {
+          return $versions[$version_build];
+        }
+        # Or better yet, the actual version.
+        elseif(isset($versions[$version]))
+        {
+          # Might want to add 64-bit to it. Maybe.
+          if($version == '5.2' && (isset($_ENV['PROCESSOR_ARCHITECTURE']) ? $_ENV['PROCESSOR_ARCHITECTURE'] : 'x86') != 'x86')
+          {
+            return 'Windows XP 64-bit'. $sp;
+          }
+          elseif($version == '6.0' && (isset($_ENV['PROCESSOR_ARCHITECTURE']) ? $_ENV['PROCESSOR_ARCHITECTURE'] : 'x86') != 'x86')
+          {
+            return 'Windows Vista 64-bit'. $sp;
+          }
+          elseif($version == '6.1' && (isset($_ENV['PROCESSOR_ARCHITECTURE']) ? $_ENV['PROCESSOR_ARCHITECTURE'] : 'x86') != 'x86')
+          {
+            return 'Windows 7 64-bit'. $sp;
+          }
+          else
+          {
+            # Just plain ol' 32-bit.
+            return $versions[$version]. $sp;
+          }
+        }
+        else
+        {
+          return 'Windows '. $version. $sp;
+        }
+      }
+      # We can't determine the particular Windows version, so let's check if it's just a generic Windows NT.
+      elseif(PHP_OS == 'WINNT')
+      {
+        return 'Windows NT';
+      }
+      # Okay, then it's just a generic Windows.
+      else
+      {
+        return 'Windows';
+      }
+    }
+    else
+    {
+      return PHP_OS;
+    }
+  }
+}
+
+if(!function_exists('admin_get_software_information'))
+{
+  /*
+    Function: admin_get_software_information
+
+    Returns the information about the server software (Like IIS or Apache).
+
+    Parameters:
+      none
+
+    Returns:
+      string - Returns a string containing the servers software information.
+
+    Note:
+      This function is overloadable.
+  */
+  function admin_get_software_information()
+  {
+    $software = $_SERVER['SERVER_SOFTWARE'];
+
+    # Is it Apache?
+    if(stripos($software, 'Apache') !== false)
+    {
+      # Try to get a version.
+      if(strpos($software, '/') !== false)
+      {
+        list(, $version) = explode('/', $software, 2);
+        list($version) = @explode(' ', $version, 2);
+
+        $version = trim($version);
+      }
+
+      return 'Apache'. (!empty($version) ? ' v'. $version : '');
+    }
+    # Might be IIS
+    elseif(stripos($software, 'IIS') !== false)
+    {
+      # Get the version of IIS, if available.
+      if(strpos($software, '/') !== false)
+      {
+        list(, $version) = explode('/', $software);
+
+        $version = trim($version);
+      }
+
+      return '<abbr title="Internet Information Services">IIS</abbr>'. (!empty($version) ? ' v'. $version : '');
+    }
+    else
+    {
+      # Don't know...
+      return $software;
+    }
+  }
 }
 ?>
