@@ -363,7 +363,7 @@ class RSS
     Returns:
       string - Returns a string containing the RSS feeds language code.
   */
-  public function title()
+  public function language()
   {
     return $this->language;
   }
@@ -566,7 +566,7 @@ class RSS
       return false;
     }
 
-    if(isset($item['source']) || (empty($item['source']['url'])))
+    if(isset($item['source']) && (empty($item['source']['url'])))
     {
       # A URL for the source is a must!
       return false;
@@ -691,7 +691,221 @@ class RSS
     file stream.
 
     Parameters:
-      resource $fp
+      resource $fp - The stream to write the RSS output to, instead of through
+                     echo.
+
+    Returns:
+      bool - Returns true if the RSS feed was generated successfully, false if
+             all the information which was required was not supplied, or if the
+             method could not obtain a lock on the supplied file pointer.
   */
+  public function generate($fp = null)
+  {
+    # You must have a title, link and description!
+    if(empty($this->title) || empty($this->link) || empty($this->description))
+    {
+      # Sorry... Can't do it without it.
+      return false;
+    }
+    # Supplied a stream for us to write to?
+    elseif(!empty($fp) && !flock($fp, LOCK_EX))
+    {
+      # It would be nice if we could have an exclusive lock...
+      return false;
+    }
+
+    # We may need to output headers!
+    if(empty($fp))
+    {
+      @ob_clean();
+
+      # Well, one ;-) The content type.
+      header('Content-Type: application/rss+xml; charset=utf-8');
+    }
+
+    # Let's start shall we?
+    $buffer = '<?xml version="1.0" encoding="UTF-8"?>'. "\r\n".
+              '<rss version="2.0">'. "\r\n".
+              '  <channel>'. "\r\n".
+              '    <title>'. htmlchars($this->title). '</title>'. "\r\n".
+              '    <link>'. htmlchars($this->link). '</link>'. "\r\n".
+              '    <description>'. htmlchars($this->description). '</description>'. "\r\n";
+
+    # Well, we have part of it... Let's output!
+    if(!empty($fp))
+    {
+      fwrite($fp, $buffer);
+    }
+    else
+    {
+      echo $buffer;
+    }
+
+    # And empty the buffer data.
+    $buffer = '';
+
+    # Did you specify a language?
+    if(!empty($this->language))
+    {
+      $buffer .= '    <language>'. htmlchars($this->language). '</language>'. "\r\n";
+    }
+
+    # Published date? Would be mighty nice :-)
+    if(!empty($this->pubDate) || $this->pubDate === 0)
+    {
+      $buffer .= '    <pubDate>'. date('r', $this->pubDate). '</pubDate>'. "\r\n";
+    }
+
+    # Last time it was built?
+    if(!empty($this->lastBuildDate) || $this->lastBuildDate === 0)
+    {
+      $buffer .= '    <lastBuildDate>'. date('r', $this->lastBuildDate). '</lastBuildDate>'. "\r\n";
+    }
+
+    # A docs URL? Weird.
+    if(!empty($this->docs))
+    {
+      $buffer .= '    <docs>'. htmlchars($this->docs). '</docs>'. "\r\n";
+    }
+
+    # The managing editors name/email?
+    if(!empty($this->managingEditor))
+    {
+      $buffer .= '    <managingEditor>'. htmlchars($this->managingEditor). '</managingEditor>'. "\r\n";
+    }
+
+    # Do you like to copyright?
+    if(!empty($this->copyright))
+    {
+      $buffer .= '    <copyright>'. htmlchars($this->copyright). '</copyright>'. "\r\n";
+    }
+
+    # Category information..?
+    if(!empty($this->category['value']))
+    {
+      $buffer .= '    <category'. (!empty($this->category['domain']) ? ' domain="'. htmlchars($this->category['domain']). '"' : ''). '>'. htmlchars($this->category['value']). '</category>'. "\r\n";
+    }
+
+    # Did you decide how long you want it to live? :P
+    if(!empty($this->ttl) || $this->ttl === 0)
+    {
+      $buffer .= '    <ttl>'. (int)$this->ttl. '</ttl>'. "\r\n";
+    }
+
+    # Once again, we got a good chunk done :-) So output the buffer to the right place.
+    if(!empty($fp))
+    {
+      fwrite($fp, $buffer);
+    }
+    else
+    {
+      echo $buffer;
+    }
+
+    # Empty it, and move on to items!
+    $buffer = '';
+
+    # That is, if there are any at all.
+    if(count($this->items) > 0)
+    {
+      foreach($this->items as $item)
+      {
+        # Start the item out.
+        $buffer = '    <item>'. "\r\n";
+
+        # You aren't required to have a title, but if you don't have the
+        # title, then you have a description ;-)
+        if(!empty($item['title']))
+        {
+          $buffer .= '      <title>'. htmlchars($item['title']). '</title>'. "\r\n";
+        }
+
+        if(!empty($item['link']))
+        {
+          # Links are always good in an RSS feed... Lol.
+          $buffer .= '      <link>'. htmlchars($item['link']). '</link>'. "\r\n";
+        }
+
+        if(!empty($item['description']))
+        {
+          # Mmm... Descriptiveness :-P.
+          $buffer .= '      <description>'. htmlchars($item['description']). '</description>'. "\r\n";
+        }
+
+        if(!empty($item['author']))
+        {
+          # Someone had to make it...
+          $buffer .= '      <author>'. htmlchars($item['author']). '</author>'. "\r\n";
+        }
+
+        if(!empty($item['category']['value']))
+        {
+          $buffer .= '      <category'. (!empty($item['domain']) ? ' domain="'. htmlchars($item['domain']). '"' : ''). '>'. htmlchars($item['category']['value']). '</category>'. "\r\n";
+        }
+
+        if(!empty($item['comments']))
+        {
+          # I would like to comment on your item. Please?
+          $buffer .= '      <comments>'. htmlchars($item['comments']). '</comments>'. "\r\n";
+        }
+
+        if(!empty($item['enclosure']['url']))
+        {
+          # Well aren't you Mr. Fancy Pants with your media in items!!!
+          $buffer .= '      <enclosure url="'. htmlchars($item['enclosure']['url']). '" length="'. (int)$item['enclosure']['length']. '" type="'. htmlchars($item['enclosure']['type']). '" />'. "\r\n";
+        }
+
+        if(!empty($item['guid']))
+        {
+          # Everything is unique! Well, unless you stole someone elses content. Tisk tisk!
+          $buffer .= '      <guid>'. htmlchars($item['guid']). '</guid>'. "\r\n";
+        }
+
+        if(isset($item['pubdate']))
+        {
+          # It had to be published at some point in time.
+          $buffer .= '      <pubDate>'. date('r', (int)$item['pubdate']). '</pubDate>'. "\r\n";
+        }
+
+        if(!empty($item['source']['url']))
+        {
+          # People have sources, you know?
+          $buffer .= '      <source url="'. htmlchars($item['source']['url']). '">'. (!empty($item['source']['value']) ? htmlchars($item['source']['value']) : ''). '</source>'. "\r\n";
+        }
+
+        # And... CLOSE TAG!
+        $buffer .= '    </item>'. "\r\n";
+
+        # Output that sucker!!!
+        if(!empty($fp))
+        {
+          fwrite($fp, $buffer);
+        }
+        else
+        {
+          echo $buffer;
+        }
+      }
+    }
+
+    # Almost done!
+    $buffer = '  </channel>'. "\r\n".
+              '</rss>';
+
+    if(!empty($fp))
+    {
+      fwrite($fp, $buffer);
+
+      # And unlock it.
+      flock($fp, LOCK_UN);
+    }
+    else
+    {
+      echo $buffer;
+    }
+
+    # Woo! DONE!
+    return true;
+  }
 }
 ?>

@@ -48,11 +48,15 @@ if(!function_exists('init_session'))
 
     # Are sessions set to automatically start upon load? Turn it off :P
     if(@ini_get('session.auto_start') == 1)
+    {
       session_write_close();
+    }
 
     # Custom session save path..? Make sure it is readable and writeable.
     if(strlen($settings->get('session.save_path', 'string', '')) > 0 && is_writeable($settings->get('session.save_path', 'string')) && is_readable($settings->get('session.save_path', 'string')))
+    {
       @ini_set('session.save_path', $settings->get('session.save_path', 'string'));
+    }
 
     # Use cookies, mmm...
     @ini_set('session.use_cookies', 1);
@@ -78,6 +82,117 @@ if(!function_exists('init_session'))
 
     # Now start the session.
     session_start();
+  }
+}
+
+if(!function_exists('verify_request'))
+{
+  /*
+    Function: verify_request
+
+    Even though the <Form> class uses <Token> class which helps stop CSRF,
+    sometimes using the <Token> class can be a bit much for what is needed
+    to be done. By calling on this function the current members session id
+    will be compared to that of the supplied. The supplied session id will
+    be either in the GET, POST or both as the variable sid. If they do not
+    match, then an error message will be shown, and any further execution
+    halted.
+
+    Parameters:
+      string $where - Where the sid variable should be looked for in, either
+                      get for $_GET['sid'], post for $_POST['sid'] or request
+                      for $_REQUEST['sid']. Defaults to request.
+
+    Returns:
+      bool - Returns true on success.
+
+    Note:
+      This function is overloadable.
+  */
+  function verify_request($where = 'request')
+  {
+    global $member, $theme;
+
+    $where = strtolower($where);
+
+    # Make sure it is a known where.
+    if(!in_array($where, array('get', 'post', 'request')))
+    {
+      return false;
+    }
+
+    # Now fetch the session id, or at least, try.
+    if($where == 'get')
+    {
+      $sid = !empty($_GET['sid']) ? $_GET['sid'] : '';
+    }
+    elseif($where == 'post')
+    {
+      $sid = !empty($_POST['sid']) ? $_POST['sid'] : '';
+    }
+    else
+    {
+      $sid = !empty($_REQUEST['sid']) ? $_REQUEST['sid'] : '';
+    }
+
+    # So do they match?
+    if($member->session_id() != $sid)
+    {
+      # We have a function to do this already ;-)
+      member_access_denied(null, l('Sorry, but session verification failed. Please go back and try again.'));
+    }
+
+    return true;
+  }
+}
+
+
+if(!function_exists('member_access_denied'))
+{
+  /*
+    Function: member_access_denied
+
+    Shows an error screen denying the member access to the page they requested.
+
+    Parameters:
+      string $title - The title of the page, defaults to Access denied
+      string $message - The error message to display, defaults to "Sorry,
+                        but you are not allowed to access the page you have requested."
+
+    Returns:
+      void - Nothing is returned by this function.
+
+    Note:
+      This function is overloadable.
+  */
+  function member_access_denied($title = null, $message = null)
+  {
+    global $theme;
+
+    if(empty($title))
+    {
+      $title = l('Access denied');
+    }
+
+    if(empty($message))
+    {
+      $message = l('Sorry, but you are not allowed to access the page you have requested.');
+    }
+
+    $theme->set_title($title);
+
+    $theme->add_meta(array('name' => 'robots', 'content' => 'noindex'));
+
+    $theme->header();
+
+    echo '
+    <h1>', $title, '</h1>
+    <p>', $message, '</p>';
+
+    $theme->footer();
+
+    # Exit!
+    exit;
   }
 }
 ?>
