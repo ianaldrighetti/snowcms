@@ -49,16 +49,24 @@ Group: Core  {
 
    Group: Admin  {
 
+      File: Control Panel - Error Log  (core/admin/admin_error_log.php)
       File: Control Panel - Home  (core/admin/admin_home.php)
-      File: Control Panel - Members  (core/admin/admin_members.php)
+      File: Control Panel - Member - Permissions  (core/admin/admin_members_permissions.php)
+      File: Control Panel - Member - Search  (core/admin/admin_members_search.php)
+      File: Control Panel - Members - Add  (core/admin/admin_members_add.php)
+      File: Control Panel - Members - Manage  (core/admin/admin_members_manage.php)
+      File: Control Panel - Members - Settings  (core/admin/admin_members_settings.php)
       File: Control Panel - Plugins  (core/admin/admin_plugins.php)
       File: Control Panel - Settings  (core/admin/admin_settings.php)
       File: Control Panel - System Update  (core/admin/admin_update.php)
+      File: Control Panel - Themes  (core/admin/admin_themes.php)
       }  # Group: Admin
 
    File: Admin switch  (core/admin.php)
    File: API  (core/api.class.php)
+   File: Atom  (core/atom.class.php)
    File: Clean Request  (core/clean_request.php)
+   File: compat/json.php  (core/compat/json.php)
    File: Compatibility functions  (core/compat.php)
    File: Core actions  (core/core.php)
    File: Error Handler  (core/errors.php)
@@ -66,19 +74,24 @@ Group: Core  {
    File: HTTP  (core/http.class.php)
    File: Language  (core/l.php)
    File: Mail  (core/mail.class.php)
+   File: mime_content_type  (core/compat/mime_content_type.php)
    File: Mitigate Globals  (core/mitigate_globals.php)
    File: Password reminder  (core/reminder.php)
    File: PHP_Mail  (core/php_mail.class.php)
+   File: plugin.php  (core/plugin.php)
    File: Profile  (core/profile.php)
    File: Resend activation email  (core/resend.php)
+   File: RSS  (core/rss.class.php)
    File: Settings  (core/settings.class.php)
    File: SMTP  (core/smtp.class.php)
    File: Table  (core/table.class.php)
    File: Tar  (core/tar.class.php)
    File: Tasks  (core/tasks.class.php)
    File: Theme  (core/theme.class.php)
+   File: theme.php  (core/theme.php)
    File: Time functions  (core/time.php)
    File: Tokens  (core/tokens.class.php)
+   File: Update  (core/update.class.php)
    File: Upload  (core/upload.class.php)
 
    Group: Members  {
@@ -103,6 +116,7 @@ Group: Core  {
 
    File: Validation  (core/validation.class.php)
    File: Variable functions  (core/func.php)
+   File: XML  (core/xml.class.php)
    }  # Group: Core
 
 Group: Plugins  {
@@ -114,6 +128,8 @@ Group: Plugins  {
 
 File: Filters  (filters.txt)
 File: Hooks  (hooks.txt)
+File: Install  (plugins/menu manager/install.php)
+File: Menu Manager plugin  (plugins/menu manager/plugin.php)
 File: Secure login plugin  (plugins/securelogin/plugin.php)
 
 Group: Index  {
@@ -124,5 +140,6 @@ Group: Index  {
    Variable Index: Variables
    Filter Index: Filters
    Hook Index: Hooks
+   File Index: Files
    }  # Group: Index
 

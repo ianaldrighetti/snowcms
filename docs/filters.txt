@@ -10,16 +10,13 @@
 ../trunk/core/core.php:  ob_start($api->apply_filters('output_callback', null));
 ../trunk/core/core.php:    $popup = $api->apply_filters('popup_'. $_GET['id'], array('title' => '', 'content'));
 ../trunk/core/core.php:    ', $api->apply_filters('core_popup_css', 'body { background: #FFFFFF; font-family: Tahoma, Arial, sans-serif; font-size: 90%; }
-../trunk/core/login.php:    if($func['strlen']($api->apply_filters('login_message', '')) > 0)
-../trunk/core/login.php:      <div id="', $api->apply_filters('login_message_id', 'login_error'), '">
-../trunk/core/login.php:        ', $api->apply_filters('login_message', ''), '
 ../trunk/core/login.php:                               'action' => $api->apply_filters('login_action_url', $base_url. '/index.php?action=login2'),
 ../trunk/core/login.php:    setcookie($api->apply_filters('login_cookie_name', $cookie_name), $api->apply_filters('login_cookie_value', $row['member_id']. '|'. sha1($row['member_pass']. $row['member_hash'])), $cookie_expires);
-../trunk/core/admin/admin_members.php:    $types = $api->apply_filters('registration_types', array(
-../trunk/core/admin/admin_members.php:    $levels = $api->apply_filters('password_security_levels', array(
-../trunk/core/admin/admin_members.php:    $permissions = $api->apply_filters('member_group_permissions', $permissions);
-../trunk/core/admin/admin_members.php:      $denied = array_merge(array('manage_system_settings', 'update_system', 'view_error_log', 'add_new_member', 'manage_members', 'search_members', 'manage_member_settings', 'manage_permissions', 'add_plugins', 'manage_plugins', 'manage_plugin_settings'), $api->apply_filters('denied_guest_permissions', array()));
 ../trunk/core/admin/admin_settings.php:                                                              'options' => $api->apply_filters('admin_mail_handler', array(
+../trunk/core/admin/admin_members_settings.php:    $types = $api->apply_filters('registration_types', array(
+../trunk/core/admin/admin_members_settings.php:    $levels = $api->apply_filters('password_security_levels', array(
+../trunk/core/admin/admin_members_permissions.php:    $permissions = $api->apply_filters('member_group_permissions', $permissions);
+../trunk/core/admin/admin_members_permissions.php:      $denied = array_merge(array('manage_system_settings', 'manage_themes', 'update_system', 'view_error_log', 'add_new_member', 'manage_members', 'search_members', 'manage_member_settings', 'manage_permissions', 'add_plugins', 'manage_plugins', 'manage_plugin_settings'), $api->apply_filters('denied_guest_permissions', array()));
 ../trunk/core/admin/admin_theme.class.php:  <title>', $api->apply_filters('theme_title', (!empty($this->title) ? htmlchars($this->title). ' - ' : ''). (!empty($this->main_title) ? $this->main_title : '')), '</title>';
 ../trunk/core/admin/admin_theme.class.php:<div id="content">', $api->apply_filters('admin_theme_pre_content', '');
 ../trunk/core/admin/admin_theme.class.php:    echo $api->apply_filters('admin_theme_post_content', ''), '
@@ -27,9 +24,9 @@
 ../trunk/core/admin/admin_update.php:    $latest_info = @unserialize($http->request($api->apply_filters('admin_update_version_url', 'http://download.snowcms.com/news/v2.x-line/latest.php'). '?version='. $settings->get('version', 'string')));
 ../trunk/core/admin/admin_update.php:      $download_url = $api->apply_filters('admin_update_url', 'http://download.snowcms.com/updates/'. $filename);
 ../trunk/core/admin/admin_update.php:      $checksum_download_url = $api->apply_filters('admin_update_checksum_url', 'http://download.snowcms.com/updates/'. $filename. '.chksum');
+../trunk/core/admin/admin_error_log.php:                                                                'options' => $api->apply_filters('error_log_types', array(
 ../trunk/core/admin/admin_home.php:      $fetched_news = $http->request($api->apply_filters('admin_news_url', 'http://download.snowcms.com/news/v2.x-line/news.php'));
 ../trunk/core/admin/admin_home.php:    $notifications = $api->apply_filters('admin_notifications', array());
-../trunk/core/upload.class.php:        echo $api->apply_filters('upload_download_file', fread($fp, 8192));
 ../trunk/core/checkcookie.php:      $login_view_func = $api->apply_filters('login_view_function', 'login_view');
 ../trunk/core/checkcookie.php:        require_once($api->apply_filters('login_view_path', $core_dir. '/login.php'));
 ../trunk/core/reminder.php:    if(strlen($api->apply_filters('reminder_message', '')) > 0)
