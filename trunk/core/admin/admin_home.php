@@ -46,7 +46,9 @@ if(!function_exists('admin_home'))
 
     # Can you even access the Admin Control Panel..?
     if(!$member->can('access_admin_cp'))
+    {
       admin_access_denied();
+    }
 
     # Do we need to fetch the news from the SnowCMS site..?
     $handled = false;
@@ -119,8 +121,10 @@ if(!function_exists('admin_home'))
     if(is_array($notifications) && count($notifications))
     {
       foreach($notifications as $notification)
+      {
         echo '
       <p class="notification">', (!empty($notification['href']) ? '<a href="'. $notification['href']. '"'. (!empty($notification['title']) ? ' title="'. $notification['title']. '"' : ''). '>' : (!empty($notification['title']) ? '<span title="'. $notification['title']. '">' : '')), $notification['subject'], (!empty($notification['href']) ? '</a>' : (!empty($notification['title']) ? '</span>' : '')), '</p>';
+      }
     }
     else
     {
@@ -169,11 +173,13 @@ if(!function_exists('admin_home'))
         <td><a href="', $icon[$i]['href'], '" title="', $icon[$i]['title'], '"><img src="', $icon[$i]['src'], '" alt="" title="', $icon[$i]['title'], '" /><br />', $icon[$i]['label'], '</a></td>';
 
           if(($i + 1) % 6 == 0 && isset($icon[$i + 1]))
+          {
             echo '
       </tr>
     </table>
     <table class="icons">
       <tr>';
+          }
         }
 
         echo '

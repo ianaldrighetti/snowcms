@@ -123,4 +123,62 @@ if(!defined('E_DEPRECATED'))
   define('E_DEPRECATED', 8192);
   define('E_USER_DEPRECATED', 16384);
 }
+
+/*
+  Function: recursive_unlink
+
+  Deletes everything in the specified directory, including the
+  directory itself.
+
+  Parameters:
+    string $path
+
+  Returns:
+    void - Nothing is returned by this function.
+*/
+function recursive_unlink($path)
+{
+  # Does the directory not exist? Then we cannot delete it!
+  if(!file_exists($path))
+  {
+    return false;
+  }
+  # Is it a file? Just delete it!
+  elseif(is_file($path))
+  {
+    return unlink($path);
+  }
+  # Nope, it is a directory.
+  else
+  {
+    # So get all the files and what not.
+    $files = scandir($path);
+
+    if(count($files) > 0)
+    {
+      foreach($files as $file)
+      {
+        # Skip . and ..
+        if($file == '.' || $file == '..')
+        {
+          continue;
+        }
+
+        # Is it a directory? Recursion!
+        if(is_dir($path. '/'. $file))
+        {
+          recursive_unlink($path. '/'. $file);
+        }
+        # Just a file, so delete it :-)
+        else
+        {
+          unlink($path. '/'. $file);
+        }
+      }
+    }
+
+    # Now to delete the directory itself!
+    return rmdir($path);
+  }
+}
 ?>

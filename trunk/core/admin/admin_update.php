@@ -490,44 +490,4 @@ function get_listing_implode($array)
 
   return $tmp;
 }
-
-/*
-  Function: recursive_unlink
-
-  Deletes everything in the specified directory, including the
-  directory itself.
-
-  Parameters:
-    string $path
-
-  Returns:
-    void - Nothing is returned by this function.
-*/
-function recursive_unlink($path)
-{
-  if(!file_exists($path))
-    return true;
-  elseif(is_file($path))
-    unlink($path);
-  else
-  {
-    $files = scandir($path);
-
-    if(count($files) > 0)
-    {
-      foreach($files as $file)
-      {
-        if($file == '.' || $file == '..')
-          continue;
-
-        if(is_dir($path. '/'. $file))
-          recursive_unlink($path. '/'. $file);
-        else
-          unlink($path. '/'. $file);
-      }
-    }
-
-    rmdir($path);
-  }
-}
 ?>

@@ -452,6 +452,8 @@ class Update
         }
 
         # We are done with these now.
+        flock($fp, LOCK_UN);
+        flock($new_fp, LOCK_UN);
         fclose($fp);
         fclose($new_fp);
 

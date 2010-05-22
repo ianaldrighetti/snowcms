@@ -88,10 +88,12 @@ if(!function_exists('admin_plugins_settings'))
 
     $api->run_hooks('admin_plugins_settings');
 
-    # Can you update the system?
+    # Can you manage plugin settings?
     if(!$member->can('manage_plugin_settings'))
+    {
       # That's what I thought!
       admin_access_denied();
+    }
 
     # We will need the form for this ;)
     admin_plugins_settings_generate_form();

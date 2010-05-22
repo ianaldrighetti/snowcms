@@ -328,6 +328,22 @@ abstract class Theme
   }
 
   /*
+    Method: return_links
+
+    Returns all the links (and their information) currently added to the theme.
+
+    Parameters:
+      none
+
+    Returns:
+      array - Returns an array containing all the links in the theme.
+  */
+  public function return_links()
+  {
+    return $this->links;
+  }
+
+  /*
     Method: add_js_var
 
     Adds a JavaScript variable to the header of the theme.
@@ -348,7 +364,7 @@ abstract class Theme
     }
 
     # JSON encode the value :D
-    $this->js_vars[$variable] = json_encode($value);
+    $this->js_vars[$variable] = $value;
     return true;
   }
 
@@ -394,6 +410,30 @@ abstract class Theme
   }
 
   /*
+    Method: return_js_var
+
+    Returns the specified JavaScript variables value, or all of them.
+
+    Parameters:
+      string $variable - The name of the variable to return, if set to null
+                         all JavaScript variables will be returned.
+
+    Returns:
+      mixed - Returns the set value for the specified variable, if $variable is set
+              (false if it does not exist), if $variable is not set, then an array
+              containing all the current variables is returned.
+
+    Note:
+      Even though false is returned if the a variable is specified does not necessarily
+      mean it is not set, since the variables value can also be set to false. In which
+      case, you should check with <Theme::js_var_exists>.
+  */
+  public function return_js_var($variable = null)
+  {
+    return !empty($variable) ? ($this->js_var_exists($variable) ? $this->js_var[$variable] : false) : $this->js_vars;
+  }
+
+  /*
     Method: add_js_file
 
     Adds a JavaScript file to the header of the theme.
@@ -414,11 +454,15 @@ abstract class Theme
 
     # No type? Add it ourselves :P
     if(empty($script['type']))
+    {
       $script['type'] = 'text/javascript';
+    }
 
     # No language? JavaScript then... Of course.
     if(empty($script['language']))
+    {
       $script['language'] = 'JavaScript';
+    }
 
     # Let's make sure you aren't throwing some random crap in...
     $allowed_attributes = array('type', 'charset', 'defer', 'src', 'language');
@@ -501,6 +545,22 @@ abstract class Theme
 
     # This shouldn't happen o.O
     return false;
+  }
+
+  /*
+    Method: return_js_files
+
+    Returns all the JavaScript files currently added to the theme.
+
+    Parameters:
+      none
+
+    Returns:
+      array - Returns an array containing all the JavaScript files.
+  */
+  public function return_js_files()
+  {
+    return $this->js_files;
   }
 
   /*
@@ -609,6 +669,22 @@ abstract class Theme
   }
 
   /*
+    Method: return_meta
+
+    Returns all the current meta tags that have been added to the theme.
+
+    Parameters:
+      none
+
+    Returns:
+      array - Returns an array containing all the current meta tags.
+  */
+  public function return_meta()
+  {
+    return $this->meta;
+  }
+
+  /*
     Method: init
 
     This is a protected method, which can be overloaded by the Implemented_Theme
@@ -687,7 +763,9 @@ abstract class Theme
       {
         # As long as they aren't empty, add them.
         if(!empty($value))
+        {
           $attr[] = $name. '="'. addcslashes($value, '"'). '"';
+        }
       }
 
       # Now add them to the tag.
