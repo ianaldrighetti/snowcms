@@ -57,7 +57,7 @@ if(!function_exists('admin_members_manage_permissions'))
     $theme->header();
 
     echo '
-  <h1><img src="', $theme->url(), '/permissions-small.png" alt="" /> ', l('Manage permissions'), '</h1>
+  <h1><img src="', $theme->url(), '/members_permissions-small.png" alt="" /> ', l('Manage permissions'), '</h1>
   <p>', l('The permissions of member groups can all be modified here. Simply click on the member group below to edit their permissions.'), '</p>';
 
     # Add the guest group.
@@ -150,7 +150,7 @@ if(!function_exists('admin_members_manage_group_permissions'))
       $theme->header();
 
       echo '
-    <h1><img src="', $theme->url(), '/permissions-small.png" alt="" /> ', l('Managing %s permissions', $api->return_group($group_id)), '</h1>
+    <h1><img src="', $theme->url(), '/members_permissions-small.png" alt="" /> ', l('Managing %s permissions', $api->return_group($group_id)), '</h1>
     <p>', l('Changes to member groups permissions can be applied here. If deny is selected, no matter what other groups the member may be in, the permission will be denied. If disallow is selected and another one of the member groups they are in allows the permission, the disallow will be overridden. <a href="%s" title="Back to Manage Permissions">Back to Manage Permissions</a>.', $base_url. '/index.php?action=admin&amp;sa=members_permissions'), '</p>';
 
       $form->show($group_id. '_permissions');

@@ -20,9 +20,9 @@
 if(!defined('IN_SNOW'))
   die;
 
-# Title: Control Panel - Member - Search
+# Title: Control Panel - Plugins - Add
 
-if(!function_exists('admin_members_search'))
+if(!function_exists('admin_plugins_add'))
 {
   /*
     Function: admin_plugins_add
@@ -38,28 +38,28 @@ if(!function_exists('admin_members_search'))
     Note:
       This function is overloadable.
   */
-  function admin_members_search()
+  function admin_plugins_add()
   {
     global $api, $base_url, $member, $settings, $theme, $theme_url;
 
-    $api->run_hooks('admin_members_search');
+    $api->run_hooks('admin_plugins_add');
 
-    # Can you search for members?
-    if(!$member->can('search_members'))
+    # Can you add plugins?
+    if(!$member->can('add_plugins'))
     {
       # That's what I thought!
       admin_access_denied();
     }
 
-    $theme->set_current_area('members_search');
+    $theme->set_current_area('plugins_add');
 
-    $theme->set_title(l('Search for members'));
+    $theme->set_title(l('Add plugin'));
 
     $theme->header();
 
     echo '
-  <h1><img src="', $theme->url(), '/members_search-small.png" alt="" /> ', l('Search for members'), '</h1>
-  <p>', l('You can search for members via the form below.'), '</p>';
+  <h1><img src="', $theme->url(), '/plugins_add-small.png" alt="" /> ', l('Add a new plugin'), '</h1>
+  <p>', l('Plugins can be added to your site by entering the plugins dependency name (the address at which the plugins package is downloaded). A plugin can also be uploaded to the plugin directory as well (in its unextracted form).'), '</p>';
 
     $theme->footer();
   }

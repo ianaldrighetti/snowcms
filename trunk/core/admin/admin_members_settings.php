@@ -77,7 +77,7 @@ if(!function_exists('admin_members_settings'))
     $theme->header();
 
     echo '
-  <h1><img src="', $theme->url(), '/member_settings-small.png" alt="" /> ', l('Member settings'), '</h1>
+  <h1><img src="', $theme->url(), '/members_settings-small.png" alt="" /> ', l('Member settings'), '</h1>
   <p>', l('Member settings can be managed here, which includes setting the registration mode, or disabling it all together.'), '</p>';
 
     $form->show('admin_members_settings_form');

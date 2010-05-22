@@ -20,14 +20,14 @@
 if(!defined('IN_SNOW'))
   die;
 
-# Title: Control Panel - Member - Search
+# Title: Control Panel - Plugins - Manage
 
-if(!function_exists('admin_members_search'))
+if(!function_exists('admin_plugins_manage'))
 {
   /*
-    Function: admin_plugins_add
+    Function: admin_plugins_manage
 
-    Handles the downloading and extracting of plugins.
+
 
     Parameters:
       none
@@ -38,28 +38,28 @@ if(!function_exists('admin_members_search'))
     Note:
       This function is overloadable.
   */
-  function admin_members_search()
+  function admin_plugins_manage()
   {
     global $api, $base_url, $member, $settings, $theme, $theme_url;
 
-    $api->run_hooks('admin_members_search');
+    $api->run_hooks('admin_plugins_manage');
 
-    # Can you search for members?
-    if(!$member->can('search_members'))
+    # Can you manage plugin settings?
+    if(!$member->can('manage_plugins'))
     {
       # That's what I thought!
       admin_access_denied();
     }
 
-    $theme->set_current_area('members_search');
+    $theme->set_current_area('plugins_manage');
 
-    $theme->set_title(l('Search for members'));
+    $theme->set_title(l('Manage plugins'));
 
     $theme->header();
 
     echo '
-  <h1><img src="', $theme->url(), '/members_search-small.png" alt="" /> ', l('Search for members'), '</h1>
-  <p>', l('You can search for members via the form below.'), '</p>';
+  <h1><img src="', $theme->url(), '/plugins_manage-small.png" alt="" /> ', l('Manage plugins'), '</h1>
+  <p>', l('Manage your current plugins.'), '</p>';
 
     $theme->footer();
   }

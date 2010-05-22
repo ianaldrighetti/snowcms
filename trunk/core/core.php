@@ -60,9 +60,9 @@ function init_core()
   $api->add_event('action=admin&sa=members_permissions&grp=*', 'admin_members_manage_group_permissions', $core_dir. '/admin/admin_members_permissions.php');
   $api->add_event('action=admin&sa=members_search', 'admin_members_search', $core_dir. '/admin/admin_members_search.php');
   $api->add_event('action=admin&sa=members_settings', 'admin_members_settings', $core_dir. '/admin/admin_members_settings.php');
-  $api->add_event('action=admin&sa=plugins_add', 'admin_plugins_add', $core_dir. '/admin/admin_plugins.php');
-  $api->add_event('action=admin&sa=plugins_manage', 'admin_plugins_manage', $core_dir. '/admin/admin_plugins.php');
-  $api->add_event('action=admin&sa=plugins_settings', 'admin_plugins_settings', $core_dir. '/admin/admin_plugins.php');
+  $api->add_event('action=admin&sa=plugins_add', 'admin_plugins_add', $core_dir. '/admin/admin_plugins_add.php');
+  $api->add_event('action=admin&sa=plugins_manage', 'admin_plugins_manage', $core_dir. '/admin/admin_plugins_manage.php');
+  $api->add_event('action=admin&sa=plugins_settings', 'admin_plugins_settings', $core_dir. '/admin/admin_plugins_settings.php');
   $api->add_event('action=admin&sa=settings', 'admin_settings', $core_dir. '/admin/admin_settings.php');
   $api->add_event('action=admin&sa=themes', 'admin_themes', $core_dir. '/admin/admin_themes.php');
   $api->add_event('action=admin&sa=update', 'admin_update', $core_dir. '/admin/admin_update.php');

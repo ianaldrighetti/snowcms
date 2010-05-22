@@ -75,6 +75,24 @@ class RSS
   */
   public function __construct()
   {
+    # clear will set everything to empty and what not.
+    $this->clear();
+  }
+
+  /*
+    Method: clear
+
+    Clears all the current RSS information.
+
+    Parameters:
+      none
+
+    Returns:
+      void - Nothing is returned by this method.
+  */
+  public function clear()
+  {
+    # Just empty everything, EVERYTHING!
     $this->title = null;
     $this->link = null;
     $this->description = null;

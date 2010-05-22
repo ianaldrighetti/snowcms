@@ -76,7 +76,7 @@ if(!function_exists('admin_members_add'))
     $theme->header();
 
     echo '
-  <h1><img src="', $theme->url(), '/add_member-small.png" alt="" /> ', l('Add a new member'), '</h1>
+  <h1><img src="', $theme->url(), '/members_add-small.png" alt="" /> ', l('Add a new member'), '</h1>
   <p>', l('If registration is enabled, guests on your site can create their own member, but if you need to create a new member, you can do so here.'), '</p>';
 
     $form->show('admin_members_add_form');

@@ -103,7 +103,7 @@ class MySQL extends Database
     }
 
     # The VERSION() function will give us what we need :-)
-    $result = $db->query('
+    $result = $this->query('
       SELECT VERSION()');
 
     # Fetch it and return it!
