@@ -5,7 +5,7 @@ function download_update()
     {
       var response = s.json(response);
 
-      if(response['error'].length > 0)
+      if(typeof response['error'] != 'undefined' && response['error'].length > 0)
       {
         s.id('download_status').innerHTML = '<p style="color: red; font-weight: bold;">' + response['error'] + '</p>';
       }
