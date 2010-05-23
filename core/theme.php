@@ -166,7 +166,7 @@ function theme_list()
 
     # Only look in directories, they are themes if they have the
     # implemented_theme.class.php file.
-    if(is_dir($theme_dir. '/'. $path) && file_exists($theme_dir. '/'. $path. '/implemented_theme.class.php') && file_exists($theme_dir. '/'. $path. '/theme.ini'))
+    if(is_dir($theme_dir. '/'. $path) && file_exists($theme_dir. '/'. $path. '/implemented_theme.class.php') && file_exists($theme_dir. '/'. $path. '/theme.xml'))
     {
       $list[] = realpath($theme_dir. '/'. $path);
     }

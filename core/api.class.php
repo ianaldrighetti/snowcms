@@ -1411,10 +1411,9 @@ function load_api()
   # Find all activated plugins, that way we can load them up.
   $result = $db->query('
     SELECT
-      dependency_name, dependency_names, dependencies, directory
+      dependency_name, directory
     FROM {db->prefix}plugins
-    WHERE is_activated = 1 AND runtime_error = 0
-    ORDER BY dependencies DESC');
+    WHERE is_activated = 1 AND runtime_error = 0');
 
   # Are there any activated plugins?
   if($result->num_rows() > 0)
@@ -1431,11 +1430,15 @@ function load_api()
     {
       # Check for that required plugin.php file.
       if(!file_exists($plugin_dir. '/'. $row['directory']. '/plugin.php'))
+      {
         # Mark it for a 'runtime error'
         $bad_plugins[] = $row['dependency_name'];
+      }
       else
+      {
         # Add the plugin, for now.
-        $plugins[strtolower($row['dependency_name'])] = array($plugin_dir. '/'. $row['directory']. '/plugin.php', explode(',', strtolower($row['dependency_names'])));
+        $plugins[strtolower($row['dependency_name'])] = $plugin_dir. '/'. $row['directory']. '/plugin.php';
+      }
     }
 
     # Did we find any bad plugins?
@@ -1448,65 +1451,19 @@ function load_api()
         array(
           'bad_plugins' => $bad_plugins,
         ));
-      }
+    }
 
     # Now for the actual loading of the plugins!
     if(count($plugins))
     {
-      # Another bad plugins array, but this time if their dependency requirements
-      # were not met, though they shouldn't have been enabled if they weren't!
-      $bad_plugins = array();
-
       foreach($plugins as $dependency => $plugin)
       {
-        # Does this plugin have dependencies? Let's check!
-        if(count($plugin[1]) > 0)
-        {
-          # Don't continue just yet.
-          $continue = false;
-
-          foreach($plugin[1] as $dependency)
-          {
-            $dependency = trim($dependency);
-
-            if(empty($dependency))
-              continue;
-            elseif(!isset($plugins[$dependency]))
-            {
-              # This is a bad plugin!
-              $bad_plugins[] = $dependency;
-              $continue = true;
-              break;
-            }
-          }
-
-          # Do we need to continue on to the next plugin?
-          if(!empty($continue))
-          {
-            continue;
-          }
-        }
-
-        # Well well, load the plugin if nothing is wrong!
-        require_once($plugin[0]);
+        # Well well, load the plugin!
+        require_once($plugin);
 
         # The plugin is now enabled :-)
         $api->add_plugin($dependency);
       }
-
-      # Any bad plugins found?
-      if(count($bad_plugins) > 0)
-      {
-        # Mark them with a 'runtime error', but this time with the number 2, which
-        # means the dependencies weren't met.
-        $db->query('
-          UPDATE {db->prefix}plugins
-          SET runtime_error = 2
-          WHERE dependency_name IN({string_array:bad_plugins})',
-          array(
-            'bad_plugins' => $bad_plugins,
-          ));
-        }
 
       # Alright, one of our first hooks! :D Just a simple one that plugins can hook
       # into when all plugins have been included (Really meant for plugins that are
@@ -1606,7 +1563,7 @@ function api_catch_fatal()
             # We do, so disable that dern thing!
             $db->query('
               UPDATE {db->prefix}plugins
-              SET runtime_error = 3
+              SET runtime_error = 2
               WHERE dependency_name = {string:dependency_name}
               LIMIT 1',
               array(
