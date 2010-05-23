@@ -48,8 +48,8 @@ if(!defined('IN_SNOW'))
       string name - The name of the plugin.
       string author - The author of the plugin.
       string version - The version of the plugin.
-      array dependencies - An array containing all of the plugins dependencies.
       string description - The description of the plugin.
+      string website - The authors website.
       string path - The root directory of the plugin.
 */
 function plugin_load($plugin_id, $is_path = true)
@@ -88,7 +88,7 @@ function plugin_load($plugin_id, $is_path = true)
   }
 
   # Simple enough, load the plugin.ini file.
-  $ini = parse_ini_file($plugin_dir. '/plugin.ini', true);
+  $ini = parse_ini_file($plugin_id. '/plugin.ini', true);
 
   # Now return the information.
   return array(
@@ -96,8 +96,8 @@ function plugin_load($plugin_id, $is_path = true)
             'name' => $ini['plugin']['plugin name'],
             'author' => $ini['plugin']['author'],
             'version' => $ini['plugin']['version'],
-            'dependencies' => !empty($ini['plugin']['dependencies']) ? explode('|', $ini['plugin']['dependencies']) : false,
             'description' => $ini['plugin']['description'],
+            'website' => isset($ini['plugin']['website']) ? $ini['plugin']['website'] : '',
             'path' => realpath($plugin_id),
           );
 }

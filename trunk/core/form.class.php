@@ -57,16 +57,23 @@ class Form
     Note:
       The following $options indices are allowed:
         accept-charset - Specifies the supported character sets, defaults to utf-8.
+
         action - The URL of where to send the form data to once submitted.
+
         ajax_submit - Whether or not (if the browser supports it) to submit the form
                       via AJAX, defaults to false.
+
         callback - The callback which is passed all the form information.
+
         enctype - Specifies how the form data will be encoded when being sent.
                   If a file field is added, the enctype is automatically changed
                   to multipart/form-data.
+
         id - The unique HTML id for the tag. Defaults to the form name.
+
         method - The way the form should be submitted, either POST or GET, defaults
                  to POST.
+
         submit - The text on the submit button.
 
       Once the form is processed using <Form::process> (might I add, successfully,
@@ -417,22 +424,35 @@ class Form
 
       Just so you know, this is how each type will be saved to the database:
         hidden - As is (See string).
+
         int - As is.
+
         double - As is.
+
         string - As is with HTML tags encoded.
+
         string-html - As is.
+
         textarea - As is with HTML tags encoded.
+
         textarea-html - As is.
+
         password - As is.
+
         checkbox - 0 for unchecked, 1 for checked.
+
         checkbox-multi - See select.
+
         select - The index of the option value. For example:
                    options = array('This setting', 'Another setting')
                  If "Another setting" was chosen, 1 would be stored in the database
                  as that is its index, however, you can do 'another' => 'Another setting'
                  and "another" would be stored in the database.
+
         select-multi - As is above, except each selected option will be comma delimited.
+
         radio - The selected options key will be passed.
+
         file - The array from the $_FILES array will be passed.
   */
   public function add_field($form_name, $name, $options = array())

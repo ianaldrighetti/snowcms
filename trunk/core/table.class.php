@@ -348,18 +348,24 @@ class Table
                  will appear in the column, if that is done, the
                  function will receive the whole rows array, not just
                  the column specific one.
+
         label - The label of the column, in the header row.
+
         title - The mouse over text of the column for the label.
+
         sortable - Whether or not the column should be allowed to be
                    sorted by. This cannot be enabled for columns which
                    do not come from the database (Ex: column not set),
                    however, you can set it to not be sortable even if
                    technically it can. For whatever reason.
+
         function - A function which will accept an array containing
                    the current row result set, and return a string
                    which will be displayed in that specific column.
                    Required if column is not specified.
+
         width - The width of the td element in the table.
+
         position - The position at which to place the column (0 -> [NUM COLS] - 1).
                    If you were, for example, to add a column at position 0
                    then another at position 0, the last column added would
@@ -555,7 +561,7 @@ class Table
   */
   public function show($tbl_name)
   {
-    global $api, $db, $theme;
+    global $api, $db, $member, $theme;
 
     if(!$this->table_exists($tbl_name))
     {
@@ -572,6 +578,9 @@ class Table
     # Are you submitting some option? If so, do it now!
     if(!empty($_POST[$tbl_name. '_submit']) && is_callable($table['callback']))
     {
+      # Make sure you did it!
+      verify_request('post');
+
       # You got it ;)
       call_user_func($table['callback'], $_POST[$tbl_name. '_option'], isset($_POST['selected']) ? $_POST['selected'] : array());
     }
@@ -749,7 +758,7 @@ class Table
         if($is_options)
         {
           echo '
-            <td><input type="checkbox" name="selected[]" value="', isset($row[$table['primary']]) ? $row[$table['primary']] : '', '" /></td>';
+            <td valign="top"><input type="checkbox" name="selected[]" value="', isset($row[$table['primary']]) ? $row[$table['primary']] : '', '" /></td>';
         }
 
         # Show each individual column!!!
@@ -794,6 +803,7 @@ class Table
     if($is_options)
     {
       echo '
+        <input name="sid" type="hidden" value="', $member->session_id(), '" />
         </form>';
     }
 

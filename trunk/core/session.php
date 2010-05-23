@@ -169,6 +169,8 @@ if(!function_exists('member_access_denied'))
   {
     global $theme;
 
+    @ob_clean();
+
     if(empty($title))
     {
       $title = l('Access denied');

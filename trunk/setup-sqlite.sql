@@ -83,15 +83,12 @@ CREATE TABLE '{db->prefix}permissions'
 CREATE TABLE '{db->prefix}plugins'
 (
   'dependency_name' VARCHAR(255) NOT NULL,
-  'dependency_names' TEXT NULL,
-  'dependencies' SMALLINT NOT NULL DEFAULT '0',
   'directory' VARCHAR(255) NOT NULL,
   'runtime_error' SMALLINT NOT NULL DEFAULT '0',
   'is_activated' SMALLINT NOT NULL DEFAULT '0',
   PRIMARY KEY ('dependency_name')
 );
 
-CREATE INDEX '{db->prefix}plugins_dependencies' ON '{db->prefix}plugins' ('dependencies');
 CREATE INDEX '{db->prefix}plugins_runtime_error' ON '{db->prefix}plugins' ('runtime_error');
 CREATE INDEX '{db->prefix}plugins_is_activated' ON '{db->prefix}plugins' ('is_activated');
 
