@@ -228,6 +228,9 @@ class Update
       }
     }
 
+    # Delete the update package...
+    unlink($filename);
+
     # All done!
     return true;
   }
