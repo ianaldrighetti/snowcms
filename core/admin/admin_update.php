@@ -227,6 +227,9 @@ if(!function_exists('admin_update_apply_step'))
 
     $response = array('error' => '');
 
+    # The update class can make this nice and easy for us!
+    $update = $api->load_class('Update');
+
     # Downloading the update?
     if($step == 1)
     {
@@ -236,37 +239,24 @@ if(!function_exists('admin_update_apply_step'))
       # And the checksum (SHA1) of the update.
       $checksum_download_url = $api->apply_filters('admin_update_checksum_url', 'http://download.snowcms.com/updates/'. $filename. '.chksum');
 
-      # HTTP class will sure come in handy ;)
-      $http = $api->load_class('HTTP');
-
-      $downloaded = $http->request($download_url, array(), 0, $base_dir. '/'. $filename);
+      # The download method of the Update class does this all for us...
+      # cool, huh?
+      $response = $update->download($download_url, $base_dir. '/'. $filename, $checksum_download_url);
 
       # Did it work?
-      if(empty($downloaded))
+      if(!$response['downloaded'])
       {
         $response['error'] = l('Failed to download the update package (%s).', $filename);
       }
+      elseif($response['valid'] === false)
+      {
+        # Looks like the checksum didn't match. Woops!
+        $response['error'] = l('The update package (%s) is corrupt. Update failed.', $filename);
+      }
       else
       {
-        # Now check the files integrity.
-        $checksum = $http->request($checksum_download_url);
-
-        # Didn't get the checksum?
-        if(empty($checksum) || strlen($checksum) != 40)
-        {
-          $response['error'] = l('Failed to obtain the checksum of %s.', $filename);
-          unlink($base_dir. '/'. $filename);
-        }
-        # Is the update bad?
-        elseif(sha1_file($base_dir. '/'. $filename) != $checksum)
-        {
-          $response['error'] = l('The update package (%s) is corrupt. Update failed.', $filename);
-          unlink($base_dir. '/'. $filename);
-        }
-        else
-        {
-          $response['message'] = l('The update package (%s) was downloaded successfully. Proceeding...', $filename);
-        }
+        # Cool, worked!
+        $response['message'] = l('The update package (%s) was downloaded successfully. Proceeding...', $filename);
       }
     }
     elseif($step == 2)
@@ -281,213 +271,60 @@ if(!function_exists('admin_update_apply_step'))
         # We will need to make a temporary directory.
         if(!file_exists($base_dir. '/update/'))
         {
-          $created = @mkdir($base_dir. '/update/', 0777, true);
-
           # Did it not work?
-          if(empty($created))
+          if(!mkdir($base_dir. '/update/', 0777, true))
           {
             $response['error'] = l('Failed to create the <em>update</em> directory.');
           }
         }
 
-        if(empty($response['error']))
+        # Once again, the Update class has us covered :-)
+        if($update->extract($base_dir. '/'. $filename, $base_dir. '/update/', 'tar'))
         {
-          # Time for the Tar class. Extract away!!!
-          $tar = $api->load_class('Tar');
-
-          # Open the tarball : ) Or try, at least.
-          $is_open = $tar->open($base_dir. '/'. $filename);
-
-          # Did it not work? That's not good!
-          if(!$is_open)
-          {
-            $response['error'] = l('Failed to open the update package (%s).', $filename);
-          }
-          else
-          {
-            # Is the package a gzipped tarball? If so, extract it from there!!!
-            if($tar->is_gzipped())
-            {
-              # Try to extract it, anyways.
-              if(!$tar->ungzip())
-                $response['error'] = l('Failed to extract the update package (%s) from its gzipped state.', $filename);
-            }
-
-            if(empty($response['error']))
-            {
-              # Now to finally extract the update package from the tarball format. Woo!
-              if($tar->extract($base_dir. '/update/'))
-              {
-                $response['message'] = l('The update package (%s) has been extracted. Proceeding...', $filename);
-              }
-              else
-              {
-                $response['error'] = l('Failed to extract the update package (%s) from its tarball state.', $filename);
-              }
-            }
-          }
+          $response['message'] = l('The update package (%s) has been extracted. Proceeding...', $filename);
+        }
+        else
+        {
+          $response['error'] = l('Failed to extract the update package (%s) from its gzipped state.', $filename);
         }
       }
     }
     elseif($step == 3)
     {
       if(!file_exists($base_dir. '/update/'))
+      {
         $response['error'] = l('The update directory was not found.');
+      }
       else
       {
         # Awesome, now it is time for some copying!!!
         # Well at least to load the data.
-        $_SESSION['files'] = get_listing($base_dir. '/update/', true);
-        $response['message'] = $_SESSION['files'];
+        $response['message'] = $update->get_listing($base_dir. '/update/');
       }
     }
     elseif($step == 4)
     {
       # Now to actually copy the files.
-      if(!file_exists($base_dir. '/update/') || empty($_SESSION['files']))
+      if(!file_exists($base_dir. '/update/'))
+      {
         $response['error'] = l('The update directory was not found.');
+      }
       else
       {
-        # So which file?
-        $filename = $_POST['filename'];
-
-        # Is it a valid file?
-        if(!in_array($filename, $_SESSION['files']))
-        {
-          $response['error'] = l('The file (%s) was invalid.', htmlchars($filename));
-        }
-        else
-        {
-          # Do we need to make a directory?
-          $dirname = dirname($base_dir. '/'. $filename);
-          if(!file_exists($dirname))
-            @mkdir($dirname, 0755, true);
-
-          # Is it not a directory?
-          if(!is_dir($base_dir. '/update/'. $filename))
-          {
-            $fp = fopen($base_dir. '/'. $filename, 'wb');
-            flock($fp, LOCK_EX);
-
-            $new_fp = fopen($base_dir. '/update/'. $filename, 'rb');
-            flock($new_fp, LOCK_SH);
-
-            # Now copy!!!
-            while(!feof($new_fp))
-              fwrite($fp, fread($new_fp, 4096));
-
-            fclose($fp);
-            fclose($new_fp);
-          }
-        }
+        # Once again, the Update class can handle this :P
+        $update->copy($base_dir. '/update/', $base_dir, $_POST['filename']);
       }
     }
     elseif($step == 5)
     {
       # Now it is time to finalize everything.
-      # Such as removing the update folder.
-      recursive_unlink($base_dir. '/update/');
-
-      # And the update package.
-      unlink($base_dir. '/'. $filename);
-
-      # Now to execute the update file. If any.
-      if(file_exists($base_dir. '/update.php'))
-      {
-        require_once($base_dir. '/update.php');
-
-        # Now delete it. We don't need it anymore!
-        unlink($base_dir. '/update.php');
-      }
+      # Such as removing the update folder and what not.
+      $update->finish($base_dir. '/update/', $base_dir);
 
       $response['message'] = '<span style="color: green;">'. l('You have successfully updated to v%s.', $settings->get('version', 'string')). '</span> <a href="'. $base_url. '/index.php?action=admin&amp;sa=update">'. l('Check for updates'). '</a>.';
     }
 
     return $response;
   }
-}
-
-/*
-  Function: get_listing
-
-  Parameters:
-    string $path - The path to get the recursive listing of.
-    bool $implode - !!!
-
-  Returns:
-    array - Returns an array containing the listing.
-*/
-function get_listing($path, $implode = false)
-{
-  $files = scandir($path);
-  $listing = array();
-
-  if(count($files) > 0)
-  {
-    foreach($files as $file)
-    {
-      if($file == '.' || $file == '..')
-        continue;
-
-      if(is_dir($path. '/'. $file))
-        $listing[$file. '/'] = array();
-      else
-        $listing[$file] = $file;
-
-      if(is_dir($path. '/'. $file))
-        # Woo for recursion!
-        $listing[$file] = get_listing($path. '/'. $file);
-    }
-  }
-
-  if(!empty($implode))
-  {
-    $tmp = array();
-
-    if(count($listing))
-    {
-      foreach($listing as $file => $f)
-      {
-        $tmp[] = $file;
-
-        if(is_array($f))
-        {
-          $append = get_listing_implode($f);
-
-          if(count($append))
-            foreach($append as $a)
-              $tmp[] = $file. '/'. $a;
-        }
-      }
-
-      $listing = $tmp;
-    }
-  }
-
-  return $listing;
-}
-
-function get_listing_implode($array)
-{
-  $tmp = array();
-
-  if(count($array))
-  {
-    foreach($array as $a => $d)
-    {
-      $tmp[] = $a;
-
-      if(is_array($d))
-      {
-        $append = get_listing_implode($d);
-
-        if(count($append))
-          foreach($append as $g)
-            $tmp[] = $a. '/'. $g;
-      }
-    }
-  }
-
-  return $tmp;
 }
 ?>

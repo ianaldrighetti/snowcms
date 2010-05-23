@@ -20,6 +20,8 @@
 if(!defined('IN_SNOW'))
   die;
 
+# Title: Theme information
+
 /*
   Function: theme_load
 
@@ -37,32 +39,91 @@ if(!defined('IN_SNOW'))
 
   Note:
     The following indexes are returned:
-      string name - The name of the theme.
-      string author - The of the theme.
-      string version - The version of the theme.
-      string update_url - The URL of where to download theme updates.
-      string description - The description of the theme.
+      string author - The name of the themes author.*
+      string website - The website of the author.
+      string email - The email address of the author.
+      string name - The name of the theme.*
+      string description - Description of the theme.
+      string update_url - The URL where updates for the theme can be retrieved from.
+
+    * Indicates this index will never be null.
 */
 function theme_load($path)
 {
+  global $api;
+
   # Doesn't exist? Then we can't load it!
-  if(!file_exists($path) || !is_dir($path) || !file_exists($path. '/implemented_theme.class.php') || !file_exists($path. '/theme.ini'))
+  if(!file_exists($path) || !is_dir($path) || !file_exists($path. '/implemented_theme.class.php') || !file_exists($path. '/theme.xml'))
   {
     return false;
   }
 
-  # Load the information from the theme.ini file.
-  $ini = parse_ini_file($path. '/theme.ini', true);
+  # We need the XML class to do this.
+  $xml = $api->load_class('XML');
 
-  return array(
-            'name' => $ini['theme']['name'],
-            'author' => $ini['theme']['author'],
-            'website' => isset($ini['theme']['website']) ? $ini['theme']['website'] : false,
-            'version' => $ini['theme']['version'],
-            'update_url' => $ini['theme']['update url'],
-            'description' => $ini['theme']['description'],
-            'path' => realpath($path),
-          );
+  # Parse the XML file now.
+  $data = $xml->parse($path. '/theme.xml');
+  $xml->reset();
+
+  if(count($data) > 0)
+  {
+    # Keep track of whether or not we are in the author tag.
+    $in_author = false;
+
+    # Keep track of the theme info.
+    $theme_info = array(
+                    'author' => null,
+                    'website' => null,
+                    'email' => null,
+                    'name' => null,
+                    'description' => null,
+                    'version' => null,
+                    'update_url' => null,
+                  );
+    foreach($data as $item)
+    {
+      # Keep track of where we are.
+      if($item['tag'] == 'author' && $item['type'] == 'open')
+      {
+        $in_author = true;
+      }
+      elseif($item['tag'] == 'author' && $item['type'] == 'close')
+      {
+        $in_author = false;
+      }
+
+      # Saving something?
+      if($item['tag'] == 'name' && $in_author)
+      {
+        $theme_info['author'] = $item['value'];
+      }
+      elseif($item['tag'] == 'update-url')
+      {
+        $theme_info['update_url'] = $item['value'];
+      }
+      elseif(array_key_exists($item['tag'], $theme_info) && $item['type'] != 'close')
+      {
+        $theme_info[$item['tag']] = $item['value'];
+      }
+    }
+
+    # No author? No name? No way!
+    if(empty($theme_info['author']) || empty($theme_info['name']))
+    {
+      return false;
+    }
+  }
+  else
+  {
+    # Woops, that's not right!
+    return false;
+  }
+
+  # Add the path, just incase :P
+  $theme_info['path'] = realpath($path);
+
+  # Alright, here ya go.
+  return $theme_info;
 }
 
 /*

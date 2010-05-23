@@ -20,6 +20,8 @@
 if(!defined('IN_SNOW'))
   die;
 
+# Title: Plugin information
+
 /*
   Function: plugin_load
 
@@ -149,5 +151,99 @@ function plugin_list()
 
   # Return the list, whether or not there are any.
   return $list;
+}
+
+/*
+  Function: plugin_check_status
+
+  Checks the status of the plugin by sending the SHA-1 hash of the plugin
+  package (or whatever file it may be) to a site which has a database of
+  plugin information, such as SnowCMS.com.
+
+  Parameters:
+    string $filename - The file to hash and send to the server to get the status
+                       of.
+    string &$reason - This will contain the reason of why the file obtained the
+                      status it got, if any.
+
+  Returns:
+    array - Returns an array containing status code(s) of the file, false if
+            the file name supplied does not exist and null if a connection to
+            the hash database could not be made.
+
+  Note:
+    These are the possible status codes to expect:
+      approved - Reviewed and approved by the hash database.
+      disapproved - Means the hash is known, however, for whatever reason,
+                    the file has been declined the approved status.
+      pending - The hash is known, but the file has not yet been reviewed.
+      unknown - The hash is unknown/not in the database.
+      deprecated - A newer version of the file is available, and this should
+                   not be installed, though, of course, it can be.
+      malicious - Means the file contains malicious code that could allow
+                  an attacker to exploit your site.
+      insecure - The file has been identified to have security issues, such
+                 ass XSS (Cross-Site Scripting), SQL Injection, or whatever,
+                 which could cause your site to be vulnerable to attack.
+
+    The server is expected to return one line. The first containing at least
+    one of the server codes, tab delimited for multiple. A second line can be
+    returned, which is to contain a description of why the file has the supplied
+    status. Though not necessary at all for the approved status.
+*/
+function plugin_check_status($filename, &$reason = null)
+{
+  global $api;
+
+  # Does the file not exist..?
+  if(!file_exists($filename))
+  {
+    # Kinda hard to check the status of that, other than not-exist :P
+    return false;
+  }
+
+  # The HTTP class, please!
+  $http = $api->load_class('HTTP');
+
+  if($response = $http->request($api->apply_filters('plugin_check_status_server', 'http://status.snowcms.com/'), array('sha1_hash' => sha1_file($filename))))
+  {
+    @list($status, $reason) = explode("\r\n", $response, 2);
+
+    $status = explode("\t", strtolower($status));
+    if(count($status) > 0)
+    {
+      $tmp = array();
+
+      # Only save statuses we know the meaning of.
+      foreach($status as $s)
+      {
+        if(in_array($s, $api->apply_filters('plugin_check_status_codes', array('approved', 'disapproved', 'pending', 'unknown', 'deprecated', 'malicious', 'insecure'))))
+        {
+          # It is a status we know.
+          $tmp[] = $s;
+        }
+      }
+
+      # Any reason?
+      if(!empty($reason))
+      {
+        # No HTML ;-)
+        $reason = htmlchars($reason);
+      }
+
+      # Alright, you can have them!
+      return $tmp;
+    }
+    else
+    {
+      # Um... Hmmm.
+      return null;
+    }
+  }
+  else
+  {
+    # Looks like we couldn't make a connection. Sorry.
+    return null;
+  }
 }
 ?>

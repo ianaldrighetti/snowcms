@@ -115,42 +115,13 @@ class XML
             continue;
           }
 
-          # Opening? Then add it to the opened tags!
-          if(in_array(strtolower($value['type']), array('open', 'close')))
-          {
-            if($value['level'] == 1 && strtolower($value['type']) != 'close')
-            {
-              $data[] = array(
-                          'tag' => strtolower($value['tag']),
-                          'type' => strtolower($value['type']),
-                          'level' => (int)$value['level'] - 1,
-                          'value' => $value['value'],
-                          'attributes' => $this->strtolower_array_keys(isset($value['attributes']) ? $value['attributes'] : array()),
-                          'childNodes' => array(),
-                        );
-            }
-            elseif(strtolower($value['type']) != 'close')
-            {
-              $data[] = array(
-                          'tag' => strtolower($value['tag']),
-                          'type' => strtolower($value['type']),
-                          'level' => (int)$value['level'] - 1,
-                          'value' => $value['value'],
-                          'attributes' => $this->strtolower_array_keys(isset($value['attributes']) ? $value['attributes'] : array()),
-                          'childNodes' => array(),
-                        );
-            }
-          }
-          else
-          {
-            $data[] = array(
-                        'tag' => strtolower($value['tag']),
-                        'type' => strtolower($value['type']),
-                        'level' => (int)$value['level'] - 1,
-                        'value' => $value['value'],
-                        'attributes' => $this->strtolower_array_keys(isset($value['attributes']) ? $value['attributes'] : array()),
-                      );
-          }
+          $data[] = array(
+                      'tag' => strtolower($value['tag']),
+                      'type' => strtolower($value['type']),
+                      'level' => (int)$value['level'] - 1,
+                      'value' => isset($value['value']) ? $value['value'] : null,
+                      'attributes' => $this->strtolower_array_keys(isset($value['attributes']) ? $value['attributes'] : array()),
+                    );
         }
       }
 
@@ -192,6 +163,27 @@ class XML
 
     # You gave us an empty array, I'll give it back!
     return array();
+  }
+
+  /*
+    Method: reset
+
+    Closes and then makes a new XML parser.
+
+    Parameters:
+      none
+
+    Returns:
+      void - Nothing is returned by this method.
+
+    Note:
+      If you set any custom options, you will have to set them again after
+      calling this method.
+  */
+  public function reset()
+  {
+    $this->__destruct();
+    $this->parser = xml_parser_create();
   }
 
   /*
