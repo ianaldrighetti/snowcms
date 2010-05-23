@@ -98,6 +98,18 @@ class Admin_Theme extends Theme
       font-size: 150%;
     }
 
+    #header #container #text h1 .visit_site a
+    {
+      font-size: 12px;
+      color: #DDDDDD;
+      text-decoration: none;
+    }
+
+    #header #container #text h1 .visit_site a:hover
+    {
+      color: #FFFFFF;
+    }
+
     #header #container #text h3
     {
       font-size: 90%;
@@ -470,15 +482,12 @@ class Admin_Theme extends Theme
     }
 
     echo '
-  <script type="text/javascript"><!-- // --><![CDATA[
-
-  // ]]></script>
 </head>
 <body>
 <div id="header">
   <div id="container">
     <div id="text">
-      <h1>', $settings->get('site_name', 'string'), '</h1>
+      <h1>', $settings->get('site_name', 'string'), ' <span class="visit_site"><a href="', $base_url, '" title="', l('Visit site'), '">&laquo; ', l('Visit site'), ' &raquo;</a></span></h1>
       <h3>', l('Control Panel'), '</h3>
     </div>
 

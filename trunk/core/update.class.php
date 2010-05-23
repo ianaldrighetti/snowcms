@@ -81,7 +81,7 @@ class Update
     Returns:
       array - Returns an array containing a downloaded (true if the file was downloaded successfully)
               and valid (true if the checksum downloaded matched that of the downloaded package, this
-              index will be set to null).
+              index will be set to null if $checksum_url was not supplied).
   */
   public function download($download_url, $save_to, $checksum_url = null)
   {
