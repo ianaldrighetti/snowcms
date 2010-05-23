@@ -45,9 +45,7 @@
 ../trunk/core/login.php:      $api->run_hooks('login_process_check_custom', array(&$login_success, $login, $row, &$errors));
 ../trunk/core/login.php:      $api->run_hooks('login_process_failed', array($login));
 ../trunk/core/login.php:    $api->run_hooks('login_success', array($row));
-../trunk/core/admin/admin_plugins.php:    $api->run_hooks('admin_plugins_add');
-../trunk/core/admin/admin_plugins.php:    $api->run_hooks('admin_plugins_settings');
-../trunk/core/admin/admin_plugins.php:    $form->run_hooks('admin_plugins_settings_form');
+../trunk/core/admin/admin_plugins_add.php:    $api->run_hooks('admin_plugins_add');
 ../trunk/core/admin/admin_themes.php:    $api->run_hooks('admin_themes');
 ../trunk/core/admin/admin_members_add.php:    $api->run_hooks('admin_members_add');
 ../trunk/core/admin/admin_settings.php:    $api->run_hooks('admin_settings');
@@ -59,6 +57,10 @@
 ../trunk/core/admin/admin_members_permissions.php:    $api->run_hooks('admin_members_manage_permissions');
 ../trunk/core/admin/admin_members_permissions.php:    $api->run_hooks('admin_members_manage_group_permissions');
 ../trunk/core/admin/admin_members_permissions.php:      $api->run_hooks('load_permissions', array(&$loaded, $group_id));
+../trunk/core/admin/admin_plugins_manage.php:    $api->run_hooks('admin_plugins_manage');
+../trunk/core/admin/admin_members_search.php:    $api->run_hooks('admin_members_search');
+../trunk/core/admin/admin_plugins_settings.php:    $api->run_hooks('admin_plugins_settings');
+../trunk/core/admin/admin_plugins_settings.php:    $form->run_hooks('admin_plugins_settings_form');
 ../trunk/core/admin/admin_update.php:    $api->run_hooks('admin_update');
 ../trunk/core/admin/admin_update.php:    $api->run_hooks('admin_update_ajax');
 ../trunk/core/admin/admin_update.php:    $api->run_hooks('admin_update_system');

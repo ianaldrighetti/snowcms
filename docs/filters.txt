@@ -10,6 +10,8 @@
 ../trunk/core/core.php:  ob_start($api->apply_filters('output_callback', null));
 ../trunk/core/core.php:    $popup = $api->apply_filters('popup_'. $_GET['id'], array('title' => '', 'content'));
 ../trunk/core/core.php:    ', $api->apply_filters('core_popup_css', 'body { background: #FFFFFF; font-family: Tahoma, Arial, sans-serif; font-size: 90%; }
+../trunk/core/plugin.php:  if($response = $http->request($api->apply_filters('plugin_check_status_server', 'http://status.snowcms.com/'), array('sha1_hash' => sha1_file($filename))))
+../trunk/core/plugin.php:        if(in_array($s, $api->apply_filters('plugin_check_status_codes', array('approved', 'disapproved', 'pending', 'unknown', 'deprecated', 'malicious', 'insecure'))))
 ../trunk/core/login.php:                               'action' => $api->apply_filters('login_action_url', $base_url. '/index.php?action=login2'),
 ../trunk/core/login.php:    setcookie($api->apply_filters('login_cookie_name', $cookie_name), $api->apply_filters('login_cookie_value', $row['member_id']. '|'. sha1($row['member_pass']. $row['member_hash'])), $cookie_expires);
 ../trunk/core/admin/admin_settings.php:                                                              'options' => $api->apply_filters('admin_mail_handler', array(

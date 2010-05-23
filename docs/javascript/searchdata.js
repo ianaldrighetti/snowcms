@@ -137,11 +137,11 @@ var indexSectionsWithContent = {
       "M": false,
       "N": false,
       "O": false,
-      "P": true,
+      "P": false,
       "Q": false,
       "R": false,
       "S": false,
-      "T": true,
+      "T": false,
       "U": false,
       "V": false,
       "W": false,
@@ -177,7 +177,7 @@ var indexSectionsWithContent = {
       "W": false,
       "X": true,
       "Y": false,
-      "Z": false
+      "Z": true
       },
    "Hooks": {
       "Symbols": true,
