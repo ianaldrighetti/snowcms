@@ -212,7 +212,7 @@ class RSS
     if((string)$timestamp == (string)(int)$timestamp)
     {
       $this->pubDate = (int)$timestamp;
-      return false;
+      return true;
     }
     else
     {
@@ -237,7 +237,7 @@ class RSS
     if((string)$timestamp == (string)(int)$timestamp)
     {
       $this->lastBuildDate = (int)$timestamp;
-      return false;
+      return true;
     }
     else
     {
@@ -747,7 +747,8 @@ class RSS
               '  <channel>'. "\r\n".
               '    <title>'. htmlchars($this->title). '</title>'. "\r\n".
               '    <link>'. htmlchars($this->link). '</link>'. "\r\n".
-              '    <description>'. htmlchars($this->description). '</description>'. "\r\n";
+              '    <description>'. htmlchars($this->description). '</description>'. "\r\n"
+              '    <generator>SnowCMS (http://www.snowcms.com/)</generator>'. "\r\n";
 
     # Well, we have part of it... Let's output!
     if(!empty($fp))

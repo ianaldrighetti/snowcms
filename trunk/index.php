@@ -21,13 +21,19 @@ $start_time = microtime(true);
 
 # Magic quotes, what a joke!!!
 if(function_exists('set_magic_quotes_runtime'))
+{
   @set_magic_quotes_runtime(0);
+}
 
 # All time/date stuff should be considered UTC, makes life easier!
 if(function_exists('date_default_timezone_set'))
+{
   date_default_timezone_set('UTC');
+}
 else
+{
   @ini_set('date.timezone', 'UTC');
+}
 
 # We are currently in SnowCMS :)
 define('IN_SNOW', true, true);
