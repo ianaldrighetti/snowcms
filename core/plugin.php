@@ -45,11 +45,17 @@ if(!defined('IN_SNOW'))
   Note:
     Here are the following indexes in the array returned:
       string dependency - The plugins dependency name.
+
       string name - The name of the plugin.
+
       string author - The author of the plugin.
+
       string version - The version of the plugin.
+
       string description - The description of the plugin.
+
       string website - The authors website.
+
       string path - The root directory of the plugin.
 */
 function plugin_load($plugin_id, $is_path = true)
@@ -174,22 +180,27 @@ function plugin_list()
   Note:
     These are the possible status codes to expect:
       approved - Reviewed and approved by the hash database.
+
       disapproved - Means the hash is known, however, for whatever reason,
                     the file has been declined the approved status.
+
       pending - The hash is known, but the file has not yet been reviewed.
+
       unknown - The hash is unknown/not in the database.
+
       deprecated - A newer version of the file is available, and this should
                    not be installed, though, of course, it can be.
+
       malicious - Means the file contains malicious code that could allow
                   an attacker to exploit your site.
+
       insecure - The file has been identified to have security issues, such
                  ass XSS (Cross-Site Scripting), SQL Injection, or whatever,
                  which could cause your site to be vulnerable to attack.
 
-    The server is expected to return one line. The first containing at least
-    one of the server codes, tab delimited for multiple. A second line can be
-    returned, which is to contain a description of why the file has the supplied
-    status. Though not necessary at all for the approved status.
+    The server is expected to return one line. The first containing one of the server codes.
+    A second line can be returned, which is to contain a description of why the file has the
+    supplied status. Though not necessary at all for the approved status.
 */
 function plugin_check_status($filename, &$reason = null)
 {
@@ -209,36 +220,24 @@ function plugin_check_status($filename, &$reason = null)
   {
     @list($status, $reason) = explode("\r\n", $response, 2);
 
-    $status = explode("\t", strtolower($status));
-    if(count($status) > 0)
+    $status = trim(strtolower($status));
+
+    # Do we even know the status code?
+    if(!in_array($status, $api->apply_filters('plugin_check_status_codes', array('approved', 'disapproved', 'pending', 'unknown', 'deprecated', 'malicious', 'insecure'))))
     {
-      $tmp = array();
-
-      # Only save statuses we know the meaning of.
-      foreach($status as $s)
-      {
-        if(in_array($s, $api->apply_filters('plugin_check_status_codes', array('approved', 'disapproved', 'pending', 'unknown', 'deprecated', 'malicious', 'insecure'))))
-        {
-          # It is a status we know.
-          $tmp[] = $s;
-        }
-      }
-
-      # Any reason?
-      if(!empty($reason))
-      {
-        # No HTML ;-)
-        $reason = htmlchars($reason);
-      }
-
-      # Alright, you can have them!
-      return $tmp;
+      # It is a status we don't know.
+      return false;
     }
-    else
+
+    # Any reason?
+    if(!empty($reason))
     {
-      # Um... Hmmm.
-      return null;
+      # No HTML ;-)
+      $reason = htmlchars($reason);
     }
+
+    # Alright, you can have them!
+    return $status;
   }
   else
   {

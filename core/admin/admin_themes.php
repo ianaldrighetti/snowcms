@@ -224,6 +224,10 @@ if(!function_exists('admin_themes_handle'))
 
     # Make a temporary file name which will be used for either downloading or uploading.
     $filename = $theme_dir. '/'. uniqid('theme_'). '.tmp';
+    while(file_exists($filename))
+    {
+      $filename = $theme_dir. '/'. uniqid('theme_'). '.tmp';
+    }
 
     # Downloading a theme, are we?
     if(!empty($data['theme_url']) && strtolower($data['theme_url']) != 'http://')
@@ -243,13 +247,18 @@ if(!function_exists('admin_themes_handle'))
       $name = basename($data['theme_url']);
     }
     # Did you want to upload a theme?
-    elseif(!empty($data['theme_file']) && is_array($data['theme_file']))
+    elseif(!empty($data['theme_file']['tmp_name']))
     {
       # Now attempt to move the file.
       if(move_uploaded_file($data['theme_file']['tmp_name'], $filename))
       {
         # Keep the original file name...
         $name = $data['theme_file']['name'];
+      }
+      else
+      {
+        $errors[] = l('Failed to move the uploaded file.');
+        return false;
       }
     }
     else
@@ -277,6 +286,9 @@ if(!function_exists('admin_themes_handle'))
       # Put it back together!!!
       $name = implode('.', $tmp);
     }
+
+    # Sanitize the name...
+    $name = sanitize_filename($name);
 
     # If the directory we will end up putting the theme in exists, we need
     # to fix that :P
