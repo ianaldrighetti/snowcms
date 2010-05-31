@@ -181,4 +181,42 @@ function recursive_unlink($path)
     return rmdir($path);
   }
 }
+
+/*
+  Function: is_flat_array
+
+  Returns whether or not the array is a flat array. What it means is that
+  if the array is not an associative array (string indexes), then it is
+  considered a "flat" array (numerical indexes only).
+
+  Parameters:
+    array $array - The array to check.
+
+  Returns:
+    bool - Returns true if the array is a flat array, false if not.
+*/
+function is_flat_array($array)
+{
+  # It's not an array, so no...
+  if(!is_array($array))
+  {
+    return false;
+  }
+  # Nothing? Technically we will consider that a flat array :P
+  elseif(count($array) == 0)
+  {
+    return true;
+  }
+
+  foreach($array as $key => $value)
+  {
+    if((string)$key != (string)(int)$key)
+    {
+      # We found one that is not a numerical index, therefore, not flat!
+      return false;
+    }
+  }
+
+  return true;
+}
 ?>
