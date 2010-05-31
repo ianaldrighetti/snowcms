@@ -127,8 +127,10 @@ function execute_update()
 }
 
 if(start_update == -1)
+{
   s.onload(function()
     {
       element = s.id('update_progress');
       download_update();
     });
+}

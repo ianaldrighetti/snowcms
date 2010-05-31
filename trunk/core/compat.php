@@ -183,6 +183,40 @@ function recursive_unlink($path)
 }
 
 /*
+  Function: sanitize_filename
+
+  Removes characters from the supplied string that would not be allowed
+  in a traditional file name, such as slashes and so on.
+
+  Parameters:
+    string $filename - The name (and only the name!) of the file.
+
+  Returns:
+    string - Returns the sanitized name.
+*/
+function sanitize_filename($filename)
+{
+  # Disallowed characters ;-)
+  $remove = array('/', '\\', ':', '*', '?', '<', '>', '|', '"');
+
+  $str = '';
+  $length = strlen($filename);
+  for($i = 0; $i < $length; $i++)
+  {
+    # Is it allowed?
+    if(in_array($filename[$i], $remove))
+    {
+      # Nope!
+      continue;
+    }
+
+    $str .= $filename[$i];
+  }
+
+  return $str;
+}
+
+/*
   Function: is_flat_array
 
   Returns whether or not the array is a flat array. What it means is that

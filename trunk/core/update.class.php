@@ -173,8 +173,11 @@ class Update
     Returns:
       bool - Returns true if the specified update package was successfully extracted
              to the specified path.
+
+    NOTE:
+      The supplied $path must exist! and as specified, be writable!!!
   */
-  public function extract($filename, $path, $type = null)
+  public function extract($filename, $path, &$type = null)
   {
     global $api;
 
@@ -183,20 +186,62 @@ class Update
     {
       $tmp = explode('.', $filename);
 
-      if(strtolower(array_pop($tmp)) == 'gz' && strtolower(array_pop($tmp)) == 'tar')
+      $extension = strtolower(array_pop($tmp));
+      if($extension == 'gz' || $extension == 'tgz' || $extension == 'tar')
       {
-        # Change the type to tar :-)
+        # It's a tarball...
+        if($extension == 'tar' || $extension == 'tgz' || strtolower(array_pop($tmp)) == 'tar')
+        {
+          $type = 'tar';
+        }
+      }
+      elseif($extension == 'zip')
+      {
+        # Change the type to zip :-)
+        $type = 'zip';
+      }
+    }
+
+    # Still empty..?
+    if(empty($type))
+    {
+      # Hmm... Try detecting it another way.
+      $zip = $api->load_class('Zip');
+      $tar = $api->load_class('Tar');
+
+      if($zip->open($filename))
+      {
+        # Looks like it's a zip! Cool.
+        $type = 'zip';
+        $zip->close();
+      }
+      elseif($tar->open($filename))
+      {
         $type = 'tar';
+        $tar->close();
       }
     }
 
     # Does the file not exist? Or the path (not writable either)? Or does is the type not supported?
-    if(!file_exists($filename) || !is_file($filename) || !file_exists($path) || !is_dir($path) || !is_writable($path) || $type != 'tar')
+    if(!file_exists($filename) || !is_file($filename) || !file_exists($path) || !is_dir($path) || !is_writable($path) || ($type != 'tar' && $type != 'zip'))
     {
       return false;
     }
 
-    if($type == 'tar')
+    if($type == 'zip')
+    {
+      $zip = $api->load_class('Zip');
+
+      if(!$zip->open($filename))
+      {
+        return false;
+      }
+      elseif(!$zip->extract($path))
+      {
+        return false;
+      }
+    }
+    elseif($type == 'tar')
     {
       # We need the Tar class.
       $tar = $api->load_class('Tar');
@@ -227,9 +272,6 @@ class Update
         }
       }
     }
-
-    # Delete the update package...
-    unlink($filename);
 
     # All done!
     return true;
