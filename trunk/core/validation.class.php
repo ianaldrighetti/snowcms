@@ -155,8 +155,11 @@ class Validation
     Note:
       The callback is expected to accept the following parameters:
         &data - The data that needs to be checked of its validity.
+
         minimum length - The minimum length of data.
+
         maximum length - The maximum length of data.
+
         truncate - A bool indicating whether or not data should be truncated
                    or not if it is longer than maximum length.
 
@@ -173,23 +176,31 @@ class Validation
   {
     # Can't have an empty name or class name.
     if(empty($name) || empty($callback))
+    {
       return false;
+    }
 
     # Does the file exist? That is, unless the function isn't already defined.
     if(!is_callable($callback) && (empty($filename) || !file_exists($filename)))
+    {
       return false;
+    }
     elseif(!is_callable($callback) && file_exists($filename))
     {
       require_once($filename);
 
       # Function still not defined? That's no good :(
       if(!is_callable($callback))
+      {
         return false;
+      }
     }
 
     # Not callable? Not good!
     if(!is_callable($callback))
+    {
       return false;
+    }
 
     # Alright, save the callback, and we are good!
     $this->types[strtolower($name)] = $callback;
@@ -325,10 +336,14 @@ class Validation
       {
         # Not much to do, is there?
         if(count($data) == 0)
+        {
           return true;
+        }
 
         if(is_array($format))
+        {
           $format = (string)$format[0];
+        }
 
         # Just a single type, so yeah.
         $new = array();
@@ -336,8 +351,10 @@ class Validation
         {
           # Simply use the data method, hehe :)
           if($this->data($value, $format))
+          {
             # It was valid, so just add it.
             $new[$key] = $value;
+          }
           else
           {
             # Oh noes! It was bad.
