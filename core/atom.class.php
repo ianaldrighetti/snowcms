@@ -793,7 +793,7 @@ class Atom
       int $published - Contains the timestamp of when the entry was initially
                        created.
       array $source - An array containing information about where the entry
-                      originated from, if it were taken from another feed.
+                      originated from, if it was taken from another feed.
                       It should contain: id, title, updated and rights.
       string $rights - A string containing the rights of the entry itself.
 
@@ -971,9 +971,361 @@ class Atom
       so if it was not found, it would be added (set as null), but if there were any
       other indexes that aren't listed, then they will be removed.
   */
-  public function has_indexes(&$array, $indexes)
+  private function has_indexes(&$array, $indexes)
   {
+    $new_array = array();
 
+    if(count($array) == 0 && count($indexes) == 0)
+    {
+      return true;
+    }
+    elseif(count($indexes) == 0)
+    {
+      return false;
+    }
+    else
+    {
+      foreach($indexes as $index => $required)
+      {
+        if(isset($array[$index]))
+        {
+          $new_array[$index] = $array[$index];
+        }
+        elseif(!isset($array[$index]) && empty($required))
+        {
+          $new_array[$index] = null;
+        }
+        elseif(!empty($required))
+        {
+          return false;
+        }
+      }
+
+      $array = $new_array;
+      return true;
+    }
+  }
+
+  /*
+    Method: generate
+
+    Generates an RSS feed according to all the current information
+    about the RSS feed. The feed will be displayed unless a file pointer
+    is specified, in which case the feed will be written to the specified
+    file stream.
+
+    Parameters:
+      resource $fp - The stream to write the RSS output to, instead of through
+                     echo.
+
+    Returns:
+      bool - Returns true if the RSS feed was generated successfully, false if
+             all the information which was required was not supplied, or if the
+             method could not obtain a lock on the supplied file pointer.
+  */
+  public function generate($fp = null)
+  {
+    # We do require some things...
+    if(empty($this->id) || empty($this->title) || empty($this->updated))
+    {
+      return false;
+    }
+    # Supplied a stream for us to write to?
+    elseif(!empty($fp) && !flock($fp, LOCK_EX))
+    {
+      # It would be nice if we could have an exclusive lock...
+      return false;
+    }
+
+    # We may need to output headers!
+    if(empty($fp))
+    {
+      if(ob_get_length() > 0)
+      {
+        ob_clean();
+      }
+
+      # Well, one ;-) The content type.
+      header('Content-Type: application/atom+xml; charset=utf-8');
+    }
+
+    # Start filling the buffer.
+    $buffer = '<?xml version="1.0" encoding="utf-8"?>'. $crlf.
+              '<feed xmlns="http://www.w3.org/2005/Atom">'. $crlf.
+              '  <id>'. htmlchars($this->id). '</id>'. $crlf.
+              '  <title>'. htmlchars($this->title). '</title>'. $crlf.
+              '  <updated>'. date('c', $this->updated). '</updated>'. $crlf.
+              '  <generator>SnowCMS (http://www.snowcms.com/)</generator>'. $crlf;
+
+    # Well, we have part of it... Let's output!
+    if(!empty($fp))
+    {
+      fwrite($fp, $buffer);
+    }
+    else
+    {
+      echo $buffer;
+      flush();
+    }
+
+    # Empty that buffer.
+    $buffer = '';
+
+    # Authors!
+    if(count($this->authors) > 0)
+    {
+      foreach($this->authors as $author)
+      {
+        $buffer .= '  <author>'. $crlf.
+                   '    <name>'. htmlchars($author['name']). '</name>'. $crlf;
+
+        if(!empty($author['email']))
+        {
+          $buffer .= '    <email>'. htmlchars($author['email']). '</email>'. $crlf;
+        }
+
+        if(!empty($author['uri']))
+        {
+          $buffer .= '    <uri>'. htmlchars($author['uri']). '</uri>'. $crlf;
+        }
+
+        $buffer .= '  </author>'. $crlf;
+      }
+    }
+
+    # Looks like links!
+    if(count($this->links) > 0)
+    {
+      foreach($this->links as $link)
+      {
+        $buffer .= '  <link href="'. $link['href']. '" rel="'. (empty($link['rel']) ? 'alternate' : $link['rel']). '"'. (!empty($link['type']) ? ' type="'. $link['type']. '"' : ''). (!empty($link['title']) ? ' title="'. htmlchars($link['title']). '"' : ''). (!empty($link['hreflang']) ? ' hreflang="'. $link['hreflang']. '"' : ''). (!empty($link['length']) ? ' length="'. $link['length']. '"' : ''). ' />'. $crlf;
+      }
+    }
+
+    # Any categories for the feed itself?
+    if(count($this->categories) > 0)
+    {
+      foreach($this->categories as $category)
+      {
+        $buffer .= '  <category term="'. htmlchars($category['term']). '"'. (!empty($category['label']) ? ' label="'. htmlchars($category['label']). '"' : ''). (!empty($category['scheme']) ? ' scheme="'. htmlchars($category['scheme']). '"' : ''). ' />'. $crlf;
+      }
+    }
+
+    # Contributors? Just like authors, but not exactly the same! :P
+    if(count($this->contributors) > 0)
+    {
+      foreach($this->contributors as $contributor)
+      {
+        $buffer .= '  <contributor>'. $crlf.
+                   '    <name>'. htmlchars($contributor['name']). '</name>'. $crlf;
+
+        if(!empty($contributor['email']))
+        {
+          $buffer .= '    <email>'. htmlchars($contributor['email']). '</email>'. $crlf;
+        }
+
+        if(!empty($contributor['uri']))
+        {
+          $buffer .= '    <uri>'. htmlchars($contributor['uri']). '</uri>'. $crlf;
+        }
+
+        $buffer .= '  </contributor>'. $crlf;
+      }
+    }
+
+    # An icon?
+    if(!empty($this->icon))
+    {
+      $buffer .= '  <icon>'. htmlchars($this->icon). '</icon>'. $crlf;
+    }
+
+    # A logo? (Just a bigger icon, or the icon is a small logo, whichever you prefer :P)
+    if(!empty($this->logo))
+    {
+      $buffer .= '  <logo>'. htmlchars($this->logo). '</logo>'. $crlf;
+    }
+
+    # Do you have any rights, well, do they?
+    if(!empty($this->rights))
+    {
+      $buffer .= '  <rights>'. htmlchars($this->rights). '</rights>'. $crlf;
+    }
+
+    # And finally, a subtitle!
+    if(!empty($this->subtitle))
+    {
+      $buffer .= '  <subtitle>'. htmlchars($this->subtitle). '</subtitle>'. $crlf;
+    }
+
+    # All done with that stuff... So save the data in the buffer.
+    if(!empty($fp))
+    {
+      # To the stream:
+      fwrite($fp, $buffer);
+    }
+    else
+    {
+      # To you!
+      echo $buffer;
+      flush();
+    }
+
+    # Now for the most important stuff! The entries themselves! Well, if there are any.
+    if(count($this->entries) > 0)
+    {
+      foreach($this->entries as $entry)
+      {
+        $buffer = '  <entry>'. $crlf;
+
+        # There are a few required tags.
+        $buffer .= '    <id>'. htmlchars($entry['id']). '</id>'. $crlf.
+                   '    <title>'. htmlchars($entry['title']). '</title>'. $crlf.
+                   '    <updated>'. date('c', $entry['updated']). '</updated>'. $crlf;
+
+        # How about authors? Lots? Some? None?
+        if(count($entry['authors']) > 0)
+        {
+          foreach($entry['authors'] as $author)
+          {
+            $buffer .= '    <author>'. $crlf.
+                       '      <name>'. htmlchars($author['name']). '</name>'. $crlf;
+
+            if(!empty($author['email']))
+            {
+              $buffer .= '      <email>'. htmlchars($author['email']). '</email>'. $crlf;
+            }
+
+            if(!empty($author['uri']))
+            {
+              $buffer .= '      <uri>'. htmlchars($author['uri']). '</uri>'. $crlf;
+            }
+
+            $buffer .= '    </author>'. $crlf;
+          }
+        }
+
+        # How about the content of the entry?
+        if(!empty($entry['content']['value']))
+        {
+          $buffer .= '    <content'. (!empty($entry['content']['type']) ? ' type="'. $entry['content']['type']. '"' : ' type="text"'). '>'. $entry['content']['value']. '</content>'. $crlf;
+        }
+
+        # Up next: links.
+        if(count($entry['links']) > 0)
+        {
+          foreach($entry['links'] as $link)
+          {
+            $buffer .= '    <link href="'. $link['href']. '" rel="'. (empty($link['rel']) ? 'alternate' : $link['rel']). '"'. (!empty($link['type']) ? ' type="'. $link['type']. '"' : ''). (!empty($link['title']) ? ' title="'. htmlchars($link['title']). '"' : ''). (!empty($link['hreflang']) ? ' hreflang="'. $link['hreflang']. '"' : ''). (!empty($link['length']) ? ' length="'. $link['length']. '"' : ''). ' />'. $crlf;
+          }
+        }
+
+        # How about the content of the entry?
+        if(!empty($entry['summary']['value']))
+        {
+          $buffer .= '    <summary'. (!empty($entry['summary']['type']) ? ' type="'. $entry['summary']['type']. '"' : ' type="text"'). '>'. $entry['summary']['value']. '</summary>'. $crlf;
+        }
+
+        # Now categories for the entry.
+        if(count($entry['categories']) > 0)
+        {
+          foreach($entry['categories'] as $category)
+          {
+            $buffer .= '    <category term="'. htmlchars($category['term']). '"'. (!empty($category['label']) ? ' label="'. htmlchars($category['label']). '"' : ''). (!empty($category['scheme']) ? ' scheme="'. htmlchars($category['scheme']). '"' : ''). ' />'. $crlf;
+          }
+        }
+
+        # Ah, contributors. Don't you love them?
+        if(count($entry['contibutors']))
+        {
+          foreach($entry['contibutors'] as $contributor)
+          {
+            $buffer .= '    <contributor>'. $crlf.
+                       '      <name>'. htmlchars($contributor['name']). '</name>'. $crlf;
+
+            if(!empty($contributor['email']))
+            {
+              $buffer .= '      <email>'. htmlchars($contributor['email']). '</email>'. $crlf;
+            }
+
+            if(!empty($contributor['uri']))
+            {
+              $buffer .= '      <uri>'. htmlchars($contributor['uri']). '</uri>'. $crlf;
+            }
+
+            $buffer .= '    </contributor>'. $crlf;
+          }
+        }
+
+        # When was it originally published..?
+        if(!empty($entry['published']))
+        {
+          $buffer .= '    <published>'. date('c', $entry['published']). '</published>'. $crlf;
+        }
+
+        # Some source information.
+        if(!empty($entry['source']['id']) || !empty($entry['source']['title']) || !empty($entry['source']['updated']) || !empty($entry['source']['rights']))
+        {
+          $buffer .= '    <source>'. $crlf;
+
+          if(!empty($entry['source']['id']))
+          {
+            $buffer .= '      <id>'. htmlchars($entry['source']['id']). '</id>'. $crlf;
+          }
+
+          if(!empty($entry['source']['title']))
+          {
+            $buffer .= '      <title>'. htmlchars($entry['source']['title']). '</title>'. $crlf;
+          }
+
+          if(!empty($entry['source']['updated']))
+          {
+            $buffer .= '      <updated>'. date('c', $entry['source']['updated']). '</updated>'. $crlf;
+          }
+
+          if(!empty($entry['source']['rights']))
+          {
+            $buffer .= '      <rights>'. htmlchars($entry['source']['rights']). '</rights>'. $crlf;
+          }
+
+          $buffer .= '    </source>'. $crlf;
+        }
+
+        # Hmm, rights?
+        if(!empty($entry['rights']))
+        {
+          $buffer .= '    <rights>'. htmlchars($entry['rights']). '</rights>';
+        }
+
+        $buffer .= '  </entry>'. $crlf;
+
+        # Alright, now write the buffer to, where ever!
+        if(!empty($fp))
+        {
+          fwrite($fp, $buffer);
+        }
+        else
+        {
+          echo $buffer;
+          flush();
+        }
+      }
+    }
+
+    # And just one, last... thing!
+    if(!empty($fp))
+    {
+      fwrite($fp, '</entry>');
+
+      # Free the lock too.
+      flock($fp, LOCK_UN);
+    }
+    else
+    {
+      echo '</entry>';
+      flush();
+    }
+
+    return true;
   }
 }
 ?>

@@ -735,20 +735,26 @@ class RSS
     # We may need to output headers!
     if(empty($fp))
     {
-      @ob_clean();
+      if(ob_get_length() > 0)
+      {
+        ob_clean();
+      }
 
       # Well, one ;-) The content type.
       header('Content-Type: application/rss+xml; charset=utf-8');
     }
 
+    # Make things a tad easier.
+    $crlf = "\r\n";
+
     # Let's start shall we?
-    $buffer = '<?xml version="1.0" encoding="UTF-8"?>'. "\r\n".
-              '<rss version="2.0">'. "\r\n".
-              '  <channel>'. "\r\n".
-              '    <title>'. htmlchars($this->title). '</title>'. "\r\n".
-              '    <link>'. htmlchars($this->link). '</link>'. "\r\n".
-              '    <description>'. htmlchars($this->description). '</description>'. "\r\n"
-              '    <generator>SnowCMS (http://www.snowcms.com/)</generator>'. "\r\n";
+    $buffer = '<?xml version="1.0" encoding="UTF-8"?>'. $crlf.
+              '<rss version="2.0">'. $crlf.
+              '  <channel>'. $crlf.
+              '    <title>'. htmlchars($this->title). '</title>'. $crlf.
+              '    <link>'. htmlchars($this->link). '</link>'. $crlf.
+              '    <description>'. htmlchars($this->description). '</description>'. $crlf
+              '    <generator>SnowCMS (http://www.snowcms.com/)</generator>'. $crlf;
 
     # Well, we have part of it... Let's output!
     if(!empty($fp))
@@ -758,6 +764,7 @@ class RSS
     else
     {
       echo $buffer;
+      flush();
     }
 
     # And empty the buffer data.
@@ -766,49 +773,49 @@ class RSS
     # Did you specify a language?
     if(!empty($this->language))
     {
-      $buffer .= '    <language>'. htmlchars($this->language). '</language>'. "\r\n";
+      $buffer .= '    <language>'. htmlchars($this->language). '</language>'. $crlf;
     }
 
     # Published date? Would be mighty nice :-)
     if(!empty($this->pubDate) || $this->pubDate === 0)
     {
-      $buffer .= '    <pubDate>'. date('r', $this->pubDate). '</pubDate>'. "\r\n";
+      $buffer .= '    <pubDate>'. date('r', $this->pubDate). '</pubDate>'. $crlf;
     }
 
     # Last time it was built?
     if(!empty($this->lastBuildDate) || $this->lastBuildDate === 0)
     {
-      $buffer .= '    <lastBuildDate>'. date('r', $this->lastBuildDate). '</lastBuildDate>'. "\r\n";
+      $buffer .= '    <lastBuildDate>'. date('r', $this->lastBuildDate). '</lastBuildDate>'. $crlf;
     }
 
     # A docs URL? Weird.
     if(!empty($this->docs))
     {
-      $buffer .= '    <docs>'. htmlchars($this->docs). '</docs>'. "\r\n";
+      $buffer .= '    <docs>'. htmlchars($this->docs). '</docs>'. $crlf;
     }
 
     # The managing editors name/email?
     if(!empty($this->managingEditor))
     {
-      $buffer .= '    <managingEditor>'. htmlchars($this->managingEditor). '</managingEditor>'. "\r\n";
+      $buffer .= '    <managingEditor>'. htmlchars($this->managingEditor). '</managingEditor>'. $crlf;
     }
 
     # Do you like to copyright?
     if(!empty($this->copyright))
     {
-      $buffer .= '    <copyright>'. htmlchars($this->copyright). '</copyright>'. "\r\n";
+      $buffer .= '    <copyright>'. htmlchars($this->copyright). '</copyright>'. $crlf;
     }
 
     # Category information..?
     if(!empty($this->category['value']))
     {
-      $buffer .= '    <category'. (!empty($this->category['domain']) ? ' domain="'. htmlchars($this->category['domain']). '"' : ''). '>'. htmlchars($this->category['value']). '</category>'. "\r\n";
+      $buffer .= '    <category'. (!empty($this->category['domain']) ? ' domain="'. htmlchars($this->category['domain']). '"' : ''). '>'. htmlchars($this->category['value']). '</category>'. $crlf;
     }
 
     # Did you decide how long you want it to live? :P
     if(!empty($this->ttl) || $this->ttl === 0)
     {
-      $buffer .= '    <ttl>'. (int)$this->ttl. '</ttl>'. "\r\n";
+      $buffer .= '    <ttl>'. (int)$this->ttl. '</ttl>'. $crlf;
     }
 
     # Once again, we got a good chunk done :-) So output the buffer to the right place.
@@ -819,6 +826,7 @@ class RSS
     else
     {
       echo $buffer;
+      flush();
     }
 
     # Empty it, and move on to items!
@@ -830,70 +838,70 @@ class RSS
       foreach($this->items as $item)
       {
         # Start the item out.
-        $buffer = '    <item>'. "\r\n";
+        $buffer = '    <item>'. $crlf;
 
         # You aren't required to have a title, but if you don't have the
         # title, then you have a description ;-)
         if(!empty($item['title']))
         {
-          $buffer .= '      <title>'. htmlchars($item['title']). '</title>'. "\r\n";
+          $buffer .= '      <title>'. htmlchars($item['title']). '</title>'. $crlf;
         }
 
         if(!empty($item['link']))
         {
           # Links are always good in an RSS feed... Lol.
-          $buffer .= '      <link>'. htmlchars($item['link']). '</link>'. "\r\n";
+          $buffer .= '      <link>'. htmlchars($item['link']). '</link>'. $crlf;
         }
 
         if(!empty($item['description']))
         {
           # Mmm... Descriptiveness :-P.
-          $buffer .= '      <description>'. htmlchars($item['description']). '</description>'. "\r\n";
+          $buffer .= '      <description>'. htmlchars($item['description']). '</description>'. $crlf;
         }
 
         if(!empty($item['author']))
         {
           # Someone had to make it...
-          $buffer .= '      <author>'. htmlchars($item['author']). '</author>'. "\r\n";
+          $buffer .= '      <author>'. htmlchars($item['author']). '</author>'. $crlf;
         }
 
         if(!empty($item['category']['value']))
         {
-          $buffer .= '      <category'. (!empty($item['domain']) ? ' domain="'. htmlchars($item['domain']). '"' : ''). '>'. htmlchars($item['category']['value']). '</category>'. "\r\n";
+          $buffer .= '      <category'. (!empty($item['domain']) ? ' domain="'. htmlchars($item['domain']). '"' : ''). '>'. htmlchars($item['category']['value']). '</category>'. $crlf;
         }
 
         if(!empty($item['comments']))
         {
           # I would like to comment on your item. Please?
-          $buffer .= '      <comments>'. htmlchars($item['comments']). '</comments>'. "\r\n";
+          $buffer .= '      <comments>'. htmlchars($item['comments']). '</comments>'. $crlf;
         }
 
         if(!empty($item['enclosure']['url']))
         {
           # Well aren't you Mr. Fancy Pants with your media in items!!!
-          $buffer .= '      <enclosure url="'. htmlchars($item['enclosure']['url']). '" length="'. (int)$item['enclosure']['length']. '" type="'. htmlchars($item['enclosure']['type']). '" />'. "\r\n";
+          $buffer .= '      <enclosure url="'. htmlchars($item['enclosure']['url']). '" length="'. (int)$item['enclosure']['length']. '" type="'. htmlchars($item['enclosure']['type']). '" />'. $crlf;
         }
 
         if(!empty($item['guid']))
         {
           # Everything is unique! Well, unless you stole someone elses content. Tisk tisk!
-          $buffer .= '      <guid>'. htmlchars($item['guid']). '</guid>'. "\r\n";
+          $buffer .= '      <guid>'. htmlchars($item['guid']). '</guid>'. $crlf;
         }
 
         if(isset($item['pubdate']))
         {
           # It had to be published at some point in time.
-          $buffer .= '      <pubDate>'. date('r', (int)$item['pubdate']). '</pubDate>'. "\r\n";
+          $buffer .= '      <pubDate>'. date('r', (int)$item['pubdate']). '</pubDate>'. $crlf;
         }
 
         if(!empty($item['source']['url']))
         {
           # People have sources, you know?
-          $buffer .= '      <source url="'. htmlchars($item['source']['url']). '">'. (!empty($item['source']['value']) ? htmlchars($item['source']['value']) : ''). '</source>'. "\r\n";
+          $buffer .= '      <source url="'. htmlchars($item['source']['url']). '">'. (!empty($item['source']['value']) ? htmlchars($item['source']['value']) : ''). '</source>'. $crlf;
         }
 
         # And... CLOSE TAG!
-        $buffer .= '    </item>'. "\r\n";
+        $buffer .= '    </item>'. $crlf;
 
         # Output that sucker!!!
         if(!empty($fp))
@@ -903,6 +911,7 @@ class RSS
         else
         {
           echo $buffer;
+          flush();
         }
       }
     }
@@ -921,6 +930,7 @@ class RSS
     else
     {
       echo $buffer;
+      flush();
     }
 
     # Woo! DONE!
