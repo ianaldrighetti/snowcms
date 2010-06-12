@@ -122,7 +122,9 @@ class Form
 
     # Only recreate the token if it does not exist.
     if(!$token->exists($form_name))
+    {
       $token->add($form_name);
+    }
 
     # Our first field, a token!
     $this->add_field($form_name, $form_name. '_form_token', array(
@@ -980,14 +982,14 @@ class Form
         {
           echo '<select class="input_select" id="', $form['id'], '_', $name, '_input" name="', $name, '"', ($field['type'] == 'select-multi' ? ' multiple="multiple"' : ''), ($field['type'] == 'select-multi' && $field['rows'] > 0 ? ' size="'. $field['rows']. '"' : ''), (!empty($field['disabled']) ? ' disabled="disabled"' : ''), '>';
 
-                if(count($field['options']))
-                {
-                  foreach($field['options'] as $key => $value)
-                  {
-                    echo '
+          if(count($field['options']))
+          {
+            foreach($field['options'] as $key => $value)
+            {
+              echo '
                   <option value="', $key, '"', ((!is_array($field['value']) && $field['value'] == $key) || (is_array($field['value']) && in_array($key, $field['value'])) ? ' selected="selected"' : ''), '>', $value, '</option>';
-                  }
-                }
+            }
+          }
 
           echo '</select>';
         }
@@ -999,8 +1001,12 @@ class Form
         {
           # Display the list of radio buttons.
           if(count($field['options']))
+          {
             foreach($field['options'] as $key => $label)
+            {
               echo '<label><input class="input_radio" id="', $form['id'], '_', $name, '_input" type="radio" name="', $name, '" value="', $key, '"', (!empty($field['value']) && $field['value'] == $key ? ' checked="checked"' : ''), (!empty($field['disabled']) ? ' disabled="disabled"' : ''), (!empty($field['readonly']) ? ' readonly="readonly"' : ''), ' /> ', $label, '</label><br />';
+            }
+          }
         }
         elseif($field['type'] == 'file')
         {

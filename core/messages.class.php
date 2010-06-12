@@ -93,7 +93,9 @@ class Messages
       );
 
       if(isset($params['message_type']))
+      {
         $db_vars['message_type'] = $params['message_type'];
+      }
 
       # Got any extra data?
       if(isset($params['extra']))
@@ -132,7 +134,9 @@ class Messages
         $this->page = $cur_page > $total_pages ? $total_pages : $cur_page;
       }
       else
+      {
         $this->page = 0;
+      }
 
       # Reset the loaded messages array...
       $this->loaded = array();
@@ -167,8 +171,9 @@ class Messages
           # Store the current message
           $message = array(
             'id' => $row['message_id'],
-            'poster' => array( # Keep in mind that this array will be different upon being returned via the get method
-                               # But of course, you can hook into that too ;)
+            'poster' => array(
+                          # Keep in mind that this array will be different upon being returned via the get method
+                          # But of course, you can hook into that too ;)
                           'id' => $row['member_id'],
                           'username' => $row['member_name'],
                           'name' => $row['member_name'],
@@ -217,7 +222,9 @@ class Messages
         $handled = $this->page == $cur_page ? 1 : 2;
       }
       else
+      {
         $handled = 0;
+      }
     }
 
     return (int)$handled;
@@ -253,8 +260,10 @@ class Messages
       {
         # Now before we get too far, is this id valid?
         if(!isset($this->loaded[$loaded_id]))
+        {
           # Nope...
           return false;
+        }
 
         $members = $api->load_class('Members');
 
@@ -263,15 +272,23 @@ class Messages
 
         # Maybe we need to update the member information?
         if($members->get($message['poster']['id']) !== false)
+        {
           $message['poster'] = array_merge($message['poster'], $members->get($message['poster']['id']));
+        }
         else
+        {
           $message['poster'] = array_merge($message['poster'], array('is_guest' => true, 'is_member' => false));
+        }
 
         # Modifier too!
         if($members->get($message['modifier']['id']) !== false)
+        {
           $message['modifier'] = array_merge($message['modifier'], $members->get($message['modifier']['id']));
+        }
         else
+        {
           $message['modifier'] = array_merge($message['modifier'], array('is_guest' => true, 'is_member' => false));
+        }
 
         # Do you have some weird thing to do before we give this message out?
         $api->run_hooks('messages_get_array', array(&$message));
@@ -284,7 +301,9 @@ class Messages
 
         # Sweet and simple!!!
         for($i = 0; $i < $this->count; $i++)
+        {
           $handled[$i] = $this->get($i);
+        }
       }
     }
 
@@ -439,7 +458,9 @@ class Messages
         ), 'messages_update_message_exists');
 
       if($result->num_rows() == 0)
+      {
         return false;
+      }
 
       # All the allowed columns that can be modified ;)
       $allowed_columns = array(
@@ -467,7 +488,9 @@ class Messages
       {
         # Only add the data if the column exists...
         if(isset($options[$column]))
+        {
           $data[$column] = $options[$column];
+        }
       }
 
       $api->run_hooks('members_update_check_data', array(&$handled, &$data));
@@ -477,9 +500,13 @@ class Messages
       {
         # The only thing we don't allow to be empty is the message, poster_time, and message_status
         if((isset($data['message']) && empty($data['message'])) || (isset($data['poster_time']) && empty($data['poster_time'])) || (isset($data['message_status']) && empty($data['message_status'])))
+        {
           return false;
+        }
         elseif(isset($data['extra']))
+        {
           $data['extra'] = @serialize(is_array($data['extra']) ? $data['extra'] : array());
+        }
 
         if(!empty($data))
         {
@@ -533,15 +560,24 @@ class Messages
     global $api, $db;
 
     if(!is_array($messages) && $messages !== null)
+    {
       $messages = array($messages);
+    }
     elseif(is_array($messages) && !count($messages))
+    {
       return true;
+    }
 
     if(!empty($messages))
     {
       foreach($messages as $key => $message_id)
+      {
         if((int)$message_id < 1)
+        {
           unset($messages[$key]);
+        }
+      }
+    }
 
       $messages = array_unique($messages);
     }

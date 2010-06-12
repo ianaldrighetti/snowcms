@@ -719,6 +719,8 @@ class RSS
   */
   public function generate($fp = null)
   {
+    global $api;
+
     # You must have a title, link and description!
     if(empty($this->title) || empty($this->link) || empty($this->description))
     {
@@ -731,6 +733,8 @@ class RSS
       # It would be nice if we could have an exclusive lock...
       return false;
     }
+
+    $api->run_hooks('rss_generate', array($this, &$fp));
 
     # We may need to output headers!
     if(empty($fp))

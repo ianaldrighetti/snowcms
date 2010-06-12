@@ -109,6 +109,18 @@ CREATE TABLE `{db->prefix}plugins`
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 
 ----
+-- Holds the search index.
+----
+CREATE TABLE `{db->prefix}search_index`
+(
+  `area_name` VARCHAR(255) NOT NULL,
+  `area_id` INT(11) UNSIGNED NOT NULL,
+  `message_id` INT(11) UNSIGNED NOT NULL,
+
+  PRIMARY KEY
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+
+----
 -- A table holding various settings and what not xD
 ----
 CREATE TABLE `{db->prefix}settings`
