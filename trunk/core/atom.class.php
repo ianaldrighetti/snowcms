@@ -1025,6 +1025,8 @@ class Atom
   */
   public function generate($fp = null)
   {
+    global $api;
+
     # We do require some things...
     if(empty($this->id) || empty($this->title) || empty($this->updated))
     {
@@ -1036,6 +1038,8 @@ class Atom
       # It would be nice if we could have an exclusive lock...
       return false;
     }
+
+    $api->run_hooks('atom_generate', array($this, &$fp));
 
     # We may need to output headers!
     if(empty($fp))

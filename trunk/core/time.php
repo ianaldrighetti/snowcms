@@ -73,16 +73,22 @@ if(!function_exists('timeformat'))
 
     # Did the hooks do anything?
     if(!empty($return))
+    {
       return $return;
+    }
 
     # Is the format acceptable?
     $format = strtolower($format);
     if(!in_array($format, array('datetime', 'date', 'time')))
+    {
       return false;
+    }
 
     # No timestamp specified? We will use the current time then!
     if(empty($timestamp))
+    {
       $timestamp = time_utc();
+    }
 
     # Want to change the time, perhaps? Timezone, maybe? :P
     $timestamp = $api->apply_filters('timeformat_timestamp', $timestamp);
