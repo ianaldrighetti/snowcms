@@ -72,9 +72,8 @@ class Table
                    of the table, you can supply a function which is expected
                    to return an array containing nested arrays for each row.
                    The following parameters will be supplied: page_num, per_page,
-                   order_by (column), order (asc|desc), current filters, if any
-                   and a reference parameter which contains the total number of
-                   rows possible.
+                   order_by (column), order (asc|desc) and a reference parameter
+                   which contains the total number of rows possible.
 
         primary - The primary column of the query. Only required if you want
                   to allow users to select rows, this should be a column
@@ -95,8 +94,6 @@ class Table
         cellpadding - The tables cellpadding attribute value.
 
         cellspacing - The tables cellspacing attribute value.
-
-        filters - An array containing filters.
 
       Do NOT add any ORDER BY or LIMIT clauses in the query! This will cause the query
       to not work. This is all done automatically.
@@ -122,7 +119,6 @@ class Table
                                  'sort' => array(),
                                  'cellpadding' => '0px',
                                  'cellspacing' => '0px',
-                                 'filters' => array(),
                                );
 
     # Now try to edit it.
@@ -247,12 +243,8 @@ class Table
 
     # How about a cellspacing for the table?
     if(isset($options['cellspacing']))
-      $this->tables[$tbl_name]['cellspacing'] = $options['cellspacing'];
-
-    # Want to let people filter data?
-    if(isset($options['filters']))
     {
-      $this->tables[$tbl_name]['filters'] = $options['filters'];
+      $this->tables[$tbl_name]['cellspacing'] = $options['cellspacing'];
     }
 
     return true;
@@ -591,7 +583,7 @@ class Table
     echo '
       <div class="table">';
 
-    if($is_options || (!empty($table['filters']) && is_array($table['filters']) && count($table['filters']) > 0))
+    if($is_options)
     {
       echo '
         <form action="" method="post">';
@@ -620,58 +612,6 @@ class Table
         $is_default_sort = true;
       }
 
-      # What's being filtered? ;-)
-      $current_filters = array();
-
-      # How about filters? Are there any of them..?
-      if(!empty($table['filters']) && is_array($table['filters']) && count($table['filters']) > 0)
-      {
-        echo '
-          <tr class="filters">
-            <td colspan="', ($is_options ? count($table['columns']) + 1 : count($table['columns'])), '">';
-
-        foreach($table['filters'] as $filter_name => $filter)
-        {
-          echo '<label', (!empty($filter['title']) ? ' title="'. $filter['title']. '"' : ''), '>', $filter['label'], ' <select name="', $filter_name, '">';
-
-          if(count($filter['options']) > 0)
-          {
-            # So, what is being filtered?
-            $current_filter = false;
-            foreach($filter['options'] as $value => $label)
-            {
-              if(!empty($_REQUEST[$filter_name]) && $_REQUEST[$filter_name] == $value)
-              {
-                $current_filter = $_REQUEST[$filter_name];
-              }
-
-              echo '
-                                                                                                                         <option value="', $value, '"', (!empty($_REQUEST[$filter_name]) && $_REQUEST[$filter_name] == $value ? ' selected="selected"' : ''), '>', $label, '</option>';
-            }
-
-            # Was an option actually set..?
-            if(!empty($current_filter))
-            {
-              # Yup, call on the callback, but this is if we are getting data via a query.
-              # We will give you all of the tables current values and what not... You can edit
-              # it by making the parameter a reference :-).
-              $filter['callback']($table, $_REQUEST[$filter_name]);
-
-              # Also add this to the current filters...
-              $current_filters[$filter_name] = $_REQUEST[$filter_name];
-            }
-          }
-
-          echo '
-                                                                                                                       </select></label> ';
-        }
-
-        echo '
-            <input type="submit" name="'. $tbl_name. '_apply_filters" value="', l('Filter'), '" />
-            </td>
-          </tr>';
-      }
-
       # Where we startin'?
       $page = !empty($_GET['page']) && (string)$_GET['page'] == (string)(int)$_GET['page'] ? (int)$_GET['page'] : 1;
 
@@ -691,26 +631,13 @@ class Table
       else
       {
         # Gimme that dataz!
-        $function_data = call_user_func_array($table['function'], array($page, $table['per_page'], $sort, $order, $current_filters, &$num_rows));
+        $function_data = call_user_func_array($table['function'], array($page, $table['per_page'], $sort, $order, &$num_rows));
       }
 
       # Create our pagination!!!
       $start = $page;
 
-      # We may have filters to add ;-)
-      $filters = '';
-      if(count($current_filters) > 0)
-      {
-        $filters = array();
-        foreach($current_filters as $param => $value)
-        {
-          $filters[] = $param. '='. htmlchars($value);
-        }
-
-        $filters = '&amp;'. implode('&amp;', $filters);
-      }
-
-      $pagination = create_pagination($table['base_url']. (empty($is_default_sort) ? '&amp;sort='. $sort. '&amp;order='. strtolower($order) : ''). $filters, $start, $num_rows, $table['per_page']);
+      $pagination = create_pagination($table['base_url']. (empty($is_default_sort) ? '&amp;sort='. $sort. '&amp;order='. strtolower($order) : ''), $start, $num_rows, $table['per_page']);
 
       $page = ceil(($start + 1 * $table['per_page']) / $table['per_page']);
 

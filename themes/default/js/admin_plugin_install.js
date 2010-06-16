@@ -2,7 +2,7 @@ var element = null;
 
 function extract_plugin()
 {
-  s.ajaxCallback(base_url + '/index.php?action=admin&sa=ajax&id=plugins_add&step=1', function(response)
+  s.ajaxCallback(base_url + '/index.php?action=admin&sa=ajax&id=plugins_add&step=1&sid=' + session_id, function(response)
     {
       var response = s.json(response);
 
@@ -30,7 +30,7 @@ function extract_plugin()
 
 function check_plugin_status()
 {
-  s.ajaxCallback(base_url + '/index.php?action=admin&sa=ajax&id=plugins_add&step=2', function(response)
+  s.ajaxCallback(base_url + '/index.php?action=admin&sa=ajax&id=plugins_add&step=2&sid=' + session_id, function(response)
     {
       var response = s.json(response);
 
@@ -80,7 +80,7 @@ function cancel_install(element)
 {
   element.innerHTML = l['canceling'];
 
-  s.ajaxCallback(base_url + '/index.php?action=admin&sa=ajax&id=plugins_add&step=cancel', function(response)
+  s.ajaxCallback(base_url + '/index.php?action=admin&sa=ajax&id=plugins_add&step=cancel&sid=' + session_id, function(response)
     {
       location.href = base_url + '/index.php?action=admin';
     }, 'filename=' + s.encode(filename));
@@ -88,7 +88,7 @@ function cancel_install(element)
 
 function finalize_install()
 {
-  s.ajaxCallback(base_url + '/index.php?action=admin&sa=ajax&id=plugins_add&step=3', function(response)
+  s.ajaxCallback(base_url + '/index.php?action=admin&sa=ajax&id=plugins_add&step=3&sid=' + session_id, function(response)
     {
       var response = s.json(response);
 

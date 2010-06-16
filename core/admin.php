@@ -114,14 +114,6 @@ if(!function_exists('admin_prepend'))
                             'show' => $member->can('manage_members'),
                           ),
                           array(
-                            'id' => 'members_search',
-                            'href' => $base_url. '/index.php?action=admin&amp;sa=members_search',
-                            'title' => l('Search for members'),
-                            'src' => $theme->url(). '/members_search.png',
-                            'label' => l('Search'),
-                            'show' => $member->can('search_members'),
-                          ),
-                          array(
                             'id' => 'members_settings',
                             'href' => $base_url. '/index.php?action=admin&amp;sa=members_settings',
                             'title' => l('Member settings'),
