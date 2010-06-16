@@ -301,11 +301,17 @@ if(!function_exists('admin_plugins_add_ajax'))
       echo json_encode(array('error' => l('Unknown step number.')));
       exit;
     }
+    elseif(empty($_GET['sid']) || $_GET['sid'] != $member->session_id())
+    {
+      echo json_encode(array('error' => l('Your session id is invalid.')));
+      exit;
+    }
 
     # Gotta make sure the file supplied is valid.
     $filename = realpath($plugin_dir. '/'. $_POST['filename']);
+    $extension = explode('.', $filename);
 
-    if(empty($filename) || !file_exists($filename) || !is_file($filename) || substr($filename, 0, strlen($plugin_dir)) != realpath($plugin_dir))
+    if(empty($filename) || !file_exists($filename) || !is_file($filename) || substr($filename, 0, strlen($plugin_dir)) != realpath($plugin_dir) || count($extension) < 2 || $extension[count($extension) - 1] != 'tmp')
     {
       echo json_encode(array('error' => l('The supplied plugin file either does not exist or is not a valid file.')));
       exit;
@@ -342,6 +348,7 @@ if(!function_exists('admin_plugins_add_ajax'))
           $response['error'] = l('The uploaded file was not a valid plugin.');
 
           @recursive_unlink($plugin_dir. '/'. $name);
+          @unlink($filename);
         }
         else
         {

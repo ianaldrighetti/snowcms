@@ -59,7 +59,6 @@ function init_core()
   $api->add_event('action=admin&sa=members_manage&id=*', 'admin_members_manage_edit', $core_dir. '/admin/admin_members_manage.php');
   $api->add_event('action=admin&sa=members_permissions', 'admin_members_manage_permissions', $core_dir. '/admin/admin_members_permissions.php');
   $api->add_event('action=admin&sa=members_permissions&grp=*', 'admin_members_manage_group_permissions', $core_dir. '/admin/admin_members_permissions.php');
-  $api->add_event('action=admin&sa=members_search', 'admin_members_search', $core_dir. '/admin/admin_members_search.php');
   $api->add_event('action=admin&sa=members_settings', 'admin_members_settings', $core_dir. '/admin/admin_members_settings.php');
   $api->add_event('action=admin&sa=plugins_add', 'admin_plugins_add', $core_dir. '/admin/admin_plugins_add.php');
   $api->add_event('action=admin&sa=plugins_add&install=*', 'admin_plugins_install', $core_dir. '/admin/admin_plugins_add.php');

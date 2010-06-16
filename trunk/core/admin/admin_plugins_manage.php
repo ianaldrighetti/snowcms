@@ -108,7 +108,7 @@ if(!function_exists('admin_plugins_manage_generate_table'))
                                           'base_url' => $base_url. '/index.php?action=admin&amp;sa=plugins_manage',
                                           'db_query' => '
                                             SELECT
-                                              dependency_name, directory, runtime_error, is_activated
+                                              dependency_name, directory, runtime_error, is_activated, available_update
                                             FROM {db->prefix}plugins',
                                           'primary' => 'dependency_name',
                                           'sort' => array('dependency_name', 'desc'),
@@ -138,7 +138,7 @@ if(!function_exists('admin_plugins_manage_generate_table'))
                                                                  'title' => l('Plugin information'),
                                                                  'sortable' => true,
                                                                  'function' => create_function('$row', '
-                                                                                 global $plugin_dir;
+                                                                                 global $base_url, $member, $plugin_dir;
 
                                                                                  $plugin_info = plugin_load($plugin_dir. \'/\'. $row[\'directory\']);
 
@@ -172,6 +172,11 @@ if(!function_exists('admin_plugins_manage_generate_table'))
                                                                                    {
                                                                                      $plugin_data[] = \'<span style="font-weight: bold;">\'. l(\'Error:\'). \'</span> <span style="color: red;">\'. $error_string. \'</span>\';
                                                                                    }
+                                                                                 }
+
+                                                                                 if(!empty($row[\'available_update\']))
+                                                                                 {
+                                                                                   $plugin_data[] = \'<span style="font-weight: bold;">\'. l(\'v%s of this plugin is available! <a href="%s?action=admin&amp;sa=plugins_manage&amp;update=%s&amp;version=%s&amp;sid=%s">Update now</a>.\', $row[\'available_update\'], $base_url, urlencode($row[\'dependency_name\']), urlencode($row[\'available_update\']), $member->session_id()). \'</span>\';
                                                                                  }
 
                                                                                  return \'<p style="margin-bottom: 10px;">\'. $plugin_info[\'description\']. \'</p><p>\'. implode(\' | \', $plugin_data). \'</p>\';'),
@@ -346,6 +351,16 @@ function admin_plugins_check_updates($dependencies = array())
       if(version_compare($request, $plugin_info['version'], '>'))
       {
         # Yup, there is a newer version available.
+        # So mark it in the database so you can update later!
+        $db->query('
+          UPDATE {db->prefix}plugins
+          SET available_update = {string:version_available}
+          WHERE dependency_name = {string:dependency_name}
+          LIMIT 1',
+          array(
+            'version_available' => $request,
+            'dependency_name' => $plugin_info['dependency'],
+          ), 'plugins_check_updates_query');
       }
     }
   }

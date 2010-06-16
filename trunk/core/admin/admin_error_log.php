@@ -109,58 +109,6 @@ if(!function_exists('admin_error_log_generate_table'))
                                'callback' => 'admin_error_log_table_handle',
                                'sort' => array('error_id', 'DESC'),
                                'cellpadding' => '4px',
-                               'filters' => array(
-                                              'error_type' => array(
-                                                                'label' => l('Show only:'),
-                                                                'title' => l('Filter by error type'),
-                                                                'options' => $api->apply_filters('error_log_types', array(
-                                                                                                                      'all' => l('Show all'),
-                                                                                                                      'fatal' => l('Fatal run-time error'),
-                                                                                                                      'general' => l('General'),
-                                                                                                                      'parse' => l('Compile-time parse error'),
-                                                                                                                      'undefined' => l('Undefined variable'),
-                                                                                                                      'interopt' => l('Interopability issue'),
-                                                                                                                      'deprecated' => l('Deprecated'),
-                                                                                                                      'database' => l('Database'),
-                                                                                                                    )),
-                                                                'callback' => create_function('&$table, $filter', '
-                                                                                  if($filter == \'fatal\')
-                                                                                  {
-                                                                                    $in = array(E_ERROR, E_USER_ERROR);
-                                                                                  }
-                                                                                  elseif($filter == \'general\')
-                                                                                  {
-                                                                                    $in = array(E_WARNING, E_USER_WARNING);
-                                                                                  }
-                                                                                  elseif($filter == \'parse\')
-                                                                                  {
-                                                                                    $in = array(E_PARSE);
-                                                                                  }
-                                                                                  elseif($filter == \'undefined\')
-                                                                                  {
-                                                                                    $in = array(E_NOTICE, E_USER_NOTICE);
-                                                                                  }
-                                                                                  elseif($filter == \'interopt\')
-                                                                                  {
-                                                                                    $in = array(E_STRICT);
-                                                                                  }
-                                                                                  elseif($filter == \'deprecated\')
-                                                                                  {
-                                                                                    $in = array(E_DEPRECATED, E_USER_DEPRECATED);
-                                                                                  }
-                                                                                  elseif($filter == \'database\')
-                                                                                  {
-                                                                                    $in = array(\'database\');
-                                                                                  }
-
-                                                                                  if(isset($in))
-                                                                                  {
-                                                                                    $table[\'db_vars\'][\'error_type\'] = $in;
-                                                                                    $table[\'db_query\'] .= \' WHERE error_type IN({array_string:error_type})\';
-                                                                                  }
-                                                                                '),
-                                                              ),
-                                            ),
                              ));
 
     # The id of the error.
