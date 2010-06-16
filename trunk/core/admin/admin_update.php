@@ -139,7 +139,9 @@ if(!function_exists('admin_update_apply'))
     $api->run_hooks('admin_update_system');
 
     if(!$member->can('update_system'))
+    {
       admin_access_denied();
+    }
 
     # You doing an AJAX request?
     if(!empty($_GET['step']) && (string)$_GET['step'] == (string)(int)$_GET['step'])
@@ -151,6 +153,10 @@ if(!function_exists('admin_update_apply'))
     $version = basename($version);
 
     $theme->set_current_area('system_update');
+
+    # Verify your session id.
+    verify_request('get');
+
     $theme->add_js_file(array('src' => $theme_url. '/default/js/admin_update_apply.js'));
     $theme->add_js_var('current_version', $settings->get('version', 'string'));
     $theme->add_js_var('version', $version);

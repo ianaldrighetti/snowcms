@@ -60,8 +60,10 @@ if(!defined('IN_SNOW'))
 */
 function plugin_load($plugin_id, $is_path = true)
 {
+  global $api;
+
   # Is it a path? Make sure it exists...
-  if(empty($plugin_id) || (!empty($is_path) && (!file_exists($plugin_id) || !is_dir($plugin_id) || !file_exists($plugin_id. '/plugin.php') || !file_exists($plugin_id. '/plugin.ini'))))
+  if(empty($plugin_id) || (!empty($is_path) && (!file_exists($plugin_id) || !is_dir($plugin_id) || !file_exists($plugin_id. '/plugin.php') || !file_exists($plugin_id. '/plugin.xml'))))
   {
     return false;
   }
@@ -93,19 +95,70 @@ function plugin_load($plugin_id, $is_path = true)
     return false;
   }
 
-  # Simple enough, load the plugin.ini file.
-  $ini = parse_ini_file($plugin_id. '/plugin.ini', true);
+  # The plugin.xml file is where it's at!!!
+  $xml = $api->load_class('XML');
+
+  $data = $xml->parse($plugin_id. '/plugin.xml');
+
+  if(count($data) > 0)
+  {
+    # Keep track of whether or not we are in the author tag.
+    $in_author = false;
+
+    # Keep track of the theme info.
+    $plugin_info = array(
+                     'dependency' => null,
+                     'author' => null,
+                     'website' => null,
+                     'email' => null,
+                     'name' => null,
+                     'description' => null,
+                     'version' => null,
+                  );
+    foreach($data as $item)
+    {
+      # Keep track of where we are.
+      if($item['tag'] == 'author' && $item['type'] == 'open')
+      {
+        $in_author = true;
+      }
+      elseif($item['tag'] == 'author' && $item['type'] == 'close')
+      {
+        $in_author = false;
+      }
+
+      # Saving something?
+      if($item['tag'] == 'name' && $in_author)
+      {
+        $plugin_info['author'] = $item['value'];
+      }
+      elseif($item['tag'] == 'dependency-name')
+      {
+        $plugin_info['dependency'] = $item['value'];
+      }
+      elseif(array_key_exists($item['tag'], $plugin_info) && $item['type'] != 'close')
+      {
+        $plugin_info[$item['tag']] = $item['value'];
+      }
+    }
+
+    # No author? No name? No way!
+    if(empty($plugin_info['author']) || empty($plugin_info['name']) || empty($plugin_info['dependency']) || empty($plugin_info['version']))
+    {
+      return false;
+    }
+  }
+  else
+  {
+    # Woops, that's not right!
+    return false;
+  }
+
+  # Add the path, just incase :P
+  $plugin_info['path'] = realpath($plugin_id);
 
   # Now return the information.
-  return array(
-            'dependency' => $ini['plugin']['dependency name'],
-            'name' => $ini['plugin']['plugin name'],
-            'author' => $ini['plugin']['author'],
-            'version' => $ini['plugin']['version'],
-            'description' => $ini['plugin']['description'],
-            'website' => isset($ini['plugin']['website']) ? $ini['plugin']['website'] : '',
-            'path' => realpath($plugin_id),
-          );
+  return $plugin_info;
 }
 
 /*
@@ -148,7 +201,7 @@ function plugin_list()
 
     # Only look in directories, of course! Then check and see if
     # plugin.php and plugin.ini exists.
-    if(is_dir($plugin_dir. '/'. $file) && file_exists($plugin_dir. '/'. $file. '/plugin.php') && file_exists($plugin_dir. '/'. $file. '/plugin.ini'))
+    if(is_dir($plugin_dir. '/'. $file) && file_exists($plugin_dir. '/'. $file. '/plugin.php') && file_exists($plugin_dir. '/'. $file. '/plugin.xml'))
     {
       # Yup, it was a valid (or most likely valid :-P) plugin.
       $list[] = realpath($plugin_dir. '/'. $file);

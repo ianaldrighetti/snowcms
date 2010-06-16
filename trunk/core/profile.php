@@ -41,12 +41,12 @@ if(!function_exists('profile_view'))
   */
   function profile_view()
   {
-    global $api, $member, $settings, $theme;
+    global $api, $base_url, $member, $settings, $theme;
 
     $api->run_hooks('profile_view');
 
     # We need to load a members information... So yeah.
-    if(!isset($_GET['id']))
+    if(empty($_GET['id']))
     {
       # Use your member id.
       $_GET['id'] = $member->id();
@@ -83,6 +83,105 @@ if(!function_exists('profile_view'))
     }
 
     # Nope, you want to view it.
+    $theme->set_title(l('Viewing profile of %s', $member_info['name']));
+
+    $theme->header();
+
+    $handled = false;
+    $api->run_hooks('profile_view_display', array(&$handled, &$member_info));
+
+    if(empty($handled))
+    {
+      echo '
+      <h1>', l('%s\'s profile', $member_info['name']), ($member->can('edit_other_profiles') || $_GET['id'] == $member->id() ? ' <span style="font-size: 50%;">'. l('<a href="%s" title="Edit this account">Edit</a>', $base_url. '/index.php?action=profile&amp;id='. $_GET['id']. '&amp;edit'). '</span>' : ''), '</h1>
+      <div class="profile_view_data">';
+
+      # You will be able to modify this later :P
+      $display_data = array(
+                        array(
+                          'label' => l('Name:'),
+                          'value' => $member_info['name'],
+                          'show' => true,
+                        ),
+                        array(
+                          'label' => l('Member groups:'),
+                          'value' => implode(', ', $member_info['groups']),
+                          'show' => true,
+                        ),
+                        array(
+                          'label' => l('Email:'),
+                          'value' => '<a href="mailto:'. $member_info['email']. '" title="'. $member_info['email']. '">'. $member_info['email']. '</a>',
+                          'show' => $_GET['id'] == $member->id() || $member->can('edit_other_profiles'),
+                        ),
+                        array(
+                          'is_hr' => true,
+                        ),
+                        array(
+                          'label' => l('Last active:'),
+                          'title' => l('The last time this member browsed the site'),
+                          'value' => '...',
+                          'show' => true,
+                        ),
+                        array(
+                          'label' => l('Date registered:'),
+                          'title' => l('When the member was originally created'),
+                          'value' => timeformat($member_info['registered']),
+                          'show' => true,
+                        ),
+                        array(
+                          'is_hr' => true,
+                        ),
+                        array(
+                          'label' => l('IP:'),
+                          'title' => l('Last known IP address'),
+                          'value' => $member_info['ip'],
+                          'show' => $_GET['id'] == $member->id() || $member->can('edit_other_profiles'),
+                        ),
+                        array(
+                          'label' => l('Activated?'),
+                          'title' => l('Whether or not the account is activated'),
+                          'value' => $member_info['is_activated'] ? l('Yes') : l('No'),
+                          'show' => true,
+                        ),
+                      );
+
+      $display_data = $api->apply_filters('profile_view_data', $display_data);
+
+      if(is_array($display_data) && count($display_data) > 0)
+      {
+        foreach($display_data as $data)
+        {
+          if(!empty($data['is_hr']))
+          {
+            echo '
+        <p>&nbsp;</p>
+        <hr class="profile_view" size="1" />
+        <p>&nbsp;</p>';
+
+            continue;
+          }
+          elseif(empty($data['label']) || empty($data['value']) || empty($data['show']))
+          {
+            continue;
+          }
+
+          echo '
+        <div class="left">
+          <label', (!empty($data['title']) ? ' title="'. $data['title']. '"' : ''), '>', $data['label'], '</label>
+        </div>
+        <div class="right">
+          ', $data['value'], '
+        </div>
+        <div class="break">
+        </div>';
+        }
+      }
+
+      echo '
+      </div>';
+    }
+
+    $theme->footer();
   }
 }
 
@@ -147,6 +246,12 @@ if(!function_exists('profile_edit'))
     {
       $form->process('member_edit_'. $member_id);
     }
+
+    $theme->header();
+
+    $form->show('member_edit_'. $member_id);
+
+    $theme->footer();
   }
 }
 
@@ -182,6 +287,7 @@ if(!function_exists('profile_edit_generate_form'))
                                                 'callback' => 'profile_edit_handle',
                                                 'method' => 'post',
                                                 'submit' => l('Update profile'),
+                                                'id' => 'member_edit',
                                               ));
 
     $form->add_field('member_edit_'. $member_info['id'], 'display_name', array(
@@ -205,7 +311,7 @@ if(!function_exists('profile_edit_generate_form'))
                                                                                       }
 
                                                                                       return true;'),
-                                                                      'value' => $member_info['display_name'],
+                                                                      'value' => $member_info['name'],
                                                                     ));
 
     $form->add_field('member_edit_'. $member_info['id'], 'member_email', array(
@@ -227,40 +333,40 @@ if(!function_exists('profile_edit_generate_form'))
                                                                       'value' => $member_info['email'],
                                                                     ));
 
-    $form->add_field('member_edit_'. $member_id, 'member_pass', array(
-                                                                  'type' => 'password',
-                                                                  'label' => l('Password:'),
-                                                                  'subtext' => l('Leave blank if you don\'t want to change your password.'),
-                                                                  'function' => create_function('$value, $form_name, &$error', '
-                                                                                  global $api;
+    $form->add_field('member_edit_'. $member_info['id'], 'member_pass', array(
+                                                                          'type' => 'password',
+                                                                          'label' => l('Password:'),
+                                                                          'subtext' => l('Leave blank if you don\'t want to change your password.'),
+                                                                          'function' => create_function('$value, $form_name, &$error', '
+                                                                                          global $api;
 
-                                                                                  if(!empty($value) && (empty($_POST[\'verify_pass\']) || $_POST[\'verify_pass\'] != $value))
-                                                                                  {
-                                                                                    $error = l(\'The supplied passwords don\\\'t match.\');
-                                                                                    return false;
-                                                                                  }
-                                                                                  elseif(!empty($value) && !empty($_POST[\'verify_pass\']))
-                                                                                  {
-                                                                                    $members = $api->load_class(\'Members\');
+                                                                                          if(!empty($value) && (empty($_POST[\'verify_pass\']) || $_POST[\'verify_pass\'] != $value))
+                                                                                          {
+                                                                                            $error = l(\'The supplied passwords don\\\'t match.\');
+                                                                                            return false;
+                                                                                          }
+                                                                                          elseif(!empty($value) && !empty($_POST[\'verify_pass\']))
+                                                                                          {
+                                                                                            $members = $api->load_class(\'Members\');
 
-                                                                                    if(!$members->password_allowed($_POST[\'display_name\'], $value))
-                                                                                    {
-                                                                                      $error = l(\'The supplied password is not allowed.\');
-                                                                                      return false;
-                                                                                    }
-                                                                                  }
+                                                                                            if(!$members->password_allowed($_POST[\'display_name\'], $value))
+                                                                                            {
+                                                                                              $error = l(\'The supplied password is not allowed.\');
+                                                                                              return false;
+                                                                                            }
+                                                                                          }
 
-                                                                                  return true;'),
-                                                                  'value' => '',
-                                                                ));
+                                                                                          return true;'),
+                                                                          'value' => '',
+                                                                        ));
 
     # We will need you to verify that ;)
-    $form->add_field('member_edit_'. $member_id, 'verify_pass', array(
-                                                                  'type' => 'password',
-                                                                  'label' => l('Verify password:'),
-                                                                  'subtext' => l('Just to make sure, re-enter the password.'),
-                                                                  'value' => '',
-                                                                ));
+    $form->add_field('member_edit_'. $member_info['id'], 'verify_pass', array(
+                                                                          'type' => 'password',
+                                                                          'label' => l('Verify password:'),
+                                                                          'subtext' => l('Just to make sure, re-enter the password.'),
+                                                                          'value' => '',
+                                                                        ));
 
     # How about which groups they are in, whether they are activated or not? etc.
     if($member->can('manage_members'))

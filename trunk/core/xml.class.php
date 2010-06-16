@@ -32,6 +32,11 @@ class XML
   # Holds the XML Parser resource.
   private $parser;
 
+  # Variable: options
+  # Holds all the set option, that way a new parser resource can
+  # automatically be created without disturbing the set options.
+  private $options;
+
   /*
     Constructor: __construct
 
@@ -42,6 +47,26 @@ class XML
   {
     # Create an XML Parser resource.
     $this->parser = xml_parser_create();
+    $this->options = array();
+  }
+
+  /*
+    Method: get_option
+
+    Returns the current value of the specified XML Parser option.
+
+    Parameters:
+      int $option - The option to return.
+
+    Returns:
+      mixed - Returns the value of the option.
+
+    Note:
+      See <http://www.php.net/xml_parser_get_option> for more information.
+  */
+  public function get_option($option)
+  {
+    return xml_parser_get_option($this->parser, $option);
   }
 
   /*
@@ -61,7 +86,16 @@ class XML
   */
   public function set_option($option, $value)
   {
-    return xml_parser_set_option($this->parser, $option, $value);
+    if(xml_parser_set_option($this->parser, $option, $value))
+    {
+      # It was a valid option, so save it!
+      $this->options[$option] = $value;
+      return true;
+    }
+    else
+    {
+      return false;
+    }
   }
 
   /*
@@ -125,11 +159,15 @@ class XML
         }
       }
 
+      # Reset!
+      $this->reset();
+
       return $data;
     }
     else
     {
       # Sorry, didn't work!
+      $this->reset();
       return false;
     }
   }
@@ -177,13 +215,21 @@ class XML
       void - Nothing is returned by this method.
 
     Note:
-      If you set any custom options, you will have to set them again after
-      calling this method.
+      This method is automatically called by the <XML::parse_string> method.
   */
-  public function reset()
+  private function reset()
   {
     $this->__destruct();
     $this->parser = xml_parser_create();
+
+    # Custom options? We need to reapply them.
+    if(count($this->options) > 0)
+    {
+      foreach($this->options as $option => $value)
+      {
+        $this->set_option($option, $value);
+      }
+    }
   }
 
   /*

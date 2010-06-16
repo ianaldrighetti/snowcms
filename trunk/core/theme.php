@@ -63,7 +63,6 @@ function theme_load($path)
 
   # Parse the XML file now.
   $data = $xml->parse($path. '/theme.xml');
-  $xml->reset();
 
   if(count($data) > 0)
   {

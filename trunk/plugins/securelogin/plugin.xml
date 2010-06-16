@@ -1,0 +1,12 @@
+<?xml version="1.0"?>
+<plugin-info xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://themes.snowcms.com/xml plugin-info.xsd">
+  <author>
+    <name>SnowCMS Dev Team</name>
+    <website>http://www.snowcms.com/</website>
+    <email>dev@snowcms.com</email>
+  </author>
+  <dependency-name>plugins.snowcms.com/snowcms/securelogin</dependency-name>
+  <name>Secure login</name>
+  <description>The secure login plugin hooks into the login form, and right before the browser sends the login information to the server, their password gets salted and encrypted, keeping it safer in transmission.</description>
+  <version>1.0</version>
+</plugin-info>

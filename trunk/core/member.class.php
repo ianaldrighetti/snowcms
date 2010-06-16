@@ -189,8 +189,12 @@ if(!class_exists('Member'))
               ), 'member_data_query');
 
             if($result->num_rows() > 0)
+            {
               while($row = $result->fetch_assoc())
+              {
                 $this->data[$row['variable']] = $row['value'];
+              }
+            }
 
             # Time to load up their permissions based on groups.
             # However, if they are an administrator, don't bother!
@@ -214,17 +218,25 @@ if(!class_exists('Member'))
               {
                 # -1 means denied, no matter what!
                 if($row['status'] == -1)
+                {
                   $deny[] = $row['permission'];
+                }
                 else
+                {
                   # If status is 1, give them the permission, however, if they can't
                   # use the previous permission unless the permission isn't set yet.
                   $this->permissions[$row['permission']] = $row['status'] == 1 ? true : (isset($this->permissions[$row['permission']]) ? !empty($this->permissions[$row['permission']]) : false);
+                }
               }
 
               # Any denied permissions? As we need to apply those.
               if(count($deny) > 0)
+              {
                 foreach($deny as $permission)
+                {
                   $this->permissions[$permission] = false;
+                }
+              }
             }
           }
         }
@@ -232,7 +244,9 @@ if(!class_exists('Member'))
 
       # So, you aren't logged in, you are a guest ;)
       if(!$this->is_logged())
+      {
         $this->groups = array('guest');
+      }
 
       # Don't think I did a good enough job at logging in the member? FINE! :P
       $member = array();
