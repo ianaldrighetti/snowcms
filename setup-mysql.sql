@@ -43,6 +43,7 @@ CREATE TABLE `{db->prefix}members`
   `display_name` VARCHAR(255) NOT NULL,
   `member_email` VARCHAR(100) NOT NULL,
   `member_groups` VARCHAR(255) NOT NULL,
+  `member_last_active` INT(10) UNSIGNED NOT NULL,
   `member_registered` INT(10) UNSIGNED NOT NULL,
   `member_ip` VARCHAR(150) NOT NULL,
   `member_activated` TINYINT(3) UNSIGNED NOT NULL DEFAULT '0',
@@ -103,6 +104,7 @@ CREATE TABLE `{db->prefix}plugins`
   `directory` VARCHAR(255) NOT NULL,
   `runtime_error` TINYINT(1) UNSIGNED NOT NULL DEFAULT '0',
   `is_activated` TINYINT(1) UNSIGNED NOT NULL DEFAULT '0',
+  `available_update` VARCHAR(255) NULL,
   PRIMARY KEY (`dependency_name`),
   KEY (`runtime_error`),
   KEY (`is_activated`)
@@ -146,6 +148,7 @@ CREATE TABLE `{db->prefix}tasks`
   `last_ran` INT(10) UNSIGNED NOT NULL DEFAULT '0',
   `run_every` INT(10) UNSIGNED NOT NULL DEFAULT '86400',
   `file` VARCHAR(255) NOT NULL DEFAULT '',
+  `location` VARCHAR(32) NOT NULL DEFAULT '',
   `func` VARCHAR(255) NOT NULL DEFAULT '',
   `queued` TINYINT(1) UNSIGNED NOT NULL DEFAULT '0',
   `enabled` TINYINT(1) UNSIGNED NOT NULL DEFAULT '1',
@@ -154,6 +157,8 @@ CREATE TABLE `{db->prefix}tasks`
   KEY (`queued`),
   KEY (`enabled`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+
+INSERT INTO `{db->prefix}tasks` (`task_name`, `file`, `location`, `func`) VALUES('plugins_update_check', 'admin/admin_plugins_manage.php', 'core_dir', 'admin_plugins_check_updates');
 
 ----
 -- Holds registered tokens...

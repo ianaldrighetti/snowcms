@@ -47,8 +47,12 @@ function mitigate_globals()
 
   # Loop through GLOBALS and remove anything that shouldn't be there...
   foreach($GLOBALS as $variable => $dummy)
+  {
     if(!in_array($variable, $safe_variables))
+    {
       unset($GLOBALS[$variable]);
+    }
+  }
 
   # Let's remove cookies from $_REQUEST.
   # We do that by setting $_REQUEST to the $_GET and $_POST array merged.
@@ -56,6 +60,8 @@ function mitigate_globals()
 
   # Don't even try it, okay?
   if(isset($_REQUEST['GLOBALS']) || isset($_COOKIE['GLOBALS']) || isset($_FILES['GLOBALS']))
+  {
     die('Hacking attempt...');
+  }
 }
 ?>

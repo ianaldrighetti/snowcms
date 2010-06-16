@@ -37,18 +37,26 @@ class Implemented_Theme extends Theme
 
     # Any meta tags?
     if(count($this->meta))
+    {
       foreach($this->meta as $meta)
+      {
         echo '
   ', $this->generate_tag('meta', $meta);
+      }
+    }
 
     echo '
   <title>', $api->apply_filters('theme_title', (!empty($this->title) ? htmlchars($this->title). ' - ' : ''). (!empty($this->main_title) ? $this->main_title : '')), '</title>';
 
     # Links
     if(count($this->links))
+    {
       foreach($this->links as $link)
+      {
         echo '
   ', $this->generate_tag('link', $link);
+      }
+    }
 
     # JavaScript variables :D
     if(count($this->js_vars))
@@ -57,8 +65,10 @@ class Implemented_Theme extends Theme
   <script type="text/javascript" language="JavaScript"><!-- // --><![CDATA[';
 
       foreach($this->js_vars as $variable => $value)
+      {
         echo '
-    var ', $variable, ' = ', $value, ';';
+    var ', $variable, ' = ', json_encode($value), ';';
+      }
 
       echo '
   // ]]></script>';
@@ -66,9 +76,13 @@ class Implemented_Theme extends Theme
 
     # Now JavaScript files!
     if(count($this->js_files))
+    {
       foreach($this->js_files as $js_file)
+      {
         echo '
   <script', !empty($js_file['language']) ? ' language="'. $js_file['language']. '"' : '', !empty($js_file['type']) ? ' type="'. $js_file['type']. '"' : '', !empty($js_file['src']) ? ' src="'. $js_file['src']. '"' : '', !empty($js_file['defer']) ? ' defer="defer"' : '', !empty($js_file['charset']) ? ' charset="'. $js_file['charset']. '"' : '', '></script>';
+      }
+    }
 
     echo '
 </head>

@@ -267,4 +267,87 @@ if(!function_exists('admin_plugins_manage_table_handle'))
     redirect($base_url. '/index.php?action=admin&sa=plugins_manage');
   }
 }
+
+/*
+  Function: admin_plugins_check_updates
+
+  Checks to see if the plugins require any updating. Plugin dependency
+  names can be supplied, but if none are supplied, all plugins will be
+  checked.
+
+  Parameters:
+    array $dependencies - An array of plugin dependency names to check for updates.
+
+  Returns:
+    void - Nothing is returned by this function.
+*/
+function admin_plugins_check_updates($dependencies = array())
+{
+  global $api, $db, $settings;
+
+  # No dependency names supplied?
+  if(count($dependencies) == 0)
+  {
+    # Load some up! Unless we didn't check too long ago.
+    if($settings->get('last_plugin_update_check', 'int', 0) + 3600 < time_utc())
+    {
+      $result = $db->query('
+        SELECT
+          dependency_name
+        FROM {db->prefix}plugins',
+        array());
+
+      $dependencies = array();
+      while($row = $result->fetch_assoc())
+      {
+        $dependencies[] = $row['dependency_name'];
+      }
+    }
+  }
+
+  # You know, just incase ;-)
+  if(count($dependencies) > 0)
+  {
+    # The HTTP class will be mighty useful!
+    $http = $api->load_class('HTTP');
+
+    foreach($dependencies as $dependency)
+    {
+      # Load the plugins information... If it exists.
+      $plugin_info = plugin_load($dependency, false);
+
+      # Does it not exist?
+      if($plugin_info === false)
+      {
+        continue;
+      }
+
+      # The dependency name is the URL to check for updates at ;-)
+      # I don't quite know how to explain this, but here it goes. Say you
+      # have a plugin with all of these version: 1.0, 1.0.1 and 1.1, when
+      # an update check is requested and the supplied version is 1.0, the
+      # response to the request should give 1.0.1, not 1.1... However, you
+      # can of course respond with 1.1 IF when the 1.1 plugin is installed
+      # that it will be completely updated from 1.0 to 1.1 (including anything
+      # that was also done in 1.0.1). It's your choice, of course! Also note
+      # that during a plugin update, a variable ($current_plugin_version) will
+      # be set before running the install.php file, that way, if required, you
+      # can do anything special :-).
+      $request = $http->request('http://'. $dependency, array('updatecheck' => 1, 'version' => $plugin_info['version']));
+
+      # Is it empty?
+      if(empty($request))
+      {
+        # Sorry, couldn't check/nothing returned!
+        continue;
+      }
+
+      # Let's check, shall we?
+      if(version_compare($request, $plugin_info['version'], '>'))
+      {
+        # Yup, there is a newer version available.
+      }
+    }
+  }
+}
 ?>

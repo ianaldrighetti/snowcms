@@ -286,3 +286,36 @@ fieldset
   text-align: center;
   color: #000000;
 }
+
+.profile_view_data .left
+{
+  float: left;
+  width: 32%;
+  text-align: right;
+  padding: 4px;
+}
+
+.profile_view_data .left label
+{
+  text-align: right;
+  color: #B0B0B0;
+  font-weight: bold;
+}
+
+.profile_view_data .right
+{
+  float: right;
+  width: 65%;
+  text-align: left;
+  padding: 4px;
+}
+
+.break
+{
+  clear: both;
+}
+
+.profile_view hr
+{
+  border: 1px solid #000000;
+}

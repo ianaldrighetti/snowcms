@@ -24,10 +24,11 @@ class Admin_Theme extends Theme
 {
   protected function init()
   {
-    global $base_url, $theme_url;
+    global $base_url, $member, $theme_url;
 
     $this->add_js_file(array('src' => $theme_url. '/default/js/snowobj.js'));
     $this->add_js_var('base_url', $base_url);
+    $this->add_js_var('session_id', $member->session_id());
 
     $this->set_current_area(null);
   }

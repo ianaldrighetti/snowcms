@@ -90,7 +90,7 @@ class Tasks
             # Does it need queueing/running?
             if(!empty($row['enabled']) && (($row['last_ran'] + $row['run_every']) <= time_utc() || !empty($row['queued'])) && $queued_tasks < $settings->get('max_tasks', 'int', 1))
             {
-              $this->queue[] = $row['task_name'];
+              $this->queue[$row['task_name']] = $row;
 
               # Queue it if it isn't already...
               if(empty($row['queued']))
@@ -104,16 +104,14 @@ class Tasks
           }
 
           # Any newly queued tasks, perhaps?
-          if($queued_tasks > 0)
+          if(count($queue_tasks) > 0)
           {
             $db->query('
               UPDATE {db->prefix}tasks
               SET queued = 1
-              WHERE task_name IN({string_array:queue_tasks})
-              LIMIT {int:num_tasks}',
+              WHERE task_name IN({array_string:queue_tasks})',
               array(
                 'queue_tasks' => $queue_tasks,
-                'num_tasks' => $queued_tasks,
               ), 'tasks_queue_query');
           }
         }
@@ -126,12 +124,14 @@ class Tasks
 
         # If we have any tasks which are in need of running, add a JavaScript file to the theme.
         if(count($this->queue) > 0)
+        {
           $api->add_hook('post_init_theme', create_function('', '
                                               global $api, $theme_url;
 
                                               $theme = $api->load_class(\'Implemented_Theme\');
 
                                               $theme->add_js_file(array(\'src\' => $theme_url. \'/default/js/tasks.js\', \'defer\' => \'defer\'));'));
+        }
       }
     }
   }
@@ -147,12 +147,15 @@ class Tasks
       callback $func - The function to call on when the task is ran.
       string $file - The file to include before calling on $func,
                      if any.
+      string $location - The location of the specified file, if any,
+                         such as plugin_dir (and $plugin_dir will be
+                         prepended when it is ran) or core_dir, etc.
       bool $enabled - Whether or not the task is enabled.
 
     Returns:
       bool - Returns true on success, false on failure.
   */
-  public function add($name, $run_every, $func, $file = null, $enabled = true)
+  public function add($name, $run_every, $func, $file = null, $location = null, $enabled = true)
   {
     global $api, $func, $settings;
 
@@ -160,14 +163,16 @@ class Tasks
       return false;
 
     $handled = null;
-    $api->run_hooks('tasks_add', array(&$handled, $name, $run_every, $func, $file, $enabled));
+    $api->run_hooks('tasks_add', array(&$handled, $name, $run_every, $func, $file, $location, $enabled));
 
     # Did you do the deed?
     if($handled === null)
     {
       # Does this task already exist? In which case, you can't add it!
       if(empty($name) || $this->exists($name) || $run_every < 1)
+      {
         return false;
+      }
 
       # We don't do anything with the database right now, SO YEAH!!!
       $this->tasks[$func['strtolower']($name)] = array(
@@ -175,6 +180,7 @@ class Tasks
                                                    'last_ran' => 0,
                                                    'run_every' => (int)$run_every,
                                                    'file' => $file,
+                                                   'location' => $location,
                                                    'func' => $func,
                                                    'queued' => 0,
                                                    'enabled' => !empty($enabled) ? 1 : 0,
@@ -202,14 +208,18 @@ class Tasks
   */
   public function update($name, $options)
   {
-    global $api, $settings;
+    global $api, $func, $settings;
 
     if(!$settings->get('enable_tasks', 'bool'))
+    {
       return false;
+    }
 
     # Can't update something that does not exist, that's for sure!
     if(!$this->exists($name))
+    {
       return false;
+    }
 
     $handled = null;
     $api->run_hooks('tasks_update', array(&$handled, $name, $options));
@@ -220,25 +230,44 @@ class Tasks
 
       # So, yeah, update the task, one option at a time!
       if(!empty($options['last_ran']) && $options['last_ran'] > 0)
+      {
         $this->tasks[$name]['last_ran'] = (int)$options['last_ran'];
+      }
 
       if(!empty($options['run_every']) && $options['run_every'] > 0)
+      {
         $this->tasks[$name]['run_every'] = (int)$options['run_every'];
+      }
 
       if(isset($options['file']))
+      {
         $this->tasks[$name]['file'] = $options['file'];
+      }
+
+      if(isset($options['location']))
+      {
+        $this->tasks[$name]['location'] = $options['location'];
+      }
 
       if(isset($options['func']))
+      {
         $this->tasks[$name]['func'] = $options['func'];
+      }
 
       if(isset($options['enabled']))
+      {
         $this->tasks[$name]['enabled'] = !empty($options['enabled']) ? 1 : 0;
+      }
 
       if(isset($options['queued']))
+      {
         $this->tasks[$name]['queued'] = !empty($options['queued']) ? 1 : 0;
+      }
 
       # Mark it as updated :)
       $this->tasks[$name]['updated'] = true;
+
+      return true;
     }
 
     return !empty($handled);
@@ -260,11 +289,9 @@ class Tasks
     global $api, $func, $settings;
 
     if(!$settings->get('enable_tasks', 'bool'))
+    {
       return false;
-
-    # Deleting something that doesn't exist? I don't think so!
-    if(!$this->exists($name))
-      return false;
+    }
 
     $handled = null;
     $api->run_hooks('tasks_exists', array(&$handled, $name));
@@ -294,7 +321,9 @@ class Tasks
     global $api, $func, $settings;
 
     if(!$settings->get('enable_tasks', 'bool'))
+    {
       return false;
+    }
 
     $handled = null;
     $api->run_hooks('tasks_delete', array(&$handled, $name));
@@ -324,10 +353,12 @@ class Tasks
   */
   public function run($output_image = true)
   {
-    global $api, $settings;
+    global $api, $base_dir, $core_dir, $plugin_dir, $theme_dir, $settings;
 
     if(!$settings->get('enable_tasks', 'bool'))
+    {
       return;
+    }
 
     $handled = null;
     $api->run_hooks('tasks_run', array(&$handled, $output_image));
@@ -336,7 +367,9 @@ class Tasks
     {
       # Do we have anything in the queue, for that matter?
       if(count($this->queue) == 0)
+      {
         return;
+      }
 
       # No going back now, that's for sure!
       ignore_user_abort(true);
@@ -353,11 +386,27 @@ class Tasks
         {
           # Is it an absolute path or..?
           if(realpath($task['file']) !== false)
+          {
             # It is, not recommended, though.
             $include_file = realpath($task['file']);
-          else
+          }
+          elseif($task['location'] == 'core_dir' || empty($task['location']))
+          {
             # Prepend core_dir to it.
             $include_file = realpath($core_dir. '/'. $task['file']);
+          }
+          elseif($task['location'] == 'base_dir')
+          {
+            $include_file = realpath($base_dir. '/'. $task['file']);
+          }
+          elseif($task['location'] == 'plugin_dir')
+          {
+            $include_file = realpath($plugin_dir. '/'. $task['file']);
+          }
+          elseif($task['location'] == 'theme_dir')
+          {
+            $include_file = realpath($plugin_dir. '/'. $task['file']);
+          }
 
           # Does it exist..?
           if(isset($include_file) && !file_exists($include_file))
@@ -372,7 +421,7 @@ class Tasks
           }
 
           # Include away!
-          require($include_file);
+          require_once($include_file);
           unset($include_file);
         }
 
@@ -393,13 +442,20 @@ class Tasks
         }
 
         # If we got here, then the task was ran successfully, and we can make it no longer queued.
-        $this->update($name, array('last_ran' => time_utc(), 'queued' => 0));
+        $this->update($name, array(
+                               'last_ran' => time_utc(),
+                               'queued' => 0
+                             ));
       }
 
       # So, dsisplay a transparent pixel?
       if(!empty($output_image))
       {
-        @ob_clean();
+        if(ob_get_length() > 0)
+        {
+          @ob_clean();
+        }
+
         header('Pragma: no-cache');
         header('Expires: -1');
         header('Content-Type: image/png');
@@ -445,18 +501,23 @@ class Tasks
         {
           # Deleted? As there is no point changing something that will be deleted, right?
           if(!empty($task['deleted']))
+          {
             $deleted[] = $name;
+          }
           elseif(!empty($task['added']) || !empty($task['updated']))
+          {
             # Doesn't matter whether it has been added or changed...
             $changed[] = array(
                            $name, $task['last_ran'], $task['run_every'],
-                           $task['file'], $task['func'], $task['queued'],
-                           $task['enabled'],
+                           $task['file'], $task['location'], $task['func'],
+                           $task['queued'], $task['enabled'],
                          );
+          }
         }
 
         # Anything need to be deleted? Do so!
         if(count($deleted) > 0)
+        {
           $db->query('
             DELETE FROM {db->prefix}tasks
             WHERE task_name IN({string_array:deleted})
@@ -465,17 +526,20 @@ class Tasks
               'deleted' => $deleted,
               'num_deleted' => count($deleted),
             ), 'tasks_destruct_delete_query');
+        }
 
         # How about changed?
         if(count($changed) > 0)
+        {
           $db->insert('replace', '{db->prefix}tasks',
             array(
               'task_name' => 'string', 'last_ran' => 'int', 'run_every' => 'int',
-              'file' => 'string', 'func' => 'string', 'queued' => 'int',
-              'enabled' => 'int',
+              'file' => 'string', 'location' => 'string', 'func' => 'string',
+              'queued' => 'int', 'enabled' => 'int',
             ),
             $changed,
             array('task_name'), 'tasks_destruct_changed_query');
+        }
       }
     }
   }

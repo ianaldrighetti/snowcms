@@ -791,7 +791,7 @@ abstract class Theme
 */
 function init_theme()
 {
-  global $api, $base_url, $core_dir, $settings, $theme, $theme_dir, $theme_url;
+  global $api, $base_url, $core_dir, $member, $settings, $theme, $theme_dir, $theme_url;
 
   # Load up <theme_load> and <theme_list> :-)
   require_once($core_dir. '/theme.php');
@@ -806,6 +806,7 @@ function init_theme()
   # Along with  JavaScript variables containing the base URL and theme URL.
   $theme->add_js_var('base_url', $base_url);
   $theme->add_js_var('theme_url', $theme_url);
+  $theme->add_js_var('session_id', $member->session_id());
 
   # You can hook into here to add all your theme stuffs (<link>'s, js vars, js files, etc).
   $api->run_hooks('post_init_theme');

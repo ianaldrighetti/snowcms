@@ -143,7 +143,7 @@ if(!function_exists('admin_plugins_add_handle'))
   */
   function admin_plugins_add_handle($data, &$errors = array())
   {
-    global $api, $base_url, $plugin_dir;
+    global $api, $base_url, $member, $plugin_dir;
 
     # Where should this plugin go..?
     $filename = $plugin_dir. '/'. uniqid('plugin_'). '.tmp';
@@ -183,7 +183,7 @@ if(!function_exists('admin_plugins_add_handle'))
     }
 
     # If it worked, we get redirected!
-    redirect($base_url. '/index.php?action=admin&sa=plugins_add&install='. urlencode(basename($filename)));
+    redirect($base_url. '/index.php?action=admin&sa=plugins_add&install='. urlencode(basename($filename)). '&sid='. $member->session_id());
   }
 }
 
@@ -218,6 +218,9 @@ if(!function_exists('admin_plugins_install'))
     }
 
     $theme->set_current_area('plugins_add');
+
+    # Check the session id.
+    verify_request('get');
 
     # Which file are you installing?
     $filename = realpath($plugin_dir. '/'. $_GET['install']);

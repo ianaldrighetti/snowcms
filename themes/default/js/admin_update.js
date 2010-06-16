@@ -28,7 +28,7 @@ function admin_update_request(response)
       var step = document.createElement('p');
       step.id = 'current_step';
       step.style.marginTop = '10px';
-      step.innerHTML = '<a href="' + base_url + '/index.php?action=admin&amp;sa=update&amp;apply=' + response['version'] + '">Apply update</a>';
+      step.innerHTML = '<a href="' + base_url + '/index.php?action=admin&amp;sa=update&amp;apply=' + response['version'] + '&amp;sid=' + session_id + '">Apply update</a>';
 
       s.id('response').appendChild(step);
     }

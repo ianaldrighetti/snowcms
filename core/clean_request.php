@@ -39,17 +39,16 @@ if(!function_exists('clean_request'))
   {
     global $_COOKIE, $_GET, $_POST, $_REQUEST;
 
-    # POST data goes first, then $_GET ;)
-    $_REQUEST = array_merge($_POST, $_GET);
-
     # Remove magic quotes, if it is on...
     if((function_exists('get_magic_quotes_gpc') && @get_magic_quotes_gpc() == 1) || @ini_get('magic_quotes_sybase'))
     {
       $_COOKIE = remove_magic($_COOKIE);
       $_GET = remove_magic($_GET);
       $_POST = remove_magic($_POST);
-      $_REQUEST = remove_magic($_REQUEST);
     }
+
+    # $_REQUEST should only contain $_POST and $_GET, no cookies!
+    $_REQUEST = array_merge($_POST, $_GET);
   }
 
   /*
@@ -64,19 +63,27 @@ if(!function_exists('clean_request'))
     Returns:
       array - An array is returned which has had the effects of magic quotes undone.
   */
-  function remove_magic($array, $depth = 0)
+  function remove_magic($array, $depth = 5)
   {
     if(count($array) == 0)
+    {
       return array();
-    elseif($depth > 5)
+    }
+    elseif($depth <= 0)
+    {
       return $array;
+    }
 
     foreach($array as $key => $value)
     {
       if(!is_array($value))
+      {
         $array[stripslashes($key)] = stripslashes($value);
+      }
       else
-        $array[stripslashes($key)] = remove_magic($value, $depth + 1);
+      {
+        $array[stripslashes($key)] = remove_magic($value, $depth - 1);
+      }
     }
 
     return $array;

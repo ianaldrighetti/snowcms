@@ -34,7 +34,8 @@ CREATE TABLE '{db->prefix}members'
   'member_groups' VARCHAR(255) NOT NULL,
   'display_name' VARCHAR(255) NOT NULL,
   'member_email' VARCHAR(100) NOT NULL,
-  'member_registered' INT NOT NULL,
+  'member_last_active' INT NULL,
+  'member_registered' INT NULL,
   'member_ip' VARCHAR(150) NOT NULL,
   'member_activated' SMALLINT NOT NULL DEFAULT '0',
   'member_acode' VARCHAR(40) NULL
@@ -86,6 +87,7 @@ CREATE TABLE '{db->prefix}plugins'
   'directory' VARCHAR(255) NOT NULL,
   'runtime_error' SMALLINT NOT NULL DEFAULT '0',
   'is_activated' SMALLINT NOT NULL DEFAULT '0',
+  'available_update' VARCHAR(255) NULL,
   PRIMARY KEY ('dependency_name')
 );
 
