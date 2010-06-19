@@ -62,7 +62,8 @@ class Atom
   private $contributors;
 
   # Variable: icon
-  # An small image which provides "iconic visual identification" for the feed.
+  # An small image which provides "iconic visual identification" for the
+  # feed.
   private $icon;
 
   # Variable: logo
@@ -120,8 +121,8 @@ class Atom
   /*
     Method: set_id
 
-    Sets the id (universally unique identifier, such as a URL to the home page)
-    of the feed.
+    Sets the id (universally unique identifier, such as a URL to the home
+    page) of the feed.
 
     Parameters:
       string $id - The id to set for the feed.
@@ -175,7 +176,8 @@ class Atom
       none
 
     Returns:
-      string - Returns a string containing the currently set title of the feed.
+      string - Returns a string containing the currently set title of the
+               feed.
   */
   public function title()
   {
@@ -241,8 +243,8 @@ class Atom
       bool - Returns true on success, false on failure.
 
     Note:
-      If entries do not have an author, then you must have an author for the
-      entire feed itself.
+      If entries do not have an author, then you must have an author for
+      the entire feed itself.
   */
   public function add_author($name, $email = null, $uri = null)
   {
@@ -339,7 +341,8 @@ class Atom
 
     Parameters:
       string $href - The href attribute of the link (required).
-      string $rel - The relationship type of the link (defaults to alternate).
+      string $rel - The relationship type of the link (defaults to
+                    alternate).
       string $type - The media type of the resource.
       string $title - Human readable information about the link.
       string $hreflang - The language of the referenced resource.
@@ -350,10 +353,11 @@ class Atom
 
     Note:
       Here are some valid options for the $rel parameter:
-        alternate - An alternate representation of the feed, like a URL to the
-                    place of where the feed entries come from or another feed (like RSS).
-        enclosure - A related resource which is large in size, like an audio or
-                    video recording.
+        alternate - An alternate representation of the feed, like a URL to
+                    the place of where the feed entries come from or another
+                    feed (like RSS).
+        enclosure - A related resource which is large in size, like an audio
+                    or video recording.
         related - A document related to the entry or feed.
         self - A URL to the feed itself (recommended by the specification).
         via - The source of information used in the entry.
@@ -407,21 +411,28 @@ class Atom
   */
   public function remove_link($index)
   {
+    # Is the index invalid? Then we cannot remove the link. Sorry.
     if((string)$index != (string)(int)$index || $index < 0 || $index >= count($this->links))
     {
       return false;
     }
 
+    # The first link? Using the unshift function will take the first item
+    # of an array off without much hassle.
     if($index == 0)
     {
       array_unshift($this->links);
     }
+    # The very last link? Pretty simple too.
     elseif($index == (count($this->links) - 1))
     {
       unset($this->links[$index]);
     }
     else
     {
+      # Anywhere inbetween? Not so plain cut and dry.
+      # We could simply just delete it, but we want to maintain the
+      # sequential ordering of the indexes.
       $links = array();
       $length = count($this->links);
 
@@ -540,8 +551,8 @@ class Atom
     Parameters:
       string $name - The name of the contributor.
       string $email - The email address of the contributor.
-      string $uri - The URI of the contributors home page, such as a link to
-                    their profile.
+      string $uri - The URI of the contributors home page, such as a link
+                    to their profile.
 
     Returns:
       bool - Returns true on success, false on failure.
@@ -663,8 +674,8 @@ class Atom
   /*
     Method: set_logo
 
-    Sets a logo which visually represents the feed. This should, in reality,
-    be the same image as set in <Atom::set_icon>, only larger.
+    Sets a logo which visually represents the feed. This should, in
+    reality, be the same image as set in <Atom::set_icon>, only larger.
 
     Parameters:
       string $logo - The URL to the logo which is being set.
@@ -697,7 +708,8 @@ class Atom
   /*
     Method: set_rights
 
-    Sets the rights of the feed, this would be something such as a copyright.
+    Sets the rights of the feed, this would be something such as a
+    copyright.
 
     Parameters:
       string $rights - The rights of the feed.
@@ -764,34 +776,35 @@ class Atom
     Adds an entry to the feed.
 
     Parameters:
-      string $id - A globally unique identifier for the entry. This id should
-                   never change! Ever! It is not recommended you use the link
-                   of where the entry came from (permalink), though it is acceptable.
+      string $id - A globally unique identifier for the entry. This id
+                   should never change! Ever! It is not recommended you
+                   use the link of where the entry came from (permalink),
+                   though it is acceptable.
       string $title - A human readable title for the entry.
-      int $updated - The timestamp of when the entry was last modified in a
-                     significant way.
-      array $author - An array containing at least a name (email and uri recommended),
-                      but you can also specify multiple authors as well, in of course,
-                      multiple arrays.
+      int $updated - The timestamp of when the entry was last modified in
+                     a significant way.
+      array $author - An array containing at least a name (email and uri
+                      recommended), but you can also specify multiple
+                      authors as well, in of course, multiple arrays.
       array $content - An array containing the value (value index) of the
                        content tag, but also the type (type index) of the
                        content tag as well. Such as text (default), html
                        or xhtml.
-      array $links - An array containing alternative links of the entry, which
-                     is where the entry came from. You are required to supply
-                     a link (href index) but you can also specify an hreflang
-                     (hreflang index) of the link itself.
+      array $links - An array containing alternative links of the entry,
+                     which is where the entry came from. You are required
+                     to supply a link (href index) but you can also specify
+                     an hreflang (hreflang index) of the link itself.
       array $summary - The same as the $content parameter, except this is
                        for a summary or excerpt of the entry.
-      array $categories - An array containing categories of the entry, there
-                          can be multiple categories. There is one required
-                          attribute term (term index), which is the category,
-                          but scheme (scheme index) and label (label index)
-                          are optional.
+      array $categories - An array containing categories of the entry,
+                          there can be multiple categories. There is one
+                          required attribute term (term index), which is
+                          the category, but scheme (scheme index) and
+                          label (label index) are optional.
       array $contributors - Just like the $authors parameter, but for
                             contributors.
-      int $published - Contains the timestamp of when the entry was initially
-                       created.
+      int $published - Contains the timestamp of when the entry was
+                       initially created.
       array $source - An array containing information about where the entry
                       originated from, if it was taken from another feed.
                       It should contain: id, title, updated and rights.
@@ -966,10 +979,11 @@ class Atom
           'someData' => true,
         )
 
-      If the supplied array did not have the data index, false would be returned,
-      same goes for the someData index. However, the otherdata index is not required,
-      so if it was not found, it would be added (set as null), but if there were any
-      other indexes that aren't listed, then they will be removed.
+      If the supplied array did not have the data index, false would be
+      returned, same goes for the someData index. However, the otherdata
+      index is not required, so if it was not found, it would be added (set
+      as null), but if there were any other indexes that aren't listed,
+      then they will be removed.
   */
   private function has_indexes(&$array, $indexes)
   {
@@ -1015,13 +1029,14 @@ class Atom
     file stream.
 
     Parameters:
-      resource $fp - The stream to write the RSS output to, instead of through
-                     echo.
+      resource $fp - The stream to write the RSS output to, instead of
+                     through echo.
 
     Returns:
-      bool - Returns true if the RSS feed was generated successfully, false if
-             all the information which was required was not supplied, or if the
-             method could not obtain a lock on the supplied file pointer.
+      bool - Returns true if the RSS feed was generated successfully, false
+             if all the information which was required was not supplied, or
+             if the method could not obtain a lock on the supplied file
+             pointer.
   */
   public function generate($fp = null)
   {
@@ -1143,7 +1158,8 @@ class Atom
       $buffer .= '  <icon>'. htmlchars($this->icon). '</icon>'. $crlf;
     }
 
-    # A logo? (Just a bigger icon, or the icon is a small logo, whichever you prefer :P)
+    # A logo? (Just a bigger icon, or the icon is a small logo, whichever
+    # you prefer :P)
     if(!empty($this->logo))
     {
       $buffer .= '  <logo>'. htmlchars($this->logo). '</logo>'. $crlf;
@@ -1174,7 +1190,8 @@ class Atom
       flush();
     }
 
-    # Now for the most important stuff! The entries themselves! Well, if there are any.
+    # Now for the most important stuff! The entries themselves! Well, if
+    # there are any.
     if(count($this->entries) > 0)
     {
       foreach($this->entries as $entry)

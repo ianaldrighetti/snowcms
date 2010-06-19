@@ -55,9 +55,13 @@ function load_database()
       $db->connect();
     }
     else
+    {
       die(!empty($db_class) || !empty($db_result_class) ? '$db_class or $db_result_class was not specified in the SQL engine files!' : 'The classes specified in $db_class or $db_result_class were not found!');
+    }
   }
   else
+  {
     die('Invalid database type supplied in config.php');
+  }
 }
 ?>

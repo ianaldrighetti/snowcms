@@ -28,7 +28,8 @@ if(!function_exists('json_encode'))
   require_once($core_dir. '/compat/json.php');
 }
 
-# Windows doesn't seem to have mime_content_type, it is somewhat important :P
+# Windows doesn't seem to have mime_content_type, at least on certain
+# setups, it is somewhat important :P
 if(!function_exists('mime_content_type'))
 {
   require_once($core_dir. '/compat/mime_content_type.php');
@@ -49,7 +50,8 @@ if(!function_exists('mime_content_type'))
     string $key
 
   Returns:
-    array - Returns the new array with item inserted at the specified position.
+    array - Returns the new array with item inserted at the specified
+            position.
 
   Note:
     If you are inserting the item into an associative array, you must
@@ -116,7 +118,7 @@ function array_insert($array, $item, $index, $key = null)
   return $array;
 }
 
-# Some constants that aren't defined until PHP 5.3.0
+# Some constants that aren't defined until PHP 5.3.0.
 if(!defined('E_DEPRECATED'))
 {
   # So for a bit of compatibility, let's define them ;)

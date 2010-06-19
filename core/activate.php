@@ -66,8 +66,9 @@ if(!function_exists('activate_view'))
       exit;
     }
 
-    # It should use a form in reality, but since this can be done through a URL
-    # that wouldn't be the best solution. So we will hand make it, in this case!
+    # It should use a form in reality, but since this can be done through
+    # a URL that wouldn't be the best solution. So we will hand make it,
+    # in this case!
     if((!empty($_REQUEST['id']) || !empty($_REQUEST['name'])) && !empty($_REQUEST['code']) && $_REQUEST['code'] != 'admin_approval')
     {
       # We will be needing this. That's for sure :P
@@ -139,7 +140,9 @@ if(!function_exists('activate_view'))
 
     # No indexing if you have anything extra set ;)
     if(isset($_GET['id']) || isset($_GET['code']))
+    {
       $theme->add_meta(array('name' => 'robots', 'content' => 'noindex'));
+    }
 
     $theme->header();
 

@@ -43,9 +43,10 @@ function init_core()
 {
   global $api, $core_dir;
 
-  # We have a couple default actions of our own :) (Remember, you can register
-  # these actions before they are registered here! :) But also all these functions
-  # are overloadable, so simply define them before this too!!!)
+  # We have a couple default actions of our own :) (Remember, you can
+  # register these actions before they are registered here! :) But also
+  #all these functions are overloadable, so simply define them before
+  # this too!!!).
   $api->add_event('action=activate', 'activate_view', $core_dir. '/activate.php');
   $api->add_event('action=admin', 'admin_home', $core_dir. '/admin/admin_home.php');
   $api->add_event('action=admin&sa=about', 'admin_about', $core_dir. '/admin/admin_home.php');
@@ -112,25 +113,29 @@ if(!function_exists('core_popup'))
       void - Nothing is returned by this function.
 
     Note:
-      To make a popup, simply apply a filter to popup_{ID_HERE}, for example
-      if the popup identifier is timeformat, apply a filter to popup_timeformat.
-      Be sure that if the popup information should only be available to a certain
-      member group, check using the <Member::is_a> method before applying the
-      filter.
+      To make a popup, simply apply a filter to popup_{ID_HERE}, for
+      example if the popup identifier is timeformat, apply a filter to
+      popup_timeformat. Be sure that if the popup information should only
+      be available to a certain member group, check using the
+      <Member::is_a> method before applying the filter.
   */
   function core_popup()
   {
     global $api, $func;
 
     if(empty($_GET['id']))
+    {
       die(l('No popup identifier supplied.'));
+    }
 
     # Collect the popup information.
     $popup = $api->apply_filters('popup_'. $_GET['id'], array('title' => '', 'content'));
 
     # We need title and content for the popup.
     if(empty($popup['title']) || empty($popup['content']))
+    {
       die(l('Invalid popup identifier'));
+    }
 
     # Now simply output the popup.
     echo '<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
