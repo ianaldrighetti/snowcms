@@ -168,7 +168,9 @@ class HTTP
   public function set_post_data($post_data)
   {
     if(is_array($post_data))
+    {
       $this->post_data = $post_data;
+    }
   }
 
   /*
@@ -203,7 +205,9 @@ class HTTP
   public function set_port($port)
   {
     if((string)$port == (string)(int)$port && $port > 0)
+    {
       $this->port = (int)$port;
+    }
   }
 
   /*
@@ -218,7 +222,9 @@ class HTTP
   public function set_timeout($timeout)
   {
     if((string)$timeout == (string)(int)$timeout && $timeout > 0)
+    {
       $this->timeout = (int)$timeout;
+    }
   }
 
   /*
@@ -233,7 +239,9 @@ class HTTP
   public function set_user_agent($user_agent)
   {
     if(is_string($user_agent))
+    {
       $this->user_agent = $user_agent;
+    }
   }
 
   /*
@@ -390,7 +398,9 @@ if(!function_exists('http_curl_request'))
     global $func;
 
     if(!is_array($request))
+    {
       return false;
+    }
 
     $ch = curl_init();
       curl_setopt($ch, CURLOPT_URL, $request['url']);
@@ -413,11 +423,15 @@ if(!function_exists('http_curl_request'))
 
     # Any referer set?
     if(!empty($request['referer']))
+    {
       curl_setopt($ch, CURLOPT_REFERER, $request['referer']);
+    }
 
     # How about a user agent?
     if(!empty($request['user_agent']))
+    {
       curl_setopt($ch, CURLOPT_USERAGENT, $request['user_agent']);
+    }
 
     # Execute the cURL session...
     $data = curl_exec($ch);
@@ -452,8 +466,10 @@ if(!function_exists('http_curl_request'))
       return $data !== false;
     }
     else
+    {
       # You just wanted the data, so here you go...
       return $data;
+    }
   }
 }
 
@@ -482,9 +498,13 @@ if(!function_exists('http_fsockopen_request'))
     global $func;
 
     if(!is_array($request))
+    {
       return false;
+    }
     elseif($num_redirects > $request['max_redirects'])
+    {
       return false;
+    }
 
     # Parse the URL... We need to for fsockopen.
     $parsed = parse_url($request['url']);
@@ -493,7 +513,9 @@ if(!function_exists('http_fsockopen_request'))
 
     # Couldn't connect...?
     if(empty($fp))
+    {
       return false;
+    }
 
     # Make our request path, used in our request, of course!
     $request_path = (!empty($parsed['path']) ? $parsed['path'] : '/'). (!empty($parsed['query']) ? '?'. $parsed['query'] : '');
@@ -505,13 +527,19 @@ if(!function_exists('http_fsockopen_request'))
       $commands .= "Host: {$parsed['host']}\r\n";
 
       if(!empty($request['resume_from']) && $request['resume_from'] > 0)
+      {
         $commands .= "Range: {$request['resume_from']}-\r\n";
+      }
 
       if(!empty($request['referer']))
+      {
         $commands .= "Referer: {$request['referer']}\r\n";
+      }
 
       if(!empty($request['user_agent']))
+      {
         $commands .= "User-Agent: {$request['user_agent']}\r\n";
+      }
 
       $commands .= "Connection: close\r\n\r\n";
     }
@@ -524,13 +552,19 @@ if(!function_exists('http_fsockopen_request'))
       $commands .= "Host: {$parsed['host']}\r\n";
 
       if(!empty($request['resume_from']) && $request['resume_from'] > 0)
+      {
         $commands .= "Range: {$request['resume_from']}-\r\n";
+      }
 
       if(!empty($request['referer']))
+      {
         $commands .= "Referer: {$request['referer']}\r\n";
+      }
 
       if(!empty($request['user_agent']))
+      {
         $commands .= "User-Agent: {$request['user_agent']}\r\n";
+      }
 
       $commands .= "Content-Type: application/x-www-form-urlencoded\r\n";
       $commands .= "Content-Length: ". strlen($post_data). "\r\n";
@@ -544,7 +578,10 @@ if(!function_exists('http_fsockopen_request'))
     # Now we can start to get the data.
     $data = '';
     while(!feof($fp))
+    {
       $data .= fgets($fp, 4096);
+    }
+
     fclose($fp);
 
     # Get the headers and data separated.
@@ -557,19 +594,25 @@ if(!function_exists('http_fsockopen_request'))
     $headers = array();
     $raw_headers = explode("\r\n", $raw_headers);
     if(count($raw_headers) > 0)
+    {
       foreach($raw_headers as $header)
       {
         $header = trim($header);
         if(empty($header) || $func['strpos']($header, ':') === false)
+        {
           continue;
+        }
 
         list($name, $content) = explode(':', $header, 2);
         $headers[$func['strtolower']($name)] = trim($content);
       }
+    }
 
     # So do we need to redirect, perhaps?
     if($func['strpos']($http_status, '302') !== false || $func['strpos']($http_status, '301') !== false || $func['strpos']($http_status, '307') !== false)
+    {
       return !empty($headers['location']) ? http_fsockopen_request(array_merge($request, array('url' => $headers['location'], 'fp' => null)), $num_redirects + 1) : false;
+    }
 
     # Okay, well, if the transfer-encoding header is not set, then we can
     # just stop here, if not, we need to do a little bit extra.
@@ -584,6 +627,7 @@ if(!function_exists('http_fsockopen_request'))
         $data = ltrim($func['substr']($data, hexdec($hex), $func['strlen']($data)));
         list($hex, $data) = explode("\r\n", $data, 2);
       }
+
       $data = $new_data;
     }
 
@@ -600,7 +644,9 @@ if(!function_exists('http_fsockopen_request'))
       return $data !== false;
     }
     else
+    {
       return $data;
+    }
   }
 }
 ?>
