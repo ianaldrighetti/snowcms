@@ -170,7 +170,7 @@ fieldset
 /* Registration form CSS */
 .form table
 {
-  text-align: center !important;
+  text-align: center;
   margin: 10px auto;
 }
 
@@ -318,4 +318,30 @@ fieldset
 .profile_view hr
 {
   border: 1px solid #000000;
+}
+
+#member_edit table
+{
+  text-align: left !important;
+}
+
+#member_edit .subtext
+{
+  font-size: 11px;
+}
+
+#member_edit .td_right
+{
+  text-align: center !important;
+}
+
+#member_edit .buttons
+{
+  text-align: center !important;
+}
+
+#member_edit input
+{
+  font-size: 14px;
+  padding: 2px;
 }

@@ -801,6 +801,9 @@ class API
   */
   public function add_group($group_identifier, $group_name)
   {
+    # Just make sure you don't have anything extra...
+    $group_identifier = trim($group_identifier);
+
     # Does the group already exist? Too bad!
     if($this->group_exists($group_identifier) || !is_string($group_identifier) || !is_string($group_name))
     {

@@ -66,7 +66,9 @@ class Members
 
     # Not an array? Easy fix!
     if(!is_array($members))
+    {
       $members = array((int)$members);
+    }
     else
     {
       if(count($members) > 0)
@@ -74,9 +76,13 @@ class Members
         foreach($members as $key => $member_id)
         {
           if((int)$member_id > 0)
+          {
             $members[$key] = (int)$member_id;
+          }
           else
+          {
             unset($members[$key]);
+          }
         }
 
         $members = array_unique($members);
@@ -93,8 +99,12 @@ class Members
     {
       # Make sure this member isn't already loaded, otherwise it is a waste of resources.
       foreach($members as $member_id)
+      {
         if(isset($this->loaded[$member_id]))
+        {
           unset($members[$member_id]);
+        }
+      }
 
       if(count($members))
       {
@@ -153,7 +163,9 @@ class Members
       $handled = true;
     }
     elseif($handled === null)
-      $handled = true;
+    {
+      $handled = false;
+    }
 
     return !empty($handled);
   }
@@ -189,9 +201,13 @@ class Members
       $api->run_hooks('members_get', array(&$member_data, $members));
 
       if($member_data == -1 && isset($this->loaded[$members]))
+      {
         $member_data = $this->loaded[$members];
+      }
       elseif($member_data == -1)
+      {
         $member_data = null;
+      }
 
       # Wanna touch it?
       $api->run_hooks('post_members_get', array(&$member_data, $members));
@@ -203,7 +219,9 @@ class Members
       # Load all those members ;)
       $member_data = array();
       foreach($members as $member_id)
+      {
         $member_data[$member_id] = $this->get($member_id);
+      }
 
       # Simple, no?
       return $member_data;
@@ -244,37 +262,57 @@ class Members
       # Now make sure that the member name and email are allowed, we don't want them to be
       # in use already, as that would be pretty bad :P
       if(!$this->name_allowed($member_name) || !$this->email_allowed($member_email) || !$this->password_allowed($member_name, $member_pass))
+      {
         return false;
+      }
 
       # How about a hash? (This hash will likely get changed eventually, but :P)
       if(!empty($options['member_hash']) && (strlen($options['member_hash']) == 0 || strlen($options['member_hash']) > 16))
+      {
         return false;
+      }
       elseif(empty($options['member_hash']))
+      {
         $options['member_hash'] = $this->rand_str(16);
+      }
 
       # Have you set a display name? Gotta check that!
       if(!empty($options['display_name']) && !$this->name_allowed($options['display_name']))
+      {
         return false;
+      }
       elseif(empty($options['display_name']))
+      {
         # We will just make your login name your display name too...
         $options['display_name'] = $member_name;
+      }
 
       # No member groups assigned? Member it is! (If the member is not an administrator, they
       # must have at least the member group assigned to them)
       if(isset($options['member_groups']) && is_array($options['member_groups']) && !in_array('administrator', $options['member_groups']) && !in_array('member', $options['member_groups']))
+      {
         return false;
+      }
       elseif(!isset($options['member_groups']) || !is_array($options['member_groups']))
+      {
         $options['member_groups'] = array('member');
+      }
 
       # Registration time can be manually set, must be greater than 0 though :P
       if(isset($options['member_registered']) && $options['member_registered'] <= 0)
+      {
         return false;
+      }
       elseif(!isset($options['member_registered']))
+      {
         $options['member_registered'] = time_utc();
+      }
 
       # An IP?
       if(empty($options['member_ip']))
+      {
         $options['member_ip'] = $member->ip();
+      }
 
       # Is the member activated?
       $options['member_activated'] = !empty($options['member_activated']) ? 1 : 0;
@@ -312,7 +350,9 @@ class Members
         if(count($data) > 0)
         {
           foreach($data as $key => $value)
+          {
             $data[$key] = array($handled, $value[0], $value[1]);
+          }
 
           $db->insert('replace', '{db->prefix}member_data',
             array(
@@ -352,7 +392,9 @@ class Members
     {
       # Make sure the name isn't too long, or too short!
       if($func['strlen']($member_name) < $settings->get('members_min_name_length', 'int', 3) || $func['strlen']($member_name) > $settings->get('members_max_name_length', 'int', 80))
+      {
         return false;
+      }
 
       # Lower it!!! (And htmlspecialchars it as well :P)
       $member_name = $func['strtolower'](htmlchars($member_name));
@@ -370,10 +412,14 @@ class Members
           if($func['strpos']($reserved_name, '*') !== false)
           {
             if(preg_match('~^'. str_replace('*', '(?:.*?)?', $reserved_name). '$~i', $member_name))
+            {
               return false;
+            }
           }
           elseif($member_name == $reserved_name)
+          {
             return false;
+          }
         }
       }
 
@@ -391,7 +437,9 @@ class Members
 
       # We find any matches?
       if($result->num_rows() > 0)
+      {
         return false;
+      }
     }
 
     # Are we still going? Then return the handled value, unless it wasn't modified,
@@ -428,12 +476,14 @@ class Members
 
       # Check the email with regex!
       if(!preg_match('~^([a-z0-9._-](\+[a-z0-9])*)+@[a-z0-9.-]+\.[a-z]{2,6}$~i', $member_email))
+      {
         return false;
+      }
 
       # Now check disallowed emails...
       $disallowed_emails = explode("\n", $func['strtolower']($settings->get('disallowed_emails', 'string')));
 
-      if(count($disallowed_emails))
+      if(count($disallowed_emails) > 0)
       {
         foreach($disallowed_emails as $disallowed_email)
         {
@@ -443,10 +493,14 @@ class Members
           if($func['strpos']($disallowed_email, '*') !== false)
           {
             if(preg_match('~^'. str_replace('*', '(?:.*?)?', $disallowed_email). '$~i', $member_email))
+            {
               return false;
+            }
           }
           elseif($member_email == $disallowed_email)
+          {
             return false;
+          }
         }
       }
 
@@ -463,7 +517,9 @@ class Members
         ), 'members_email_allowed_query');
 
       if($result->num_rows() > 0)
+      {
         return false;
+      }
     }
 
     return $handled === null ? true : !empty($handled);
@@ -497,13 +553,19 @@ class Members
     {
       # Just a low setting? So must have at least 3 characters...
       if($settings->get('password_security', 'int') == 1)
+      {
         $handled = $func['strlen']($member_pass) >= 3;
+      }
       # Must be at least 4 characters long and cannot contain their username ;)
       elseif($settings->get('password_security', 'int') == 2)
+      {
         $handled = $func['strlen']($member_pass) >= 4 && $func['stripos']($member_pass, $member_name) === false;
+      }
       # At least 5 characters in length and must contain at least 1 number.
       else
+      {
         $handled = $func['strlen']($member_pass) >= 5 && $func['stripos']($member_pass, $member_name) === false && preg_match('~[0-9]+~', $member_pass);
+      }
     }
 
     return !empty($handled);
@@ -570,7 +632,9 @@ class Members
 
         # So let's check
         if($member_pass == $row['member_pass'] || (!empty($pass_hash) && $pass_hash !== true && $member_pass == sha1($row['member_pass']. $pass_hash)))
+        {
           return true;
+        }
         else
         {
           # Maybe you would like to check..?
@@ -581,8 +645,10 @@ class Members
         }
       }
       else
+      {
         # We got nothing!
         return false;
+      }
     }
 
     return !empty($authenticated);
@@ -614,7 +680,9 @@ class Members
     if($handled === null)
     {
       if(empty($length) || $length < 1)
+      {
         $length = mt_rand(1, 100);
+      }
 
       $chars = array(
                  'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z',
@@ -624,12 +692,16 @@ class Members
 
       $str = '';
       for($i = 0; $i < $length; $i++)
+      {
         $str .= $chars[array_rand($chars)];
+      }
 
       return $str;
     }
     else
+    {
       return $str;
+    }
   }
 
   /*
@@ -646,6 +718,7 @@ class Members
 
     Note:
       For the $options parameter, these are acceptable indices to use:
+
         member_name - Their login name, however, if this is changed, their current password
                       MUST be supplied, otherwise, the update will fail (Password must
                       not be hashed yet), their member name must be supplied if their password
@@ -683,7 +756,9 @@ class Members
     global $api, $db, $func;
 
     if(count($options) == 0)
+    {
       return false;
+    }
 
     $handled = null;
     $api->run_hooks('members_update', array(&$handled, $member_id, $options));
@@ -702,7 +777,9 @@ class Members
         ), 'members_update_profile_exists');
 
       if($result->num_rows() == 0)
+      {
         return false;
+      }
       elseif(isset($options['data']))
       {
         $member_data = $options['data'];
@@ -729,7 +806,9 @@ class Members
       {
         # Only add the data if the column exists...
         if(isset($options[$column]))
+        {
           $data[$column] = $options[$column];
+        }
       }
 
       # Let's let you check the data (just incase ;)) first...
@@ -739,20 +818,32 @@ class Members
       if($handled !== false)
       {
         if(isset($data['member_groups']) && !is_array($data['member_groups']))
+        {
           $data['member_groups'] = array($data['member_groups']);
+        }
 
         # Make sure their name and password are OK, if supplied!
         if(isset($data['member_name']) && !$this->name_allowed($data['member_name'], $member_id))
+        {
           # Must be taken!
           return false;
+        }
         elseif(isset($data['member_pass']) && !$this->password_allowed(isset($data['member_name']) ? $data['member_name'] : '', $data['member_pass']))
+        {
           return false;
+        }
         elseif(isset($data['member_email']) && !$this->email_allowed($data['member_email'], $member_id))
+        {
           return false;
+        }
         elseif(isset($data['display_name']) && !$this->name_allowed($data['display_name'], $member_id))
+        {
           return false;
+        }
         elseif((isset($data['member_groups']) && !is_array($data['member_groups'])) || (isset($data['member_groups']) && (!in_array('member', $data['member_groups']) && !in_array('administrator', $data['member_groups']))))
+        {
           return false;
+        }
 
         # Remove any blank groups.
         if(isset($data['member_groups']) && count($data['member_groups']) > 0)
@@ -761,7 +852,9 @@ class Members
           foreach($data['member_groups'] as $group_id)
           {
             if(strlen(trim($group_id)) > 0)
-              $member_groups[] = $group_id;
+            {
+              $member_groups[] = trim($group_id);
+            }
           }
 
           # There, all done :-)
@@ -770,13 +863,23 @@ class Members
 
         # Now we need to hash the password, maybe!
         if(!empty($options['member_name']) && !empty($options['member_pass']))
+        {
           $data['member_pass'] = sha1($func['strtolower']($options['member_name']). $options['member_pass']);
+        }
         elseif(empty($options['admin_override']) && ((!empty($options['member_name']) && empty($options['member_pass'])) || (empty($options['member_name']) && !empty($options['member_pass']))))
+        {
           return false;
+        }
         elseif(!empty($options['admin_override']))
         {
           $data['member_acode'] = empty($data['member_acode']) ? sha1($this->rand_str(mt_rand(30, 40))) : $data['member_acode'];
           $data['member_activated'] = 11;
+        }
+
+        # Can't be a bool, the database wants an integer! Easy fix, though!
+        if(is_bool($data['member_activated']))
+        {
+          $data['member_activated'] = !empty($data['member_activated']) ? 1 : 0;
         }
 
         # Our data array could be empty, simply because they are updating member_data table information!
@@ -810,9 +913,13 @@ class Members
           foreach($member_data as $variable => $value)
           {
             if($value !== false)
+            {
               $data[] = array($member_id, $variable, $value);
+            }
             else
+            {
               $delete[] = $variable;
+            }
           }
 
           if(count($data) > 0)
@@ -877,11 +984,15 @@ class Members
     {
       # Not an array? We will fix that!!!
       if(!is_array($members))
+      {
         $members = array($members);
+      }
 
       # Yeah, we deleted nothing successfully! Ha!
-      if(!count($members))
+      if(count($members) == 0)
+      {
         return true;
+      }
 
       # Now let's just make sure they are all plausible ids...
       foreach($members as $key => $member_id)
@@ -889,7 +1000,9 @@ class Members
         $member_id = (int)$member_id;
 
         if($member_id < 1)
+        {
           unset($members[$key]);
+        }
       }
 
       $members = array_unique($members);
@@ -954,16 +1067,22 @@ class Members
     {
       # Is it a bird, a plane, an array?!
       if(!is_array($name))
+      {
         # It's not an array, yet ;)
         $name = array($name);
+      }
 
       # Nothing? Bad!
       if(count($name) == 0)
+      {
         return false;
+      }
 
       # Lowercase all the names.
       foreach($name as $key => $value)
+      {
         $name[$key] = $func['strtolower']($value);
+      }
 
       # Simple in reality...
       $result = $db->query('
@@ -979,9 +1098,12 @@ class Members
       if(count($name) == 1)
       {
         if($result->num_rows() == 0)
+        {
           return false;
+        }
 
         list(, $member_id) = $result->fetch_row();
+
         return $member_id;
       }
       else
@@ -991,10 +1113,14 @@ class Members
 
         # For now, we will assume none were found.
         foreach($names as $key => $name)
+        {
           $names[$key] = false;
+        }
 
         while($row = $result->fetch_assoc())
+        {
           $names[$row['name']] = $row['id'];
+        }
 
         return $names;
       }

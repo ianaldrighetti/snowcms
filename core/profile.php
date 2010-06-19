@@ -41,7 +41,7 @@ if(!function_exists('profile_view'))
   */
   function profile_view()
   {
-    global $api, $base_url, $member, $settings, $theme;
+    global $_GET, $api, $base_url, $member, $settings, $theme;
 
     $api->run_hooks('profile_view');
 
@@ -193,9 +193,9 @@ if(!function_exists('profile_edit'))
     Provides an interface for editing a members information.
 
     Parameters:
-      mixed $member - This is either an array containing all the members information,
-                      including their id, or an integer which is the id of the member
-                      you want to edit.
+      mixed $member_info - This is either an array containing all the members information,
+                           including their id, or an integer which is the id of the member
+                           you want to edit.
 
     Returns:
       void - Nothing is returned by this function.
@@ -203,27 +203,27 @@ if(!function_exists('profile_edit'))
     Note:
       This function is overloadable.
   */
-  function profile_edit($member)
+  function profile_edit($member_info)
   {
-    global $api, $member, $settings, $theme;
+    global $api, $base_url, $member, $settings, $theme;
 
-    $api->run_hooks('profile_edit', array(&$member));
+    $api->run_hooks('profile_edit', array(&$member_info));
 
     # We will need the Members class either way.
     $members = $api->load_class('Members');
 
     # So an array?
-    if(is_array($member))
+    if(is_array($member_info))
     {
       # Load their information (we will stil use the stuff you gave us, but
       # this will check to make sure the member actually exists).
-      $members->load((int)$member['id']);
-      $member_id = (int)$member['id'];
+      $members->load((int)$member_info['id']);
+      $member_id = (int)$member_info['id'];
     }
     else
     {
-      $members->load((int)$member);
-      $member_id = (int)$member;
+      $members->load((int)$member_info);
+      $member_id = (int)$member_info;
     }
 
     # So can they edit anothers profile?
@@ -238,7 +238,7 @@ if(!function_exists('profile_edit'))
     }
 
     # Generate the form, now!
-    profile_edit_generate_form(is_array($member) ? $member : $members->get($member_id));
+    profile_edit_generate_form(is_array($member_info) ? $member_info : $members->get($member_id));
 
     $form = $api->load_class('Form');
 
@@ -248,6 +248,10 @@ if(!function_exists('profile_edit'))
     }
 
     $theme->header();
+
+    echo '
+      <h1>', l('Editing %s\'s profile', $member_info['name']), '</h1>
+      <p>', l('You are currently editing %s\'s profile. <a href="%s" title="Back to profile">Back to profile</a>.', $member_info['name'], $base_url. '/index.php?action=profile'. ($member_info['id'] != $member->id() ? '&amp;id='. $member_info['id'] : '')), '</p>';
 
     $form->show('member_edit_'. $member_id);
 
@@ -366,6 +370,7 @@ if(!function_exists('profile_edit_generate_form'))
                                                                           'label' => l('Verify password:'),
                                                                           'subtext' => l('Just to make sure, re-enter the password.'),
                                                                           'value' => '',
+                                                                          'save' => false,
                                                                         ));
 
     # How about which groups they are in, whether they are activated or not? etc.
@@ -397,6 +402,7 @@ if(!function_exists('profile_edit_generate_form'))
       $form->add_field('member_edit_'. $member_info['id'], 'member_activated', array(
                                                                                  'type' => 'checkbox',
                                                                                  'label' => l('Account activated:'),
+                                                                                 'subtext' => l('Whether or not their account is activated. If you deactivate their account, that means they will not be able to log in.'),
                                                                                  'value' => $member_info['is_activated'],
                                                                                ));
     }
@@ -422,6 +428,7 @@ if(!function_exists('profile_edit_generate_form'))
                                                                                                 $error = l(\'The password you entered did not match your current password.\');
                                                                                                 return false;
                                                                                               }'),
+                                                                              'save' => false,
                                                                             ));
 
     # Lastly, a hidden field containing the members id. Pointless? I guess, but still :P
@@ -451,7 +458,58 @@ if(!function_exists('profile_edit_handle'))
   */
   function profile_edit_handle($data, &$errors = array())
   {
+    global $api, $base_url, $member;
 
+    $members = $api->load_class('Members');
+    $members->load($data['member_id']);
+
+    if($member_info = $members->get($data['member_id']))
+    {
+      $update_info = array(
+                       'display_name' => $data['display_name'],
+                       'member_email' => $data['member_email'],
+                     );
+
+      if(!empty($data['member_pass']))
+      {
+        $update_info['member_name'] = $member_info['username'];
+        $update_info['member_pass'] = $data['member_pass'];
+        $update_info['member_hash'] = $members->rand_str(16);
+        $redir_login = $member->id() == $member_info['id'];
+      }
+
+      if($member->can('manage_members'))
+      {
+        if(!empty($data['is_administrator']))
+        {
+          $update_info['member_groups'] = array('administrator');
+        }
+        else
+        {
+          $update_info['member_groups'] = array_merge(array('member'), $data['member_groups']);
+        }
+
+        $update_info['member_activated'] = !empty($data['member_activated']);
+      }
+
+      $members->update($member_info['id'], $update_info);
+
+      if(!empty($redir_login))
+      {
+        header('Location: '. $base_url. '/index.php?action=login&member_name='. urlencode($member_info['username']));
+      }
+      else
+      {
+        header('Location: '. $base_url. '/index.php?action=profile'. ($member->id() == $member_info['id'] ? '' : '&id='. $member_info['id']));
+      }
+
+      exit;
+    }
+    else
+    {
+      $errors[] = l('An unknown error has occurred.');
+      return false;
+    }
   }
 }
 ?>

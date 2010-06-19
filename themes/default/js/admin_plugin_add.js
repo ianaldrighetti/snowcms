@@ -1,36 +1,8 @@
 var element = null;
 
-function extract_plugin()
-{
-  s.ajaxCallback(base_url + '/index.php?action=admin&sa=ajax&id=plugins_add&step=1&sid=' + session_id, function(response)
-    {
-      var response = s.json(response);
-
-      if(typeof response['error'] != 'undefined' && response['error'].length > 0)
-      {
-        s.id('extract_status').innerHTML = '<p style="color: red; font-weight: bold;">' + response['error'] + '</p>';
-      }
-      else
-      {
-        s.id('extract_status').innerHTML = response['message'];
-        check_plugin_status();
-      }
-    }, 'filename=' + s.encode(filename));
-
-  var h3 = document.createElement('h3');
-  h3.innerHTML = l['extracting plugin'];
-
-  var div = document.createElement('div');
-  div.id = 'extract_status';
-  div.innerHTML = '<p style="font-style: italic;">' + l['please wait'] + '</p>';
-
-  element.appendChild(h3);
-  element.appendChild(div);
-}
-
 function check_plugin_status()
 {
-  s.ajaxCallback(base_url + '/index.php?action=admin&sa=ajax&id=plugins_add&step=2&sid=' + session_id, function(response)
+  s.ajaxCallback(base_url + '/index.php?action=admin&sa=ajax&id=plugins_add&step=1&sid=' + session_id, function(response)
     {
       var response = s.json(response);
 
@@ -46,11 +18,11 @@ function check_plugin_status()
 
         if(response['message']['proceed'])
         {
-          finalize_install();
+          extract_plugin();
         }
         else
         {
-          s.id('plugin_status').innerHTML += '<div style="text-align: center !important;"><a href="javascript:void(0);" onclick="prompt_finalize_install();">' + l['proceed with install'] + '</a> | <a href="javascript:void(0);" onclick="cancel_install(this);">' + l['cancel install'] + '</a></div>';
+          s.id('plugin_status').innerHTML += '<div style="text-align: center !important;"><a href="javascript:void(0);" onclick="prompt_extract_plugin();">' + l['proceed with install'] + '</a> | <a href="javascript:void(0);" onclick="cancel_install(this);">' + l['cancel install'] + '</a></div>';
         }
       }
     }, 'filename=' + s.encode(filename));
@@ -68,11 +40,39 @@ function check_plugin_status()
   element.appendChild(div);
 }
 
-function prompt_finalize_install()
+function extract_plugin()
+{
+  s.ajaxCallback(base_url + '/index.php?action=admin&sa=ajax&id=plugins_add&step=2&sid=' + session_id, function(response)
+    {
+      var response = s.json(response);
+
+      if(typeof response['error'] != 'undefined' && response['error'].length > 0)
+      {
+        s.id('extract_status').innerHTML = '<p style="color: red; font-weight: bold;">' + response['error'] + '</p>';
+      }
+      else
+      {
+        s.id('extract_status').innerHTML = response['message'];
+        finalize_install();
+      }
+    }, 'filename=' + s.encode(filename));
+
+  var h3 = document.createElement('h3');
+  h3.innerHTML = l['extracting plugin'];
+
+  var div = document.createElement('div');
+  div.id = 'extract_status';
+  div.innerHTML = '<p style="font-style: italic;">' + l['please wait'] + '</p>';
+
+  element.appendChild(h3);
+  element.appendChild(div);
+}
+
+function prompt_extract_plugin()
 {
   if(confirm(l['are you sure']))
   {
-    finalize_install();
+    extract_plugin();
   }
 }
 
@@ -116,5 +116,5 @@ function finalize_install()
 s.onload(function()
   {
     element = s.id('plugin_progress');
-    extract_plugin();
+    check_plugin_status();
   });

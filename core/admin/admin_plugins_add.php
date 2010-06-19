@@ -241,7 +241,7 @@ if(!function_exists('admin_plugins_install'))
     else
     {
       # Time for some JavaScript!
-      $theme->add_js_file(array('src' => $theme_url. '/default/js/admin_plugin_install.js'));
+      $theme->add_js_file(array('src' => $theme_url. '/default/js/admin_plugin_add.js'));
       $theme->add_js_var('filename', $_GET['install']);
       $theme->add_js_var('l', array(
                                 'extracting plugin' => l('Extracting plugin'),
@@ -329,40 +329,6 @@ if(!function_exists('admin_plugins_add_ajax'))
     }
     elseif($_GET['step'] == 1)
     {
-      # The Update class can extract a file for us.
-      $update = $api->load_class('Update');
-
-      $name = basename($filename);
-      $name = substr($name, 0, strlen($name) - 4);
-
-      # We need to make the directory.
-      if(!file_exists($plugin_dir. '/'. $name) && !@mkdir($plugin_dir. '/'. $name, 0755, true))
-      {
-        $response['error'] = l('Failed to create the temporary plugin folder. Make sure the plugins directory is writable.');
-      }
-      elseif($update->extract($filename, $plugin_dir. '/'. $name, $type))
-      {
-        # Just because it extracted doesn't mean it is a valid plugin!!!
-        if(plugin_load($plugin_dir. '/'. $name) === false)
-        {
-          $response['error'] = l('The uploaded file was not a valid plugin.');
-
-          @recursive_unlink($plugin_dir. '/'. $name);
-          @unlink($filename);
-        }
-        else
-        {
-          $response['message'] = l('The plugin was successfully extracted. Proceeding...');
-        }
-      }
-      else
-      {
-        $response['error'] = l('Failed to extract the plugin file. %s', $type);
-        @recursive_unlink($plugin_dir. '/'. $name);
-      }
-    }
-    elseif($_GET['step'] == 2)
-    {
       # An array, please :-)
       $response['message'] = array(
                                'border' => null,
@@ -418,6 +384,40 @@ if(!function_exists('admin_plugins_add_ajax'))
       else
       {
         $api->run_hooks('admin_plugins_handle_status', array(&$response['message']));
+      }
+    }
+    elseif($_GET['step'] == 2)
+    {
+      # The Update class can extract a file for us.
+      $update = $api->load_class('Update');
+
+      $name = basename($filename);
+      $name = substr($name, 0, strlen($name) - 4);
+
+      # We need to make the directory.
+      if(!file_exists($plugin_dir. '/'. $name) && !@mkdir($plugin_dir. '/'. $name, 0755, true))
+      {
+        $response['error'] = l('Failed to create the temporary plugin folder. Make sure the plugins directory is writable.');
+      }
+      elseif($update->extract($filename, $plugin_dir. '/'. $name))
+      {
+        # Just because it extracted doesn't mean it is a valid plugin!!!
+        if(plugin_load($plugin_dir. '/'. $name) === false)
+        {
+          $response['error'] = l('The uploaded file was not a valid plugin.');
+
+          @recursive_unlink($plugin_dir. '/'. $name);
+          @unlink($filename);
+        }
+        else
+        {
+          $response['message'] = l('The plugin was successfully extracted. Proceeding...');
+        }
+      }
+      else
+      {
+        $response['error'] = l('Failed to extract the plugin file.');
+        @recursive_unlink($plugin_dir. '/'. $name);
       }
     }
     elseif($_GET['step'] == 3)
