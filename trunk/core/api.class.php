@@ -38,7 +38,8 @@ class API
   private $filters;
 
   # Variable: count
-  # Keeps track of how many times, if any, an action or tag has been called.
+  # Keeps track of how many times, if any, an action or tag has been
+  # called.
   private $count;
 
   # Variable: events
@@ -53,7 +54,8 @@ class API
   private $menu;
 
   # Variable: classes
-  # Holds registered classes, which are not located within the core directory.
+  # Holds registered classes, which are not located within the core
+  # directory.
   private $classes;
 
   # Variable: objects
@@ -65,6 +67,8 @@ class API
 
   /*
     Constructor: __construct
+
+    Sets all attributes to empty arrays and what not.
 
     Parameters:
       none
@@ -100,20 +104,22 @@ class API
     Parameters:
       string $action_name - The action to attach the hook to.
       callback $callback - The callback to have ran once the action occurs.
-      int $importance - Allows you to set when your hook is ran, compared to
-                        others hooks added to the same action. The smaller
-                        the number the more important the hook is.
-      int $accepted_args - The number of arguments your hook expects to receive
-                           from the action, if any. If you keep this to the
-                           default (null), all available arguments will be passed.
+      int $importance - Allows you to set when your hook is ran, compared
+                        to others hooks added to the same action. The
+                        smaller the number the more important the hook is.
+      int $accepted_args - The number of arguments your hook expects to
+                           receive from the action, if any. If you keep
+                           this to the default (null), all available
+                           arguments will be passed.
 
     Returns:
-      bool - Returns true if the hook was added successfully, false if the hook
-             already exists, or if the callback was not callable.
+      bool - Returns true if the hook was added successfully, false if the
+             hook already exists, or if the callback was not callable.
 
     Note:
-      If you supply accepted args as a large number than is actually passed by the
-      specified action, the parameters that are "out of range" will receive null.
+      If you supply accepted args as a large number than is actually passed
+      by the specified action, the parameters that are "out of range" will
+      receive null.
   */
   public function add_hook($action_name, $callback, $importance = 10, $accepted_args = null)
   {
@@ -145,7 +151,8 @@ class API
 
     Parameters:
       string $action_name - The name of the action to remove the hook from.
-      callback $callback - The callback of the hook to remove from the action.
+      callback $callback - The callback of the hook to remove from the
+                           action.
 
     Returns:
       bool - Returns true if the hook was removed successfully, false if the
@@ -163,16 +170,18 @@ class API
     {
       if($hook['callback'] == $callback)
       {
-        # We can't just delete it, we need to make sure all the keys are sequential,
-        # otherwise, when the action is ran and the hooks sorted, things would get
-        # all screwed up, which we don't want! ;)
+        # We can't just delete it, we need to make sure all the keys are
+        # sequential, otherwise, when the action is ran and the hooks
+        # sorted, things would get all screwed up, which we don't want! ;)
         $array = array();
         $array_size = count($this->hooks[$action_name]);
         for($i = 0; $i < $array_size; $i++)
         {
           # Do the keys match? Then skip!
           if($key == $i)
+          {
             continue;
+          }
 
           # Otherwise, add it to the new array.
           $array[] = $this->hooks[$action_name][$i];
@@ -202,9 +211,9 @@ class API
       void - Nothing is returned by this method.
 
     Note:
-      If you want to allow hooks to change the value of a variable, you must
-      pass the variable as a reference inside an array, otherwise you will
-      receive an E_DEPRECATED error!
+      If you want to allow hooks to change the value of a variable, you
+      must pass the variable as a reference inside an array, otherwise
+      you will receive an E_DEPRECATED error!
   */
   public function run_hooks($action_name, $args = null)
   {
@@ -241,10 +250,14 @@ class API
       if($hook['accepted_args'] > $num_args)
       {
         for($i = 0; $i < $hook['accepted_args'] - $num_args; $i++)
+        {
           $passed_args[] = null;
+        }
       }
       elseif($hook['accepted_args'] < $num_args)
+      {
         $passed_args = array_slice($passed_args, 0, $hook['accepted_args']);
+      }
 
       call_user_func_array($hook['callback'], $passed_args);
     }
@@ -260,8 +273,8 @@ class API
       callback $callback - The callback to find.
 
     Returns:
-      bool - Returns true if the hook is registered to the specified action,
-             false if the hook was not found.
+      bool - Returns true if the hook is registered to the specified
+             action, false if the hook was not found.
   */
   public function hook_exists($action_name, $callback)
   {
@@ -296,7 +309,8 @@ class API
       void - Nothing is returned by this method.
 
     Note:
-      Original function available at <http://mschat.net/forum/index.php?topic=1609.0>.
+      Original function available at
+      <http://mschat.net/forum/index.php?topic=1609.0>.
   */
   private function sort(&$array)
   {
@@ -320,22 +334,25 @@ class API
   /*
     Method: add_filter
 
-    Adds a filter to the specified tag, which when the tag is ran, the filter
-    callback is passed the tag value.
+    Adds a filter to the specified tag, which when the tag is ran, the
+    filter callback is passed the tag value.
 
     Parameters:
       string $tag_name - The tag to add the filter to.
-      callback $callback - The filter callback.
-      int $importance - The importance of this filter compared to other filters
-                        added to the same tag. The lower the number, the sooner
-                        the filter is ran.
+      mixed $callback - The filter callback, however, this can also be a
+                        string, integer, double, etc. That way if you do
+                        not need to receive the value of the filter, and
+                        you just want to set a new value regardless!
+      int $importance - The importance of this filter compared to other
+                        filters added to the same tag. The lower the number,
+                        the sooner the filter is ran.
 
     Returns:
       bool - Returns true if the filter is added successfully, false if not.
   */
   public function add_filter($tag_name, $callback, $importance = 10)
   {
-    if(empty($tag_name) || !is_callable($callback) || $this->filter_exists($tag_name, $callback))
+    if(empty($tag_name) || $this->filter_exists($tag_name, $callback))
     {
       return false;
     }
@@ -362,14 +379,15 @@ class API
 
     Parameters:
       string $tag_name - The tag to remove the filter from.
-      callback $callback - The callback of the filter.
+      mixed $callback - The callback of the filter or the value.
 
     Returns:
-      bool - Returns true if the filter was removed, false if it was not found.
+      bool - Returns true if the filter was removed, false if it was not
+             found.
   */
   public function remove_filter($tag_name, $callback)
   {
-    if(empty($tag_name) || !is_callable($callback) || !isset($this->filters[$tag_name]) || count($this->filters[$tag_name]) == 0)
+    if(empty($tag_name) || !isset($this->filters[$tag_name]) || count($this->filters[$tag_name]) == 0)
     {
       return false;
     }
@@ -378,8 +396,8 @@ class API
     {
       if($filter['callback'] == $callback)
       {
-        # If we found it, we need to make a new array, and exclude the one to
-        # be removed, otherwise we will have sorting issues ;)
+        # If we found it, we need to make a new array, and exclude the one
+        # to be removed, otherwise we will have sorting issues ;)
         $array = array();
         $array_size = count($this->filters[$tag_name]);
         for($i = 0; $i < $array_size; $i++)
@@ -433,8 +451,16 @@ class API
 
     foreach($this->filters[$tag_name] as $filter)
     {
-      # Simple enough, really ;)
-      $value = call_user_func($filter['callback'], $value);
+      # Simple enough, really ;) Well, unless it isn't a callback!
+      if(is_callable($filter['callback']))
+      {
+        $value = call_user_func($filter['callback'], $value);
+      }
+      else
+      {
+        # The callback index is the new value...
+        $value = $filter['callback'];
+      }
     }
 
     return $value;
@@ -447,10 +473,10 @@ class API
 
     Parameters:
       string $tag_name - The name of the tag to check in.
-      callback $callback - The callback to find.
+      mixed $callback - The callback/value to find.
 
     Returns:
-      bool - Returns true if the callback was found, false if not.
+      bool - Returns true if the callback/value was found, false if not.
   */
   public function filter_exists($tag_name, $callback)
   {
@@ -475,53 +501,61 @@ class API
   /*
     Method: add_event
 
-    Adds a query string event with a callback to be executed once the event occurs.
+    Adds a query string event with a callback to be executed once the
+    event occurs.
 
     Parameters:
-      string $query_string - The query string that should be matched in order to
-                             execute the supplied callback.
+      string $query_string - The query string that should be matched in
+                             order to execute the supplied callback.
       callback $callback - The callback to associate with the event.
-      string $filename - The file which is included before the callback is executed.
-                         Not required unless the callback is not callable...
+      string $filename - The file which is included before the callback is
+                         executed. Not required unless the callback is not
+                         currently callable.
 
     Returns:
-      bool - Returns true if the event was added successfully, false if the event
-             already exists.
+      bool - Returns true if the event was added successfully, false if
+             the event already exists.
 
     Note:
-      What is an event? Say you want to have doMyAwesomeThing function called
-      when someone accesses $base_url/index.php?action=awesome, you would supply
-      action=awesome as the query string. Previously, SnowCMS had separate methods
-      to do such a thing with actions, sub actions, and request parameters, but
-      now all of that is handled via events.
+      What is an event? Say you want to have doMyAwesomeThing function
+      called when someone accesses $base_url/index.php?action=awesome, you
+      would supply action=awesome as the query string. Previously, SnowCMS
+      had separate methods to do such a thing with actions, sub actions,
+      and request parameters, but  now all of that is handled via events.
 
-      You can also specify wild cards, say you want to have blog_view_article called
-      when $base_url/index.php?blog={Some ID}, your query string would be blog=* and
-      whatever the value of blog is, it will be passed as a parameter, as is.
+      You can also specify wild cards, say you want to have
+      blog_view_article called when $base_url/index.php?blog={Some ID},
+      your query string would be blog=* and whatever the value of blog is,
+      it will be passed as a parameter, as is.
 
       This also allows the ability to do such things as
-      action=someExisting&another=action, what will occur is if the whole query string
-      is not found, the last part of the query string is chopped off (in this case,
-      &another=action) and another check would occur with just action=someExisting,
-      and if it was found, the callback would be executed.
+      action=someExisting&another=action, what will occur is if the whole
+      query string is not found, the last part of the query string is
+      chopped off (in this case, &another=action) and another check would
+      occur with just action=someExisting, and if it was found, the callback
+      would be executed.
 
-      All callbacks are expected to return a boolean value, true if everything was
-      done as should, false, if for some reason, everything was not properly executed.
-      If the function does return false, the next callback (the one below it, with the
-      last bit of the query string chopped off) would be executed.
+      All callbacks are expected to return a boolean value, true if
+      everything was done as should, false, if for some reason, everything
+      was not properly executed. If the function does return false, the
+      next callback (the one below it, with the last bit of the query
+      string chopped off) would be executed.
 
-      Also note that you cannot add an event such as blog=* and then add another event
-      called blog=help, this would cause an already exists error. Same goes for the other
-      way around, if blog=help were added, then blog=* were added, an error would occur.
+      Also note that you cannot add an event such as blog=* and then add
+      another event called blog=help, this would cause an already exists
+      error. Same goes for the other way around, if blog=help were added,
+      then blog=* were added, an error would occur.
 
-      DO NOT URL encode the query string, and also DO NOT use &amp; as a separator, you
-      must use just &.
+      DO NOT URL encode the query string, and also DO NOT use &amp; as a
+      separator, you must use just &.
 
-      Query strings are CASE SENSITIVE! so action=something is not the same as Action=something!
+      Query strings are CASE SENSITIVE! so action=something is not the
+      same as Action=something!
   */
   public function add_event($query_string, $callback, $filename = null)
   {
-    # Is the callback not callable? Does the file not exist? Does the event already exist?
+    # Is the callback not callable? Does the file not exist? Does the
+    # event already exist?
     if(empty($query_string) || (empty($filename) && !is_callable($callback)) || (!empty($filename) && !file_exists($filename)) || $this->event_exists($query_string) || !($query = $this->parse_query($query_string)))
     {
       return false;
@@ -599,10 +633,12 @@ class API
       string $query_string -The query string to remove.
 
     Returns:
-      bool - Returns true if the query string was removed, false if it was not found.
+      bool - Returns true if the query string was removed, false if it was
+             not found.
   */
   public function remove_event($query_string)
   {
+    # Bad query? Then their ain't nothin' we can do for ya!
     if(!($query = $this->parse_query($query_string)))
     {
       return false;
@@ -618,9 +654,12 @@ class API
       # Are we there yet? :P
       if($current + 1 == $count)
       {
-        # Is it set, not empty, I mean... If it isn't it doesn't exist. BREAK!
+        # Is it set, not empty, I mean... If it isn't it doesn't exist.
+        # BREAK!
         if(empty($events[$key][$value]['callback']))
+        {
           break;
+        }
 
         # Found it, delete it, done!
         unset($events[$key][$value]);
@@ -642,15 +681,15 @@ class API
   /*
     Method: return_event
 
-    Returns a registered events information according to the query string supplied.
-    The best matching event will be returned.
+    Returns a registered events information according to the query string
+    supplied. The best matching event will be returned.
 
     Parameters:
       string $query_string - The query string to get the event of.
 
     Returns:
-      array - Returns an array containing the callback, false on failure to find
-              a match.
+      array - Returns an array containing the callback, false on failure
+              to find a match.
   */
   public function return_event($query_string)
   {
@@ -691,7 +730,8 @@ class API
     Checks to see if the specified event exists.
 
     Parameters:
-      string $query_string - The query string which would trigger the event.
+      string $query_string - The query string which would trigger the
+                             event.
 
     Returns:
       bool - Returns true if the event exists, false if not.
@@ -713,7 +753,8 @@ class API
       # Are we there yet? :P
       if($current + 1 == $count)
       {
-        # Is it set, not empty, I mean... If it isn't it doesn't exist. So you can set it.
+        # Is it set, not empty, I mean... If it isn't it doesn't exist. So
+        # you can set it.
         if(empty($events[$key][$value]['callback']) && empty($events[$key]['*']['callback']))
         {
           return false;
@@ -725,8 +766,7 @@ class API
       else
       {
         # Nope.
-        $events = &$events[$key][$value]['children'
-        ];
+        $events = &$events[$key][$value]['children'];
       }
 
       $current++;
@@ -754,7 +794,9 @@ class API
       return false;
     }
 
-    # Separate by the ampersands first...
+    # Separate by the ampersands (funny word, huh? But so is any word if
+    # you repeat it enough times, go ahead, try it! ... Weird, right?)
+    # first...
     $queries = explode('&', $query_string);
     $parsed = array();
     foreach($queries as $query)
@@ -785,16 +827,16 @@ class API
   /*
     Method: add_group
 
-    Adds a group which can be assigned to members, which can be used by plugins
-    for permission checking with $member->is_a('group_identifier');
+    Adds a group which can be assigned to members, which can be used by
+    plugins for permission checking with $member->is_a('group_identifier');
 
     Parameters:
-      string $group_identifier - The groups identifier, which is stored in the
-                                 members database, an example for a page manager
-                                 would be page_manager.
-      string $group_name - The label for the group. Such as Page manager, which
-                           should be passed through the l() function before using
-                           it in this method.
+      string $group_identifier - The groups identifier, which is stored in
+                                 the members database, an example for a
+                                 page manager would be page_manager.
+      string $group_name - The label for the group. Such as Page manager,
+                           which should be passed through the l() function
+                           before using it in this method.
 
     Returns:
       bool - Returns true if the group was added successfully, false if not.
@@ -823,13 +865,15 @@ class API
       string $group_identifier - The group identifier to remove.
 
     Returns:
-      bool - Returns true if the group was removed successfully, false if not.
+      bool - Returns true if the group was removed successfully, false if
+             not.
   */
   public function remove_group($group_identifier)
   {
     $group_identifier = strtolower($group_identifier);
 
-    # Does it not exist? Then we can't remove it! Nor can you remove the member or administrator group, silly!
+    # Does it not exist? Then we can't remove it! Nor can you remove the
+    # member or administrator group, silly!
     if(!$this->group_exists($group_identifier) || $group_identifier == 'administrator' || $group_identifier == 'member')
     {
       return false;
@@ -863,13 +907,15 @@ class API
     Returns either the group name, or an array of all the registered groups.
 
     Parameters:
-      string $group_identifier - The group identifier to have the name returned.
+      string $group_identifier - The group identifier to have the name
+                                 returned.
 
     Returns:
-      mixed - Returns a string containing the groups name if the group identifier
-              was specified, and false if the group identifier was not found. If
-              the group identifier was omitted, then all groups, in an associative
-              array (group_identifier => group_name) is returned.
+      mixed - Returns a string containing the groups name if the group
+              identifier was specified, and false if the group identifier
+              was not found. If the group identifier was omitted, then all
+              groups, in an associative array
+              (group_identifier => group_name) is returned.
   */
   public function return_group($group_identifier = null)
   {
@@ -907,31 +953,40 @@ class API
     Note:
       The following indexes are supported for the $options parameter:
         href - The destination (URL) of the link.
-        name - The name of the anchor to link to (if href supplied, this is ignored,
-               and vice versa).
+
+        name - The name of the anchor to link to (if href supplied, this is
+               ignored, and vice versa).
+
         rel - Specifies the relationship between the current document
               and the one it is linking to. For example, if nofollow was
               supplied, then bots (Google, Bing, etc.) will not follow
               the link (well, they will, but it won't help them).
+
         class - Specifies a CSS class name(s) for the link.
+
         id - A unique HTML id for the tag.
+
         style - Inline styling.
+
         title - A mouseover text.
+
         content - The actual content between the tags which is linked.
+
         extra - Any extra information (which could be a string, array, etc).
-        position - A number (starting at zero), specifying at which position
-                   the link should be inserted at in the list. If 0 is supplied,
-                   the link will be placed in the front, if none supplied,
-                   the link will be added to the end. Please note that when
-                   links are retrieved they are not sorted by this number,
-                   they are sorted once it is added. So if you add two links
-                   at position 0, the first link will be second and the next
-                   will be first.
+
+        position - A number (starting at zero), specifying at which
+                   position the link should be inserted at in the list. If
+                   0 is supplied, the link will be placed in the front, if
+                   none supplied, the link will be added to the end.
+                   Please note that when links are retrieved they are not
+                   sorted by this number, they are sorted once it is added.
+                   So if you add two links at position 0, the first link
+                   will be second and the next will be first.
 
       By the way. In order to add a link to the admin menu, simply set the
-      category as action=admin. To put the link into a category, simply supply
-      the categories label in the extra field as a string, if it doesn't exist,
-      it will be created.
+      category as action=admin. To put the link into a category, simply
+      supply the categories label in the extra field as a string, if it
+      doesn't exist, it will be created.
   */
   public function add_menu_item($category, $options)
   {
@@ -994,7 +1049,9 @@ class API
         {
           # Is this where you want it to be placed?
           if($i == $position)
+          {
             $menu[] = $options;
+          }
 
           $menu[] = $this->menu[$category][$i];
         }
@@ -1087,7 +1144,9 @@ class API
         {
           $menu = array();
           foreach($this->menu[$category] as $value)
+          {
             $menu[] = $value;
+          }
 
           $this->menu[$category] = $menu;
         }
@@ -1134,7 +1193,9 @@ class API
           if(count($value) > 0)
           {
             foreach($value as $sub_value)
+            {
               $menu[] = $sub_value;
+            }
           }
         }
       }
@@ -1150,9 +1211,9 @@ class API
   /*
     Method: add_class
 
-    Registers a class in the API to allow the class to be loaded with <API::load_class>
-    without needing to specify the classes file location if the class file is not located
-    within the core directory.
+    Registers a class in the API to allow the class to be loaded with
+    <API::load_class> without needing to specify the classes file location
+    if the class file is not located within the core directory.
 
     Parameters:
       string $class - The name of the class in the file.
@@ -1215,24 +1276,26 @@ class API
   /*
     Method: load_class
 
-    Loads the specified class and returns the object. If the new parameter is set
-    to false, then the same object can be obtained through loading the same class
-    by calling on this method again.
+    Loads the specified class and returns the object. If the new parameter
+    is set to false, then the same object can be obtained through loading
+    the same class by calling on this method again.
 
     Parameters:
       string $class_name - The name of the class to load.
-      array $params - An array of parameters you want to pass to the __construct
-                      method once the class has been instantiated.
-      string $filename - The name of the where the class is defined, if the file
-                         is not specified, then $core_dir/lower($class_name).class.php
-                         is assumed.
-      bool $new - If set to true, a new and private object will be returned, if false,
-                  a reference will be stored in the API class which can be obtained
-                  later by loading the same class.
+      array $params - An array of parameters you want to pass to the
+                      __construct method once the class has been
+                      instantiated.
+      string $filename - The name of the where the class is defined, if the
+                         file is not specified, then
+                         $core_dir/lower($class_name).class.php is assumed.
+      bool $new - If set to true, a new and private object will be returned,
+                  if false, a reference will be stored in the API class
+                  which can be obtained later by loading the same class.
 
     Returns:
-      object - Returns the instantiated object of the specified class, however, if
-               the file was not found or the class did not exist, false is returned.
+      object - Returns the instantiated object of the specified class,
+               however, if the file was not found or the class did not
+               exist, false is returned.
   */
   public function load_class($class_name, $params = array(), $filename = null, $new = false)
   {
@@ -1382,7 +1445,8 @@ class API
 /*
   Function: load_api
 
-  Instantiates the API class, and also loads all enabled plugins.
+  Instantiates an instance of the API class, and also loads all enabled
+  plugins.
 
   Parameters:
     none
@@ -1397,7 +1461,8 @@ function load_api()
   ob_start();
 
   # Register a shutdown function, which calls on a function to see if the
-  # error was fatal, if it was, and caused by a plugin, it will be disabled :)
+  # error was fatal, if it was, and caused by a plugin, it will be
+  # disabled :)
   register_shutdown_function('api_catch_fatal');
 
   # We are about to load the plugins!
@@ -1407,8 +1472,8 @@ function load_api()
   # Instantiate the API class.
   $api = new API();
 
-  # Load up plugin_load and plugin_list (we don't really use it here, but hey
-  # it's for other people too!)
+  # Load up plugin_load and plugin_list (we don't really use it here, but
+  #hey it's for other people too!)
   require_once($core_dir. '/plugin.php');
 
   # Find all activated plugins, that way we can load them up.
@@ -1421,12 +1486,13 @@ function load_api()
   # Are there any activated plugins?
   if($result->num_rows() > 0)
   {
-    # Just incase the plugin doesn't actually work right, we will hold them all
-    # here, they are considered bad if our check for the plugin.php file fails.
+    # Just incase the plugin doesn't actually work right, we will hold
+    # them all here, they are considered bad if our check for the
+    # plugin.php file fails.
     $bad_plugins = array();
 
-    # The plugins array, on the other hand, is good. This is where all the plugins
-    # information, such as dependencies are held.
+    # The plugins array, on the other hand, is good. This is where all the
+    # plugins information, such as dependencies are held.
     $plugins = array();
 
     while($row = $result->fetch_assoc())
@@ -1468,9 +1534,10 @@ function load_api()
         $api->add_plugin($dependency);
       }
 
-      # Alright, one of our first hooks! :D Just a simple one that plugins can hook
-      # into when all plugins have been included (Really meant for plugins that are
-      # depended upon, so they can have hooks and what not, confusing :P)
+      # Alright, one of our first hooks! :D Just a simple one that plugins
+      # can hook into when all plugins have been included (Really meant for
+      # plugins that are depended upon, so they can have hooks and what not,
+      # confusing :P)
       $api->run_hooks('post_plugin_activation');
     }
   }
@@ -1478,7 +1545,8 @@ function load_api()
   # We have now loaded all plugins.
   $loading_plugins = false;
 
-  # Simple hook, something you can hook onto if you want to do something right before SnowCMS stops executing.
+  # Simple hook, something you can hook onto if you want to do something
+  # right before SnowCMS stops executing.
   register_shutdown_function(create_function('', '
     global $api;
 
@@ -1504,7 +1572,10 @@ function api_catch_fatal()
 
   # Not loading plugins?
   if(empty($loading_plugins))
+  {
+    # Then don't worry about it!
     return;
+  }
 
   # Only PHP 5.2.0 >= supports error_get_last :/
   if(!function_exists('error_get_last'))

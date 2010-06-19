@@ -52,7 +52,8 @@ if(!function_exists('admin_prepend'))
 
     if($member->can('access_admin_cp'))
     {
-      # Generate all the icons, done here as it is used in other places than just the control panel home.
+      # Generate all the icons, done here as it is used in other places
+      # than just the control panel home.
       $icons = array(
         l('SnowCMS') => array(
                           array(
@@ -166,11 +167,17 @@ if(!function_exists('admin_prepend'))
       foreach($icons as $header => $icon)
       {
         foreach($icon as $key => $info)
+        {
           if(empty($info['show']))
+          {
             unset($icon[$key]);
+          }
+        }
 
         if(count($icon) > 0)
+        {
           $tmp[$header] = $icon;
+        }
       }
 
       # Put it back :P
@@ -209,8 +216,10 @@ if(!function_exists('admin_prepend'))
     {
       # Not allowed to access the Admin Control Panel?
       if(!$member->can('access_admin_cp'))
+      {
         # There's a function for that. :P
         admin_access_denied();
+      }
 
       # We may require you to enter a password, for security reasons!
       admin_prompt_password();
@@ -243,8 +252,9 @@ if(!function_exists('admin_prompt_required'))
   {
     global $api, $member, $settings;
 
-    # Check to see if your last check has now timed out, quite simple really! But
-    # if you for some strange reason have it disabled, nevermind!
+    # Check to see if your last check has now timed out, quite simple
+    # really! But if you for some strange reason have it disabled,
+    # nevermind!
     if(!$settings->get('disable_admin_security', 'bool', false) && (empty($_SESSION['admin_password_prompted']) || ((int)$_SESSION['admin_password_prompted'] + ($settings->get('admin_login_timeout', 'int', 15) * 60)) < time_utc()))
     {
       return true;
@@ -274,6 +284,9 @@ if(!function_exists('admin_prompt_password'))
       mixed - This function returns nothing if password is null,
               otherwise it returns a bool, true if the password
               was correct, false if not.
+
+    Note:
+      This function is overloadable.
   */
   function admin_prompt_password($password = null)
   {
@@ -308,8 +321,10 @@ if(!function_exists('admin_prompt_password'))
 
         # Did they pass?
         if(!empty($success))
+        {
           # Yup, no need to continue!
           return;
+        }
       }
 
       $theme->set_title(l('Login'));
@@ -387,7 +402,8 @@ if(!function_exists('admin_prompt_handle'))
       array &$errors
 
     Returns:
-      bool - Returns true if the supplied password was correct, false if not.
+      bool - Returns true if the supplied password was correct, false if
+             not.
 
     Note:
       This function is overloadable.
@@ -427,12 +443,14 @@ if(!function_exists('admin_access_denied'))
   /*
     Function: admin_access_denied
 
-    Shows an error screen denying the member access to the page they requested.
+    Shows an error screen denying the member access to the page they
+    requested.
 
     Parameters:
       string $title - The title of the page, defaults to Access denied
       string $message - The error message to display, defaults to "Sorry,
-                        but you are not allowed to access the page you have requested."
+                        but you are not allowed to access the page you
+                        have requested."
 
     Returns:
       void - Nothing is returned by this function.
@@ -444,11 +462,18 @@ if(!function_exists('admin_access_denied'))
   {
     global $theme;
 
+    # No title? Just use a generic one, then.
     if(empty($title))
+    {
       $title = l('Access denied');
+    }
 
+    # No special message? We will take it that they just don't have the
+    # right to access whatever it is you are wanting to block them from :P
     if(empty($message))
+    {
       $message = l('Sorry, but you are not allowed to access the page you have requested.');
+    }
 
     $theme->set_title($title);
 

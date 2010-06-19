@@ -31,40 +31,44 @@ if(!defined('IN_SNOW'))
 class HTTP
 {
   # Variable: referer
-  # The value of the HTTP Referer header, if none set, the header is not sent.
+  # The value of the HTTP Referer header, if none set, the header is not
+  # sent.
   private $referer;
 
   # Variable: allow_redirect
-  # Whether or not you want to be redirected when a Location header is retrieved.
+  # Whether or not you want to be redirected when a Location header is
+  # retrieved.
   private $allow_redirect;
 
   # Variable: max_redirects
-  # Specifies the maximum amount of times the Location header will be allowed to redirect
-  # your request, if allow_redirect is TRUE.
+  # Specifies the maximum amount of times the Location header will be
+  # allowed to redirect  your request, if allow_redirect is true.
   private $max_redirects;
 
   # Variable: include_header
-  # Whether or not you want to have the header included with the body of the retrieved file.
+  # Whether or not you want to have the header included with the body of
+  # the retrieved file.
   private $include_header;
 
   # Variable: post_data
-  # An array (key => value) containing POST data you want sent on every remote request.
-  # However, you can also set POST data at the time of making the request, this attribute
-  # is for POST data you want sent for every remote request.
+  # An array (key => value) containing POST data you want sent on every
+  # remote request. However, you can also set POST data at the time of
+  # making the request, this attribute is for POST data you want sent for
+  # every remote request.
   private $post_data;
 
   # Variable: http_version
-  # The HTTP version to use in requests, either 1.0 or 1.1
+  # The HTTP version to use in requests, either 1.0 or 1.1.
   private $http_version;
 
   # Variable: port
-  # The port to connect through. If none specified 80 is used. If you set is_ssl to true
-  # then the port is automatically changed to 443.
+  # The port to connect through. If none specified 80 is used. If you set
+  # is_ssl to true then the port is automatically changed to 443.
   private $port;
 
   # Variable: timeout
-  # The maximum number of seconds that the downloading can take. If not specified, 5 seconds
-  # is assumed.
+  # The maximum number of seconds that the downloading can take. If not
+  # specified, 5 seconds is assumed.
   private $timeout;
 
   # Variable: user_agent
@@ -78,7 +82,8 @@ class HTTP
       int $port - The port to use when requesting a URL.
       array $post_data - The POST data to send upon each URL request.
       string $user_agent - The user agent to use in the HTTP headers.
-      int $http_version - The HTTP version to use in requests, either 1.0 or 1.1.
+      int $http_version - The HTTP version to use in requests, either 1.0
+                          or 1.1.
   */
   public function __construct($port = null, $post_data = null, $user_agent = null, $http_version = null)
   {
@@ -98,8 +103,11 @@ class HTTP
   /*
     Method: set_referer
 
+    Sets the HTTP Referer header.
+
     Parameters:
-      string referer - The HTTP referer to send in the remote request. Defaults to NULL.
+      string $referer - The HTTP referer to send in the remote request.
+                        Defaults to null.
 
     Returns:
       void - Nothing is returned by this method.
@@ -110,11 +118,29 @@ class HTTP
   }
 
   /*
-    Method: set_allow_redirect
+    Method: referer
+
+    Returns the currently set HTTP Referer.
 
     Parameters:
-      bool $allow_redirect - Whether or not to allow the remote file you are requesting redirect you.
-                             Defaults to TRUE.
+      none
+
+    Returns:
+      string - Returns the currently set HTTP Referer.
+  */
+  public function referer()
+  {
+    return $this->referer;
+  }
+
+  /*
+    Method: set_allow_redirect
+
+    Whether or not to allow redirects (HTTP Location header) at all.
+
+    Parameters:
+      bool $allow_redirect - Whether or not to allow the remote file you
+                             are requesting redirect you. Defaults to true.
 
     Returns:
       void - Nothing is returned by this method.
@@ -125,10 +151,31 @@ class HTTP
   }
 
   /*
-    Method: set_max_redirects
+    Method: allow_redirect
+
+    This will return whether or not the HTTP instance at hand is set to
+    redirect upon receiving a HTTP Location header.
 
     Parameters:
-      int $max_redirects - The maximum number of times to allow your request to be redirected. Defaults to 5.
+      none
+
+    Returns:
+      bool - Returns true if Location headers will be followed, false if not.
+  */
+  public function allow_redirect()
+  {
+    return $this->allow_redirect;
+  }
+
+  /*
+    Method: set_max_redirects
+
+    Sets the maximum number of times the Location header will be followed
+    when making a request.
+
+    Parameters:
+      int $max_redirects - The maximum number of times to allow your
+                           request to be redirected. Defaults to 5.
 
     Returns:
       void - Nothing is returned by this method.
@@ -139,11 +186,33 @@ class HTTP
   }
 
   /*
-    Method: set_include_header
+    Method: max_redirects
+
+    Returns the maximum number of times the HTTP instance will follow
+    a Location header.
 
     Parameters:
-      bool $include_header - Whether or not to have the header data along with the content retrieved from the request.
-                             Defaults to FALSE.
+      none
+
+    Returns:
+      int - Returns the maximum number of times the Location header will
+            be followed.
+  */
+  public function max_redirects()
+  {
+    return $this->max_redirects;
+  }
+
+  /*
+    Method: set_include_header
+
+    Whether or not to include the header when returning or saving the
+    data received from the request.
+
+    Parameters:
+      bool $include_header - Whether or not to have the header data along
+                             with the content retrieved from the request.
+                             Defaults to false.
 
     Returns:
       void - Nothing is returned by this method.
@@ -154,16 +223,39 @@ class HTTP
   }
 
   /*
-    Method: set_post_data
+    Method: include_header
+
+    Returns whether or not the HTTP headers will be included when the data
+    is returned or saved to a file.
 
     Parameters:
-      array $post_data - An associative array (array('key' => 'value', [...])) containing the post data to send
-                         upon every remote request.
+      none
+
+    Returns:
+      bool - Returns true if the header will be included, false if not.
+  */
+  public function include_header()
+  {
+    return $this->include_header;
+  }
+
+  /*
+    Method: set_post_data
+
+    Sets an array which will be sent as POST data to the address when
+    making a request via the <HTTP::request> method.
+
+    Parameters:
+      array $post_data - An associative array (array('key' => 'value', [...]))
+                         containing the post data to send upon every
+                         remote request.
 
     Returns:
       void - Nothing is returned by this method.
 
-    Note: You can set the post data for the specific request you are making via the method
+    Note:
+      You can set the post data for the specific request you are making
+      via the method <HTTP::request>.
   */
   public function set_post_data($post_data)
   {
@@ -174,11 +266,31 @@ class HTTP
   }
 
   /*
-    Method: set_http_version
+    Method: post_data
+
+    Returns the currently set POST data, which will be sent to the URL
+    upon making a request. This can be set when making a specific request
+    via the <HTTP::request> method.
 
     Parameters:
-      float $http_version - The version of HTTP to use when requesting the remote file.
-                            Can either be 1.0 or 1.1
+      none
+
+    Returns:
+      array - Returns an array containing the POST data.
+  */
+  public function post_data()
+  {
+    return $this->post_data;
+  }
+
+  /*
+    Method: set_http_version
+
+    The HTTP version to use when making a request via <HTTP::request>.
+
+    Parameters:
+      float $http_version - The version of HTTP to use when requesting the
+                            remote file. This can either be 1.0 or 1.1.
 
     Returns:
       void - Nothing is returned by this method.
@@ -189,18 +301,38 @@ class HTTP
   }
 
   /*
-    Method: set_port
+    Method: http_version
+
+    Returns the currently set HTTP version to use upon making a request.
 
     Parameters:
-      int $port - The port number to send the request to. Such as 80 (HTTP), 443 (HTTPS)
-                  or others.
+      none
+
+    Returns:
+      float - Returns the currently set HTTP version to use upon making a
+              request.
+  */
+  public function http_version()
+  {
+    return $this->http_version;
+  }
+
+  /*
+    Method: set_port
+
+    Sets the port number to connect to when making a request via the
+    <HTTP::request> method.
+
+    Parameters:
+      int $port - The port number to send the request to. Such as 80
+                  (HTTP), 443 (HTTPS) or others.
 
     Returns:
       void - Nothing is returned by this method.
 
     Note:
-      The port defaults to 80. If you are going to attempt to make an SSL connection
-      ensure that the server supports it via <HTTP::ssl_supported>.
+      The port defaults to 80. If you are going to attempt to make an SSL
+      connection ensure that the server supports it via <HTTP::ssl_supported>.
   */
   public function set_port($port)
   {
@@ -211,10 +343,31 @@ class HTTP
   }
 
   /*
-    Method: set_timeout
+    Method: port
+
+    Returns the currently set port, which will be connected to upon making
+    a request to the specified address via <HTTP::request>.
 
     Parameters:
-      int $timeout - In seconds, how long the request can take before timing out.
+      none
+
+    Returns:
+      int - Returns the currently set port.
+  */
+  public function port()
+  {
+    return $this->port;
+  }
+
+  /*
+    Method: set_timeout
+
+    Sets the maximum amount of time (in seconds) that the request will
+    wait before giving up on a connection.
+
+    Parameters:
+      int $timeout - In seconds, how long the request can take before
+                     timing out.
 
     Returns:
       void - Nothing is returned by this method.
@@ -228,7 +381,25 @@ class HTTP
   }
 
   /*
+    Method: timeout
+
+    Returns the currently set timeout limit.
+
+    Parameters:
+      none
+
+    Returns:
+      int - Returns the currently set timeout limit, in seconds.
+  */
+  public function timeout()
+  {
+    return $this->timeout;
+  }
+
+  /*
     Method: set_user_agent
+
+    Sets the User-Agent header for any requests made.
 
     Parameters:
       string $user_agent - The user agent to send in the request.
@@ -245,13 +416,29 @@ class HTTP
   }
 
   /*
+    Method: user_agent
+
+    Returns the currently set user agent to use in a request.
+
+    Parameters:
+      none
+
+    Returns:
+      string - Returns the user agent currently set.
+  */
+  public function user_agent()
+  {
+    return $this->user_agent;
+  }
+
+  /*
     Method: ssl_supported
 
     Parameters:
       none
 
     Returns:
-      bool - Returns TRUE if PHP supports SSL, FALSE if not.
+      bool - Returns true if PHP supports SSL, false if not.
   */
   public function ssl_supported()
   {
@@ -274,24 +461,27 @@ class HTTP
 
     Returns:
       mixed - If filename is left empty, a string containing the data from
-              the request is returned, however, FALSE on failure. If filename
-              is not left empty, TRUE will be returned if the data was saved
-              to the file successfully, FALSE on failure which could mean
-              the request as a whole failed, or the file could not be written to.
+              the request is returned, however, false on failure. If
+              filename is not left empty, true will be returned if the
+              data was saved to the file successfully, false on failure
+              which could mean the request as a whole failed, or the file
+              could not be written to.
 
     Note:
-      If the protocol of $url is https, the port is automatically changed to 443.
-      Only if the server supports SSL, otherwise the protocol is automatically
-      changed to http.
-      If $resume_from is set to 0 and $filename is set, if $filename already exists
-      then its contents will be overwritten, however, if $resume_from is set to
-      greater than 0, than the file is appended to.
-      There is an array inside which plugins can hook into (called 'request_callbacks')
-      and modify to add additional support to remote file accessing. Currently
-      SnowCMS supports cURL and fsockopen as methods of remote requesting. The order
-      in which each callback is in is the order in which SnowCMS tests to see if
-      the current PHP setup supports it. So if cURL and fsockopen are supported, cURL
-      is still used.
+      If the protocol of $url is https, the port is automatically changed
+      to 443. Only if the server supports SSL, otherwise the protocol is
+      automatically changed to http.
+
+      If $resume_from is set to 0 and $filename is set, if $filename
+      already exists then its contents will be overwritten, however, if
+      $resume_from is set to greater than 0, than the file is appended to.
+
+      There is an array inside which plugins can hook into
+      (called 'request_callbacks') and modify to add additional support to
+      remote file accessing. Currently SnowCMS supports cURL and fsockopen
+      as methods of remote requesting. cURL is preferred over fsockopen
+      (as fsockopen tends to be much slower than cURL!), so even if
+      fsockopen would work, cURL is still used.
   */
   public function request($url, $post_data = array(), $resume_from = 0, $filename = null)
   {
@@ -301,7 +491,7 @@ class HTTP
     $url = ltrim($url);
 
     # In the embedded arrays, each array is to contain two things,
-    # a test index which is a callback that returns TRUE or FALSE.
+    # a test index which is a callback that returns true or false.
     # That bool the test callback tells request whether or not the
     # remote request can be made via the callback index. The callback
     # index contains, obviously, a callback to a function which
@@ -309,8 +499,8 @@ class HTTP
     # (such as url, post_data, etc. etc.) to use in the request is passed.
     # If filename isn't empty, an index in the passed array will contain
     # the pointer to the file which you will write to via fwrite (the index
-    # being called 'fp'). The callback is to return FALSE on failure, or
-    # TRUE if all data was written to the file successfully OR the string
+    # being called 'fp'). The callback is to return false on failure, or
+    # true if all data was written to the file successfully OR the string
     # containing the retrieved data if 'fp' was empty. Capeesh? :P
     $request_callbacks = array(
       array(
@@ -384,14 +574,18 @@ if(!function_exists('http_curl_request'))
     PHP extension cURL.
 
     Parameters:
-      array $request - An array containing things such as the url, post_data,
-                       among others. Check out <HTTP::request> for more info.
+      array $request - An array containing things such as the url,
+                       post_data, among others. Check out <HTTP::request>
+                       for more info.
 
     Returns:
-      mixed - If the index in $request 'fp' is set, TRUE will be returned
-              if the file was successfully written to, FALSE on failure.
+      mixed - If the index in $request 'fp' is set, true will be returned
+              if the file was successfully written to, false on failure.
               Otherwise, a string containing the retrieved data is returned,
-              or FALSE on failure.
+              or false on failure.
+
+    Note:
+      This function is overloadable.
   */
   function http_curl_request($request)
   {
@@ -402,15 +596,34 @@ if(!function_exists('http_curl_request'))
       return false;
     }
 
+    # Get an instance of cURL going!
     $ch = curl_init();
       curl_setopt($ch, CURLOPT_URL, $request['url']);
+
+      # Any special place we are resuming from?
       curl_setopt($ch, CURLOPT_RESUME_FROM, $request['resume_from']);
+
+      # Whether or not we are following Location headers. Luckily cURL
+      # does this without needing us to do it, phew!
       curl_setopt($ch, CURLOPT_FOLLOWLOCATION, $request['allow_redirect']);
+
+      # The maximum number of times the request can be redirected.
       curl_setopt($ch, CURLOPT_MAXREDIRS, $request['max_redirects']);
+
+      # Want the header or not?
       curl_setopt($ch, CURLOPT_HEADER, $request['include_header']);
+
+      # Which version of HTTP?
       curl_setopt($ch, CURLOPT_HTTP_VERSION, $request['http_version'] == 1 ? CURL_HTTP_VERSION_1_0 : CURL_HTTP_VERSION_1_1);
+
+      # The port? Preferably 80 :P
       curl_setopt($ch, CURLOPT_PORT, $request['port']);
+
+      # How long should we wait?
       curl_setopt($ch, CURLOPT_TIMEOUT, $request['timeout']);
+
+      # We want cURL to return the data to us, otherwise upon calling
+      # curl_exec, it is just automatically displayed to the user.
       curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
       curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
 
@@ -481,17 +694,22 @@ if(!function_exists('http_fsockopen_request'))
     This function completes the specified remote request using fsockopen.L.
 
     Parameters:
-      array $request - An array containing things such as the url, post_data,
-                       among others. Check out <HTTP::request> for more info.
-      int $num_redirects - This holds the number of times that the function has
-                           followed the HTTP Location header. This is used by
-                           the function itself! So no touchy, please :)
+      array $request - An array containing things such as the url,
+                       post_data, among others. Check out <HTTP::request>
+                       for more info.
+      int $num_redirects - This holds the number of times that the
+                           function has followed the HTTP Location header.
+                           This is used by the function itself! So no
+                           touchy, please :)
 
     Returns:
-      mixed - If the index in $request 'fp' is set, TRUE will be returned
-              if the file was successfully written to, FALSE on failure.
+      mixed - If the index in $request 'fp' is set, true will be returned
+              if the file was successfully written to, false on failure.
               Otherwise, a string containing the retrieved data is returned,
-              or FALSE on failure.
+              or false on failure.
+
+    Note:
+      This function is overloadable.
   */
   function http_fsockopen_request($request, $num_redirects = 0)
   {

@@ -59,7 +59,9 @@ if(!function_exists('checkcookie_verify'))
       # Login view function exist?
       $login_view_func = $api->apply_filters('login_view_function', 'login_view');
       if(!function_exists($login_view_func))
+      {
         require_once($api->apply_filters('login_view_path', $core_dir. '/login.php'));
+      }
 
       $theme->add_meta(array('name' => 'robots', 'content' => 'noindex'));
 
