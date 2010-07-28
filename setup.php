@@ -38,4 +38,42 @@ define('IN_SNOW', true, true);
 
 # We want to see those errors...
 error_reporting(E_STRICT | E_ALL);
+
+# Remove magic quotes, if it is on...
+if((function_exists('get_magic_quotes_gpc') && @get_magic_quotes_gpc() == 1) || @ini_get('magic_quotes_sybase'))
+{
+  $_COOKIE = remove_magic($_COOKIE);
+  $_GET = remove_magic($_GET);
+  $_POST = remove_magic($_POST);
+}
+
+function remove_magic($array, $depth = 5)
+{
+  # Nothing in the array? No need!
+  if(count($array) == 0)
+  {
+    return array();
+  }
+  # Exceeded our maximum depth? Just return the array, untouched.
+  elseif($depth <= 0)
+  {
+    return $array;
+  }
+
+  foreach($array as $key => $value)
+  {
+    # Gotta remember that the key needs to have magic quote crud removed
+    # as well!
+    if(!is_array($value))
+    {
+      $array[stripslashes($key)] = stripslashes($value);
+    }
+    else
+    {
+      $array[stripslashes($key)] = remove_magic($value, $depth - 1);
+    }
+  }
+
+  return $array;
+}
 ?>

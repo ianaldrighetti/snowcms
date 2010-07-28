@@ -65,6 +65,10 @@ class API
   # Currently enabled plugins are held in this array.
   private $plugins;
 
+  # Variable: resources
+  # A resource is something such as an image, style sheet, or anything, really.
+  private $resources;
+
   /*
     Constructor: __construct
 
@@ -94,6 +98,7 @@ class API
     $this->classes = array();
     $this->objects = array();
     $this->plugins = array();
+    $this->resources = array();
   }
 
   /*
@@ -1440,6 +1445,184 @@ class API
 
     return in_array(strtolower($dependency_name), $this->plugins);
   }
+
+  /*
+    Method: add_resource
+
+    Adds a resource which will then become accessible to those browsing
+    the current website. The idea of a resource is to allow plugins to
+    have images, style sheets, JavaScript files, etc. and then instead of
+    the plugins needing to figure out their location on the server in
+    order to serve that resource directly, the API can handle that for
+    them.
+
+    Parameters:
+      string $area_name - The area under which to add the resource to,
+                          so say your plugin is a blog, you would, ideally,
+                          supply the area name as blog, or something close
+                          to that.
+      string $resource_id - An identifier for the resource, for example, if
+                            you are adding an icon which symbolizes adding
+                            a new blog post, ideally, the resource
+                            identifier would be blog_add or so. This can
+                            be left blank only if the location parameter
+                            is a callback, which would allow you to handle
+                            resource viewing yourself.
+      mixed $location - This can either be a callback, in which case the
+                        viewing of resources will be handled by the
+                        callback, and the callback will be invoked when
+                        the area is requested. However, this can also be a
+                        path to a file, of any kind, such as an image. The
+                        supplied path must exist, otherwise adding the
+                        resource will fail.
+
+    Returns:
+      bool - Returns true if the resource was added successfully, false if
+             not.
+
+    Note:
+      Resources can be accessed via:
+
+        {$base_url}/index.php?action=resource&area={$area_name}&id={$resource_id}
+
+      That is of course if a resource identifier is supplied, if not then
+      the "&id={$resource_id}" can be changed to anything.
+
+      Also note that area names are internally lowercased, however resource
+      identifiers are not!
+  */
+  public function add_resource($area_name, $resource_id, $location)
+  {
+    # Does the resource already exist?
+    if(empty($area_name) || (empty($resource_id) && !is_callable($location)) || (!empty($resource_id) && (!is_file($location) || !is_readable($location))) || $this->resource_exists($area_name, $resource_id))
+    {
+      return false;
+    }
+    # Trying to overwrite everything? To bad!
+    elseif(is_callable($location) && is_array($this->resources[strtolower($area_name)]) && count($this->resources[strtolower($area_name)]) > 0)
+    {
+      return false;
+    }
+
+    $area_name = strtolower($area_name);
+
+    if(!isset($this->resources[$area_name]))
+    {
+      $this->resources[$area_name] = array();
+    }
+
+    # Do you want to handle all the resource requests yourself? Fine by me!
+    if(is_callable($location))
+    {
+      # In that case, we just need a callback.
+      $this->resources[$area_name] = $location;
+    }
+    else
+    {
+      $this->resources[$area_name][$resource_id] = realpath($location);
+    }
+
+    return true;
+  }
+
+  /*
+    Method: remove_resource
+
+    Removes the supplied resource.
+
+    Parameters:
+      string $area_name - The area to remove the resource from.
+      string $resource_id - The resource to remove, if you want to remove
+                            all resources from the supplied area, or if
+                            the area is a callback, leave this set to null.
+
+    Returns:
+      bool - Returns true on success, false on failure.
+  */
+  public function remove_resource($area_name, $resource_id = null)
+  {
+    # We can't remove something that doesn't exist can we? Right?
+    if(empty($area_name) || !$this->resource_exists($area_name, $resource_id))
+    {
+      return false;
+    }
+
+    if(empty($resource_id))
+    {
+      unset($this->resources[strtolower($area_name)]);
+    }
+    else
+    {
+      unset($this->resources[strtolower($area_name)][$resource_id]);
+    }
+
+    return true;
+  }
+
+  /*
+    Method: resource_exists
+
+    Checks to see if the specified resource (or resource handler) exists.
+
+    Parameters:
+      string $area_name - The name of the area to check.
+      string $resource_id - The resources identifier to check the existence
+                            of.
+
+    Returns:
+      bool - Returns true if the resource exists, false if not.
+  */
+  public function resource_exists($area_name, $resource_id)
+  {
+    if(empty($area_name))
+    {
+      return false;
+    }
+
+    if(empty($resource_id))
+    {
+      return isset($this->resources[strtolower($area_name)]) && is_callable($this->resources[strtolower($area_name)]);
+    }
+    else
+    {
+      return isset($this->resources[strtolower($area_name)][$resource_id]) && !$this->resource_exists($area_name);
+    }
+  }
+
+  /*
+    Method: return_resource
+
+    Returns the resource information.
+
+    Parameters:
+      string $area_name - The name of the area which contains the resource.
+      string $resource_id - The identifier for the specific resource.
+
+    Returns:
+      mixed - Returns a string containing the path to the resource, or a
+              callback which will handle the entire resource area, or an
+              array containing all the resources in the specified area if
+              the area is not handled by a callback OR false if the area
+              or resource identifier does not exist.
+  */
+  public function return_resource($area_name, $resource_id = null)
+  {
+    # Returning a specific resource?
+    if(!empty($resource_id) && $this->resource_exists($area_name, $resource_id))
+    {
+      return $this->resources[strtolower($area_name)][$resource_id];
+    }
+    # Returning the callback for the resource, or all the available resources?
+    elseif(isset($this->resources[strtolower($area_name)]) || is_callable($this->resources[strtolower($area_name)]))
+    {
+      return $this->resources[strtolower($area_name)];
+    }
+    else
+    {
+      # Does exist, sorry!
+      return false;
+    }
+  }
 }
 
 /*
@@ -1669,6 +1852,109 @@ function api_catch_fatal()
 
         unset($path[$i]);
       }
+    }
+  }
+}
+
+if(!function_exists('api_handle_resource'))
+{
+  /*
+    Function: api_handle_resource
+
+    Handles the displaying of registered resources.
+
+    Parameters:
+      none
+
+    Returns:
+      void - Nothing is returned by this function.
+
+    Note:
+      This function is overloadable.
+  */
+  function api_handle_resource()
+  {
+    global $api, $settings;
+
+    $api->run_hooks('api_handle_resource');
+
+    # Do we have an area name?
+    if(empty($_GET['area']))
+    {
+      member_access_denied('No area supplied', 'No area of where the resource is located was supplied.');
+    }
+
+    # Why, yes, we do!!!
+    $area_name = $_GET['area'];
+
+    # Now let's check if their is a callback which will handle these resources.
+    if($callback = $api->return_resource($area_name) && is_callable($callback))
+    {
+      # Yup, there is!!!
+      call_user_func($callback);
+      exit;
+    }
+
+    # Now we need a resource identifier. So get that ;-).
+    if(empty($_GET['id']))
+    {
+      # Nope, none given.
+      member_access_denied('No resource supplied', 'No resource identifier was supplied.');
+    }
+
+    # Yup, it was...
+    $resource_id = $_GET['id'];
+
+    # Now does this resource exist?
+    if(!$api->resource_exists($area_name, $resource_id))
+    {
+      member_access_denied('Resource not found', 'The supplied resource was not found.');
+    }
+
+    # Let's get the location, shall we?
+    $location = $api->return_resource($area_name, $resource_id);
+
+    # Maybe you want to handle this? Fine with me!
+    $handled = false;
+    $api->run_hooks('api_handle_resource_location', array(&$handled, $location));
+
+    # Handled?
+    if(empty($handled))
+    {
+      # Not it was not.
+      if(ob_get_length() > 0)
+      {
+        @ob_clean();
+      }
+
+      # Time to output, once we get the content type.
+      if(function_exists('finfo_file'))
+      {
+        $ff = finfo_open(FILEINFO_MIME, $settings->get('finfo_magic_file', 'string', substr(PHP_OS, 0, 3) == 'WIN' ? 'C:\Program Files\PHP\magic' : '/usr/share/misc/file/magic.mgc'));
+        $mime_type = finfo_file($ff, $location);
+        finfo_close($ff);
+      }
+      else
+      {
+        # Use the older, alternative.
+        $mime_type = mime_content_type($location);
+      }
+
+      header('Content-Type: '. $mime_type);
+      header('Content-Length: '. filesize($location));
+
+      # Now to output.
+      $fp = fopen($location, 'rb');
+
+      while(!feof($fp))
+      {
+        echo fread($fp, 8192);
+        flush();
+      }
+
+      # Alright, we are now done!
+      fclose($fp);
+      exit;
     }
   }
 }

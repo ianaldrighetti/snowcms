@@ -79,6 +79,7 @@ function init_core()
   $api->add_event('action=register', 'register_view', $core_dir. '/register.php');
   $api->add_event('action=register2', 'register_process', $core_dir. '/register.php');
   $api->add_event('action=resend', 'resend_view', $core_dir. '/resend.php');
+  $api->add_event('action=resource', 'api_handle_resource');
   $api->add_event('action=reminder', 'reminder_view', $core_dir. '/reminder.php');
   $api->add_event('action=reminder2', 'reminder_view2', $core_dir. '/reminder.php');
   $api->add_event('action=popup', 'core_popup');

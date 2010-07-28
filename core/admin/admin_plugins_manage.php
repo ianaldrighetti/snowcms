@@ -629,21 +629,18 @@ if(!function_exists('admin_plugins_check_updates'))
           continue;
         }
 
-        # Let's check, shall we?
-        if(version_compare($request, $plugin_info['version'], '>'))
-        {
-          # Yup, there is a newer version available.
-          # So mark it in the database so you can update later!
-          $db->query('
-            UPDATE {db->prefix}plugins
-            SET available_update = {string:version_available}
-            WHERE dependency_name = {string:dependency_name}
-            LIMIT 1',
-            array(
-              'version_available' => $request,
-              'dependency_name' => $plugin_info['dependency'],
-            ), 'plugins_check_updates_query');
-        }
+        # Even if there isn't a newer version, still update the plugins
+        # information. This is just incase, for some odd reason, an update
+        # has been taken down.
+        $db->query('
+          UPDATE {db->prefix}plugins
+          SET available_update = {string:version_available}
+          WHERE dependency_name = {string:dependency_name}
+          LIMIT 1',
+          array(
+            'version_available' => version_compare($request, $plugin_info['version'], '>') ? $request : '',
+            'dependency_name' => $plugin_info['dependency'],
+          ), 'plugins_check_updates_query');
       }
     }
   }
