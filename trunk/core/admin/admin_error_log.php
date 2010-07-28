@@ -319,6 +319,8 @@ if(!function_exists('admin_error_log_view'))
 
       $theme->set_current_area('system_error_log');
 
+      $api->run_hooks('admin_error_log_view_id', array($error_id, &$error, &$error_const));
+
       $theme->set_title(l('Viewing error #%s - Error log', $error_id));
 
       $theme->header();

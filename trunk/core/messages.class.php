@@ -81,7 +81,7 @@ class Messages
     global $api, $db, $func;
 
     $handled = null;
-    $api->run_hooks('messages_load', array(&$handled, $area_name, $area_id, $cur_page, $per_page, $order, $params));
+    $api->run_hooks('messages_load', array(&$handled, &$area_name, &$area_id, &$cur_page, &$per_page, &$order, &$params));
 
     if($handled === null)
     {
@@ -251,7 +251,7 @@ class Messages
     global $api;
 
     $handled = null;
-    $api->run_hooks('messages_get', array(&$handled, $loaded_id));
+    $api->run_hooks('messages_get', array(&$handled, &$loaded_id));
 
     if($handled === null)
     {
@@ -356,15 +356,17 @@ class Messages
       int - Returns the message id on success, FALSE on failure.
 
     Note:
-      If no message_type is supplied in the options parameter, the message parameter
+      If dont_htmlchars_message is not set or false, the message parameter
       will have its contents htmlspecialchars encoded!
+
+      Same goes for dont_htmlchars_subject! ;-)
   */
   public function add($area_name, $area_id, $subject, $message, $options = array())
   {
     global $api, $db, $member;
 
     $handled = null;
-    $api->run_hooks('messages_add', array(&$handled, $area_name, $area_id, $subject, $message, $options));
+    $api->run_hooks('messages_add', array(&$handled, &$area_name, &$area_id, &$subject, &$message, &$options));
 
     if($handled === null)
     {
@@ -391,16 +393,16 @@ class Messages
         'member_name' => isset($options['member_name']) ? $options['member_name'] : $member->name(),
         'member_email' => isset($options['member_email']) ? $options['member_email'] : $member->email(),
         'member_ip' => isset($options['member_ip']) ? $options['member_ip'] : $member->ip(),
-        'subject' => $subject,
+        'subject' => !empty($options['dont_htmlchars_subject']) ? $subject : htmlchars($subject),
         'poster_time' => isset($options['poster_time']) ? $options['poster_time'] : time_utc(),
-        'message' => !empty($options['message_type']) && !empty($options['dont_htmlchars_message']) ? $message : htmlchars($message),
+        'message' => !empty($options['dont_htmlchars_message']) ? $message : htmlchars($message),
         'message_type' => !empty($options['message_type']) ? $options['message_type'] : '',
         'message_status' => isset($options['message_status']) ? $options['message_status'] : 'approved',
         'extra' => isset($options['extra']) && is_array($options['extra']) ? $options['extra'] : array(),
       );
 
       # Maybe you wanted to add something (Or change something!)?
-      $api->run_hooks('messages_add_data', array(&$columns, &$data, $options));
+      $api->run_hooks('messages_add_data', array(&$columns, &$data, &$options));
 
       # Serialize that extra array first!
       $data['extra'] = serialize(is_array($data['extra']) ? $data['extra'] : array());
@@ -440,7 +442,7 @@ class Messages
       return false;
 
     $handled = null;
-    $api->run_hooks('messages_update', array(&$handled, $area_name, $area_id, $message_id, $options));
+    $api->run_hooks('messages_update', array(&$handled, &$area_name, &$area_id, &$message_id, &$options));
 
     if($handled === null)
     {
@@ -579,11 +581,10 @@ class Messages
       }
     }
 
-      $messages = array_unique($messages);
-    }
+    $messages = array_unique($messages);
 
     $handled = null;
-    $api->run_hooks('messages_delete', array(&$handled, $area_name, $area_id, $messages));
+    $api->run_hooks('messages_delete', array(&$handled, &$area_name, &$area_id, &$messages));
 
     if($handled === null)
     {

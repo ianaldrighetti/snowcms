@@ -37,11 +37,26 @@ if(!function_exists('mime_content_type'))
       This function attempts to detect the type of the file according to
       a text file containing extensions and content types, so it won't
       be as accurate as it could be.
+
+      However, if the system detects that the Fileinfo extension for PHP
+      is installed, then that will be used instead of the crappy method.
   */
   function mime_content_type($filename)
   {
+    global $settings;
+
+    # Is the Fileinfo extension installed in your PHP setup? Even better!
+    if(function_exists('finfo_file'))
+    {
+      $ff = finfo_open(FILEINFO_MIME, $settings->get('finfo_magic_file', 'string', substr(PHP_OS, 0, 3) == 'WIN' ? 'C:\Program Files\PHP\magic' : '/usr/share/misc/file/magic.mgc'));
+      $mime_type = finfo_file($ff, $location);
+      finfo_close($ff);
+
+      # Alright, got it!
+      return $mime_type;
+    }
     # Get the extension of the file. Maybe.
-    if(strpos($filename, '.') !== false)
+    elseif(strpos($filename, '.') !== false)
     {
       # The extension is SHA-1'd ;)
       $tmp = explode('.', $filename);

@@ -5,8 +5,8 @@
     <website>http://www.snowcms.com/</website>
     <email>dev@snowcms.com</email>
   </author>
-  <dependency-name>plugins.snowcms.com/snowcms/securelogin</dependency-name>
-  <name>Secure login</name>
-  <description>The secure login plugin hooks into the login form, and right before the browser sends the login information to the server, their password gets salted and encrypted, keeping it safer in transmission.</description>
+  <dependency-name>plugins.snowcms.com/snowcms/blog</dependency-name>
+  <name>Blog</name>
+  <description>With the Blog plugin, you can add a blog of your very own to your SnowCMS powered site.</description>
   <version>1.0</version>
 </plugin-info>
