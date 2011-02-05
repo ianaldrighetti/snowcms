@@ -31,4 +31,12 @@ The first objective will be accomplished by remaking the Form class, and separat
 
 In celebration of finally leaving the alpha stages, there will be a brand new (and much better) default administrative control panel layout! Yay.
 
+=== 2.0 RC ===
+
+Just a few bugs left to squash, almost there! But just to be sure...
+
+=== 2.0 final ===
+
+Once all known bugs and issues are fixed, we can finally call SnowCMS 2.0 complete... Next stop? SnowCMS 2.1!
+
 _*This roadmap could change in the future, currently it is highly unlikely for the alpha releases to be changed at all (though some could be added), but expect more than one beta and at least one release candidate, all of which will mainly be bug fixes.*_
