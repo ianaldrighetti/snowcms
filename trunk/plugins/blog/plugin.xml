@@ -5,7 +5,7 @@
     <website>http://www.snowcms.com/</website>
     <email>dev@snowcms.com</email>
   </author>
-  <dependency-name>plugins.snowcms.com/snowcms/blog</dependency-name>
+  <guid>plugins.snowcms.com/snowcms/blog</guid>
   <name>Blog</name>
   <description>With the Blog plugin, you can add a blog of your very own to your SnowCMS powered site.</description>
   <version>1.0</version>

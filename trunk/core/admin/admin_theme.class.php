@@ -431,6 +431,16 @@ class Admin_Theme extends Theme
     {
       font-weight: bold;
     }
+
+    .red
+    {
+      color: red !important;
+    }
+
+    .green
+    {
+      color: green !important;
+    }
   </style>';
 
     # Any meta tags?

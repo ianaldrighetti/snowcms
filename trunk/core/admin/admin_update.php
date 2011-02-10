@@ -46,11 +46,30 @@ if(!function_exists('admin_update'))
 
     # Can you update the system?
     if(!$member->can('update_system'))
+    {
       # That's what I thought!
       admin_access_denied();
+    }
 
-    # We will need some JavaScript.
-    $theme->add_js_file(array('src' => $theme_url. '/default/js/admin_update.js'));
+    // When was the last time we checked for system updates? (Or do you want us to check anyways?)
+    if($settings->get('system_last_update_check', 'int', 0) < (time() + $settings->get('system_update_interval', 'int', 3600)) || isset($_REQUEST['check']))
+    {
+      $http = $api->load_class('HTTP');
+
+      $latest_version = $http->request($api->apply_filters('admin_update_version_url', 'http://download.snowcms.com/news/v2.x-line/latest.php'));
+      $latest_info = @unserialize($http->request($api->apply_filters('admin_update_version_url', 'http://download.snowcms.com/news/v2.x-line/latest.php'). '?version='. $settings->get('version', 'string')));
+
+
+    }
+    else
+    {
+      $latest_version = $settings->get('system_latest_version', 'string', null);
+      $latest_info = @unserialize($settings->get('system_latest_info', 'string', 'a:0:{}'));
+    }
+
+    // Is an update required?
+    $is_update_required = version_compare($settings->get('version', 'string'), $latest_version) == -1;
+    $latest_info = array_merge(array('header' => '', 'text' => ''), $latest_info);
 
     $theme->set_current_area('system_update');
 
@@ -62,11 +81,13 @@ if(!function_exists('admin_update'))
   <h1><img src="', $theme->url(), '/update-small.png" alt="" /> ', l('Check for updates'), '</h1>
   <p>', l('Just as with computers, it is a good idea to ensure that your system is up to date to make sure that you are not vulnerable to any security issues, or just to fix any bugs in the system.'), '</p>
   <br />
-  <p>Your version: <span id="your_version">', $settings->get('version', 'string'), '</span></p>
-  <p>Latest version: <span id="latest_version" style="font-style: italic;" title="Currently checking for the latest version. Please hold.">Checking...</span></p>
+  <p>Your version: <span class="', !empty($is_update_required) ? 'red bold' : 'green', '">', $settings->get('version', 'string'), '</span></p>
+  <p>Latest version: ', $latest_version, '</p>
 
-  <div id="response">
-  </div>';
+  <h1 style="font-size: 14px;">', l($latest_info['header']), '</h1>
+  <p>', l($latest_info['text']), '</p>
+  <br />
+  <p>', !empty($is_update_required) ? '<a href="'. $base_url. '/index.php?action=admin&amp;sa=update&amp;apply='. $latest_version. '&amp;sc='. $member->session_id(). '" title="'. l('Apply update'). '">'. l('Apply update'). '</a> | ' : '', ' <a href="', $base_url, '/index.php?action=admin&amp;sa=update&amp;check" title="', l('Check for updates'), '">', l('Check for updates'), '</a></p>';
 
     $theme->footer();
   }

@@ -177,7 +177,7 @@ class Update
     NOTE:
       The supplied $path must exist! and as specified, be writable!!!
   */
-  public function extract($filename, $path, &$type = null)
+  public function extract($filename, $path, $type = null)
   {
     global $api;
 
@@ -240,6 +240,11 @@ class Update
       {
         return false;
       }
+      else
+      {
+        // Unlock the file! Sheesh!
+        $zip->close();
+      }
     }
     elseif($type == 'tar')
     {
@@ -269,6 +274,11 @@ class Update
         {
           # That didn't work :/
           return false;
+        }
+        else
+        {
+          // Unlock the file, please.
+          $tar->close();
         }
       }
     }
