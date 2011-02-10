@@ -47,7 +47,7 @@ if(!function_exists('login_view'))
     # Are you already logged in? If you are, you don't need this!
     if($member->is_logged())
     {
-      header('Location: /');
+      redirect('index.php');
       exit;
     }
 

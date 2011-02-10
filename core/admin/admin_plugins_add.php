@@ -206,33 +206,36 @@ if(!function_exists('admin_plugins_install'))
   */
   function admin_plugins_install()
   {
-    global $api, $base_url, $member, $plugin_dir, $theme, $theme_url;
+    global $api, $base_url, $db, $member, $plugin_dir, $theme, $theme_url;
 
     $api->run_hooks('admin_plugins_install');
 
-    # Can you add plugins?
+    // Can you add plugins?
     if(!$member->can('add_plugins'))
     {
-      # That's what I thought!
+      // That's what I thought!
       admin_access_denied();
     }
 
     $theme->set_current_area('plugins_add');
 
-    # Check the session id.
+    // Check the session id.
     verify_request('get');
 
-    # Which file are you installing?
-    $filename = realpath($plugin_dir. '/'. $_GET['install']);
+    // Which file are you installing as a plugin?
+    $filename = realpath($plugin_dir. '/'. basename($_GET['install']));
+    $extension = explode('.', $filename);
 
-    # So does it exist? Is it in the plugin directory? It better be!
-    if(empty($filename) || !file_exists($filename) || !is_file($filename) || substr($filename, 0, strlen($plugin_dir)) != realpath($plugin_dir))
+    // Make sure the file exists, that it is a file, that it is within the
+    // plugin directory, and that the extension is valid.
+    if(empty($filename) || !is_file($filename) || substr($filename, 0, strlen(realpath($plugin_dir))) != realpath($plugin_dir) || count($extension) < 2 || $extension[count($extension) - 1] != 'tmp')
     {
+      // Must not be valid, from what we can tell.
       $theme->set_title(l('An error has occurred'));
 
       $theme->header();
 
-    echo '
+      echo '
   <h1><img src="', $theme->url(), '/plugins_add-small.png" alt="" /> ', l('An error has occurred'), '</h1>
   <p>', l('Sorry, but the supplied plugin file either does not exist or is not a valid file.'), '</p>';
 
@@ -240,225 +243,218 @@ if(!function_exists('admin_plugins_install'))
     }
     else
     {
-      # Time for some JavaScript!
-      $theme->add_js_file(array('src' => $theme_url. '/default/js/admin_plugin_add.js'));
-      $theme->add_js_var('filename', $_GET['install']);
-      $theme->add_js_var('l', array(
-                                'extracting plugin' => l('Extracting plugin'),
-                                'checking status' => l('Checking plugin status'),
-                                'please wait' => l('Please wait...'),
-                                'proceed with install' => l('Proceed with plugin installation'),
-                                'cancel install' => l('Cancel plugin installation'),
-                                'are you sure' => l("Are you sure you want to install this plugin?\r\nPlease be aware that damage to your website could result from the installation of this plugin."),
-                                'canceling' => l('Canceling install. Please wait...'),
-                                'finalize install' => l('Finalizing install'),
-                              ));
-
+      // Time to get to installation!
       $theme->set_title(l('Installing plugin'));
 
       $theme->header();
 
-    echo '
-  <h1><img src="', $theme->url(), '/plugins_add-small.png" alt="" /> ', l('Installing plugin'), '</h1>
-  <p>', l('Please wait while the plugin is being installed.'), '</p>
+      echo '
+    <h1><img src="', $theme->url(), '/plugins_add-small.png" alt="" /> ', l('Installing plugin'), '</h1>
+    <p>', l('Please wait while the plugin is being installed.'), '</p>
 
-  <div id="plugin_progress">
-  </div>';
+    <h3>', l('Extracting...'), '</h3>';
+
+      // The Update class will be very useful!
+      $update = $api->load_class('Update');
+
+      // Get the name of the file. Simple enough.
+      $name = substr(basename($filename), 0, strlen(basename($name)) - 4);
+
+      // We need to make the directory where the plugin will be extracted to.
+      if(!file_exists($plugin_dir. '/'. $name) && !@mkdir($plugin_dir. '/'. $name, 0755, true))
+      {
+          echo '
+    <p>', l('Failed to create the temporary plugin directory. Make sure the plugins directory is writable.'), '</p>';
+      }
+      // Try extracting the plugin.
+      elseif($update->extract($filename, $plugin_dir. '/'. $name))
+      {
+        // Just because the package could be extracted means nothing. We
+        // will use the <plugin_load> function to check to see if it is a
+        // valid plugin. If it isn't, the function will return false.
+        if(plugin_load($plugin_dir. '/'. $name) === false)
+        {
+          echo '
+  <p>', l('The uploaded package was not a valid plugin.'), '</p>';
+
+          recursive_unlink($plugin_dir. '/'. $name);
+          unlink($filename);
+        }
+        else
+        {
+          echo '
+  <p>', l('The plugin was successfully extracted. Proceeding...'), '</p>';
+
+          // The package was extracted successfully, so we can continue to
+          // the next step.
+          $package_extracted = true;
+        }
+      }
+      else
+      {
+        // Hmmm, the Update class could not extract the package. Must not be
+        // a ZIP, Tarball or Gzipped tarball. That sucks.
+        echo '
+    <p>', l('The uploaded package could not be extracted.'), '</p>';
+
+        // Delete everything. It is no use to us now.
+        recursive_unlink($plugin_dir. '/'. $name);
+        unlink($filename);
+      }
+
+      // Was the package extracted? If so, we may continue.
+      if(!empty($package_extracted))
+      {
+        // Get the current status of the plugin.
+        $status = plugin_check_status($filename, $reason);
+        $plugin_info = plugin_load($plugin_dir. '/'. $name);
+
+        // Get the status message, and the color that the message should be.
+        $response = admin_plugins_get_message($status, $plugin_info['name'], $reason);
+
+        // Is the plugin safe to proceed?
+        $install_proceed = isset($_GET['proceed']) || $status == 'approved';
+        $api->run_hooks('plugin_install_proceed', array(&$install_proceed, $status));
+
+        echo '
+  <h3>', l('Verifying plugin status'), '</h3>
+  <p style="color: ', $response['color'], '">', $response['message'], '</p>';
+
+        // Is it safe to proceed?
+        if(!empty($install_proceed))
+        {
+          // Time to make the finishing touches.
+          echo '
+  <h3>', l('Finishing install'), '</h3>';
+
+          // Add the plugin to the database.
+          $result= $db->insert('ignore', '{db->prefix}plugins',
+            array(
+              'dependency_name' => 'string-255', 'directory' => 'string-255',
+            ),
+            array(
+              $plugin_info['guid'], $name,
+            ), array('dependency_name'), 'admin_plugins_add_query');
+
+          // No rows affected? Then a plugin with the same guid already
+          // exists.
+          if($result->affected_rows() == 0)
+          {
+            // Delete it.
+            recursive_unlink($plugin_dir. '/'. $name);
+
+            echo '
+  <p>', l('A plugin with that globally unique identifier (%s) is already installed.', htmlchars($plugin_info['guid']));
+          }
+          else
+          {
+            // Is there a file which you want run once installed?
+            if(file_exists($plugin_dir. '/'. $name. '/install.php'))
+            {
+              require_once($plugin_dir. '/'. $name. '/install.php');
+              unlink($plugin_dir. '/'. $name. '/install.php');
+            }
+
+            // If there is an update file, there is no need for it now.
+            if(file_exists($plugin_dir. '/'. $name. '/update.php'))
+            {
+              unlink($plugin_dir. '/'. $name. '/update.php');
+            }
+
+            echo '
+  <p>', l('The installation was completed successfully. <a href="%s">Back to plugin management</a>.', $base_url. '/index.php?action=admin&sa=plugins_manage'), '</p>';
+          }
+
+          // We are done with the package.
+          unlink($filename);
+        }
+        else
+        {
+          // No, it's not... But you can decide to continue anyways. Just be
+          // sure you know what you are doing, and until you decide to
+          // proceed, we will delete the extracted plugin, for safety
+          // reasons.
+          recursive_unlink($plugin_dir. '/'. $name);
+
+          echo '
+  <form action="', $base_url, '/index.php" method="get" onsubmit="return confirm(\'', l('Are you sure you want to proceed with the installation of this plugin?\r\nBe sure you trust the source of this plugin.'), '\');">
+    <input type="submit" value="Proceed" />
+    <input type="hidden" name="action" value="admin" />
+    <input type="hidden" name="sa" value="plugins_add" />
+    <input type="hidden" name="install" value="', urlencode($_GET['install']), '" />
+    <input type="hidden" name="sid" value="', $member->session_id(), '" />
+    <input type="hidden" name="proceed" value="true" />
+  </form>';
+        }
+      }
 
       $theme->footer();
     }
   }
 }
 
-if(!function_exists('admin_plugins_add_ajax'))
+if(!function_exists('admin_plugins_get_message'))
 {
   /*
-    Function: admin_plugins_add_ajax
-
-    Installs the plugin through AJAX requests.
+    Function: admin_plugins_get_message
 
     Parameters:
-      none
+      string $status
+      string $plugin_name
+      string $reason
 
     Returns:
-      void - Nothing is returned by this function.
-
-    Note:
-      This function is overloadable.
+      array
   */
-  function admin_plugins_add_ajax()
+  function admin_plugins_get_message($status, $plugin_name, $reason = null)
   {
-    global $api, $base_url, $db, $member, $plugin_dir, $theme_url;
+    global $api;
 
-    if(!$member->can('add_plugins'))
+    $response = array(
+                  'color' => '',
+                  'message' => '',
+                );
+
+    // Is the package approved?
+    if($status == 'approved')
     {
-      # That's what I thought!
-      echo json_encode(array('error' => l('Access denied.')));
-      exit;
+      $response['color'] = 'green';
+      $response['message'] =  l('The plugin "%s" has been reviewed and approved by the SnowCMS Plugin Database.<br />Proceeding...', $plugin_name);
     }
-    elseif((empty($_GET['step']) || (string)$_GET['step'] != (string)(int)$_GET['step']) && $_GET['step'] != 'cancel')
+    // Disapproved?
+    elseif($status == 'disapproved')
     {
-      echo json_encode(array('error' => l('Unknown step number.')));
-      exit;
+      $response['color'] = '#DB2929';
+      $response['message'] = l('The plugin "%s" has been reviewed and disapproved by the SnowCMS Dev Team.<br />Reason: %s<br />Proceed at your own risk.', $plugin_name, !empty($reason) ? l($reason) : l('None given.'));
     }
-    elseif(empty($_GET['sid']) || $_GET['sid'] != $member->session_id())
+    // Deprecated? Pending..?
+    elseif($status == 'deprecated' || $status == 'pending')
     {
-      echo json_encode(array('error' => l('Your session id is invalid.')));
-      exit;
+      $response['color'] = '#1874CD';
+      $response['message'] = ($status == 'deprecated' ? l('The plugin "%s" is deprecated and a newer version is available at the <a href="http://plugins.snowcms.com/" target="_blank" title="SnowCMS Plugin Database">SnowCMS Plugin Database</a> site.<br />Proceed at your own risk.', $plugin_name) : l('The plugin "%s" is currently under review by the SnowCMS Plugin Database, so no definitive status can be given.<br />Proceed at your own risk.', $plugin_name));
     }
-
-    # Gotta make sure the file supplied is valid.
-    $filename = realpath($plugin_dir. '/'. $_POST['filename']);
-    $extension = explode('.', $filename);
-
-    if(empty($filename) || !file_exists($filename) || !is_file($filename) || substr($filename, 0, strlen($plugin_dir)) != realpath($plugin_dir) || count($extension) < 2 || $extension[count($extension) - 1] != 'tmp')
+    elseif(in_array($status, array('unknown', 'malicious', 'insecure')))
     {
-      echo json_encode(array('error' => l('The supplied plugin file either does not exist or is not a valid file.')));
-      exit;
+      if($status == 'unknown')
+      {
+        $response['message'] = l('The plugin "%s" is unknown to the <a href="http://plugins.snowcms.com/" target="_blank" title="SnowCMS Plugin Database">SnowCMS Plugin Database</a> site.<br />Proceed at your unknown risk.', $plugin_name);
+      }
+      elseif($status == 'malicious')
+      {
+        $response['message'] = l('The plugin "%s" has been identified as malicious and it is not recommended you continue.<br />Reason: %s<br />Proceed at your own risk.', $plugin_name, !empty($reason) ? l($reason) : l('None given.'));
+      }
+      elseif($status == 'insecure')
+      {
+        $response['message'] = l('The plugin "%s" has known security issues, it is recommended that you not continue.<br />Reason: %s<br />Proceed at your own risk.', $plugin_name, !empty($reason) ? l($reason) : l('None given.'));
+      }
+
+      $response['color'] = '#DB2929';
     }
-
-    # Our response will be held here :-)
-    $response = array('error' => '');
-
-    # Canceling? Maybe!
-    if($_GET['step'] == 'cancel')
+    else
     {
-      # Cancel it by deleting everything.
-      @recursive_unlink($plugin_dir. '/'. substr(basename($filename), 0, strlen(basename($filename)) - 4));
-      @unlink($filename);
-    }
-    elseif($_GET['step'] == 1)
-    {
-      # An array, please :-)
-      $response['message'] = array(
-                               'border' => null,
-                               'background' => null,
-                               'text' => null,
-                               'proceed' => false,
-                             );
-
-      $status = plugin_check_status($filename, $reason);
-      $plugin_info = plugin_load($plugin_dir. '/'. substr(basename($filename), 0, strlen(basename($filename)) - 4));
-
-      # Is it approved? Sweet!
-      if($status == 'approved')
-      {
-        $response['message']['border'] = '2px solid green';
-        $response['message']['background'] = '#90EE90';
-        $response['message']['text'] = '<table width="100%"><tr><td valign="middle"><img src="'. $theme_url. '/default/style/images/approved.png" alt="" title="" /></td><td valign="middle" align="center">'. l('The plugin "%s" has been reviewed and approved by the SnowCMS Dev Team.<br />Proceeding...', $plugin_info['name']). '</td></tr></table>';
-        $response['message']['proceed'] = true;
-      }
-      # Disapproved?
-      elseif($status == 'disapproved')
-      {
-        $response['message']['border'] = '2px solid #DB2929';
-        $response['message']['background'] = '#F08080';
-        $response['message']['text'] = '<table width="100%"><tr><td valign="middle"><img src="'. $theme_url. '/default/style/images/disapproved.png" alt="" title="" /></td><td valign="middle" align="center">'. l('The plugin "%s" has been reviewed and disapproved by the SnowCMS Dev Team.<br />Reason: %s<br />Proceed at your own risk.', $plugin_info['name'], !empty($reason) ? l($reason) : l('None given.')). '</td></tr></table>';
-      }
-      # Deprecated? Pending..?
-      elseif($status == 'deprecated' || $status == 'pending')
-      {
-        $response['message']['border'] = '2px solid #1874CD';
-        $response['message']['background'] = '#CAE1FF';
-        $response['message']['text'] = '<table width="100%"><tr><td valign="middle"><img src="'. $theme_url. '/default/style/images/information.png" alt="" title="" /></td><td valign="middle" align="center">'. ($status == 'deprecated' ? l('The plugin "%s" is deprecated and a newer version is available at the <a href="http://www.snowcms.com/" target="_blank" title="SnowCMS">SnowCMS</a> site.<br />Proceed at your own risk.', $plugin_info['name']) : l('The plugin "%s" is currently under review by the SnowCMS Dev Team, so no definitive status can be given.<br />Proceed at your own risk.', $plugin_info['name'])). '</td></tr></table>';
-      }
-      elseif(in_array($status, array('unknown', 'malicious', 'insecure')))
-      {
-        if($status == 'unknown')
-        {
-          $text = l('The plugin "%s" is unknown to the <a href="http://www.snowcms.com/" target="_blank" title="SnowCMS">SnowCMS</a> site.<br />Proceed at your unknown risk.', $plugin_info['name']);
-        }
-        elseif($status == 'malicious')
-        {
-          $text = l('The plugin "%s" has been identified as malicious and it is not recommended you continue.<br />Reason: %s<br />Proceed at your own risk.', $plugin_info['name'], !empty($reason) ? l($reason) : l('None given.'));
-        }
-        elseif($status == 'insecure')
-        {
-          $text = l('The plugin "%s" has known security issues, it is recommended you not continue.<br />Reason: %s<br />Proceed at your own risk.', $plugin_info['name'], !empty($reason) ? l($reason) : l('None given.'));
-        }
-
-        $response['message']['border'] = '2px solid #FCD116';
-        $response['message']['background'] = '#FFF68F';
-        $response['message']['text'] = '<table width="100%"><tr><td valign="middle"><img src="'. $theme_url. '/default/style/images/warning.png" alt="" title="" /></td><td valign="middle" align="center">'. $text. '</td></tr></table>';
-      }
-      else
-      {
-        $api->run_hooks('admin_plugins_handle_status', array(&$response['message']));
-      }
-    }
-    elseif($_GET['step'] == 2)
-    {
-      # The Update class can extract a file for us.
-      $update = $api->load_class('Update');
-
-      $name = basename($filename);
-      $name = substr($name, 0, strlen($name) - 4);
-
-      # We need to make the directory.
-      if(!file_exists($plugin_dir. '/'. $name) && !@mkdir($plugin_dir. '/'. $name, 0755, true))
-      {
-        $response['error'] = l('Failed to create the temporary plugin folder. Make sure the plugins directory is writable.');
-      }
-      elseif($update->extract($filename, $plugin_dir. '/'. $name))
-      {
-        # Just because it extracted doesn't mean it is a valid plugin!!!
-        if(plugin_load($plugin_dir. '/'. $name) === false)
-        {
-          $response['error'] = l('The uploaded file was not a valid plugin.');
-
-          @recursive_unlink($plugin_dir. '/'. $name);
-          @unlink($filename);
-        }
-        else
-        {
-          $response['message'] = l('The plugin was successfully extracted. Proceeding...');
-        }
-      }
-      else
-      {
-        $response['error'] = l('Failed to extract the plugin file.');
-        @recursive_unlink($plugin_dir. '/'. $name);
-      }
-    }
-    elseif($_GET['step'] == 3)
-    {
-      # Get the directory of where the plugin is currently at.
-      $path = $plugin_dir. '/'. substr(basename($filename), 0, strlen(basename($filename)) - 4);
-      $plugin_info = plugin_load($path);
-      $name = basename($path);
-
-      # Add the plugin to the database.
-      $result = $db->insert('ignore', '{db->prefix}plugins',
-        array(
-          'dependency_name' => 'string-255', 'directory' => 'string',
-        ),
-        array(
-          $plugin_info['dependency'], $name,
-        ), array(), 'admin_plugins_add_query');
-
-      # Does this plugin already exist?
-      if($result->affected_rows() == 0)
-      {
-        @unlink($filename);
-        @recursive_unlink($path);
-        $response['error'] = l('A plugin with that dependency name already exists!');
-      }
-      else
-      {
-        # Any install file? Run it!
-        if(file_exists($path. '/install.php'))
-        {
-          require_once($path. '/install.php');
-          @unlink($path. '/install.php');
-        }
-
-        @unlink($filename);
-
-        $response['message'] = l('Plugin installed successfully! <a href="%s">Go back to plugin management</a>.', $base_url. '/index.php?action=admin&sa=plugins_manage');
-      }
+      $api->run_hooks('admin_plugins_handle_status', array(&$response));
     }
 
-    echo json_encode($response);
+    return $response;
   }
 }
-?>

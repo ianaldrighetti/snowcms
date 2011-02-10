@@ -345,3 +345,6 @@ fieldset
   font-size: 14px;
   padding: 2px;
 }
+
+.red { color: red; }
+.green { color: green; }

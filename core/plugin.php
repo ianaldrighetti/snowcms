@@ -44,7 +44,7 @@ if(!defined('IN_SNOW'))
 
   Note:
     Here are the following indexes in the array returned:
-      string dependency - The plugins dependency name.
+      string guid - The plugins globally unique identifier.
 
       string name - The name of the plugin.
 
@@ -83,7 +83,7 @@ function plugin_load($plugin_id, $is_path = true)
         # if the dependency name matches :-).
         $plugin = plugin_load($path);
 
-        if($plugin['dependency'] == $plugin_id)
+        if($plugin['guid'] == $plugin_id)
         {
           # Found it! Just return it's information now.
           return $plugin;
@@ -107,7 +107,7 @@ function plugin_load($plugin_id, $is_path = true)
 
     # Keep track of the theme info.
     $plugin_info = array(
-                     'dependency' => null,
+                     'guid' => null,
                      'author' => null,
                      'website' => null,
                      'email' => null,
@@ -132,9 +132,9 @@ function plugin_load($plugin_id, $is_path = true)
       {
         $plugin_info['author'] = $item['value'];
       }
-      elseif($item['tag'] == 'dependency-name')
+      elseif($item['tag'] == 'guid')
       {
-        $plugin_info['dependency'] = $item['value'];
+        $plugin_info['guid'] = $item['value'];
       }
       elseif(array_key_exists($item['tag'], $plugin_info) && $item['type'] != 'close')
       {
@@ -143,7 +143,7 @@ function plugin_load($plugin_id, $is_path = true)
     }
 
     # No author? No name? No way!
-    if(empty($plugin_info['author']) || empty($plugin_info['name']) || empty($plugin_info['dependency']) || empty($plugin_info['version']))
+    if(empty($plugin_info['author']) || empty($plugin_info['name']) || empty($plugin_info['guid']) || empty($plugin_info['version']))
     {
       return false;
     }
@@ -156,6 +156,9 @@ function plugin_load($plugin_id, $is_path = true)
 
   # Add the path, just incase :P
   $plugin_info['path'] = realpath($plugin_id);
+
+  // For backwards compatibility.
+  $plugin_info['dependency'] = $plugin_info['guid'];
 
   # Now return the information.
   return $plugin_info;
@@ -258,7 +261,7 @@ function plugin_list()
 function plugin_check_status($filename, &$reason = null)
 {
   global $api;
-
+return 'malicious';
   # Does the file not exist..?
   if(!file_exists($filename))
   {

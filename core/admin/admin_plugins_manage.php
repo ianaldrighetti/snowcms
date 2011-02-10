@@ -101,6 +101,18 @@ if(!function_exists('admin_plugins_manage_generate_table'))
   {
     global $api, $base_url, $plugin_dir;
 
+    // Only display plugins for directories that exist.
+    $plugin_directories = scandir($plugin_dir);
+
+    foreach($plugin_directories as $index => $directory)
+    {
+      // We don't want ., .., or objects that are not directories.
+      if($directory == '.' || $directory == '..' || !is_dir($plugin_dir. '/'. $directory))
+      {
+        unset($plugin_directories[$index]);
+      }
+    }
+
     $table = $api->load_class('Table');
 
     # Add our table.
@@ -109,12 +121,17 @@ if(!function_exists('admin_plugins_manage_generate_table'))
                                           'db_query' => '
                                             SELECT
                                               dependency_name, directory, runtime_error, is_activated, available_update
-                                            FROM {db->prefix}plugins',
+                                            FROM {db->prefix}plugins
+                                            WHERE directory IN('. (count($plugin_directories) > 0 ? '{string_array:directories}' : 'NULL'). ')',
+                                          'db_vars' => array(
+                                                         'directories' => $plugin_directories,
+                                                       ),
                                           'primary' => 'dependency_name',
                                           'sort' => array('dependency_name', 'desc'),
                                           'options' => array(
                                                          'activate' => l('Activate'),
                                                          'deactivate' => l('Deactivate'),
+                                                         'update' => l('Update'),
                                                          'delete' => l('Delete'),
                                                        ),
                                           'callback' => 'admin_plugins_manage_table_handle',
@@ -518,6 +535,7 @@ if(!function_exists('admin_plugins_update_ajax'))
     elseif($_GET['step'] == 4)
     {
       # Add the plugin to the database (well, the new one, you never know, stuff might have changed!)
+      // !!! TODO: Probably should delete the old row first, incase the guid changed.
       $result = $db->insert('replace', '{db->prefix}plugins',
         array(
           'dependency_name' => 'string-255', 'directory' => 'string',

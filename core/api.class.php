@@ -807,7 +807,7 @@ class API
     foreach($queries as $query)
     {
       # Now by the equals sign.
-      list($key, $value) = @explode('=', $query, 2);
+      @list($key, $value) = @explode('=', $query, 2);
 
       # Is the value empty? Skip!
       if(strlen(trim($value)) == 0)

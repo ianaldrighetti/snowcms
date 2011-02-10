@@ -1,6 +1,6 @@
-----
--- Holds all the PHP errors which have occurred!
-----
+##
+# Holds all the PHP errors which have occurred!
+##
 CREATE TABLE `{db->prefix}error_log`
 (
   `error_id` INT(11) UNSIGNED NOT NULL AUTO_INCREMENT,
@@ -20,9 +20,9 @@ CREATE TABLE `{db->prefix}error_log`
   KEY (`error_type`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 
-----
--- Holds members extra information, this is what a plugin should use to store extra member stuffs!
-----
+##
+# Holds members extra information, this is what a plugin should use to store extra member stuffs!
+##
 CREATE TABLE `{db->prefix}member_data`
 (
   `member_id` INT(11) UNSIGNED NOT NULL,
@@ -31,9 +31,9 @@ CREATE TABLE `{db->prefix}member_data`
   PRIMARY KEY (`member_id`, `variable`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 
-----
--- The members table, holding, you guessed it! MEMBERS!
----
+##
+# The members table, holding, you guessed it! MEMBERS!
+#-
 CREATE TABLE `{db->prefix}members`
 (
   `member_id` INT(11) UNSIGNED NOT NULL AUTO_INCREMENT,
@@ -54,9 +54,9 @@ CREATE TABLE `{db->prefix}members`
   KEY (`member_activated`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 
-----
--- Used via the Messages API
-----
+##
+# Used via the Messages API
+##
 CREATE TABLE `{db->prefix}messages`
 (
   `area_name` VARCHAR(255) NOT NULL,
@@ -84,9 +84,9 @@ CREATE TABLE `{db->prefix}messages`
   KEY (`extra`(255))
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 
-----
--- All permissions here! ;)
-----
+##
+# All permissions here! ;)
+##
 CREATE TABLE `{db->prefix}permissions`
 (
   `group_id` VARCHAR(128) NOT NULL,
@@ -95,9 +95,9 @@ CREATE TABLE `{db->prefix}permissions`
   PRIMARY KEY (`group_id`, `permission`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 
-----
--- This is where currently enabled plugins are held
-----
+##
+# This is where currently enabled plugins are held
+##
 CREATE TABLE `{db->prefix}plugins`
 (
   `dependency_name` VARCHAR(255) NOT NULL,
@@ -110,21 +110,9 @@ CREATE TABLE `{db->prefix}plugins`
   KEY (`is_activated`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 
-----
--- Holds the search index.
-----
-CREATE TABLE `{db->prefix}search_index`
-(
-  `area_name` VARCHAR(255) NOT NULL,
-  `area_id` INT(11) UNSIGNED NOT NULL,
-  `message_id` INT(11) UNSIGNED NOT NULL,
-
-  PRIMARY KEY
-) ENGINE=MyISAM DEFAULT CHARSET=utf8;
-
-----
--- A table holding various settings and what not xD
-----
+##
+# A table holding various settings and what not xD
+##
 CREATE TABLE `{db->prefix}settings`
 (
   `variable` VARCHAR(255) NOT NULL,
@@ -132,16 +120,16 @@ CREATE TABLE `{db->prefix}settings`
   PRIMARY KEY (`variable`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 
-INSERT INTO `{db->prefix}settings` (`variable`, `value`) VALUES('show_version', 1),('version', '2.0 SVN'),('password_security', 1),('reserved_names', ''),('disallowed_emails', ''),('default_event', '');
+INSERT INTO `{db->prefix}settings` (`variable`, `value`) VALUES('show_version', 1),('version', '2.0dev'),('password_security', 1),('reserved_names', ''),('disallowed_emails', ''),('default_event', '');
 INSERT INTO `{db->prefix}settings` (`variable`, `value`) VALUES('enable_tasks', 1),('site_name', 'SnowCMS'),('site_email', ''),('theme', 'default'),('max_tasks', 2);
 INSERT INTO `{db->prefix}settings` (`variable`, `value`) VALUES('registration_enabled', 1),('registration_type', 0),('enable_utf8', 1),('members_min_name_length', 3),('members_max_name_length', 80),('errors_log', 1);
 INSERT INTO `{db->prefix}settings` (`variable`, `value`) VALUES('mail_handler', 'mail'),('smtp_host', 'localhost'),('smtp_port', 25),('smtp_is_tls', 0),('smtp_timeout', 5),('smtp_user', ''),('smtp_pass', '');
 INSERT INTO `{db->prefix}settings` (`variable`, `value`) VALUES('mail_additional_parameters', ''),('default_member_groups', 'member'),('disable_admin_security', 0),('admin_login_timeout', 15),('admin_news_fetch_every', 43200);
 INSERT INTO `{db->prefix}settings` (`variable`, `value`) VALUES('date_format', '%B %d, %Y'),('time_format', '%I:%M:%S %p'),('datetime_format', '%B %d, %Y, %I:%M:%S %p');
 
-----
--- Need to do something?
-----
+##
+# Need to do something?
+##
 CREATE TABLE `{db->prefix}tasks`
 (
   `task_name` VARCHAR(255) NOT NULL,
@@ -160,9 +148,9 @@ CREATE TABLE `{db->prefix}tasks`
 
 INSERT INTO `{db->prefix}tasks` (`task_name`, `file`, `location`, `func`) VALUES('plugins_update_check', 'admin/admin_plugins_manage.php', 'core_dir', 'admin_plugins_check_updates');
 
-----
--- Holds registered tokens...
-----
+##
+# Holds registered tokens...
+##
 CREATE TABLE `{db->prefix}tokens`
 (
   `session_id` VARCHAR(150) NOT NULL,
@@ -173,9 +161,9 @@ CREATE TABLE `{db->prefix}tokens`
   KEY (`token_registered`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 
-----
--- Holds uploaded files, well, the files information that is.
-----
+##
+# Holds uploaded files, well, the files information that is.
+##
 CREATE TABLE `{db->prefix}uploads`
 (
   `area_name` VARCHAR(255) NOT NULL,

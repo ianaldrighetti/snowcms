@@ -5,7 +5,7 @@
     <website>http://www.snowcms.com/</website>
     <email>dev@snowcms.com</email>
   </author>
-  <dependency-name>plugins.snowcms.com/snowcms/menu-manager</dependency-name>
+  <guid>plugins.snowcms.com/snowcms/menu-manager</guid>
   <name>Menu Manager</name>
   <description>Provides an interface to managing the menus in your sites theme.</description>
   <version>1.0</version>

@@ -327,13 +327,16 @@ if(!function_exists('admin_prompt_password'))
         }
       }
 
-      $theme->set_title(l('Login'));
+      $theme->set_title(l('Log in'));
 
       $theme->header();
 
       echo '
       <h1>', l('Login'), '</h1>
-      <p>', l('For security purposes, please enter your account password below. This is done to help make sure that you are who you say you are.'), '</p>';
+      <p>', l('For security purposes, please enter your account password below. This is done to help make sure that you are who you say you are.'), '</p>
+      <script type="text/javascript">
+        s.onload(function() { document.getElementById(\'admin_prompt_form_admin_verification_password_input\').focus(); });
+      </script>';
 
       $form->show('admin_prompt_form');
 
