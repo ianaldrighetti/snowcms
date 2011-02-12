@@ -357,7 +357,7 @@ class Update
             {
               foreach($append as $a)
               {
-                $tmp[] = $file. '/'. $a;
+                $tmp[] = $file. $a;
               }
             }
           }
