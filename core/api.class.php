@@ -799,26 +799,30 @@ class API
       return false;
     }
 
-    # Separate by the ampersands (funny word, huh? But so is any word if
-    # you repeat it enough times, go ahead, try it! ... Weird, right?)
-    # first...
+    // Separate by the ampersands (funny word, huh? But so is any word if
+    // you repeat it enough times, go ahead, try it! ... Weird, right?)
+    // first...
     $queries = explode('&', $query_string);
     $parsed = array();
     foreach($queries as $query)
     {
-      # Now by the equals sign.
-      @list($key, $value) = @explode('=', $query, 2);
-
-      # Is the value empty? Skip!
-      if(strlen(trim($value)) == 0)
+      // Now by the equals sign. Maybe.
+      if(strpos($query, '=') !== false)
       {
-        continue;
+        list($key, $value) = explode('=', $query, 2);
+      }
+      else
+      {
+        // This is still valid, but the value will be set to true.
+        $key = $query;
+        $value = true;
       }
 
+      // Save it!
       $parsed[$key] = $value;
     }
 
-    # Empty? Not good either!
+    // Empty? Not good either!
     if(count($parsed) == 0)
     {
       return false;

@@ -327,6 +327,7 @@ if(!function_exists('admin_plugins_update'))
     # Which file are you installing?
     $dependency_name = $_GET['update'];
     $plugin_info = plugin_load($dependency_name, false);
+    $version = basename($_GET['version']);
 
     # So does it exist? Is it in the plugin directory? It better be!
     if(empty($plugin_info))
@@ -337,38 +338,60 @@ if(!function_exists('admin_plugins_update'))
 
     echo '
   <h1><img src="', $theme->url(), '/plugins_manage-small.png" alt="" /> ', l('An error has occurred'), '</h1>
-  <p>', l('Sorry, but the plugin you are wanting to update is not installed.'), '</p>';
+  <p>', l('Sorry, but the plugin you are wanting to update does not exist.'), '</p>';
 
       $theme->footer();
     }
     else
     {
-      # Time for some JavaScript!
-      $theme->add_js_file(array('src' => $theme_url. '/default/js/admin_plugin_update.js'));
-      $theme->add_js_var('dependency_name', $_GET['update']);
-      $theme->add_js_var('version', $_GET['version']);
-      $theme->add_js_var('l', array(
-                                'downloading update' => l('Downloading update'),
-                                'extracting plugin' => l('Extracting plugin'),
-                                'checking status' => l('Checking plugin status'),
-                                'please wait' => l('Please wait...'),
-                                'proceed with install' => l('Proceed with plugin installation'),
-                                'cancel install' => l('Cancel plugin installation'),
-                                'are you sure' => l("Are you sure you want to install this plugin?\r\nPlease be aware that damage to your website could result from the installation of this plugin."),
-                                'canceling' => l('Canceling install. Please wait...'),
-                                'finalize install' => l('Finalizing update'),
-                              ));
-
       $theme->set_title(l('Updating plugin'));
 
       $theme->header();
 
-    echo '
+      echo '
   <h1><img src="', $theme->url(), '/plugins_manage-small.png" alt="" /> ', l('Updating plugin'), '</h1>
   <p>', l('Please wait while we are updating the %s plugin.', $plugin_info['name']), '</p>
 
-  <div id="plugin_progress">
-  </div>';
+  <h3>', l('Downloading update'), '</h3>';
+
+      // The HTTP class is always useful.
+      $http = $api->load_class('HTTP');
+
+      // Hmm, make a POST request to the plugins GUID, with the version we
+      // want... Be sure to store it in a file for later use!
+      if(!$http->request('http://'. $plugin_info['guid'], array('download' => 1, 'version' => $version), 0, $plugin_info['path']. '/update-package'))
+      {
+        echo '
+  <p class="red">', l('The update package version "%s" was not found. Update process failed.', $version), '</p>';
+      }
+      else
+      {
+        // !!! May not be required !!!
+        file_put_contents($plugin_info['path']. '/previous-version', $plugin_info['version']);
+
+        echo '
+  <p class="green">', l('The update package was successfully downloaded. Proceeding...'), '</p>
+
+  <h3>', l('Verifying plugin status'), '</h3>';
+
+        // We need a file which has the <plugin_check_status> function,
+        // which we really need.
+        require_once($core_dir. '/admin/admin_plugins_add.php');
+
+        // So get the status, please.
+        $status = plugin_check_status($plugin_info['path']. '/update-package', $reason);
+
+        // This next function interprets the status message into something
+        // slightly more useful, to real people, that is.
+        $response = admin_plugins_get_message($status, $plugin_info['name'], $reason);
+
+        // So, shall we proceed?
+        $update_proceed = isset($_GET['proceed']) || $status == 'approved';
+        $api->run_hooks('plugin_install_proceed', array(&$update_proceed, $status));
+
+        echo '
+  <p style="color: ', $response['color'], '">', $response['message'], '</p>';
+      }
 
       $theme->footer();
     }
@@ -393,66 +416,7 @@ if(!function_exists('admin_plugins_update_ajax'))
   */
   function admin_plugins_update_ajax()
   {
-    global $api, $base_url, $db, $member, $plugin_dir, $theme_url;
-
-    if(!$member->can('manage_plugins'))
-    {
-      # That's what I thought!
-      echo json_encode(array('error' => l('Access denied.')));
-      exit;
-    }
-    elseif((empty($_GET['step']) || (string)$_GET['step'] != (string)(int)$_GET['step']) && $_GET['step'] != 'cancel')
-    {
-      echo json_encode(array('error' => l('Unknown step number.')));
-      exit;
-    }
-    elseif(empty($_GET['sid']) || $_GET['sid'] != $member->session_id())
-    {
-      echo json_encode(array('error' => l('Your session id is invalid.')));
-      exit;
-    }
-
-    # Gotta make sure the plugin you want to update is valid.
-    $dependency_name = isset($_POST['dependency_name']) ? $_POST['dependency_name'] : '';
-    $version = isset($_POST['version']) ? $_POST['version'] : '';
-
-    $plugin_info = plugin_load($dependency_name, false);
-
-    if(empty($dependency_name) || empty($version) || empty($plugin_info))
-    {
-      echo json_encode(array('error' => l('The plugin you are wanting to update is not installed.')));
-      exit;
-    }
-
-    # Our response will be held here :-)
-    $response = array('error' => '');
-
-    # Canceling? Maybe!
-    if($_GET['step'] == 'cancel')
-    {
-      @recursive_unlink($plugin_info['path']. '/update~/');
-      @unlink($plugin_info['path']. '/update-package');
-      @unlink($plugin_info['path']. '/previous-version');
-    }
-    elseif($_GET['step'] == 1)
-    {
-      # Downloading the update are we? Alright.
-      $http = $api->load_class('HTTP');
-
-      # Download it! Maybe... (Return a 404 if the update version is invalid/unknown!!!)
-      if($http->request('http://'. $plugin_info['dependency'], array('download' => 1, 'version' => $version), 0, $plugin_info['path']. '/update-package'))
-      {
-        # Write the current version (well, will be previous) of the plugin in a file!
-        $success = file_put_contents($plugin_info['path']. '/previous-version', $plugin_info['version']);
-
-        $response['message'] = l('Plugin update package downloaded successfully. Proceeding... %s', print_r($success, true));
-      }
-      else
-      {
-        $response['error'] = l('The update package for the version %s was not found.', htmlchars($version));
-      }
-    }
-    elseif($_GET['step'] == 2)
+    if($_GET['step'] == 2)
     {
       # An array, please :-)
       $response['message'] = array(
