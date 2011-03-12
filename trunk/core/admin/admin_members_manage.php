@@ -129,7 +129,7 @@ if(!function_exists('admin_members_manage_generate_table'))
                                                                       'function' => create_function('$row', '
                                                                                       global $base_url;
 
-                                                                                      return l(\'<a href="%s/index.php?action=admin&amp;sa=members_manage&amp;id=%s" title="Edit %s\\\'s account">%s</a>\', $base_url, $row[\'member_id\'], $row[\'display_name\'], $row[\'display_name\']);'),
+                                                                                      return l(\'<a href="%s/index.php?action=profile&amp;id=%s" title="Edit %s\\\'s account">%s</a>\', $base_url, $row[\'member_id\'], $row[\'display_name\'], $row[\'display_name\']);'),
                                                                     ));
 
     # How about that email? :P

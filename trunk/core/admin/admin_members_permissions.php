@@ -345,7 +345,7 @@ if(!function_exists('admin_members_permissions_handle'))
     {
       # You can add more DENIED permissions via the guest_denied_permissions hook ;)
       # (Sorry, but I will not allow plugins to remove denied permissions, at least built in functionality)
-      $denied = array_merge(array('manage_system_settings', 'manage_themes', 'update_system', 'view_error_log', 'add_new_member', 'manage_members', 'search_members', 'manage_member_settings', 'manage_permissions', 'add_plugins', 'manage_plugins', 'manage_plugin_settings'), $api->apply_filters('denied_guest_permissions', array()));
+      $denied = array_merge(array('manage_system_settings', 'manage_themes', 'update_system', 'view_error_log', 'add_new_member', 'manage_members', 'search_members', 'manage_member_settings', 'manage_permissions', 'add_plugins', 'manage_plugins', 'manage_plugin_settings', 'edit_other_profiles'), $api->apply_filters('denied_guest_permissions', array()));
 
       foreach($denied as $deny)
       {

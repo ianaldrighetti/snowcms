@@ -252,13 +252,16 @@ if(!function_exists('admin_plugins_install'))
     <h1><img src="', $theme->url(), '/plugins_add-small.png" alt="" /> ', l('Installing plugin'), '</h1>
     <p>', l('Please wait while the plugin is being installed.'), '</p>
 
-    <h3>', l('Extracting...'), '</h3>';
+    <h3>', l('Extracting plugin'), '</h3>';
 
       // The Update class will be very useful!
       $update = $api->load_class('Update');
 
-      // Get the name of the file. Simple enough.
-      $name = substr(basename($filename), 0, strlen(basename($name)) - 4);
+      // Get the name of the file.
+      $name = explode('.', $filename, 2);
+
+      // and just the first index.
+      $name = $name[0];
 
       // We need to make the directory where the plugin will be extracted to.
       if(!file_exists($plugin_dir. '/'. $name) && !@mkdir($plugin_dir. '/'. $name, 0755, true))
