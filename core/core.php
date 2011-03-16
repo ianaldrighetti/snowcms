@@ -67,6 +67,7 @@ function init_core()
   $api->add_event('action=admin&sa=plugins_settings', 'admin_plugins_settings', $core_dir. '/admin/admin_plugins_settings.php');
   $api->add_event('action=admin&sa=settings', 'admin_settings', $core_dir. '/admin/admin_settings.php');
   $api->add_event('action=admin&sa=themes', 'admin_themes', $core_dir. '/admin/admin_themes.php');
+  $api->add_event('action=admin&sa=themes&install=*', 'admin_themes_install', $core_dir. '/admin/admin_themes.php');
   $api->add_event('action=admin&sa=update', 'admin_update', $core_dir. '/admin/admin_update.php');
   $api->add_event('action=checkcookie', 'checkcookie_verify', $core_dir. '/checkcookie.php');
   $api->add_event('action=login', 'login_view', $core_dir. '/login.php');

@@ -220,7 +220,7 @@ if(!function_exists('admin_themes_handle'))
   */
   function admin_themes_handle($data, &$errors = array())
   {
-    global $api, $theme_dir;
+    global $api, $base_url, $member, $theme_dir;
 
     # Make a temporary file name which will be used for either downloading or uploading.
     $filename = $theme_dir. '/'. uniqid('theme_'). '.tmp';
@@ -267,106 +267,183 @@ if(!function_exists('admin_themes_handle'))
       return false;
     }
 
-    # Get the file extension ;-) We will use the base name as the directory
-    # to put the new theme in.
-    if(strpos($name, '.') !== false)
+    // We will need to test the theme to make sure it is okay, not
+    // deprecated and so on and so forth.
+    redirect($base_url. '/index.php?action=admin&sa=themes&install='. urlencode(basename($filename)). '&sid='. $member->session_id());
+  }
+}
+
+if(!function_exists('admin_themes_install'))
+{
+  /*
+    Function: admin_themes_install
+
+    Handles the installation of new themes.
+
+    Parameters:
+      none
+
+    Returns:
+      void
+
+    Notes:
+      This function is overloadable.
+  */
+  function admin_themes_install()
+  {
+    global $api, $base_url, $core_dir, $member, $theme, $theme_dir;
+
+    // Can you do this? If not, get out of here!
+    if(!$member->can('manage_themes'))
     {
-      $tmp = explode('.', $name);
-
-      # Remove the last one.
-      array_pop($tmp);
-
-      # Though if there is tar, we want that gone too.
-      if($tmp[count($tmp) - 1] == 'tar')
-      {
-        # POP!
-        array_pop($tmp);
-      }
-
-      # Put it back together!!!
-      $name = implode('.', $tmp);
+      admin_access_denied();
     }
 
-    # Sanitize the name...
-    $name = sanitize_filename($name);
+    $theme->set_current_area('manage_themes');
 
-    # If the directory we will end up putting the theme in exists, we need
-    # to fix that :P
-    if(file_exists($theme_dir. '/'. $name))
+    // Check their session id supplied in the URL.
+    verify_request('get');
+
+    // Get the filename of the theme we are installing.
+    $filename = realpath($theme_dir. '/'. basename($_GET['install']));
+    $extension = explode('.', $filename);
+
+    // Do some file checks, making sure it is in the right place and what
+    // not. Don't want to let anyone do anything tricky, that's for sure.
+    if(empty($filename) || !is_file($filename) || substr($filename, 0, strlen(realpath($theme_dir))) != realpath($theme_dir) || count($extension) < 2 || $extension[count($extension) - 1] != 'tmp')
     {
-      $copy = 1;
-      while(file_exists($theme_dir. '/'. $name. ' ('. $copy. ')'))
-      {
-        # Just keep on moving along.
-        $copy++;
-      }
+      $theme->set_title(l('An error has occurred'));
 
-      # Alright, change the name.
-      $name .= ' ('. $copy. ')';
-    }
+      $theme->header();
 
-    # Could be a zip, so let's try that! (Well, and it's detection is a bit better)
-    $zip = $api->load_class('Zip');
-    $tar = $api->load_class('Tar');
-    if($zip->open($filename))
-    {
-      # Looks like it is time to extract!!!
-      if(!$zip->extract($theme_dir. '/'. $name))
-      {
-        # Hmm, that isn't good.
-        $errors[] = l('Failed to extract the theme from the zip archive.');
-        return false;
-      }
+      echo '
+    <h1><img src="', $theme->url(), '/manage_themes-small.png" alt="" /> ', l('An error has occurred'), '</h1>
+    <p>', l('Sorry, but the supplied theme file either does not exist or is not a valid file.'), '</p>';
 
-      $zip->close();
-    }
-    elseif($tar->open($filename))
-    {
-      # Time to extract it, or at least, try!
-      # First the gzip, if it is gzippped.
-      if($tar->is_gzipped() && !$tar->ungzip())
-      {
-        $errors[] = l('Failed to extract the theme from the gzip archive.');
-        return false;
-      }
-      # Now the tarball itself.
-      elseif(!$tar->extract($theme_dir. '/'. $name))
-      {
-        $errors[] = l('Failed to extract the theme from the tar archive.');
-        return false;
-      }
-
-      # We are done!
-      $tar->close();
+      $theme->footer();
     }
     else
     {
-      # Wasn't anything we can handle. FAIL.
-      unlink($filename);
-      $errors[] = l('The file was not a zip, tar or tar.gz.');
-      return false;
+      // Install that theme! Maybe.
+      $theme->set_title(l('Installing theme'));
+
+      $theme->header();
+
+      echo '
+    <h1><img src="', $theme->url(), '/manage_themes-small.png" alt="" /> ', l('Installing theme'), '</h1>
+    <p>', l('Please wait while the theme is being installed.'), '</p>
+
+    <h3>', l('Extracting theme'), '</h3>';
+
+      // The Update class can do the work for us.
+      $update = $api->load_class('Update');
+
+      // Get the name of the theme.
+      $name = explode('.', basename($filename), 2);
+
+      // We did this to remove the extension.
+      $name = $name[0];
+
+      // Make the directory where the theme will be extracted to.
+      if(!file_exists($theme_dir. '/'. $name) && !@mkdir($theme_dir. '/'. $name, 0755, true))
+      {
+        echo '
+    <p>', l('Failed to create the temporary theme directory. Make sure the theme directory is writable.'), '</p>';
+      }
+      elseif($update->extract($filename, $theme_dir. '/'. $name))
+      {
+        // If we were able to extract the theme package, that doesn't mean
+        // it is a valid theme. Time to do some checking with <theme_load>!
+        if(theme_load($theme_dir. '/'. $name) === false)
+        {
+          echo '
+    <p>', l('The uploaded package was not a valid theme.'), '</p>';
+
+          // Delete the NOT theme (:P) and the package that was uploaded.
+          recursive_unlink($theme_dir. '/'. $name);
+          unlink($filename);
+        }
+        else
+        {
+          echo '
+    <p>', l('The theme was successfully extracted. Proceeding...'), '</p>';
+
+          // The theme was extracted, and it appears to be a real theme,
+          // so we may continue!
+          $package_extracted = true;
+        }
+      }
+      else
+      {
+        // Well, the Update class couldn't extract the package, so it isn't
+        // a supported format (ZIP, Tarball, or Gzip tarball). That sucks.
+        echo '
+    <p>', l('The uploaded package could not be extracted.'), '</p>';
+
+        recursive_unlink($theme_dir. '/'. $name);
+        unlink($filename);
+      }
+
+      // Was the package extracted? If so, we can go on!
+      if(!empty($package_extracted))
+      {
+        // Yes, yes I know! This is for checking the status of a plugin, but
+        // it can do themes too! (Not like it knows better)
+        // Why are we checking, you ask? Well, think about it! A theme is
+        // also PHP, and in reality, it can do just as much as any plugin
+        // can, meaning it can be as dangerous as any plugin.
+        $status = plugin_check_status($filename, $reason);
+        $theme_info = theme_load($theme_dir. '/'. $name);
+
+        // Get the status message, and the color that the message should be.
+        // But first, include a file.
+        require_once($core_dir. '/admin/admin_plugins_add.php');
+
+        // Okay, now get the response!
+        $response = admin_plugins_get_message($status, $theme_info['name'], $reason, true);
+
+        // Is it okay? Can we continue without prompting?
+        $install_proceed = isset($_GET['proceed']) || $status == 'approved';
+        $api->run_hooks('plugin_install_proceed', array(&$install_proceed, $status, 'theme'));
+
+        echo '
+    <h3>', l('Verifying theme status'), '</h3>
+    <p style="color: ', $response['color'], ';">', $response['message'], '</p>';
+
+        // Was it deemed okay?
+        if(!empty($install_proceed))
+        {
+          // Yup! Sure was!
+          echo '
+    <h3>', l('Finishing installation'), '</h3>
+    <p>', l('The installation of the theme was completed successfully. <a href="%s">Back to theme management</a>.', $base_url. '/index.php?action=admin&sa=themes'), '</p>';
+
+          // Delete the file, and we really are done!
+          unlink($filename);
+        }
+        else
+        {
+          // Uh oh!
+          // It was not safe, but if you still want to continue installing
+          // it, be my guest! Just be sure you know what you're getting
+          // yourself into, please!
+          // We will delete the extracted theme, you know, just incase ;).
+          recursive_unlink($theme_dir. '/'. $name);
+
+          echo '
+      <form action="', $base_url, '/index.php" method="get" onsubmit="return confirm(\'', l('Are you sure you want to proceed with the installation of this theme?\r\nBe sure you trust the source of this plugin.'), '\');">
+        <input type="submit" value="', l('Proceed'), '" />
+        <input type="hidden" name="action" value="admin" />
+        <input type="hidden" name="sa" value="themes" />
+        <input type="hidden" name="install" value="', urlencode($_GET['install']), '" />
+        <input type="hidden" name="sid" value="', $member->session_id(), '" />
+        <input type="hidden" name="proceed" value="true" />
+      </form>';
+        }
+      }
+
+      $theme->footer();
     }
-
-    # Remove the downloaded/uploaded file.
-    unlink($filename);
-
-    # Make sure the theme we just extracted is actually a theme... We can check
-    # that through theme_load.
-    if(theme_load($theme_dir. '/'. $name) === false)
-    {
-      # Woops! It isn't valid. Delete it now.
-      recursive_unlink($theme_dir. '/'. $name);
-
-      $errors[] = l('The supplied theme was invalid.');
-      return false;
-    }
-
-    # It's a theme, thats for sure. So show a success message.
-    $api->add_filter('install_theme_form_message', create_function('$value', '
-                                                     return l(\'The theme was installed successfully.\');'));
-
-    # Seemed to have worked!
-    return true;
   }
 }
 ?>
