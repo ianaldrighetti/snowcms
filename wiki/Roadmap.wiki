@@ -5,7 +5,7 @@
 
 === 2.0 alpha ===
 
-This version will have the basic functionality working, such as adding plugins, managing them (updating, disabling, activating, deleting), updating the system, system settings, managing users, group permissions, theme management and the like.
+This version will have the basic functionality working, such as adding plugins (√), managing them (updating, disabling (√), activating (√), deleting (√)), updating the system (√), system settings (√), managing users, group permissions (√), theme management (installing (√), updating, deleting (√)) and the like.
 
 2.0 alpha will finally have a working installer.
 
