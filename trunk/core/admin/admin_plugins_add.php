@@ -254,11 +254,22 @@ if(!function_exists('admin_plugins_install'))
 
     <h3>', l('Extracting plugin'), '</h3>';
 
+      /*
+        Why in the world do I have it extracting the plugin THEN checking
+        to see if it approved?
+
+        Did I do it to validate whether or not it was a plugin before
+        it warning that it is not an approved plugin when it isn't a plugin
+        at all?
+
+        Interesting... I will have to think about it.
+      */
+
       // The Update class will be very useful!
       $update = $api->load_class('Update');
 
       // Get the name of the file.
-      $name = explode('.', $filename, 2);
+      $name = explode('.', basename($filename), 2);
 
       // and just the first index.
       $name = $name[0];
@@ -266,7 +277,7 @@ if(!function_exists('admin_plugins_install'))
       // We need to make the directory where the plugin will be extracted to.
       if(!file_exists($plugin_dir. '/'. $name) && !@mkdir($plugin_dir. '/'. $name, 0755, true))
       {
-          echo '
+        echo '
     <p>', l('Failed to create the temporary plugin directory. Make sure the plugins directory is writable.'), '</p>';
       }
       // Try extracting the plugin.
@@ -278,7 +289,7 @@ if(!function_exists('admin_plugins_install'))
         if(plugin_load($plugin_dir. '/'. $name) === false)
         {
           echo '
-  <p>', l('The uploaded package was not a valid plugin.'), '</p>';
+    <p>', l('The uploaded package was not a valid plugin.'), '</p>';
 
           recursive_unlink($plugin_dir. '/'. $name);
           unlink($filename);
@@ -286,7 +297,7 @@ if(!function_exists('admin_plugins_install'))
         else
         {
           echo '
-  <p>', l('The plugin was successfully extracted. Proceeding...'), '</p>';
+    <p>', l('The plugin was successfully extracted. Proceeding...'), '</p>';
 
           // The package was extracted successfully, so we can continue to
           // the next step.
@@ -317,18 +328,18 @@ if(!function_exists('admin_plugins_install'))
 
         // Is the plugin safe to proceed?
         $install_proceed = isset($_GET['proceed']) || $status == 'approved';
-        $api->run_hooks('plugin_install_proceed', array(&$install_proceed, $status));
+        $api->run_hooks('plugin_install_proceed', array(&$install_proceed, $status, 'plugin'));
 
         echo '
   <h3>', l('Verifying plugin status'), '</h3>
-  <p style="color: ', $response['color'], '">', $response['message'], '</p>';
+  <p style="color: ', $response['color'], ';">', $response['message'], '</p>';
 
         // Is it safe to proceed?
         if(!empty($install_proceed))
         {
           // Time to make the finishing touches.
           echo '
-  <h3>', l('Finishing install'), '</h3>';
+  <h3>', l('Finishing installation'), '</h3>';
 
           // Add the plugin to the database.
           $result= $db->insert('ignore', '{db->prefix}plugins',
@@ -365,7 +376,7 @@ if(!function_exists('admin_plugins_install'))
             }
 
             echo '
-  <p>', l('The installation was completed successfully. <a href="%s">Back to plugin management</a>.', $base_url. '/index.php?action=admin&sa=plugins_manage'), '</p>';
+  <p>', l('The installation of the plugin was completed successfully. <a href="%s">Back to plugin management</a>.', $base_url. '/index.php?action=admin&sa=plugins_manage'), '</p>';
           }
 
           // We are done with the package.
@@ -381,7 +392,7 @@ if(!function_exists('admin_plugins_install'))
 
           echo '
   <form action="', $base_url, '/index.php" method="get" onsubmit="return confirm(\'', l('Are you sure you want to proceed with the installation of this plugin?\r\nBe sure you trust the source of this plugin.'), '\');">
-    <input type="submit" value="Proceed" />
+    <input type="submit" value="', l('Proceed'), '" />
     <input type="hidden" name="action" value="admin" />
     <input type="hidden" name="sa" value="plugins_add" />
     <input type="hidden" name="install" value="', urlencode($_GET['install']), '" />
@@ -405,11 +416,12 @@ if(!function_exists('admin_plugins_get_message'))
       string $status
       string $plugin_name
       string $reason
+      bool $is_theme
 
     Returns:
       array
   */
-  function admin_plugins_get_message($status, $plugin_name, $reason = null)
+  function admin_plugins_get_message($status, $plugin_name, $reason = null, $is_theme = false)
   {
     global $api;
 
@@ -422,40 +434,40 @@ if(!function_exists('admin_plugins_get_message'))
     if($status == 'approved')
     {
       $response['color'] = 'green';
-      $response['message'] =  l('The plugin "%s" has been reviewed and approved by the SnowCMS Plugin Database.<br />Proceeding...', $plugin_name);
+      $response['message'] =  l('The '. (empty($is_theme) ? 'plugin' : 'theme'). ' "%s" has been reviewed and approved by the SnowCMS '. (empty($is_theme) ? 'Plugin' : 'Theme'). ' Database.<br />Proceeding...', $plugin_name);
     }
     // Disapproved?
     elseif($status == 'disapproved')
     {
       $response['color'] = '#DB2929';
-      $response['message'] = l('The plugin "%s" has been reviewed and disapproved by the SnowCMS Dev Team.<br />Reason: %s<br />Proceed at your own risk.', $plugin_name, !empty($reason) ? l($reason) : l('None given.'));
+      $response['message'] = l('The '. (empty($is_theme) ? 'plugin' : 'theme'). ' "%s" has been reviewed and disapproved by the SnowCMS Dev Team.<br />Reason: %s<br />Proceed at your own risk.', $plugin_name, !empty($reason) ? l($reason) : l('None given.'));
     }
     // Deprecated? Pending..?
     elseif($status == 'deprecated' || $status == 'pending')
     {
       $response['color'] = '#1874CD';
-      $response['message'] = ($status == 'deprecated' ? l('The plugin "%s" is deprecated and a newer version is available at the <a href="http://plugins.snowcms.com/" target="_blank" title="SnowCMS Plugin Database">SnowCMS Plugin Database</a> site.<br />Proceed at your own risk.', $plugin_name) : l('The plugin "%s" is currently under review by the SnowCMS Plugin Database, so no definitive status can be given.<br />Proceed at your own risk.', $plugin_name));
+      $response['message'] = ($status == 'deprecated' ? l('The '. (empty($is_theme) ? 'plugin' : 'theme'). ' "%s" is deprecated and a newer version is available at the <a href="http://'. (empty($is_theme) ? 'plugins' : 'themes'). '.snowcms.com/" target="_blank" title="SnowCMS '. (empty($is_theme) ? 'Plugin' : 'Theme'). ' Database">SnowCMS '. (empty($is_theme) ? 'Plugin' : 'Theme'). ' Database</a> site.<br />Proceed at your own risk.', $plugin_name) : l('The '. (empty($is_theme) ? 'plugin' : 'theme'). ' "%s" is currently under review by the SnowCMS '. (empty($is_theme) ? 'Plugin' : 'Theme'). ' Database, so no definitive status can be given.<br />Proceed at your own risk.', $plugin_name));
     }
     elseif(in_array($status, array('unknown', 'malicious', 'insecure')))
     {
       if($status == 'unknown')
       {
-        $response['message'] = l('The plugin "%s" is unknown to the <a href="http://plugins.snowcms.com/" target="_blank" title="SnowCMS Plugin Database">SnowCMS Plugin Database</a> site.<br />Proceed at your unknown risk.', $plugin_name);
+        $response['message'] = l('The '. (empty($is_theme) ? 'plugin' : 'theme'). ' "%s" is unknown to the <a href="http://'. (empty($is_theme) ? 'plugins' : 'themes'). '.snowcms.com/" target="_blank" title="SnowCMS '. (empty($is_theme) ? 'Plugin' : 'Theme'). ' Database">SnowCMS '. (empty($is_theme) ? 'Plugin' : 'Theme'). ' Database</a> site.<br />Proceed at your own risk.', $plugin_name);
       }
       elseif($status == 'malicious')
       {
-        $response['message'] = l('The plugin "%s" has been identified as malicious and it is not recommended you continue.<br />Reason: %s<br />Proceed at your own risk.', $plugin_name, !empty($reason) ? l($reason) : l('None given.'));
+        $response['message'] = l('The '. (empty($is_theme) ? 'plugin' : 'theme'). ' "%s" has been identified as malicious and it is not recommended you continue.<br />Reason: %s<br />Proceed at your own risk.', $plugin_name, !empty($reason) ? l($reason) : l('None given.'));
       }
       elseif($status == 'insecure')
       {
-        $response['message'] = l('The plugin "%s" has known security issues, it is recommended that you not continue.<br />Reason: %s<br />Proceed at your own risk.', $plugin_name, !empty($reason) ? l($reason) : l('None given.'));
+        $response['message'] = l('The '. (empty($is_theme) ? 'plugin' : 'theme'). ' "%s" has known security issues, it is recommended that you not continue.<br />Reason: %s<br />Proceed at your own risk.', $plugin_name, !empty($reason) ? l($reason) : l('None given.'));
       }
 
       $response['color'] = '#DB2929';
     }
     else
     {
-      $api->run_hooks('admin_plugins_handle_status', array(&$response));
+      $api->run_hooks('admin_plugins_handle_status', array(&$response, $plugin_name, $reason, !empty($is_theme)));
     }
 
     return $response;
