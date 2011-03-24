@@ -193,7 +193,7 @@ if(!function_exists('admin_plugins_manage_generate_table'))
 
                                                                                  if(!empty($row[\'available_update\']))
                                                                                  {
-                                                                                   $plugin_data[] = \'<span style="font-weight: bold;">\'. l(\'v%s of this plugin is available! <a href="%s?action=admin&amp;sa=plugins_manage&amp;update=%s&amp;version=%s&amp;sid=%s">Update now</a>.\', $row[\'available_update\'], $base_url, urlencode($row[\'dependency_name\']), urlencode($row[\'available_update\']), $member->session_id()). \'</span>\';
+                                                                                   $plugin_data[] = \'<span style="font-weight: bold;">\'. l(\'v%s of this plugin is available! <a href="%s/index.php?action=admin&amp;sa=plugins_manage&amp;update=%s&amp;version=%s&amp;sid=%s">Update now</a>.\', $row[\'available_update\'], $base_url, urlencode($row[\'dependency_name\']), urlencode($row[\'available_update\']), $member->session_id()). \'</span>\';
                                                                                  }
 
                                                                                  return \'<p style="margin-bottom: 10px;">\'. $plugin_info[\'description\']. \'</p><p>\'. implode(\' | \', $plugin_data). \'</p>\';'),
@@ -308,25 +308,25 @@ if(!function_exists('admin_plugins_update'))
   */
   function admin_plugins_update()
   {
-    global $api, $base_url, $member, $plugin_dir, $theme, $theme_url;
+    global $api, $base_url, $core_dir, $db, $member, $plugin_dir, $theme, $theme_url;
 
     $api->run_hooks('admin_plugins_update');
 
-    # Can you add plugins?
+    // Can you add plugins?
     if(!$member->can('manage_plugins'))
     {
-      # That's what I thought!
+      // That's what I thought!
       admin_access_denied();
     }
 
     $theme->set_current_area('plugins_manage');
 
-    # Check the session id.
+    // Check the session id.
     verify_request('get');
 
-    # Which file are you installing?
-    $dependency_name = $_GET['update'];
-    $plugin_info = plugin_load($dependency_name, false);
+    // Which plugin are you updating?
+    $guid = isset($_GET['update']) ? $_GET['update'] : '';
+    $plugin_info = plugin_load($guid, false);
     $version = basename($_GET['version']);
 
     # So does it exist? Is it in the plugin directory? It better be!
@@ -366,9 +366,6 @@ if(!function_exists('admin_plugins_update'))
       }
       else
       {
-        // !!! May not be required !!!
-        file_put_contents($plugin_info['path']. '/previous-version', $plugin_info['version']);
-
         echo '
   <p class="green">', l('The update package was successfully downloaded. Proceeding...'), '</p>
 
@@ -391,144 +388,117 @@ if(!function_exists('admin_plugins_update'))
 
         echo '
   <p style="color: ', $response['color'], '">', $response['message'], '</p>';
+
+        // Is it okay to proceed?
+        if(!empty($update_proceed))
+        {
+          // Time to extract the plugin!
+          echo '
+  <h3>', l('Extracting plugin'), '</h3>';
+
+          $update = $api->load_class('Update');
+
+          // We need to make the temporary directory.
+          if(!file_exists($plugin_info['path']. '/update~/') && !@mkdir($plugin_info['path']. '/update~', 0755, true))
+          {
+            echo '
+  <p class="red">', l('Failed to create the temporary update folder. Make sure the plugins directory is writable.'), '</p>';
+          }
+          // If we made that directory successfully, extract it to that
+          // temporary location.
+          elseif($update->extract($plugin_info['path']. '/update-package', $plugin_info['path']. '/update~'))
+          {
+            echo '
+  <p class="green">', l('The update package was successfully extracted. Proceeding...'), '</p>';
+
+            // No longer need the package containing the update...
+            unlink($plugin_info['path']. '/update-package');
+
+            // Time to move on to the next step, then.
+            // Which is just copying the files from the update~ directory to
+            // the root directory of the plugin. If you are wondering why we
+            // extracted the files to update~ instead of the root directory
+            // in the first place, well, it is done just to make sure the
+            // package could actually be extracted.
+            $files = scandir($plugin_info['path']. '/update~');
+
+            foreach($files as $filename)
+            {
+              if($filename == '.' || $filename == '..')
+              {
+                continue;
+              }
+
+              // Just rename them!
+              rename($plugin_info['path']. '/update~/'. $filename, $plugin_info['path']. '/'. $filename);
+            }
+
+            // Now delete the update~ directory.
+            recursive_unlink($plugin_info['path']. '/update~/');
+
+            // Get the new plugin information. Though it certainly might not
+            // have changed. Just incase!
+            $new_plugin_info = plugin_load($plugin_info['path']);
+
+            // We will do this just incase the GUID changed, and clear any
+            // possible runtime error, oh, and set the available update
+            // column to empty.
+            $db->query('
+              UPDATE {db->prefix}plugins
+              SET dependency_name = {string:updated_guid}, runtime_error = 0, available_update = ''
+              WHERE dependency_name = {string:current_guid}
+              LIMIT 1',
+              array(
+                'updated_guid' => $new_plugin_info['guid'],
+                'current_guid' => $plugin_info['guid'],
+              ), 'update_plugin_guid');
+
+            // Is there an installation file?
+            if(file_exists($plugin_info['path']. '/install.php'))
+            {
+              // Set the current plugin version.
+              $current_plugin_version = $plugin_info['version'];
+
+              require_once($plugin_info['path']. '/install.php');
+
+              // And delete it.
+              unlink($plugin_info['path']. '/install.php');
+            }
+
+            // Sweet! The update is complete!
+            echo '
+  <h3>', l('Update finished'), '</h3>
+  <p>', l('You have successfully updated the plugin "%s" to version %s. <a href="%s">Back to plugin management</a>.', htmlchars($new_plugin_info['name']), htmlchars($new_plugin_info['version']), $base_url. '/index.php?action=admin&sa=plugins_manage'), '</p>';
+          }
+          else
+          {
+            echo '
+  <p class="red">', l('Failed to extract the update package.'), '</p>';
+
+            recursive_unlink($plugin_info['path']. '/update~/');
+            unlink($plugin_info['path']. '/update-package');
+          }
+        }
+        else
+        {
+          // Seems like it isn't!
+          unlink($plugin_info['path']. '/update-package');
+
+          echo '
+  <form action="', $base_url, '/index.php" method="get" onsubmit="return confirm(\'', l('Are you sure you want to proceed with the installation of this plugin?\r\nBe sure you trust the source of this plugin.'), '\');">
+    <input type="submit" value="', l('Proceed'), '" />
+    <input type="hidden" name="action" value="admin" />
+    <input type="hidden" name="sa" value="plugins_manage" />
+    <input type="hidden" name="update" value="', htmlchars($guid), '" />
+    <input type="hidden" name="version" value="', urlencode($_GET['version']), '" />
+    <input type="hidden" name="sid" value="', $member->session_id(), '" />
+    <input type="hidden" name="proceed" value="true" />
+  </form>';
+        }
       }
 
       $theme->footer();
     }
-  }
-}
-
-if(!function_exists('admin_plugins_update_ajax'))
-{
-  /*
-    Function: admin_plugins_update_ajax
-
-    Basically just the <admin_plugins_add_ajax> function with a few modifications ;-)
-
-    Parameters:
-      none
-
-    Returns:
-      void - Nothing is returned by this function.
-
-    Note:
-      This function is overloadable.
-  */
-  function admin_plugins_update_ajax()
-  {
-    if($_GET['step'] == 2)
-    {
-      # An array, please :-)
-      $response['message'] = array(
-                               'border' => null,
-                               'background' => null,
-                               'text' => null,
-                               'proceed' => false,
-                             );
-
-      $status = plugin_check_status($plugin_info['path']. '/update-package', $reason);
-
-      # Is it approved? Sweet!
-      if($status == 'approved')
-      {
-        $response['message']['border'] = '2px solid green';
-        $response['message']['background'] = '#90EE90';
-        $response['message']['text'] = '<table width="100%"><tr><td valign="middle"><img src="'. $theme_url. '/default/style/images/approved.png" alt="" title="" /></td><td valign="middle" align="center">'. l('The plugin "%s" has been reviewed and approved by the SnowCMS Dev Team.<br />Proceeding...', $plugin_info['name']). '</td></tr></table>';
-        $response['message']['proceed'] = true;
-      }
-      # Disapproved?
-      elseif($status == 'disapproved')
-      {
-        $response['message']['border'] = '2px solid #DB2929';
-        $response['message']['background'] = '#F08080';
-        $response['message']['text'] = '<table width="100%"><tr><td valign="middle"><img src="'. $theme_url. '/default/style/images/disapproved.png" alt="" title="" /></td><td valign="middle" align="center">'. l('The plugin "%s" has been reviewed and disapproved by the SnowCMS Dev Team.<br />Reason: %s<br />Proceed at your own risk.', $plugin_info['name'], !empty($reason) ? l($reason) : l('None given.')). '</td></tr></table>';
-      }
-      # Deprecated? Pending..?
-      elseif($status == 'deprecated' || $status == 'pending')
-      {
-        $response['message']['border'] = '2px solid #1874CD';
-        $response['message']['background'] = '#CAE1FF';
-        $response['message']['text'] = '<table width="100%"><tr><td valign="middle"><img src="'. $theme_url. '/default/style/images/information.png" alt="" title="" /></td><td valign="middle" align="center">'. ($status == 'deprecated' ? l('The plugin "%s" is deprecated and a newer version is available at the <a href="http://www.snowcms.com/" target="_blank" title="SnowCMS">SnowCMS</a> site.<br />Proceed at your own risk.', $plugin_info['name']) : l('The plugin "%s" is currently under review by the SnowCMS Dev Team, so no definitive status can be given.<br />Proceed at your own risk.', $plugin_info['name'])). '</td></tr></table>';
-      }
-      elseif(in_array($status, array('unknown', 'malicious', 'insecure')))
-      {
-        if($status == 'unknown')
-        {
-          $text = l('The plugin "%s" is unknown to the <a href="http://www.snowcms.com/" target="_blank" title="SnowCMS">SnowCMS</a> site.<br />Proceed at your unknown risk.', $plugin_info['name']);
-        }
-        elseif($status == 'malicious')
-        {
-          $text = l('The plugin "%s" has been identified as malicious and it is not recommended you continue.<br />Reason: %s<br />Proceed at your own risk.', $plugin_info['name'], !empty($reason) ? l($reason) : l('None given.'));
-        }
-        elseif($status == 'insecure')
-        {
-          $text = l('The plugin "%s" has known security issues, it is recommended you not continue.<br />Reason: %s<br />Proceed at your own risk.', $plugin_info['name'], !empty($reason) ? l($reason) : l('None given.'));
-        }
-
-        $response['message']['border'] = '2px solid #FCD116';
-        $response['message']['background'] = '#FFF68F';
-        $response['message']['text'] = '<table width="100%"><tr><td valign="middle"><img src="'. $theme_url. '/default/style/images/warning.png" alt="" title="" /></td><td valign="middle" align="center">'. $text. '</td></tr></table>';
-      }
-      else
-      {
-        $api->run_hooks('admin_plugins_handle_status', array(&$response['message']));
-      }
-    }
-    elseif($_GET['step'] == 3)
-    {
-      # The Update class can extract a file for us.
-      $update = $api->load_class('Update');
-
-      # We need to make the temporary directory.
-      if(!file_exists($plugin_info['path']. '/update~/') && !@mkdir($plugin_info['path']. '/update~', 0755, true))
-      {
-        $response['error'] = l('Failed to create the temporary update folder. Make sure the plugins directory is writable.');
-      }
-      elseif($update->extract($plugin_info['path']. '/update-package', $plugin_info['path']))
-      {
-        $response['message'] = l('The update package was successfully extracted. Proceeding...');
-      }
-      else
-      {
-        $response['error'] = l('Failed to extract the update package.');
-        @recursive_unlink($plugin_info['path']. '/update~/');
-        @unlink($plugin_info['path']. '/update-package');
-        @unlink($plugin_info['path']. '/previous-version');
-      }
-    }
-    elseif($_GET['step'] == 4)
-    {
-      # Add the plugin to the database (well, the new one, you never know, stuff might have changed!)
-      // !!! TODO: Probably should delete the old row first, incase the guid changed.
-      $result = $db->insert('replace', '{db->prefix}plugins',
-        array(
-          'dependency_name' => 'string-255', 'directory' => 'string',
-        ),
-        array(
-          $plugin_info['dependency'], basename($plugin_info['path']),
-        ), array(), 'admin_plugins_add_query');
-
-      # Any install file? Run it!
-      if(file_exists($plugin_info['path']. '/install.php'))
-      {
-        # Set the current plugin version. Maybe.
-        if(file_exists($plugin_info['path']. '/previous-version'))
-        {
-          $current_plugin_version = file_get_contents($plugin_info['path']. '/previous-version');
-        }
-
-        require_once($plugin_info['path']. '/install.php');
-        @unlink($plugin_info['path']. '/install.php');
-      }
-
-      @recursive_unlink($plugin_info['path']. '/update~/');
-      @unlink($plugin_info['path']. '/update-package');
-      @unlink($plugin_info['path']. '/previous-version');
-
-      $response['message'] = l('Plugin updated successfully! <a href="%s">Go back to plugin management</a>.', $base_url. '/index.php?action=admin&sa=plugins_manage');
-    }
-
-    echo json_encode($response);
   }
 }
 
@@ -550,70 +520,70 @@ if(!function_exists('admin_plugins_check_updates'))
     Note:
       This function is overloadable.
   */
-  function admin_plugins_check_updates($dependencies = array())
+  function admin_plugins_check_updates($guids = array())
   {
     global $api, $db, $settings;
 
-    # No dependency names supplied?
-    if(count($dependencies) == 0)
+    // No GUIDs supplied?
+    if(count($guids) == 0)
     {
-      # Load some up! Unless we didn't check too long ago.
+      // Load some up! Unless we recently checked.
       if($settings->get('last_plugin_update_check', 'int', 0) + 3600 < time_utc())
       {
-        $result = $db->query('
-          SELECT
-            dependency_name
-          FROM {db->prefix}plugins',
-          array());
+        // We can use the <plugin_list> function to get all the plugins.
+        $plugins = plugin_list();
 
-        $dependencies = array();
-        while($row = $result->fetch_assoc())
+        // But, we only need the GUIDs!
+        foreach($plugins as $plugin)
         {
-          $dependencies[] = $row['dependency_name'];
+          $guids[] = $plugin['guid'];
         }
+
+        // Woops! Don't forget to set the last time we checked for updates!
+        $settings->set('last_plugin_update_check', time_utc(), 'int');
       }
     }
 
-    # You know, just incase ;-)
-    if(count($dependencies) > 0)
+    // You know, just incase ;-)
+    if(count($guids) > 0)
     {
-      # The HTTP class will be mighty useful!
+      // The HTTP class will be mighty useful!
       $http = $api->load_class('HTTP');
 
-      foreach($dependencies as $dependency)
+      foreach($guids as $guid)
       {
-        # Load the plugins information... If it exists.
-        $plugin_info = plugin_load($dependency, false);
+        // Load the plugins information... If it exists.
+        $plugin_info = plugin_load($guid, false);
 
-        # Does it not exist?
+        // Does it not exist?
         if($plugin_info === false)
         {
           continue;
         }
 
-        # The dependency name is the URL to check for updates at ;-)
-        # I don't quite know how to explain this, but here it goes. Say you
-        # have a plugin with all of these version: 1.0, 1.0.1 and 1.1, when
-        # an update check is requested and the supplied version is 1.0, the
-        # response to the request should give 1.0.1, not 1.1... However, you
-        # can of course respond with 1.1 IF when the 1.1 plugin is installed
-        # that it will be completely updated from 1.0 to 1.1 (including anything
-        # that was also done in 1.0.1). It's your choice, of course! Also note
-        # that during a plugin update, a variable ($current_plugin_version) will
-        # be set before running the install.php file, that way, if required, you
-        # can do anything special :-).
-        $request = $http->request('http://'. $dependency, array('updatecheck' => 1, 'version' => $plugin_info['version']));
+        // The dependency name is the URL to check for updates at ;-)
+        // I don't quite know how to explain this, but here it goes. Say you
+        // have a plugin with all of these version: 1.0, 1.0.1 and 1.1, when
+        // an update check is requested and the supplied version is 1.0, the
+        // response to the request should give 1.0.1, not 1.1... However, you
+        // can of course respond with 1.1 IF when the 1.1 plugin is installed
+        // that it will be completely updated from 1.0 to 1.1 (including anything
+        // that was also done in 1.0.1). It's your choice, of course! Also note
+        // that during a plugin update, a variable ($current_plugin_version) will
+        // be set before running the install.php file, that way, if required, you
+        // can do anything special :-).
+        $request = $http->request('http://'. $guid, array('updatecheck' => 1, 'version' => $plugin_info['version']));
 
-        # Is it empty?
+        // Is it empty?
         if(empty($request))
         {
-          # Sorry, couldn't check/nothing returned!
+          // Sorry, couldn't check/nothing returned!
           continue;
         }
 
-        # Even if there isn't a newer version, still update the plugins
-        # information. This is just incase, for some odd reason, an update
-        # has been taken down.
+        // Even if there isn't a newer version, still update the plugins
+        // information. This is just incase, for some odd reason, an update
+        // has been taken down.
         $db->query('
           UPDATE {db->prefix}plugins
           SET available_update = {string:version_available}
@@ -621,7 +591,7 @@ if(!function_exists('admin_plugins_check_updates'))
           LIMIT 1',
           array(
             'version_available' => version_compare($request, $plugin_info['version'], '>') ? $request : '',
-            'dependency_name' => $plugin_info['dependency'],
+            'dependency_name' => $plugin_info['guid'],
           ), 'plugins_check_updates_query');
       }
     }
