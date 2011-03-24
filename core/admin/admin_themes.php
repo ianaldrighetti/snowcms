@@ -446,4 +446,99 @@ if(!function_exists('admin_themes_install'))
     }
   }
 }
+
+if(!function_exists('admin_themes_check_updates'))
+{
+  /*
+    Function: admin_themes_check_updates
+
+    Checks to see if the themes require any updating. If no specific theme
+    directories are supplied, all themes will be checked for updates, if
+    they support it.
+
+    Parameters:
+      $themes - An array containing an array of directories which are at the
+                root of the theme.
+
+    Returns:
+      void
+
+    Note:
+      This function is overloadable.
+  */
+  function admin_themes_check_updates($themes = array())
+  {
+    global $api, $settings;
+
+    // Did any theme directories get supplied?
+    if(count($themes) == 0)
+    {
+      // Since you didn't supply any themes, we will get them on our own!
+      // It is likely this is being called on by the task scheduling system,
+      // so let's make sure we aren't doing this too often!
+      if($settings->get('last_theme_update_check', 'int', 0) + 3600 < time_utc())
+      {
+        // <theme_load> will get us the information we want.
+        $theme_list = theme_list();
+
+        foreach($theme_list as $theme_info)
+        {
+          $themes[] = $theme_info['directory'];
+        }
+
+        // We are checking now.
+        $settings->set('last_theme_update_check', time_utc(), 'int');
+      }
+    }
+
+    // Now for the actual checking.
+    if(count($themes) > 0)
+    {
+      // The HTTP class will do everything we want.
+      $http = $api->load_class('HTTP');
+
+      foreach($themes as $theme_location)
+      {
+        // Get the theme information.
+        $theme_info = theme_load($theme_location);
+
+        // Does the theme not exist, no update URL, no version?
+        if($theme_info === false || empty($theme_info['update_url']) || empty($theme_info['version']))
+        {
+          continue;
+        }
+
+        // We will use the supplied update URL to query for any available
+        // updates. This of course requires both the update URL (of course)
+        // and a current version to be supplied.
+        $request = $http->request('http://'. $theme_info['update_url'], array('updatecheck' => 1, 'version' => $theme_info['version']));
+
+        // Did we get an answer?
+        if(empty($request))
+        {
+          // Nope, nothing. How rude!
+          continue;
+        }
+
+        // If there is a new version, we will save it in a file.
+        if(version_compare($request, $theme_info['version'], '>'))
+        {
+          $fp = fopen($theme_info['path']. '/available-update', 'w');
+
+          flock($fp, LOCK_EX);
+          fwrite($fp, $request);
+          flock($fp, LOCK_UN);
+
+          fclose($fp);
+        }
+        // There is no newer version available. Delete the new version file
+        // if there is one.
+        elseif(file_exists($theme_info['path']. '/available-update'))
+        {
+          unlink($theme_info['path']. '/available-update');
+        }
+      }
+    }
+  }
+}
 ?>

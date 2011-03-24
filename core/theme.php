@@ -44,7 +44,9 @@ if(!defined('IN_SNOW'))
       string email - The email address of the author.
       string name - The name of the theme.*
       string description - Description of the theme.
+      string version - The themes current version.
       string update_url - The URL where updates for the theme can be retrieved from.
+      string directory - The directory where the theme is located.*
 
     * Indicates this index will never be null.
 */
@@ -120,6 +122,7 @@ function theme_load($path)
 
   # Add the path, just incase :P
   $theme_info['path'] = realpath($path);
+  $theme_info['directory'] = $theme_info['path'];
 
   # Alright, here ya go.
   return $theme_info;

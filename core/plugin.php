@@ -178,7 +178,7 @@ function plugin_load($plugin_id, $is_path = true)
 
   Note:
     In order for a plugin to be detected, the plugins directory must contain
-    a plugin.ini and plugin.php file.
+    a plugin.xml and plugin.php file.
 */
 function plugin_list()
 {
