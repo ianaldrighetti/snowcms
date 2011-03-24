@@ -114,24 +114,48 @@ if(!function_exists('clean_request'))
   Redirects the browser to the specified URL.
 
   Parameters:
-    string $url - The URL to redirect to.
+    string $location - The new location redirect the browser to.
+    mixed $status - The type of redirect to issue, such as 301 (Moved
+                    Permanently) or 307 (Temporary). If you don't want to
+                    remember either, you can supply permanent[ly] or
+                    temporary. This defaults to a temporary move.
 
   Returns:
     void - Nothing is returned by this function.
+
+  Note:
+    If you are wondering what the difference between a temporary and a
+    permanent redirect are, and cannot deduce what it means through their
+    names, I suppose I should tell you! A temporary redirect ensures that a
+    browser will not cache the redirection when the same page is requested
+    at a later time, while a permanent redirect can cause certain browsers
+    (I know Chrome does, not sure about others) to cache the redirect until
+    the cache is cleared, which can be bad if you don't want the browser to
+    assume anything. Did that help? Bet not.
 */
-function redirect($url)
+function redirect($location, $status = 307)
 {
-  # Simply clear all headers, and redirect.
+  // Simply clear all headers, and redirect.
   if(ob_get_length() > 0)
   {
-    # Well, if there are any.
+    // Well, if there are any.
     @ob_clean();
   }
 
-  # Now redirect to the location of your desire!
-  header('Location: '. $url);
+  // What type of redirect?
+  if((int)$status == 307 || strtolower($status) == 'temporary')
+  {
+    header('HTTP/1.1 307 Temporary Redirect');
+  }
+  else
+  {
+    header('HTTP/1.0 301 Moved Permanently');
+  }
 
-  # Execution, HALT!
+  // Now redirect to the location of your desire!
+  header('Location: '. $location);
+
+  // Execution, HALT!
   exit;
 }
 ?>

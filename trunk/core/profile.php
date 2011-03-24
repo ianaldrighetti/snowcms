@@ -209,14 +209,14 @@ if(!function_exists('profile_edit'))
 
     $api->run_hooks('profile_edit', array(&$member_info));
 
-    # We will need the Members class either way.
+    // We will need the Members class either way.
     $members = $api->load_class('Members');
 
-    # So an array?
+    // So an array?
     if(is_array($member_info))
     {
-      # Load their information (we will stil use the stuff you gave us, but
-      # this will check to make sure the member actually exists).
+      // Load their information (we will stil use the stuff you gave us, but
+      // this will check to make sure the member actually exists).
       $members->load((int)$member_info['id']);
       $member_id = (int)$member_info['id'];
     }
@@ -226,18 +226,18 @@ if(!function_exists('profile_edit'))
       $member_id = (int)$member_info;
     }
 
-    # So can they edit anothers profile?
-    if(!$member->can('edit_other_profiles'))
+    // So can they edit anothers profile or manage another's profile?
+    if(!$member->can('edit_other_profiles') || !$member->can('manage_members'))
     {
       member_access_denied(l('Access denied'), l('Sorry, but you do not have permission to edit other members profiles.'));
     }
-    # Do they exist?
+    // Do they exist?
     elseif($members->get($member_id) === false)
     {
       member_access_denied(l('Member doesn\'t exist'), l('Sorry, but the member you are requesting does not exist.'));
     }
 
-    # Generate the form, now!
+    // Generate the form, now!
     profile_edit_generate_form(is_array($member_info) ? $member_info : $members->get($member_id));
 
     $form = $api->load_class('Form');
@@ -315,7 +315,7 @@ if(!function_exists('profile_edit_generate_form'))
                                                                                       }
 
                                                                                       return true;'),
-                                                                      'value' => $member_info['name'],
+                                                                      'value' => !empty($_POST['display_name']) ? $_POST['display_name'] : $member_info['name'],
                                                                     ));
 
     $form->add_field('member_edit_'. $member_info['id'], 'member_email', array(
@@ -334,7 +334,7 @@ if(!function_exists('profile_edit_generate_form'))
                                                                                       }
 
                                                                                       return true;'),
-                                                                      'value' => $member_info['email'],
+                                                                      'value' => !empty($_POST['member_email']) ? $_POST['member_email'] : $member_info['email'],
                                                                     ));
 
     $form->add_field('member_edit_'. $member_info['id'], 'member_pass', array(
@@ -458,7 +458,7 @@ if(!function_exists('profile_edit_handle'))
   */
   function profile_edit_handle($data, &$errors = array())
   {
-    global $api, $base_url, $member;
+    global $api, $base_url, $core_dir, $member;
 
     $members = $api->load_class('Members');
     $members->load($data['member_id']);
@@ -490,20 +490,31 @@ if(!function_exists('profile_edit_handle'))
         }
 
         $update_info['member_activated'] = !empty($data['member_activated']);
+
+        // Do we need to send a welcome email?
+        if($member_info['acode'] != 'admin_approval' && !$member_info['is_activated'])
+        {
+          $update_info['member_acode'] = '';
+
+          if(!function_exists('register_send_welcome_email'))
+          {
+            require_once($core_dir. '/register.php');
+          }
+
+          register_send_welcome_email($member_info['id']);
+        }
       }
 
       $members->update($member_info['id'], $update_info);
 
       if(!empty($redir_login))
       {
-        header('Location: '. $base_url. '/index.php?action=login&member_name='. urlencode($member_info['username']));
+        redirect($base_url. '/index.php?action=login&member_name='. urlencode($member_info['username']));
       }
       else
       {
-        header('Location: '. $base_url. '/index.php?action=profile'. ($member->id() == $member_info['id'] ? '' : '&id='. $member_info['id']));
+        redirect($base_url. '/index.php?action=profile'. ($member->id() == $member_info['id'] ? '' : '&id='. $member_info['id']));
       }
-
-      exit;
     }
     else
     {
