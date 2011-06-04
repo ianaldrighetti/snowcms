@@ -1,24 +1,26 @@
 <?php
-#########################################################################
-#                             SnowCMS v2.0                              #
-#                          By the SnowCMS Team                          #
-#                            www.snowcms.com                            #
-#                  Released under the GNU GPL v3 License                #
-#                     www.gnu.org/licenses/gpl-3.0.txt                  #
-#########################################################################
-#                                                                       #
-# SnowCMS originally pawned by soren121 started some time in early 2008 #
-#                                                                       #
-#########################################################################
-#                                                                       #
-#                SnowCMS v2.0 began in November 2009                    #
-#                                                                       #
-#########################################################################
-#                     File version: SnowCMS 2.0                         #
-#########################################################################
+////////////////////////////////////////////////////////////////////////////
+//                              SnowCMS v2.0                              //
+//                           By the SnowCMS Team                          //
+//                             www.snowcms.com                            //
+//                  Released under the GNU GPL v3 License                 //
+//                    www.gnu.org/licenses/gpl-3.0.txt                    //
+////////////////////////////////////////////////////////////////////////////
+//                                                                        //
+//       SnowCMS originally pawned by soren121 started in early 2008      //
+//                                                                        //
+////////////////////////////////////////////////////////////////////////////
+//                                                                        //
+//                  SnowCMS v2.0 began in November 2009                   //
+//                                                                        //
+////////////////////////////////////////////////////////////////////////////
+//                       File version: SnowCMS 2.0                        //
+////////////////////////////////////////////////////////////////////////////
 
 if(!defined('IN_SNOW'))
-  die;
+{
+  die('Nice try...');
+}
 
 # Title: Control Panel - Themes
 
@@ -140,8 +142,17 @@ if(!function_exists('admin_themes'))
     <tr>';
       }
 
+      // Check to see if there is an update available.
+      $update_available = false;
+
+      // There is a file containing the new version...
+      if(file_exists($theme_info['path']. '/available-update') && version_compare(file_get_contents($theme_info['path']. '/available-update'), $theme_info['version'], '>'))
+      {
+        $update_available = file_get_contents($theme_info['path']. '/available-update');
+      }
+
       echo '
-      <td', (basename($theme_info['path']) == $settings->get('theme', 'string', 'default') ? ' class="selected"' : ''), '><a href="', $base_url, '/index.php?action=admin&amp;sa=themes&amp;set=', urlencode(basename($theme_info['path'])), '&amp;sid=', $member->session_id(), '" title="', l('Set as site theme'), '"><img src="', $theme_url, '/', basename($theme_info['path']), '/image.png" alt="" title="', $theme_info['description'], '" /><br />', $theme_info['name'], ' </a><br /><a href="', $base_url, '/index.php?action=admin&amp;sa=themes&amp;delete=', urlencode(basename($theme_info['path'])), '&amp;sid=', $member->session_id(), '" title="', l('Delete %s', $theme_info['name']), '" onclick="', ($settings->get('theme', 'string', 'default') == basename($theme_info['path']) ? 'alert(\''. l('You cannot delete the current theme.'). '\'); return false;' : 'return confirm(\''. l('Are you sure you want to delete this theme?\r\nThis cannot be undone!'). '\');"'), '" class="delete">[', l('Delete'), ']</a></td>';
+      <td><a href="', $base_url, '/index.php?action=admin&amp;sa=themes&amp;set=', urlencode(basename($theme_info['path'])), '&amp;sid=', $member->session_id(), '" title="', l('Set as site theme'), '"', (basename($theme_info['path']) == $settings->get('theme', 'string', 'default') ? ' class="selected"' : ''), '><img src="', $theme_url, '/', basename($theme_info['path']), '/image.png" alt="" title="', $theme_info['description'], '" /><br />', $theme_info['name'], ' </a><br /><a href="', $base_url, '/index.php?action=admin&amp;sa=themes&amp;delete=', urlencode(basename($theme_info['path'])), '&amp;sid=', $member->session_id(), '" title="', l('Delete %s', $theme_info['name']), '" onclick="', ($settings->get('theme', 'string', 'default') == basename($theme_info['path']) ? 'alert(\''. l('You cannot delete the current theme.'). '\'); return false;' : 'return confirm(\''. l('Are you sure you want to delete this theme?\r\nThis cannot be undone!'). '\');"'), '" class="button">', l('Delete'), '</a>', !empty($update_available) ? '<a href="'. $base_url. '/index.php?action=admin&amp;sa=themes&amp;update='. urlencode(basename($theme_info['path'])). '&amp;version='. urlencode($update_available). '&amp;sid='. $member->session_id(). '" title="'. l('Update theme to version %s', htmlchars($update_available)). '" class="button">'. l('Update available'). '</a>' : '', '</td>';
     }
 
     echo '
@@ -447,6 +458,30 @@ if(!function_exists('admin_themes_install'))
   }
 }
 
+if(!function_exists('admin_themes_update'))
+{
+  /*
+    Function: admin_themes_update
+
+    When there is an update for a theme available, this function will handle
+    the update process by downloading, extracting, and installing the new
+    version of the theme.
+
+    Parameters:
+      none
+
+    Returns:
+      void - Nothing is returned by this function.
+
+    Note:
+      This function is overloadable.
+  */
+  function admin_themes_update()
+  {
+
+  }
+}
+
 if(!function_exists('admin_themes_check_updates'))
 {
   /*
@@ -461,10 +496,15 @@ if(!function_exists('admin_themes_check_updates'))
                 root of the theme.
 
     Returns:
-      void
+      void - Nothing is returned by this function.
 
     Note:
       This function is overloadable.
+
+      If the $themes parameter is empty, it is assumed that this function is
+      being called upon by the SnowCMS task system and will check for
+      updates for all existing themes, so long as it hasn't been done within
+      the last hour.
   */
   function admin_themes_check_updates($themes = array())
   {
@@ -476,14 +516,14 @@ if(!function_exists('admin_themes_check_updates'))
       // Since you didn't supply any themes, we will get them on our own!
       // It is likely this is being called on by the task scheduling system,
       // so let's make sure we aren't doing this too often!
-      if($settings->get('last_theme_update_check', 'int', 0) + 3600 < time_utc())
+      if(true/*$settings->get('last_theme_update_check', 'int', 0) + 3600 < time_utc()*/)
       {
         // <theme_load> will get us the information we want.
         $theme_list = theme_list();
 
-        foreach($theme_list as $theme_info)
+        foreach($theme_list as $theme_location)
         {
-          $themes[] = $theme_info['directory'];
+          $themes[] = $theme_location;
         }
 
         // We are checking now.
