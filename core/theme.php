@@ -39,16 +39,24 @@ if(!defined('IN_SNOW'))
 
   Note:
     The following indexes are returned:
+
       string author - The name of the themes author.*
+
       string website - The website of the author.
+
       string email - The email address of the author.
+
       string name - The name of the theme.*
+
       string description - Description of the theme.
+
       string version - The themes current version.
+
       string update_url - The URL where updates for the theme can be retrieved from.
+
       string directory - The directory where the theme is located.*
 
-    * Indicates this index will never be null.
+    * (asterisk) Indicates this index will never be null.
 */
 function theme_load($path)
 {

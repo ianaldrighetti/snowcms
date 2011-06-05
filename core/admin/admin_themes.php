@@ -152,7 +152,7 @@ if(!function_exists('admin_themes'))
       }
 
       echo '
-      <td><a href="', $base_url, '/index.php?action=admin&amp;sa=themes&amp;set=', urlencode(basename($theme_info['path'])), '&amp;sid=', $member->session_id(), '" title="', l('Set as site theme'), '"', (basename($theme_info['path']) == $settings->get('theme', 'string', 'default') ? ' class="selected"' : ''), '><img src="', $theme_url, '/', basename($theme_info['path']), '/image.png" alt="" title="', $theme_info['description'], '" /><br />', $theme_info['name'], ' </a><br /><a href="', $base_url, '/index.php?action=admin&amp;sa=themes&amp;delete=', urlencode(basename($theme_info['path'])), '&amp;sid=', $member->session_id(), '" title="', l('Delete %s', $theme_info['name']), '" onclick="', ($settings->get('theme', 'string', 'default') == basename($theme_info['path']) ? 'alert(\''. l('You cannot delete the current theme.'). '\'); return false;' : 'return confirm(\''. l('Are you sure you want to delete this theme?\r\nThis cannot be undone!'). '\');"'), '" class="button">', l('Delete'), '</a>', !empty($update_available) ? '<a href="'. $base_url. '/index.php?action=admin&amp;sa=themes&amp;update='. urlencode(basename($theme_info['path'])). '&amp;version='. urlencode($update_available). '&amp;sid='. $member->session_id(). '" title="'. l('Update theme to version %s', htmlchars($update_available)). '" class="button">'. l('Update available'). '</a>' : '', '</td>';
+      <td><a href="', $base_url, '/index.php?action=admin&amp;sa=themes&amp;set=', urlencode(basename($theme_info['path'])), '&amp;sid=', $member->session_id(), '" title="', l('Set as site theme'), '"', (basename($theme_info['path']) == $settings->get('theme', 'string', 'default') ? ' class="selected"' : ''), '><img src="', $theme_url, '/', basename($theme_info['path']), '/image.png" alt="" title="', $theme_info['description'], '" /><br />', $theme_info['name'], ' </a><br /><a href="', $base_url, '/index.php?action=admin&amp;sa=themes&amp;delete=', urlencode(basename($theme_info['path'])), '&amp;sid=', $member->session_id(), '" title="', l('Delete %s', $theme_info['name']), '" onclick="', ($settings->get('theme', 'string', 'default') == basename($theme_info['path']) ? 'alert(\''. l('You cannot delete the current theme.'). '\'); return false;' : 'return confirm(\''. l('Are you sure you want to delete this theme?\r\nThis cannot be undone!'). '\');"'), '" class="button">', l('Delete'), '</a>', !empty($update_available) ? '<a href="'. $base_url. '/index.php?action=admin&amp;sa=themes&amp;update='. urlencode(basename($theme_info['path'])). '&amp;version='. urlencode($update_available). '&amp;sid='. $member->session_id(). '" title="'. l('Update theme to version %s', htmlchars($update_available)). '" class="button important">'. l('Update available'). '</a>' : '', '</td>';
     }
 
     echo '
@@ -478,7 +478,187 @@ if(!function_exists('admin_themes_update'))
   */
   function admin_themes_update()
   {
+    global $api, $base_url, $core_dir, $member, $theme, $theme_dir;
 
+    // Can you do this? If not, get out of here!
+    if(!$member->can('manage_themes'))
+    {
+      admin_access_denied();
+    }
+
+    $theme->set_current_area('manage_themes');
+
+    // Check their session id supplied in the URL.
+    verify_request('get');
+
+		// Which theme are we updating?
+		$update = !empty($_GET['update']) ? htmlchars(basename($_GET['update'])) : false;
+
+		// To which version? (If none given, we will check for the latest)
+		$version = !empty($_GET['version']) ? htmlchars($_GET['version']) : false;
+
+		// Make sure this stuff given to us is valid. Though we only need to
+		// make sure the theme given is actually a real theme.
+		if(empty($update) || theme_load($theme_dir. '/'. $update) === false)
+		{
+      $theme->set_title(l('An error has occurred'));
+
+      $theme->header();
+
+      echo '
+    <h1><img src="', $theme->url(), '/manage_themes-small.png" alt="" /> ', l('An error has occurred'), '</h1>
+    <p>', l('Sorry, but the specified theme does not exist.'), '</p>';
+
+      $theme->footer();
+		}
+		else
+		{
+			// Get the latest version of this theme.
+			// This function will handle that for us.
+			admin_themes_check_updates(array($theme_dir. '/'. $update));
+
+			// Let's make our lives a bit easier...
+			$current_dir = $theme_dir. '/'. $update;
+			$theme_info = theme_load($current_dir);
+
+			// Any update available?
+			if(file_exists($current_dir. '/available-update'))
+			{
+				// There could be, but let's make sure...
+				$new_version = file_get_contents($current_dir. '/available-update');
+
+				// Well, if you specified a version.
+				if(!empty($version))
+				{
+					$continue_update = version_compare($new_version, $theme_info['version'], '>');
+				}
+				else
+				{
+					// We will update you to this version, then.
+					$version = $new_version;
+					$continue_update = true;
+				}
+			}
+			else
+			{
+				// No, no updating needed, apparently.
+				$continue_update = false;
+			}
+
+			// So, how did that go?
+			if(empty($continue_update))
+			{
+				// No update needed!
+				$theme->set_title(l('Theme up-to-date'));
+
+				$theme->header();
+
+				echo '
+			<h1><img src="', $theme->url(), '/manage_themes-small.png" alt="" /> ', l('Theme up-to-date'), '</h1>
+			<p>', l('The theme "%s" is already up-to-date, so no action is required.', htmlchars($theme_info['name'])), '</p>';
+
+				$theme->footer();
+			}
+			else
+			{
+				// Here we go!
+				$theme->set_title(l('Updating theme'));
+
+				$theme->header();
+
+				echo '
+    <h1><img src="', $theme->url(), '/manage_themes-small.png" alt="" /> ', l('Updating theme'), '</h1>
+    <p>', l('Please wait while the theme is being updated.'), '</p>
+
+    <h3>', l('Downloading update'), '</h3>';
+
+				// Download that puppy!
+				$http = $api->load_class('HTTP');
+
+				if(!$http->request($theme_info['update_url'], array('download' => 1, 'version' => $version), 0, $current_dir. '/update-package'))
+				{
+					echo '
+		<p class="red">', l('Failed to download v%s of "%s"', htmlchars($version), htmlchars($theme_info['name'])), '</p>';
+				}
+				else
+				{
+					echo '
+		<p class="green">', l('Successfully downloaded v%s of "%s." Proceeding...', htmlchars($version), htmlchars($theme_info['name'])), '</p>
+
+		<h3>', l('Extracting update'), '</h3>';
+
+					// We want to extract this theme, now.
+					// The Update class can do the work for us.
+					$update = $api->load_class('Update');
+
+					// A bit easier to do this:
+					$filename = $current_dir. '/update-package';
+
+					// Make the directory where the theme will be extracted to.
+					if(!file_exists($current_dir. '/~update') && !@mkdir($current_dir. '/~update', 0755, true))
+					{
+						echo '
+				<p>', l('Failed to create the temporary update directory. Make sure the theme directory is writable.'), '</p>';
+					}
+					elseif($update->extract($filename, $current_dir. '/~update'))
+					{
+						// If we were able to extract the theme package, that doesn't mean
+						// it is a valid theme. Time to do some checking with <theme_load>!
+						if(theme_load($current_dir. '/~update') === false)
+						{
+							echo '
+				<p>', l('The update package was not a valid theme.'), '</p>';
+
+							// Delete the NOT theme (:P) and the package that was uploaded.
+							recursive_unlink($current_dir. '/~update');
+							unlink($filename);
+						}
+						else
+						{
+							echo '
+				<p>', l('The update was successfully extracted. Proceeding...'), '</p>';
+
+							// The theme was extracted, and it appears to be a real theme,
+							// so we may continue!
+							$package_extracted = true;
+						}
+					}
+					else
+					{
+						// Well, the Update class couldn't extract the package, so it isn't
+						// a supported format (ZIP, Tarball, or Gzip tarball). That sucks.
+						echo '
+				<p>', l('The update package could not be extracted.'), '</p>';
+
+						recursive_unlink($current_dir. '/~update');
+						unlink($filename);
+					}
+
+					if(!empty($package_extracted))
+					{
+						// Yes, yes I know! This is for checking the status of a plugin, but
+						// it can do themes too! (Not like it knows better)
+						// Why are we checking, you ask? Well, think about it! A theme is
+						// also PHP, and in reality, it can do just as much as any plugin
+						// can, meaning it can be as dangerous as any plugin.
+						$status = plugin_check_status($filename, $reason);
+
+						// Get the status message, and the color that the message should be.
+						// But first, include a file.
+						require_once($core_dir. '/admin/admin_plugins_add.php');
+
+						// Okay, now get the response!
+						$response = admin_plugins_get_message($status, $theme_info['name'], $reason, true);
+
+						// Is it okay? Can we continue without prompting?
+						$install_proceed = isset($_GET['proceed']) || $status == 'approved';
+						$api->run_hooks('plugin_install_proceed', array(&$install_proceed, $status, 'theme'));
+					}
+				}
+
+				$theme->footer();
+			}
+		}
   }
 }
 
@@ -492,8 +672,8 @@ if(!function_exists('admin_themes_check_updates'))
     they support it.
 
     Parameters:
-      $themes - An array containing an array of directories which are at the
-                root of the theme.
+      array $themes - An array containing an array of directories which are
+											at the root of the theme.
 
     Returns:
       void - Nothing is returned by this function.
@@ -506,7 +686,7 @@ if(!function_exists('admin_themes_check_updates'))
       updates for all existing themes, so long as it hasn't been done within
       the last hour.
   */
-  function admin_themes_check_updates($themes = array())
+  function admin_themes_check_updates($themes = array(), $force_check = false)
   {
     global $api, $settings;
 
@@ -516,7 +696,7 @@ if(!function_exists('admin_themes_check_updates'))
       // Since you didn't supply any themes, we will get them on our own!
       // It is likely this is being called on by the task scheduling system,
       // so let's make sure we aren't doing this too often!
-      if(true/*$settings->get('last_theme_update_check', 'int', 0) + 3600 < time_utc()*/)
+      if($settings->get('last_theme_update_check', 'int', 0) + 3600 < time_utc())
       {
         // <theme_load> will get us the information we want.
         $theme_list = theme_list();
@@ -566,7 +746,7 @@ if(!function_exists('admin_themes_check_updates'))
           $fp = fopen($theme_info['path']. '/available-update', 'w');
 
           flock($fp, LOCK_EX);
-          fwrite($fp, $request);
+          fwrite($fp, htmlchars(substr(strip_tags($request), 0, 10)));
           flock($fp, LOCK_UN);
 
           fclose($fp);
