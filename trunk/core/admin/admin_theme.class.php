@@ -252,6 +252,22 @@ class Admin_Theme extends Theme
       border: 1px solid #FFFFFF;
       background: transparent;
       margin-top: 10px;
+      margin-left: 5px;
+    }
+
+    #content .theme_list .important
+    {
+			-moz-border-radius: 5px;
+			-webkit-border-radius: 5px;
+			border-radius: 5px;
+			border: 1px solid #CD0000;
+			background: #FFC1C1;
+    }
+
+    #content .theme_list .important:hover
+    {
+			border-color: #CD0000;
+			background: #FF6A6A;
     }
 
     #content #main .icons a

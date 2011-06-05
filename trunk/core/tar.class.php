@@ -385,7 +385,7 @@ class Tar
           fseek($this->fp, $file['pos']);
 
           # Open the file that needs creation.
-          $fp = fopen($file['name'], 'wb');
+          $fp = @fopen($file['name'], 'wb');
 
           if(empty($fp))
           {
