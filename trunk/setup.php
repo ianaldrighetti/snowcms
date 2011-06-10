@@ -186,7 +186,7 @@ function setup_step_1()
 			// So, did it work?
 			if(!empty($connection))
 			{
-				$selected_db = @mysql_select_db($db_name);
+				$selected_db = @mysql_select_db($db_name, $connection);
 
 				// Were we able to select the database?
 				if(!empty($selected_db))
@@ -377,6 +377,8 @@ function setup_step_2()
 
 		$member_name = !empty($_POST['member_name']) ? trim($_POST['member_name']) : '';
 		$member_pass = !empty($_POST['member_pass']) ? $_POST['member_pass'] : '';
+		$verify_pass = !empty($_POST['verify_pass']) ? $_POST['verify_pass'] : '';
+		$member_email = !empty($_POST['member_email']) ? $_POST['member_email'] : '';
 
 		// Make sure they pass session verification.
 		if(empty($_POST['session_id']) || $_POST['session_id'] != $_SESSION['id'])
@@ -395,11 +397,21 @@ function setup_step_2()
 		{
 			$error_msg[] = 'Please use a password that is more than 6 characters long.';
 		}
+		elseif($verify_pass != $member_pass)
+		{
+			$error_msg[] = 'Your passwords do not match.';
+		}
+
+		// We won't validate it, but enter SOMETHING!
+		if(empty($member_email))
+		{
+			$error_msg[] = 'Please enter an email address.';
+		}
 
 		if(count($error_msg) == 0)
 		{
 			// Finalize the installation process :-)
-			if(setup_finalize($member_name, $member_pass, $error_msg))
+			if(setup_finalize($member_name, $member_pass, $member_email, $error_msg))
 			{
 				// Awesome, you're done!
 				$_SESSION['step'] = 3;
@@ -445,6 +457,13 @@ function setup_step_2()
 						<td><input type="password" name="member_pass" value="" /></td>
 					</tr>
 					<tr>
+						<td class="label">Password: <sub>Just to be sure...</sub></td>
+						<td><input type="password" name="verify_pass" value="" /></td>
+					</tr>
+					<tr>
+						<td class="label">Email:</td>
+						<td><input type="text" name="member_email" value="', !empty($_POST['member_email']) ? htmlspecialchars($_POST['member_email'], ENT_QUOTES) : '', '" /></td>
+					<tr>
 						<td colspan="2" style="text-align: right; padding: 5px 0;"><input type="submit" name="proc_step_2" value="Proceed &raquo;" /></td>
 					</tr>
 				</table>
@@ -465,9 +484,134 @@ function setup_step_2()
 	Returns:
 		bool
 */
-function setup_finalize($member_name, $member_pass, &$error_msg)
+function setup_finalize($member_name, $member_pass, $member_email, &$error_msg)
 {
-	return false;
+	// Get the configuration file. We will need that!
+	if(!file_exists(dirname(__FILE__). '/config.php'))
+	{
+		$error_msg[] = 'Could not find the configuration file. Please restart the installation process.';
+
+		return false;
+	}
+
+	require_once(dirname(__FILE__). '/config.php');
+
+	$connection = @mysql_connect($db_host, $db_user, $db_pass);
+
+	// This shouldn't happen, but hey, you never know!
+	if(empty($connection))
+	{
+		$error_msg[] = 'MySQL Error: ['. mysql_errno(). '] '. mysql_error();
+
+		return false;
+	}
+
+	$selected_db = @mysql_select_db($db_name, $connection);
+
+	// This shouldn't happen either, but whatever.
+	if(empty($selected_db))
+	{
+		$error_msg[] = 'MySQL Error: ['. mysql_errno(). '] '. mysql_error();
+
+		return false;
+	}
+
+	// Get the setup SQL... If we can.
+	if(!file_exists(dirname(__FILE__). '/setup-mysql.sql'))
+	{
+		$error_msg[] = 'Could not find setup-mysql.sql, which is required for installation.';
+
+		return false;
+	}
+
+	$lines = explode("\r\n", file_get_contents(dirname(__FILE__). '/setup-mysql.sql'));
+
+	$commands = array();
+	foreach($lines as $line)
+	{
+		if(substr(ltrim($line), 0, 1) == '#' || substr(ltrim($line), 0, 2) == '--')
+		{
+			// Skip this, it's a comment.
+			continue;
+		}
+
+		$commands[] = $line;
+	}
+
+	$commands = explode(';', str_replace('{db->prefix}', $tbl_prefix, implode('', $commands)));
+
+	// Start a transaction.
+	mysql_query('SET autocommit = 0');
+	mysql_query('START TRANSACTION');
+
+	foreach($commands as $command)
+	{
+		if(strlen(trim($command)) == 0)
+		{
+			continue;
+		}
+
+		// If anything bad happens, we will quit.
+		if(!mysql_query($command))
+		{
+			// Oh noes! Something bad happened!
+			$error_msg[] = 'MySQL Error: ['. mysql_errno(). '] '. mysql_error();
+
+			// Rollback! Quick!
+			mysql_query('ROLLBACK');
+
+			// Quit!
+			return false;
+		}
+	}
+
+	// Seems to be all good.
+	mysql_query('COMMIT');
+
+	// Let's create your account now, shall we?
+	mysql_query('
+		INSERT INTO `'. $tbl_prefix. 'members`
+		(`member_name`, `member_pass`, `member_hash`, `member_email`, `display_name`, `member_groups`, `member_registered`, `member_activated`)
+		VALUES(\''. mysql_real_escape_string(htmlspecialchars($member_name, ENT_QUOTES)). '\', \''. mysql_real_escape_string(sha1(strtolower($member_name). $member_pass)). '\', \''. mysql_real_escape_string(rand_str(16)). '\', \''. mysql_real_escape_string(htmlspecialchars($member_email, ENT_QUOTES)). '\', \''. mysql_real_escape_string(htmlspecialchars($member_name, ENT_QUOTES)). '\', \'administrator\', \''. time(). '\', 1)');
+
+	return true;
+}
+
+/*
+	Function: rand_str
+
+	Generates a random string, randomly... Of course!
+
+	Parameters:
+		int $length
+
+	Returns:
+		void
+
+	Note:
+		Well, it's as random as a random number can be... Well, what I could
+		think of anyway. :-P
+*/
+function rand_str($length = 0)
+{
+	if(empty($length) || $length < 1)
+	{
+		$length = mt_rand(1, 100);
+	}
+
+	$chars = array(
+						 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z',
+						 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z',
+						 '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '~', '!', '@', '#', '$', '%', '^', '*', '-', '_', '+', '=', '?',
+					 );
+
+	$str = '';
+	for($i = 0; $i < $length; $i++)
+	{
+		$str .= $chars[array_rand($chars)];
+	}
+
+	return $str;
 }
 
 /*
@@ -597,7 +741,7 @@ function template_header($step = 0)
 <body>
 	<div id="container">
 		<div id="current-step">
-			<p><span class="header', $step == 1 ? ' current' : '', '">Step 1</span> <sub>Configure</sub> <span class="header current">&gt;</span> <span class="header', $step == 2 ? ' current' : '', '">Step 2</span> <sub>Default Account</sub> <span class="header current">&gt;</span> <span class="header', $step == 3 ? ' current' : '', '">Finished</span> <sub>Enjoy!</sub></p>
+			<p><span class="header', $step == 1 ? ' current' : '', '">Step 1</span> <sub>Configure</sub> <span class="header current">&gt;</span> <span class="header', $step == 2 ? ' current' : '', '">Step 2</span> <sub>Create Account</sub> <span class="header current">&gt;</span> <span class="header', $step == 3 ? ' current' : '', '">Finished</span> <sub>Enjoy!</sub></p>
 		</div>
 		<div id="content">';
 }
