@@ -615,6 +615,37 @@ function rand_str($length = 0)
 }
 
 /*
+	Function: setup_step_3
+
+	Finishes the installation process by, well, deleting stuff!
+
+	Parameters:
+		none
+
+	Returns:
+		void
+*/
+function setup_step_3()
+{
+	// Delete some stuff...
+	unlink(__FILE__);
+	unlink(dirname(__FILE__). '/setup-mysql.sql');
+	unlink(dirname(__FILE__). '/setup-sqlite.sql');
+
+	require_once(dirname(__FILE__). '/config.php');
+
+	template_header(3);
+
+	echo '
+			<h1>You&#039;re Ready to Go!</h1>
+			<p>You&#039;re <a href="', $base_url, '">new site is all set</a> and ready to go!</p>
+
+			<p>Thanks again for choosing SnowCMS for your content management needs. If you need any help, check out <a href="http://www.snowcms.com/" target="_blank">www.snowcms.com</a>.</p>';
+
+	template_footer();
+}
+
+/*
 	Function: template_header
 
 	Parameters:
