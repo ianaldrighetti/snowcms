@@ -44,6 +44,7 @@ error_reporting(E_STRICT | E_ALL);
 # config.php not exist? A good sign SnowCMS isn't installed :P
 if(!file_exists('config.php'))
 {
+	header('HTTP/1.1 307 Temporary Redirect');
   header('Location: setup.php');
   exit;
 }
