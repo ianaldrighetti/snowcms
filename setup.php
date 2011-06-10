@@ -359,6 +359,118 @@ $cookie_name = \'SCMS'. mt_rand(100, 999). '\';
 }
 
 /*
+	Function: setup_step_2
+
+	Displays and processes everything which needs to occur during step #2.
+
+	Parameters:
+		none
+
+	Returns:
+		void
+*/
+function setup_step_2()
+{
+	if(!empty($_POST['proc_step_2']))
+	{
+		$error_msg = array();
+
+		$member_name = !empty($_POST['member_name']) ? trim($_POST['member_name']) : '';
+		$member_pass = !empty($_POST['member_pass']) ? $_POST['member_pass'] : '';
+
+		// Make sure they pass session verification.
+		if(empty($_POST['session_id']) || $_POST['session_id'] != $_SESSION['id'])
+		{
+			$error_msg[] = 'Session verification failed. Please try again.';
+		}
+
+		// No empty username!
+		if(strlen($member_name) == 0)
+		{
+			$error_msg[] = 'Please enter a username.';
+		}
+
+		// At least a 6 character long password, please.
+		if(strlen($member_pass) < 6)
+		{
+			$error_msg[] = 'Please use a password that is more than 6 characters long.';
+		}
+
+		if(count($error_msg) == 0)
+		{
+			// Finalize the installation process :-)
+			if(setup_finalize($member_name, $member_pass, $error_msg))
+			{
+				// Awesome, you're done!
+				$_SESSION['step'] = 3;
+
+				header('HTTP/1.1 Temporary Redirect');
+				header('Location: setup.php?step=3');
+
+				exit;
+			}
+		}
+	}
+
+	template_header(2);
+
+	echo '
+			<h1>Create an Account</h1>
+			<p>Alrighty, let&#039;s get you an administrative account created. We&#039;re just about done!</p>';
+
+	if(!empty($error_msg) && count($error_msg) > 0)
+	{
+		echo '
+			<div class="error-message">';
+
+		foreach($error_msg as $e_message)
+		{
+			echo '
+				<p>', $e_message, '</p>';
+		}
+
+		echo '
+			</div>';
+	}
+
+	echo '
+			<form action="setup.php?step=2" method="post">
+				<table width="50%" style="margin: auto;">
+					<tr>
+						<td class="label">Username:</td>
+						<td><input type="text" name="member_name" value="', !empty($_POST['member_name']) ? htmlspecialchars($_POST['member_name'], ENT_QUOTES) : '', '" /></td>
+					</tr>
+					<tr>
+						<td class="label">Password:</td>
+						<td><input type="password" name="member_pass" value="" /></td>
+					</tr>
+					<tr>
+						<td colspan="2" style="text-align: right; padding: 5px 0;"><input type="submit" name="proc_step_2" value="Proceed &raquo;" /></td>
+					</tr>
+				</table>
+				<input type="hidden" name="session_id" value="', $_SESSION['id'], '" />
+			</form>';
+
+	template_footer();
+}
+
+/*
+	Function: setup_finalize
+
+	Parameters:
+		string $member_name
+		string $member_pass
+		array &$error_msg
+
+	Returns:
+		bool
+*/
+function setup_finalize($member_name, $member_pass, &$error_msg)
+{
+	return false;
+}
+
+/*
 	Function: template_header
 
 	Parameters:
