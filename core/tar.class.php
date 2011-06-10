@@ -280,7 +280,7 @@ class Tar
         $file['pos'] = ftell($this->fp);
 
         # Ignore the file data, for now (The file size must be a multiple of 512)...
-        $seek = $file['size'] + (($file['size'] / (double)512) == 0 ? 0 : 512 - ($file['size'] % 512));
+        $seek = $file['size'] + (($file['size'] % 512) == 0 ? 0 : 512 - ($file['size'] % 512));
         fseek($this->fp, $seek, SEEK_CUR);
 
         # Remove some bytes.

@@ -84,7 +84,7 @@ class Zip
 
     # Not right?
     if($signature != 0x04034b50)
-    {var_dump($signature);
+    {
       return false;
     }
 

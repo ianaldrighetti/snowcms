@@ -598,7 +598,7 @@ if(!function_exists('admin_themes_update'))
 					if(!file_exists($current_dir. '/~update') && !@mkdir($current_dir. '/~update', 0755, true))
 					{
 						echo '
-				<p>', l('Failed to create the temporary update directory. Make sure the theme directory is writable.'), '</p>';
+				<p class="red">', l('Failed to create the temporary update directory. Make sure the theme directory is writable.'), '</p>';
 					}
 					elseif($update->extract($filename, $current_dir. '/~update'))
 					{
@@ -607,7 +607,7 @@ if(!function_exists('admin_themes_update'))
 						if(theme_load($current_dir. '/~update') === false)
 						{
 							echo '
-				<p>', l('The update package was not a valid theme.'), '</p>';
+				<p class="red">', l('The update package was not a valid theme.'), '</p>';
 
 							// Delete the NOT theme (:P) and the package that was uploaded.
 							recursive_unlink($current_dir. '/~update');
@@ -616,7 +616,7 @@ if(!function_exists('admin_themes_update'))
 						else
 						{
 							echo '
-				<p>', l('The update was successfully extracted. Proceeding...'), '</p>';
+				<p class="green">', l('The update was successfully extracted. Proceeding...'), '</p>';
 
 							// The theme was extracted, and it appears to be a real theme,
 							// so we may continue!
@@ -628,7 +628,7 @@ if(!function_exists('admin_themes_update'))
 						// Well, the Update class couldn't extract the package, so it isn't
 						// a supported format (ZIP, Tarball, or Gzip tarball). That sucks.
 						echo '
-				<p>', l('The update package could not be extracted.'), '</p>';
+				<p class="red">', l('The update package could not be extracted.'), '</p>';
 
 						recursive_unlink($current_dir. '/~update');
 						unlink($filename);
@@ -653,6 +653,46 @@ if(!function_exists('admin_themes_update'))
 						// Is it okay? Can we continue without prompting?
 						$install_proceed = isset($_GET['proceed']) || $status == 'approved';
 						$api->run_hooks('plugin_install_proceed', array(&$install_proceed, $status, 'theme'));
+
+						echo '
+				<h3>', l('Verifying theme status'), '</h3>
+				<p style="color: ', $response['color'], ';">', $response['message'], '</p>';
+
+						// Was it deemed okay?
+						if(!empty($install_proceed))
+						{
+							// Yup! Sure was!
+							// Just copy over the update files.
+							$update->copy($current_dir. '/~update', $current_dir);
+
+							echo '
+				<h3>', l('Finishing installation'), '</h3>
+				<p>', l('The installation of the theme update was completed successfully. <a href="%s">Back to theme management</a>.', $base_url. '/index.php?action=admin&sa=themes'), '</p>';
+
+							// Delete the file, and we really are done!
+							unlink($filename);
+						}
+						else
+						{
+							// Uh oh!
+							// It was not safe, but if you still want to continue installing
+							// it, be my guest! Just be sure you know what you're getting
+							// yourself into, please!
+							// We will delete the extracted theme, you know, just incase ;).
+							recursive_unlink($current_dir. '/~update');
+							unlink($filename);
+
+							echo '
+					<form action="', $base_url, '/index.php" method="get" onsubmit="return confirm(\'', l('Are you sure you want to proceed with the installation of this theme update?\r\nBe sure you trust the source of this plugin.'), '\');">
+						<input type="submit" value="', l('Proceed'), '" />
+						<input type="hidden" name="action" value="admin" />
+						<input type="hidden" name="sa" value="themes" />
+						<input type="hidden" name="update" value="', urlencode($_GET['update']), '" />
+						<input type="hidden" name="version" value="', urlencode(!empty($_GET['version']) ? $_GET['version'] : ''), '" />
+						<input type="hidden" name="sid" value="', $member->session_id(), '" />
+						<input type="hidden" name="proceed" value="true" />
+					</form>';
+						}
 					}
 				}
 
