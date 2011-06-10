@@ -447,7 +447,7 @@ if(!function_exists('admin_plugins_update'))
             // column to empty.
             $db->query('
               UPDATE {db->prefix}plugins
-              SET dependency_name = {string:updated_guid}, runtime_error = 0, available_update = ''
+              SET dependency_name = {string:updated_guid}, runtime_error = 0, available_update = \'\'
               WHERE dependency_name = {string:current_guid}
               LIMIT 1',
               array(

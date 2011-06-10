@@ -84,6 +84,7 @@ function init_core()
   $api->add_event('action=resource', 'api_handle_resource');
   $api->add_event('action=reminder', 'reminder_view', $core_dir. '/reminder.php');
   $api->add_event('action=reminder2', 'reminder_view2', $core_dir. '/reminder.php');
+  $api->add_event('action=tasks', 'tasks_run', $core_dir. '/tasks.class.php');
   $api->add_event('action=popup', 'core_popup');
 
   # Stop output buffering which was started in the <load_api> function.
