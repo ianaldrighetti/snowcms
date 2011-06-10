@@ -553,4 +553,13 @@ function init_tasks()
 
   $api->run_hooks('post_init_tasks');
 }
+
+function tasks_run()
+{
+	global $api;
+
+	$tasks = $api->load_class('Tasks');
+
+	$tasks->run();
+}
 ?>

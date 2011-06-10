@@ -670,7 +670,9 @@ if(!function_exists('admin_themes_update'))
 				<p>', l('The installation of the theme update was completed successfully. <a href="%s">Back to theme management</a>.', $base_url. '/index.php?action=admin&sa=themes'), '</p>';
 
 							// Delete the file, and we really are done!
+							recursive_unlink($current_dir. '/~update');
 							unlink($filename);
+							unlink($current_dir. '/available-update');
 						}
 						else
 						{
