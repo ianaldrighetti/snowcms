@@ -42,12 +42,12 @@ if(!function_exists('checkcookie_verify'))
   */
   function checkcookie_verify()
   {
-    global $api, $base_url, $cookie_name, $core_dir, $theme;
+    global $api, $theme;
 
     $api->run_hooks('checkcookie_verify');
 
     # This is a pretty simple check...
-    $cookie = isset($_COOKIE[$cookie_name]) ? $_COOKIE[$cookie_name] : '';
+    $cookie = isset($_COOKIE[cookiename]) ? $_COOKIE[cookiename] : '';
     list($member_id) = explode('|', $cookie);
 
     if(empty($cookie) || empty($_GET['id']) || $_GET['id'] != $member_id)
@@ -62,7 +62,7 @@ if(!function_exists('checkcookie_verify'))
       $login_view_func = $api->apply_filters('login_view_function', 'login_view');
       if(!function_exists($login_view_func))
       {
-        require_once($api->apply_filters('login_view_path', $core_dir. '/login.php'));
+        require_once($api->apply_filters('login_view_path', coredir. '/login.php'));
       }
 
       $theme->add_meta(array('name' => 'robots', 'content' => 'noindex'));
@@ -74,7 +74,7 @@ if(!function_exists('checkcookie_verify'))
     $api->run_hooks('checkcookie_success');
 
     # Seemed to have worked, so let's go home!
-    header('Location: '. $base_url);
+    header('Location: '. baseurl);
     exit;
   }
 }

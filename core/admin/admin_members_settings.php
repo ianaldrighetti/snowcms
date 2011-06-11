@@ -106,12 +106,12 @@ if(!function_exists('admin_members_settings_generate_form'))
   */
   function admin_members_settings_generate_form()
   {
-    global $api, $base_url, $settings;
+    global $api, $settings;
 
     $form = $api->load_class('Form');
 
     $form->add('admin_members_settings_form', array(
-                                                'action' => $base_url. '/index.php?action=admin&sa=members_settings',
+                                                'action' => baseurl. '/index.php?action=admin&sa=members_settings',
                                                 'ajax_submit' => true,
                                                 'callback' => 'admin_members_settings_handle',
                                                 'submit' => l('Save settings'),

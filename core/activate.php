@@ -43,14 +43,14 @@ if(!function_exists('activate_view'))
   */
   function activate_view()
   {
-    global $api, $base_url, $member, $settings, $theme;
+    global $api, $member, $settings, $theme;
 
     $api->run_hooks('activate_view');
 
     # Are you logged in? Then why would you need to activate another account?
     if($member->is_logged())
     {
-      header('Location: '. $base_url);
+      header('Location: '. baseurl);
       exit;
     }
     # What is the registration type? Is it actually email?
@@ -93,9 +93,7 @@ if(!function_exists('activate_view'))
         if($member_info['is_activated'] == 1)
         {
           $api->add_filter('activation_message', create_function('$value', '
-                                                 global $base_url;
-
-                                                 return l(\'It appears that the specified member is already activated. If this is your account, you can <a href="%s">login</a> now.\', $base_url. \'/index.php?action=login\');'));
+                                                 return l(\'It appears that the specified member is already activated. If this is your account, you can <a href="%s">login</a> now.\', baseurl. \'/index.php?action=login\');'));
           $api->run_hooks('activation_member_already_activated', array($member_info));
 
           $_REQUEST['name'] = $member_info['username'];
@@ -120,9 +118,7 @@ if(!function_exists('activate_view'))
           $api->add_filter('activation_message_id', create_function('$value', '
                                                       return \'activation_success\';'));
           $api->add_filter('activation_message', create_function('$value', '
-                                                     global $base_url;
-
-                                                     return l(\'Your account has been successfully activated. You may now proceed to <a href="%s">login</a>.\', $base_url. \'/index.php?action=login\');'));
+                                                     return l(\'Your account has been successfully activated. You may now proceed to <a href="%s">login</a>.\', baseurl. \'/index.php?action=login\');'));
           $api->run_hooks('activation_member_success', array($member_info));
 
           $_REQUEST['name'] = '';
@@ -150,7 +146,7 @@ if(!function_exists('activate_view'))
 
     echo '
       <h1>', l('Activate your account'), '</h1>
-      <p>', l('If your account has not yet been activated, you can enter your activation information here. If you have yet to receive your activation email, you can <a href="%s">request for it to be resent</a>.', $base_url. '/index.php?action=resend'), '</p>';
+      <p>', l('If your account has not yet been activated, you can enter your activation information here. If you have yet to receive your activation email, you can <a href="%s">request for it to be resent</a>.', baseurl. '/index.php?action=resend'), '</p>';
 
     if(strlen($api->apply_filters('activation_message', '')) > 0)
     {
@@ -161,7 +157,7 @@ if(!function_exists('activate_view'))
     }
 
     echo '
-      <form action="', $base_url, '/index.php?action=activate" method="post" id="activation_form">
+      <form action="', baseurl, '/index.php?action=activate" method="post" id="activation_form">
         <fieldset>
           <table>
             <tr id="activation_form_name">

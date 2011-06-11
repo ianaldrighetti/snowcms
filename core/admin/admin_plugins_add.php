@@ -42,7 +42,7 @@ if(!function_exists('admin_plugins_add'))
   */
   function admin_plugins_add()
   {
-    global $api, $base_url, $member, $settings, $theme, $theme_url;
+    global $api, $member, $settings, $theme;
 
     $api->run_hooks('admin_plugins_add');
 
@@ -95,13 +95,13 @@ if(!function_exists('admin_plugins_add_generate_form'))
   */
   function admin_plugins_add_generate_form()
   {
-    global $api, $base_url;
+    global $api;
 
     $form = $api->load_class('Form');
 
     # Let's get to making our form, shall we?
     $form->add('add_plugins_form', array(
-                                     'action' => $base_url. '/index.php?action=admin&amp;sa=plugins_add',
+                                     'action' => baseurl. '/index.php?action=admin&amp;sa=plugins_add',
                                      'callback' => 'admin_plugins_add_handle',
                                      'method' => 'post',
                                      'submit' => l('Add plugin'),
@@ -137,7 +137,7 @@ if(!function_exists('admin_plugins_add_handle'))
 
     Returns:
       bool - Returns false on failure, the user gets redirected to
-             {$base_url}/index.php?action=admin&sa=plugins_add&install={filename}
+             {baseurl}/index.php?action=admin&sa=plugins_add&install={filename}
              where the status of the plugin is checked and then installed.
 
     Note:
@@ -145,13 +145,13 @@ if(!function_exists('admin_plugins_add_handle'))
   */
   function admin_plugins_add_handle($data, &$errors = array())
   {
-    global $api, $base_url, $member, $plugin_dir;
+    global $api, $member;
 
     # Where should this plugin go..?
-    $filename = $plugin_dir. '/'. uniqid('plugin_'). '.tmp';
+    $filename = plugindir. '/'. uniqid('plugin_'). '.tmp';
     while(file_exists($filename))
     {
-      $filename = $plugin_dir. '/'. uniqid('plugin_'). '.tmp';
+      $filename = plugindir. '/'. uniqid('plugin_'). '.tmp';
     }
 
     # Uploading a file, are we?
@@ -185,7 +185,7 @@ if(!function_exists('admin_plugins_add_handle'))
     }
 
     # If it worked, we get redirected!
-    redirect($base_url. '/index.php?action=admin&sa=plugins_add&install='. urlencode(basename($filename)). '&sid='. $member->session_id());
+    redirect(baseurl. '/index.php?action=admin&sa=plugins_add&install='. urlencode(basename($filename)). '&sid='. $member->session_id());
   }
 }
 
@@ -208,7 +208,7 @@ if(!function_exists('admin_plugins_install'))
   */
   function admin_plugins_install()
   {
-    global $api, $base_url, $db, $member, $plugin_dir, $theme, $theme_url;
+    global $api, $db, $member, $theme;
 
     $api->run_hooks('admin_plugins_install');
 
@@ -225,12 +225,12 @@ if(!function_exists('admin_plugins_install'))
     verify_request('get');
 
     // Which file are you installing as a plugin?
-    $filename = realpath($plugin_dir. '/'. basename($_GET['install']));
+    $filename = realpath(plugindir. '/'. basename($_GET['install']));
     $extension = explode('.', $filename);
 
     // Make sure the file exists, that it is a file, that it is within the
     // plugin directory, and that the extension is valid.
-    if(empty($filename) || !is_file($filename) || substr($filename, 0, strlen(realpath($plugin_dir))) != realpath($plugin_dir) || count($extension) < 2 || $extension[count($extension) - 1] != 'tmp')
+    if(empty($filename) || !is_file($filename) || substr($filename, 0, strlen(realpath(plugindir))) != realpath(plugindir) || count($extension) < 2 || $extension[count($extension) - 1] != 'tmp')
     {
       // Must not be valid, from what we can tell.
       $theme->set_title(l('An error has occurred'));
@@ -277,23 +277,23 @@ if(!function_exists('admin_plugins_install'))
       $name = $name[0];
 
       // We need to make the directory where the plugin will be extracted to.
-      if(!file_exists($plugin_dir. '/'. $name) && !@mkdir($plugin_dir. '/'. $name, 0755, true))
+      if(!file_exists(plugindir. '/'. $name) && !@mkdir(plugindir. '/'. $name, 0755, true))
       {
         echo '
     <p>', l('Failed to create the temporary plugin directory. Make sure the plugins directory is writable.'), '</p>';
       }
       // Try extracting the plugin.
-      elseif($update->extract($filename, $plugin_dir. '/'. $name))
+      elseif($update->extract($filename, plugindir. '/'. $name))
       {
         // Just because the package could be extracted means nothing. We
         // will use the <plugin_load> function to check to see if it is a
         // valid plugin. If it isn't, the function will return false.
-        if(plugin_load($plugin_dir. '/'. $name) === false)
+        if(plugin_load(plugindir. '/'. $name) === false)
         {
           echo '
     <p>', l('The uploaded package was not a valid plugin.'), '</p>';
 
-          recursive_unlink($plugin_dir. '/'. $name);
+          recursive_unlink(plugindir. '/'. $name);
           unlink($filename);
         }
         else
@@ -314,7 +314,7 @@ if(!function_exists('admin_plugins_install'))
     <p>', l('The uploaded package could not be extracted.'), '</p>';
 
         // Delete everything. It is no use to us now.
-        recursive_unlink($plugin_dir. '/'. $name);
+        recursive_unlink(plugindir. '/'. $name);
         unlink($filename);
       }
 
@@ -323,7 +323,7 @@ if(!function_exists('admin_plugins_install'))
       {
         // Get the current status of the plugin.
         $status = plugin_check_status($filename, $reason);
-        $plugin_info = plugin_load($plugin_dir. '/'. $name);
+        $plugin_info = plugin_load(plugindir. '/'. $name);
 
         // Get the status message, and the color that the message should be.
         $response = admin_plugins_get_message($status, $plugin_info['name'], $reason);
@@ -357,7 +357,7 @@ if(!function_exists('admin_plugins_install'))
           if($result->affected_rows() == 0)
           {
             // Delete it.
-            recursive_unlink($plugin_dir. '/'. $name);
+            recursive_unlink(plugindir. '/'. $name);
 
             echo '
   <p>', l('A plugin with that globally unique identifier (%s) is already installed.', htmlchars($plugin_info['guid']));
@@ -365,20 +365,20 @@ if(!function_exists('admin_plugins_install'))
           else
           {
             // Is there a file which you want run once installed?
-            if(file_exists($plugin_dir. '/'. $name. '/install.php'))
+            if(file_exists(plugindir. '/'. $name. '/install.php'))
             {
-              require_once($plugin_dir. '/'. $name. '/install.php');
-              unlink($plugin_dir. '/'. $name. '/install.php');
+              require_once(plugindir. '/'. $name. '/install.php');
+              unlink(plugindir. '/'. $name. '/install.php');
             }
 
             // If there is an update file, there is no need for it now.
-            if(file_exists($plugin_dir. '/'. $name. '/update.php'))
+            if(file_exists(plugindir. '/'. $name. '/update.php'))
             {
-              unlink($plugin_dir. '/'. $name. '/update.php');
+              unlink(plugindir. '/'. $name. '/update.php');
             }
 
             echo '
-  <p>', l('The installation of the plugin was completed successfully. <a href="%s">Back to plugin management</a>.', $base_url. '/index.php?action=admin&sa=plugins_manage'), '</p>';
+  <p>', l('The installation of the plugin was completed successfully. <a href="%s">Back to plugin management</a>.', baseurl. '/index.php?action=admin&sa=plugins_manage'), '</p>';
           }
 
           // We are done with the package.
@@ -390,10 +390,10 @@ if(!function_exists('admin_plugins_install'))
           // sure you know what you are doing, and until you decide to
           // proceed, we will delete the extracted plugin, for safety
           // reasons.
-          recursive_unlink($plugin_dir. '/'. $name);
+          recursive_unlink(plugindir. '/'. $name);
 
           echo '
-  <form action="', $base_url, '/index.php" method="get" onsubmit="return confirm(\'', l('Are you sure you want to proceed with the installation of this plugin?\r\nBe sure you trust the source of this plugin.'), '\');">
+  <form action="', baseurl, '/index.php" method="get" onsubmit="return confirm(\'', l('Are you sure you want to proceed with the installation of this plugin?\r\nBe sure you trust the source of this plugin.'), '\');">
     <input type="submit" value="', l('Proceed'), '" />
     <input type="hidden" name="action" value="admin" />
     <input type="hidden" name="sa" value="plugins_add" />

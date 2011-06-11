@@ -42,7 +42,7 @@ if(!function_exists('admin_home'))
   */
   function admin_home()
   {
-    global $api, $base_url, $func, $icons, $member, $settings, $theme;
+    global $api, $func, $icons, $member, $settings, $theme;
 
     $api->run_hooks('admin_home');
 
@@ -221,7 +221,7 @@ if(!function_exists('admin_home'))
 */
 function admin_about()
 {
-  global $api, $base_url, $db, $theme;
+  global $api, $db, $theme;
 
   $theme->set_current_area('system_about');
 

@@ -42,7 +42,7 @@ if(!function_exists('login_view'))
   */
   function login_view()
   {
-    global $api, $base_url, $func, $member, $theme, $theme_url;
+    global $api,$func, $member, $theme;
 
     $api->run_hooks('login_view');
 
@@ -59,7 +59,7 @@ if(!function_exists('login_view'))
 
     echo '
       <h1>', l('Log in to your account'), '</h1>
-      <p>', l('Here you can log in to your account, if you do not have an account, you can <a href="%s">register one</a>. Did you forget your password? Request a new one <a href="%s">here</a>.', $base_url. '/index.php?action=register', $base_url. '/index.php?action=reminder'), '</p>';
+      <p>', l('Here you can log in to your account, if you do not have an account, you can <a href="%s">register one</a>. Did you forget your password? Request a new one <a href="%s">here</a>.', baseurl. '/index.php?action=register', baseurl. '/index.php?action=reminder'), '</p>';
 
     # Generate that lovely login form.
     login_generate_form();
@@ -90,7 +90,7 @@ if(!function_exists('login_generate_form'))
   */
   function login_generate_form()
   {
-    global $api, $base_url;
+    global $api;
     static $generated = false;
 
     # Don't generate the form twice.
@@ -103,7 +103,7 @@ if(!function_exists('login_generate_form'))
     $form = $api->load_class('Form');
     $form->add('login_form', array(
                                'callback' => 'login_process',
-                               'action' => $api->apply_filters('login_action_url', $base_url. '/index.php?action=login2'),
+                               'action' => $api->apply_filters('login_action_url', baseurl. '/index.php?action=login2'),
                                'method' => 'post',
                                'submit' => l('Login'),
                              ));
@@ -182,12 +182,12 @@ if(!function_exists('login_view2'))
   */
   function login_view2()
   {
-    global $api, $base_url, $theme, $member;
+    global $api, $theme, $member;
 
     # Are you logged in? You Silly Pants you!
     if($member->is_logged())
     {
-      header('Location: '. $base_url);
+      header('Location: '. baseurl);
       exit;
     }
 
@@ -209,7 +209,7 @@ if(!function_exists('login_view2'))
     }
 
     # Redirect to check that login cookie! :)
-    header('Location: '. $base_url. '/index.php?action=checkcookie&id='. $member_id);
+    header('Location: '. baseurl. '/index.php?action=checkcookie&id='. $member_id);
     exit;
   }
 }
@@ -235,7 +235,7 @@ if(!function_exists('login_process'))
   */
   function login_process($login, &$errors = array())
   {
-    global $api, $base_url, $cookie_name, $db, $func, $settings, $theme, $member;
+    global $api, $db, $func, $settings, $theme, $member;
 
     $api->run_hooks('login_process');
 
@@ -320,7 +320,7 @@ if(!function_exists('login_process'))
 
     # Set the cookie, a chocolate chip cookie :) No one likes oatmeal cookies, they are nasty...
     # Oh yeah, and give the password a touch of salt, :D Take that HTTP sniffers!
-    setcookie($api->apply_filters('login_cookie_name', $cookie_name), $api->apply_filters('login_cookie_value', $row['member_id']. '|'. sha1($row['member_pass']. $row['member_hash'])), $cookie_expires);
+    setcookie($api->apply_filters('login_cookie_name', cookiename), $api->apply_filters('login_cookie_value', $row['member_id']. '|'. sha1($row['member_pass']. $row['member_hash'])), $cookie_expires);
 
     $_SESSION['member_id'] = (int)$row['member_id'];
     $_SESSION['member_pass'] = sha1($row['member_pass']. $row['member_hash']);

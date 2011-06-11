@@ -26,18 +26,14 @@ class SQLite extends Database
 {
   public function connect()
   {
-    # We only need the database host (path to database), whether you want a
-    # persistent connection, and the table prefix.
-    global $db_host, $db_persist, $tbl_prefix;
-
     # Make it persistent, or not?
-    if(empty($db_persist))
+    if(!defined('dbpersist') || !dbpersist)
     {
-      $this->con = @sqlite_open($db_host);
+      $this->con = @sqlite_open(dbhost);
     }
     else
     {
-      $this->con = @sqlite_popen($db_host);
+      $this->con = @sqlite_popen(dbhost);
     }
 
     # Couldn't open the database?
@@ -48,7 +44,7 @@ class SQLite extends Database
     }
 
     # All done, set a couple things, though.
-    $this->prefix = $tbl_prefix;
+    $this->prefix = tblprefix;
     $this->type = 'SQLite v2';
 
     # SQLite is case sensitive.

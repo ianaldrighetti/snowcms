@@ -1,21 +1,21 @@
 <?php
-#########################################################################
-#                             SnowCMS v2.0                              #
-#                          By the SnowCMS Team                          #
-#                            www.snowcms.com                            #
-#                  Released under the GNU GPL v3 License                #
-#                     www.gnu.org/licenses/gpl-3.0.txt                  #
-#########################################################################
-#                                                                       #
-# SnowCMS originally pawned by soren121 started some time in early 2008 #
-#                                                                       #
-#########################################################################
-#                                                                       #
-#                SnowCMS v2.0 began in November 2009                    #
-#                                                                       #
-#########################################################################
-#                     File version: SnowCMS 2.0                         #
-#########################################################################
+////////////////////////////////////////////////////////////////////////////
+//                              SnowCMS v2.0                              //
+//                           By the SnowCMS Team                          //
+//                             www.snowcms.com                            //
+//                  Released under the GNU GPL v3 License                 //
+//                    www.gnu.org/licenses/gpl-3.0.txt                    //
+////////////////////////////////////////////////////////////////////////////
+//                                                                        //
+//       SnowCMS originally pawned by soren121 started in early 2008      //
+//                                                                        //
+////////////////////////////////////////////////////////////////////////////
+//                                                                        //
+//                  SnowCMS v2.0 began in November 2009                   //
+//                                                                        //
+////////////////////////////////////////////////////////////////////////////
+//                       File version: SnowCMS 2.0                        //
+////////////////////////////////////////////////////////////////////////////
 
 $start_time = microtime(true);
 
@@ -50,24 +50,24 @@ if(!file_exists('config.php'))
 }
 
 require(dirname(__FILE__). '/config.php');
-require_once($core_dir. '/mitigate_globals.php');
+require_once(coredir. '/mitigate_globals.php');
 
 # register_globals is horrible, just plain bad...
 mitigate_globals();
 
 # Now load up the database, very important you know!
-require($core_dir. '/database.php');
+require(coredir. '/database.php');
 
 load_database();
 
 # Set the error handler as soon as possible!
-require($core_dir. '/errors.php');
+require(coredir. '/errors.php');
 
 # Even though plugins can't overload this function, they can hook into it.
 set_error_handler('errors_handler');
 
 # Now that our database is loaded up, let's get the API started, very important you know?
-require($core_dir. '/api.class.php');
+require(coredir. '/api.class.php');
 
 # Call on load_api which is in api.class.php :)
 load_api();
@@ -75,50 +75,50 @@ load_api();
 # Just a hook before anything else major is done.
 $api->run_hooks('pre_start');
 
-require($core_dir. '/time.php');
-require($core_dir. '/validation.class.php');
-require($core_dir. '/settings.class.php');
+require(coredir. '/time.php');
+require(coredir. '/validation.class.php');
+require(coredir. '/settings.class.php');
 
 # Load up the validation and settings class :)
 init_validation();
 init_settings();
 
-require($core_dir. '/func.php');
+require(coredir. '/func.php');
 
 # Initialize the $func array.
 init_func();
 
-require($core_dir. '/compat.php');
-require($core_dir. '/clean_request.php');
+require(coredir. '/compat.php');
+require(coredir. '/clean_request.php');
 
 # We need to filter out some baaaad stuff, like any register_globals issues and other security things.
 clean_request();
 
-require($core_dir. '/session.php');
+require(coredir. '/session.php');
 
 # Start up the session.
 init_session();
 
-require($core_dir. '/member.class.php');
+require(coredir. '/member.class.php');
 
 # Now get that member stuff started up!
 init_member();
 
 # Include our l() function for translation :)
-require($core_dir. '/l.php');
+require(coredir. '/l.php');
 
 # Tasks tool, don't wanna forget that!
-require($core_dir. '/tasks.class.php');
+require(coredir. '/tasks.class.php');
 
 init_tasks();
 
-require($core_dir. '/theme.class.php');
+require(coredir. '/theme.class.php');
 
 # Initialize the theme!!!
 init_theme();
 
 # Now there is some stuff that the system itself needs to take care of :)
-require($core_dir. '/core.php');
+require(coredir. '/core.php');
 
 init_core();
 

@@ -1,24 +1,26 @@
 <?php
-#########################################################################
-#                             SnowCMS v2.0                              #
-#                          By the SnowCMS Team                          #
-#                            www.snowcms.com                            #
-#                  Released under the GNU GPL v3 License                #
-#                     www.gnu.org/licenses/gpl-3.0.txt                  #
-#########################################################################
-#                                                                       #
-# SnowCMS originally pawned by soren121 started some time in early 2008 #
-#                                                                       #
-#########################################################################
-#                                                                       #
-#                SnowCMS v2.0 began in November 2009                    #
-#                                                                       #
-#########################################################################
-#                     File version: SnowCMS 2.0                         #
-#########################################################################
+////////////////////////////////////////////////////////////////////////////
+//                              SnowCMS v2.0                              //
+//                           By the SnowCMS Team                          //
+//                             www.snowcms.com                            //
+//                  Released under the GNU GPL v3 License                 //
+//                    www.gnu.org/licenses/gpl-3.0.txt                    //
+////////////////////////////////////////////////////////////////////////////
+//                                                                        //
+//       SnowCMS originally pawned by soren121 started in early 2008      //
+//                                                                        //
+////////////////////////////////////////////////////////////////////////////
+//                                                                        //
+//                  SnowCMS v2.0 began in November 2009                   //
+//                                                                        //
+////////////////////////////////////////////////////////////////////////////
+//                       File version: SnowCMS 2.0                        //
+////////////////////////////////////////////////////////////////////////////
 
 if(!defined('IN_SNOW'))
-  die;
+{
+  die('Nice try...');
+}
 
 # Title: Blog plugin
 
@@ -53,30 +55,30 @@ $api->add_resource('blog', 'js_editor', dirname(__FILE__). '/js/editor.js');
 */
 function blog_add_admin_icons($icons)
 {
-  global $base_url, $member;
+  global $member;
 
   $icons[l('Blog')] = array(
                         array(
                           'id' => 'blog_add',
-                          'href' => $base_url. '/index.php?action=admin&amp;sa=blog_add',
+                          'href' => baseurl. '/index.php?action=admin&amp;sa=blog_add',
                           'title' => l('Add a new blog post'),
-                          'src' => $base_url. '/index.php?action=resource&amp;area=blog&amp;id=icon_add',
+                          'src' => baseurl. '/index.php?action=resource&amp;area=blog&amp;id=icon_add',
                           'label' => l('Add'),
                           'show' => $member->can('manage_blog_posts'),
                         ),
                         array(
                           'id' => 'blog_manage',
-                          'href' => $base_url. '/index.php?action=admin&amp;sa=blog_manage',
+                          'href' => baseurl. '/index.php?action=admin&amp;sa=blog_manage',
                           'title' => l('Manage blog posts'),
-                          'src' => $base_url. '/index.php?action=resource&amp;area=blog&amp;id=icon_manage',
+                          'src' => baseurl. '/index.php?action=resource&amp;area=blog&amp;id=icon_manage',
                           'label' => l('Manage'),
                           'show' => $member->can('manage_blog_posts'),
                         ),
                         array(
                           'id' => 'blog_settings',
-                          'href' => $base_url. '/index.php?action=admin&amp;sa=blog_settings',
+                          'href' => baseurl. '/index.php?action=admin&amp;sa=blog_settings',
                           'title' => l('Manage blog settings'),
-                          'src' => $base_url. '/index.php?action=resource&amp;area=blog&amp;id=icon_settings',
+                          'src' => baseurl. '/index.php?action=resource&amp;area=blog&amp;id=icon_settings',
                           'label' => l('Settings'),
                           'show' => $member->can('manage_blog_settings'),
                         ),

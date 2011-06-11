@@ -42,7 +42,7 @@ if(!function_exists('admin_members_manage_permissions'))
   */
   function admin_members_manage_permissions()
   {
-    global $api, $base_url, $member, $theme;
+    global $api, $member, $theme;
 
     $api->run_hooks('admin_members_manage_permissions');
 
@@ -71,7 +71,7 @@ if(!function_exists('admin_members_manage_permissions'))
     $group_list = array();
     foreach($groups as $group_id => $group_name)
     {
-      $group_list[] = '<a href="'. $base_url. '/index.php?action=admin&amp;sa=members_permissions&amp;grp='. urlencode($group_id). '">'. $group_name. '</a>';
+      $group_list[] = '<a href="'. baseurl. '/index.php?action=admin&amp;sa=members_permissions&amp;grp='. urlencode($group_id). '">'. $group_name. '</a>';
     }
 
     echo '
@@ -100,7 +100,7 @@ if(!function_exists('admin_members_manage_group_permissions'))
   */
   function admin_members_manage_group_permissions()
   {
-    global $api, $base_url, $member, $theme;
+    global $api, $member, $theme;
 
     $group_id = $_GET['grp'];
 
@@ -153,7 +153,7 @@ if(!function_exists('admin_members_manage_group_permissions'))
 
       echo '
     <h1><img src="', $theme->url(), '/members_permissions-small.png" alt="" /> ', l('Managing %s permissions', $api->return_group($group_id)), '</h1>
-    <p>', l('Changes to member groups permissions can be applied here. If deny is selected, no matter what other groups the member may be in, the permission will be denied. If disallow is selected and another one of the member groups they are in allows the permission, the disallow will be overridden. <a href="%s" title="Back to Manage Permissions">Back to Manage Permissions</a>.', $base_url. '/index.php?action=admin&amp;sa=members_permissions'), '</p>';
+    <p>', l('Changes to member groups permissions can be applied here. If deny is selected, no matter what other groups the member may be in, the permission will be denied. If disallow is selected and another one of the member groups they are in allows the permission, the disallow will be overridden. <a href="%s" title="Back to Manage Permissions">Back to Manage Permissions</a>.', baseurl. '/index.php?action=admin&amp;sa=members_permissions'), '</p>';
 
       $form->show($group_id. '_permissions');
 
@@ -181,13 +181,13 @@ if(!function_exists('admin_members_permissions_generate_form'))
   */
   function admin_members_permissions_generate_form($form_name, $group_id)
   {
-    global $api, $base_url, $db;
+    global $api, $db;
 
     $form = $api->load_class('Form');
 
     # Add our form, before we do anything else, of course!
     $form->add($form_name, array(
-                             'action' => $base_url. '/index.php?action=admin&sa=members_permissions&grp='. $_GET['grp'],
+                             'action' => baseurl. '/index.php?action=admin&sa=members_permissions&grp='. $_GET['grp'],
                              'ajax_submit' => true,
                              'callback' => 'admin_members_permissions_handle',
                              'method' => 'post',

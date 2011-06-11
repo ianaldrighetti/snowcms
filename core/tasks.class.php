@@ -1,24 +1,26 @@
 <?php
-#########################################################################
-#                             SnowCMS v2.0                              #
-#                          By the SnowCMS Team                          #
-#                            www.snowcms.com                            #
-#                  Released under the GNU GPL v3 License                #
-#                     www.gnu.org/licenses/gpl-3.0.txt                  #
-#########################################################################
-#                                                                       #
-# SnowCMS originally pawned by soren121 started some time in early 2008 #
-#                                                                       #
-#########################################################################
-#                                                                       #
-#                SnowCMS v2.0 began in November 2009                    #
-#                                                                       #
-#########################################################################
-#                     File version: SnowCMS 2.0                         #
-#########################################################################
+////////////////////////////////////////////////////////////////////////////
+//                              SnowCMS v2.0                              //
+//                           By the SnowCMS Team                          //
+//                             www.snowcms.com                            //
+//                  Released under the GNU GPL v3 License                 //
+//                    www.gnu.org/licenses/gpl-3.0.txt                    //
+////////////////////////////////////////////////////////////////////////////
+//                                                                        //
+//       SnowCMS originally pawned by soren121 started in early 2008      //
+//                                                                        //
+////////////////////////////////////////////////////////////////////////////
+//                                                                        //
+//                  SnowCMS v2.0 began in November 2009                   //
+//                                                                        //
+////////////////////////////////////////////////////////////////////////////
+//                       File version: SnowCMS 2.0                        //
+////////////////////////////////////////////////////////////////////////////
 
 if(!defined('IN_SNOW'))
-  die;
+{
+  die('Nice try...');
+}
 
 /*
   Class: Tasks
@@ -126,11 +128,11 @@ class Tasks
         if(count($this->queue) > 0)
         {
           $api->add_hook('post_init_theme', create_function('', '
-                                              global $api, $theme_url;
+                                              global $api;
 
                                               $theme = $api->load_class(\'Implemented_Theme\');
 
-                                              $theme->add_js_file(array(\'src\' => $theme_url. \'/default/js/tasks.js\', \'defer\' => \'defer\'));'));
+                                              $theme->add_js_file(array(\'src\' => themeurl. \'/default/js/tasks.js\', \'defer\' => \'defer\'));'));
         }
       }
     }
@@ -148,7 +150,7 @@ class Tasks
       string $file - The file to include before calling on $func,
                      if any.
       string $location - The location of the specified file, if any,
-                         such as plugin_dir (and $plugin_dir will be
+                         such as plugin_dir (and plugindir will be
                          prepended when it is ran) or core_dir, etc.
       bool $enabled - Whether or not the task is enabled.
 
@@ -353,7 +355,7 @@ class Tasks
   */
   public function run($output_image = true)
   {
-    global $api, $base_dir, $core_dir, $plugin_dir, $theme_dir, $settings;
+    global $api, $settings;
 
     if(!$settings->get('enable_tasks', 'bool'))
     {
@@ -393,19 +395,19 @@ class Tasks
           elseif($task['location'] == 'core_dir' || empty($task['location']))
           {
             # Prepend core_dir to it.
-            $include_file = realpath($core_dir. '/'. $task['file']);
+            $include_file = realpath(coredir. '/'. $task['file']);
           }
           elseif($task['location'] == 'base_dir')
           {
-            $include_file = realpath($base_dir. '/'. $task['file']);
+            $include_file = realpath(basedir. '/'. $task['file']);
           }
           elseif($task['location'] == 'plugin_dir')
           {
-            $include_file = realpath($plugin_dir. '/'. $task['file']);
+            $include_file = realpath(plugindir. '/'. $task['file']);
           }
           elseif($task['location'] == 'theme_dir')
           {
-            $include_file = realpath($plugin_dir. '/'. $task['file']);
+            $include_file = realpath(plugindir. '/'. $task['file']);
           }
 
           # Does it exist..?

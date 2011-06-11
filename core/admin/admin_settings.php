@@ -43,7 +43,7 @@ if(!function_exists('admin_settings'))
   */
   function admin_settings()
   {
-    global $api, $base_url, $theme, $member;
+    global $api, $theme, $member;
 
     $api->run_hooks('admin_settings');
 
@@ -106,12 +106,12 @@ if(!function_exists('admin_settings_generate_form'))
   */
   function admin_settings_generate_form()
   {
-    global $api, $base_url, $settings, $theme_dir;
+    global $api, $settings;
 
     $form = $api->load_class('Form');
 
     $form->add('admin_settings_form', array(
-                                        'action' => $base_url. '/index.php?action=admin&sa=settings',
+                                        'action' => baseurl. '/index.php?action=admin&sa=settings',
                                         'ajax_submit' => true,
                                         'callback' => 'admin_settings_handle',
                                         'submit' => l('Save settings'),

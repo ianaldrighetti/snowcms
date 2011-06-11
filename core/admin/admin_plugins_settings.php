@@ -45,7 +45,7 @@ if(!function_exists('admin_plugins_settings'))
   */
   function admin_plugins_settings()
   {
-    global $api, $base_url, $member, $settings, $theme, $theme_url;
+    global $api, $member, $settings, $theme;
 
     $api->run_hooks('admin_plugins_settings');
 
@@ -125,13 +125,13 @@ if(!function_exists('admin_plugins_settings_generate_form'))
   */
   function admin_plugins_settings_generate_form()
   {
-    global $api, $base_url, $db, $settings;
+    global $api, $db, $settings;
 
     # We need the Form class, that's for sure!
     $form = $api->load_class('Form');
 
     $form->add('admin_plugins_settings_form', array(
-                                                'action' => $base_url. '/index.php?action=admin&sa=plugins_settings',
+                                                'action' => baseurl. '/index.php?action=admin&sa=plugins_settings',
                                                 'ajax_submit' => true,
                                                 'callback' => 'admin_plugins_settings_handle',
                                                 'submit' => l('Save settings'),

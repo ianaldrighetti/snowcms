@@ -1298,7 +1298,7 @@ class API
                       instantiated.
       string $filename - The name of the where the class is defined, if the
                          file is not specified, then
-                         $core_dir/lower($class_name).class.php is assumed.
+                         coredir/lower($class_name).class.php is assumed.
       bool $new - If set to true, a new and private object will be returned,
                   if false, a reference will be stored in the API class
                   which can be obtained later by loading the same class.
@@ -1310,8 +1310,6 @@ class API
   */
   public function load_class($class_name, $params = array(), $filename = null, $new = false)
   {
-    global $core_dir;
-
     # Don't want a new object? Does it already exist? Great! You can have this one :)
     if(empty($new) && isset($this->objects[strtolower($class_name)]))
     {
@@ -1331,7 +1329,7 @@ class API
       # Is the file name not specified?
       if(empty($filename))
       {
-        $filename = $core_dir. '/'. strtolower($class_name). '.class.php';
+        $filename = coredir. '/'. strtolower($class_name). '.class.php';
       }
 
       # Does the file not exist..?!
@@ -1645,7 +1643,7 @@ class API
 */
 function load_api()
 {
-  global $api, $core_dir, $db, $loading_plugins, $plugin_dir;
+  global $api, $db, $loading_plugins;
 
   ob_start();
 
@@ -1663,7 +1661,7 @@ function load_api()
 
   # Load up plugin_load and plugin_list (we don't really use it here, but
   #hey it's for other people too!)
-  require_once($core_dir. '/plugin.php');
+  require_once(coredir. '/plugin.php');
 
   # Find all activated plugins, that way we can load them up.
   $result = $db->query('
@@ -1687,7 +1685,7 @@ function load_api()
     while($row = $result->fetch_assoc())
     {
       # Check for that required plugin.php file.
-      if(!file_exists($plugin_dir. '/'. $row['directory']. '/plugin.php'))
+      if(!file_exists(plugindir. '/'. $row['directory']. '/plugin.php'))
       {
         # Mark it for a 'runtime error'
         $bad_plugins[] = $row['dependency_name'];
@@ -1695,7 +1693,7 @@ function load_api()
       else
       {
         # Add the plugin, for now.
-        $plugins[strtolower($row['dependency_name'])] = $plugin_dir. '/'. $row['directory']. '/plugin.php';
+        $plugins[strtolower($row['dependency_name'])] = plugindir. '/'. $row['directory']. '/plugin.php';
       }
     }
 
@@ -1757,7 +1755,7 @@ function load_api()
 */
 function api_catch_fatal()
 {
-  global $db, $core_dir, $loading_plugins, $plugin_dir;
+  global $db, $loading_plugins;
 
   # Not loading plugins?
   if(empty($loading_plugins))
@@ -1805,7 +1803,7 @@ function api_catch_fatal()
   if($last_error['type'] == E_PARSE)
   {
     # Did it come from the plugin directory?
-    if(substr($last_error['file'], 0, strlen($plugin_dir)) == realpath($plugin_dir))
+    if(substr($last_error['file'], 0, strlen(plugindir)) == realpath(plugindir))
     {
       # Yes it did, now we need to obtain the plugins information.
       $path = explode(strtoupper(substr(PHP_OS, 0, 3)) == 'WIN' ? '\\' : '/', realpath(dirname($last_error['file'])));
@@ -1836,7 +1834,7 @@ function api_catch_fatal()
             # Log the error.
             if(!function_exists('errors_handler'))
             {
-              require_once($core_dir. '/errors.php');
+              require_once(coredir. '/errors.php');
             }
 
             # Well, now log the error.

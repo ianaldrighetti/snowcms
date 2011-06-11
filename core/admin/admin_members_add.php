@@ -42,7 +42,7 @@ if(!function_exists('admin_members_add'))
   */
   function admin_members_add()
   {
-    global $api, $base_url, $member, $theme;
+    global $api, $member, $theme;
 
     $api->run_hooks('admin_members_add');
 
@@ -105,12 +105,12 @@ if(!function_exists('admin_members_add_generate_form'))
   */
   function admin_members_add_generate_form()
   {
-    global $api, $base_url;
+    global $api;
 
     $form = $api->load_class('Form');
 
     $form->add('admin_members_add_form', array(
-                                          'action' => $base_url. '/index.php?action=admin&sa=members_add',
+                                          'action' => baseurl. '/index.php?action=admin&sa=members_add',
                                           'ajax_submit' => true,
                                           'callback' => 'admin_members_add_handle',
                                           'submit' => 'Add member',

@@ -1,24 +1,26 @@
 <?php
-#########################################################################
-#                             SnowCMS v2.0                              #
-#                          By the SnowCMS Team                          #
-#                            www.snowcms.com                            #
-#                  Released under the GNU GPL v3 License                #
-#                     www.gnu.org/licenses/gpl-3.0.txt                  #
-#########################################################################
-#                                                                       #
-# SnowCMS originally pawned by soren121 started some time in early 2008 #
-#                                                                       #
-#########################################################################
-#                                                                       #
-#                SnowCMS v2.0 began in November 2009                    #
-#                                                                       #
-#########################################################################
-#                     File version: SnowCMS 2.0                         #
-#########################################################################
+////////////////////////////////////////////////////////////////////////////
+//                              SnowCMS v2.0                              //
+//                           By the SnowCMS Team                          //
+//                             www.snowcms.com                            //
+//                  Released under the GNU GPL v3 License                 //
+//                    www.gnu.org/licenses/gpl-3.0.txt                    //
+////////////////////////////////////////////////////////////////////////////
+//                                                                        //
+//       SnowCMS originally pawned by soren121 started in early 2008      //
+//                                                                        //
+////////////////////////////////////////////////////////////////////////////
+//                                                                        //
+//                  SnowCMS v2.0 began in November 2009                   //
+//                                                                        //
+////////////////////////////////////////////////////////////////////////////
+//                       File version: SnowCMS 2.0                        //
+////////////////////////////////////////////////////////////////////////////
 
 if(!defined('IN_SNOW'))
-  die;
+{
+  die('Nice try...');
+}
 
 # Title: Theme information
 
@@ -154,16 +156,14 @@ function theme_load($path)
 */
 function theme_list()
 {
-  global $theme_dir;
-
   # Doesn't exist?!
-  if(!file_exists($theme_dir) || !is_dir($theme_dir))
+  if(!file_exists(themedir) || !is_dir(themedir))
   {
     return false;
   }
 
   # Get all the directories.
-  $ls = scandir($theme_dir);
+  $ls = scandir(themedir);
 
   $list = array();
   foreach($ls as $path)
@@ -176,9 +176,9 @@ function theme_list()
 
     # Only look in directories, they are themes if they have the
     # implemented_theme.class.php file.
-    if(is_dir($theme_dir. '/'. $path) && file_exists($theme_dir. '/'. $path. '/implemented_theme.class.php') && file_exists($theme_dir. '/'. $path. '/theme.xml'))
+    if(is_dir(themedir. '/'. $path) && file_exists(themedir. '/'. $path. '/implemented_theme.class.php') && file_exists(themedir. '/'. $path. '/theme.xml'))
     {
-      $list[] = realpath($theme_dir. '/'. $path);
+      $list[] = realpath(themedir. '/'. $path);
     }
   }
 

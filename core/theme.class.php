@@ -1,24 +1,26 @@
 <?php
-#########################################################################
-#                             SnowCMS v2.0                              #
-#                          By the SnowCMS Team                          #
-#                            www.snowcms.com                            #
-#                  Released under the GNU GPL v3 License                #
-#                     www.gnu.org/licenses/gpl-3.0.txt                  #
-#########################################################################
-#                                                                       #
-# SnowCMS originally pawned by soren121 started some time in early 2008 #
-#                                                                       #
-#########################################################################
-#                                                                       #
-#                SnowCMS v2.0 began in November 2009                    #
-#                                                                       #
-#########################################################################
-#                     File version: SnowCMS 2.0                         #
-#########################################################################
+////////////////////////////////////////////////////////////////////////////
+//                              SnowCMS v2.0                              //
+//                           By the SnowCMS Team                          //
+//                             www.snowcms.com                            //
+//                  Released under the GNU GPL v3 License                 //
+//                    www.gnu.org/licenses/gpl-3.0.txt                    //
+////////////////////////////////////////////////////////////////////////////
+//                                                                        //
+//       SnowCMS originally pawned by soren121 started in early 2008      //
+//                                                                        //
+////////////////////////////////////////////////////////////////////////////
+//                                                                        //
+//                  SnowCMS v2.0 began in November 2009                   //
+//                                                                        //
+////////////////////////////////////////////////////////////////////////////
+//                       File version: SnowCMS 2.0                        //
+////////////////////////////////////////////////////////////////////////////
 
 if(!defined('IN_SNOW'))
-  die;
+{
+  die('Nice try...');
+}
 
 /*
   Class: Theme
@@ -791,21 +793,21 @@ abstract class Theme
 */
 function init_theme()
 {
-  global $api, $base_url, $core_dir, $member, $settings, $theme, $theme_dir, $theme_url;
+  global $api, $member, $settings, $theme;
 
   # Load up <theme_load> and <theme_list> :-)
-  require_once($core_dir. '/theme.php');
+  require_once(coredir. '/theme.php');
 
   # Load the Implemented_Theme class...
-  require_once($theme_dir. '/'. $settings->get('theme', 'string', 'default'). '/implemented_theme.class.php');
-  $theme = $api->load_class('Implemented_Theme', array($settings->get('site_name', 'string'), $theme_url. '/'. $settings->get('theme', 'string', 'default')));
+  require_once(themedir. '/'. $settings->get('theme', 'string', 'default'). '/implemented_theme.class.php');
+  $theme = $api->load_class('Implemented_Theme', array($settings->get('site_name', 'string'), themeurl. '/'. $settings->get('theme', 'string', 'default')));
 
   # Be sure that the snowobj.js file is in all themes.
-  $theme->add_js_file(array('src' => $theme_url. '/default/js/snowobj.js'));
+  $theme->add_js_file(array('src' => themeurl. '/default/js/snowobj.js'));
 
   # Along with  JavaScript variables containing the base URL and theme URL.
-  $theme->add_js_var('base_url', $base_url);
-  $theme->add_js_var('theme_url', $theme_url);
+  $theme->add_js_var('base_url', baseurl);
+  $theme->add_js_var('theme_url', themeurl);
   $theme->add_js_var('session_id', $member->session_id());
 
   # You can hook into here to add all your theme stuffs (<link>'s, js vars, js files, etc).

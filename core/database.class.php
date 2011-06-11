@@ -660,13 +660,11 @@ abstract class Database
   */
   public function __destruct()
   {
-    global $base_dir;
-
     $this->debug_text = trim($this->debug_text);
 
     if(!empty($this->debug_text))
     {
-      $fp = fopen($base_dir. '/db_debug.sql', 'a');
+      $fp = fopen(basedir. '/db_debug.sql', 'a');
       fwrite($fp, $this->debug_text);
       @fclose($fp);
     }
