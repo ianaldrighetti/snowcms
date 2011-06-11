@@ -26,16 +26,14 @@ class MySQL extends Database
 {
   public function connect()
   {
-    global $db_host, $db_name, $db_pass, $db_persist, $db_type, $db_user, $tbl_prefix;
-
     # Persistent connection or not?
-    if(empty($db_persist))
+    if(!defined('dbpersist') || !dbpersist)
     {
-      $this->con = @mysql_connect($db_host, $db_user, $db_pass);
+      $this->con = @mysql_connect(dbhost, dbuser, dbpass);
     }
     else
     {
-      $this->con = @mysql_pconnect($db_host, $db_user, $db_pass);
+      $this->con = @mysql_pconnect(dbhost, dbuser, dbpass);
     }
 
     # Fail to connect?
@@ -47,7 +45,7 @@ class MySQL extends Database
     }
 
     # Select the database now ;)
-    $select_db = @mysql_select_db($db_name, $this->con);
+    $select_db = @mysql_select_db(dbname, $this->con);
 
     # Failed to select the database..? That isn't good!
     if(empty($select_db))
@@ -57,7 +55,7 @@ class MySQL extends Database
 
     # Sweet, everything seems to be in order so far, set a couple other things others
     # may need to use at a later time.
-    $this->prefix = $tbl_prefix;
+    $this->prefix = tblprefix;
     $this->type = 'MySQL';
     $this->case_sensitive = false;
     $this->drop_if_exists = true;

@@ -1,24 +1,26 @@
 <?php
-#########################################################################
-#                             SnowCMS v2.0                              #
-#                          By the SnowCMS Team                          #
-#                            www.snowcms.com                            #
-#                  Released under the GNU GPL v3 License                #
-#                     www.gnu.org/licenses/gpl-3.0.txt                  #
-#########################################################################
-#                                                                       #
-# SnowCMS originally pawned by soren121 started some time in early 2008 #
-#                                                                       #
-#########################################################################
-#                                                                       #
-#                SnowCMS v2.0 began in November 2009                    #
-#                                                                       #
-#########################################################################
-#                     File version: SnowCMS 2.0                         #
-#########################################################################
+////////////////////////////////////////////////////////////////////////////
+//                              SnowCMS v2.0                              //
+//                           By the SnowCMS Team                          //
+//                             www.snowcms.com                            //
+//                  Released under the GNU GPL v3 License                 //
+//                    www.gnu.org/licenses/gpl-3.0.txt                    //
+////////////////////////////////////////////////////////////////////////////
+//                                                                        //
+//       SnowCMS originally pawned by soren121 started in early 2008      //
+//                                                                        //
+////////////////////////////////////////////////////////////////////////////
+//                                                                        //
+//                  SnowCMS v2.0 began in November 2009                   //
+//                                                                        //
+////////////////////////////////////////////////////////////////////////////
+//                       File version: SnowCMS 2.0                        //
+////////////////////////////////////////////////////////////////////////////
 
 if(!defined('IN_SNOW'))
-  die;
+{
+  die('Nice try...');
+}
 
 # Title: Blog plugin - Add
 
@@ -33,7 +35,7 @@ if(!defined('IN_SNOW'))
 */
 function blog_add()
 {
-  global $api, $base_url, $member, $theme;
+  global $api, $member, $theme;
 
   $api->run_hooks('blog_add');
 
@@ -48,14 +50,14 @@ function blog_add()
   $form = $api->load_class('Form');
 
   $theme->set_current_area('blog_add');
-  $theme->add_js_file(array('src' => $base_url. '/index.php?action=resource&amp;area=blog&amp;id=js_editor'));
+  $theme->add_js_file(array('src' => baseurl. '/index.php?action=resource&amp;area=blog&amp;id=js_editor'));
 
   $theme->set_title(l('Add new post'));
 
   $theme->header();
 
   echo '
-  <h1><img src="', $base_url, '/index.php?action=resource&amp;area=blog&amp;id=icon_add-small" alt="" /> ', l('Add new post'), '</h1>';
+  <h1><img src="', baseurl, '/index.php?action=resource&amp;area=blog&amp;id=icon_add-small" alt="" /> ', l('Add new post'), '</h1>';
 
   $form->show('blog_add_post');
 
@@ -73,12 +75,12 @@ function blog_add()
 */
 function blog_add_generate_form()
 {
-  global $api, $base_url;
+  global $api;
 
   $form = $api->load_class('Form');
 
   $form->add('blog_add_post', array(
-                                'action' => $base_url. '/index.php?action=admin&amp;sa=blog_add',
+                                'action' => baseurl. '/index.php?action=admin&amp;sa=blog_add',
                                 'callback' => 'blog_add_handle',
                                 'method' => 'post',
                                 'submit' => l('Add post'),

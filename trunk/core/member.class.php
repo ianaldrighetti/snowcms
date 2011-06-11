@@ -114,7 +114,7 @@ if(!class_exists('Member'))
     */
     public function __construct()
     {
-      global $api, $cookie_name, $db, $func;
+      global $api, $db, $func;
 
       # Just define them, for now.
       $member_id = 0;
@@ -122,9 +122,9 @@ if(!class_exists('Member'))
       $this->ip = isset($_SERVER['HTTP_X_FORWARDED_FOR']) ? $_SERVER['HTTP_X_FORWARDED_FOR'] : $_SERVER['REMOTE_ADDR'];
 
       # Get that cookie, mmm..!
-      if(!empty($_COOKIE[$cookie_name]))
+      if(!empty($_COOKIE[cookiename]))
       {
-        list($member_id, $passwrd) = @explode('|', $_COOKIE[$cookie_name]);
+        list($member_id, $passwrd) = @explode('|', $_COOKIE[cookiename]);
 
         $member_id = (string)$member_id == (string)(int)$member_id && (int)$member_id > 0 && $func['strlen']($passwrd) == 40 ? (int)$member_id : 0;
         $passwrd = $member_id > 0 && $func['strlen']($passwrd) == 40 ? $passwrd : '';

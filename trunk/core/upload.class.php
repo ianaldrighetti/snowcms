@@ -1,24 +1,26 @@
 <?php
-#########################################################################
-#                             SnowCMS v2.0                              #
-#                          By the SnowCMS Team                          #
-#                            www.snowcms.com                            #
-#                  Released under the GNU GPL v3 License                #
-#                     www.gnu.org/licenses/gpl-3.0.txt                  #
-#########################################################################
-#                                                                       #
-# SnowCMS originally pawned by soren121 started some time in early 2008 #
-#                                                                       #
-#########################################################################
-#                                                                       #
-#                SnowCMS v2.0 began in November 2009                    #
-#                                                                       #
-#########################################################################
-#                     File version: SnowCMS 2.0                         #
-#########################################################################
+////////////////////////////////////////////////////////////////////////////
+//                              SnowCMS v2.0                              //
+//                           By the SnowCMS Team                          //
+//                             www.snowcms.com                            //
+//                  Released under the GNU GPL v3 License                 //
+//                    www.gnu.org/licenses/gpl-3.0.txt                    //
+////////////////////////////////////////////////////////////////////////////
+//                                                                        //
+//       SnowCMS originally pawned by soren121 started in early 2008      //
+//                                                                        //
+////////////////////////////////////////////////////////////////////////////
+//                                                                        //
+//                  SnowCMS v2.0 began in November 2009                   //
+//                                                                        //
+////////////////////////////////////////////////////////////////////////////
+//                       File version: SnowCMS 2.0                        //
+////////////////////////////////////////////////////////////////////////////
 
 if(!defined('IN_SNOW'))
-  die;
+{
+  die('Nice try...');
+}
 
 /*
   Class: Upload
@@ -88,7 +90,7 @@ class Upload
   */
   public function add($area_name, $area_id, $file, $options = array())
   {
-    global $api, $db, $member, $settings, $upload_dir;
+    global $api, $db, $member, $settings;
 
     $handled = null;
     $api->run_hooks('upload_add', array(&$handled, $area_name, $area_id, $file, $options));
@@ -191,7 +193,7 @@ class Upload
       $options['filelocation'] = sha1(mt_rand(1, 1000). $options['filename']. microtime(true). $members->rand_str(10));
 
       # Make sure the file doesn't exist.
-      while(file_exists($upload_dir. '/'. $options['filelocation']))
+      while(file_exists(uploaddir. '/'. $options['filelocation']))
       {
         $options['filelocation'] = sha1(mt_rand(1, 1000). $options['filename']. microtime(true). $members->rand_str(10));
       }
@@ -205,7 +207,7 @@ class Upload
       $api->run_hooks('upload_add_options', array(&$options));
 
       # Now move the file to the right location.
-      if(!empty($allow_file) && move_uploaded_file($file['tmp_name'], $upload_dir. '/'. $options['filelocation']))
+      if(!empty($allow_file) && move_uploaded_file($file['tmp_name'], uploaddir. '/'. $options['filelocation']))
       {
         # Save the information into the database.
         $result = $db->insert('insert', '{db->prefix}uploads',
@@ -267,7 +269,7 @@ class Upload
   */
   public function remove($area_name, $area_id, $upload_id)
   {
-    global $api, $db, $upload_dir;
+    global $api, $db;
 
     $handled = null;
     $api->run_hooks('upload_remove', array(&$handled, $area_name, $area_id, $upload_id));
@@ -312,7 +314,7 @@ class Upload
         $upload_id[] = $row['upload_id'];
 
         # Remove the file.
-        unlink($upload_dir. '/'. $row['filelocation']);
+        unlink(uploaddir. '/'. $row['filelocation']);
       }
 
       # Now delete them from the database.
@@ -516,7 +518,7 @@ class Upload
   */
   public function load($area_name, $area_id, $upload_id)
   {
-    global $api, $db, $upload_dir;
+    global $api, $db;
 
     if(empty($area_name) || empty($upload_id))
     {
@@ -615,7 +617,7 @@ class Upload
                     'file' => array(
                                 'name' => $row['filename'],
                                 'extension' => $row['file_ext'],
-                                'location' => realpath($upload_dir. '/'. $row['filelocation']),
+                                'location' => realpath(uploaddir. '/'. $row['filelocation']),
                                 'size' => $row['filesize'],
                                 'downloads' => $row['downloads'],
                                 'type' => $row['upload_type'],

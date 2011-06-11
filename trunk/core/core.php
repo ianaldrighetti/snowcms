@@ -43,48 +43,48 @@ if(!defined('IN_SNOW'))
 */
 function init_core()
 {
-  global $api, $core_dir;
+  global $api;
 
   # We have a couple default actions of our own :) (Remember, you can
   # register these actions before they are registered here! :) But also
   #all these functions are overloadable, so simply define them before
   # this too!!!).
-  $api->add_event('action=activate', 'activate_view', $core_dir. '/activate.php');
-  $api->add_event('action=admin', 'admin_home', $core_dir. '/admin/admin_home.php');
-  $api->add_event('action=admin&sa=about', 'admin_about', $core_dir. '/admin/admin_home.php');
-  $api->add_event('action=admin&sa=ajax&id=plugins_update', 'admin_plugins_update_ajax', $core_dir. '/admin/admin_plugins_manage.php');
-  $api->add_event('action=admin&sa=update&apply=*', 'admin_update_apply', $core_dir. '/admin/admin_update.php');
-  $api->add_event('action=admin&sa=error_log', 'admin_error_log', $core_dir. '/admin/admin_error_log.php');
-  $api->add_event('action=admin&sa=error_log&id=*', 'admin_error_log_view', $core_dir. '/admin/admin_error_log.php');
-  $api->add_event('action=admin&sa=members_add', 'admin_members_add', $core_dir. '/admin/admin_members_add.php');
-  $api->add_event('action=admin&sa=members_manage', 'admin_members_manage', $core_dir. '/admin/admin_members_manage.php');
-  $api->add_event('action=admin&sa=members_manage&id=*', 'admin_members_manage_edit', $core_dir. '/admin/admin_members_manage.php');
-  $api->add_event('action=admin&sa=members_permissions', 'admin_members_manage_permissions', $core_dir. '/admin/admin_members_permissions.php');
-  $api->add_event('action=admin&sa=members_permissions&grp=*', 'admin_members_manage_group_permissions', $core_dir. '/admin/admin_members_permissions.php');
-  $api->add_event('action=admin&sa=members_settings', 'admin_members_settings', $core_dir. '/admin/admin_members_settings.php');
-  $api->add_event('action=admin&sa=plugins_add', 'admin_plugins_add', $core_dir. '/admin/admin_plugins_add.php');
-  $api->add_event('action=admin&sa=plugins_add&install=*', 'admin_plugins_install', $core_dir. '/admin/admin_plugins_add.php');
-  $api->add_event('action=admin&sa=plugins_manage', 'admin_plugins_manage', $core_dir. '/admin/admin_plugins_manage.php');
-  $api->add_event('action=admin&sa=plugins_manage&update=*', 'admin_plugins_update', $core_dir. '/admin/admin_plugins_manage.php');
-  $api->add_event('action=admin&sa=plugins_settings', 'admin_plugins_settings', $core_dir. '/admin/admin_plugins_settings.php');
-  $api->add_event('action=admin&sa=settings', 'admin_settings', $core_dir. '/admin/admin_settings.php');
-  $api->add_event('action=admin&sa=themes', 'admin_themes', $core_dir. '/admin/admin_themes.php');
-  $api->add_event('action=admin&sa=themes&install=*', 'admin_themes_install', $core_dir. '/admin/admin_themes.php');
-  $api->add_event('action=admin&sa=themes&update=*', 'admin_themes_update', $core_dir. '/admin/admin_themes.php');
-  $api->add_event('action=admin&sa=update', 'admin_update', $core_dir. '/admin/admin_update.php');
-  $api->add_event('action=checkcookie', 'checkcookie_verify', $core_dir. '/checkcookie.php');
-  $api->add_event('action=login', 'login_view', $core_dir. '/login.php');
-  $api->add_event('action=login2', 'login_view2', $core_dir. '/login.php');
-  $api->add_event('action=logout', 'logout_process', $core_dir. '/logout.php');
-  $api->add_event('action=profile', 'profile_view', $core_dir. '/profile.php');
-  $api->add_event('action=profile&id=*', 'profile_view', $core_dir. '/profile.php');
-  $api->add_event('action=register', 'register_view', $core_dir. '/register.php');
-  $api->add_event('action=register2', 'register_process', $core_dir. '/register.php');
-  $api->add_event('action=resend', 'resend_view', $core_dir. '/resend.php');
+  $api->add_event('action=activate', 'activate_view', coredir. '/activate.php');
+  $api->add_event('action=admin', 'admin_home', coredir. '/admin/admin_home.php');
+  $api->add_event('action=admin&sa=about', 'admin_about', coredir. '/admin/admin_home.php');
+  $api->add_event('action=admin&sa=ajax&id=plugins_update', 'admin_plugins_update_ajax', coredir. '/admin/admin_plugins_manage.php');
+  $api->add_event('action=admin&sa=update&apply=*', 'admin_update_apply', coredir. '/admin/admin_update.php');
+  $api->add_event('action=admin&sa=error_log', 'admin_error_log', coredir. '/admin/admin_error_log.php');
+  $api->add_event('action=admin&sa=error_log&id=*', 'admin_error_log_view', coredir. '/admin/admin_error_log.php');
+  $api->add_event('action=admin&sa=members_add', 'admin_members_add', coredir. '/admin/admin_members_add.php');
+  $api->add_event('action=admin&sa=members_manage', 'admin_members_manage', coredir. '/admin/admin_members_manage.php');
+  $api->add_event('action=admin&sa=members_manage&id=*', 'admin_members_manage_edit', coredir. '/admin/admin_members_manage.php');
+  $api->add_event('action=admin&sa=members_permissions', 'admin_members_manage_permissions', coredir. '/admin/admin_members_permissions.php');
+  $api->add_event('action=admin&sa=members_permissions&grp=*', 'admin_members_manage_group_permissions', coredir. '/admin/admin_members_permissions.php');
+  $api->add_event('action=admin&sa=members_settings', 'admin_members_settings', coredir. '/admin/admin_members_settings.php');
+  $api->add_event('action=admin&sa=plugins_add', 'admin_plugins_add', coredir. '/admin/admin_plugins_add.php');
+  $api->add_event('action=admin&sa=plugins_add&install=*', 'admin_plugins_install', coredir. '/admin/admin_plugins_add.php');
+  $api->add_event('action=admin&sa=plugins_manage', 'admin_plugins_manage', coredir. '/admin/admin_plugins_manage.php');
+  $api->add_event('action=admin&sa=plugins_manage&update=*', 'admin_plugins_update', coredir. '/admin/admin_plugins_manage.php');
+  $api->add_event('action=admin&sa=plugins_settings', 'admin_plugins_settings', coredir. '/admin/admin_plugins_settings.php');
+  $api->add_event('action=admin&sa=settings', 'admin_settings', coredir. '/admin/admin_settings.php');
+  $api->add_event('action=admin&sa=themes', 'admin_themes', coredir. '/admin/admin_themes.php');
+  $api->add_event('action=admin&sa=themes&install=*', 'admin_themes_install', coredir. '/admin/admin_themes.php');
+  $api->add_event('action=admin&sa=themes&update=*', 'admin_themes_update', coredir. '/admin/admin_themes.php');
+  $api->add_event('action=admin&sa=update', 'admin_update', coredir. '/admin/admin_update.php');
+  $api->add_event('action=checkcookie', 'checkcookie_verify', coredir. '/checkcookie.php');
+  $api->add_event('action=login', 'login_view', coredir. '/login.php');
+  $api->add_event('action=login2', 'login_view2', coredir. '/login.php');
+  $api->add_event('action=logout', 'logout_process', coredir. '/logout.php');
+  $api->add_event('action=profile', 'profile_view', coredir. '/profile.php');
+  $api->add_event('action=profile&id=*', 'profile_view', coredir. '/profile.php');
+  $api->add_event('action=register', 'register_view', coredir. '/register.php');
+  $api->add_event('action=register2', 'register_process', coredir. '/register.php');
+  $api->add_event('action=resend', 'resend_view', coredir. '/resend.php');
   $api->add_event('action=resource', 'api_handle_resource');
-  $api->add_event('action=reminder', 'reminder_view', $core_dir. '/reminder.php');
-  $api->add_event('action=reminder2', 'reminder_view2', $core_dir. '/reminder.php');
-  $api->add_event('action=tasks', 'tasks_run', $core_dir. '/tasks.class.php');
+  $api->add_event('action=reminder', 'reminder_view', coredir. '/reminder.php');
+  $api->add_event('action=reminder2', 'reminder_view2', coredir. '/reminder.php');
+  $api->add_event('action=tasks', 'tasks_run', coredir. '/tasks.class.php');
   $api->add_event('action=popup', 'core_popup');
 
   # Stop output buffering which was started in the <load_api> function.
@@ -97,7 +97,7 @@ function init_core()
   reset($_GET);
   if(key($_GET) == 'action' && current($_GET) == 'admin')
   {
-    require_once($core_dir. '/admin.php');
+    require_once(coredir. '/admin.php');
 
     admin_prepend();
   }

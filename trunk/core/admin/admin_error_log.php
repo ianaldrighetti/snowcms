@@ -42,7 +42,7 @@ if(!function_exists('admin_error_log'))
   */
   function admin_error_log()
   {
-    global $api, $base_url, $member, $theme;
+    global $api, $member, $theme;
 
     $api->run_hooks('admin_error_log');
 
@@ -91,13 +91,13 @@ if(!function_exists('admin_error_log_generate_table'))
   */
   function admin_error_log_generate_table()
   {
-    global $api, $base_url;
+    global $api;
 
     $table = $api->load_class('Table');
 
     # Add our error log table.
     $table->add('error_log', array(
-                               'base_url' => $base_url. '/index.php?action=admin&amp;sa=error_log',
+                               'base_url' => baseurl. '/index.php?action=admin&amp;sa=error_log',
                                'db_query' => '
                                               SELECT
                                                 error_id, error_time, member_id, member_name, member_ip, error_type, error_message, error_file, error_line, error_url
@@ -118,9 +118,7 @@ if(!function_exists('admin_error_log_generate_table'))
                                                   'column' => 'error_id',
                                                   'label' => l('ID'),
                                                   'function' => create_function('$row', '
-                                                                  global $base_url;
-
-                                                                  return \'<a href="\'. $base_url. \'/index.php?action=admin&amp;sa=error_log&amp;id=\'. $row[\'error_id\']. \'" title="\'. l(\'View full error\'). \'">\'. $row[\'error_id\']. \'</a>\';'),
+                                                                  return \'<a href="\'. baseurl. \'/index.php?action=admin&amp;sa=error_log&amp;id=\'. $row[\'error_id\']. \'" title="\'. l(\'View full error\'). \'">\'. $row[\'error_id\']. \'</a>\';'),
                                                   'width' => '6%',
                                                 ));
 
@@ -259,7 +257,7 @@ if(!function_exists('admin_error_log_view'))
   */
   function admin_error_log_view()
   {
-    global $api, $base_url, $db, $member, $theme;
+    global $api, $db, $member, $theme;
 
     $api->run_hooks('admin_error_log_view');
 
@@ -295,7 +293,7 @@ if(!function_exists('admin_error_log_view'))
 
       echo '
   <h1><img src="', $theme->url(), '/error_log-small.png" alt="" /> ', l('An error has occurred'), '</h1>
-  <p>', l('The error you are trying to view does not exist. <a href="%s/index.php?action=admin&amp;sa=error_log" title="Back to error log">Back to error log</a>.', $base_url), '</p>';
+  <p>', l('The error you are trying to view does not exist. <a href="%s/index.php?action=admin&amp;sa=error_log" title="Back to error log">Back to error log</a>.', baseurl), '</p>';
 
       $theme->footer();
     }
@@ -329,7 +327,7 @@ if(!function_exists('admin_error_log_view'))
 
       echo '
   <h1><img src="', $theme->url(), '/error_log-small.png" alt="" /> ', l('Viewing error #%s', $error_id), '</h1>
-  <p>', l('You are currently viewing error #%s. <a href="%s/index.php?action=admin&amp;sa=error_log" title="Back to error log">Back to error log</a>.', $error_id, $base_url), '</p>';
+  <p>', l('You are currently viewing error #%s. <a href="%s/index.php?action=admin&amp;sa=error_log" title="Back to error log">Back to error log</a>.', $error_id, baseurl), '</p>';
 
       # Output all the information.
       echo '
@@ -358,7 +356,7 @@ if(!function_exists('admin_error_log_view'))
         else
         {
           echo '
-    <p><span class="bold">', l('Member:'), '</span> ', l('<a href="%s/index.php?action=profile&amp;id=%s" target="_blank">%s</a> (IP: %s)', $base_url, $member['id'], $member['name'], $error['member_ip']), '</p>';
+    <p><span class="bold">', l('Member:'), '</span> ', l('<a href="%s/index.php?action=profile&amp;id=%s" target="_blank">%s</a> (IP: %s)', baseurl, $member['id'], $member['name'], $error['member_ip']), '</p>';
         }
       }
 

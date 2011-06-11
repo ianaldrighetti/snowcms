@@ -1,24 +1,26 @@
 <?php
-#########################################################################
-#                             SnowCMS v2.0                              #
-#                          By the SnowCMS Team                          #
-#                            www.snowcms.com                            #
-#                  Released under the GNU GPL v3 License                #
-#                     www.gnu.org/licenses/gpl-3.0.txt                  #
-#########################################################################
-#                                                                       #
-# SnowCMS originally pawned by soren121 started some time in early 2008 #
-#                                                                       #
-#########################################################################
-#                                                                       #
-#                SnowCMS v2.0 began in November 2009                    #
-#                                                                       #
-#########################################################################
-#                     File version: SnowCMS 2.0                         #
-#########################################################################
+////////////////////////////////////////////////////////////////////////////
+//                              SnowCMS v2.0                              //
+//                           By the SnowCMS Team                          //
+//                             www.snowcms.com                            //
+//                  Released under the GNU GPL v3 License                 //
+//                    www.gnu.org/licenses/gpl-3.0.txt                    //
+////////////////////////////////////////////////////////////////////////////
+//                                                                        //
+//       SnowCMS originally pawned by soren121 started in early 2008      //
+//                                                                        //
+////////////////////////////////////////////////////////////////////////////
+//                                                                        //
+//                  SnowCMS v2.0 began in November 2009                   //
+//                                                                        //
+////////////////////////////////////////////////////////////////////////////
+//                       File version: SnowCMS 2.0                        //
+////////////////////////////////////////////////////////////////////////////
 
 if(!defined('IN_SNOW'))
-  die;
+{
+  die('Nice try...');
+}
 
 # Title: Password reminder
 
@@ -41,13 +43,13 @@ if(!function_exists('reminder_view'))
   */
   function reminder_view()
   {
-    global $api, $base_url, $member, $settings, $theme;
+    global $api, $member, $settings, $theme;
 
     $api->run_hooks('reminder_view');
 
     if($member->is_logged())
     {
-      header('Location: '. $base_url);
+      header('Location: '. baseurl);
       exit;
     }
 
@@ -55,7 +57,7 @@ if(!function_exists('reminder_view'))
     $form = $api->load_class('Form');
 
     $form->add('reminder_form', array(
-                                  'action' => $base_url. '/index.php?action=reminder',
+                                  'action' => baseurl. '/index.php?action=reminder',
                                   'method' => 'post',
                                   'callback' => 'reminder_process',
                                   'submit' => l('Request reminder'),
@@ -123,7 +125,7 @@ if(!function_exists('reminder_process'))
   */
   function reminder_process($remind, &$errors = array())
   {
-    global $api, $base_url, $member, $_POST, $settings;
+    global $api, $member, $_POST, $settings;
 
     # We will need the name_to_id method in the Members class, along with others...
     $members = $api->load_class('Members');
@@ -162,7 +164,7 @@ if(!function_exists('reminder_process'))
 
     # Email time! :) and that's pretty much it!
     $mail = $api->load_class('Mail');
-    $mail->send($member_info['email'], l('Reset your password instructions'), l("Here there %s, this email comes from %s.\r\n\r\nYou are receiving this email as some has requested a password change for your account at %s. If you did not request this password reset, please contact the site administrators promptly.\r\n\r\nIf you did request this password change however, simply click the link below to proceed with the password change:\r\n%s/index.php?action=reminder2&id=%s&code=%s\r\n\r\nPlease realize that this link will only work for the next 24 hours.", $member_info['username'], $base_url, $settings->get('site_name', 'string'), $base_url, $member_info['id'], $reminder_key));
+    $mail->send($member_info['email'], l('Reset your password instructions'), l("Here there %s, this email comes from %s.\r\n\r\nYou are receiving this email as some has requested a password change for your account at %s. If you did not request this password reset, please contact the site administrators promptly.\r\n\r\nIf you did request this password change however, simply click the link below to proceed with the password change:\r\n%s/index.php?action=reminder2&id=%s&code=%s\r\n\r\nPlease realize that this link will only work for the next 24 hours.", $member_info['username'], baseurl, $settings->get('site_name', 'string'), baseurl, $member_info['id'], $reminder_key));
 
     $api->add_filter('reminder_message', create_function('$value', '
                                            return l(\'Further instructions have been sent to your account\\\'s email address, which cannot be disclosed for security reasons. Be sure to click the link within the next 24 hours or else it will be rendered useless.\');'));
@@ -194,13 +196,13 @@ if(!function_exists('reminder_view2'))
   */
   function reminder_view2()
   {
-    global $api, $base_url, $member, $theme;
+    global $api, $member, $theme;
 
     $api->run_hook('reminder_view2');
 
     if($member->is_logged())
     {
-      header('Location: '. $base_url);
+      header('Location: '. baseurl);
       exit;
     }
 
@@ -222,7 +224,7 @@ if(!function_exists('reminder_view2'))
           $form = $api->load_class('Form');
 
           $form->add('reset_password_form', array(
-                                              'action' => $base_url. '/index.php?action=reminder2',
+                                              'action' => baseurl. '/index.php?action=reminder2',
                                               'method' => 'post',
                                               'callback' => 'reminder_process2',
                                               'submit' => l('Reset password'),
@@ -310,7 +312,7 @@ if(!function_exists('reminder_process2'))
   */
   function reminder_process2($reset, &$errors = array())
   {
-    global $api, $base_url;
+    global $api;
 
     $api->run_hook('reminder_process2');
 
@@ -341,7 +343,7 @@ if(!function_exists('reminder_process2'))
     $api->run_hook('password_reset', array($member_info));
 
     # Alright, redirecting you to the login screen :)
-    header('Location: '. $base_url. '/index.php?action=login&member_name='. urlencode($member_info['username']));
+    header('Location: '. baseurl. '/index.php?action=login&member_name='. urlencode($member_info['username']));
     exit;
   }
 }

@@ -1,24 +1,26 @@
 <?php
-#########################################################################
-#                             SnowCMS v2.0                              #
-#                          By the SnowCMS Team                          #
-#                            www.snowcms.com                            #
-#                  Released under the GNU GPL v3 License                #
-#                     www.gnu.org/licenses/gpl-3.0.txt                  #
-#########################################################################
-#                                                                       #
-# SnowCMS originally pawned by soren121 started some time in early 2008 #
-#                                                                       #
-#########################################################################
-#                                                                       #
-#                SnowCMS v2.0 began in November 2009                    #
-#                                                                       #
-#########################################################################
-#                     File version: SnowCMS 2.0                         #
-#########################################################################
+////////////////////////////////////////////////////////////////////////////
+//                              SnowCMS v2.0                              //
+//                           By the SnowCMS Team                          //
+//                             www.snowcms.com                            //
+//                  Released under the GNU GPL v3 License                 //
+//                    www.gnu.org/licenses/gpl-3.0.txt                    //
+////////////////////////////////////////////////////////////////////////////
+//                                                                        //
+//       SnowCMS originally pawned by soren121 started in early 2008      //
+//                                                                        //
+////////////////////////////////////////////////////////////////////////////
+//                                                                        //
+//                  SnowCMS v2.0 began in November 2009                   //
+//                                                                        //
+////////////////////////////////////////////////////////////////////////////
+//                       File version: SnowCMS 2.0                        //
+////////////////////////////////////////////////////////////////////////////
 
 if(!defined('IN_SNOW'))
-  die;
+{
+  die('Nice try...');
+}
 
 # Title: Resend activation email
 
@@ -40,13 +42,13 @@ if(!function_exists('resend_view'))
   */
   function resend_view()
   {
-    global $api, $base_url, $member, $settings, $theme;
+    global $api, $member, $settings, $theme;
 
     $api->run_hooks('resend_view');
 
     if($member->is_logged())
     {
-      header('Location: '. $base_url);
+      header('Location: '. baseurl);
       exit;
     }
     elseif($settings->get('registration_type', 'int', 0) != 2)
@@ -67,7 +69,7 @@ if(!function_exists('resend_view'))
     $form = $api->load_class('Form');
 
     $form->add('resend_form', array(
-                                'action' => $base_url. '/index.php?action=resend',
+                                'action' => baseurl. '/index.php?action=resend',
                                 'method' => 'post',
                                 'submit' => l('Resend activation'),
                                 'callback' => 'resend_process',
@@ -135,7 +137,7 @@ if(!function_exists('resend_process'))
   */
   function resend_process($resend, &$errors = array())
   {
-    global $api, $base_url, $core_dir;
+    global $api;
 
     $members = $api->load_class('Members');
 
@@ -155,7 +157,7 @@ if(!function_exists('resend_process'))
     # Is the account already activated? No go!
     if($member_info['is_activated'] == 1)
     {
-      $errors[] = l('The account is already activated. If this is your account, you can proceed to <a href="%s">login</a>.', $base_url. '/index.php?action=login');
+      $errors[] = l('The account is already activated. If this is your account, you can proceed to <a href="%s">login</a>.', baseurl. '/index.php?action=login');
       return false;
     }
 
@@ -169,7 +171,7 @@ if(!function_exists('resend_process'))
 
     # Resend it! Woo!
     if(!function_exists('register_send_email'))
-      require_once($core_dir. '/register.php');
+      require_once(coredir. '/register.php');
 
     register_send_email($member_id);
 

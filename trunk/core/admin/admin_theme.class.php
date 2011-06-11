@@ -26,10 +26,10 @@ class Admin_Theme extends Theme
 {
   protected function init()
   {
-    global $base_url, $member, $theme_url;
+    global $member;
 
-    $this->add_js_file(array('src' => $theme_url. '/default/js/snowobj.js'));
-    $this->add_js_var('base_url', $base_url);
+    $this->add_js_file(array('src' => themeurl. '/default/js/snowobj.js'));
+    $this->add_js_var('base_url', baseurl);
     $this->add_js_var('session_id', $member->session_id());
 
     $this->set_current_area(null);
@@ -37,7 +37,7 @@ class Admin_Theme extends Theme
 
   public function header()
   {
-    global $api, $base_url, $cookie_name, $member, $settings;
+    global $api, $member, $settings;
 
     echo '<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml">
@@ -516,13 +516,13 @@ class Admin_Theme extends Theme
 <div id="header">
   <div id="container">
     <div id="text">
-      <h1>', $settings->get('site_name', 'string'), ' <span class="visit_site"><a href="', $base_url, '" title="', l('Visit site'), '">&laquo; ', l('Visit site'), ' &raquo;</a></span></h1>
+      <h1>', $settings->get('site_name', 'string'), ' <span class="visit_site"><a href="', baseurl, '" title="', l('Visit site'), '">&laquo; ', l('Visit site'), ' &raquo;</a></span></h1>
       <h3>', l('Control Panel'), '</h3>
     </div>
 
     <div id="member_info">
-      <p>', l('Hello, <a href="%s" title="View your profile">%s</a>.', $base_url. '/index.php?action=profile', $member->display_name()), '</p>
-      <p class="links">', l('<a href="%s" title="Go to the Control Panel Home">Control Panel</a> | <a href="%s" title="Log out of your account">Log out</a>', $base_url. '/index.php?action=admin', $base_url. '/index.php?action=logout&amp;sc='. $member->session_id()), '</p>
+      <p>', l('Hello, <a href="%s" title="View your profile">%s</a>.', baseurl. '/index.php?action=profile', $member->display_name()), '</p>
+      <p class="links">', l('<a href="%s" title="Go to the Control Panel Home">Control Panel</a> | <a href="%s" title="Log out of your account">Log out</a>', baseurl. '/index.php?action=admin', baseurl. '/index.php?action=logout&amp;sc='. $member->session_id()), '</p>
     </div>
     <div class="break">
     </div>
@@ -533,7 +533,7 @@ class Admin_Theme extends Theme
 
   public function footer()
   {
-    global $api, $base_url, $db, $icons, $settings, $start_time;
+    global $api, $db, $icons, $settings, $start_time;
 
     echo $api->apply_filters('admin_theme_post_content', ''), '
 </div>
@@ -565,7 +565,7 @@ class Admin_Theme extends Theme
 
     echo '
       </select>
-      <input type="button" name="go" title="Go" value="Go" onclick="if(this.form.jump_to_select.value == \'\') { location.href = \'', $base_url, '/index.php?action=admin\'; } else { location.href = decodeURIComponent(this.form.jump_to_select.value); }" />
+      <input type="button" name="go" title="Go" value="Go" onclick="if(this.form.jump_to_select.value == \'\') { location.href = \'', baseurl, '/index.php?action=admin\'; } else { location.href = decodeURIComponent(this.form.jump_to_select.value); }" />
     </form>
   </div>
   <div class="break">

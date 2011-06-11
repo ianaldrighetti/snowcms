@@ -42,7 +42,7 @@ if(!function_exists('admin_members_manage'))
   */
   function admin_members_manage()
   {
-    global $api, $base_url, $member, $theme, $theme_url;
+    global $api, $member, $theme;
 
     $api->run_hooks('admin_members_manage');
 
@@ -62,7 +62,7 @@ if(!function_exists('admin_members_manage'))
     $theme->set_title(l('Manage Members'));
 
     $theme->add_js_var('delete_confirm', l('Are you sure you want to delete the selected members?\\r\\nThis cannot be undone!'));
-    $theme->add_js_file(array('src' => $theme_url. '/default/js/members_manage.js'));
+    $theme->add_js_file(array('src' => themeurl. '/default/js/members_manage.js'));
 
     $theme->header();
 
@@ -94,7 +94,7 @@ if(!function_exists('admin_members_manage_generate_table'))
   */
   function admin_members_manage_generate_table()
   {
-    global $api, $base_url;
+    global $api;
 
     $table = $api->load_class('Table');
 
@@ -107,7 +107,7 @@ if(!function_exists('admin_members_manage_generate_table'))
                                                 'callback' => 'admin_members_manage_table_handle',
                                                 'primary' => 'member_id',
                                                 'sort' => array('member_id', 'asc'),
-                                                'base_url' => $base_url. '/index.php?action=admin&sa=members_manage',
+                                                'base_url' => baseurl. '/index.php?action=admin&sa=members_manage',
                                                 'cellpadding' => '4px',
                                                 'options' => array(
                                                                'activate' => 'Activate',
@@ -129,9 +129,7 @@ if(!function_exists('admin_members_manage_generate_table'))
                                                                       'label' => l('Member name'),
                                                                       'title' => l('Member name'),
                                                                       'function' => create_function('$row', '
-                                                                                      global $base_url;
-
-                                                                                      return l(\'<a href="%s/index.php?action=profile&amp;id=%s" title="Edit %s\\\'s account">%s</a>\', $base_url, $row[\'member_id\'], $row[\'display_name\'], $row[\'display_name\']);'),
+                                                                                      return l(\'<a href="%s/index.php?action=profile&amp;id=%s" title="Edit %s\\\'s account">%s</a>\', baseurl, $row[\'member_id\'], $row[\'display_name\'], $row[\'display_name\']);'),
                                                                     ));
 
     # How about that email? :P
@@ -177,7 +175,7 @@ if(!function_exists('admin_members_manage_table_handle'))
   */
   function admin_members_manage_table_handle($action, $selected)
   {
-    global $api, $core_dir, $db;
+    global $api, $db;
 
     # No point on executing anything if nothing was selected.
     if(!is_array($selected) || count($selected) == 0)
@@ -218,7 +216,7 @@ if(!function_exists('admin_members_manage_table_handle'))
             # Yup... The function to send them is in the register.php file.
             if(!function_exists('register_send_welcome_email'))
             {
-              require_once($core_dir. '/register.php');
+              require_once(coredir. '/register.php');
             }
 
             # Simple :-), I like it!

@@ -45,12 +45,12 @@ if(!function_exists('admin_prepend'))
   */
   function admin_prepend()
   {
-    global $api, $base_url, $core_dir, $icons, $member, $settings, $theme, $theme_url;
+    global $api, $icons, $member, $settings, $theme;
 
     # Whether or not you can view the Admin Control Panel, load the theme!
-    require_once($core_dir. '/admin/admin_theme.class.php');
+    require_once(coredir. '/admin/admin_theme.class.php');
 
-    $theme = $api->load_class($api->apply_filters('admin_theme_class', 'Admin_Theme'), array(l('Control Panel'). ' - '. $settings->get('site_name', 'string'), $api->apply_filters('admin_theme_image_url', $theme_url. '/default/style/images/admincp')));
+    $theme = $api->load_class($api->apply_filters('admin_theme_class', 'Admin_Theme'), array(l('Control Panel'). ' - '. $settings->get('site_name', 'string'), $api->apply_filters('admin_theme_image_url', themeurl. '/default/style/images/admincp')));
 
     if($member->can('access_admin_cp'))
     {
@@ -60,7 +60,7 @@ if(!function_exists('admin_prepend'))
         l('SnowCMS') => array(
                           array(
                             'id' => 'system_settings',
-                            'href' => $base_url. '/index.php?action=admin&amp;sa=settings',
+                            'href' => baseurl. '/index.php?action=admin&amp;sa=settings',
                             'title' => l('System settings'),
                             'src' => $theme->url(). '/settings.png',
                             'label' => l('Settings'),
@@ -68,7 +68,7 @@ if(!function_exists('admin_prepend'))
                           ),
                           array(
                             'id' => 'manage_themes',
-                            'href' => $base_url. '/index.php?action=admin&amp;sa=themes',
+                            'href' => baseurl. '/index.php?action=admin&amp;sa=themes',
                             'title' => l('Manage themes'),
                             'src' => $theme->url(). '/manage_themes.png',
                             'label' => l('Themes'),
@@ -76,7 +76,7 @@ if(!function_exists('admin_prepend'))
                           ),
                           array(
                             'id' => 'system_update',
-                            'href' => $base_url. '/index.php?action=admin&amp;sa=update',
+                            'href' => baseurl. '/index.php?action=admin&amp;sa=update',
                             'title' => l('Check for updates'),
                             'src' => $theme->url(). '/update.png',
                             'label' => l('Update'),
@@ -84,7 +84,7 @@ if(!function_exists('admin_prepend'))
                           ),
                           array(
                             'id' => 'system_about',
-                            'href' => $base_url. '/index.php?action=admin&amp;sa=about',
+                            'href' => baseurl. '/index.php?action=admin&amp;sa=about',
                             'title' => l('About SnowCMS and system information'),
                             'src' => $theme->url(). '/about.png',
                             'label' => l('About'),
@@ -92,7 +92,7 @@ if(!function_exists('admin_prepend'))
                           ),
                           array(
                             'id' => 'system_error_log',
-                            'href' => $base_url. '/index.php?action=admin&amp;sa=error_log',
+                            'href' => baseurl. '/index.php?action=admin&amp;sa=error_log',
                             'title' => l('View the error log'),
                             'src' => $theme->url(). '/error_log.png',
                             'label' => l('Errors'),
@@ -102,7 +102,7 @@ if(!function_exists('admin_prepend'))
         l('Members') => array(
                           array(
                             'id' => 'members_add',
-                            'href' => $base_url. '/index.php?action=admin&amp;sa=members_add',
+                            'href' => baseurl. '/index.php?action=admin&amp;sa=members_add',
                             'title' => l('Add a new member'),
                             'src' => $theme->url(). '/members_add.png',
                             'label' => l('Add'),
@@ -110,7 +110,7 @@ if(!function_exists('admin_prepend'))
                           ),
                           array(
                             'id' => 'members_manage',
-                            'href' => $base_url. '/index.php?action=admin&amp;sa=members_manage',
+                            'href' => baseurl. '/index.php?action=admin&amp;sa=members_manage',
                             'title' => l('Manage existing members'),
                             'src' => $theme->url(). '/members_manage.png',
                             'label' => l('Manage'),
@@ -118,7 +118,7 @@ if(!function_exists('admin_prepend'))
                           ),
                           array(
                             'id' => 'members_settings',
-                            'href' => $base_url. '/index.php?action=admin&amp;sa=members_settings',
+                            'href' => baseurl. '/index.php?action=admin&amp;sa=members_settings',
                             'title' => l('Member settings'),
                             'src' => $theme->url(). '/members_settings.png',
                             'label' => l('Settings'),
@@ -126,7 +126,7 @@ if(!function_exists('admin_prepend'))
                           ),
                           array(
                             'id' => 'members_permissions',
-                            'href' => $base_url. '/index.php?action=admin&amp;sa=members_permissions',
+                            'href' => baseurl. '/index.php?action=admin&amp;sa=members_permissions',
                             'title' => l('Set member group permissions'),
                             'src' => $theme->url(). '/members_permissions.png',
                             'label' => l('Permissions'),
@@ -136,7 +136,7 @@ if(!function_exists('admin_prepend'))
         l('Plugins') => array(
                           array(
                             'id' => 'plugins_add',
-                            'href' => $base_url. '/index.php?action=admin&amp;sa=plugins_add',
+                            'href' => baseurl. '/index.php?action=admin&amp;sa=plugins_add',
                             'title' => l('Add a new plugin'),
                             'src' => $theme->url(). '/plugins_add.png',
                             'label' => l('Add'),
@@ -144,7 +144,7 @@ if(!function_exists('admin_prepend'))
                           ),
                           array(
                             'id' => 'plugins_manage',
-                            'href' => $base_url. '/index.php?action=admin&amp;sa=plugins_manage',
+                            'href' => baseurl. '/index.php?action=admin&amp;sa=plugins_manage',
                             'title' => l('Manage plugins'),
                             'src' => $theme->url(). '/plugins_manage.png',
                             'label' => l('Manage'),
@@ -152,7 +152,7 @@ if(!function_exists('admin_prepend'))
                           ),
                           array(
                             'id' => 'plugins_settings',
-                            'href' => $base_url. '/index.php?action=admin&amp;sa=plugins_settings',
+                            'href' => baseurl. '/index.php?action=admin&amp;sa=plugins_settings',
                             'title' => l('Manage plugin settings'),
                             'src' => $theme->url(). '/plugins_settings.png',
                             'label' => l('Settings'),

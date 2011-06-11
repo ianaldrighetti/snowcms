@@ -35,16 +35,16 @@ if(!defined('IN_SNOW'))
 */
 function load_database()
 {
-  global $core_dir, $db, $db_type;
+  global $db;
 
   # Does the right stuff exist? It needs to for this system to run!
-  if(file_exists($core_dir. '/engines/'. strtolower($db_type). '.engine.php') && file_exists($core_dir. '/engines/'. strtolower($db_type). '_result.engine.php'))
+  if(file_exists(coredir. '/engines/'. strtolower(dbtype). '.engine.php') && file_exists(coredir. '/engines/'. strtolower(dbtype). '_result.engine.php'))
   {
     # Awesome, they're there! So we can get going now :)
-    require_once($core_dir. '/database_result.class.php');
-    require_once($core_dir. '/engines/'. strtolower($db_type). '_result.engine.php');
-    require_once($core_dir. '/database.class.php');
-    require_once($core_dir. '/engines/'. strtolower($db_type). '.engine.php');
+    require_once(coredir. '/database_result.class.php');
+    require_once(coredir. '/engines/'. strtolower(dbtype). '_result.engine.php');
+    require_once(coredir. '/database.class.php');
+    require_once(coredir. '/engines/'. strtolower(dbtype). '.engine.php');
 
     # Well, you should have specified the name of your class and result class, did you?
     if(!empty($db_class) && !empty($db_result_class) && class_exists($db_class) && class_exists($db_result_class))

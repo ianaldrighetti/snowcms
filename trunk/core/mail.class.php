@@ -44,7 +44,7 @@ class Mail
   */
   public function __construct()
   {
-    global $api, $core_dir, $settings;
+    global $api, $settings;
 
     $api->run_hooks('mail_construct');
 
@@ -52,14 +52,14 @@ class Mail
     if(strtolower($settings->get('mail_handler', 'string')) == 'smtp')
     {
       if(!class_exists('SMTP'))
-        require_once($core_dir. '/smtp.class.php');
+        require_once(coredir. '/smtp.class.php');
 
       $this->handler = new SMTP();
     }
     else
     {
       if(!class_exists('PHP_Mail'))
-        require_once($core_dir. '/php_mail.class.php');
+        require_once(coredir. '/php_mail.class.php');
 
       $this->handler = new PHP_Mail();
     }

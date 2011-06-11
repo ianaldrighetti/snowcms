@@ -43,7 +43,7 @@ if(!function_exists('profile_view'))
   */
   function profile_view()
   {
-    global $_GET, $api, $base_url, $member, $settings, $theme;
+    global $_GET, $api, $member, $settings, $theme;
 
     $api->run_hooks('profile_view');
 
@@ -95,7 +95,7 @@ if(!function_exists('profile_view'))
     if(empty($handled))
     {
       echo '
-      <h1>', l('%s\'s profile', $member_info['name']), ($member->can('edit_other_profiles') || $_GET['id'] == $member->id() ? ' <span style="font-size: 50%;">'. l('<a href="%s" title="Edit this account">Edit</a>', $base_url. '/index.php?action=profile&amp;id='. $_GET['id']. '&amp;edit'). '</span>' : ''), '</h1>
+      <h1>', l('%s\'s profile', $member_info['name']), ($member->can('edit_other_profiles') || $_GET['id'] == $member->id() ? ' <span style="font-size: 50%;">'. l('<a href="%s" title="Edit this account">Edit</a>', baseurl. '/index.php?action=profile&amp;id='. $_GET['id']. '&amp;edit'). '</span>' : ''), '</h1>
       <div class="profile_view_data">';
 
       # You will be able to modify this later :P
@@ -207,7 +207,7 @@ if(!function_exists('profile_edit'))
   */
   function profile_edit($member_info)
   {
-    global $api, $base_url, $member, $settings, $theme;
+    global $api, $member, $settings, $theme;
 
     $api->run_hooks('profile_edit', array(&$member_info));
 
@@ -253,7 +253,7 @@ if(!function_exists('profile_edit'))
 
     echo '
       <h1>', l('Editing %s\'s profile', $member_info['name']), '</h1>
-      <p>', l('You are currently editing %s\'s profile. <a href="%s" title="Back to profile">Back to profile</a>.', $member_info['name'], $base_url. '/index.php?action=profile'. ($member_info['id'] != $member->id() ? '&amp;id='. $member_info['id'] : '')), '</p>';
+      <p>', l('You are currently editing %s\'s profile. <a href="%s" title="Back to profile">Back to profile</a>.', $member_info['name'], baseurl. '/index.php?action=profile'. ($member_info['id'] != $member->id() ? '&amp;id='. $member_info['id'] : '')), '</p>';
 
     $form->show('member_edit_'. $member_id);
 
@@ -460,7 +460,7 @@ if(!function_exists('profile_edit_handle'))
   */
   function profile_edit_handle($data, &$errors = array())
   {
-    global $api, $base_url, $core_dir, $member;
+    global $api, $member;
 
     $members = $api->load_class('Members');
     $members->load($data['member_id']);
@@ -500,7 +500,7 @@ if(!function_exists('profile_edit_handle'))
 
           if(!function_exists('register_send_welcome_email'))
           {
-            require_once($core_dir. '/register.php');
+            require_once(coredir. '/register.php');
           }
 
           register_send_welcome_email($member_info['id']);
@@ -511,11 +511,11 @@ if(!function_exists('profile_edit_handle'))
 
       if(!empty($redir_login))
       {
-        redirect($base_url. '/index.php?action=login&member_name='. urlencode($member_info['username']));
+        redirect(baseurl. '/index.php?action=login&member_name='. urlencode($member_info['username']));
       }
       else
       {
-        redirect($base_url. '/index.php?action=profile'. ($member->id() == $member_info['id'] ? '' : '&id='. $member_info['id']));
+        redirect(baseurl. '/index.php?action=profile'. ($member->id() == $member_info['id'] ? '' : '&id='. $member_info['id']));
       }
     }
     else

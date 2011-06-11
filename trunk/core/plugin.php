@@ -184,16 +184,14 @@ function plugin_load($plugin_id, $is_path = true)
 */
 function plugin_list()
 {
-  global $plugin_dir;
-
   # Does the plugin directory not exist for some strange reason?
-  if(!file_exists($plugin_dir) || !is_dir($plugin_dir))
+  if(!file_exists(plugindir) || !is_dir(plugindir))
   {
     return false;
   }
 
   # Scan the plugins directory.
-  $ls = scandir($plugin_dir);
+  $ls = scandir(plugindir);
 
   $list = array();
   foreach($ls as $file)
@@ -206,10 +204,10 @@ function plugin_list()
 
     # Only look in directories, of course! Then check and see if
     # plugin.php and plugin.ini exists.
-    if(is_dir($plugin_dir. '/'. $file) && file_exists($plugin_dir. '/'. $file. '/plugin.php') && file_exists($plugin_dir. '/'. $file. '/plugin.xml'))
+    if(is_dir(plugindir. '/'. $file) && file_exists(plugindir. '/'. $file. '/plugin.php') && file_exists(plugindir. '/'. $file. '/plugin.xml'))
     {
       # Yup, it was a valid (or most likely valid :-P) plugin.
-      $list[] = realpath($plugin_dir. '/'. $file);
+      $list[] = realpath(plugindir. '/'. $file);
     }
   }
 
@@ -263,7 +261,7 @@ function plugin_list()
 function plugin_check_status($filename, &$reason = null)
 {
   global $api;
-return 'malicious';
+
   # Does the file not exist..?
   if(!file_exists($filename))
   {

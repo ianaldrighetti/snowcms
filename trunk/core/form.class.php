@@ -922,7 +922,7 @@ class Form
   */
   private function show_field($form_name, $name, $field)
   {
-    global $api, $base_url, $theme_url;
+    global $api;
 
     # Do you want to do this?
     $handled = null;
@@ -940,7 +940,7 @@ class Form
       if($field['type'] != 'hidden' && empty($field['is_full']))
       {
         echo '
-              <td id="', $form['id'], '_', $name, '_left" class="td_left"><p class="label">', (!empty($field['popup']) ? '<a href="javascript:void(0);" onclick="formPopup = window.open(\''. $base_url. '/index.php?action=popup&amp;id=popup_'. $name. '\', \'formPopup\', \'location=no,menubar=no,status=no,titlebar=yes,height=300px,width=300px,directories=no\'); formPopup.focus();"><img src="'. $api->apply_filters('form_popup_image_url', $theme_url. '/default/style/images/admincp/about-small.png'). '" alt="" title="'. l('More information'). '" /></a> ' : ''). '<label for="', $form['id'], '_', $name, '_input">', $field['label'], '</label></p>', !empty($field['subtext']) ? '<p class="subtext">'. $field['subtext']. '</p>' : '', '</td>';
+              <td id="', $form['id'], '_', $name, '_left" class="td_left"><p class="label">', (!empty($field['popup']) ? '<a href="javascript:void(0);" onclick="formPopup = window.open(\''. baseurl. '/index.php?action=popup&amp;id=popup_'. $name. '\', \'formPopup\', \'location=no,menubar=no,status=no,titlebar=yes,height=300px,width=300px,directories=no\'); formPopup.focus();"><img src="'. $api->apply_filters('form_popup_image_url', themeurl. '/default/style/images/admincp/about-small.png'). '" alt="" title="'. l('More information'). '" /></a> ' : ''). '<label for="', $form['id'], '_', $name, '_input">', $field['label'], '</label></p>', !empty($field['subtext']) ? '<p class="subtext">'. $field['subtext']. '</p>' : '', '</td>';
       }
 
       # Now here is the fun part! Actually displaying the fields.

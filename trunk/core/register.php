@@ -1,24 +1,26 @@
 <?php
-#########################################################################
-#                             SnowCMS v2.0                              #
-#                          By the SnowCMS Team                          #
-#                            www.snowcms.com                            #
-#                  Released under the GNU GPL v3 License                #
-#                     www.gnu.org/licenses/gpl-3.0.txt                  #
-#########################################################################
-#                                                                       #
-# SnowCMS originally pawned by soren121 started some time in early 2008 #
-#                                                                       #
-#########################################################################
-#                                                                       #
-#                SnowCMS v2.0 began in November 2009                    #
-#                                                                       #
-#########################################################################
-#                     File version: SnowCMS 2.0                         #
-#########################################################################
+////////////////////////////////////////////////////////////////////////////
+//                              SnowCMS v2.0                              //
+//                           By the SnowCMS Team                          //
+//                             www.snowcms.com                            //
+//                  Released under the GNU GPL v3 License                 //
+//                    www.gnu.org/licenses/gpl-3.0.txt                    //
+////////////////////////////////////////////////////////////////////////////
+//                                                                        //
+//       SnowCMS originally pawned by soren121 started in early 2008      //
+//                                                                        //
+////////////////////////////////////////////////////////////////////////////
+//                                                                        //
+//                  SnowCMS v2.0 began in November 2009                   //
+//                                                                        //
+////////////////////////////////////////////////////////////////////////////
+//                       File version: SnowCMS 2.0                        //
+////////////////////////////////////////////////////////////////////////////
 
 if(!defined('IN_SNOW'))
-  die;
+{
+  die('Nice try...');
+}
 
 # Title: Registration Handler
 
@@ -40,14 +42,14 @@ if(!function_exists('register_view'))
   */
   function register_view()
   {
-    global $api, $base_url, $member, $settings, $theme;
+    global $api, $member, $settings, $theme;
 
     $api->run_hooks('register_view');
 
     # Are you logged in? You don't need to register an account because you obviously have one!
     if($member->is_logged())
     {
-      header('Location: '. $base_url);
+      header('Location: '. baseurl);
       exit;
     }
 
@@ -103,14 +105,14 @@ if(!function_exists('register_process'))
   */
   function register_process()
   {
-    global $api, $base_url, $member, $settings, $theme;
+    global $api, $member, $settings, $theme;
 
     $api->run_hooks('register_process');
 
     # Already logged in? You don't need another account! ;)
     if($member->is_logged())
     {
-      header('Location: '. $base_url);
+      header('Location: '. baseurl);
       exit;
     }
 
@@ -148,7 +150,7 @@ if(!function_exists('register_process'))
 
       echo '
       <h1>', l('Registration successful'), '</h1>
-      <p>', l('Thank you for registering %s.', $member_info['name']), ' ', (!empty($member_info['is_activated']) ? l('You may now proceed to <a href="%s">log in to your account</a>.', $base_url. '/index.php?action=login') : ($settings->get('registration_type') == 1 ? l('The site requires an administrator to activate new accounts. You will receive an email once your account has been activated.') : ($settings->get('registration_type') == 2 ? l('The site requires you to activate your account via email, so check you email (%s) for your activation link.', $member_info['email']) : $api->apply_filters('registration_message_other', '')))), '</p>';
+      <p>', l('Thank you for registering %s.', $member_info['name']), ' ', (!empty($member_info['is_activated']) ? l('You may now proceed to <a href="%s">log in to your account</a>.', baseurl. '/index.php?action=login') : ($settings->get('registration_type') == 1 ? l('The site requires an administrator to activate new accounts. You will receive an email once your account has been activated.') : ($settings->get('registration_type') == 2 ? l('The site requires you to activate your account via email, so check you email (%s) for your activation link.', $member_info['email']) : $api->apply_filters('registration_message_other', '')))), '</p>';
 
       $theme->footer();
     }
@@ -173,7 +175,7 @@ if(!function_exists('register_generate_form'))
   */
   function register_generate_form()
   {
-    global $api, $base_url;
+    global $api;
     static $generated = false;
 
     # Already been done? Don't need to do it again.
@@ -184,7 +186,7 @@ if(!function_exists('register_generate_form'))
     $form = $api->load_class('Form');
     $form->add('registration_form', array(
                                       'callback' => 'register_member',
-                                      'action' => $api->apply_filters('register_action_url', $base_url. '/index.php?action=register2'),
+                                      'action' => $api->apply_filters('register_action_url', baseurl. '/index.php?action=register2'),
                                       'submit' => l('Register account'),
                                     ));
 
@@ -303,7 +305,7 @@ if(!function_exists('register_member'))
   */
   function register_member($options, &$errors = array())
   {
-    global $api, $base_url, $db, $settings;
+    global $api, $db, $settings;
 
     $handled = null;
     $api->run_hooks('register_member', array(&$handled, $options, &$errors));
@@ -367,7 +369,7 @@ if(!function_exists('register_send_email'))
   */
   function register_send_email($member_id)
   {
-    global $api, $base_url, $settings;
+    global $api, $settings;
 
     # Great! You get the wonders of email activation :P
     # The activation code and what not has already been set, we just need to get it out.
@@ -386,7 +388,7 @@ if(!function_exists('register_send_email'))
 
     if($handled === null)
     {
-      $handled = $mail->send($member_info['email'], $api->apply_filters('register_member_email_subject', l('Account activation for %s', $settings->get('site_name', 'string'))), $api->apply_filters('register_member_email_body', l("Hello there %s, this email comes from %s.\r\n\r\nYou are receiving this email because someone has attempted to register an account on our site with your email address. If this was not you who did this, please disregard this email, no further actions are required.\r\n\r\nIf you did, however, request this account, please activate your account by clicking on the link below:\r\n%s/index.php?action=activate&id=%s&code=%s\r\n\r\nThank you for registering! Hope to see you around!", $member_info['name'], $base_url, $base_url, $member_info['id'], $member_info['acode'])), $api->apply_filters('register_member_alt_email', ''), $api->apply_filters('register_member_email_options', array()));
+      $handled = $mail->send($member_info['email'], $api->apply_filters('register_member_email_subject', l('Account activation for %s', $settings->get('site_name', 'string'))), $api->apply_filters('register_member_email_body', l("Hello there %s, this email comes from %s.\r\n\r\nYou are receiving this email because someone has attempted to register an account on our site with your email address. If this was not you who did this, please disregard this email, no further actions are required.\r\n\r\nIf you did, however, request this account, please activate your account by clicking on the link below:\r\n%s/index.php?action=activate&id=%s&code=%s\r\n\r\nThank you for registering! Hope to see you around!", $member_info['name'], baseurl, baseurl, $member_info['id'], $member_info['acode'])), $api->apply_filters('register_member_alt_email', ''), $api->apply_filters('register_member_email_options', array()));
     }
 
     return !empty($handled);
@@ -409,7 +411,7 @@ if(!function_exists('register_send_welcome_email'))
   */
   function register_send_welcome_email($member_id)
   {
-    global $api, $base_url, $settings;
+    global $api, $settings;
 
     if(!is_array($member_id))
       $member_id = array($member_id);
@@ -447,7 +449,7 @@ if(!function_exists('register_send_welcome_email'))
         # Now dispatch them emails!
         foreach($members_info as $member_info)
         {
-          $mail->send($member_info['email'], $api->apply_filters('register_welcome_member_email_subject', l('Welcome to %s', $settings->get('site_name', 'string'))), $api->apply_filters('register_welcome_member_email_body', l("Hello there %s, this email comes from %s.\r\n\r\nYou are receiving this email because your account on %s is now activated, and you can now log in to your account. If you never registered an account on %s, please disregard this email.\r\n\r\nIf you did, however, you can now log in to your account at %s/index.php?action=login&member_name=%s\r\n\r\nThank you for registering! Hope to see you around!", $member_info['name'], $base_url, $settings->get('site_name', 'string'), $settings->get('site_name', 'string'), $base_url, urlencode($member_info['username']))), $api->apply_filters('register_welcome_member_alt_email', ''), $api->apply_filters('register_welcome_member_email_options', array()));
+          $mail->send($member_info['email'], $api->apply_filters('register_welcome_member_email_subject', l('Welcome to %s', $settings->get('site_name', 'string'))), $api->apply_filters('register_welcome_member_email_body', l("Hello there %s, this email comes from %s.\r\n\r\nYou are receiving this email because your account on %s is now activated, and you can now log in to your account. If you never registered an account on %s, please disregard this email.\r\n\r\nIf you did, however, you can now log in to your account at %s/index.php?action=login&member_name=%s\r\n\r\nThank you for registering! Hope to see you around!", $member_info['name'], baseurl, $settings->get('site_name', 'string'), $settings->get('site_name', 'string'), baseurl, urlencode($member_info['username']))), $api->apply_filters('register_welcome_member_alt_email', ''), $api->apply_filters('register_welcome_member_email_options', array()));
         }
 
         return true;

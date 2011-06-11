@@ -42,7 +42,7 @@ if(!function_exists('admin_update'))
   */
   function admin_update()
   {
-    global $api, $base_url, $member, $settings, $theme, $theme_url;
+    global $api, $member, $settings, $theme;
 
     $api->run_hooks('admin_update');
 
@@ -93,7 +93,7 @@ if(!function_exists('admin_update'))
   <h1 style="font-size: 14px;">', l($latest_info['header']), '</h1>
   <p>', l($latest_info['text']), '</p>
   <br />
-  <p>', !empty($is_update_required) ? '<a href="'. $base_url. '/index.php?action=admin&amp;sa=update&amp;apply='. $latest_version. '&amp;sid='. $member->session_id(). '" title="'. l('Apply update'). '">'. l('Apply update'). '</a> | ' : '', ' <a href="', $base_url, '/index.php?action=admin&amp;sa=update&amp;check" title="', l('Check for updates'), '">', l('Check for updates'), '</a></p>';
+  <p>', !empty($is_update_required) ? '<a href="'. baseurl. '/index.php?action=admin&amp;sa=update&amp;apply='. $latest_version. '&amp;sid='. $member->session_id(). '" title="'. l('Apply update'). '">'. l('Apply update'). '</a> | ' : '', ' <a href="', baseurl, '/index.php?action=admin&amp;sa=update&amp;check" title="', l('Check for updates'), '">', l('Check for updates'), '</a></p>';
 
     $theme->footer();
   }
@@ -117,7 +117,7 @@ if(!function_exists('admin_update_apply'))
   */
   function admin_update_apply()
   {
-    global $api, $base_dir, $base_url, $member, $settings, $theme, $theme_url;
+    global $api, $member, $settings, $theme;
 
     $version = $_GET['apply'];
 
@@ -146,7 +146,7 @@ if(!function_exists('admin_update_apply'))
 
       echo '
   <h1><img src="', $theme->url(), '/update-small.png" alt="" /> ', l('No update required'), '</h1>
-  <p>', l('No update needs to be applied at this time. <a href="%s">Back to system update</a>.', $base_url. '/index.php?action=admin&amp;sa=update'), '</p>';
+  <p>', l('No update needs to be applied at this time. <a href="%s">Back to system update</a>.', baseurl. '/index.php?action=admin&amp;sa=update'), '</p>';
 
       $theme->footer();
     }
@@ -175,7 +175,7 @@ if(!function_exists('admin_update_apply'))
       $checksum_download_url = $api->apply_filters('admin_update_checksum_url', 'http://download.snowcms.com/updates/'. $filename. '.chksum');
 
       // and now, to download the update.
-      $package = $update->download($download_url, $base_dir. '/'. $filename, $checksum_download_url);
+      $package = $update->download($download_url, basedir. '/'. $filename, $checksum_download_url);
 
       // Did the package actually get downloaded?
       if(empty($package['downloaded']))
@@ -196,35 +196,35 @@ if(!function_exists('admin_update_apply'))
     <h3>Extracting update</h3>';
 
         // Does the update directory exist? Delete it...
-        if(!@recursive_unlink($base_dir. '/update/') && is_dir($base_dir. '/update/'))
+        if(!@recursive_unlink(basedir. '/update/') && is_dir(basedir. '/update/'))
         {
           echo '
     <p class="red">', l('Could not delete the update directory. Update process failed.'), '</p>';
 
           // Delete the package. Sorry.
-          @unlink($base_dir. '/'. $filename);
+          @unlink(basedir. '/'. $filename);
         }
         // Make a temporary directory.
-        elseif(!@mkdir($base_dir. '/update/', 0777, true))
+        elseif(!@mkdir(basedir. '/update/', 0777, true))
         {
           echo '
     <p class="red">', l('Could not create the temporary update directory. Update process failed.'), '</p>';
 
           // Delete the package. Sorry.
-          @unlink($base_dir. '/'. $filename);
+          @unlink(basedir. '/'. $filename);
         }
         else
         {
           // Sure, we ought to extract it right from the base directory, but
           // just to be safe, we will try extracting it to another location
           // first.
-          if(!$update->extract($base_dir. '/'. $filename, $base_dir. '/update/', 'tar'))
+          if(!$update->extract(basedir. '/'. $filename, basedir. '/update/', 'tar'))
           {
             echo '
     <p class="red">', l('The update package "%s" could not be extracted due to an unknown error. Update process failed.', $filename), '</p>';
 
             // Delete...
-            @unlink($base_dir. '/'. $filename);
+            @unlink(basedir. '/'. $filename);
           }
           else
           {
@@ -235,9 +235,9 @@ if(!function_exists('admin_update_apply'))
 
             // Time to do some copying.
             $copied_files = 0;
-            foreach($update->get_listing($base_dir. '/update/') as $updated_filename)
+            foreach($update->get_listing(basedir. '/update/') as $updated_filename)
             {
-              $update->copy($base_dir. '/update/', $base_dir, $updated_filename);
+              $update->copy(basedir. '/update/', basedir, $updated_filename);
 
               $copied_files++;
             }
@@ -248,13 +248,13 @@ if(!function_exists('admin_update_apply'))
     <h3>Completing update</h3>';
 
     // Alright, we are DONE! Woo!
-    $update->finish($base_dir. '/update/', $base_dir);
+    $update->finish(basedir. '/update/', basedir);
 
     // We don't need this anymore.
-    @unlink($base_dir. '/'. $filename);
+    @unlink(basedir. '/'. $filename);
 
     echo '
-    <p class="green">', l('You have been successfully updated to v%s. <a href="%s">Go to the control panel</a>.', $settings->get('version', 'string'), $base_url. '/index.php?action=admin'), '</p>';
+    <p class="green">', l('You have been successfully updated to v%s. <a href="%s">Go to the control panel</a>.', $settings->get('version', 'string'), baseurl. '/index.php?action=admin'), '</p>';
           }
         }
       }
