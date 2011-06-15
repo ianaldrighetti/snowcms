@@ -22,7 +22,7 @@ if(!defined('IN_SNOW'))
   die('Nice try...');
 }
 
-# Title: Account activation
+// Title: Account activation
 
 if(!function_exists('activate_view'))
 {
@@ -45,81 +45,81 @@ if(!function_exists('activate_view'))
   {
     global $api, $member, $settings, $theme;
 
-    $api->run_hooks('activate_view');
+    api()->run_hooks('activate_view');
 
-    # Are you logged in? Then why would you need to activate another account?
-    if($member->is_logged())
+    // Are you logged in? Then why would you need to activate another account?
+    if(member()->is_logged())
     {
-      header('Location: '. baseurl);
+      redirect();
       exit;
     }
-    # What is the registration type? Is it actually email?
-    elseif($settings->get('registration_type', 'int', 0) != 2)
+    // What is the registration type? Is it actually email?
+    elseif(settings()->get('registration_type', 'int', 0) != 2)
     {
-      $theme->set_title(l('An error has occurred'));
+      theme()->set_title(l('An error has occurred'));
 
-      $theme->header();
+      theme()->header();
 
       echo '
       <h1>', l('An error has occurred'), '</h1>
       <p>', l('It appears that the current type of registration isn\'t email activation, so you cannot activate your account this way.'), '</p>';
 
-      $theme->footer();
+      theme()->footer();
       exit;
     }
 
-    # It should use a form in reality, but since this can be done through
-    # a URL that wouldn't be the best solution. So we will hand make it,
-    # in this case!
+    // It should use a form in reality, but since this can be done through
+    // a URL that wouldn't be the best solution. So we will hand make it,
+    // in this case!
     if((!empty($_REQUEST['id']) || !empty($_REQUEST['name'])) && !empty($_REQUEST['code']) && $_REQUEST['code'] != 'admin_approval')
     {
-      # We will be needing this. That's for sure :P
-      $members = $api->load_class('Members');
+      // We will be needing this. That's for sure :P
+      $members = api()->load_class('Members');
 
-      # Did you give is a name? We need to convert it to an ID.
+      // Did you give is a name? We need to convert it to an ID.
       if(empty($_REQUEST['id']) && !empty($_REQUEST['name']))
       {
         $_REQUEST['id'] = (int)$members->name_to_id($_REQUEST['name']);
       }
 
-      # Load up that member :)
+      // Load up that member :)
       $members->load($_REQUEST['id']);
       $member_info = $members->get($_REQUEST['id']);
 
       if(!empty($member_info))
       {
-        # Just because you got the right ID doesn't mean nothin' :P
-        # Has this account already been activated?
+        // Just because you got the right ID doesn't mean nothin' :P
+        // Has this account already been activated?
         if($member_info['is_activated'] == 1)
         {
-          $api->add_filter('activation_message', create_function('$value', '
+          api()->add_filter('activation_message', create_function('$value', '
                                                  return l(\'It appears that the specified member is already activated. If this is your account, you can <a href="%s">login</a> now.\', baseurl. \'/index.php?action=login\');'));
-          $api->run_hooks('activation_member_already_activated', array($member_info));
+          api()->run_hooks('activation_member_already_activated', array($member_info));
 
           $_REQUEST['name'] = $member_info['username'];
         }
-        # Do the codes not match?
+        // Do the codes not match?
         elseif($member_info['acode'] != $_REQUEST['code'] || strlen($member_info['acode']) == 0)
         {
-          $api->add_filter('activation_message', create_function('$value', '
+          api()->add_filter('activation_message', create_function('$value', '
                                                    return l(\'The supplied activation code is invalid.\');'));
-          $api->run_hooks('activation_member_invalid_acode', array($member_info));
+          api()->run_hooks('activation_member_invalid_acode', array($member_info));
 
           $_REQUEST['name'] = $member_info['username'];
         }
         else
         {
-          # Sweet! It's right ;D
+          // Sweet! It's right ;D
           $members->update($_REQUEST['id'], array(
                                               'member_acode' => '',
                                               'member_activated' => 1,
                                             ));
 
-          $api->add_filter('activation_message_id', create_function('$value', '
+          api()->add_filter('activation_message_id', create_function('$value', '
                                                       return \'activation_success\';'));
-          $api->add_filter('activation_message', create_function('$value', '
+          api()->add_filter('activation_message', create_function('$value', '
                                                      return l(\'Your account has been successfully activated. You may now proceed to <a href="%s">login</a>.\', baseurl. \'/index.php?action=login\');'));
-          $api->run_hooks('activation_member_success', array($member_info));
+          api()->run_hooks('activation_member_success', array($member_info));
 
           $_REQUEST['name'] = '';
           $_REQUEST['code'] = '';
@@ -127,32 +127,32 @@ if(!function_exists('activate_view'))
       }
       else
       {
-        # It appears that member does not exist... Interesting.
-        $api->add_filter('activation_message', create_function('$value', '
+        // It appears that member does not exist... Interesting.
+        api()->add_filter('activation_message', create_function('$value', '
                                                  return l(\'It appears that the specified member does not exist. Please try again.\');'));
-        $api->run_hooks('activation_member_nonexist');
+        api()->run_hooks('activation_member_nonexist');
       }
     }
 
-    $theme->set_title('Activate your account');
+    theme()->set_title('Activate your account');
 
-    # No indexing if you have anything extra set ;)
+    // No indexing if you have anything extra set ;)
     if(isset($_GET['id']) || isset($_GET['code']))
     {
-      $theme->add_meta(array('name' => 'robots', 'content' => 'noindex'));
+      theme()->add_meta(array('name' => 'robots', 'content' => 'noindex'));
     }
 
-    $theme->header();
+    theme()->header();
 
     echo '
       <h1>', l('Activate your account'), '</h1>
       <p>', l('If your account has not yet been activated, you can enter your activation information here. If you have yet to receive your activation email, you can <a href="%s">request for it to be resent</a>.', baseurl. '/index.php?action=resend'), '</p>';
 
-    if(strlen($api->apply_filters('activation_message', '')) > 0)
+    if(strlen(api()->apply_filters('activation_message', '')) > 0)
     {
       echo '
-      <div id="', $api->apply_filters('activation_message_id', 'activation_error'), '">
-        ', $api->apply_filters('activation_message', ''), '
+      <div id="', api()->apply_filters('activation_message_id', 'activation_error'), '">
+        ', api()->apply_filters('activation_message', ''), '
       </div>';
     }
 
@@ -173,7 +173,7 @@ if(!function_exists('activate_view'))
         </fieldset>
       </form>';
 
-    $theme->footer();
+    theme()->footer();
   }
 }
 ?>

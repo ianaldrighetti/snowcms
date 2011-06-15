@@ -22,7 +22,7 @@ if(!defined('IN_SNOW'))
   die('Nice try...');
 }
 
-# Title: Admin switch
+// Title: Admin switch
 
 if(!function_exists('admin_prepend'))
 {
@@ -45,48 +45,48 @@ if(!function_exists('admin_prepend'))
   */
   function admin_prepend()
   {
-    global $api, $icons, $member, $settings, $theme;
+    global $icons;
 
-    # Whether or not you can view the Admin Control Panel, load the theme!
+    // Whether or not you can view the Admin Control Panel, load the theme!
     require_once(coredir. '/admin/admin_theme.class.php');
 
-    $theme = $api->load_class($api->apply_filters('admin_theme_class', 'Admin_Theme'), array(l('Control Panel'). ' - '. $settings->get('site_name', 'string'), $api->apply_filters('admin_theme_image_url', themeurl. '/default/style/images/admincp')));
+    $theme = api()->load_class(api()->apply_filters('admin_theme_class', 'Admin_Theme'), array(l('Control Panel'). ' - '. settings()->get('site_name', 'string'), api()->apply_filters('admin_theme_image_url', themeurl. '/default/style/images/admincp')));
 
-    if($member->can('access_admin_cp'))
+    if(member()->can('access_admin_cp'))
     {
-      # Generate all the icons, done here as it is used in other places
-      # than just the control panel home.
+      // Generate all the icons, done here as it is used in other places
+      // than just the control panel home.
       $icons = array(
         l('SnowCMS') => array(
                           array(
                             'id' => 'system_settings',
                             'href' => baseurl. '/index.php?action=admin&amp;sa=settings',
                             'title' => l('System settings'),
-                            'src' => $theme->url(). '/settings.png',
+                            'src' => theme()->url(). '/settings.png',
                             'label' => l('Settings'),
-                            'show' => $member->can('manage_system_settings'),
+                            'show' => member()->can('manage_system_settings'),
                           ),
                           array(
                             'id' => 'manage_themes',
                             'href' => baseurl. '/index.php?action=admin&amp;sa=themes',
                             'title' => l('Manage themes'),
-                            'src' => $theme->url(). '/manage_themes.png',
+                            'src' => theme()->url(). '/manage_themes.png',
                             'label' => l('Themes'),
-                            'show' => $member->can('manage_themes'),
+                            'show' => member()->can('manage_themes'),
                           ),
                           array(
                             'id' => 'system_update',
                             'href' => baseurl. '/index.php?action=admin&amp;sa=update',
                             'title' => l('Check for updates'),
-                            'src' => $theme->url(). '/update.png',
+                            'src' => theme()->url(). '/update.png',
                             'label' => l('Update'),
-                            'show' => $member->can('update_system'),
+                            'show' => member()->can('update_system'),
                           ),
                           array(
                             'id' => 'system_about',
                             'href' => baseurl. '/index.php?action=admin&amp;sa=about',
                             'title' => l('About SnowCMS and system information'),
-                            'src' => $theme->url(). '/about.png',
+                            'src' => theme()->url(). '/about.png',
                             'label' => l('About'),
                             'show' => true,
                           ),
@@ -94,9 +94,9 @@ if(!function_exists('admin_prepend'))
                             'id' => 'system_error_log',
                             'href' => baseurl. '/index.php?action=admin&amp;sa=error_log',
                             'title' => l('View the error log'),
-                            'src' => $theme->url(). '/error_log.png',
+                            'src' => theme()->url(). '/error_log.png',
                             'label' => l('Errors'),
-                            'show' => $member->can('view_error_log') && $settings->get('errors_log', 'bool'),
+                            'show' => member()->can('view_error_log') && settings()->get('errors_log', 'bool'),
                           ),
                         ),
         l('Members') => array(
@@ -104,33 +104,33 @@ if(!function_exists('admin_prepend'))
                             'id' => 'members_add',
                             'href' => baseurl. '/index.php?action=admin&amp;sa=members_add',
                             'title' => l('Add a new member'),
-                            'src' => $theme->url(). '/members_add.png',
+                            'src' => theme()->url(). '/members_add.png',
                             'label' => l('Add'),
-                            'show' => $member->can('add_new_member'),
+                            'show' => member()->can('add_new_member'),
                           ),
                           array(
                             'id' => 'members_manage',
                             'href' => baseurl. '/index.php?action=admin&amp;sa=members_manage',
                             'title' => l('Manage existing members'),
-                            'src' => $theme->url(). '/members_manage.png',
+                            'src' => theme()->url(). '/members_manage.png',
                             'label' => l('Manage'),
-                            'show' => $member->can('manage_members'),
+                            'show' => member()->can('manage_members'),
                           ),
                           array(
                             'id' => 'members_settings',
                             'href' => baseurl. '/index.php?action=admin&amp;sa=members_settings',
                             'title' => l('Member settings'),
-                            'src' => $theme->url(). '/members_settings.png',
+                            'src' => theme()->url(). '/members_settings.png',
                             'label' => l('Settings'),
-                            'show' => $member->can('manage_member_settings'),
+                            'show' => member()->can('manage_member_settings'),
                           ),
                           array(
                             'id' => 'members_permissions',
                             'href' => baseurl. '/index.php?action=admin&amp;sa=members_permissions',
                             'title' => l('Set member group permissions'),
-                            'src' => $theme->url(). '/members_permissions.png',
+                            'src' => theme()->url(). '/members_permissions.png',
                             'label' => l('Permissions'),
-                            'show' => $member->can('manage_permissions'),
+                            'show' => member()->can('manage_permissions'),
                           ),
                         ),
         l('Plugins') => array(
@@ -138,33 +138,33 @@ if(!function_exists('admin_prepend'))
                             'id' => 'plugins_add',
                             'href' => baseurl. '/index.php?action=admin&amp;sa=plugins_add',
                             'title' => l('Add a new plugin'),
-                            'src' => $theme->url(). '/plugins_add.png',
+                            'src' => theme()->url(). '/plugins_add.png',
                             'label' => l('Add'),
-                            'show' => $member->can('add_plugins'),
+                            'show' => member()->can('add_plugins'),
                           ),
                           array(
                             'id' => 'plugins_manage',
                             'href' => baseurl. '/index.php?action=admin&amp;sa=plugins_manage',
                             'title' => l('Manage plugins'),
-                            'src' => $theme->url(). '/plugins_manage.png',
+                            'src' => theme()->url(). '/plugins_manage.png',
                             'label' => l('Manage'),
-                            'show' => $member->can('manage_plugins'),
+                            'show' => member()->can('manage_plugins'),
                           ),
                           array(
                             'id' => 'plugins_settings',
                             'href' => baseurl. '/index.php?action=admin&amp;sa=plugins_settings',
                             'title' => l('Manage plugin settings'),
-                            'src' => $theme->url(). '/plugins_settings.png',
+                            'src' => theme()->url(). '/plugins_settings.png',
                             'label' => l('Settings'),
-                            'show' => $member->can('manage_plugin_settings'),
+                            'show' => member()->can('manage_plugin_settings'),
                           ),
                         ),
       );
 
-      # You can make changes via this filter:
-      $icons = $api->apply_filters('admin_icons', $icons);
+      // You can make changes via this filter:
+      $icons = api()->apply_filters('admin_icons', $icons);
 
-      # Remove any that don't need showing, though.
+      // Remove any that don't need showing, though.
       $tmp = array();
       foreach($icons as $header => $icon)
       {
@@ -182,33 +182,33 @@ if(!function_exists('admin_prepend'))
         }
       }
 
-      # Put it back :P
+      // Put it back :P
       $icons = $tmp;
     }
 
-    # You could be making an ajax request (Oh yeah, did I mention any ajax
-    # requests dealing with control panel stuff should be prepended by
-    # action=admin&sa=ajax{rest of your stuff}? It should be!!!)
-    if($member->can('access_admin_cp') && substr($_SERVER['QUERY_STRING'], 0, 20) == 'action=admin&sa=ajax')
+    // You could be making an ajax request (Oh yeah, did I mention any ajax
+    // requests dealing with control panel stuff should be prepended by
+    // action=admin&sa=ajax{rest of your stuff}? It should be!!!)
+    if(member()->can('access_admin_cp') && substr($_SERVER['QUERY_STRING'], 0, 20) == 'action=admin&sa=ajax')
     {
-      # So it's an ajax request!
-      # Is an administrative prompt required?
+      // So it's an ajax request!
+      // Is an administrative prompt required?
       if(admin_prompt_required())
       {
-        # You sending us a password? Cool!
+        // You sending us a password? Cool!
         if(isset($_POST['admin_password']))
         {
-          # Did it work?
+          // Did it work?
           if(!admin_prompt_password($_POST['admin_password']))
           {
-            # Nope :(
+            // Nope :(
             echo json_encode(array('error' => l('Incorrect password'), 'admin_prompt_required' => true));
             exit;
           }
         }
         else
         {
-          # Yes, it is.
+          // Yes, it is.
           echo json_encode(array('error' => l('Your session has timed out'), 'admin_prompt_required' => true));
           exit;
         }
@@ -216,19 +216,19 @@ if(!function_exists('admin_prepend'))
     }
     else
     {
-      # Not allowed to access the Admin Control Panel?
-      if(!$member->can('access_admin_cp'))
+      // Not allowed to access the Admin Control Panel?
+      if(!member()->can('access_admin_cp'))
       {
-        # There's a function for that. :P
+        // There's a function for that. :P
         admin_access_denied();
       }
 
-      # We may require you to enter a password, for security reasons!
+      // We may require you to enter a password, for security reasons!
       admin_prompt_password();
     }
 
-    # You can make changes to the theme and what not now :)
-    $api->run_hooks('admin_prepend_authenticated', array('ajax' => substr($_SERVER['QUERY_STRING'], 0, 20) == 'action=admin&sa=ajax'));
+    // You can make changes to the theme and what not now :)
+    api()->run_hooks('admin_prepend_authenticated', array('ajax' => substr($_SERVER['QUERY_STRING'], 0, 20) == 'action=admin&sa=ajax'));
   }
 }
 
@@ -252,17 +252,15 @@ if(!function_exists('admin_prompt_required'))
   */
   function admin_prompt_required()
   {
-    global $api, $member, $settings;
-
-    # Check to see if your last check has now timed out, quite simple
-    # really! But if you for some strange reason have it disabled,
-    # nevermind!
-    if(!$settings->get('disable_admin_security', 'bool', false) && (empty($_SESSION['admin_password_prompted']) || ((int)$_SESSION['admin_password_prompted'] + ($settings->get('admin_login_timeout', 'int', 15) * 60)) < time_utc()))
+    // Check to see if your last check has now timed out, quite simple
+    // really! But if you for some strange reason have it disabled,
+    // nevermind!
+    if(!settings()->get('disable_admin_security', 'bool', false) && (empty($_SESSION['admin_password_prompted']) || ((int)$_SESSION['admin_password_prompted'] + (settings()->get('admin_login_timeout', 'int', 15) * 60)) < time_utc()))
     {
       return true;
     }
 
-    # Your good, for now!
+    // Your good, for now!
     return false;
   }
 }
@@ -292,12 +290,10 @@ if(!function_exists('admin_prompt_password'))
   */
   function admin_prompt_password($password = null)
   {
-    global $api, $member, $settings, $theme;
-
-    # Is it time for you to re-enter your password?
+    // Is it time for you to re-enter your password?
     if(admin_prompt_required())
     {
-      # Did you supply a password?
+      // Did you supply a password?
       if($password !== null)
       {
         $errors = array();
@@ -311,27 +307,27 @@ if(!function_exists('admin_prompt_password'))
         }
       }
 
-      # Generate the login form.
+      // Generate the login form.
       admin_prompt_generate_form();
 
-      $form = $api->load_class('Form');
+      $form = api()->load_class('Form');
 
-      # Has the form been submitted? Process it!
+      // Has the form been submitted? Process it!
       if(isset($_POST['admin_prompt_form']))
       {
         $success = $form->process('admin_prompt_form');
 
-        # Did they pass?
+        // Did they pass?
         if(!empty($success))
         {
-          # Yup, no need to continue!
+          // Yup, no need to continue!
           return;
         }
       }
 
-      $theme->set_title(l('Log in'));
+      theme()->set_title(l('Log in'));
 
-      $theme->header();
+      theme()->header();
 
       echo '
       <h1>', l('Login'), '</h1>
@@ -342,9 +338,9 @@ if(!function_exists('admin_prompt_password'))
 
       $form->show('admin_prompt_form');
 
-      $theme->footer();
+      theme()->footer();
 
-      # Don't execute anything else.
+      // Don't execute anything else.
       exit;
     }
   }
@@ -368,10 +364,8 @@ if(!function_exists('admin_prompt_generate_form'))
   */
   function admin_prompt_generate_form()
   {
-    global $api;
-
-    # Create the form so you can enter your password.
-    $form = $api->load_class('Form');
+    // Create the form so you can enter your password.
+    $form = api()->load_class('Form');
 
     $form->add('admin_prompt_form', array(
                                       'action' => '',
@@ -384,7 +378,7 @@ if(!function_exists('admin_prompt_generate_form'))
                                                                            'label' => l('Password:'),
                                                                          ));
 
-    # Let's add all the post data you were entering before ;)
+    // Let's add all the post data you were entering before ;)
     foreach($_POST as $key => $value)
     {
       $form->add_field('admin_prompt_form', $key, array(
@@ -415,22 +409,22 @@ if(!function_exists('admin_prompt_handle'))
   */
   function admin_prompt_handle($data, &$errors = array())
   {
-    global $api, $func, $member;
+    global $func;
 
-    # No password? Pfft.
+    // No password? Pfft.
     if(empty($data['admin_verification_password']) || $func['strlen']($data['admin_verification_password']) == 0)
     {
       $errors[] = l('Please enter your password.');
       return false;
     }
 
-    # The Members class has a useful method called authenticate :)
-    $members = $api->load_class('Members');
+    // The Members class has a useful method called authenticate :)
+    $members = api()->load_class('Members');
 
-    # Pretty simple to do. There are a couple hooks in that method, fyi.
-    if($members->authenticate($member->name(), $data['admin_verification_password']))
+    // Pretty simple to do. There are a couple hooks in that method, fyi.
+    if($members->authenticate(member()->name(), $data['admin_verification_password']))
     {
-      # Set the last time you verified in your session information ;)
+      // Set the last time you verified in your session information ;)
       $_SESSION['admin_password_prompted'] = time_utc();
 
       return true;
@@ -465,32 +459,30 @@ if(!function_exists('admin_access_denied'))
   */
   function admin_access_denied($title = null, $message = null)
   {
-    global $theme;
-
-    # No title? Just use a generic one, then.
+    // No title? Just use a generic one, then.
     if(empty($title))
     {
       $title = l('Access denied');
     }
 
-    # No special message? We will take it that they just don't have the
-    # right to access whatever it is you are wanting to block them from :P
+    // No special message? We will take it that they just don't have the
+    // right to access whatever it is you are wanting to block them from :P
     if(empty($message))
     {
       $message = l('Sorry, but you are not allowed to access the page you have requested.');
     }
 
-    $theme->set_title($title);
+    theme()->set_title($title);
 
-    $theme->header();
+    theme()->header();
 
     echo '
     <h1>', $title, '</h1>
     <p>', $message, '</p>';
 
-    $theme->footer();
+    theme()->footer();
 
-    # Exit!
+    // Exit!
     exit;
   }
 }

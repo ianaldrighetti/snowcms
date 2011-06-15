@@ -64,10 +64,10 @@ function array_insert($array, $item, $index, $key = null)
   $index = (int)$index;
   $length = count($array);
 
-  # Is it an associative array?
+  // Is it an associative array?
   if($key === null)
   {
-    # Maybe we can just plop it at the end..?
+    // Maybe we can just plop it at the end..?
     if($index >= $length)
     {
       $array[] = $item;
@@ -78,7 +78,7 @@ function array_insert($array, $item, $index, $key = null)
 
       for($i = 0; $i < $length; $i++)
       {
-        # The right index to insert item at?
+        // The right index to insert item at?
         if($i == $index)
           $new_array[] = $item;
 
@@ -90,7 +90,7 @@ function array_insert($array, $item, $index, $key = null)
   }
   else
   {
-    # Can't have two of the same indexes, sorry!
+    // Can't have two of the same indexes, sorry!
     if(isset($array[$key]))
     {
       return false;
@@ -101,7 +101,7 @@ function array_insert($array, $item, $index, $key = null)
     }
     else
     {
-      # Interesting... :P
+      // Interesting... :P
       $new_array = array();
       $current = 0;
 

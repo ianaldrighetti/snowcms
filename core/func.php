@@ -38,44 +38,44 @@ if(!defined('IN_SNOW'))
 */
 function init_func()
 {
-  global $api, $func, $settings;
+  global $func;
 
   $func = array(
-    # Add a couple aliases.
+    // Add a couple aliases.
     'htmlchars' => 'htmlchars',
     'htmlspecialchars' => 'htmlchars',
     'htmlchars_decode' => 'htmlchars_decode',
     'htmlspecialchars_decode' => 'htmlchars_decode',
   );
 
-  # Enable multibyte strings (which we set to use UTF-8).
-  if($settings->get('enable_utf8', 'bool') && function_exists('mb_internal_encoding'))
+  // Enable multibyte strings (which we set to use UTF-8).
+  if(settings()->get('enable_utf8', 'bool') && function_exists('mb_internal_encoding'))
   {
-    # Set the internal encoding to UTF-8.
+    // Set the internal encoding to UTF-8.
     mb_internal_encoding('UTF-8');
     mb_http_output(mb_internal_encoding());
 
-    # Handle the output buffer correctly.
-    $api->add_filter('output_callback', create_function('$value', '
+    // Handle the output buffer correctly.
+    api()->add_filter('output_callback', create_function('$value', '
                                           return \'mb_output_handler\';'), 1);
 
-    # Setup the variable functions for use!
+    // Setup the variable functions for use!
     $func += array(
       'parse_str' => 'mb_parse_str',
       'mail' => 'mb_send_mail',
       'stripos' => create_function('$haystack, $needle, $offset = 0', '
-                     # This function doesn\'t exist until PHP 5.2.0 >=
+                     // This function doesn\'t exist until PHP 5.2.0 >=
                      if(function_exists(\'mb_stripos\'))
                        return mb_stripos($haystack, $needle, $offset);
                      else
-                       # Simple to emulate, really.
+                       // Simple to emulate, really.
                        return mb_strpos(mb_strtolower($haystack), mb_strtolower($needle), $offset);'),
       'stristr' => create_function('$haystack, $needle, $part = false', '
-                     # Same as mb_stripos, this doesn\'t exist until 5.2.0 as well.
+                     // Same as mb_stripos, this doesn\'t exist until 5.2.0 as well.
                      if(function_exists(\'mb_stristr\'))
                        return mb_stristr($haystack, $needle, $part);
                      else
-                       # Pretty easy to emulate too.
+                       // Pretty easy to emulate too.
                        return mb_strstr(mb_strtolower($haystack), mb_strtolower($needle), $part);'),
       'strlen' => 'mb_strlen',
       'strpos' => 'mb_strpos',
@@ -95,7 +95,7 @@ function init_func()
       'strtolower' => 'mb_strtolower',
       'strtoupper' => 'mb_strtoupper',
       'ucwords' => create_function('$str', '
-                     # It may not have its own dedicated function, but this is good enough :P
+                     // It may not have its own dedicated function, but this is good enough :P
                      return mb_convert_case($str, MB_CASE_TITLE);'),
       'substr_count' => 'mb_substr_count',
       'substr' => 'mb_substr',
@@ -103,7 +103,7 @@ function init_func()
   }
   else
   {
-    # Define all the same variable functions, just without mb_ in front, really.
+    // Define all the same variable functions, just without mb_ in front, really.
     $func += array(
       'parse_str' => 'parse_str',
       'mail' => 'mail',
@@ -125,7 +125,7 @@ function init_func()
     );
   }
 
-  $api->run_hooks('post_init_func', array(&$func));
+  api()->run_hooks('post_init_func', array(&$func));
 }
 
 /*
@@ -188,80 +188,80 @@ if(!function_exists('create_pagination'))
   */
   function create_pagination($tpl_url, &$start, $num_items, $per_page = 10)
   {
-    # So how many pages total..?
+    // So how many pages total..?
     $total_pages = ceil((int)($num_items == 0 ? 1 : $num_items) / (int)$per_page);
 
-    # Make sure start is an integer... At least make it one.
+    // Make sure start is an integer... At least make it one.
     $start = (int)$start;
 
-    # We can't have a page less then one,
-    # or greater then total_pages ;)
+    // We can't have a page less then one,
+    // or greater then total_pages ;)
     if($start < 1)
       $start = 1;
     elseif($start > $total_pages)
       $start = $total_pages;
 
-    # So start... Make an array holding all our stuffs.
+    // So start... Make an array holding all our stuffs.
     $index = array();
 
-    # So the << First :) Though we may not link it
-    # if we are on the first page.
+    // So the << First :) Though we may not link it
+    // if we are on the first page.
     $index[] = '<span class="pagination_first">'. ($start != 1 ? '<a href="'. $tpl_url. '">' : ''). l('&laquo;&laquo; First'). ($start != 1 ? '</a>' : ''). '</span>';
 
-    # Now the < which is the previous one... Don't link
-    # it if thats where we are :P
+    // Now the < which is the previous one... Don't link
+    // it if thats where we are :P
     $index[] = '<span class="pagination_prev">'. ($start != 1 ? '<a href="'. (($start - 1) > 1 ? $tpl_url. '&page='. ($start - 1) : $tpl_url). '">' : ''). l('&laquo; Previous'). ($start != 1 ? '</a>' : ''). '</span>';
 
-    # So now the page numbers...
+    // So now the page numbers...
     if($total_pages < 6)
     {
-      # Hmm... Less then 5 :P
+      // Hmm... Less then 5 :P
       $page_start = 1;
       $page_end = $total_pages;
     }
     elseif($start - 2 < 1)
     {
-      # We are gonna go from 1 to 5 ;)
+      // We are gonna go from 1 to 5 ;)
       $page_start = 1;
       $page_end = 5;
     }
     elseif($start + 2 <= $total_pages)
     {
-      # Somewhere in between...
+      // Somewhere in between...
       $page_start = $start - 2;
       $page_end = $start + 2;
     }
     else
     {
-      # The end of the line...
-      # Some weird buggy that needs fixing...
+      // The end of the line...
+      // Some weird buggy that needs fixing...
       $page_start = ($start == ($total_pages - 1) ? $start - 3 : $start - 4);
       $page_end = $total_pages;
     }
 
-    # So now that we have our numbers, for loop :D
+    // So now that we have our numbers, for loop :D
     for($page = $page_start; $page < ($page_end + 1); $page++)
     {
-      # So add the page number... Also, don't link the page number
-      # if thats where we are at ;) oh, ya and, don't add &page=
-      # to the end of our template url if its page one :)
+      // So add the page number... Also, don't link the page number
+      // if thats where we are at ;) oh, ya and, don't add &page=
+      // to the end of our template url if its page one :)
       $index[] = '<span class="pagination_page'. ($page == $start ? ' pagination_current' : ''). '">'. ($page != $start ? '<a href="'. ($page != 1 ? $tpl_url. '&page='. $page : $tpl_url). '">' : ''). $page. ($page != $start ? '</a>' : ''). '</span>';
     }
 
-    # Almost done :D!
-    # So add the > which is the next one ;)
-    # Don't link it if thats our current page...
+    // Almost done :D!
+    // So add the > which is the next one ;)
+    // Don't link it if thats our current page...
     $index[] = '<span class="pagination_next">'. ($start < $total_pages ? '<a href="'. $tpl_url. '&page='. ($start + 1). '">' : ''). l('Next &raquo;'). ($start < $total_pages ? '</a>' : ''). '</span>';
 
-    # Now the Last >> Of course, don't link it if thats where we are.
+    // Now the Last >> Of course, don't link it if thats where we are.
     $index[] = '<span class="pagination_last">'. ($start < $total_pages ? '<a href="'. $tpl_url. '&page='. $total_pages. '">' : ''). l('Last &raquo;&raquo;'). ($start < $total_pages ? '</a>' : ''). '</span>';
 
-    # And we are done with the hard stuffs, yay.
-    # So before we implode the stuff, take away 1 from
-    # start, then multiply it by per_page. What for? For LIMIT clauses :D
+    // And we are done with the hard stuffs, yay.
+    // So before we implode the stuff, take away 1 from
+    // start, then multiply it by per_page. What for? For LIMIT clauses :D
     $start = ($start - 1) * $per_page;
 
-    # Return it imploded...
+    // Return it imploded...
     return '<span class="pagination">'. implode(' ', $index). '</span>';
   }
 }

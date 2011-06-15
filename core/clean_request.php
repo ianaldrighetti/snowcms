@@ -53,7 +53,7 @@ if(!function_exists('clean_request'))
   {
     global $_COOKIE, $_GET, $_POST, $_REQUEST;
 
-    # Remove magic quotes, if it is on...
+    // Remove magic quotes, if it is on...
     if((function_exists('get_magic_quotes_gpc') && @get_magic_quotes_gpc() == 1) || @ini_get('magic_quotes_sybase'))
     {
       $_COOKIE = remove_magic($_COOKIE);
@@ -61,7 +61,7 @@ if(!function_exists('clean_request'))
       $_POST = remove_magic($_POST);
     }
 
-    # $_REQUEST should only contain $_POST and $_GET, no cookies!
+    // $_REQUEST should only contain $_POST and $_GET, no cookies!
     $_REQUEST = array_merge($_POST, $_GET);
   }
 
@@ -81,12 +81,12 @@ if(!function_exists('clean_request'))
   */
   function remove_magic($array, $depth = 5)
   {
-    # Nothing in the array? No need!
+    // Nothing in the array? No need!
     if(count($array) == 0)
     {
       return array();
     }
-    # Exceeded our maximum depth? Just return the array, untouched.
+    // Exceeded our maximum depth? Just return the array, untouched.
     elseif($depth <= 0)
     {
       return $array;
@@ -94,8 +94,8 @@ if(!function_exists('clean_request'))
 
     foreach($array as $key => $value)
     {
-      # Gotta remember that the key needs to have magic quote crud removed
-      # as well!
+      // Gotta remember that the key needs to have magic quote crud removed
+      // as well!
       if(!is_array($value))
       {
         $array[stripslashes($key)] = stripslashes($value);

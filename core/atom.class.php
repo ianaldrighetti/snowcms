@@ -34,54 +34,54 @@ if(!defined('IN_SNOW'))
 */
 class Atom
 {
-  # Variable: id
-  # Identifies the feed using a unique ID, such as a URL to your site.
+  // Variable: id
+  // Identifies the feed using a unique ID, such as a URL to your site.
   private $id;
 
-  # Variable: title
-  # The title of the Atom feed.
+  // Variable: title
+  // The title of the Atom feed.
   private $title;
 
-  # Variable: updated
-  # The last time the feed was modified significantly.
+  // Variable: updated
+  // The last time the feed was modified significantly.
   private $updated;
 
-  # Variable: authors
-  # An array containing sub arrays with an author name, email address
-  # and URI (URL to their home page, like their profile).
+  // Variable: authors
+  // An array containing sub arrays with an author name, email address
+  // and URI (URL to their home page, like their profile).
   private $authors;
 
-  # Variable: links
-  # An array containing links, such as a link to the Atom feed itself.
+  // Variable: links
+  // An array containing links, such as a link to the Atom feed itself.
   private $links;
 
-  # Variable: categories
-  # An array containing categories of the Atom feed.
+  // Variable: categories
+  // An array containing categories of the Atom feed.
   private $categories;
 
-  # Variable: contributors
-  # An array containing contributors to the feed.
+  // Variable: contributors
+  // An array containing contributors to the feed.
   private $contributors;
 
-  # Variable: icon
-  # An small image which provides "iconic visual identification" for the
-  # feed.
+  // Variable: icon
+  // An small image which provides "iconic visual identification" for the
+  // feed.
   private $icon;
 
-  # Variable: logo
-  # Same as the above, but only larger.
+  // Variable: logo
+  // Same as the above, but only larger.
   private $logo;
 
-  # Variable: rights
-  # Contains information about the rights of the feed, like copyrights.
+  // Variable: rights
+  // Contains information about the rights of the feed, like copyrights.
   private $rights;
 
-  # Variable: subtitle
-  # A subtitle for the Atom feed.
+  // Variable: subtitle
+  // A subtitle for the Atom feed.
   private $subtitle;
 
-  # Variable: entries
-  # An array containing entries for the Atom feed.
+  // Variable: entries
+  // An array containing entries for the Atom feed.
   private $entries;
 
   /*
@@ -89,7 +89,7 @@ class Atom
   */
   public function __construct()
   {
-    # This will set everything to null and empty.
+    // This will set everything to null and empty.
     $this->clear();
   }
 
@@ -250,7 +250,7 @@ class Atom
   */
   public function add_author($name, $email = null, $uri = null)
   {
-    # You must have a name...
+    // You must have a name...
     if(empty($name))
     {
       return false;
@@ -303,30 +303,30 @@ class Atom
 
     if($index == 0)
     {
-      # Pop it off the top.
+      // Pop it off the top.
       array_shift($this->authors);
     }
     elseif($index == (count($this->authors) - 1))
     {
-      # Take it off the end.
+      // Take it off the end.
       unset($this->authors[$index]);
     }
     else
     {
-      # Somewhere inbetween it appears.
+      // Somewhere inbetween it appears.
       $authors = array();
       $length = count($this->authors);
 
       for($i = 0; $i < $length; $i++)
       {
-        # Is this what we are deleting?
+        // Is this what we are deleting?
         if($index == $i)
         {
-          # Yup, so skip it.
+          // Yup, so skip it.
           continue;
         }
 
-        # Keeping it!
+        // Keeping it!
         $authors[] = $this->authors[$i];
       }
 
@@ -366,7 +366,7 @@ class Atom
   */
   public function add_link($href, $rel = 'alternate', $type = null, $title = null, $hreflang = null, $length = null)
   {
-    # The href is required.
+    // The href is required.
     if(empty($href))
     {
       return false;
@@ -413,28 +413,28 @@ class Atom
   */
   public function remove_link($index)
   {
-    # Is the index invalid? Then we cannot remove the link. Sorry.
+    // Is the index invalid? Then we cannot remove the link. Sorry.
     if((string)$index != (string)(int)$index || $index < 0 || $index >= count($this->links))
     {
       return false;
     }
 
-    # The first link? Using the unshift function will take the first item
-    # of an array off without much hassle.
+    // The first link? Using the unshift function will take the first item
+    // of an array off without much hassle.
     if($index == 0)
     {
       array_unshift($this->links);
     }
-    # The very last link? Pretty simple too.
+    // The very last link? Pretty simple too.
     elseif($index == (count($this->links) - 1))
     {
       unset($this->links[$index]);
     }
     else
     {
-      # Anywhere inbetween? Not so plain cut and dry.
-      # We could simply just delete it, but we want to maintain the
-      # sequential ordering of the indexes.
+      // Anywhere inbetween? Not so plain cut and dry.
+      // We could simply just delete it, but we want to maintain the
+      // sequential ordering of the indexes.
       $links = array();
       $length = count($this->links);
 
@@ -561,7 +561,7 @@ class Atom
   */
   public function add_contributor($name, $email = null, $uri = null)
   {
-    # A name is required.
+    // A name is required.
     if(empty($name))
     {
       return false;
@@ -817,14 +817,14 @@ class Atom
   */
   public function add_entry($id, $title, $updated, $author = array(), $content = array(), $links = array(), $summary = array(), $categories = array(), $contributors = array(), $published = null, $source = array(), $rights = null)
   {
-    # You must have at least an id, title and updated time.
+    // You must have at least an id, title and updated time.
     if(empty($id) || empty($title) || (string)$updated != (string)(int)$updated)
     {
       return false;
     }
 
-    # Do the simpler validation stuff.
-    # Such as content requiring the value index :P
+    // Do the simpler validation stuff.
+    // Such as content requiring the value index :P
     if(empty($content['value']) || empty($summy['type']) || ($published !== null && (string)$published != (string)(int)$published) || (count($source) > 0 && (empty($source['id']) || empty($source['title']))))
     {
       return false;
@@ -849,38 +849,38 @@ class Atom
                 );
     }
 
-    # Authors not a flat array? Make it into one!
+    // Authors not a flat array? Make it into one!
     if(!is_flat_array($author))
     {
       $author = array($author);
     }
 
-    # Same goes for links.
+    // Same goes for links.
     if(!is_flat_array($links))
     {
       $links = array($links);
     }
 
-    # And categories.
+    // And categories.
     if(!is_flat_array($categories))
     {
       $categories = array($categories);
     }
 
-    # ... and contributors.
+    // ... and contributors.
     if(!is_flat_array($contributors))
     {
       $contributors = array($contributors);
     }
 
-    # Now validate each one, then we are done!!!
+    // Now validate each one, then we are done!!!
     if(!$this->has_indexes($author, array('name' => true, 'email' => false, 'uri' => false)) || !$this->has_indexes($links, array('href' => true, 'hreflang' => false)) || !$this->has_indexes($categories, array('term' => true, 'scheme' => false, 'label' => false)) || !$this->has_indexes($contributors, array('name' => true, 'email' => false, 'uri' => false)))
     {
-      # Something was invalid!
+      // Something was invalid!
       return false;
     }
 
-    # Alright, all good.
+    // Alright, all good.
     $this->entries[] = array(
                          'id' => $id,
                          'title' => $title,
@@ -1042,23 +1042,21 @@ class Atom
   */
   public function generate($fp = null)
   {
-    global $api;
-
-    # We do require some things...
+    // We do require some things...
     if(empty($this->id) || empty($this->title) || empty($this->updated))
     {
       return false;
     }
-    # Supplied a stream for us to write to?
+    // Supplied a stream for us to write to?
     elseif(!empty($fp) && !flock($fp, LOCK_EX))
     {
-      # It would be nice if we could have an exclusive lock...
+      // It would be nice if we could have an exclusive lock...
       return false;
     }
 
-    $api->run_hooks('atom_generate', array($this, &$fp));
+    api()->run_hooks('atom_generate', array($this, &$fp));
 
-    # We may need to output headers!
+    // We may need to output headers!
     if(empty($fp))
     {
       if(ob_get_length() > 0)
@@ -1066,11 +1064,11 @@ class Atom
         ob_clean();
       }
 
-      # Well, one ;-) The content type.
+      // Well, one ;-) The content type.
       header('Content-Type: application/atom+xml; charset=utf-8');
     }
 
-    # Start filling the buffer.
+    // Start filling the buffer.
     $buffer = '<?xml version="1.0" encoding="utf-8"?>'. $crlf.
               '<feed xmlns="http://www.w3.org/2005/Atom">'. $crlf.
               '  <id>'. htmlchars($this->id). '</id>'. $crlf.
@@ -1078,7 +1076,7 @@ class Atom
               '  <updated>'. date('c', $this->updated). '</updated>'. $crlf.
               '  <generator>SnowCMS (http://www.snowcms.com/)</generator>'. $crlf;
 
-    # Well, we have part of it... Let's output!
+    // Well, we have part of it... Let's output!
     if(!empty($fp))
     {
       fwrite($fp, $buffer);
@@ -1089,10 +1087,10 @@ class Atom
       flush();
     }
 
-    # Empty that buffer.
+    // Empty that buffer.
     $buffer = '';
 
-    # Authors!
+    // Authors!
     if(count($this->authors) > 0)
     {
       foreach($this->authors as $author)
@@ -1114,7 +1112,7 @@ class Atom
       }
     }
 
-    # Looks like links!
+    // Looks like links!
     if(count($this->links) > 0)
     {
       foreach($this->links as $link)
@@ -1123,7 +1121,7 @@ class Atom
       }
     }
 
-    # Any categories for the feed itself?
+    // Any categories for the feed itself?
     if(count($this->categories) > 0)
     {
       foreach($this->categories as $category)
@@ -1132,7 +1130,7 @@ class Atom
       }
     }
 
-    # Contributors? Just like authors, but not exactly the same! :P
+    // Contributors? Just like authors, but not exactly the same! :P
     if(count($this->contributors) > 0)
     {
       foreach($this->contributors as $contributor)
@@ -1154,58 +1152,58 @@ class Atom
       }
     }
 
-    # An icon?
+    // An icon?
     if(!empty($this->icon))
     {
       $buffer .= '  <icon>'. htmlchars($this->icon). '</icon>'. $crlf;
     }
 
-    # A logo? (Just a bigger icon, or the icon is a small logo, whichever
-    # you prefer :P)
+    // A logo? (Just a bigger icon, or the icon is a small logo, whichever
+    // you prefer :P)
     if(!empty($this->logo))
     {
       $buffer .= '  <logo>'. htmlchars($this->logo). '</logo>'. $crlf;
     }
 
-    # Do you have any rights, well, do they?
+    // Do you have any rights, well, do they?
     if(!empty($this->rights))
     {
       $buffer .= '  <rights>'. htmlchars($this->rights). '</rights>'. $crlf;
     }
 
-    # And finally, a subtitle!
+    // And finally, a subtitle!
     if(!empty($this->subtitle))
     {
       $buffer .= '  <subtitle>'. htmlchars($this->subtitle). '</subtitle>'. $crlf;
     }
 
-    # All done with that stuff... So save the data in the buffer.
+    // All done with that stuff... So save the data in the buffer.
     if(!empty($fp))
     {
-      # To the stream:
+      // To the stream:
       fwrite($fp, $buffer);
     }
     else
     {
-      # To you!
+      // To you!
       echo $buffer;
       flush();
     }
 
-    # Now for the most important stuff! The entries themselves! Well, if
-    # there are any.
+    // Now for the most important stuff! The entries themselves! Well, if
+    // there are any.
     if(count($this->entries) > 0)
     {
       foreach($this->entries as $entry)
       {
         $buffer = '  <entry>'. $crlf;
 
-        # There are a few required tags.
+        // There are a few required tags.
         $buffer .= '    <id>'. htmlchars($entry['id']). '</id>'. $crlf.
                    '    <title>'. htmlchars($entry['title']). '</title>'. $crlf.
                    '    <updated>'. date('c', $entry['updated']). '</updated>'. $crlf;
 
-        # How about authors? Lots? Some? None?
+        // How about authors? Lots? Some? None?
         if(count($entry['authors']) > 0)
         {
           foreach($entry['authors'] as $author)
@@ -1227,13 +1225,13 @@ class Atom
           }
         }
 
-        # How about the content of the entry?
+        // How about the content of the entry?
         if(!empty($entry['content']['value']))
         {
           $buffer .= '    <content'. (!empty($entry['content']['type']) ? ' type="'. $entry['content']['type']. '"' : ' type="text"'). '>'. $entry['content']['value']. '</content>'. $crlf;
         }
 
-        # Up next: links.
+        // Up next: links.
         if(count($entry['links']) > 0)
         {
           foreach($entry['links'] as $link)
@@ -1242,13 +1240,13 @@ class Atom
           }
         }
 
-        # How about the content of the entry?
+        // How about the content of the entry?
         if(!empty($entry['summary']['value']))
         {
           $buffer .= '    <summary'. (!empty($entry['summary']['type']) ? ' type="'. $entry['summary']['type']. '"' : ' type="text"'). '>'. $entry['summary']['value']. '</summary>'. $crlf;
         }
 
-        # Now categories for the entry.
+        // Now categories for the entry.
         if(count($entry['categories']) > 0)
         {
           foreach($entry['categories'] as $category)
@@ -1257,7 +1255,7 @@ class Atom
           }
         }
 
-        # Ah, contributors. Don't you love them?
+        // Ah, contributors. Don't you love them?
         if(count($entry['contibutors']))
         {
           foreach($entry['contibutors'] as $contributor)
@@ -1279,13 +1277,13 @@ class Atom
           }
         }
 
-        # When was it originally published..?
+        // When was it originally published..?
         if(!empty($entry['published']))
         {
           $buffer .= '    <published>'. date('c', $entry['published']). '</published>'. $crlf;
         }
 
-        # Some source information.
+        // Some source information.
         if(!empty($entry['source']['id']) || !empty($entry['source']['title']) || !empty($entry['source']['updated']) || !empty($entry['source']['rights']))
         {
           $buffer .= '    <source>'. $crlf;
@@ -1313,7 +1311,7 @@ class Atom
           $buffer .= '    </source>'. $crlf;
         }
 
-        # Hmm, rights?
+        // Hmm, rights?
         if(!empty($entry['rights']))
         {
           $buffer .= '    <rights>'. htmlchars($entry['rights']). '</rights>';
@@ -1321,7 +1319,7 @@ class Atom
 
         $buffer .= '  </entry>'. $crlf;
 
-        # Alright, now write the buffer to, where ever!
+        // Alright, now write the buffer to, where ever!
         if(!empty($fp))
         {
           fwrite($fp, $buffer);
@@ -1334,12 +1332,12 @@ class Atom
       }
     }
 
-    # And just one, last... thing!
+    // And just one, last... thing!
     if(!empty($fp))
     {
       fwrite($fp, '</entry>');
 
-      # Free the lock too.
+      // Free the lock too.
       flock($fp, LOCK_UN);
     }
     else

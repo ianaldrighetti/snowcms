@@ -29,52 +29,52 @@ if(!defined('IN_SNOW'))
 */
 abstract class Database
 {
-  # Variable: con
-  # Holds the database connection resource.
+  // Variable: con
+  // Holds the database connection resource.
   public $con = null;
 
-  # Variable: prefix
-  # Holds the table prefix, such as snow_
+  // Variable: prefix
+  // Holds the table prefix, such as snow_
   public $prefix = null;
 
-  # Variable: type
-  # The type of database, for example: MySQL, SQLite, PostgreSQL, etc.
+  // Variable: type
+  // The type of database, for example: MySQL, SQLite, PostgreSQL, etc.
   public $type = null;
 
-  # Variable: case_sensitive
-  # Is the database system case sensitive? Some are, some aren't. Be sure
-  # that you set this to true if the database is case sensitive, or very
-  #bad things could occur!!! (Set to true, just incase ;))
+  // Variable: case_sensitive
+  // Is the database system case sensitive? Some are, some aren't. Be sure
+  // that you set this to true if the database is case sensitive, or very
+  //bad things could occur!!! (Set to true, just incase ;))
   public $case_sensitive = true;
 
-  # Variable: num_queries
-  # The number of queries executed so far, right now, none!
+  // Variable: num_queries
+  // The number of queries executed so far, right now, none!
   public $num_queries = 0;
 
-  # Variable: drop_if_exists
-  # Does your database type support DROP TABLE IF EXISTS?
+  // Variable: drop_if_exists
+  // Does your database type support DROP TABLE IF EXISTS?
   public $drop_if_exists = false;
 
-  # Variable: if_not_exists
-  # How about CREATE TABLE IF NOT EXISTS?
+  // Variable: if_not_exists
+  // How about CREATE TABLE IF NOT EXISTS?
   public $if_not_exists = false;
 
-  # Variable: extended_inserts
-  # Can the database handle extended inserts?
+  // Variable: extended_inserts
+  // Can the database handle extended inserts?
   public $extended_inserts = false;
 
-  # Variable: debug
-  # Is the database in a forced debug mode?
+  // Variable: debug
+  // Is the database in a forced debug mode?
   public $debug = false;
 
-  # Variable: result_class
-  # The result class which query and insert return (global $db_result_class
-  # in connect()).
+  // Variable: result_class
+  // The result class which query and insert return (global $db_result_class
+  // in connect()).
   public $result_class = null;
 
-  # Variable: debug_text
-  # Holds all the debugging stuff which gets written to a file when the
-  # object is destructed.
+  // Variable: debug_text
+  // Holds all the debugging stuff which gets written to a file when the
+  // object is destructed.
   protected $debug_text = '';
 
   /*
@@ -610,13 +610,13 @@ abstract class Database
   */
   public function log_error($error_message, $is_fatal = false, $file = null, $line = 0)
   {
-    # If the errors_handler function exists, use that, otherwise, nothing we can do!
+    // If the errors_handler function exists, use that, otherwise, nothing we can do!
     if(function_exists('errors_handler'))
     {
       errors_handler('database', $error_message, $file, $line);
     }
 
-    # Fatal error..?
+    // Fatal error..?
     if(!empty($is_fatal) && ($error_message === 1 || $error_message === 2))
     {
       die('<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">

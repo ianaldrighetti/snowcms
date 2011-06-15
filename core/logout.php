@@ -22,7 +22,7 @@ if(!defined('IN_SNOW'))
   die('Nice try...');
 }
 
-# Title: Logout Handler
+// Title: Logout Handler
 
 if(!function_exists('logout_process'))
 {
@@ -42,42 +42,38 @@ if(!function_exists('logout_process'))
   */
   function logout_process()
   {
-    global $api, $member, $theme;
-
-    # Not even logged in? Then you can't log out!
-    if($member->is_guest())
+    // Not even logged in? Then you can't log out!
+    if(member()->is_guest())
     {
-      header('Location: '. baseurl);
-      exit;
+      redirect(baseurl);
     }
 
-    # Check that session identifier, make sure it is yours.
-    if(empty($_GET['sc']) || $_GET['sc'] != $member->session_id())
+    // Check that session identifier, make sure it is yours.
+    if(empty($_GET['sc']) || $_GET['sc'] != member()->session_id())
     {
-      $api->run_hooks('logout_failed');
+      api()->run_hooks('logout_failed');
 
-      $theme->set_title(l('An error has occurred'));
-      $theme->add_meta(array('name' => 'robots', 'content' => 'noindex'));
+      theme()->set_title(l('An error has occurred'));
+      theme()->add_meta(array('name' => 'robots', 'content' => 'noindex'));
 
-      $theme->header();
+      theme()->header();
 
       echo '
       <h1>', l('Logging out failed'), '</h1>
       <p>', l('Sorry, but the supplied session identifier was invalid, so your request to be logged out failed. Please try again.'), '</p>';
 
-      $theme->footer();
+      theme()->footer();
       exit;
     }
 
-    # Remove the cookie and session information.
+    // Remove the cookie and session information.
     setcookie(cookiename, '', time_utc() - 604800);
     unset($_SESSION['member_id'], $_SESSION['member_pass']);
 
-    $api->run_hooks('logout_success');
+    api()->run_hooks('logout_success');
 
-    # Let's go home...
-    header('Location: '. baseurl);
-    exit;
+    // Let's go home...
+    redirect(baseurl);
   }
 }
 ?>

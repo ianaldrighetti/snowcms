@@ -31,12 +31,12 @@ if(!defined('IN_SNOW'))
 */
 class Mail
 {
-  # Variable: handler
-  # Contains the class which handles the sending of emails.
+  // Variable: handler
+  // Contains the class which handles the sending of emails.
   private $handler;
 
-  # Variable: options
-  # Holds any options for email sending.
+  // Variable: options
+  // Holds any options for email sending.
   private $options;
 
   /*
@@ -44,29 +44,31 @@ class Mail
   */
   public function __construct()
   {
-    global $api, $settings;
+    api()->run_hooks('mail_construct');
 
-    $api->run_hooks('mail_construct');
-
-    # SMTP or plain ol' mail()?
-    if(strtolower($settings->get('mail_handler', 'string')) == 'smtp')
+    // SMTP or plain ol' mail()?
+    if(strtolower(settings()->get('mail_handler', 'string')) == 'smtp')
     {
       if(!class_exists('SMTP'))
+      {
         require_once(coredir. '/smtp.class.php');
+      }
 
       $this->handler = new SMTP();
     }
     else
     {
       if(!class_exists('PHP_Mail'))
+      {
         require_once(coredir. '/php_mail.class.php');
+      }
 
       $this->handler = new PHP_Mail();
     }
 
     $this->options = array(
                        'headers' => array(),
-                       'from' => $settings->get('site_email', 'string'),
+                       'from' => settings()->get('site_email', 'string'),
                        'is_html' => false,
                        'priority' => 3,
                        'charset' => 'utf-8',
@@ -119,13 +121,17 @@ class Mail
   {
     if(is_array($header) && is_array($value))
     {
-      # Not the same amount in both? That won't work.
+      // Not the same amount in both? That won't work.
       if(count($header) != count($value) || count($header) == 0)
+      {
         return false;
+      }
 
       foreach($header as $key => $val)
-        # Woo for easiness :)
+      {
+        // Woo for easiness :)
         $this->add_header($val, $value[$key]);
+      }
 
       return true;
     }
@@ -166,60 +172,68 @@ class Mail
   */
   public function send($to, $subject, $message, $alt_message = null, $options = array())
   {
-    global $api, $settings;
-
-    # Do you have anything you want to do? Like, oh, say a mail queue, that way many
-    # emails can be sent without overloading the server or the remote server, and you
-    # know, you could use the $options array to then set a value of override to true
-    # and then you would ignore the email request and the email would be sent once the
-    # email actually gets sent through an automated task (<Tasks>). But, you know, you
-    # didn't hear it from me! :-)
+    // Do you have anything you want to do? Like, oh, say a mail queue, that way many
+    // emails can be sent without overloading the server or the remote server, and you
+    // know, you could use the $options array to then set a value of override to true
+    // and then you would ignore the email request and the email would be sent once the
+    // email actually gets sent through an automated task (<Tasks>). But, you know, you
+    // didn't hear it from me! :-)
     $handled = null;
-    $api->run_hooks('mail_send', array(&$handled, $to, $subject, $message, $alt_message, $options, $this->handler, $this->options));
+    api()->run_hooks('mail_send', array(&$handled, $to, $subject, $message, $alt_message, $options, $this->handler, $this->options));
 
     if($handled === null)
     {
-      # Using SMTP? We got a couple SPECIAL things we got to do.
-      if($settings->get('mail_handler', 'string') == 'smtp')
+      // Using SMTP? We got a couple SPECIAL things we got to do.
+      if(settings()->get('mail_handler', 'string') == 'smtp')
       {
-        $connected = $this->handler->connect($settings->get('smtp_host', 'string', 'localhost'), $settings->get('smtp_port', 'int', 25), $settings->get('smtp_is_tls', 'bool', false), $settings->get('smtp_timeout', 'int', 5));
+        $connected = $this->handler->connect(settings()->get('smtp_host', 'string', 'localhost'), settings()->get('smtp_port', 'int', 25), settings()->get('smtp_is_tls', 'bool', false), settings()->get('smtp_timeout', 'int', 5));
 
-        # Did we connect..?
+        // Did we connect..?
         if(empty($connected))
+        {
           return false;
+        }
 
-        # Authenticate!
-        $auth = $this->handler->authenticate($settings->get('smtp_user', 'string'), $settings->get('smtp_pass', 'string'));
+        // Authenticate!
+        $auth = $this->handler->authenticate(settings()->get('smtp_user', 'string'), settings()->get('smtp_pass', 'string'));
 
-        # Did we successfully authenticate?
+        // Did we successfully authenticate?
         if(empty($auth))
+        {
           return false;
+        }
       }
 
-      # Set the FROM address.
-      $success = $this->handler->set_from(!empty($this->options['from']) ? $this->options['from'] : $settings->get('site_email', 'string'));
+      // Set the FROM address.
+      $success = $this->handler->set_from(!empty($this->options['from']) ? $this->options['from'] : settings()->get('site_email', 'string'));
 
       if(empty($success))
+      {
         return false;
+			}
 
-      # Should the message be HTML?
+      // Should the message be HTML?
       $this->handler->set_html(!empty($this->options['is_html']));
 
-      # Priority :)
+      // Priority :)
       $this->handler->set_priority(!empty($this->options['priority']) ? $this->options['priority'] : 3);
 
-      # Character set... Yippe?
+      // Character set... Yippe?
       $this->handler->set_charset(!empty($this->options['charset']) ? $this->options['charset'] : 'utf-8');
 
-      # Add any headers, that is, if there are any.
+      // Add any headers, that is, if there are any.
       if(isset($this->options['headers']) && count($this->options['headers']) > 0)
+      {
         $this->handler->add_header(array_keys($this->options['headers']), array_values($this->options['headers']));
+      }
 
-      # Alrighty then! Send the message and we are DONE!
+      // Alrighty then! Send the message and we are DONE!
       $handled = $this->handler->send($to, $subject, $message, $alt_message);
 
       if(!empty($handled))
+      {
         $this->close();
+      }
     }
 
     return !empty($handled);
@@ -238,11 +252,9 @@ class Mail
   */
   public function close()
   {
-    global $settings;
-
     $this->options = array(
                        'headers' => array(),
-                       'from' => $settings->get('site_email', 'string'),
+                       'from' => settings()->get('site_email', 'string'),
                        'is_html' => false,
                        'priority' => 3,
                        'charset' => 'utf-8',
@@ -280,7 +292,9 @@ class Mail
   public function set_priority($priority = 3)
   {
     if((string)$priority != (string)(int)$priority || $priority > 5 || $priority < 1)
+    {
       return false;
+    }
 
     $this->options['priority'] = (int)$priority;
     return true;
@@ -300,7 +314,9 @@ class Mail
   public function set_charset($charset = 'utf-8')
   {
     if(empty($charset))
+    {
       return false;
+    }
 
     $this->options['charset'] = $charset;
     return true;

@@ -52,27 +52,31 @@ if(!defined('IN_SNOW'))
 */
 function errors_handler($error_type, $error_message, $error_file = null, $error_line = 0, $error_context = array())
 {
-  global $api, $api_force_log, $db, $member, $settings;
+  global $api_force_log;
 
-  # Sorry, we can only do this if the API class has been declared and instantiated.
+  // Sorry, we can only do this if the API class has been declared and instantiated.
   $handled = null;
-  if(isset($api) && is_object($api))
-    $api->run_hooks('error_handler', array(&$handled, $error_type, $error_message, $error_file, $error_line, $error_context));
-
-  # Not handled? We will do it then! That is, if it's enabled.
-  if($handled === null && ((isset($settings) && is_object($settings) && $settings->get('errors_log', 'bool')) || !empty($api_force_log)))
+  if(isset($GLOBALS['api']))
   {
-    # In order to stop any possible recursion, don't log errors coming from this file.
+    api()->run_hooks('error_handler', array(&$handled, $error_type, $error_message, $error_file, $error_line, $error_context));
+	}
+
+  // Not handled? We will do it then! That is, if it's enabled.
+  if($handled === null && ((isset($settings) && is_object($settings) && settings()->get('errors_log', 'bool')) || !empty($api_force_log)))
+  {
+    // In order to stop any possible recursion, don't log errors coming from this file.
     if(substr($error_file, strlen($error_file) - 10, strlen($error_file)) == 'errors.php')
+    {
       return false;
+		}
 
-    # Just for the record, we need your IP!
-    $member_id = (int)(isset($member) && is_object($member) ? $member->id() : 0);
-    $member_name = isset($member) && is_object($member) ? $member->name() : '';
-    $member_ip = isset($member) && is_object($member) ? $member->ip() : (isset($_SERVER['HTTP_X_FORWARDED_FOR']) ? $_SERVER['HTTP_X_FORWARDED_FOR'] : $_SERVER['REMOTE_ADDR']);
+    // Just for the record, we need your IP!
+    $member_id = (int)(isset($member) && is_object($member) ? member()->id() : 0);
+    $member_name = isset($member) && is_object($member) ? member()->name() : '';
+    $member_ip = isset($member) && is_object($member) ? member()->ip() : (isset($_SERVER['HTTP_X_FORWARDED_FOR']) ? $_SERVER['HTTP_X_FORWARDED_FOR'] : $_SERVER['REMOTE_ADDR']);
 
-    # Simply insert the error into the database now.
-    $result = $db->insert('insert', '{db->prefix}error_log',
+    // Simply insert the error into the database now.
+    $result = db()->insert('insert', '{db->prefix}error_log',
       array(
         'error_time' => 'int', 'member_id' => 'int', 'member_name' => 'string-80',
         'member_ip' => 'string', 'error_type' => 'string-40', 'error_message' => 'text',
@@ -84,7 +88,7 @@ function errors_handler($error_type, $error_message, $error_file = null, $error_
         $error_file, $error_line, 'http://'. $_SERVER['HTTP_HOST']. $_SERVER['REQUEST_URI'],
       ), array(), 'errors_handler_query');
 
-    # If the query was a success, then PHP doesn't have to deal with it ;)
+    // If the query was a success, then PHP doesn't have to deal with it ;)
     $handled = $result->success();
   }
 
