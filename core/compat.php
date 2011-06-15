@@ -22,23 +22,23 @@ if(!defined('IN_SNOW'))
   die('Nice try...');
 }
 
-# Title: Compatibility functions
+// Title: Compatibility functions
 
-# Don't have JSON enabled?
+// Don't have JSON enabled?
 if(!function_exists('json_encode'))
 {
-  require_once($core_dir. '/compat/json.php');
+  require_once(coredir. '/compat/json.php');
 }
 
-# Windows doesn't seem to have mime_content_type, at least on certain
-# setups, it is somewhat important :P
+// Windows doesn't seem to have mime_content_type, at least on certain
+// setups, it is somewhat important :P
 if(!function_exists('mime_content_type'))
 {
-  require_once($core_dir. '/compat/mime_content_type.php');
+  require_once(coredir. '/compat/mime_content_type.php');
 }
 
-# The following are a bit simpler ;-) or just plain don't exist on
-# any version of PHP...
+// The following are a bit simpler ;-) or just plain don't exist on
+// any version of PHP...
 
 /*
   Function: array_insert
@@ -120,10 +120,10 @@ function array_insert($array, $item, $index, $key = null)
   return $array;
 }
 
-# Some constants that aren't defined until PHP 5.3.0.
+// Some constants that aren't defined until PHP 5.3.0.
 if(!defined('E_DEPRECATED'))
 {
-  # So for a bit of compatibility, let's define them ;)
+  // So for a bit of compatibility, let's define them ;)
   define('E_DEPRECATED', 8192);
   define('E_USER_DEPRECATED', 16384);
 }
@@ -142,38 +142,38 @@ if(!defined('E_DEPRECATED'))
 */
 function recursive_unlink($path)
 {
-  # Does the directory not exist? Then we cannot delete it!
+  // Does the directory not exist? Then we cannot delete it!
   if(!file_exists($path))
   {
     return false;
   }
-  # Is it a file? Just delete it!
+  // Is it a file? Just delete it!
   elseif(is_file($path))
   {
     return unlink($path);
   }
-  # Nope, it is a directory.
+  // Nope, it is a directory.
   else
   {
-    # So get all the files and what not.
+    // So get all the files and what not.
     $files = scandir($path);
 
     if(count($files) > 0)
     {
       foreach($files as $file)
       {
-        # Skip . and ..
+        // Skip . and ..
         if($file == '.' || $file == '..')
         {
           continue;
         }
 
-        # Is it a directory? Recursion!
+        // Is it a directory? Recursion!
         if(is_dir($path. '/'. $file))
         {
           recursive_unlink($path. '/'. $file);
         }
-        # Just a file, so delete it :-)
+        // Just a file, so delete it :-)
         else
         {
           unlink($path. '/'. $file);
@@ -181,7 +181,7 @@ function recursive_unlink($path)
       }
     }
 
-    # Now to delete the directory itself!
+    // Now to delete the directory itself!
     return rmdir($path);
   }
 }
@@ -200,17 +200,17 @@ function recursive_unlink($path)
 */
 function sanitize_filename($filename)
 {
-  # Disallowed characters ;-)
+  // Disallowed characters ;-)
   $remove = array('/', '\\', ':', '*', '?', '<', '>', '|', '"');
 
   $str = '';
   $length = strlen($filename);
   for($i = 0; $i < $length; $i++)
   {
-    # Is it allowed?
+    // Is it allowed?
     if(in_array($filename[$i], $remove))
     {
-      # Nope!
+      // Nope!
       continue;
     }
 
@@ -235,12 +235,12 @@ function sanitize_filename($filename)
 */
 function is_flat_array($array)
 {
-  # It's not an array, so no...
+  // It's not an array, so no...
   if(!is_array($array))
   {
     return false;
   }
-  # Nothing? Technically we will consider that a flat array :P
+  // Nothing? Technically we will consider that a flat array :P
   elseif(count($array) == 0)
   {
     return true;
@@ -250,7 +250,7 @@ function is_flat_array($array)
   {
     if((string)$key != (string)(int)$key)
     {
-      # We found one that is not a numerical index, therefore, not flat!
+      // We found one that is not a numerical index, therefore, not flat!
       return false;
     }
   }
