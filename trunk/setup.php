@@ -17,6 +17,11 @@
 //                       File version: SnowCMS 2.0                        //
 ////////////////////////////////////////////////////////////////////////////
 
+// Setting this to true will prevent the setup.php and setup SQL files
+// from being deleted, just in case any modifications were made to these
+// files... Wouldn't want any work to be lost!
+define('INDEVMODE', true);
+
 session_start();
 
 // Magic quotes, what a joke!!!
@@ -295,58 +300,59 @@ function generate_config($db_host, $db_user, $db_pass, $db_name, $tbl_prefix, &$
 {
 	$bytes = file_put_contents(dirname(__FILE__). '/config.php',
 	'<?php
-#########################################################################
-#                             SnowCMS v2.0                              #
-#                          By the SnowCMS Team                          #
-#                            www.snowcms.com                            #
-#                  Released under the GNU GPL v3 License                #
-#                     www.gnu.org/licenses/gpl-3.0.txt                  #
-#########################################################################
-#                                                                       #
-# SnowCMS originally pawned by soren121 started some time in early 2008 #
-#                                                                       #
-#########################################################################
-#                                                                       #
-#                SnowCMS v2.0 began in November 2009                    #
-#                                                                       #
-#########################################################################
-#                     File version: SnowCMS 2.0                         #
-#########################################################################
+////////////////////////////////////////////////////////////////////////////
+//                              SnowCMS v2.0                              //
+//                           By the SnowCMS Team                          //
+//                             www.snowcms.com                            //
+//                  Released under the GNU GPL v3 License                 //
+//                    www.gnu.org/licenses/gpl-3.0.txt                    //
+////////////////////////////////////////////////////////////////////////////
+//                                                                        //
+//       SnowCMS originally pawned by soren121 started in early 2008      //
+//                                                                        //
+////////////////////////////////////////////////////////////////////////////
+//                                                                        //
+//                  SnowCMS v2.0 began in November 2009                   //
+//                                                                        //
+////////////////////////////////////////////////////////////////////////////
+//                       File version: SnowCMS 2.0                        //
+////////////////////////////////////////////////////////////////////////////
 
-# No direct access!!!
 if(!defined(\'IN_SNOW\'))
-  die;
+{
+  die(\'Nice try...\');
+}
 
-#
-# config.php holds all your database information and paths.
-#
+//
+// config.php holds all your database information and paths.
+//
 
-# Database settings:
-$db_type = \'mysql\'; # Your database type, an example would be mysql, sqlite or postgresql
-$db_host = \''. addcslashes($db_host, '\''). '\'; # The location of your database, could be localhost or a path (for SQLite)
-$db_user = \''. addcslashes($db_user, '\''). '\'; # The user that has access to your database, though not all database systems have this.
-$db_pass = \''. addcslashes($db_pass, '\''). '\'; # The password to your database user.
-$db_name = \''. addcslashes($db_name, '\''). '\'; # The name of the database.
-$db_persist = false; # Whether or not to have a persistent connection to the database.
-$db_debug = false; # Enable database debugging? (Outputs queries into a file ;))
-$tbl_prefix = \''. addcslashes($tbl_prefix, '\''). '\'; # The prefix of the tables, allows multiple installs on the same database.
+// Database settings:
+define(\'DBTYPE\', \'mysql\', true); // Your database type, an example would be mysql, sqlite or postgresql
+define(\'DBHOST\', \''. addcslashes($db_host, '\''). '\', true); // The location of your database, could be localhost or a path (for SQLite)
+define(\'DBUSER\', \''. addcslashes($db_user, '\''). '\', true); // The user that has access to your database, though not all database systems have this.
+define(\'DBPASS\', \''. addcslashes($db_pass, '\''). '\', true); // The password to your database user.
+define(\'DBNAME\', \''. addcslashes($db_name, '\''). '\', true); // The name of the database.
+define(\'DBPERSIST\', false, true); // Whether or not to have a persistent connection to the database.
+define(\'DBDEBUG\', false, true); // Enable database debugging? (Outputs queries into a file ;))
+define(\'TBLPREFIX\', \''. addcslashes($tbl_prefix, '\''). '\', true); // The prefix of the tables, allows multiple installs on the same database.
 
-# The location of your root directory of your SnowCMS installation.
-$base_dir = defined(\'__DIR__\') ? __DIR__ : dirname(__FILE__);
+// The location of your root directory of your SnowCMS installation.
+define(\'BASEDIR\', defined(\'__DIR__\') ? __DIR__ : dirname(__FILE__), true);
 
-# Some other useful paths...
-$core_dir = $base_dir. \'/core\';
-$theme_dir = $base_dir. \'/themes\';
-$plugin_dir = $base_dir. \'/plugins\';
-$upload_dir = $base_dir. \'/uploads\';
+// Some other useful paths...
+define(\'COREDIR\', basedir. \'/core\', true);
+define(\'THEMEDIR\', basedir. \'/themes\', true);
+define(\'PLUGINDIR\', basedir. \'/plugins\', true);
+define(\'UPLOADDIR\', basedir. \'/uploads\', true);
 
-# The address of where your SnowCMS install is accessible (No trailing /!)
-$base_url = \'http://'. $_SERVER['HTTP_HOST']. dirname($_SERVER['REQUEST_URI']). '\';
-$theme_url = $base_url. \'/themes\';
-$plugin_url = $base_url. \'/plugins\';
+// The address of where your SnowCMS install is accessible (No trailing /!)
+define(\'BASEURL\', \'http://'. $_SERVER['HTTP_HOST']. (str_replace('\\', '/', dirname($_SERVER['REQUEST_URI'])) == '/' ? '' : str_replace('\\', '/', dirname($_SERVER['REQUEST_URI']))). '\', true);
+define(\'THEMEURL\', baseurl. \'/themes\', true);
+define(\'PLUGINURL\', baseurl. \'/plugins\', true);
 
-# What do you want to be the name of the cookie?
-$cookie_name = \'SCMS'. mt_rand(100, 999). '\';
+// What do you want to be the name of the cookie?
+define(\'COOKIENAME\', \'SCMS'. mt_rand(100, 999). '\', true);
 ?>');
 
 	// Do we need to add an error message?
@@ -496,7 +502,7 @@ function setup_finalize($member_name, $member_pass, $member_email, &$error_msg)
 
 	require_once(dirname(__FILE__). '/config.php');
 
-	$connection = @mysql_connect($db_host, $db_user, $db_pass);
+	$connection = @mysql_connect(DBHOST, DBUSER, DBPASS);
 
 	// This shouldn't happen, but hey, you never know!
 	if(empty($connection))
@@ -506,7 +512,7 @@ function setup_finalize($member_name, $member_pass, $member_email, &$error_msg)
 		return false;
 	}
 
-	$selected_db = @mysql_select_db($db_name, $connection);
+	$selected_db = @mysql_select_db(DBNAME, $connection);
 
 	// This shouldn't happen either, but whatever.
 	if(empty($selected_db))
@@ -538,7 +544,7 @@ function setup_finalize($member_name, $member_pass, $member_email, &$error_msg)
 		$commands[] = $line;
 	}
 
-	$commands = explode(';', str_replace('{db->prefix}', $tbl_prefix, implode('', $commands)));
+	$commands = explode(';', str_replace('{db->prefix}', TBLPREFIX, implode('', $commands)));
 
 	// Start a transaction.
 	mysql_query('SET autocommit = 0');
@@ -570,7 +576,7 @@ function setup_finalize($member_name, $member_pass, $member_email, &$error_msg)
 
 	// Let's create your account now, shall we?
 	mysql_query('
-		INSERT INTO `'. $tbl_prefix. 'members`
+		INSERT INTO `'. TBLPREFIX. 'members`
 		(`member_name`, `member_pass`, `member_hash`, `member_email`, `display_name`, `member_groups`, `member_registered`, `member_activated`)
 		VALUES(\''. mysql_real_escape_string(htmlspecialchars($member_name, ENT_QUOTES)). '\', \''. mysql_real_escape_string(sha1(strtolower($member_name). $member_pass)). '\', \''. mysql_real_escape_string(rand_str(16)). '\', \''. mysql_real_escape_string(htmlspecialchars($member_email, ENT_QUOTES)). '\', \''. mysql_real_escape_string(htmlspecialchars($member_name, ENT_QUOTES)). '\', \'administrator\', \''. time(). '\', 1)');
 
@@ -627,10 +633,13 @@ function rand_str($length = 0)
 */
 function setup_step_3()
 {
-	// Delete some stuff...
-	unlink(__FILE__);
-	unlink(dirname(__FILE__). '/setup-mysql.sql');
-	unlink(dirname(__FILE__). '/setup-sqlite.sql');
+	// Delete some stuff... If we aren't in dev mode.
+	if(!defined('INDEVMODE') || !INDEVMODE)
+	{
+		unlink(__FILE__);
+		unlink(dirname(__FILE__). '/setup-mysql.sql');
+		unlink(dirname(__FILE__). '/setup-sqlite.sql');
+	}
 
 	require_once(dirname(__FILE__). '/config.php');
 
@@ -638,7 +647,7 @@ function setup_step_3()
 
 	echo '
 			<h1>You&#039;re Ready to Go!</h1>
-			<p>You&#039;re <a href="', $base_url, '">new site is all set</a> and ready to go!</p>
+			<p>You&#039;re <a href="', baseurl, '">new site is all set</a> and ready to go!</p>
 
 			<p>Thanks again for choosing SnowCMS for your content management needs. If you need any help, check out <a href="http://www.snowcms.com/" target="_blank">www.snowcms.com</a>.</p>';
 
