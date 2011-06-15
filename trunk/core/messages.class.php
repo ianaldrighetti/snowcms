@@ -32,16 +32,16 @@ if(!defined('IN_SNOW'))
 */
 class Messages
 {
-  # Variable: loaded
-  # This array contains the currently loaded messages.
+  // Variable: loaded
+  // This array contains the currently loaded messages.
   private $loaded;
 
-  # Variable: page
-  # Contains the current "page" of the loaded messages.
+  // Variable: page
+  // Contains the current "page" of the loaded messages.
   private $page;
 
-  # Variable: count
-  # Contains the total messages in the loaded attribute.
+  // Variable: count
+  // Contains the total messages in the loaded attribute.
   private $count;
 
   /*
@@ -80,14 +80,14 @@ class Messages
   */
   public function load($area_name, $area_id, $cur_page = 0, $per_page = 10, $order = 'asc', $params = array())
   {
-    global $api, $db, $func;
+    global $func;
 
     $handled = null;
-    $api->run_hooks('messages_load', array(&$handled, &$area_name, &$area_id, &$cur_page, &$per_page, &$order, &$params));
+    api()->run_hooks('messages_load', array(&$handled, &$area_name, &$area_id, &$cur_page, &$per_page, &$order, &$params));
 
     if($handled === null)
     {
-      # Now all of the database variables.
+      // Now all of the database variables.
       $db_vars = array(
         'area_name' => $area_name,
         'area_id' => $area_id,
@@ -99,7 +99,7 @@ class Messages
         $db_vars['message_type'] = $params['message_type'];
       }
 
-      # Got any extra data?
+      // Got any extra data?
       if(isset($params['extra']))
       {
         $i = 0;
@@ -115,14 +115,14 @@ class Messages
         $extra_search = implode(' AND ', $extra_search);
       }
 
-      # Current page 0? Then we don't need to do this...
+      // Current page 0? Then we don't need to do this...
       if($cur_page > 0)
       {
         $offset = (($cur_page - 1) * $per_page);
         $row_count = $per_page;
 
-        # Make sure you aren't inputting a wrong page :P
-        $result = $db->query('
+        // Make sure you aren't inputting a wrong page :P
+        $result = db()->query('
           SELECT
             COUNT(*)
           FROM {db->prefix}messages
@@ -132,7 +132,7 @@ class Messages
         list($num_messages) = $result->fetch_row();
         $total_pages = ceil($num_messages / $per_page);
 
-        # Set the right page...
+        // Set the right page...
         $this->page = $cur_page > $total_pages ? $total_pages : $cur_page;
       }
       else
@@ -140,22 +140,22 @@ class Messages
         $this->page = 0;
       }
 
-      # Reset the loaded messages array...
+      // Reset the loaded messages array...
       $this->loaded = array();
       $this->count = 0;
 
-      # All that member information to load! ;)
+      // All that member information to load! ;)
       $member_ids = array();
 
-      # A LIMIT clause?
+      // A LIMIT clause?
       if($this->page > 0)
       {
         $db_vars['offset'] = $offset;
         $db_vars['row_count'] = $row_count;
       }
 
-      # Query that database!
-      $result = $db->query('
+      // Query that database!
+      $result = db()->query('
         SELECT
           message_id, member_id, member_name, member_email, member_ip, modified_id, modified_name, modified_email,
           modified_ip, subject, poster_time, modified_time, message, message_type, message_status, extra
@@ -165,25 +165,25 @@ class Messages
         LIMIT {int:offset},{int:row_count}' : ''),
         $db_vars, 'messages_load_query');
 
-      # Was it a success?
+      // Was it a success?
       if($result->success())
       {
         while($row = $result->fetch_assoc())
         {
-          # Store the current message
+          // Store the current message
           $message = array(
             'id' => $row['message_id'],
             'poster' => array(
-                          # Keep in mind that this array will be different upon being returned via the get method
-                          # But of course, you can hook into that too ;)
+                          // Keep in mind that this array will be different upon being returned via the get method
+                          // But of course, you can hook into that too ;)
                           'id' => $row['member_id'],
                           'username' => $row['member_name'],
                           'name' => $row['member_name'],
                           'email' => $row['member_email'],
                           'ip' => $row['member_ip'],
                           'time' => $row['poster_time'],
-                          'is_guest' => $row['member_id'] == 0, # This is just a quick guess... Of course all member id's of 0 are guests, but that doesn't mean the member which posted hasn't been removed :P
-                          'is_member' => $row['member_id'] > 0, # Just a quick guess too!!
+                          'is_guest' => $row['member_id'] == 0, // This is just a quick guess... Of course all member id's of 0 are guests, but that doesn't mean the member which posted hasn't been removed :P
+                          'is_member' => $row['member_id'] > 0, // Just a quick guess too!!
                         ),
             'modifier' => array(
                             'id' => $row['modified_id'],
@@ -192,7 +192,7 @@ class Messages
                             'email' => $row['modified_email'],
                             'ip' => $row['modified_ip'],
                             'time' => $row['modified_time'],
-                            'is_guest' => false, # Guests can't edit their posts :P But of course, that doesn't mean this can never be true (Ex: the modifiers account no longer exists)
+                            'is_guest' => false, // Guests can't edit their posts :P But of course, that doesn't mean this can never be true (Ex: the modifiers account no longer exists)
                             'is_member' => true,
                           ),
             'subject' => $row['subject'],
@@ -203,12 +203,12 @@ class Messages
             'extra' => @unserialize($row['extra']),
           );
 
-          # Add this member (and modifier, maybe!) to the members we need to have loaded...
+          // Add this member (and modifier, maybe!) to the members we need to have loaded...
           $member_ids[] = $row['member_id'];
           $member_ids[] = $row['modified_id'];
 
-          # Do you want to do something? Go ahead!!! (Like, oh say parse message if there is a message_type ;))
-          $api->run_hooks('messages_load_array', array(&$message, &$member_ids));
+          // Do you want to do something? Go ahead!!! (Like, oh say parse message if there is a message_type ;))
+          api()->run_hooks('messages_load_array', array(&$message, &$member_ids));
 
           if(!empty($message))
           {
@@ -217,10 +217,10 @@ class Messages
           }
         }
 
-        $members = $api->load_class('Members');
+        $members = api()->load_class('Members');
         $members->load($member_ids);
 
-        # I think we are done here :)
+        // I think we are done here :)
         $handled = $this->page == $cur_page ? 1 : 2;
       }
       else
@@ -250,29 +250,27 @@ class Messages
   */
   public function get($loaded_id = null)
   {
-    global $api;
-
     $handled = null;
-    $api->run_hooks('messages_get', array(&$handled, &$loaded_id));
+    api()->run_hooks('messages_get', array(&$handled, &$loaded_id));
 
     if($handled === null)
     {
-      # Any specific id given..?
+      // Any specific id given..?
       if($loaded_id !== null)
       {
-        # Now before we get too far, is this id valid?
+        // Now before we get too far, is this id valid?
         if(!isset($this->loaded[$loaded_id]))
         {
-          # Nope...
+          // Nope...
           return false;
         }
 
-        $members = $api->load_class('Members');
+        $members = api()->load_class('Members');
 
-        # Let's get that specific message, shall we?
+        // Let's get that specific message, shall we?
         $message = $this->loaded[$loaded_id];
 
-        # Maybe we need to update the member information?
+        // Maybe we need to update the member information?
         if($members->get($message['poster']['id']) !== false)
         {
           $message['poster'] = array_merge($message['poster'], $members->get($message['poster']['id']));
@@ -282,7 +280,7 @@ class Messages
           $message['poster'] = array_merge($message['poster'], array('is_guest' => true, 'is_member' => false));
         }
 
-        # Modifier too!
+        // Modifier too!
         if($members->get($message['modifier']['id']) !== false)
         {
           $message['modifier'] = array_merge($message['modifier'], $members->get($message['modifier']['id']));
@@ -292,8 +290,8 @@ class Messages
           $message['modifier'] = array_merge($message['modifier'], array('is_guest' => true, 'is_member' => false));
         }
 
-        # Do you have some weird thing to do before we give this message out?
-        $api->run_hooks('messages_get_array', array(&$message));
+        // Do you have some weird thing to do before we give this message out?
+        api()->run_hooks('messages_get_array', array(&$message));
 
         $handled = $message;
       }
@@ -301,7 +299,7 @@ class Messages
       {
         $handled = array();
 
-        # Sweet and simple!!!
+        // Sweet and simple!!!
         for($i = 0; $i < $this->count; $i++)
         {
           $handled[$i] = $this->get($i);
@@ -365,14 +363,12 @@ class Messages
   */
   public function add($area_name, $area_id, $subject, $message, $options = array())
   {
-    global $api, $db, $member;
-
     $handled = null;
-    $api->run_hooks('messages_add', array(&$handled, &$area_name, &$area_id, &$subject, &$message, &$options));
+    api()->run_hooks('messages_add', array(&$handled, &$area_name, &$area_id, &$subject, &$message, &$options));
 
     if($handled === null)
     {
-      # Let's construct the array which will be used to insert the comment :)
+      // Let's construct the array which will be used to insert the comment :)
       $columns = array(
         'area_name' => 'string',
         'area_id' => 'int',
@@ -391,10 +387,10 @@ class Messages
       $data = array(
         'area_name' => $area_name,
         'area_id' => $area_id,
-        'member_id' => isset($options['member_id']) ? $options['member_id'] : $member->id(),
-        'member_name' => isset($options['member_name']) ? $options['member_name'] : $member->name(),
-        'member_email' => isset($options['member_email']) ? $options['member_email'] : $member->email(),
-        'member_ip' => isset($options['member_ip']) ? $options['member_ip'] : $member->ip(),
+        'member_id' => isset($options['member_id']) ? $options['member_id'] : member()->id(),
+        'member_name' => isset($options['member_name']) ? $options['member_name'] : member()->name(),
+        'member_email' => isset($options['member_email']) ? $options['member_email'] : member()->email(),
+        'member_ip' => isset($options['member_ip']) ? $options['member_ip'] : member()->ip(),
         'subject' => !empty($options['dont_htmlchars_subject']) ? $subject : htmlchars($subject),
         'poster_time' => isset($options['poster_time']) ? $options['poster_time'] : time_utc(),
         'message' => !empty($options['dont_htmlchars_message']) ? $message : htmlchars($message),
@@ -403,14 +399,14 @@ class Messages
         'extra' => isset($options['extra']) && is_array($options['extra']) ? $options['extra'] : array(),
       );
 
-      # Maybe you wanted to add something (Or change something!)?
-      $api->run_hooks('messages_add_data', array(&$columns, &$data, &$options));
+      // Maybe you wanted to add something (Or change something!)?
+      api()->run_hooks('messages_add_data', array(&$columns, &$data, &$options));
 
-      # Serialize that extra array first!
+      // Serialize that extra array first!
       $data['extra'] = serialize(is_array($data['extra']) ? $data['extra'] : array());
 
-      # Now insert that comment! :D
-      $result = $db->insert('insert', '{db->prefix}messages',
+      // Now insert that comment! :D
+      $result = db()->insert('insert', '{db->prefix}messages',
                   $columns,
                   array_values($data),
                   array(), 'messages_add_query');
@@ -438,18 +434,18 @@ class Messages
   */
   public function update($area_name, $area_id, $message_id, $options)
   {
-    global $api, $db;
-
     if(count($options) == 0)
+    {
       return false;
+    }
 
     $handled = null;
-    $api->run_hooks('messages_update', array(&$handled, &$area_name, &$area_id, &$message_id, &$options));
+    api()->run_hooks('messages_update', array(&$handled, &$area_name, &$area_id, &$message_id, &$options));
 
     if($handled === null)
     {
-      # Can't update a message which doesn't exist, now can we?
-      $result = $db->query('
+      // Can't update a message which doesn't exist, now can we?
+      $result = db()->query('
         SELECT
           message_id
         FROM {db->prefix}messages
@@ -466,7 +462,7 @@ class Messages
         return false;
       }
 
-      # All the allowed columns that can be modified ;)
+      // All the allowed columns that can be modified ;)
       $allowed_columns = array(
         'member_id' => 'int',
         'member_name' => 'string-255',
@@ -485,24 +481,24 @@ class Messages
         'extra' => 'string',
       );
 
-      $api->run_hooks('messages_update_allowed_columns', array(&$allowed_columns));
+      api()->run_hooks('messages_update_allowed_columns', array(&$allowed_columns));
 
       $data = array();
       foreach($allowed_columns as $column => $type)
       {
-        # Only add the data if the column exists...
+        // Only add the data if the column exists...
         if(isset($options[$column]))
         {
           $data[$column] = $options[$column];
         }
       }
 
-      $api->run_hooks('members_update_check_data', array(&$handled, &$data));
+      api()->run_hooks('members_update_check_data', array(&$handled, &$data));
 
-      # Did you not like the data..? (Was something wrong..?)
+      // Did you not like the data..? (Was something wrong..?)
       if($handled !== false)
       {
-        # The only thing we don't allow to be empty is the message, poster_time, and message_status
+        // The only thing we don't allow to be empty is the message, poster_time, and message_status
         if((isset($data['message']) && empty($data['message'])) || (isset($data['poster_time']) && empty($data['poster_time'])) || (isset($data['message_status']) && empty($data['message_status'])))
         {
           return false;
@@ -526,8 +522,8 @@ class Messages
             $db_vars[$column. '_value'] = $value;
           }
 
-          # Now to update the stuff in the database :)
-          $result = $db->query('
+          // Now to update the stuff in the database :)
+          $result = db()->query('
             UPDATE {db->prefix}messages
             SET '. implode(', ', $values). '
             WHERE area_name = {string:area_name} AND area_id = {int:area_id} AND message_id = {int:message_id}
@@ -561,8 +557,6 @@ class Messages
   */
   public function delete($area_name, $area_id, $messages)
   {
-    global $api, $db;
-
     if(!is_array($messages) && $messages !== null)
     {
       $messages = array($messages);
@@ -586,11 +580,11 @@ class Messages
     $messages = array_unique($messages);
 
     $handled = null;
-    $api->run_hooks('messages_delete', array(&$handled, &$area_name, &$area_id, &$messages));
+    api()->run_hooks('messages_delete', array(&$handled, &$area_name, &$area_id, &$messages));
 
     if($handled === null)
     {
-      $result = $db->query('
+      $result = db()->query('
         DELETE FROM {db->prefix}messages
         WHERE area_name = {string:area_name} AND area_id = {int:area_id}'. (empty($messages) ? ' AND message_id IN({array_int:messages})' : ''),
         array(

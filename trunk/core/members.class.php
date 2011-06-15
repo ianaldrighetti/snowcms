@@ -33,8 +33,8 @@ if(!defined('IN_SNOW'))
 */
 class Members
 {
-  # Variable: loaded
-  # An array containing members which have already been loaded once (they don't need to be twice ;))
+  // Variable: loaded
+  // An array containing members which have already been loaded once (they don't need to be twice ;))
   private $loaded;
 
   /*
@@ -64,9 +64,7 @@ class Members
   */
   public function load($members)
   {
-    global $api, $db;
-
-    # Not an array? Easy fix!
+    // Not an array? Easy fix!
     if(!is_array($members))
     {
       $members = array((int)$members);
@@ -91,15 +89,15 @@ class Members
       }
     }
 
-    # Alright, so do you want to do this yourself? ;) If you do do this yourself,
-    # set the handled parameter to a bool, otherwise, if it is null, this method
-    # will just do it itself!!! :P
+    // Alright, so do you want to do this yourself? ;) If you do do this yourself,
+    // set the handled parameter to a bool, otherwise, if it is null, this method
+    // will just do it itself!!! :P
     $handled = null;
-    $api->run_hooks('load_members', array(&$handled, $members));
+    api()->run_hooks('load_members', array(&$handled, $members));
 
     if($handled === null && count($members) > 0)
     {
-      # Make sure this member isn't already loaded, otherwise it is a waste of resources.
+      // Make sure this member isn't already loaded, otherwise it is a waste of resources.
       foreach($members as $member_id)
       {
         if(isset($this->loaded[$member_id]))
@@ -110,7 +108,7 @@ class Members
 
       if(count($members))
       {
-        $result = $db->query('
+        $result = db()->query('
           SELECT
             *
           FROM {db->prefix}members
@@ -141,13 +139,13 @@ class Members
                         'data' => array(),
                       );
 
-            # Got something to add?
-            $api->run_hooks('members_load_array', array(&$member, $row));
+            // Got something to add?
+            api()->run_hooks('members_load_array', array(&$member, $row));
 
             $this->loaded[$row['member_id']] = $member;
           }
 
-          $result = $db->query('
+          $result = db()->query('
             SELECT
               member_id, variable, value
             FROM {db->prefix}member_data
@@ -157,8 +155,12 @@ class Members
             ), 'load_members_data_query');
 
           if($result->num_rows() > 0)
+          {
             while($row = $result->fetch_assoc())
+            {
               $this->loaded[$row['member_id']]['data'][$row['variable']] = $row['value'];
+            }
+          }
         }
       }
 
@@ -190,17 +192,15 @@ class Members
   */
   public function get($members)
   {
-    global $api;
-
     if(!is_array($members))
     {
       $members = (int)$members;
       $member_data = -1;
 
-      # You want to do the loading? Set the member_data variable to something other
-      # than -1, otherwise, this method will get the data itself. Set member_data to
-      # null if that member has not been loaded.
-      $api->run_hooks('members_get', array(&$member_data, $members));
+      // You want to do the loading? Set the member_data variable to something other
+      // than -1, otherwise, this method will get the data itself. Set member_data to
+      // null if that member has not been loaded.
+      api()->run_hooks('members_get', array(&$member_data, $members));
 
       if($member_data == -1 && isset($this->loaded[$members]))
       {
@@ -211,21 +211,21 @@ class Members
         $member_data = null;
       }
 
-      # Wanna touch it?
-      $api->run_hooks('post_members_get', array(&$member_data, $members));
+      // Wanna touch it?
+      api()->run_hooks('post_members_get', array(&$member_data, $members));
 
       return $member_data === null ? false : $member_data;
     }
     else
     {
-      # Load all those members ;)
+      // Load all those members ;)
       $member_data = array();
       foreach($members as $member_id)
       {
         $member_data[$member_id] = $this->get($member_id);
       }
 
-      # Simple, no?
+      // Simple, no?
       return $member_data;
     }
   }
@@ -249,26 +249,26 @@ class Members
   */
   public function add($member_name, $member_pass, $member_email, $options = array())
   {
-    global $api, $db, $func, $member;
+    global $func;
 
-    # Allows a plugin to handle the creation of members themselves ;)
-    # Set the handled parameter to an integer or FALSE, otherwise the
-    # system will handle the creation of the member.
+    // Allows a plugin to handle the creation of members themselves ;)
+    // Set the handled parameter to an integer or FALSE, otherwise the
+    // system will handle the creation of the member.
     $handled = null;
-    $api->run_hooks('members_add', array(&$handled, $member_name, $member_pass, $member_email, $options));
+    api()->run_hooks('members_add', array(&$handled, $member_name, $member_pass, $member_email, $options));
 
     if($handled === null)
     {
       $member_name = trim($member_name);
 
-      # Now make sure that the member name and email are allowed, we don't want them to be
-      # in use already, as that would be pretty bad :P
+      // Now make sure that the member name and email are allowed, we don't want them to be
+      // in use already, as that would be pretty bad :P
       if(!$this->name_allowed($member_name) || !$this->email_allowed($member_email) || !$this->password_allowed($member_name, $member_pass))
       {
         return false;
       }
 
-      # How about a hash? (This hash will likely get changed eventually, but :P)
+      // How about a hash? (This hash will likely get changed eventually, but :P)
       if(!empty($options['member_hash']) && (strlen($options['member_hash']) == 0 || strlen($options['member_hash']) > 16))
       {
         return false;
@@ -278,19 +278,19 @@ class Members
         $options['member_hash'] = $this->rand_str(16);
       }
 
-      # Have you set a display name? Gotta check that!
+      // Have you set a display name? Gotta check that!
       if(!empty($options['display_name']) && !$this->name_allowed($options['display_name']))
       {
         return false;
       }
       elseif(empty($options['display_name']))
       {
-        # We will just make your login name your display name too...
+        // We will just make your login name your display name too...
         $options['display_name'] = $member_name;
       }
 
-      # No member groups assigned? Member it is! (If the member is not an administrator, they
-      # must have at least the member group assigned to them)
+      // No member groups assigned? Member it is! (If the member is not an administrator, they
+      // must have at least the member group assigned to them)
       if(isset($options['member_groups']) && is_array($options['member_groups']) && !in_array('administrator', $options['member_groups']) && !in_array('member', $options['member_groups']))
       {
         return false;
@@ -300,7 +300,7 @@ class Members
         $options['member_groups'] = array('member');
       }
 
-      # Registration time can be manually set, must be greater than 0 though :P
+      // Registration time can be manually set, must be greater than 0 though :P
       if(isset($options['member_registered']) && $options['member_registered'] <= 0)
       {
         return false;
@@ -310,20 +310,20 @@ class Members
         $options['member_registered'] = time_utc();
       }
 
-      # An IP?
+      // An IP?
       if(empty($options['member_ip']))
       {
-        $options['member_ip'] = $member->ip();
+        $options['member_ip'] = member()->ip();
       }
 
-      # Is the member activated?
+      // Is the member activated?
       $options['member_activated'] = !empty($options['member_activated']) ? 1 : 0;
 
-      # If the member is not activated, then we will generate an activation code...
+      // If the member is not activated, then we will generate an activation code...
       $options['member_acode'] = empty($options['member_activated']) && empty($options['member_acode']) ? sha1($this->rand_str(mt_rand(30, 40))) : (!empty($options['member_acode']) ? $options['member_acode'] : '');
 
-      # Alright! Now insert that member!!!
-      $result = $db->insert('insert', '{db->prefix}members',
+      // Alright! Now insert that member!!!
+      $result = db()->insert('insert', '{db->prefix}members',
                   array(
                     'member_name' => 'string', 'member_pass' => 'string', 'member_hash' => 'string',
                     'display_name' => 'string', 'member_email' => 'string', 'member_groups' => 'string',
@@ -339,16 +339,16 @@ class Members
 
       $handled = $result->success() ? $result->insert_id() : false;
 
-      # Maybe there is some default data that needs insertion?
+      // Maybe there is some default data that needs insertion?
       if(!empty($handled))
       {
         $data = array();
 
-        # If you want to add data, do:
-        # $data[] = array(varible, value)
-        $api->run_hooks('members_add_default_data', array(&$data));
+        // If you want to add data, do:
+        // $data[] = array(varible, value)
+        api()->run_hooks('members_add_default_data', array(&$data));
 
-        # Anything?
+        // Anything?
         if(count($data) > 0)
         {
           foreach($data as $key => $value)
@@ -356,7 +356,7 @@ class Members
             $data[$key] = array($handled, $value[0], $value[1]);
           }
 
-          $db->insert('replace', '{db->prefix}member_data',
+          db()->insert('replace', '{db->prefix}member_data',
             array(
               'member_id' => 'int', 'variable' => 'string-255', 'value' => 'string',
             ),
@@ -384,25 +384,25 @@ class Members
   */
   public function name_allowed($member_name, $member_id = 0)
   {
-    global $api, $db, $func, $settings;
+    global $func;
 
-    # You know what to do, set it to a bool if you handle it ;)
+    // You know what to do, set it to a bool if you handle it ;)
     $handled = null;
-    $api->run_hooks('members_name_allowed', array(&$handled, $member_name));
+    api()->run_hooks('members_name_allowed', array(&$handled, $member_name));
 
     if($handled === null)
     {
-      # Make sure the name isn't too long, or too short!
-      if($func['strlen']($member_name) < $settings->get('members_min_name_length', 'int', 3) || $func['strlen']($member_name) > $settings->get('members_max_name_length', 'int', 80))
+      // Make sure the name isn't too long, or too short!
+      if($func['strlen']($member_name) < settings()->get('members_min_name_length', 'int', 3) || $func['strlen']($member_name) > settings()->get('members_max_name_length', 'int', 80))
       {
         return false;
       }
 
-      # Lower it!!! (And htmlspecialchars it as well :P)
+      // Lower it!!! (And htmlspecialchars it as well :P)
       $member_name = $func['strtolower'](htmlchars($member_name));
 
-      # First check to see if it is a reserved name...
-      $reserved_names = explode("\n", $func['strtolower']($settings->get('reserved_names', 'string')));
+      // First check to see if it is a reserved name...
+      $reserved_names = explode("\n", $func['strtolower'](settings()->get('reserved_names', 'string')));
 
       if(count($reserved_names))
       {
@@ -410,7 +410,7 @@ class Members
         {
           $reserved_name = trim($reserved_name);
 
-          # Any wildcards?
+          // Any wildcards?
           if($func['strpos']($reserved_name, '*') !== false)
           {
             if(preg_match('~^'. str_replace('*', '(?:.*?)?', $reserved_name). '$~i', $member_name))
@@ -425,27 +425,27 @@ class Members
         }
       }
 
-      # Now search the database...
-      $result = $db->query('
+      // Now search the database...
+      $result = db()->query('
         SELECT
           member_id
         FROM {db->prefix}members
-        WHERE '. ($db->case_sensitive ? '(LOWER(member_name) = {string:member_name} OR LOWER(display_name) = {string:member_name})' : '(member_name = {string:member_name} OR display_name = {string:member_name})'). ' AND member_id != {int:member_id}
+        WHERE '. (db()->case_sensitive ? '(LOWER(member_name) = {string:member_name} OR LOWER(display_name) = {string:member_name})' : '(member_name = {string:member_name} OR display_name = {string:member_name})'). ' AND member_id != {int:member_id}
         LIMIT 1',
         array(
           'member_name' => $member_name,
           'member_id' => $member_id,
         ), 'members_name_allowed_query');
 
-      # We find any matches?
+      // We find any matches?
       if($result->num_rows() > 0)
       {
         return false;
       }
     }
 
-    # Are we still going? Then return the handled value, unless it wasn't modified,
-    # in which case, that means we handled it and we didn't find the name!
+    // Are we still going? Then return the handled value, unless it wasn't modified,
+    // in which case, that means we handled it and we didn't find the name!
     return $handled === null ? true : !empty($handled);
   }
 
@@ -466,24 +466,24 @@ class Members
   */
   public function email_allowed($member_email, $member_id = 0)
   {
-    global $api, $db, $func, $settings;
+    global $func;
 
-    # You know what to do, set it to a bool if you handle it ;)
+    // You know what to do, set it to a bool if you handle it ;)
     $handled = null;
-    $api->run_hooks('members_email_allowed', array(&$handled, $member_email));
+    api()->run_hooks('members_email_allowed', array(&$handled, $member_email));
 
     if($handled === null)
     {
       $member_email = $func['strtolower'](htmlchars($member_email));
 
-      # Check the email with regex!
+      // Check the email with regex!
       if(!preg_match('~^([a-z0-9._-](\+[a-z0-9])*)+@[a-z0-9.-]+\.[a-z]{2,6}$~i', $member_email))
       {
         return false;
       }
 
-      # Now check disallowed emails...
-      $disallowed_emails = explode("\n", $func['strtolower']($settings->get('disallowed_emails', 'string')));
+      // Now check disallowed emails...
+      $disallowed_emails = explode("\n", $func['strtolower'](settings()->get('disallowed_emails', 'string')));
 
       if(count($disallowed_emails) > 0)
       {
@@ -491,7 +491,7 @@ class Members
         {
           $disallowed_email = trim($disallowed_email);
 
-          # Any wildcards?
+          // Any wildcards?
           if($func['strpos']($disallowed_email, '*') !== false)
           {
             if(preg_match('~^'. str_replace('*', '(?:.*?)?', $disallowed_email). '$~i', $member_email))
@@ -506,12 +506,12 @@ class Members
         }
       }
 
-      # Or maybe, just maybe, it is already in use...
-      $result = $db->query('
+      // Or maybe, just maybe, it is already in use...
+      $result = db()->query('
         SELECT
           member_id
         FROM {db->prefix}members
-        WHERE '. ($db->case_sensitive ? 'LOWER(member_email) = {string:member_email}' : 'member_email = {string:member_email}'). ' AND member_id != {int:member_id}
+        WHERE '. (db()->case_sensitive ? 'LOWER(member_email) = {string:member_email}' : 'member_email = {string:member_email}'). ' AND member_id != {int:member_id}
         LIMIT 1',
         array(
           'member_email' => $member_email,
@@ -546,24 +546,24 @@ class Members
   */
   public function password_allowed($member_name, $member_pass)
   {
-    global $api, $db, $func, $settings;
+    global $func;
 
     $handled = null;
-    $api->run_hooks('members_password_allowed', array(&$handled, $member_pass));
+    api()->run_hooks('members_password_allowed', array(&$handled, $member_pass));
 
     if($handled === null)
     {
-      # Just a low setting? So must have at least 3 characters...
-      if($settings->get('password_security', 'int') == 1)
+      // Just a low setting? So must have at least 3 characters...
+      if(settings()->get('password_security', 'int') == 1)
       {
         $handled = $func['strlen']($member_pass) >= 3;
       }
-      # Must be at least 4 characters long and cannot contain their username ;)
-      elseif($settings->get('password_security', 'int') == 2)
+      // Must be at least 4 characters long and cannot contain their username ;)
+      elseif(settings()->get('password_security', 'int') == 2)
       {
         $handled = $func['strlen']($member_pass) >= 4 && $func['stripos']($member_pass, $member_name) === false;
       }
-      # At least 5 characters in length and must contain at least 1 number.
+      // At least 5 characters in length and must contain at least 1 number.
       else
       {
         $handled = $func['strlen']($member_pass) >= 5 && $func['stripos']($member_pass, $member_name) === false && preg_match('~[0-9]+~', $member_pass);
@@ -598,25 +598,25 @@ class Members
   */
   public function authenticate($member_name, $member_pass, $pass_hash = false)
   {
-    global $api, $db, $func;
+    global $func;
 
-    # You should get this idea by now :P
+    // You should get this idea by now :P
     $authenticated = null;
-    $api->run_hooks('members_authenticate', array(&$authenticated, $member_name, $member_pass, $pass_hash));
+    api()->run_hooks('members_authenticate', array(&$authenticated, $member_name, $member_pass, $pass_hash));
 
     if($authenticated === null)
     {
       $member_name = htmlchars(trim($member_name));
 
-      # Password not hashed..? That's fine, I'll do it myself, then. :P
+      // Password not hashed..? That's fine, I'll do it myself, then. :P
       if(empty($pass_hash))
       {
         $member_pass = sha1($func['strtolower'](htmlchars($member_name)). $member_pass);
         $pass_hash = true;
       }
 
-      # Alright, let's query that database!
-      $result = $db->query('
+      // Alright, let's query that database!
+      $result = db()->query('
         SELECT
           member_pass, member_hash
         FROM {db->prefix}members
@@ -626,29 +626,29 @@ class Members
           'member_name' => $member_name,
         ), 'members_authenticate_query');
 
-      # Did we get anything?
+      // Did we get anything?
       if($result->num_rows() > 0)
       {
-        # Sure, we may have gotten a result, but that doesn't mean their password is right :P
+        // Sure, we may have gotten a result, but that doesn't mean their password is right :P
         $row = $result->fetch_assoc();
 
-        # So let's check
+        // So let's check
         if($member_pass == $row['member_pass'] || (!empty($pass_hash) && $pass_hash !== true && $member_pass == sha1($row['member_pass']. $pass_hash)))
         {
           return true;
         }
         else
         {
-          # Maybe you would like to check..?
+          // Maybe you would like to check..?
           $authenticated = false;
-          $api->run_hooks('members_authenticate_other', array(&$authenticated, $member_name, $member_pass, $pass_hash, $row));
+          api()->run_hooks('members_authenticate_other', array(&$authenticated, $member_name, $member_pass, $pass_hash, $row));
 
           return !empty($authenticated);
         }
       }
       else
       {
-        # We got nothing!
+        // We got nothing!
         return false;
       }
     }
@@ -672,12 +672,10 @@ class Members
   */
   public function rand_str($length = 0)
   {
-    global $api;
-
-    # If for some very strange, unknown reason you want to do a random string, be my guest!
+    // If for some very strange, unknown reason you want to do a random string, be my guest!
     $handled = null;
     $str = '';
-    $api->run_hooks('members_rand_str', array(&$handled, $length, &$str));
+    api()->run_hooks('members_rand_str', array(&$handled, $length, &$str));
 
     if($handled === null)
     {
@@ -755,7 +753,7 @@ class Members
   */
   public function update($member_id, $options)
   {
-    global $api, $db, $func;
+    global $func;
 
     if(count($options) == 0)
     {
@@ -763,12 +761,12 @@ class Members
     }
 
     $handled = null;
-    $api->run_hooks('members_update', array(&$handled, $member_id, $options));
+    api()->run_hooks('members_update', array(&$handled, $member_id, $options));
 
     if($handled === null)
     {
-      # Can't update a profile that doesn't exist, can we?
-      $result = $db->query('
+      // Can't update a profile that doesn't exist, can we?
+      $result = db()->query('
         SELECT
           member_id
         FROM {db->prefix}members
@@ -801,22 +799,22 @@ class Members
         'member_acode' => 'string-40',
       );
 
-      $api->run_hooks('members_update_allowed_columns', array(&$allowed_columns));
+      api()->run_hooks('members_update_allowed_columns', array(&$allowed_columns));
 
       $data = array();
       foreach($allowed_columns as $column => $type)
       {
-        # Only add the data if the column exists...
+        // Only add the data if the column exists...
         if(isset($options[$column]))
         {
           $data[$column] = $options[$column];
         }
       }
 
-      # Let's let you check the data (just incase ;)) first...
-      $api->run_hooks('members_update_check_data', array(&$handled, &$data));
+      // Let's let you check the data (just incase ;)) first...
+      api()->run_hooks('members_update_check_data', array(&$handled, &$data));
 
-      # If a hook didn't change handled, we can do our stuff :P
+      // If a hook didn't change handled, we can do our stuff :P
       if($handled !== false)
       {
         if(isset($data['member_groups']) && !is_array($data['member_groups']))
@@ -824,10 +822,10 @@ class Members
           $data['member_groups'] = array($data['member_groups']);
         }
 
-        # Make sure their name and password are OK, if supplied!
+        // Make sure their name and password are OK, if supplied!
         if(isset($data['member_name']) && !$this->name_allowed($data['member_name'], $member_id))
         {
-          # Must be taken!
+          // Must be taken!
           return false;
         }
         elseif(isset($data['member_pass']) && !$this->password_allowed(isset($data['member_name']) ? $data['member_name'] : '', $data['member_pass']))
@@ -847,7 +845,7 @@ class Members
           return false;
         }
 
-        # Remove any blank groups.
+        // Remove any blank groups.
         if(isset($data['member_groups']) && count($data['member_groups']) > 0)
         {
           $member_groups = array();
@@ -859,11 +857,11 @@ class Members
             }
           }
 
-          # There, all done :-)
+          // There, all done :-)
           $data['member_groups'] = $member_groups;
         }
 
-        # Now we need to hash the password, maybe!
+        // Now we need to hash the password, maybe!
         if(!empty($options['member_name']) && !empty($options['member_pass']))
         {
           $data['member_pass'] = sha1($func['strtolower']($options['member_name']). $options['member_pass']);
@@ -878,13 +876,13 @@ class Members
           $data['member_activated'] = 11;
         }
 
-        # Can't be a bool, the database wants an integer! Easy fix, though!
+        // Can't be a bool, the database wants an integer! Easy fix, though!
         if(is_bool($data['member_activated']))
         {
           $data['member_activated'] = !empty($data['member_activated']) ? 1 : 0;
         }
 
-        # Our data array could be empty, simply because they are updating member_data table information!
+        // Our data array could be empty, simply because they are updating member_data table information!
         if(!empty($data))
         {
           $db_vars = array(
@@ -897,8 +895,8 @@ class Members
             $db_vars[$column. '_value'] = $column == 'member_groups' ? implode(',', $value) : $value;
           }
 
-          # Now update that data!
-          $result = $db->query('
+          // Now update that data!
+          $result = db()->query('
             UPDATE {db->prefix}members
             SET '. implode(', ', $values). '
             WHERE member_id = {int:member_id}
@@ -926,7 +924,7 @@ class Members
 
           if(count($data) > 0)
           {
-            $result = $db->insert('replace', '{db->prefix}member_data',
+            $result = db()->insert('replace', '{db->prefix}member_data',
                         array(
                           'member_id' => 'int', 'variable' => 'string-255', 'value' => 'string',
                         ),
@@ -938,7 +936,7 @@ class Members
 
           if(count($delete) > 0)
           {
-            $result = $db->query('
+            $result = db()->query('
               DELETE FROM {db->prefix}member_data
               WHERE member_id = {int:member_id} AND variable IN({string_array:variables})',
               array(
@@ -950,10 +948,10 @@ class Members
           }
         }
 
-        # This member will need to be reloaded ;)
+        // This member will need to be reloaded ;)
         unset($this->loaded[$member_id]);
 
-        $api->run_hooks('members_update_force_refresh', array($member_id));
+        api()->run_hooks('members_update_force_refresh', array($member_id));
       }
     }
 
@@ -977,26 +975,24 @@ class Members
   */
   public function delete($members)
   {
-    global $api, $db;
-
     $handled = null;
-    $api->run_hooks('members_delete', array(&$handled, $members));
+    api()->run_hooks('members_delete', array(&$handled, $members));
 
     if($handled === null)
     {
-      # Not an array? We will fix that!!!
+      // Not an array? We will fix that!!!
       if(!is_array($members))
       {
         $members = array($members);
       }
 
-      # Yeah, we deleted nothing successfully! Ha!
+      // Yeah, we deleted nothing successfully! Ha!
       if(count($members) == 0)
       {
         return true;
       }
 
-      # Now let's just make sure they are all plausible ids...
+      // Now let's just make sure they are all plausible ids...
       foreach($members as $key => $member_id)
       {
         $member_id = (int)$member_id;
@@ -1009,8 +1005,8 @@ class Members
 
       $members = array_unique($members);
 
-      # Now delete those members!
-      $result = $db->query('
+      // Now delete those members!
+      $result = db()->query('
         DELETE FROM {db->prefix}members
         WHERE member_id IN({int_array:members})
         LIMIT {int:member_count}',
@@ -1019,11 +1015,11 @@ class Members
           'member_count' => count($members),
         ), 'members_delete_query');
 
-      # Was it a success? We still have some more to do!
+      // Was it a success? We still have some more to do!
       if($result->success())
       {
-        # Now delete their data in the member_data table.
-        $result = $db->query('
+        // Now delete their data in the member_data table.
+        $result = db()->query('
           DELETE FROM {db->prefix}member_data
           WHERE member_id IN({int_array:members})',
           array(
@@ -1033,7 +1029,7 @@ class Members
 
       $handled = $result->success();
 
-      $api->run_hooks('post_members_delete', array($members));
+      api()->run_hooks('post_members_delete', array($members));
     }
 
     return !empty($handled);
@@ -1059,44 +1055,44 @@ class Members
   */
   public function name_to_id($name)
   {
-    global $api, $db, $func;
+    global $func;
 
-    # You might want to do this if you have your own member setup ;)
+    // You might want to do this if you have your own member setup ;)
     $handled = null;
-    $api->run_hooks('member_name_to_id', array(&$handled, $name));
+    api()->run_hooks('member_name_to_id', array(&$handled, $name));
 
     if($handled === null)
     {
-      # Is it a bird, a plane, an array?!
+      // Is it a bird, a plane, an array?!
       if(!is_array($name))
       {
-        # It's not an array, yet ;)
+        // It's not an array, yet ;)
         $name = array($name);
       }
 
-      # Nothing? Bad!
+      // Nothing? Bad!
       if(count($name) == 0)
       {
         return false;
       }
 
-      # Lowercase all the names.
+      // Lowercase all the names.
       foreach($name as $key => $value)
       {
         $name[$key] = $func['strtolower']($value);
       }
 
-      # Simple in reality...
-      $result = $db->query('
+      // Simple in reality...
+      $result = db()->query('
         SELECT
           LOWER(member_name) AS name, member_id AS id
         FROM {db->prefix}members
-        WHERE '. ($db->case_sensitive ? 'LOWER(member_name)' : 'member_name'). ' IN({string_array:names})',
+        WHERE '. (db()->case_sensitive ? 'LOWER(member_name)' : 'member_name'). ' IN({string_array:names})',
         array(
           'names' => $name,
         ), 'member_name_to_id_query');
 
-      # Now it gets different... We may just return the ID itself, no array.
+      // Now it gets different... We may just return the ID itself, no array.
       if(count($name) == 1)
       {
         if($result->num_rows() == 0)
@@ -1110,10 +1106,10 @@ class Members
       }
       else
       {
-        # Flip!!! :-)
+        // Flip!!! :-)
         $names = array_flip($name);
 
-        # For now, we will assume none were found.
+        // For now, we will assume none were found.
         foreach($names as $key => $name)
         {
           $names[$key] = false;

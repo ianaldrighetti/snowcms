@@ -22,7 +22,7 @@ if(!defined('IN_SNOW'))
   die('Nice try...');
 }
 
-# Title: Cookie verification
+// Title: Cookie verification
 
 if(!function_exists('checkcookie_verify'))
 {
@@ -42,39 +42,38 @@ if(!function_exists('checkcookie_verify'))
   */
   function checkcookie_verify()
   {
-    global $api, $theme;
+    api()->run_hooks('checkcookie_verify');
 
-    $api->run_hooks('checkcookie_verify');
-
-    # This is a pretty simple check...
+    // This is a pretty simple check...
     $cookie = isset($_COOKIE[cookiename]) ? $_COOKIE[cookiename] : '';
     list($member_id) = explode('|', $cookie);
 
     if(empty($cookie) || empty($_GET['id']) || $_GET['id'] != $member_id)
     {
-      # The cookie didn't save :(
-      $api->add_filter('login_message', create_function('$value', '
+      // The cookie didn't save :(
+      api()->add_filter('login_message', create_function('$value', '
         return l(\'It appears your login cookie couldn\\\'t be saved. Please be sure you have cookies enabled in your browser settings and try again.\');'));
 
-      $api->run_hooks('checkcookie_failed');
+      api()->run_hooks('checkcookie_failed');
 
-      # Login view function exist?
-      $login_view_func = $api->apply_filters('login_view_function', 'login_view');
+      // Login view function exist?
+      $login_view_func = api()->apply_filters('login_view_function', 'login_view');
       if(!function_exists($login_view_func))
       {
-        require_once($api->apply_filters('login_view_path', coredir. '/login.php'));
+        require_once(api()->apply_filters('login_view_path', coredir. '/login.php'));
       }
 
-      $theme->add_meta(array('name' => 'robots', 'content' => 'noindex'));
+      theme()->add_meta(array('name' => 'robots', 'content' => 'noindex'));
 
       $login_view_func();
       exit;
     }
 
-    $api->run_hooks('checkcookie_success');
+    api()->run_hooks('checkcookie_success');
 
-    # Seemed to have worked, so let's go home!
-    header('Location: '. baseurl);
+    // Seemed to have worked, so let's go home!
+    redirect();
+
     exit;
   }
 }

@@ -31,44 +31,44 @@ if(!defined('IN_SNOW'))
 */
 class API
 {
-  # Variable: hooks
-  # Contains all the registered hooks to the specified actions.
+  // Variable: hooks
+  // Contains all the registered hooks to the specified actions.
   private $hooks;
 
-  # Variable: filters
-  # Contains all the registered filters to the specified tags.
+  // Variable: filters
+  // Contains all the registered filters to the specified tags.
   private $filters;
 
-  # Variable: count
-  # Keeps track of how many times, if any, an action or tag has been
-  # called.
+  // Variable: count
+  // Keeps track of how many times, if any, an action or tag has been
+  // called.
   private $count;
 
-  # Variable: events
-  # All query string events are kept here.
+  // Variable: events
+  // All query string events are kept here.
   private $events;
 
-  # Variable: groups
-  # All the registered groups reside here.
+  // Variable: groups
+  // All the registered groups reside here.
   private $groups;
 
-  # Variable: menu
+  // Variable: menu
   private $menu;
 
-  # Variable: classes
-  # Holds registered classes, which are not located within the core
-  # directory.
+  // Variable: classes
+  // Holds registered classes, which are not located within the core
+  // directory.
   private $classes;
 
-  # Variable: objects
+  // Variable: objects
   private $objects;
 
-  # Variable: plugins
-  # Currently enabled plugins are held in this array.
+  // Variable: plugins
+  // Currently enabled plugins are held in this array.
   private $plugins;
 
-  # Variable: resources
-  # A resource is something such as an image, style sheet, or anything, really.
+  // Variable: resources
+  // A resource is something such as an image, style sheet, or anything, really.
   private $resources;
 
   /*
@@ -81,7 +81,7 @@ class API
   */
   public function __construct()
   {
-    # Just set them all to an array...
+    // Just set them all to an array...
     $this->hooks = array();
     $this->filters = array();
     $this->count = array(
@@ -135,13 +135,13 @@ class API
       return false;
     }
 
-    # Is the action not set in the array yet? Let's do it now! ;)
+    // Is the action not set in the array yet? Let's do it now! ;)
     if(!isset($this->hooks[$action_name]))
     {
       $this->hooks[$action_name] = array();
     }
 
-    # Add the hook, and its now ready to go!
+    // Add the hook, and its now ready to go!
     $this->hooks[$action_name][] = array(
                                      'callback' => $callback,
                                      'importance' => max(intval($importance), 1),
@@ -167,7 +167,7 @@ class API
   */
   public function remove_hook($action_name, $callback)
   {
-    # We can't delete a hook from an action that has no hooks, can we?
+    // We can't delete a hook from an action that has no hooks, can we?
     if(empty($action_name) || !is_callable($callback) || !isset($this->hooks[$action_name]) || count($this->hooks[$action_name]) == 0)
     {
       return false;
@@ -177,31 +177,31 @@ class API
     {
       if($hook['callback'] == $callback)
       {
-        # We can't just delete it, we need to make sure all the keys are
-        # sequential, otherwise, when the action is ran and the hooks
-        # sorted, things would get all screwed up, which we don't want! ;)
+        // We can't just delete it, we need to make sure all the keys are
+        // sequential, otherwise, when the action is ran and the hooks
+        // sorted, things would get all screwed up, which we don't want! ;)
         $array = array();
         $array_size = count($this->hooks[$action_name]);
         for($i = 0; $i < $array_size; $i++)
         {
-          # Do the keys match? Then skip!
+          // Do the keys match? Then skip!
           if($key == $i)
           {
             continue;
           }
 
-          # Otherwise, add it to the new array.
+          // Otherwise, add it to the new array.
           $array[] = $this->hooks[$action_name][$i];
         }
 
-        # Now save our change, before exiting.
+        // Now save our change, before exiting.
         $this->hooks[$action_name] = $array;
 
         return true;
       }
     }
 
-    # Sorry, didn't find it.
+    // Sorry, didn't find it.
     return false;
   }
 
@@ -224,36 +224,36 @@ class API
   */
   public function run_hooks($action_name, $args = null)
   {
-    # Increment the counter, for this action, even if no hooks are ran.
+    // Increment the counter, for this action, even if no hooks are ran.
     $this->count['actions'][$action_name] = isset($this->count['actions'][$action_name]) ? $this->count['actions'][$action_name] + 1 : 1;
 
-    # No hooks to run?
+    // No hooks to run?
     if(!isset($this->hooks[$action_name]) || count($this->hooks[$action_name]) == 0)
     {
       return;
     }
 
-    # Sort the hooks by importance, if there is more than 1!
+    // Sort the hooks by importance, if there is more than 1!
     if(count($this->hooks[$action_name]) > 1)
     {
       $this->sort($this->hooks[$action_name]);
     }
 
-    # Not an array? I'll make it one!
+    // Not an array? I'll make it one!
     if(!is_array($args))
     {
       $args = array($args);
     }
 
-    # No need to count the number of parameters over and over again, right?
+    // No need to count the number of parameters over and over again, right?
     $num_args = count($args);
 
-    # Now run all the hooks.
+    // Now run all the hooks.
     foreach($this->hooks[$action_name] as $hook)
     {
       $passed_args = $args;
 
-      # Do you want more than we have..?
+      // Do you want more than we have..?
       if($hook['accepted_args'] > $num_args)
       {
         for($i = 0; $i < $hook['accepted_args'] - $num_args; $i++)
@@ -294,12 +294,12 @@ class API
     {
       if($hook['callback'] == $callback)
       {
-        # Here it is!
+        // Here it is!
         return true;
       }
     }
 
-    # Not found, sorry.
+    // Not found, sorry.
     return false;
   }
 
@@ -364,13 +364,13 @@ class API
       return false;
     }
 
-    # Do we need to create this tags array?
+    // Do we need to create this tags array?
     if(!isset($this->filters[$tag_name]))
     {
       $this->filters[$tag_name] = array();
     }
 
-    # Add it, and we're done.
+    // Add it, and we're done.
     $this->filters[$tag_name][] = array(
                                     'callback' => $callback,
                                     'importance' => max(intval($importance), 1),
@@ -403,15 +403,15 @@ class API
     {
       if($filter['callback'] == $callback)
       {
-        # If we found it, we need to make a new array, and exclude the one
-        # to be removed, otherwise we will have sorting issues ;)
+        // If we found it, we need to make a new array, and exclude the one
+        // to be removed, otherwise we will have sorting issues ;)
         $array = array();
         $array_size = count($this->filters[$tag_name]);
         for($i = 0; $i < $array_size; $i++)
         {
           if($key == $i)
           {
-            # This is the one we don't want, so skip!
+            // This is the one we don't want, so skip!
             continue;
           }
 
@@ -423,7 +423,7 @@ class API
       }
     }
 
-    # Didn't find it, sorry.
+    // Didn't find it, sorry.
     return false;
   }
 
@@ -441,16 +441,16 @@ class API
   */
   public function apply_filters($tag_name, $value)
   {
-    # Increment the counter for this filter, that's one more, after all ;)
+    // Increment the counter for this filter, that's one more, after all ;)
     $this->count['tags'][$tag_name] = isset($this->count['tags'][$tag_name]) ? $this->count['tags'][$tag_name] + 1 : 1;
 
-    # No filters? Just return the value.
+    // No filters? Just return the value.
     if(!isset($this->filters[$tag_name]) || count($this->filters[$tag_name]) == 0)
     {
       return $value;
     }
 
-    # Sort the filters, just maybe.
+    // Sort the filters, just maybe.
     if(count($this->filters[$tag_name]) > 1)
     {
       $this->sort($this->filters[$tag_name]);
@@ -458,14 +458,14 @@ class API
 
     foreach($this->filters[$tag_name] as $filter)
     {
-      # Simple enough, really ;) Well, unless it isn't a callback!
+      // Simple enough, really ;) Well, unless it isn't a callback!
       if(is_callable($filter['callback']))
       {
         $value = call_user_func($filter['callback'], $value);
       }
       else
       {
-        # The callback index is the new value...
+        // The callback index is the new value...
         $value = $filter['callback'];
       }
     }
@@ -496,12 +496,12 @@ class API
     {
       if($filter['callback'] == $callback)
       {
-        # Here it is!
+        // Here it is!
         return true;
       }
     }
 
-    # Not found, sorry.
+    // Not found, sorry.
     return false;
   }
 
@@ -561,8 +561,8 @@ class API
   */
   public function add_event($query_string, $callback, $filename = null)
   {
-    # Is the callback not callable? Does the file not exist? Does the
-    # event already exist?
+    // Is the callback not callable? Does the file not exist? Does the
+    // event already exist?
     if(empty($query_string) || (empty($filename) && !is_callable($callback)) || (!empty($filename) && !file_exists($filename)) || $this->event_exists($query_string) || !($query = $this->parse_query($query_string)))
     {
       return false;
@@ -572,28 +572,28 @@ class API
     $count = count($query);
     $current = 0;
 
-    # Now for the fun part, adding the event to the events array.
+    // Now for the fun part, adding the event to the events array.
     foreach($query as $key => $value)
     {
-      # Does the key not exist? Well, we ought to create, shouldn't we..?
+      // Does the key not exist? Well, we ought to create, shouldn't we..?
       if(!isset($events[$key]))
       {
-        # Just an array ;-)
+        // Just an array ;-)
         $events[$key] = array();
       }
 
-      # Are we to where we need to add something..?
+      // Are we to where we need to add something..?
       if($current + 1 == $count)
       {
-        # Is the value in the array? Or do we have a wildcard..?
+        // Is the value in the array? Or do we have a wildcard..?
         if(isset($events[$key]['*']))
         {
-          # Sorry, can't add anything specific when there is a wildcard.
+          // Sorry, can't add anything specific when there is a wildcard.
           return false;
         }
         else
         {
-          # Doesn't exist yet, at all..?
+          // Doesn't exist yet, at all..?
           if(!isset($events[$key][$value]))
           {
             $events[$key][$value] = array(
@@ -604,17 +604,17 @@ class API
           }
           else
           {
-            # Don't mess anything up ;)
+            // Don't mess anything up ;)
             $events[$key][$value]['callback'] = $callback;
             $events[$key][$value]['filename'] = $filename;
           }
 
-          # Added, we are done!
+          // Added, we are done!
           return true;
         }
       }
 
-      # The next place doesn't exist? So sad.
+      // The next place doesn't exist? So sad.
       if(!isset($events[$key][$value]))
       {
         $events[$key][$value] = array(
@@ -645,7 +645,7 @@ class API
   */
   public function remove_event($query_string)
   {
-    # Bad query? Then their ain't nothin' we can do for ya!
+    // Bad query? Then their ain't nothin' we can do for ya!
     if(!($query = $this->parse_query($query_string)))
     {
       return false;
@@ -655,33 +655,33 @@ class API
     $count = count($query);
     $current = 0;
 
-    # Traverse through the array, fun!
+    // Traverse through the array, fun!
     foreach($query as $key => $value)
     {
-      # Are we there yet? :P
+      // Are we there yet? :P
       if($current + 1 == $count)
       {
-        # Is it set, not empty, I mean... If it isn't it doesn't exist.
-        # BREAK!
+        // Is it set, not empty, I mean... If it isn't it doesn't exist.
+        // BREAK!
         if(empty($events[$key][$value]['callback']))
         {
           break;
         }
 
-        # Found it, delete it, done!
+        // Found it, delete it, done!
         unset($events[$key][$value]);
         return true;
       }
       else
       {
-        # Nope.
+        // Nope.
         $events = &$events[$key][$value]['children'];
       }
 
       $current++;
     }
 
-    # Did you get out here? Then it didn't exist, so it wasn't deleted!
+    // Did you get out here? Then it didn't exist, so it wasn't deleted!
     return false;
   }
 
@@ -705,20 +705,20 @@ class API
       return false;
     }
 
-    # Keep track of the last known working event, right now, nothing!
+    // Keep track of the last known working event, right now, nothing!
     $event = null;
 
     $events = &$this->events;
     foreach($query as $key => $value)
     {
-      # Does this have a working callback? (Or a wildcard)
+      // Does this have a working callback? (Or a wildcard)
       $wildcard = isset($events[$key]['*']);
       if(($found = !empty($events[$key][$value]['callback'])) || $wildcard)
       {
         $event = $events[$key][!empty($wildcard) ? '*' : $value];
       }
 
-      # Move on to the next... Maybe.
+      // Move on to the next... Maybe.
       if(!isset($events[$key][!empty($wildcard) ? '*' : $value]['children']))
       {
         break;
@@ -727,7 +727,7 @@ class API
       $events = &$events[$key][!empty($wildcard) ? '*' : $value]['children'];
     }
 
-    # Is the event not null? Then we found one! Otherwise, nope.
+    // Is the event not null? Then we found one! Otherwise, nope.
     return !empty($event) ? $event : false;
   }
 
@@ -754,32 +754,32 @@ class API
     $count = count($query);
     $current = 0;
 
-    # Traverse through the array, fun!
+    // Traverse through the array, fun!
     foreach($query as $key => $value)
     {
-      # Are we there yet? :P
+      // Are we there yet? :P
       if($current + 1 == $count)
       {
-        # Is it set, not empty, I mean... If it isn't it doesn't exist. So
-        # you can set it.
+        // Is it set, not empty, I mean... If it isn't it doesn't exist. So
+        // you can set it.
         if(empty($events[$key][$value]['callback']) && empty($events[$key]['*']['callback']))
         {
           return false;
         }
 
-        # Nope, it exists, you can't set it.
+        // Nope, it exists, you can't set it.
         return true;
       }
       else
       {
-        # Nope.
+        // Nope.
         $events = &$events[$key][$value]['children'];
       }
 
       $current++;
     }
 
-    # Didn't find it, so have fun!
+    // Didn't find it, so have fun!
     return false;
   }
 
@@ -854,10 +854,10 @@ class API
   */
   public function add_group($group_identifier, $group_name)
   {
-    # Just make sure you don't have anything extra...
+    // Just make sure you don't have anything extra...
     $group_identifier = trim($group_identifier);
 
-    # Does the group already exist? Too bad!
+    // Does the group already exist? Too bad!
     if($this->group_exists($group_identifier) || !is_string($group_identifier) || !is_string($group_name))
     {
       return false;
@@ -883,14 +883,14 @@ class API
   {
     $group_identifier = strtolower($group_identifier);
 
-    # Does it not exist? Then we can't remove it! Nor can you remove the
-    # member or administrator group, silly!
+    // Does it not exist? Then we can't remove it! Nor can you remove the
+    // member or administrator group, silly!
     if(!$this->group_exists($group_identifier) || $group_identifier == 'administrator' || $group_identifier == 'member')
     {
       return false;
     }
 
-    # Simply unset it!
+    // Simply unset it!
     unset($this->groups[$group_identifier]);
     return true;
   }
@@ -908,7 +908,7 @@ class API
   */
   public function group_exists($group_identifier)
   {
-    # Simple enough, right?
+    // Simple enough, right?
     return isset($this->groups[strtolower($group_identifier)]);
   }
 
@@ -930,18 +930,18 @@ class API
   */
   public function return_group($group_identifier = null)
   {
-    # No group specified? Then all groups will be returned!
+    // No group specified? Then all groups will be returned!
     if(empty($group_identifier))
     {
       asort($this->groups, SORT_STRING);
       return $this->groups;
     }
-    # How about a specific group?
+    // How about a specific group?
     elseif($this->group_exists($group_identifier))
     {
       return $this->groups[strtolower($group_identifier)];
     }
-    # The group doesn't exist!
+    // The group doesn't exist!
     else
     {
       return false;
@@ -1001,64 +1001,64 @@ class API
   */
   public function add_menu_item($category, $options)
   {
-    # No category? No options..? No href or name? No content?
+    // No category? No options..? No href or name? No content?
     if(empty($category) || !is_array($options) || count($options) == 0 || (!isset($options['href']) && !isset($options['name'])) || empty($options['content']))
     {
-      # Then I can't add the link!
+      // Then I can't add the link!
       return false;
     }
 
-    # If you have an href and a name, the name goes buh bye!
+    // If you have an href and a name, the name goes buh bye!
     if(isset($options['href']) && isset($options['name']))
     {
       unset($options['name']);
     }
 
-    # Only allow certain attributes, delete the rest.
+    // Only allow certain attributes, delete the rest.
     $allowed_indexes = array('href', 'name', 'rel', 'class', 'id', 'style', 'title', 'content', 'extra', 'position');
     foreach($options as $key => $value)
     {
       if(!in_array($key, $allowed_indexes))
       {
-        # Not allowed, so simply delete it.
+        // Not allowed, so simply delete it.
         unset($options[$key]);
       }
     }
 
-    # Is the category not yet created? Then do so!
+    // Is the category not yet created? Then do so!
     if(!isset($this->menu[$category]))
     {
       $this->menu[$category] = array();
     }
 
-    # Are you going to make my life easy..? :)
+    // Are you going to make my life easy..? :)
     if(!isset($options['position']) || (string)$options['position'] != (string)(int)$options['position'] || (int)$options['position'] < 0 || count($this->menu[$category]) == 0)
     {
-      # Yes, thank you!!!
+      // Yes, thank you!!!
       $this->menu[$category][] = $options;
     }
     else
     {
       $position = (int)$options['position'];
 
-      # We don't need that index anymore...
+      // We don't need that index anymore...
       unset($options['position']);
 
-      # If the position you want to put it at is bigger than the array,
-      # just place it in the back!
+      // If the position you want to put it at is bigger than the array,
+      // just place it in the back!
       if($position >= count($this->menu[$category]))
       {
         $this->menu[$category][] = $options;
       }
       else
       {
-        # Move them all over to a temporary array!
+        // Move them all over to a temporary array!
         $menu = array();
         $length = count($this->menu[$category]);
 
         for($i = 0; $i < $length; $i++)
         {
-          # Is this where you want it to be placed?
+          // Is this where you want it to be placed?
           if($i == $position)
           {
             $menu[] = $options;
@@ -1067,12 +1067,12 @@ class API
           $menu[] = $this->menu[$category][$i];
         }
 
-        # Copy the new one over.
+        // Copy the new one over.
         $this->menu[$category] = $menu;
       }
     }
 
-    # We're done!
+    // We're done!
     return true;
   }
 
@@ -1098,25 +1098,25 @@ class API
   {
     global $func;
 
-    # Make sure the index you are searching by is allowed.
+    // Make sure the index you are searching by is allowed.
     $index = strtolower($index);
     if(!in_array($index, array('href', 'name', 'rel', 'class', 'id', 'style', 'title', 'content')))
     {
-      # None deleted! :P
+      // None deleted! :P
       return 0;
     }
 
-    # All categories?
+    // All categories?
     if(empty($category))
     {
-      # We will keep track of the number of deleted menu items here.
+      // We will keep track of the number of deleted menu items here.
       $deleted = 0;
 
       if(count($this->menu) > 0)
       {
         foreach($this->menu as $key => $value)
         {
-          # We will let this method do the stuff :P
+          // We will let this method do the stuff :P
           $deleted += $this->remove_menu_item($search, $key, $index, !empty($case_sensitive));
         }
       }
@@ -1125,7 +1125,7 @@ class API
     }
     else
     {
-      # Does this category even exist?
+      // Does this category even exist?
       if(!isset($this->menu[$category]))
       {
         return 0;
@@ -1134,23 +1134,23 @@ class API
       $deleted = 0;
       if(count($this->menu[$category]) > 0)
       {
-        # Make this a tad easier.
+        // Make this a tad easier.
         $compare_func = !empty($case_sensitive) ? create_function('$value', 'return $value;') : $func['strtolower'];
 
-        # No need to continually do this, right?
+        // No need to continually do this, right?
         $search = $compare_func($search);
 
         foreach($this->menu[$category] as $key => $value)
         {
           if($search == $compare_func($value[$index]))
           {
-            # Remove it!
+            // Remove it!
             unset($this->menu[$category][$key]);
             $deleted++;
           }
         }
 
-        # If any were deleted, we may need to tidy up the indexing order :)
+        // If any were deleted, we may need to tidy up the indexing order :)
         if($deleted > 0)
         {
           $menu = array();
@@ -1187,7 +1187,7 @@ class API
   */
   public function return_menu_items($category = null)
   {
-    # Just return them all? Alright.
+    // Just return them all? Alright.
     if($category === null)
     {
       return $this->menu;
@@ -1196,7 +1196,7 @@ class API
     {
       $menu = array();
 
-      # Loop through them all! If any!
+      // Loop through them all! If any!
       if(count($this->menu) > 0)
       {
         foreach($this->menu as $value)
@@ -1258,7 +1258,7 @@ class API
   */
   public function remove_class($class)
   {
-    # A bit hard to remove a class which isn't registered.
+    // A bit hard to remove a class which isn't registered.
     if(!$this->class_exists($class))
     {
       return false;
@@ -1310,29 +1310,29 @@ class API
   */
   public function load_class($class_name, $params = array(), $filename = null, $new = false)
   {
-    # Don't want a new object? Does it already exist? Great! You can have this one :)
+    // Don't want a new object? Does it already exist? Great! You can have this one :)
     if(empty($new) && isset($this->objects[strtolower($class_name)]))
     {
       return $this->objects[strtolower($class_name)];
     }
 
-    # Does the class not exist already? Then load up the file.
+    // Does the class not exist already? Then load up the file.
     if(!class_exists($class_name))
     {
-      # Hmm, is this a registered class?
+      // Hmm, is this a registered class?
       if($this->class_exists($class_name))
       {
-        # Use the file name from the registered class.
+        // Use the file name from the registered class.
         $filename = $this->classes[strtolower($class_name)];
       }
 
-      # Is the file name not specified?
+      // Is the file name not specified?
       if(empty($filename))
       {
         $filename = coredir. '/'. strtolower($class_name). '.class.php';
       }
 
-      # Does the file not exist..?!
+      // Does the file not exist..?!
       if(!file_exists($filename))
       {
         return false;
@@ -1342,17 +1342,17 @@ class API
         require_once($filename);
       }
 
-      # The class still doesn't exist? Tisk tisk!
+      // The class still doesn't exist? Tisk tisk!
       if(!class_exists($class_name))
       {
         return false;
       }
     }
 
-    # Instantiate that class.
+    // Instantiate that class.
     $obj = new $class_name();
 
-    # Any parameters?
+    // Any parameters?
     if(count($params) > 0 && is_callable(array($obj, '__construct')))
     {
       call_user_func_array(array($obj, '__construct'), $params);
@@ -1362,13 +1362,13 @@ class API
       return false;
     }
 
-    # Not your own "private" object? Then we shall store it!
+    // Not your own "private" object? Then we shall store it!
     if(empty($new))
     {
       $this->objects[strtolower($class_name)] = $obj;
     }
 
-    # Now we're done!
+    // Now we're done!
     return $obj;
   }
 
@@ -1385,13 +1385,13 @@ class API
   */
   public function add_plugin($dependency_name)
   {
-    # Empty dependency name? Or is the plugin already added?
+    // Empty dependency name? Or is the plugin already added?
     if(empty($dependency_name) || $this->plugin_exists($dependency_name))
     {
       return false;
     }
 
-    # Simply add the dependency name ;)
+    // Simply add the dependency name ;)
     $this->plugins[] = strtolower($dependency_name);
     return true;
   }
@@ -1416,7 +1416,7 @@ class API
 
     foreach($this->plugins as $key => $name)
     {
-      # Is it the right one?
+      // Is it the right one?
       if($name == strtolower($dependency_name))
       {
         unset($this->plugins[$key]);
@@ -1424,7 +1424,7 @@ class API
       }
     }
 
-    # Technically speaking, this shouldn't happen...
+    // Technically speaking, this shouldn't happen...
     return false;
   }
 
@@ -1443,7 +1443,7 @@ class API
   {
     if(empty($dependency_name))
     {
-      # Sorry, we need a name ;)
+      // Sorry, we need a name ;)
       return false;
     }
 
@@ -1497,12 +1497,12 @@ class API
   */
   public function add_resource($area_name, $resource_id, $location)
   {
-    # Does the resource already exist?
+    // Does the resource already exist?
     if(empty($area_name) || (empty($resource_id) && !is_callable($location)) || (!empty($resource_id) && (!is_file($location) || !is_readable($location))) || $this->resource_exists($area_name, $resource_id))
     {
       return false;
     }
-    # Trying to overwrite everything? To bad!
+    // Trying to overwrite everything? To bad!
     elseif(is_callable($location) && is_array($this->resources[strtolower($area_name)]) && count($this->resources[strtolower($area_name)]) > 0)
     {
       return false;
@@ -1515,10 +1515,10 @@ class API
       $this->resources[$area_name] = array();
     }
 
-    # Do you want to handle all the resource requests yourself? Fine by me!
+    // Do you want to handle all the resource requests yourself? Fine by me!
     if(is_callable($location))
     {
-      # In that case, we just need a callback.
+      // In that case, we just need a callback.
       $this->resources[$area_name] = $location;
     }
     else
@@ -1545,7 +1545,7 @@ class API
   */
   public function remove_resource($area_name, $resource_id = null)
   {
-    # We can't remove something that doesn't exist can we? Right?
+    // We can't remove something that doesn't exist can we? Right?
     if(empty($area_name) || !$this->resource_exists($area_name, $resource_id))
     {
       return false;
@@ -1611,19 +1611,19 @@ class API
   */
   public function return_resource($area_name, $resource_id = null)
   {
-    # Returning a specific resource?
+    // Returning a specific resource?
     if(!empty($resource_id) && $this->resource_exists($area_name, $resource_id))
     {
       return $this->resources[strtolower($area_name)][$resource_id];
     }
-    # Returning the callback for the resource, or all the available resources?
+    // Returning the callback for the resource, or all the available resources?
     elseif(isset($this->resources[strtolower($area_name)]) || is_callable($this->resources[strtolower($area_name)]))
     {
       return $this->resources[strtolower($area_name)];
     }
     else
     {
-      # Does exist, sorry!
+      // Does exist, sorry!
       return false;
     }
   }
@@ -1640,67 +1640,71 @@ class API
 
   Returns:
     void - Nothing is returned by this function.
+
+  Note:
+		This function should *not* be called directly. The api() function will
+		make a call to this function when necessary.
 */
 function load_api()
 {
-  global $api, $db, $loading_plugins;
+  global $loading_plugins;
 
   ob_start();
 
-  # Register a shutdown function, which calls on a function to see if the
-  # error was fatal, if it was, and caused by a plugin, it will be
-  # disabled :)
+  // Register a shutdown function, which calls on a function to see if the
+  // error was fatal, if it was, and caused by a plugin, it will be
+  // disabled :)
   register_shutdown_function('api_catch_fatal');
 
-  # We are about to load the plugins!
-  # (fyi, this is used to help api_catch_fatal, specifically for PHP 5.2.0 <)
+  // We are about to load the plugins!
+  // (fyi, this is used to help api_catch_fatal, specifically for PHP 5.2.0 <)
   $loading_plugins = true;
 
-  # Instantiate the API class.
-  $api = new API();
+  // Instantiate the API class.
+  $GLOBALS['api'] = new API();
 
-  # Load up plugin_load and plugin_list (we don't really use it here, but
-  #hey it's for other people too!)
+  // Load up plugin_load and plugin_list (we don't really use it here, but
+  // hey it's for other people too!)
   require_once(coredir. '/plugin.php');
 
-  # Find all activated plugins, that way we can load them up.
-  $result = $db->query('
+  // Find all activated plugins, that way we can load them up.
+  $result = db()->query('
     SELECT
       dependency_name, directory
     FROM {db->prefix}plugins
     WHERE is_activated = 1 AND runtime_error = 0');
 
-  # Are there any activated plugins?
+  // Are there any activated plugins?
   if($result->num_rows() > 0)
   {
-    # Just incase the plugin doesn't actually work right, we will hold
-    # them all here, they are considered bad if our check for the
-    # plugin.php file fails.
+    // Just incase the plugin doesn't actually work right, we will hold
+    // them all here, they are considered bad if our check for the
+    // plugin.php file fails.
     $bad_plugins = array();
 
-    # The plugins array, on the other hand, is good. This is where all the
-    # plugins information, such as dependencies are held.
+    // The plugins array, on the other hand, is good. This is where all the
+    // plugins information, such as dependencies are held.
     $plugins = array();
 
     while($row = $result->fetch_assoc())
     {
-      # Check for that required plugin.php file.
+      // Check for that required plugin.php file.
       if(!file_exists(plugindir. '/'. $row['directory']. '/plugin.php'))
       {
-        # Mark it for a 'runtime error'
+        // Mark it for a 'runtime error'
         $bad_plugins[] = $row['dependency_name'];
       }
       else
       {
-        # Add the plugin, for now.
+        // Add the plugin, for now.
         $plugins[strtolower($row['dependency_name'])] = plugindir. '/'. $row['directory']. '/plugin.php';
       }
     }
 
-    # Did we find any bad plugins?
+    // Did we find any bad plugins?
     if(count($bad_plugins) > 0)
     {
-      $db->query('
+      db()->query('
         UPDATE {db->prefix}plugins
         SET runtime_error = 1
         WHERE dependency_name IN({string_array:bad_plugins})',
@@ -1709,35 +1713,35 @@ function load_api()
         ));
     }
 
-    # Now for the actual loading of the plugins!
+    // Now for the actual loading of the plugins!
     if(count($plugins))
     {
       foreach($plugins as $dependency => $plugin)
       {
-        # Well well, load the plugin!
+        // Well well, load the plugin!
         require_once($plugin);
 
-        # The plugin is now enabled :-)
-        $api->add_plugin($dependency);
+        // The plugin is now enabled :-)
+        api()->add_plugin($dependency);
       }
 
-      # Alright, one of our first hooks! :D Just a simple one that plugins
-      # can hook into when all plugins have been included (Really meant for
-      # plugins that are depended upon, so they can have hooks and what not,
-      # confusing :P)
-      $api->run_hooks('post_plugin_activation');
+      // Alright, one of our first hooks! :D Just a simple one that plugins
+      // can hook into when all plugins have been included (Really meant for
+      // plugins that are depended upon, so they can have hooks and what not,
+      // confusing :P)
+      api()->run_hooks('post_plugin_activation');
     }
   }
 
-  # We have now loaded all plugins.
+  // We have now loaded all plugins.
   $loading_plugins = false;
 
-  # Simple hook, something you can hook onto if you want to do something
-  # right before SnowCMS stops executing.
+  // Simple hook, something you can hook onto if you want to do something
+  // right before SnowCMS stops executing.
   register_shutdown_function(create_function('', '
     global $api;
 
-    $api->run_hooks(\'snow_exit\');'));
+    api()->run_hooks(\'snow_exit\');'));
 }
 
 /*
@@ -1755,29 +1759,29 @@ function load_api()
 */
 function api_catch_fatal()
 {
-  global $db, $loading_plugins;
+  global $loading_plugins;
 
-  # Not loading plugins?
+  // Not loading plugins?
   if(empty($loading_plugins))
   {
-    # Then don't worry about it!
+    // Then don't worry about it!
     return;
   }
 
-  # Only PHP 5.2.0 >= supports error_get_last :/
+  // Only PHP 5.2.0 >= supports error_get_last :/
   if(!function_exists('error_get_last'))
   {
     $last_error = error_get_last();
   }
   else
   {
-    # Which means we need to do it in another way!!!
+    // Which means we need to do it in another way!!!
     $error_string = ob_get_contents();
 
-    # Is it a parse error?
+    // Is it a parse error?
     if(stripos($error_string, 'parse error') !== false)
     {
-      # Now that we know it is a parse error, try to get the path.
+      // Now that we know it is a parse error, try to get the path.
       $last_error = array(
                       'type' => E_PARSE,
                       'file' => null,
@@ -1786,10 +1790,10 @@ function api_catch_fatal()
 
       $path = substr(trim(substr($error_string, stripos($error_string, ' in '))), 3);
 
-      # Remove the on line #, and we got it!
+      // Remove the on line #, and we got it!
       $path = trim(substr($path, 0, strripos($path, 'on line')));
 
-      # Any HTML? We don't want that!
+      // Any HTML? We don't want that!
       if(stripos($path, '<b>') !== false)
       {
         $path = strtr($path, array('<b>' => '', '</b>' => ''));
@@ -1799,54 +1803,57 @@ function api_catch_fatal()
     }
   }
 
-  # Parse error? That's what we are looking for, after all!
+  // Parse error? That's what we are looking for, after all!
   if($last_error['type'] == E_PARSE)
   {
-    # Did it come from the plugin directory?
+    // Did it come from the plugin directory?
     if(substr($last_error['file'], 0, strlen(plugindir)) == realpath(plugindir))
     {
-      # Yes it did, now we need to obtain the plugins information.
+      // Yes it did, now we need to obtain the plugins information.
       $path = explode(strtoupper(substr(PHP_OS, 0, 3)) == 'WIN' ? '\\' : '/', realpath(dirname($last_error['file'])));
       $length = count($path);
 
       for($i = $length - 1; $i > 0; $i--)
       {
-        # Keep trying to find the plugin.ini file...
+        // Keep trying to find the plugin.ini file...
         $cur_path = implode(strtoupper(substr(PHP_OS, 0, 3)) == 'WIN' ? '\\' : '/', $path);
 
-        if(file_exists($cur_path. '/plugin.ini'))
+        if(file_exists($cur_path. '/plugin.xml'))
         {
-          $plugin = parse_ini_file($cur_path. '/plugin.ini', true);
+          $plugin = plugin_load($cur_path, true);
 
-          # Is the dependency name in there?
-          if(isset($plugin['plugin']['dependency name']))
+          // Is the GUID in there?
+          if(isset($plugin['guid']))
           {
-            # We do, so disable that dern thing!
-            $db->query('
+            // We do, so disable that dern thing!
+            db()->query('
               UPDATE {db->prefix}plugins
               SET runtime_error = 2
               WHERE dependency_name = {string:dependency_name}
               LIMIT 1',
               array(
-                'dependency_name' => $plugin['plugin']['dependency name'],
+                'dependency_name' => $plugin['guid'],
               ));
 
-            # Log the error.
+            // Log the error.
             if(!function_exists('errors_handler'))
             {
               require_once(coredir. '/errors.php');
             }
 
-            # Well, now log the error.
+            // Well, now log the error.
             errors_handler($last_error['type'], $last_error['message'], $last_error['file'], null);
 
-            # Redirect, maybe.
+            // Redirect, maybe.
             if(!isset($_SESSION['last_error_fix']) || ((int)$_SESSION['last_error_fix'] + 10) < time())
             {
               $_SESSION['last_error_fix'] = time();
 
               ob_clean();
-              header('Location: '. $base_url. $_SERVER['REQUEST_URI']);
+
+              header('HTTP/1.1 307 Temporary Redirect');
+              header('Location: '. baseurl. $_SERVER['REQUEST_URI']);
+
               exit;
             }
           }
@@ -1878,76 +1885,74 @@ if(!function_exists('api_handle_resource'))
   */
   function api_handle_resource()
   {
-    global $api, $settings;
+    api()->run_hooks('api_handle_resource');
 
-    $api->run_hooks('api_handle_resource');
-
-    # Do we have an area name?
+    // Do we have an area name?
     if(empty($_GET['area']))
     {
       member_access_denied('No area supplied', 'No area of where the resource is located was supplied.');
     }
 
-    # Why, yes, we do!!!
+    // Why, yes, we do!!!
     $area_name = $_GET['area'];
 
-    # Now let's check if their is a callback which will handle these resources.
-    if($callback = $api->return_resource($area_name) && is_callable($callback))
+    // Now let's check if their is a callback which will handle these resources.
+    if($callback = api()->return_resource($area_name) && is_callable($callback))
     {
-      # Yup, there is!!!
+      // Yup, there is!!!
       call_user_func($callback);
       exit;
     }
 
-    # Now we need a resource identifier. So get that ;-).
+    // Now we need a resource identifier. So get that ;-).
     if(empty($_GET['id']))
     {
-      # Nope, none given.
+      // Nope, none given.
       member_access_denied('No resource supplied', 'No resource identifier was supplied.');
     }
 
-    # Yup, it was...
+    // Yup, it was...
     $resource_id = $_GET['id'];
 
-    # Now does this resource exist?
-    if(!$api->resource_exists($area_name, $resource_id))
+    // Now does this resource exist?
+    if(!api()->resource_exists($area_name, $resource_id))
     {
       member_access_denied('Resource not found', 'The supplied resource was not found.');
     }
 
-    # Let's get the location, shall we?
-    $location = $api->return_resource($area_name, $resource_id);
+    // Let's get the location, shall we?
+    $location = api()->return_resource($area_name, $resource_id);
 
-    # Maybe you want to handle this? Fine with me!
+    // Maybe you want to handle this? Fine with me!
     $handled = false;
-    $api->run_hooks('api_handle_resource_location', array(&$handled, $location));
+    api()->run_hooks('api_handle_resource_location', array(&$handled, $location));
 
-    # Handled?
+    // Handled?
     if(empty($handled))
     {
-      # Not it was not.
+      // Not it was not.
       if(ob_get_length() > 0)
       {
         @ob_clean();
       }
 
-      # Time to output, once we get the content type.
+      // Time to output, once we get the content type.
       if(function_exists('finfo_file'))
       {
-        $ff = finfo_open(FILEINFO_MIME, $settings->get('finfo_magic_file', 'string', substr(PHP_OS, 0, 3) == 'WIN' ? 'C:\Program Files\PHP\magic' : '/usr/share/misc/file/magic.mgc'));
+        $ff = finfo_open(FILEINFO_MIME, settings()->get('finfo_magic_file', 'string', substr(PHP_OS, 0, 3) == 'WIN' ? 'C:\Program Files\PHP\magic' : '/usr/share/misc/file/magic.mgc'));
         $mime_type = finfo_file($ff, $location);
         finfo_close($ff);
       }
       else
       {
-        # Use the older, alternative.
+        // Use the older, alternative.
         $mime_type = mime_content_type($location);
       }
 
       header('Content-Type: '. $mime_type);
       header('Content-Length: '. filesize($location));
 
-      # Now to output.
+      // Now to output.
       $fp = fopen($location, 'rb');
 
       while(!feof($fp))
@@ -1956,10 +1961,33 @@ if(!function_exists('api_handle_resource'))
         flush();
       }
 
-      # Alright, we are now done!
+      // Alright, we are now done!
       fclose($fp);
       exit;
     }
   }
+}
+
+/*
+	Function: api
+
+	Returns the API object.
+
+	Parameters:
+		none
+
+	Returns:
+		object
+*/
+function api()
+{
+	// Is there no instance of the API? Let's make one!
+	if(!isset($GLOBALS['api']))
+	{
+		// By calling load_api()!
+		load_api();
+	}
+
+	return $GLOBALS['api'];
 }
 ?>

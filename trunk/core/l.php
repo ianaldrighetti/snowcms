@@ -45,18 +45,20 @@ if(!defined('IN_SNOW'))
 */
 function l($str)
 {
-  global $api;
-
-  # Any extra parameters?
+  // Any extra parameters?
   if(func_num_args() > 1)
+  {
     $args = func_get_args();
+  }
 
-  # CAN HAZ TRANSLATION?
-  $api->run_hooks('translate', array(&$str, &$args));
+  // CAN HAZ TRANSLATION?
+  api()->run_hooks('translate', array(&$str, &$args));
 
-  # Hmm, any warrant for calling sprintf?
-  if(func_num_args() > 1)
+  // Hmm, any warrant for calling sprintf?
+  if(is_array($args) && count($args) > 0)
+  {
     $str = call_user_func_array('sprintf', $args);
+  }
 
   return $str;
 }

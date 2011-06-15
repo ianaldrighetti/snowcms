@@ -32,49 +32,49 @@ if(!defined('IN_SNOW'))
 */
 class HTTP
 {
-  # Variable: referer
-  # The value of the HTTP Referer header, if none set, the header is not
-  # sent.
+  // Variable: referer
+  // The value of the HTTP Referer header, if none set, the header is not
+  // sent.
   private $referer;
 
-  # Variable: allow_redirect
-  # Whether or not you want to be redirected when a Location header is
-  # retrieved.
+  // Variable: allow_redirect
+  // Whether or not you want to be redirected when a Location header is
+  // retrieved.
   private $allow_redirect;
 
-  # Variable: max_redirects
-  # Specifies the maximum amount of times the Location header will be
-  # allowed to redirect  your request, if allow_redirect is true.
+  // Variable: max_redirects
+  // Specifies the maximum amount of times the Location header will be
+  // allowed to redirect  your request, if allow_redirect is true.
   private $max_redirects;
 
-  # Variable: include_header
-  # Whether or not you want to have the header included with the body of
-  # the retrieved file.
+  // Variable: include_header
+  // Whether or not you want to have the header included with the body of
+  // the retrieved file.
   private $include_header;
 
-  # Variable: post_data
-  # An array (key => value) containing POST data you want sent on every
-  # remote request. However, you can also set POST data at the time of
-  # making the request, this attribute is for POST data you want sent for
-  # every remote request.
+  // Variable: post_data
+  // An array (key => value) containing POST data you want sent on every
+  // remote request. However, you can also set POST data at the time of
+  // making the request, this attribute is for POST data you want sent for
+  // every remote request.
   private $post_data;
 
-  # Variable: http_version
-  # The HTTP version to use in requests, either 1.0 or 1.1.
+  // Variable: http_version
+  // The HTTP version to use in requests, either 1.0 or 1.1.
   private $http_version;
 
-  # Variable: port
-  # The port to connect through. If none specified 80 is used. If you set
-  # is_ssl to true then the port is automatically changed to 443.
+  // Variable: port
+  // The port to connect through. If none specified 80 is used. If you set
+  // is_ssl to true then the port is automatically changed to 443.
   private $port;
 
-  # Variable: timeout
-  # The maximum number of seconds that the downloading can take. If not
-  # specified, 5 seconds is assumed.
+  // Variable: timeout
+  // The maximum number of seconds that the downloading can take. If not
+  // specified, 5 seconds is assumed.
   private $timeout;
 
-  # Variable: user_agent
-  # The user agent to set the User-Agent HTTP header to.
+  // Variable: user_agent
+  // The user agent to set the User-Agent HTTP header to.
   private $user_agent;
 
   /*
@@ -89,8 +89,6 @@ class HTTP
   */
   public function __construct($port = null, $post_data = null, $user_agent = null, $http_version = null)
   {
-    global $settings;
-
     $this->set_referer(null);
     $this->set_allow_redirect(true);
     $this->set_max_redirects(5);
@@ -99,7 +97,7 @@ class HTTP
     $this->set_http_version(empty($http_version) || (string)$http_version != (string)(float)$http_version ? 1.1 : $http_version);
     $this->set_port(empty($port) || (string)$port != (string)(int)$port ? 80 : $port);
     $this->set_timeout(5);
-    $this->set_user_agent(empty($user_agent) || !is_string($user_agent) ? 'SnowCMS ' .($settings->get('show_version', 'bool', false) ? 'v'. $settings->get('version', 'string') : ''). '/PHP'. ($settings->get('show_version', 'bool', false) ? 'v'. PHP_VERSION : '') : $user_agent);
+    $this->set_user_agent(empty($user_agent) || !is_string($user_agent) ? 'SnowCMS ' .(settings()->get('show_version', 'bool', false) ? 'v'. settings()->get('version', 'string') : ''). '/PHP'. (settings()->get('show_version', 'bool', false) ? 'v'. PHP_VERSION : '') : $user_agent);
   }
 
   /*
@@ -444,7 +442,7 @@ class HTTP
   */
   public function ssl_supported()
   {
-    # OpenSSL available..?
+    // OpenSSL available..?
     return function_exists('openssl_seal');
   }
 
@@ -487,23 +485,23 @@ class HTTP
   */
   public function request($url, $post_data = array(), $resume_from = 0, $filename = null)
   {
-    global $api, $func;
+    global $func;
 
-    # Just incase...
+    // Just incase...
     $url = ltrim($url);
 
-    # In the embedded arrays, each array is to contain two things,
-    # a test index which is a callback that returns true or false.
-    # That bool the test callback tells request whether or not the
-    # remote request can be made via the callback index. The callback
-    # index contains, obviously, a callback to a function which
-    # makes the remote request. An array containing all the information
-    # (such as url, post_data, etc. etc.) to use in the request is passed.
-    # If filename isn't empty, an index in the passed array will contain
-    # the pointer to the file which you will write to via fwrite (the index
-    # being called 'fp'). The callback is to return false on failure, or
-    # true if all data was written to the file successfully OR the string
-    # containing the retrieved data if 'fp' was empty. Capeesh? :P
+    // In the embedded arrays, each array is to contain two things,
+    // a test index which is a callback that returns true or false.
+    // That bool the test callback tells request whether or not the
+    // remote request can be made via the callback index. The callback
+    // index contains, obviously, a callback to a function which
+    // makes the remote request. An array containing all the information
+    // (such as url, post_data, etc. etc.) to use in the request is passed.
+    // If filename isn't empty, an index in the passed array will contain
+    // the pointer to the file which you will write to via fwrite (the index
+    // being called 'fp'). The callback is to return false on failure, or
+    // true if all data was written to the file successfully OR the string
+    // containing the retrieved data if 'fp' was empty. Capeesh? :P
     $request_callbacks = array(
       array(
         'test' => create_function('', '
@@ -517,10 +515,10 @@ class HTTP
       ),
     );
 
-    # Well, want to add anything...?
-    $api->run_hooks('request_callbacks', array(&$request_callbacks));
+    // Well, want to add anything...?
+    api()->run_hooks('request_callbacks', array(&$request_callbacks));
 
-    # Find what will be handling our request :)
+    // Find what will be handling our request :)
     if(!empty($request_callbacks))
     {
       foreach($request_callbacks as $request_callback)
@@ -532,19 +530,19 @@ class HTTP
         }
       }
 
-      # Nothing found..? What a shame...
+      // Nothing found..? What a shame...
       if(empty($callback))
       {
         return false;
       }
 
-      # You wanted this written to a file?
+      // You wanted this written to a file?
       if(!empty($filename))
       {
         $fp = fopen($filename, $resume_from > 0 ? 'ab' : 'wb');
       }
 
-      # Well, we have gone as far as we have, no it is up to you ;)
+      // Well, we have gone as far as we have, no it is up to you ;)
       return $callback(array(
         'url' => ($func['substr']($func['strtolower']($url), 0, 8) == 'https://' && !$this->ssl_supported() ? 'http'. $func['substr']($func['strtolower']($url), 5, $func['strlen']($url)) : $url),
         'post_data' => array_merge($this->post_data, $post_data),
@@ -598,79 +596,79 @@ if(!function_exists('http_curl_request'))
       return false;
     }
 
-    # Get an instance of cURL going!
+    // Get an instance of cURL going!
     $ch = curl_init();
       curl_setopt($ch, CURLOPT_URL, $request['url']);
 
-      # Any special place we are resuming from?
+      // Any special place we are resuming from?
       curl_setopt($ch, CURLOPT_RESUME_FROM, $request['resume_from']);
 
-      # Whether or not we are following Location headers. Luckily cURL
-      # does this without needing us to do it, phew!
+      // Whether or not we are following Location headers. Luckily cURL
+      // does this without needing us to do it, phew!
       curl_setopt($ch, CURLOPT_FOLLOWLOCATION, $request['allow_redirect']);
 
-      # The maximum number of times the request can be redirected.
+      // The maximum number of times the request can be redirected.
       curl_setopt($ch, CURLOPT_MAXREDIRS, $request['max_redirects']);
 
-      # Want the header or not?
+      // Want the header or not?
       curl_setopt($ch, CURLOPT_HEADER, $request['include_header']);
 
-      # Which version of HTTP?
+      // Which version of HTTP?
       curl_setopt($ch, CURLOPT_HTTP_VERSION, $request['http_version'] == 1 ? CURL_HTTP_VERSION_1_0 : CURL_HTTP_VERSION_1_1);
 
-      # The port? Preferably 80 :P
+      // The port? Preferably 80 :P
       curl_setopt($ch, CURLOPT_PORT, $request['port']);
 
-      # How long should we wait?
+      // How long should we wait?
       curl_setopt($ch, CURLOPT_TIMEOUT, $request['timeout']);
 
-      # We want cURL to return the data to us, otherwise upon calling
-      # curl_exec, it is just automatically displayed to the user.
+      // We want cURL to return the data to us, otherwise upon calling
+      // curl_exec, it is just automatically displayed to the user.
       curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
       curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
 
-    # Any post data..?
+    // Any post data..?
     if(!empty($request['post_data']) && count($request['post_data']) > 0)
     {
       curl_setopt($ch, CURLOPT_POST, true);
       curl_setopt($ch, CURLOPT_POSTFIELDS, http_build_query($request['post_data']));
     }
 
-    # Any referer set?
+    // Any referer set?
     if(!empty($request['referer']))
     {
       curl_setopt($ch, CURLOPT_REFERER, $request['referer']);
     }
 
-    # How about a user agent?
+    // How about a user agent?
     if(!empty($request['user_agent']))
     {
       curl_setopt($ch, CURLOPT_USERAGENT, $request['user_agent']);
     }
 
-    # Execute the cURL session...
+    // Execute the cURL session...
     $data = curl_exec($ch);
 
-    # Get the error number... Just incase...
+    // Get the error number... Just incase...
     $curl_errno = curl_errno($ch);
     curl_close($ch);
 
-    # Did we get error #33? We can fix that :P
+    // Did we get error #33? We can fix that :P
     if($curl_errno == 33)
     {
       $new_request = $request;
       $new_request['resume_from'] = 0;
       $new_request['fp'] = null;
 
-      # Make the request again, with everything originally
-      # except the resume from and fp...
+      // Make the request again, with everything originally
+      // except the resume from and fp...
       $data = http_curl_request($new_request);
 
-      # Cheating..? Sure, but don't tell anyone xD
+      // Cheating..? Sure, but don't tell anyone xD
       $data = $func['substr']($data, $request['resume_from'], $func['strlen']($data));
     }
 
-    # Did you want this written to a file?
+    // Did you want this written to a file?
     if(!empty($request['fp']))
     {
       flock($request['fp'], LOCK_EX);
@@ -682,7 +680,7 @@ if(!function_exists('http_curl_request'))
     }
     else
     {
-      # You just wanted the data, so here you go...
+      // You just wanted the data, so here you go...
       return $data;
     }
   }
@@ -726,21 +724,21 @@ if(!function_exists('http_fsockopen_request'))
       return false;
     }
 
-    # Parse the URL... We need to for fsockopen.
+    // Parse the URL... We need to for fsockopen.
     $parsed = parse_url($request['url']);
 
     $fp = fsockopen(($parsed['scheme'] == 'https' ? 'ssl://' : ''). $parsed['host'], $request['port'], $errno, $errstr, $request['timeout']);
 
-    # Couldn't connect...?
+    // Couldn't connect...?
     if(empty($fp))
     {
       return false;
     }
 
-    # Make our request path, used in our request, of course!
+    // Make our request path, used in our request, of course!
     $request_path = (!empty($parsed['path']) ? $parsed['path'] : '/'). (!empty($parsed['query']) ? '?'. $parsed['query'] : '');
 
-    # No post data? Then GET!
+    // No post data? Then GET!
     if(empty($post_data))
     {
       $commands = "GET $request_path HTTP/". ($request['http_version'] == 1 ? '1.0' : '1.1'). "\r\n";
@@ -765,7 +763,7 @@ if(!function_exists('http_fsockopen_request'))
     }
     else
     {
-      # Turn the array into a string.
+      // Turn the array into a string.
       $post_data = http_build_query($request['post_data']);
 
       $commands = "POST $request_path HTTP/". ($request['http_version'] == 1 ? '1.0' : '1.1'). "\r\n";
@@ -792,10 +790,10 @@ if(!function_exists('http_fsockopen_request'))
       $commands .= $post_data. "\r\n\r\n";
     }
 
-    # Send those commands to the server.
+    // Send those commands to the server.
     fwrite($fp, $commands);
 
-    # Now we can start to get the data.
+    // Now we can start to get the data.
     $data = '';
     while(!feof($fp))
     {
@@ -804,13 +802,13 @@ if(!function_exists('http_fsockopen_request'))
 
     fclose($fp);
 
-    # Get the headers and data separated.
+    // Get the headers and data separated.
     list($full_raw_headers, $data) = explode("\r\n\r\n", $data, 2);
 
-    # Get the status.
+    // Get the status.
     list($http_status, $raw_headers) = explode("\r\n", $full_raw_headers, 2);
 
-    # Now read the headers into an easy to read array... :D
+    // Now read the headers into an easy to read array... :D
     $headers = array();
     $raw_headers = explode("\r\n", $raw_headers);
     if(count($raw_headers) > 0)
@@ -828,14 +826,14 @@ if(!function_exists('http_fsockopen_request'))
       }
     }
 
-    # So do we need to redirect, perhaps?
+    // So do we need to redirect, perhaps?
     if($func['strpos']($http_status, '302') !== false || $func['strpos']($http_status, '301') !== false || $func['strpos']($http_status, '307') !== false)
     {
       return !empty($headers['location']) ? http_fsockopen_request(array_merge($request, array('url' => $headers['location'], 'fp' => null)), $num_redirects + 1) : false;
     }
 
-    # Okay, well, if the transfer-encoding header is not set, then we can
-    # just stop here, if not, we need to do a little bit extra.
+    // Okay, well, if the transfer-encoding header is not set, then we can
+    // just stop here, if not, we need to do a little bit extra.
     if(!empty($headers['transfer-encoding']) && $func['strtolower']($headers['transfer-encoding']) == 'chunked')
     {
       list($hex, $data) = explode("\r\n", $data, 2);
@@ -853,7 +851,7 @@ if(!function_exists('http_fsockopen_request'))
 
     $data = $request['include_header'] ? implode("\r\n\r\n", array($full_raw_headers, $data)) : $data;
 
-    # Did you want this written to a file?
+    // Did you want this written to a file?
     if(!empty($request['fp']))
     {
       flock($request['fp'], LOCK_EX);
