@@ -5,19 +5,23 @@
 
 === 2.0 alpha ===
 
+_SnowCMS 2.0 alpha is now completed, and may be downloaded on our [http://code.google.com/p/snowcms/downloads/list Downloads page]._
+
 This version will have the basic functionality working, such as adding plugins (√), managing them (updating (√), disabling (√), activating (√), deleting (√)), updating the system (√), system settings (√), managing users (√), group permissions (√), theme management (installing (√), updating (√), deleting (√)) and the like.
 
-2.0 alpha will finally have a working installer.
+2.0 alpha will finally have a working installer (√).
 
 What won't be quite working: anything but MySQL.
 
 === 2.0 alpha 2 ===
 
+_SnowCMS 2.0 alpha 2 is currently a work-in-progress. You can monitor changes through the [http://code.google.com/p/snowcms/source/list commit changes list]._
+
 A lot will change in 2.0 alpha 2, however, little will change that would be noticed by the one using the system, these are all underlying (unless there are bug fixes).
 
 Currently in order to access $api, $member, etc. you must first _global_ them. This can be quite a pain, so these objects will be encapsulated in a function (api(), member(), etc.) which will return these objects, and can be used like you would its variable counterpart (member()->is_logged() instead of $member->is_logged()).
 
-Not only will the objects be accessed without needing to _global_ them, system variables such as $base_url, $core_dir, $plugin_dir and so forth will be converted to constants, such as baseurl, coredir, plugindir which means no globaling needed.
+Not only will the objects be accessed without needing to _global_ them, system variables such as $base_url, $core_dir, $plugin_dir and so forth will be converted to constants, such as baseurl, coredir, plugindir which means no globaling needed (√).
 
 There will be one other major change: the Theme class. Currently the source files have embedded HTML, which means if a plugin really wanted to they could not easily modify the HTML. In order to get past this both the Theme methods header and footer will be removed, and when the page is finally to be displayed a new method called render will be called, which will be passed a parameter called $template, this is a template file containing the HTML in between the overall header and footer of the page. Plugins can then hook into the render method and reroute the location of the template file to wherever they please.
 
