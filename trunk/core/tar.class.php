@@ -30,25 +30,25 @@ if(!defined('IN_SNOW'))
 */
 class Tar
 {
-  # Variable: filename
+  // Variable: filename
   private $filename;
 
-  # Variable: filemtime
+  // Variable: filemtime
   private $filemtime;
 
-  # Variable: fp
+  // Variable: fp
   private $fp;
 
-  # Variable: mode
+  // Variable: mode
   private $mode;
 
-  # Variable: files
+  // Variable: files
   private $files;
 
-  # Variable: gzipped
+  // Variable: gzipped
   private $is_gzipped;
 
-  # Variable: is_ustar
+  // Variable: is_ustar
   private $is_ustar;
 
   /*
@@ -90,7 +90,7 @@ class Tar
   */
   public function open($filename, $mode = 'r')
   {
-    # Already doing something right now? Sorry!
+    // Already doing something right now? Sorry!
     if(!empty($this->mode))
     {
       return false;
@@ -100,7 +100,7 @@ class Tar
 
     if($mode == 'r')
     {
-      # Open the file for reading, if it exists!
+      // Open the file for reading, if it exists!
       if(!file_exists($filename) || (file_exists($filename) && !is_file($filename)))
       {
         return false;
@@ -108,7 +108,7 @@ class Tar
 
       $filename = realpath($filename);
 
-      # Now open it for reading.
+      // Now open it for reading.
       $fp = fopen($filename, 'rb');
 
       if(empty($fp))
@@ -120,11 +120,11 @@ class Tar
       $this->fp = $fp;
       $this->mode = 'r';
 
-      # It's mine now ;) Sorta.
+      // It's mine now ;) Sorta.
       flock($this->fp, LOCK_SH);
 
-      # Check to see if it is gzipped, because if it is, that needs handling first!
-      # The first couple of bytes will tell us that...
+      // Check to see if it is gzipped, because if it is, that needs handling first!
+      // The first couple of bytes will tell us that...
       $magic = unpack('H2a/H2b', fread($this->fp, 2));
 
       if(strtolower($magic['a']. $magic['b']) == '1f8b')
@@ -135,15 +135,15 @@ class Tar
       {
         $this->is_gzipped = false;
 
-        # Since it isn't gzipped, we can check to see if it is a tar.
-        # There isn't a for sure way to tell if it is a tar, but we can try!
+        // Since it isn't gzipped, we can check to see if it is a tar.
+        // There isn't a for sure way to tell if it is a tar, but we can try!
         if(filesize($filename) < 512)
         {
-          # Tarballs headers are 512 bytes, if it isn't even that long, it can't be real!
+          // Tarballs headers are 512 bytes, if it isn't even that long, it can't be real!
           return false;
         }
 
-        # Move 512 bytes from the end, they should be all NUL-bytes.
+        // Move 512 bytes from the end, they should be all NUL-bytes.
         fseek($fp, -512, SEEK_END);
         if(fread($fp, 512) != str_repeat(chr(0), 512))
         {
@@ -153,17 +153,17 @@ class Tar
         fseek($fp, 0);
       }
 
-      # Not gzipped? We can check if it is UStar formatted!
+      // Not gzipped? We can check if it is UStar formatted!
       $this->check_format();
 
-      # Back to 0!
+      // Back to 0!
       fseek($this->fp, 0);
 
       return true;
     }
     elseif($mode == 'w')
     {
-      # Just try to open it.
+      // Just try to open it.
       $fp = fopen($filename, 'wb');
 
       if(empty($fp))
@@ -177,7 +177,7 @@ class Tar
       $this->files = array();
       $this->is_gzipped = false;
 
-      # This time it IS mine :P
+      // This time it IS mine :P
       flock($this->fp, LOCK_EX);
 
       return true;
@@ -207,7 +207,7 @@ class Tar
 
     fseek($this->fp, 257);
 
-    # At position 257, there should be ustar...
+    // At position 257, there should be ustar...
     $ustar = strtolower(trim(str_replace(chr(0), '', fread($this->fp, 6))));
     $this->is_ustar = $ustar == 'ustar';
 
@@ -236,24 +236,24 @@ class Tar
 
     if($this->mode == 'r')
     {
-      # Did we already do this? Make sure the file hasn't been modified since, either.
+      // Did we already do this? Make sure the file hasn't been modified since, either.
       if($this->filemtime !== null && $this->filemtime >= filemtime($this->filename) && !empty($this->files))
       {
         return $this->files;
       }
 
-      # Get the number of bytes in the file.
+      // Get the number of bytes in the file.
       fseek($this->fp, 0, SEEK_END);
       $bytes = ftell($this->fp);
       fseek($this->fp, 0);
 
-      # Some of the header data needs to be converted from octal to decimal.
+      // Some of the header data needs to be converted from octal to decimal.
       $octal = array('mode', 'uid', 'gid', 'size', 'mtime', 'chksum', 'type');
 
-      # And then the format of what we shall read!
+      // And then the format of what we shall read!
       $format = 'a100name/a8mode/a8uid/a8gid/a12size/a12mtime/a8chksum/a1type/a100linkname';
 
-      # Now, if the tar is in UStar format, we read a bit extra ;)
+      // Now, if the tar is in UStar format, we read a bit extra ;)
       if($this->is_ustar())
       {
         $format .= '/a6magic/a2version/a32uname/a32gname/a8devmajor/a8devminor/a155prefix';
@@ -264,7 +264,7 @@ class Tar
       {
         $file = unpack($format, ($header = fread($this->fp, 512)));
 
-        # Remove extra spacing, and convert octals to decimals!
+        // Remove extra spacing, and convert octals to decimals!
         foreach($file as $key => $value)
         {
           $file[$key] = trim($value);
@@ -275,27 +275,27 @@ class Tar
           }
         }
 
-        # Is it a file or directory?
+        // Is it a file or directory?
         $file['is_dir'] = substr($file['name'], -1, 1) == '/';
 
-        # Just save the position of the file, for later use!
+        // Just save the position of the file, for later use!
         $file['pos'] = ftell($this->fp);
 
-        # Ignore the file data, for now (The file size must be a multiple of 512)...
+        // Ignore the file data, for now (The file size must be a multiple of 512)...
         $seek = $file['size'] + (($file['size'] % 512) == 0 ? 0 : 512 - ($file['size'] % 512));
         fseek($this->fp, $seek, SEEK_CUR);
 
-        # Remove some bytes.
+        // Remove some bytes.
         $bytes -= 512 + $seek;
 
-        # File name not empty? Then it's good (For some reason, there are empty records added, at least 2!)
+        // File name not empty? Then it's good (For some reason, there are empty records added, at least 2!)
         if(!empty($file['name']))
         {
           $files[] = $file;
         }
       }
 
-      # Cache it, for a bit.
+      // Cache it, for a bit.
       $this->files = $files;
       $this->filemtime = filemtime($this->filename);
 
@@ -303,7 +303,7 @@ class Tar
     }
     elseif($this->mode == 'w')
     {
-      # Just return what we got!
+      // Just return what we got!
       return $this->files;
     }
 
@@ -335,47 +335,47 @@ class Tar
       return false;
     }
 
-    # Does the destination exist? Is it a directory?
+    // Does the destination exist? Is it a directory?
     if(!file_exists($destination))
     {
       $made = mkdir($destination, 0755, true);
 
       if(empty($made))
       {
-        # We tried, but it failed! :(
+        // We tried, but it failed! :(
         return false;
       }
     }
     elseif(file_exists($destination) && !is_dir($destination))
     {
-      # It isn't a directory, silly pants!
+      // It isn't a directory, silly pants!
       return false;
     }
 
-    # Turn it into an absolute path.
+    // Turn it into an absolute path.
     $destination = realpath($destination);
 
-    # The files method saves the position of the file, so yeah... Simple enough, really.
+    // The files method saves the position of the file, so yeah... Simple enough, really.
     $this->files();
 
-    # Before we get head over heels, are there even any files?
+    // Before we get head over heels, are there even any files?
     if(count($this->files))
     {
       foreach($this->files as $file)
       {
-        # Prepend the destination to the file name!
+        // Prepend the destination to the file name!
         $file['name'] = $destination. '/'. $file['name'];
 
-        # Safe mode on..?
+        // Safe mode on..?
         if(!empty($safe_mode))
         {
           $file['name'] = strtr($file['name'], array('../' => '', '/..' => ''));
         }
 
-        # Now, is it a directory, or a file?
+        // Now, is it a directory, or a file?
         if($file['is_dir'])
         {
-          # Make that directory, and we are done. If we need to.
+          // Make that directory, and we are done. If we need to.
           if(!file_exists($file['name']))
           {
             @mkdir($file['name'], 0755, true);
@@ -383,10 +383,10 @@ class Tar
         }
         else
         {
-          # It's a file, super fun!
+          // It's a file, super fun!
           fseek($this->fp, $file['pos']);
 
-          # Open the file that needs creation.
+          // Open the file that needs creation.
           $fp = @fopen($file['name'], 'wb');
 
           if(empty($fp))
@@ -394,14 +394,14 @@ class Tar
             continue;
           }
 
-          # Small enough to do it quickly?
+          // Small enough to do it quickly?
           if($file['size'] <= 8192 && $file['size'] > 0)
           {
             fwrite($fp, fread($this->fp, $file['size']));
           }
           elseif($file['size'] > 8192)
           {
-            # Nope...
+            // Nope...
             $left = $file['size'];
             while($left > 0)
             {
@@ -443,51 +443,51 @@ class Tar
       return false;
     }
 
-    # We already checked the magic number (which is how the gzipped attribute was set to true),
-    # next check the compression method, which should be 8! Get out the flag while we are at it too.
+    // We already checked the magic number (which is how the gzipped attribute was set to true),
+    // next check the compression method, which should be 8! Get out the flag while we are at it too.
     fseek($this->fp, 2);
     $info = unpack('Ccm/Cflg', fread($this->fp, 2));
 
-    # Compression method not 8? Then I'm not up to the task! (The only method right now is 8 anyways >.>)
+    // Compression method not 8? Then I'm not up to the task! (The only method right now is 8 anyways >.>)
     if($info['cm'] != 8)
     {
       return false;
     }
 
-    # Skip past the modified time, XFL and OS, I don't really care about that :P
+    // Skip past the modified time, XFL and OS, I don't really care about that :P
     fseek($this->fp, 6, SEEK_CUR);
 
-    # File name? Don't want it! But gotta get past it.
-    if($info['flg'] & 8 || $info['flg'] & 3) # Should be 3, 7z seems to do 8? o.O
+    // File name? Don't want it! But gotta get past it.
+    if($info['flg'] & 8 || $info['flg'] & 3) // Should be 3, 7z seems to do 8? o.O
     {
       while(fread($this->fp, 1) != chr(0))
       {
-        # Just keep going!
+        // Just keep going!
         continue;
       }
     }
 
-    # Comment, perhaps?
+    // Comment, perhaps?
     if($info['flg'] & 4)
     {
       while(fread($this->fp, 1) != chr(0))
       {
-        # Just keep going, again!
+        // Just keep going, again!
         continue;
       }
     }
 
-    # CRC16 stuff?
+    // CRC16 stuff?
     if($info['flg'] & 1)
     {
-      # Skip past the next 2 bytes.
+      // Skip past the next 2 bytes.
       fseek($this->fp, 2, SEEK_CUR);
     }
 
-    # Now we need to store the data to inflate it!
+    // Now we need to store the data to inflate it!
     $tar = '';
 
-    # How many bytes do we need to read?
+    // How many bytes do we need to read?
     $cur_pos = ftell($this->fp);
     fseek($this->fp, 0, SEEK_END);
     $bytes = ftell($this->fp);
@@ -499,10 +499,10 @@ class Tar
       $bytes -= $bytes >= 8192 ? 8192 : $bytes;
     }
 
-    # Ungzip it now, then we can write it to the current file!!!
+    // Ungzip it now, then we can write it to the current file!!!
     $tar = gzinflate($tar);
 
-    # Can't write to a file that is opened in read only, can we?
+    // Can't write to a file that is opened in read only, can we?
     flock($this->fp, LOCK_UN);
     fclose($this->fp);
 
@@ -512,14 +512,14 @@ class Tar
     flock($this->fp, LOCK_UN);
     fclose($this->fp);
 
-    # Now open it in read only mode :P
+    // Now open it in read only mode :P
     $this->fp = fopen($this->filename, 'rb');
     flock($this->fp, LOCK_SH);
 
-    # All done! And it is no longer gzipped! :)
+    // All done! And it is no longer gzipped! :)
     $this->is_gzipped = false;
 
-    # Oh! And check to see the tarballs format, just incase!
+    // Oh! And check to see the tarballs format, just incase!
     $this->check_format();
 
     return true;
@@ -549,16 +549,16 @@ class Tar
   */
   public function add_file($filename, $new_filename = null)
   {
-    # Check the usual, and whether or not the file exists.
+    // Check the usual, and whether or not the file exists.
     if(empty($this->mode) || $this->mode != 'w' || !file_exists($filename) || !is_file($filename))
     {
       return false;
     }
 
-    # Resolve the absolute file path.
+    // Resolve the absolute file path.
     $filename = realpath($filename);
 
-    # No new filename supplied? Alright, I'll try my best!
+    // No new filename supplied? Alright, I'll try my best!
     if(empty($new_filename) && substr($filename, 0, strlen(getcwd())) == getcwd())
     {
       $new_filename = substr($filename, strlen(getcwd()) + 1, strlen($filename));
@@ -568,16 +568,16 @@ class Tar
       return false;
     }
 
-    # Is the new file name a directory? Nuh uh!
+    // Is the new file name a directory? Nuh uh!
     if(substr($new_filename, -1, 1) == '/')
     {
       return false;
     }
 
-    # Remove any ./ or ../
+    // Remove any ./ or ../
     $new_filename = strtr($new_filename, array('../' => '', '/..' => ''));
 
-    # Add it to the files array, and thats it, for now.
+    // Add it to the files array, and thats it, for now.
     $this->files[$new_filename] = array(
                                     'name' => $filename,
                                     'stat' => stat($filename),
@@ -604,16 +604,16 @@ class Tar
   */
   public function add_from_string($filename, $file)
   {
-    # Check the usual and whether or not you are trying to make a directory ;)
+    // Check the usual and whether or not you are trying to make a directory ;)
     if(empty($this->mode) || $this->mode != 'w' || empty($filename) || substr($filename, -1, 1) == '/')
     {
       return false;
     }
 
-    # No ../ ;)
+    // No ../ ;)
     $filename = strtr($filename, array('../' => '', '/..' => ''));
 
-    # Simply add the file data.
+    // Simply add the file data.
     $this->files[$filename] = array(
                                 'data' => $file,
                                 'stat' => array(
@@ -657,7 +657,7 @@ class Tar
       return false;
     }
 
-    # Don't have a / at the end, it is needed, but I can do it :P
+    // Don't have a / at the end, it is needed, but I can do it :P
     if(substr($dirname, -1, 1) != '/')
     {
       $dirname .= '/';
@@ -665,7 +665,7 @@ class Tar
 
     $dirname = strtr($dirname, array('../' => '', '/..' => ''));
 
-    # Add it, done!
+    // Add it, done!
     $this->files[$dirname] = array(
                                'stat' => array(
                                            'dev' => 0,
@@ -738,7 +738,7 @@ class Tar
 
     if(count($this->files) > 0)
     {
-      # Used later :P
+      // Used later :P
       $format = array(
                   'mode' => array(6, ' '. chr(0)),
                   'uid' => array(6, ' '. chr(0)),
@@ -749,67 +749,67 @@ class Tar
 
       foreach($this->files as $filename => $file)
       {
-        # Some special stuff needs to be done to certain things ;)
+        // Some special stuff needs to be done to certain things ;)
         foreach($format as $key => $f)
         {
           $file['stat'][$key] = str_pad(decoct($file['stat'][$key]), $f[0], ' ', STR_PAD_LEFT). $f[1];
         }
 
-        # Make the generic header...
+        // Make the generic header...
         $header = str_pad($filename, 100, chr(0)). $file['stat']['mode']. $file['stat']['uid']. $file['stat']['gid']. $file['stat']['size']. $file['stat']['mtime']. '        '. (!isset($file['data']) && !isset($file['name']) ? 5 : 0). str_repeat(chr(0), 100);
 
-        # Calculate the headers checksum by converting it to their decimal value...
+        // Calculate the headers checksum by converting it to their decimal value...
         $checksum = 0;
         for($i = 0; $i < 257; $i++)
           $checksum += ord($header[$i]);
         $checksum = decoct($checksum);
 
-        # Make it again, but with extra padding ;)
+        // Make it again, but with extra padding ;)
         $header = str_pad($filename, 100, chr(0)). $file['stat']['mode']. $file['stat']['uid']. $file['stat']['gid']. $file['stat']['size']. $file['stat']['mtime']. str_pad($checksum, 6, ' ', STR_PAD_LEFT). ' '. chr(0). (!isset($file['data']) && !isset($file['name']) ? 5 : 0). str_repeat(chr(0), 355);
 
-        # Write the header to the file now.
+        // Write the header to the file now.
         fwrite($this->fp, $header);
 
-        # Now for the file data...
+        // Now for the file data...
         $data = isset($file['data']) ? $file['data'] : (isset($file['name']) ? file_get_contents($file['name']) : '');
 
-        # We may need to append NUL bytes in order to make it take up multiples of 512 bytes.
+        // We may need to append NUL bytes in order to make it take up multiples of 512 bytes.
         $length = octdec($file['stat']['size']);
         if($length > 0 && ($length / (double)512) != 0)
         {
           $data .= str_repeat(chr(0), 512 - ($length % 512));
         }
 
-        # And the data!
+        // And the data!
         fwrite($this->fp, $data);
       }
     }
 
-    # The end of the tar contains at least 2 512 byte blocks of NUL's... Weird.
+    // The end of the tar contains at least 2 512 byte blocks of NUL's... Weird.
     fwrite($this->fp, str_repeat(chr(0), 1024));
 
-    # Did you want this to be gzipped..?
+    // Did you want this to be gzipped..?
     if($this->is_gzipped())
     {
-      # Save the file name, close everything, then get the files contents.
+      // Save the file name, close everything, then get the files contents.
       $filename = $this->filename;
       $this->close();
       $file = file_get_contents($filename);
 
-      # Open up the file, in writing mode, of course!
+      // Open up the file, in writing mode, of course!
       $fp = fopen($filename, 'wb');
 
-      # MINE!
+      // MINE!
       flock($fp, LOCK_EX);
 
-      # Just one second! If you already added a .gz to the end of the file, let's just remove it
-      # for the sake of the "original" name ;)
+      // Just one second! If you already added a .gz to the end of the file, let's just remove it
+      // for the sake of the "original" name ;)
       if(substr($filename, -3, 3) == '.gz')
       {
         $filename = substr($filename, 0, strlen($filename) - 3);
       }
 
-      # Now write it :P
+      // Now write it :P
       fwrite($fp, chr(31). chr(139). chr(8). chr(8). pack('V', filemtime($filename)). chr(0). chr(0). basename($filename). chr(0). gzdeflate($file, 9). pack('VV', crc32($file), strlen($file)));
       flock($fp, LOCK_UN);
       fclose($fp);

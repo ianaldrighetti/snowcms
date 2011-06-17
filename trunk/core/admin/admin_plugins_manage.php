@@ -22,7 +22,7 @@ if(!defined('IN_SNOW'))
   die('Nice try...');
 }
 
-# Title: Control Panel - Plugins - Manage
+// Title: Control Panel - Plugins - Manage
 
 if(!function_exists('admin_plugins_manage'))
 {
@@ -42,44 +42,42 @@ if(!function_exists('admin_plugins_manage'))
   */
   function admin_plugins_manage()
   {
-    global $api, $member, $settings, $theme;
+    api()->run_hooks('admin_plugins_manage');
 
-    $api->run_hooks('admin_plugins_manage');
-
-    # Can you manage plugin settings?
-    if(!$member->can('manage_plugins'))
+    // Can you manage plugin settings?
+    if(!member()->can('manage_plugins'))
     {
-      # That's what I thought!
+      // That's what I thought!
       admin_access_denied();
     }
 
-    # Generate the table which shows all the plugin information :-)
+    // Generate the table which shows all the plugin information :-)
     admin_plugins_manage_generate_table();
-    $table = $api->load_class('Table');
+    $table = api()->load_class('Table');
 
-    # Activating, deactivating or deleting a plugin..?
+    // Activating, deactivating or deleting a plugin..?
     if(!empty($_GET['activate']) || !empty($_GET['deactivate']) || !empty($_GET['delete']))
     {
-      # Gotta make sure it's you ;-)
+      // Gotta make sure it's you ;-)
       verify_request('get');
 
-      # Just use the function used in the table.
+      // Just use the function used in the table.
       admin_plugins_manage_table_handle(!empty($_GET['activate']) ? 'activate' : (!empty($_GET['deactivate']) ? 'deactivate' : 'delete'), array(!empty($_GET['activate']) ? $_GET['activate'] : (!empty($_GET['deactivate']) ? $_GET['deactivate'] : $_GET['delete'])));
     }
 
-    $theme->set_current_area('plugins_manage');
+    theme()->set_current_area('plugins_manage');
 
-    $theme->set_title(l('Manage plugins'));
+    theme()->set_title(l('Manage plugins'));
 
-    $theme->header();
+    theme()->header();
 
     echo '
-  <h1><img src="', $theme->url(), '/plugins_manage-small.png" alt="" /> ', l('Manage plugins'), '</h1>
+  <h1><img src="', theme()->url(), '/plugins_manage-small.png" alt="" /> ', l('Manage plugins'), '</h1>
   <p>', l('Manage your current plugins.'), '</p>';
 
     $table->show('manage_plugins_table');
 
-    $theme->footer();
+    theme()->footer();
   }
 }
 
@@ -101,8 +99,6 @@ if(!function_exists('admin_plugins_manage_generate_table'))
   */
   function admin_plugins_manage_generate_table()
   {
-    global $api;
-
     // Only display plugins for directories that exist.
     $plugin_dirs = scandir(plugindir);
 
@@ -115,9 +111,9 @@ if(!function_exists('admin_plugins_manage_generate_table'))
       }
     }
 
-    $table = $api->load_class('Table');
+    $table = api()->load_class('Table');
 
-    # Add our table.
+    // Add our table.
     $table->add('manage_plugins_table', array(
                                           'base_url' => baseurl. '/index.php?action=admin&amp;sa=plugins_manage',
                                           'db_query' => '
@@ -144,11 +140,9 @@ if(!function_exists('admin_plugins_manage_generate_table'))
                                                          'label' => l('Plugin'),
                                                          'title' => l('Plugin name'),
                                                          'function' => create_function('$row', '
-                                                                         global $member;
-
                                                                          $plugin_info = plugin_load(plugindir. \'/\'. $row[\'directory\']);
 
-                                                                         return \'<p style="font-weight: bold; margin-bottom: 10px;">\'. $plugin_info[\'name\']. \'</p><p>\'. (!empty($row[\'is_activated\']) ? \'<a href="\'. baseurl. \'/index.php?action=admin&amp;sa=plugins_manage&amp;deactivate=\'. urlencode($row[\'dependency_name\']). \'&amp;sid=\'. $member->session_id(). \'" title="\'. l(\'Deactivate this plugin\'). \'">\'. l(\'Deactivate\'). \'</a>\' : \'<a href="\'. baseurl. \'/index.php?action=admin&amp;sa=plugins_manage&amp;activate=\'. urlencode($row[\'dependency_name\']). \'&amp;sid=\'. $member->session_id(). \'" title="\'. l(\'Activate this plugin\'). \'">\'. l(\'Activate\'). \'</a> | <a href="\'. baseurl. \'/index.php?action=admin&amp;sa=plugins_manage&amp;delete=\'. urlencode($row[\'dependency_name\']). \'&amp;sid=\'. $member->session_id(). \'" title="\'. l(\'Delete this plugin\'). \'" onclick="return confirm(\\\'\'. l(\'Are you sure you want to delete this plugin?\'). \'\\\');">\'. l(\'Delete\'). \'</a>\'). \'</p>\';'),
+                                                                         return \'<p style="font-weight: bold; margin-bottom: 10px;">\'. $plugin_info[\'name\']. \'</p><p>\'. (!empty($row[\'is_activated\']) ? \'<a href="\'. baseurl. \'/index.php?action=admin&amp;sa=plugins_manage&amp;deactivate=\'. urlencode($row[\'dependency_name\']). \'&amp;sid=\'. member()->session_id(). \'" title="\'. l(\'Deactivate this plugin\'). \'">\'. l(\'Deactivate\'). \'</a>\' : \'<a href="\'. baseurl. \'/index.php?action=admin&amp;sa=plugins_manage&amp;activate=\'. urlencode($row[\'dependency_name\']). \'&amp;sid=\'. member()->session_id(). \'" title="\'. l(\'Activate this plugin\'). \'">\'. l(\'Activate\'). \'</a> | <a href="\'. baseurl. \'/index.php?action=admin&amp;sa=plugins_manage&amp;delete=\'. urlencode($row[\'dependency_name\']). \'&amp;sid=\'. member()->session_id(). \'" title="\'. l(\'Delete this plugin\'). \'" onclick="return confirm(\\\'\'. l(\'Are you sure you want to delete this plugin?\'). \'\\\');">\'. l(\'Delete\'). \'</a>\'). \'</p>\';'),
                                                          'width' => '20%',
                                                        ));
 
@@ -157,11 +151,9 @@ if(!function_exists('admin_plugins_manage_generate_table'))
                                                                  'title' => l('Plugin information'),
                                                                  'sortable' => true,
                                                                  'function' => create_function('$row', '
-                                                                                 global $member;
-
                                                                                  $plugin_info = plugin_load(plugindir. \'/\'. $row[\'directory\']);
 
-                                                                                 # Let\'s get some extra information displayed too.
+                                                                                 // Let\'s get some extra information displayed too.
                                                                                  $plugin_data = array();
 
                                                                                  if(!empty($plugin_info[\'version\']))
@@ -195,7 +187,7 @@ if(!function_exists('admin_plugins_manage_generate_table'))
 
                                                                                  if(!empty($row[\'available_update\']))
                                                                                  {
-                                                                                   $plugin_data[] = \'<span style="font-weight: bold;">\'. l(\'v%s of this plugin is available! <a href="%s/index.php?action=admin&amp;sa=plugins_manage&amp;update=%s&amp;version=%s&amp;sid=%s">Update now</a>.\', $row[\'available_update\'], baseurl, urlencode($row[\'dependency_name\']), urlencode($row[\'available_update\']), $member->session_id()). \'</span>\';
+                                                                                   $plugin_data[] = \'<span style="font-weight: bold;">\'. l(\'v%s of this plugin is available! <a href="%s/index.php?action=admin&amp;sa=plugins_manage&amp;update=%s&amp;version=%s&amp;sid=%s">Update now</a>.\', $row[\'available_update\'], baseurl, urlencode($row[\'dependency_name\']), urlencode($row[\'available_update\']), member()->session_id()). \'</span>\';
                                                                                  }
 
                                                                                  return \'<p style="margin-bottom: 10px;">\'. $plugin_info[\'description\']. \'</p><p>\'. implode(\' | \', $plugin_data). \'</p>\';'),
@@ -224,16 +216,14 @@ if(!function_exists('admin_plugins_manage_table_handle'))
   */
   function admin_plugins_manage_table_handle($action, $selected)
   {
-    global $api, $db;
-
-    # Make sure the supplied plugins are legit... Along with that, load their information.
+    // Make sure the supplied plugins are legit... Along with that, load their information.
     $plugins = array();
 
     if(count($selected) > 0)
     {
       foreach($selected as $plugin_id)
       {
-        # This will check to see if it is a valid plugin.
+        // This will check to see if it is a valid plugin.
         if($plugin_info = plugin_load($plugin_id, false))
         {
           $plugins[$plugin_id] = $plugin_info;
@@ -241,7 +231,7 @@ if(!function_exists('admin_plugins_manage_table_handle'))
       }
     }
 
-    # No plugins? No doing anything then...
+    // No plugins? No doing anything then...
     if(count($plugins) == 0)
     {
       redirect(baseurl. '/index.php?action=admin&sa=plugins_manage');
@@ -249,8 +239,8 @@ if(!function_exists('admin_plugins_manage_table_handle'))
 
     if($action == 'activate')
     {
-      # Activating a plugin, are we? Alright. Simple enough.
-      $db->query('
+      // Activating a plugin, are we? Alright. Simple enough.
+      db()->query('
         UPDATE {db->prefix}plugins
         SET is_activated = 1, runtime_error = 0
         WHERE dependency_name IN({array_string:plugin_ids})',
@@ -260,8 +250,8 @@ if(!function_exists('admin_plugins_manage_table_handle'))
     }
     elseif($action == 'deactivate')
     {
-      # Looks like we are deactivating a plugin.
-      $db->query('
+      // Looks like we are deactivating a plugin.
+      db()->query('
         UPDATE {db->prefix}plugins
         SET is_activated = 0
         WHERE dependency_name IN({array_string:plugin_ids})',
@@ -271,23 +261,23 @@ if(!function_exists('admin_plugins_manage_table_handle'))
     }
     elseif($action == 'delete')
     {
-      # Deleting, huh? Well... Delete it from the database then.
-      $db->query('
+      // Deleting, huh? Well... Delete it from the database then.
+      db()->query('
         DELETE FROM {db->prefix}plugins
         WHERE dependency_name IN({array_string:plugin_ids})',
         array(
           'plugin_ids' => array_keys($plugins),
         ), 'admin_plugins_manage_delete_query');
 
-      # Remove it from the plugins directory too.
+      // Remove it from the plugins directory too.
       foreach($plugins as $plugin_info)
       {
-        # Recursive unlink, please!
+        // Recursive unlink, please!
         recursive_unlink($plugin_info['path']);
       }
     }
 
-    # Redirect!
+    // Redirect!
     redirect(baseurl. '/index.php?action=admin&sa=plugins_manage');
   }
 }
@@ -310,18 +300,16 @@ if(!function_exists('admin_plugins_update'))
   */
   function admin_plugins_update()
   {
-    global $api, $db, $member, $theme;
-
-    $api->run_hooks('admin_plugins_update');
+    api()->run_hooks('admin_plugins_update');
 
     // Can you add plugins?
-    if(!$member->can('manage_plugins'))
+    if(!member()->can('manage_plugins'))
     {
       // That's what I thought!
       admin_access_denied();
     }
 
-    $theme->set_current_area('plugins_manage');
+    theme()->set_current_area('plugins_manage');
 
     // Check the session id.
     verify_request('get');
@@ -331,33 +319,33 @@ if(!function_exists('admin_plugins_update'))
     $plugin_info = plugin_load($guid, false);
     $version = basename($_GET['version']);
 
-    # So does it exist? Is it in the plugin directory? It better be!
+    // So does it exist? Is it in the plugin directory? It better be!
     if(empty($plugin_info))
     {
-      $theme->set_title(l('An error has occurred'));
+      theme()->set_title(l('An error has occurred'));
 
-      $theme->header();
+      theme()->header();
 
     echo '
-  <h1><img src="', $theme->url(), '/plugins_manage-small.png" alt="" /> ', l('An error has occurred'), '</h1>
+  <h1><img src="', theme()->url(), '/plugins_manage-small.png" alt="" /> ', l('An error has occurred'), '</h1>
   <p>', l('Sorry, but the plugin you are wanting to update does not exist.'), '</p>';
 
-      $theme->footer();
+      theme()->footer();
     }
     else
     {
-      $theme->set_title(l('Updating plugin'));
+      theme()->set_title(l('Updating plugin'));
 
-      $theme->header();
+      theme()->header();
 
       echo '
-  <h1><img src="', $theme->url(), '/plugins_manage-small.png" alt="" /> ', l('Updating plugin'), '</h1>
+  <h1><img src="', theme()->url(), '/plugins_manage-small.png" alt="" /> ', l('Updating plugin'), '</h1>
   <p>', l('Please wait while we are updating the %s plugin.', $plugin_info['name']), '</p>
 
   <h3>', l('Downloading update'), '</h3>';
 
       // The HTTP class is always useful.
-      $http = $api->load_class('HTTP');
+      $http = api()->load_class('HTTP');
 
       // Hmm, make a POST request to the plugins GUID, with the version we
       // want... Be sure to store it in a file for later use!
@@ -386,7 +374,7 @@ if(!function_exists('admin_plugins_update'))
 
         // So, shall we proceed?
         $update_proceed = isset($_GET['proceed']) || $status == 'approved';
-        $api->run_hooks('plugin_install_proceed', array(&$update_proceed, $status));
+        api()->run_hooks('plugin_install_proceed', array(&$update_proceed, $status));
 
         echo '
   <p style="color: ', $response['color'], '">', $response['message'], '</p>';
@@ -398,7 +386,7 @@ if(!function_exists('admin_plugins_update'))
           echo '
   <h3>', l('Extracting plugin'), '</h3>';
 
-          $update = $api->load_class('Update');
+          $update = api()->load_class('Update');
 
           // We need to make the temporary directory.
           if(!file_exists($plugin_info['path']. '/update~/') && !@mkdir($plugin_info['path']. '/update~', 0755, true))
@@ -445,7 +433,7 @@ if(!function_exists('admin_plugins_update'))
             // We will do this just incase the GUID changed, and clear any
             // possible runtime error, oh, and set the available update
             // column to empty.
-            $db->query('
+            db()->query('
               UPDATE {db->prefix}plugins
               SET dependency_name = {string:updated_guid}, runtime_error = 0, available_update = \'\'
               WHERE dependency_name = {string:current_guid}
@@ -493,13 +481,13 @@ if(!function_exists('admin_plugins_update'))
     <input type="hidden" name="sa" value="plugins_manage" />
     <input type="hidden" name="update" value="', htmlchars($guid), '" />
     <input type="hidden" name="version" value="', urlencode($_GET['version']), '" />
-    <input type="hidden" name="sid" value="', $member->session_id(), '" />
+    <input type="hidden" name="sid" value="', member()->session_id(), '" />
     <input type="hidden" name="proceed" value="true" />
   </form>';
         }
       }
 
-      $theme->footer();
+      theme()->footer();
     }
   }
 }
@@ -524,13 +512,11 @@ if(!function_exists('admin_plugins_check_updates'))
   */
   function admin_plugins_check_updates($guids = array())
   {
-    global $api, $db, $settings;
-
     // No GUIDs supplied?
     if(count($guids) == 0)
     {
       // Load some up! Unless we recently checked.
-      if($settings->get('last_plugin_update_check', 'int', 0) + 3600 < time_utc())
+      if(settings()->get('last_plugin_update_check', 'int', 0) + 3600 < time_utc())
       {
         // We can use the <plugin_list> function to get all the plugins.
         $plugins = plugin_list();
@@ -542,7 +528,7 @@ if(!function_exists('admin_plugins_check_updates'))
         }
 
         // Woops! Don't forget to set the last time we checked for updates!
-        $settings->set('last_plugin_update_check', time_utc(), 'int');
+        settings()->set('last_plugin_update_check', time_utc(), 'int');
       }
     }
 
@@ -550,7 +536,7 @@ if(!function_exists('admin_plugins_check_updates'))
     if(count($guids) > 0)
     {
       // The HTTP class will be mighty useful!
-      $http = $api->load_class('HTTP');
+      $http = api()->load_class('HTTP');
 
       foreach($guids as $guid)
       {
@@ -586,7 +572,7 @@ if(!function_exists('admin_plugins_check_updates'))
         // Even if there isn't a newer version, still update the plugins
         // information. This is just incase, for some odd reason, an update
         // has been taken down.
-        $db->query('
+        db()->query('
           UPDATE {db->prefix}plugins
           SET available_update = {string:version_available}
           WHERE dependency_name = {string:dependency_name}

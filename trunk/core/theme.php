@@ -22,7 +22,7 @@ if(!defined('IN_SNOW'))
   die('Nice try...');
 }
 
-# Title: Theme information
+// Title: Theme information
 
 /*
   Function: theme_load
@@ -62,26 +62,24 @@ if(!defined('IN_SNOW'))
 */
 function theme_load($path)
 {
-  global $api;
-
-  # Doesn't exist? Then we can't load it!
+  // Doesn't exist? Then we can't load it!
   if(!file_exists($path) || !is_dir($path) || !file_exists($path. '/implemented_theme.class.php') || !file_exists($path. '/theme.xml'))
   {
     return false;
   }
 
-  # We need the XML class to do this.
-  $xml = $api->load_class('XML');
+  // We need the XML class to do this.
+  $xml = api()->load_class('XML');
 
-  # Parse the XML file now.
+  // Parse the XML file now.
   $data = $xml->parse($path. '/theme.xml');
 
   if(count($data) > 0)
   {
-    # Keep track of whether or not we are in the author tag.
+    // Keep track of whether or not we are in the author tag.
     $in_author = false;
 
-    # Keep track of the theme info.
+    // Keep track of the theme info.
     $theme_info = array(
                     'author' => null,
                     'website' => null,
@@ -93,7 +91,7 @@ function theme_load($path)
                   );
     foreach($data as $item)
     {
-      # Keep track of where we are.
+      // Keep track of where we are.
       if($item['tag'] == 'author' && $item['type'] == 'open')
       {
         $in_author = true;
@@ -103,7 +101,7 @@ function theme_load($path)
         $in_author = false;
       }
 
-      # Saving something?
+      // Saving something?
       if($item['tag'] == 'name' && $in_author)
       {
         $theme_info['author'] = $item['value'];
@@ -118,7 +116,7 @@ function theme_load($path)
       }
     }
 
-    # No author? No name? No way!
+    // No author? No name? No way!
     if(empty($theme_info['author']) || empty($theme_info['name']))
     {
       return false;
@@ -126,15 +124,15 @@ function theme_load($path)
   }
   else
   {
-    # Woops, that's not right!
+    // Woops, that's not right!
     return false;
   }
 
-  # Add the path, just incase :P
+  // Add the path, just incase :P
   $theme_info['path'] = realpath($path);
   $theme_info['directory'] = $theme_info['path'];
 
-  # Alright, here ya go.
+  // Alright, here ya go.
   return $theme_info;
 }
 
@@ -156,33 +154,33 @@ function theme_load($path)
 */
 function theme_list()
 {
-  # Doesn't exist?!
+  // Doesn't exist?!
   if(!file_exists(themedir) || !is_dir(themedir))
   {
     return false;
   }
 
-  # Get all the directories.
+  // Get all the directories.
   $ls = scandir(themedir);
 
   $list = array();
   foreach($ls as $path)
   {
-    # Skip ., .. and .svn.
+    // Skip ., .. and .svn.
     if(in_array($path, array('.', '..', '.svn')))
     {
       continue;
     }
 
-    # Only look in directories, they are themes if they have the
-    # implemented_theme.class.php file.
+    // Only look in directories, they are themes if they have the
+    // implemented_theme.class.php file.
     if(is_dir(themedir. '/'. $path) && file_exists(themedir. '/'. $path. '/implemented_theme.class.php') && file_exists(themedir. '/'. $path. '/theme.xml'))
     {
       $list[] = realpath(themedir. '/'. $path);
     }
   }
 
-  # Whether or not there were any themes found, return the array.
+  // Whether or not there were any themes found, return the array.
   return $list;
 }
 ?>

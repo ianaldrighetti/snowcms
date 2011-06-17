@@ -68,59 +68,57 @@ if(!function_exists('timeformat'))
 {
   function timeformat($timestamp = 0, $format = 'datetime', $today_yesterday = true)
   {
-    global $api, $member, $settings;
-
     $return = null;
-    $api->run_hooks('timeformat', array(&$return, $timestamp, $format, $today_yesterday));
+    api()->run_hooks('timeformat', array(&$return, $timestamp, $format, $today_yesterday));
 
-    # Did the hooks do anything?
+    // Did the hooks do anything?
     if(!empty($return))
     {
       return $return;
     }
 
-    # Is the format acceptable?
+    // Is the format acceptable?
     $format = strtolower($format);
     if(!in_array($format, array('datetime', 'date', 'time')))
     {
       return false;
     }
 
-    # No timestamp specified? We will use the current time then!
+    // No timestamp specified? We will use the current time then!
     if(empty($timestamp))
     {
       $timestamp = time_utc();
     }
 
-    # Want to change the time, perhaps? Timezone, maybe? :P
-    $timestamp = $api->apply_filters('timeformat_timestamp', $timestamp);
+    // Want to change the time, perhaps? Timezone, maybe? :P
+    $timestamp = api()->apply_filters('timeformat_timestamp', $timestamp);
 
-    # Do you want that fancy Today at or Yesterday at stuff? : )
+    // Do you want that fancy Today at or Yesterday at stuff? : )
     if(!empty($today_yesterday))
     {
-      # We need to get the current time.
-      $cur_time_time = $api->apply_filters('timeformat_timestamp', time_utc());
+      // We need to get the current time.
+      $cur_time_time = api()->apply_filters('timeformat_timestamp', time_utc());
 
-      # Get useful information.
+      // Get useful information.
       $cur_time = getdate($cur_time_time);
       $supplied = getdate($timestamp);
 
-      # Is it today?
+      // Is it today?
       $is_today = $supplied['yday'] == $cur_time_time['yday'] && $supplied['year'] == $cur_time_time['year'];
 
-      # How about yesterday?
+      // How about yesterday?
       $is_yesterday = ($supplied['yday'] == $cur_time['yday'] - 1 && $supplied['year'] == $cur_time_time['year']) || ($cur_time['yday'] == 0 && $supplied['year'] == $cur_time_time['year'] - 1 && $supplied['mday'] == 31 && $supplied['mon'] == 12);
 
-      # So was it today or yesterday?
+      // So was it today or yesterday?
       if($is_today || $is_yesterday)
       {
-        # For the date format, we just return Today or Yesterday ;)
-        return '<strong>'. ($is_today ? l('Today') : l('Yesterday')). '</strong>'. ($format != 'date' ? ' '. l('at'). ' '. strftime($settings->get('time_format', 'string', '%I:%M:%S %p'), $timestamp) : '');
+        // For the date format, we just return Today or Yesterday ;)
+        return '<strong>'. ($is_today ? l('Today') : l('Yesterday')). '</strong>'. ($format != 'date' ? ' '. l('at'). ' '. strftime(settings()->get('time_format', 'string', '%I:%M:%S %p'), $timestamp) : '');
       }
     }
 
-    # Nothing special, huh?
-    return strftime($settings->get($format. '_format', 'string'), $timestamp);
+    // Nothing special, huh?
+    return strftime(settings()->get($format. '_format', 'string'), $timestamp);
   }
 }
 ?>

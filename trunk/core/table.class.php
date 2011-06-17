@@ -31,7 +31,7 @@ if(!defined('IN_SNOW'))
 */
 class Table
 {
-  # Variable: tables
+  // Variable: tables
   private $tables;
 
   /*
@@ -107,7 +107,7 @@ class Table
       return false;
     }
 
-    # Make the array, which we will edit ;)
+    // Make the array, which we will edit ;)
     $this->tables[$tbl_name] = array(
                                  'columns' => array(),
                                  'per_page' => 25,
@@ -123,15 +123,15 @@ class Table
                                  'cellspacing' => '0px',
                                );
 
-    # Now try to edit it.
+    // Now try to edit it.
     if(!$this->edit($tbl_name, $options))
     {
-      # It didn't work. Uh oh!
+      // It didn't work. Uh oh!
       $this->remove($tbl_name);
       return false;
     }
 
-    # Added!
+    // Added!
     return true;
   }
 
@@ -155,7 +155,7 @@ class Table
       return false;
     }
 
-    # The database query, important.
+    // The database query, important.
     if(!empty($options['db_query']))
     {
       $this->tables[$tbl_name]['db_query'] = $options['db_query'];
@@ -165,7 +165,7 @@ class Table
       return false;
     }
 
-    # The database variables, important, usually.
+    // The database variables, important, usually.
     if(isset($options['db_vars']) && is_array($options['db_vars']))
     {
       $this->tables[$tbl_name]['db_vars'] = $options['db_vars'];
@@ -175,7 +175,7 @@ class Table
       return false;
     }
 
-    # A function, maybe?
+    // A function, maybe?
     if(isset($options['function']) && is_callable($options['function']))
     {
       $this->tables[$tbl_name]['function'] = $options['function'];
@@ -185,13 +185,13 @@ class Table
       return false;
     }
 
-    # The primary column identifier, not necessarily important, but can be!
+    // The primary column identifier, not necessarily important, but can be!
     if(isset($options['primary']))
     {
       $this->tables[$tbl_name]['primary'] = $options['primary'];
     }
 
-    # Some options, only if there is a primary key defined!
+    // Some options, only if there is a primary key defined!
     if(!empty($this->tables[$tbl_name]['primary']) && isset($options['options']) && is_array($options['options']))
     {
       $this->tables[$tbl_name]['options'] = $options['options'];
@@ -201,7 +201,7 @@ class Table
       return false;
     }
 
-    # How about the callback? Changing that?
+    // How about the callback? Changing that?
     if(!empty($this->tables[$tbl_name]['primary']) && isset($options['callback']) && is_callable($options['callback']))
     {
       $this->tables[$tbl_name]['callback'] = $options['callback'];
@@ -211,7 +211,7 @@ class Table
       return false;
     }
 
-    # Sorting..?
+    // Sorting..?
     if(!empty($options['sort']) && is_array($options['sort']))
     {
       $this->tables[$tbl_name]['sort'] = $options['sort'];
@@ -221,7 +221,7 @@ class Table
       return false;
     }
 
-    # How many items per page?
+    // How many items per page?
     if(isset($options['per_page']) && (string)$options['per_page'] == (string)(int)$options['per_page'])
     {
       $this->tables[$tbl_name]['per_page'] = (int)$options['per_page'];
@@ -231,19 +231,19 @@ class Table
       return false;
     }
 
-    # The base URL of the table would be mighty useful.
+    // The base URL of the table would be mighty useful.
     if(isset($options['base_url']))
     {
       $this->tables[$tbl_name]['base_url'] = $options['base_url'];
     }
 
-    # Got padding?
+    // Got padding?
     if(isset($options['cellpadding']))
     {
       $this->tables[$tbl_name]['cellpadding'] = $options['cellpadding'];
     }
 
-    # How about a cellspacing for the table?
+    // How about a cellspacing for the table?
     if(isset($options['cellspacing']))
     {
       $this->tables[$tbl_name]['cellspacing'] = $options['cellspacing'];
@@ -367,36 +367,36 @@ class Table
   */
   public function add_column($tbl_name, $column, $options)
   {
-    # Does this column already exist? Silly!
+    // Does this column already exist? Silly!
     if(!$this->table_exists($tbl_name) || $this->column_exists($tbl_name, $column))
     {
       return false;
     }
 
-    # Did you specify a position?
+    // Did you specify a position?
     if(isset($options['position']))
     {
       $position = (string)$options['position'] == (string)(int)$options['position'] ? (int)$options['position'] : null;
       unset($options['position']);
     }
 
-    # We will validate the column.
+    // We will validate the column.
     $options = $this->validate_column($column, $options);
 
-    # Hm, didn't work. Good luck with that!
+    // Hm, didn't work. Good luck with that!
     if(empty($options))
     {
       return false;
     }
 
-    # Add it! Maybe...
+    // Add it! Maybe...
     if(!isset($position) || $position === null)
     {
       $this->tables[$tbl_name]['columns'][$column] = $options;
     }
     else
     {
-      # Insert it..!
+      // Insert it..!
       $this->tables[$tbl_name]['columns'] = array_insert($this->tables[$tbl_name]['columns'], $options, $position, $column);
     }
 
@@ -423,31 +423,31 @@ class Table
       return false;
     }
 
-    # Did you specify a position?
+    // Did you specify a position?
     if(isset($options['position']))
     {
       $position = (string)$options['position'] == (string)(int)$options['position'] ? (int)$options['position'] : null;
       unset($options['position']);
     }
 
-    # We will validate the column. To apply the changes, simply merge the old options.
+    // We will validate the column. To apply the changes, simply merge the old options.
     $options = $this->validate_column($column, array_merge($this->tables[$tbl_name]['columns'][$column], $options));
 
-    # Hm, didn't work. Good luck with that!
+    // Hm, didn't work. Good luck with that!
     if(empty($options))
       return false;
 
-    # Add it! Maybe...
+    // Add it! Maybe...
     if(!isset($position) || $position === null)
     {
       $this->tables[$tbl_name]['columns'][$column] = $options;
     }
     else
     {
-      # Delete the old one.
+      // Delete the old one.
       unset($this->tables[$tbl_name]['columns'][$column]);
 
-      # Insert it..! Again.
+      // Insert it..! Again.
       $this->tables[$tbl_name]['columns'] = array_insert($this->tables[$tbl_name]['columns'], $options, $position, $column);
     }
 
@@ -555,31 +555,29 @@ class Table
   */
   public function show($tbl_name)
   {
-    global $api, $db, $member, $theme;
-
     if(!$this->table_exists($tbl_name))
     {
       echo l('The table "%s" doesn\'t exist.', htmlchars($tbl_name));
       return;
     }
 
-    # Do any changes!
-    $api->run_hooks($tbl_name);
+    // Do any changes!
+    api()->run_hooks($tbl_name);
 
-    # Make things a bit easier ;)
+    // Make things a bit easier ;)
     $table = $this->tables[$tbl_name];
 
-    # Are you submitting some option? If so, do it now!
+    // Are you submitting some option? If so, do it now!
     if(!empty($_POST[$tbl_name. '_submit']) && is_callable($table['callback']))
     {
-      # Make sure you did it!
+      // Make sure you did it!
       verify_request('post');
 
-      # You got it ;)
+      // You got it ;)
       call_user_func($table['callback'], $_POST[$tbl_name. '_option'], isset($_POST['selected']) ? $_POST['selected'] : array());
     }
 
-    # Are there any options? If there are, we will need to make a form!!!
+    // Are there any options? If there are, we will need to make a form!!!
     $is_options = is_array($table['options']) && count($table['options']) > 0;
 
     echo '
@@ -591,38 +589,38 @@ class Table
         <form action="" method="post">';
     }
 
-    # Continue the output of the table now.
+    // Continue the output of the table now.
     echo '
         <table id="', $tbl_name, '" class="table" cellpadding="', $table['cellpadding'], '" cellspacing="', $table['cellspacing'], '">';
 
-    # Were any columns defined, by chance?
+    // Were any columns defined, by chance?
     if(count($table['columns']))
     {
-      # Let's get a few things before we get too far, such as if anything is being sorted.
+      // Let's get a few things before we get too far, such as if anything is being sorted.
       if(!empty($_GET['sort']))
       {
-        # Check to make sure you can actually sort by the specified column, if not, default!
+        // Check to make sure you can actually sort by the specified column, if not, default!
         $sort = !empty($table['columns'][$_GET['sort']]['sortable']) ? $_GET['sort'] : (!empty($table['sort'][0]) && !empty($table['columns'][$table['sort'][0]]['sortable']) ? $table['sort'][0] : '');
         $order = !empty($_GET['order']) && in_array($_GET['order'], array('asc', 'desc')) ? strtoupper($_GET['order']) : 'ASC';
         $is_default_sort = false;
       }
       else
       {
-        # Just go straight to the default!
+        // Just go straight to the default!
         $sort = !empty($table['sort'][0]) && !empty($table['columns'][$table['sort'][0]]['sortable']) ? $table['sort'][0] : '';
         $order = in_array(strtolower($table['sort'][1]), array('asc', 'desc')) ? strtoupper($table['sort'][1]) : 'ASC';
         $is_default_sort = true;
       }
 
-      # Where we startin'?
+      // Where we startin'?
       $page = !empty($_GET['page']) && (string)$_GET['page'] == (string)(int)$_GET['page'] ? (int)$_GET['page'] : 1;
 
-      # Now it is time to get some more information...
-      # But will we query the database, or something else?
+      // Now it is time to get some more information...
+      // But will we query the database, or something else?
       if(empty($table['function']))
       {
-        # Get the number of rows, change that query a bit ;)
-        $result = $db->query('
+        // Get the number of rows, change that query a bit ;)
+        $result = db()->query('
                     SELECT
                       COUNT(*)
                     '. substr($table['db_query'], stripos($table['db_query'], 'FROM')),
@@ -632,18 +630,18 @@ class Table
       }
       else
       {
-        # Gimme that dataz!
+        // Gimme that dataz!
         $function_data = call_user_func_array($table['function'], array($page, $table['per_page'], $sort, $order, &$num_rows));
       }
 
-      # Create our pagination!!!
+      // Create our pagination!!!
       $start = $page;
 
       $pagination = create_pagination($table['base_url']. (empty($is_default_sort) ? '&amp;sort='. $sort. '&amp;order='. strtolower($order) : ''), $start, $num_rows, $table['per_page']);
 
       $page = ceil(($start + 1 * $table['per_page']) / $table['per_page']);
 
-      # Now output the pagination and the column headers.
+      // Now output the pagination and the column headers.
       echo '
           <tr class="header">
             <td colspan="', ($is_options ? count($table['columns']) + 1 : count($table['columns'])), '">', $pagination, '</td>
@@ -659,17 +657,17 @@ class Table
       foreach($table['columns'] as $column_id => $column)
       {
         echo '
-            <th', (!empty($column['title']) ? ' title="'. $column['title']. '"' : ''), '>', ($column['sortable'] ? '<a href="'. $table['base_url']. '&amp;sort='. $column_id. '&amp;order='. (!empty($order) && $sort == $column_id && ($order == 'ASC' || $order == 'DESC') ? ($order == 'ASC' ? 'desc' : 'asc') : 'asc'). '&amp;page='. $page. '">' : ''), $column['label'], ($column['sortable'] ? (!empty($order) && $sort == $column_id ? ' <img src="'. $theme->url(). '/style/images/'. ($order == 'ASC' ? 'arrow_up.png' : 'arrow_down.png'). '" alt="" />' : ''). '</a>' : ''), '</th>';
+            <th', (!empty($column['title']) ? ' title="'. $column['title']. '"' : ''), '>', ($column['sortable'] ? '<a href="'. $table['base_url']. '&amp;sort='. $column_id. '&amp;order='. (!empty($order) && $sort == $column_id && ($order == 'ASC' || $order == 'DESC') ? ($order == 'ASC' ? 'desc' : 'asc') : 'asc'). '&amp;page='. $page. '">' : ''), $column['label'], ($column['sortable'] ? (!empty($order) && $sort == $column_id ? ' <img src="'. theme()->url(). '/style/images/'. ($order == 'ASC' ? 'arrow_up.png' : 'arrow_down.png'). '" alt="" />' : ''). '</a>' : ''), '</th>';
       }
 
       echo '
           </tr>';
 
-      # Do we need to do a query?
+      // Do we need to do a query?
       if(empty($table['function']))
       {
-        # Now to query the real data!
-        $result = $db->query(
+        // Now to query the real data!
+        $result = db()->query(
                          $table['db_query']. '
                          '. (!empty($sort) ? 'ORDER BY '. $table['columns'][$sort]['column']. ' '. $order : ''). '
                          LIMIT '. (int)$start. ','. (int)$table['per_page'],
@@ -690,7 +688,7 @@ class Table
             <td valign="top"><input type="checkbox" name="selected[]" value="', isset($row[$table['primary']]) ? $row[$table['primary']] : '', '" /></td>';
         }
 
-        # Show each individual column!!!
+        // Show each individual column!!!
         foreach($table['columns'] as $column_id => $column)
         {
           echo '
@@ -732,7 +730,7 @@ class Table
     if($is_options)
     {
       echo '
-        <input name="sid" type="hidden" value="', $member->session_id(), '" />
+        <input name="sid" type="hidden" value="', member()->session_id(), '" />
         </form>';
     }
 

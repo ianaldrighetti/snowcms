@@ -31,12 +31,10 @@ class SQLite_Result extends Database_Result
 
   public function data_seek($row_num = 0)
   {
-    global $api;
-
-    # Got something to do?
+    // Got something to do?
     $return = null;
     $current = $this->current;
-    $api->run_hooks('database_data_seek', array($this->result, $row_num, &$return, &$current));
+    api()->run_hooks('database_data_seek', array($this->result, $row_num, &$return, &$current));
     $this->current = $current;
 
     return $return === null ? $this->sqlite_data_seek($this->result, $row_num) : $return;
@@ -44,11 +42,9 @@ class SQLite_Result extends Database_Result
 
   public function fetch_array()
   {
-    global $api;
-
     $return = null;
     $current = $this->current;
-    $api->run_hooks('database_fetch_array', array($this->result, &$return, &$current));
+    api()->run_hooks('database_fetch_array', array($this->result, &$return, &$current));
     $this->current = $current;
 
     return $return === null ? sqlite_fetch_array($this->result) : $return;
@@ -56,11 +52,9 @@ class SQLite_Result extends Database_Result
 
   public function fetch_assoc()
   {
-    global $api;
-
     $return = null;
     $current = $this->current;
-    $api->run_hooks('database_fetch_assoc', array($this->result, &$return, &$current));
+    api()->run_hooks('database_fetch_assoc', array($this->result, &$return, &$current));
     $this->current = $current;
 
     return $return === null ? sqlite_fetch_array($this->result, SQLITE_ASSOC) : $return;
@@ -68,11 +62,9 @@ class SQLite_Result extends Database_Result
 
   public function fetch_object()
   {
-    global $api;
-
     $return = null;
     $current = $this->current;
-    $api->run_hooks('database_fetch_object', array($this->result, &$return, &$current));
+    api()->run_hooks('database_fetch_object', array($this->result, &$return, &$current));
     $this->current = $current;
 
     return $return === null ? sqlite_fetch_object($this->result) : $return;
@@ -80,11 +72,9 @@ class SQLite_Result extends Database_Result
 
   public function fetch_row()
   {
-    global $api;
-
     $return = null;
     $current = $this->current;
-    $api->run_hooks('database_fetch_row', array($this->result, &$return, &$current));
+    api()->run_hooks('database_fetch_row', array($this->result, &$return, &$current));
     $this->current = $current;
 
     return $return === null ? sqlite_fetch_array($this->result, SQLITE_NUM) : $return;
@@ -92,10 +82,8 @@ class SQLite_Result extends Database_Result
 
   public function field_name($field_offset)
   {
-    global $api;
-
     $return = null;
-    $api->run_hooks('database_field_name', array($this->result, $field_offset, &$return));
+    api()->run_hooks('database_field_name', array($this->result, $field_offset, &$return));
 
     return $return === null ? sqlite_field_name($this->result, $field_offset) : $return;
   }
@@ -108,20 +96,16 @@ class SQLite_Result extends Database_Result
 
   public function num_fields()
   {
-    global $api;
-
     $return = null;
-    $api->run_hooks('database_num_fields', array($this->result, &$return));
+    api()->run_hooks('database_num_fields', array($this->result, &$return));
 
     return $return === null ? sqlite_num_fields($this->result) : $return;
   }
 
   public function num_rows()
   {
-    global $api;
-
     $return = null;
-    $api->run_hooks('database_num_rows', array($this->result, &$return));
+    api()->run_hooks('database_num_rows', array($this->result, &$return));
 
     return $return === null ? sqlite_num_rows($this->result) : $return;
   }

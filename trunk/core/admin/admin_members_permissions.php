@@ -22,7 +22,7 @@ if(!defined('IN_SNOW'))
   die('Nice try...');
 }
 
-# Title: Control Panel - Member - Permissions
+// Title: Control Panel - Member - Permissions
 
 if(!function_exists('admin_members_manage_permissions'))
 {
@@ -42,30 +42,28 @@ if(!function_exists('admin_members_manage_permissions'))
   */
   function admin_members_manage_permissions()
   {
-    global $api, $member, $theme;
+    api()->run_hooks('admin_members_manage_permissions');
 
-    $api->run_hooks('admin_members_manage_permissions');
-
-    # Do you have the permission to edit permissions!?
-    if(!$member->can('manage_permissions'))
+    // Do you have the permission to edit permissions!?
+    if(!member()->can('manage_permissions'))
     {
       admin_access_denied();
     }
 
-    $theme->set_current_area('members_permissions');
+    theme()->set_current_area('members_permissions');
 
-    $theme->set_title(l('Manage permissions'));
+    theme()->set_title(l('Manage permissions'));
 
-    $theme->header();
+    theme()->header();
 
     echo '
-  <h1><img src="', $theme->url(), '/members_permissions-small.png" alt="" /> ', l('Manage permissions'), '</h1>
+  <h1><img src="', theme()->url(), '/members_permissions-small.png" alt="" /> ', l('Manage permissions'), '</h1>
   <p>', l('The permissions of member groups can all be modified here. Simply click on the member group below to edit their permissions.'), '</p>';
 
-    # Add the guest group.
-    $groups = array_merge(array('guest' => l('Guest')), $api->return_group());
+    // Add the guest group.
+    $groups = array_merge(array('guest' => l('Guest')), api()->return_group());
 
-    # Remove the administrator group, as administrators are ALL POWERFUL!
+    // Remove the administrator group, as administrators are ALL POWERFUL!
     unset($groups['administrator']);
 
     $group_list = array();
@@ -78,7 +76,7 @@ if(!function_exists('admin_members_manage_permissions'))
   <h3>', l('Member groups'), '</h3>
   <p>', implode(', ', $group_list), '</p>';
 
-    $theme->footer();
+    theme()->footer();
   }
 }
 
@@ -100,64 +98,62 @@ if(!function_exists('admin_members_manage_group_permissions'))
   */
   function admin_members_manage_group_permissions()
   {
-    global $api, $member, $theme;
-
     $group_id = $_GET['grp'];
 
-    $api->run_hooks('admin_members_manage_group_permissions');
+    api()->run_hooks('admin_members_manage_group_permissions');
 
-    if(!$member->can('manage_permissions'))
+    if(!member()->can('manage_permissions'))
     {
       admin_access_denied();
     }
 
-    $theme->set_current_area('members_permissions');
+    theme()->set_current_area('members_permissions');
 
-    # Check to see if the specified group even exists!
-    if(!$api->return_group($group_id) && strtolower($group_id) != 'guest')
+    // Check to see if the specified group even exists!
+    if(!api()->return_group($group_id) && strtolower($group_id) != 'guest')
     {
-      $theme->set_title(l('An error has occurred'));
+      theme()->set_title(l('An error has occurred'));
 
-      $theme->header();
+      theme()->header();
 
       echo '
     <h1>', l('An error has occurred'), '</h1>
     <p>', l('Sorry, but it appears the group you have requested doesn\'t exist.'), '</p>';
 
-      $theme->footer();
+      theme()->footer();
     }
     else
     {
-      # Time to generate that form!
+      // Time to generate that form!
       admin_members_permissions_generate_form($group_id. '_permissions', $group_id);
-      $form = $api->load_class('Form');
+      $form = api()->load_class('Form');
 
       if(!empty($_POST[$group_id. '_permissions']))
       {
         if(isset($_GET['ajax']))
         {
-          # Using AJAX? Well aren't you Mr. Fancy Pants!
+          // Using AJAX? Well aren't you Mr. Fancy Pants!
           echo $form->json_process($group_id. '_permissions');
           exit;
         }
         else
         {
-          # Process the form! The boring way!
+          // Process the form! The boring way!
           $form->process($group_id. '_permissions');
         }
       }
 
-      $theme->set_title(l('Managing %s permissions', $api->return_group($group_id)));
+      theme()->set_title(l('Managing %s permissions', api()->return_group($group_id)));
 
-      $theme->header();
+      theme()->header();
 
       echo '
-    <h1><img src="', $theme->url(), '/members_permissions-small.png" alt="" /> ', l('Managing %s permissions', $api->return_group($group_id)), '</h1>
+    <h1><img src="', theme()->url(), '/members_permissions-small.png" alt="" /> ', l('Managing %s permissions', api()->return_group($group_id)), '</h1>
     <p>', l('Changes to member groups permissions can be applied here. If deny is selected, no matter what other groups the member may be in, the permission will be denied. If disallow is selected and another one of the member groups they are in allows the permission, the disallow will be overridden. <a href="%s" title="Back to Manage Permissions">Back to Manage Permissions</a>.', baseurl. '/index.php?action=admin&amp;sa=members_permissions'), '</p>';
 
       $form->show($group_id. '_permissions');
 
-      $theme->footer();
+      theme()->footer();
     }
   }
 }
@@ -181,11 +177,9 @@ if(!function_exists('admin_members_permissions_generate_form'))
   */
   function admin_members_permissions_generate_form($form_name, $group_id)
   {
-    global $api, $db;
+    $form = api()->load_class('Form');
 
-    $form = $api->load_class('Form');
-
-    # Add our form, before we do anything else, of course!
+    // Add our form, before we do anything else, of course!
     $form->add($form_name, array(
                              'action' => baseurl. '/index.php?action=admin&sa=members_permissions&grp='. $_GET['grp'],
                              'ajax_submit' => true,
@@ -194,12 +188,12 @@ if(!function_exists('admin_members_permissions_generate_form'))
                              'submit' => l('Save'),
                            ));
 
-    # Now is your time to add your permission!
+    // Now is your time to add your permission!
     $permissions = array(
                      array(
-                       'permission' => 'manage_system_settings', # The permission in the table.
-                       'label' => l('Manage system settings:'), # The label of the field
-                       'subtext' => '', # Subtext too, if you want.
+                       'permission' => 'manage_system_settings', // The permission in the table.
+                       'label' => l('Manage system settings:'), // The label of the field
+                       'subtext' => '', // Subtext too, if you want.
                      ),
                      array(
                        'permission' => 'manage_themes',
@@ -265,20 +259,20 @@ if(!function_exists('admin_members_permissions_generate_form'))
                      ),
                    );
 
-    # So yeah, add your permissions!
-    $permissions = $api->apply_filters('member_group_permissions', $permissions);
+    // So yeah, add your permissions!
+    $permissions = api()->apply_filters('member_group_permissions', $permissions);
 
     if(is_array($permissions) && count($permissions))
     {
-      # Time to load up the permissions in the database, or elsewhere.
+      // Time to load up the permissions in the database, or elsewhere.
       $loaded = null;
-      $api->run_hooks('load_permissions', array(&$loaded, $group_id));
+      api()->run_hooks('load_permissions', array(&$loaded, $group_id));
 
-      # Oh, I need to do it?
+      // Oh, I need to do it?
       if($loaded === null)
       {
-        # They are in the database ;)
-        $result = $db->query('
+        // They are in the database ;)
+        $result = db()->query('
                     SELECT
                       permission, status
                     FROM {db->prefix}permissions
@@ -296,7 +290,7 @@ if(!function_exists('admin_members_permissions_generate_form'))
       {
         if(empty($permission['permission']))
         {
-          # We really kinda need the permissions identifier.
+          // We really kinda need the permissions identifier.
           continue;
         }
 
@@ -335,28 +329,26 @@ if(!function_exists('admin_members_permissions_handle'))
   */
   function admin_members_permissions_handle($data, &$errors = array())
   {
-    global $api, $db;
-
     $group_id = $_GET['grp'];
 
-    # We will need to update the value in the form.
-    $form = $api->load_class('Form');
+    // We will need to update the value in the form.
+    $form = api()->load_class('Form');
 
-    # Sorry guests, there are certain permissions you just cannot have!!!
+    // Sorry guests, there are certain permissions you just cannot have!!!
     if($group_id == 'guest')
     {
-      # You can add more DENIED permissions via the guest_denied_permissions hook ;)
-      # (Sorry, but I will not allow plugins to remove denied permissions, at least built in functionality)
-      $denied = array_merge(array('manage_system_settings', 'manage_themes', 'update_system', 'view_error_log', 'add_new_member', 'manage_members', 'search_members', 'manage_member_settings', 'manage_permissions', 'add_plugins', 'manage_plugins', 'manage_plugin_settings', 'edit_other_profiles'), $api->apply_filters('denied_guest_permissions', array()));
+      // You can add more DENIED permissions via the guest_denied_permissions hook ;)
+      // (Sorry, but I will not allow plugins to remove denied permissions, at least built in functionality)
+      $denied = array_merge(array('manage_system_settings', 'manage_themes', 'update_system', 'view_error_log', 'add_new_member', 'manage_members', 'search_members', 'manage_member_settings', 'manage_permissions', 'add_plugins', 'manage_plugins', 'manage_plugin_settings', 'edit_other_profiles'), api()->apply_filters('denied_guest_permissions', array()));
 
       foreach($denied as $deny)
       {
-        # Deny it by giving it a -1.
+        // Deny it by giving it a -1.
         $data[$deny] = -1;
       }
     }
 
-    # Get all of our rows built :-).
+    // Get all of our rows built :-).
     $rows = array();
     foreach($data as $permission => $status)
     {
@@ -367,18 +359,16 @@ if(!function_exists('admin_members_permissions_handle'))
                                                                             ));
     }
 
-    # Now save the new permissions.
-    $db->insert('replace', '{db->prefix}permissions',
+    // Now save the new permissions.
+    db()->insert('replace', '{db->prefix}permissions',
       array(
         'group_id' => 'string-128', 'permission' => 'string-128', 'status' => 'int',
       ),
       $rows,
       array('group_id', 'permission'), 'permissions_handle_query');
 
-    $api->add_filter(strtolower($group_id). '_permissions_message', create_function('$value', '
-                                                                      global $api;
-
-                                                                      return l(\'%s permissions have been updated successfully.\', ($_GET[\'grp\'] == \'guest\' ? l(\'Guest\') : $api->return_group($_GET[\'grp\'])));'));
+    api()->add_filter(strtolower($group_id). '_permissions_message', create_function('$value', '
+                                                                      return l(\'%s permissions have been updated successfully.\', ($_GET[\'grp\'] == \'guest\' ? l(\'Guest\') : api()->return_group($_GET[\'grp\'])));'));
 
     return true;
   }

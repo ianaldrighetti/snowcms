@@ -38,12 +38,12 @@ if(!defined('IN_SNOW'))
 */
 class Tasks
 {
-  # Variable: tasks
-  # The currently registered tasks array.
+  // Variable: tasks
+  // The currently registered tasks array.
   private $tasks;
 
-  # Variable: queue
-  # Holds the tasks which need to be ran, if any!
+  // Variable: queue
+  // Holds the tasks which need to be ran, if any!
   private $queue;
 
   /*
@@ -53,48 +53,46 @@ class Tasks
   */
   public function __construct()
   {
-    global $api, $db, $settings;
-
-    if($settings->get('enable_tasks', 'bool'))
+    if(settings()->get('enable_tasks', 'bool'))
     {
-      # Want to do this? Less work for me! ;)
+      // Want to do this? Less work for me! ;)
       $handled = false;
-      $api->run_hooks('tasks_construct', array(&$handled));
+      api()->run_hooks('tasks_construct', array(&$handled));
 
       if(empty($handled))
       {
         $this->queue = array();
         $this->tasks = array();
 
-        # Load up all the tasks then queue the ones that need queueing.
-        $result = $db->query('
+        // Load up all the tasks then queue the ones that need queueing.
+        $result = db()->query('
           SELECT
             *
           FROM {db->prefix}tasks
           ORDER BY queued DESC',
           array(), 'tasks_query');
 
-        # Any tasks, at all?
+        // Any tasks, at all?
         if($result->num_rows() > 0)
         {
-          # We use this to mark tasks which are ready to be ran!
-          # (Which have a higher priority, if they are older ;))
+          // We use this to mark tasks which are ready to be ran!
+          // (Which have a higher priority, if they are older ;))
           $queue_tasks = array();
 
-          # There is a limit (maybe) on how many tasks to run at one time.
+          // There is a limit (maybe) on how many tasks to run at one time.
           $queued_tasks = 0;
 
           while($row = $result->fetch_assoc())
           {
-            # Add a few things to the tasks information which we will use to our advantage later!
+            // Add a few things to the tasks information which we will use to our advantage later!
             $this->tasks[$row['task_name']] = array_merge($row, array('added' => false, 'updated' => false, 'deleted' => false));
 
-            # Does it need queueing/running?
-            if(!empty($row['enabled']) && (($row['last_ran'] + $row['run_every']) <= time_utc() || !empty($row['queued'])) && $queued_tasks < $settings->get('max_tasks', 'int', 1))
+            // Does it need queueing/running?
+            if(!empty($row['enabled']) && (($row['last_ran'] + $row['run_every']) <= time_utc() || !empty($row['queued'])) && $queued_tasks < settings()->get('max_tasks', 'int', 1))
             {
               $this->queue[$row['task_name']] = $row;
 
-              # Queue it if it isn't already...
+              // Queue it if it isn't already...
               if(empty($row['queued']))
               {
                 $queue_tasks[] = $row['task_name'];
@@ -105,10 +103,10 @@ class Tasks
             }
           }
 
-          # Any newly queued tasks, perhaps?
+          // Any newly queued tasks, perhaps?
           if(count($queue_tasks) > 0)
           {
-            $db->query('
+            db()->query('
               UPDATE {db->prefix}tasks
               SET queued = 1
               WHERE task_name IN({array_string:queue_tasks})',
@@ -118,21 +116,17 @@ class Tasks
           }
         }
 
-        # Register an action for running tasks :)
-        $api->add_event('action=tasks', array($this, 'run'));
+        // Register an action for running tasks :)
+        api()->add_event('action=tasks', array($this, 'run'));
 
-        # Register the save method to be called before shutdown ;)
-        $api->add_hook('snow_exit', array($this, 'save'));
+        // Register the save method to be called before shutdown ;)
+        api()->add_hook('snow_exit', array($this, 'save'));
 
-        # If we have any tasks which are in need of running, add a JavaScript file to the theme.
+        // If we have any tasks which are in need of running, add a JavaScript file to the theme.
         if(count($this->queue) > 0)
         {
-          $api->add_hook('post_init_theme', create_function('', '
-                                              global $api;
-
-                                              $theme = $api->load_class(\'Implemented_Theme\');
-
-                                              $theme->add_js_file(array(\'src\' => themeurl. \'/default/js/tasks.js\', \'defer\' => \'defer\'));'));
+          api()->add_hook('post_init_theme', create_function('', '
+                                              theme()->add_js_file(array(\'src\' => themeurl. \'/default/js/tasks.js\', \'defer\' => \'defer\'));'));
         }
       }
     }
@@ -159,24 +153,26 @@ class Tasks
   */
   public function add($name, $run_every, $func, $file = null, $location = null, $enabled = true)
   {
-    global $api, $func, $settings;
+    global $func;
 
-    if(!$settings->get('enable_tasks', 'bool'))
+    if(!settings()->get('enable_tasks', 'bool', false))
+    {
       return false;
+    }
 
     $handled = null;
-    $api->run_hooks('tasks_add', array(&$handled, $name, $run_every, $func, $file, $location, $enabled));
+    api()->run_hooks('tasks_add', array(&$handled, $name, $run_every, $func, $file, $location, $enabled));
 
-    # Did you do the deed?
+    // Did you do the deed?
     if($handled === null)
     {
-      # Does this task already exist? In which case, you can't add it!
+      // Does this task already exist? In which case, you can't add it!
       if(empty($name) || $this->exists($name) || $run_every < 1)
       {
         return false;
       }
 
-      # We don't do anything with the database right now, SO YEAH!!!
+      // We don't do anything with the database right now, SO YEAH!!!
       $this->tasks[$func['strtolower']($name)] = array(
                                                    'task_name' => $func['strtolower']($name),
                                                    'last_ran' => 0,
@@ -210,27 +206,27 @@ class Tasks
   */
   public function update($name, $options)
   {
-    global $api, $func, $settings;
+    global $func;
 
-    if(!$settings->get('enable_tasks', 'bool'))
+    if(!settings()->get('enable_tasks', 'bool'))
     {
       return false;
     }
 
-    # Can't update something that does not exist, that's for sure!
+    // Can't update something that does not exist, that's for sure!
     if(!$this->exists($name))
     {
       return false;
     }
 
     $handled = null;
-    $api->run_hooks('tasks_update', array(&$handled, $name, $options));
+    api()->run_hooks('tasks_update', array(&$handled, $name, $options));
 
     if($handled === null)
     {
       $name = $func['strtolower']($name);
 
-      # So, yeah, update the task, one option at a time!
+      // So, yeah, update the task, one option at a time!
       if(!empty($options['last_ran']) && $options['last_ran'] > 0)
       {
         $this->tasks[$name]['last_ran'] = (int)$options['last_ran'];
@@ -266,7 +262,7 @@ class Tasks
         $this->tasks[$name]['queued'] = !empty($options['queued']) ? 1 : 0;
       }
 
-      # Mark it as updated :)
+      // Mark it as updated :)
       $this->tasks[$name]['updated'] = true;
 
       return true;
@@ -288,19 +284,19 @@ class Tasks
   */
   public function exists($name)
   {
-    global $api, $func, $settings;
+    global $func;
 
-    if(!$settings->get('enable_tasks', 'bool'))
+    if(!settings()->get('enable_tasks', 'bool', false))
     {
       return false;
     }
 
     $handled = null;
-    $api->run_hooks('tasks_exists', array(&$handled, $name));
+    api()->run_hooks('tasks_exists', array(&$handled, $name));
 
     if($handled === null)
     {
-      # Simple check, really.
+      // Simple check, really.
       return isset($this->tasks[$func['strtolower']($name)]) && !$this->tasks[$func['strtolower']($name)]['deleted'];
     }
 
@@ -320,19 +316,19 @@ class Tasks
   */
   public function delete($name)
   {
-    global $api, $func, $settings;
+    global $func;
 
-    if(!$settings->get('enable_tasks', 'bool'))
+    if(!settings()->get('enable_tasks', 'bool', false))
     {
       return false;
     }
 
     $handled = null;
-    $api->run_hooks('tasks_delete', array(&$handled, $name));
+    api()->run_hooks('tasks_delete', array(&$handled, $name));
 
     if($handled === null)
     {
-      # Simply mark it for deletion...
+      // Simply mark it for deletion...
       $this->tasks[$func['strtolower']($name)]['deleted'] = true;
 
       return true;
@@ -355,46 +351,44 @@ class Tasks
   */
   public function run($output_image = true)
   {
-    global $api, $settings;
-
-    if(!$settings->get('enable_tasks', 'bool'))
+    if(!settings()->get('enable_tasks', 'bool', false))
     {
       return;
     }
 
     $handled = null;
-    $api->run_hooks('tasks_run', array(&$handled, $output_image));
+    api()->run_hooks('tasks_run', array(&$handled, $output_image));
 
     if($handled === null)
     {
-      # Do we have anything in the queue, for that matter?
+      // Do we have anything in the queue, for that matter?
       if(count($this->queue) == 0)
       {
         return;
       }
 
-      # No going back now, that's for sure!
+      // No going back now, that's for sure!
       ignore_user_abort(true);
       @set_time_limit(0);
 
-      # Just incase ;-)
+      // Just incase ;-)
       define('IN_TASK', true);
 
-      # Time to do those tasks, sweet!
+      // Time to do those tasks, sweet!
       foreach($this->queue as $name => $task)
       {
-        # Any file to include?
+        // Any file to include?
         if(!empty($task['file']))
         {
-          # Is it an absolute path or..?
+          // Is it an absolute path or..?
           if(realpath($task['file']) !== false)
           {
-            # It is, not recommended, though.
+            // It is, not recommended, though.
             $include_file = realpath($task['file']);
           }
           elseif($task['location'] == 'core_dir' || empty($task['location']))
           {
-            # Prepend core_dir to it.
+            // Prepend core_dir to it.
             $include_file = realpath(coredir. '/'. $task['file']);
           }
           elseif($task['location'] == 'base_dir')
@@ -410,47 +404,47 @@ class Tasks
             $include_file = realpath(plugindir. '/'. $task['file']);
           }
 
-          # Does it exist..?
+          // Does it exist..?
           if(isset($include_file) && !file_exists($include_file))
           {
-            # No, it does not.
+            // No, it does not.
             unset($include_file);
 
             errors_handler('plugin', 'The file "'. htmlchars($task['file']). '" does not exist. Task name: "'. htmlchars($name). '"');
 
-            # We will just skip this, okay? ;)
+            // We will just skip this, okay? ;)
             continue;
           }
 
-          # Include away!
+          // Include away!
           require_once($include_file);
           unset($include_file);
         }
 
-        # How about a function to call?
+        // How about a function to call?
         if(!empty($task['func']))
         {
-          # Is it callable? Needs to be!
+          // Is it callable? Needs to be!
           if(!is_callable($task['func']))
           {
             errors_handler('plugin', 'The function "'. htmlchars($task['func']). '" is undefined. Task name: "'. htmlchars($name). '"');
 
-            # Skip!!!
+            // Skip!!!
             continue;
           }
 
-          # Call it!
+          // Call it!
           $task['func']();
         }
 
-        # If we got here, then the task was ran successfully, and we can make it no longer queued.
+        // If we got here, then the task was ran successfully, and we can make it no longer queued.
         $this->update($name, array(
                                'last_ran' => time_utc(),
                                'queued' => 0
                              ));
       }
 
-      # So, dsisplay a transparent pixel?
+      // So, dsisplay a transparent pixel?
       if(!empty($output_image))
       {
         if(ob_get_length() > 0)
@@ -486,29 +480,27 @@ class Tasks
   */
   public function save()
   {
-    global $api, $db, $settings;
-
-    if($settings->get('enable_tasks', 'bool'))
+    if(settings()->get('enable_tasks', 'bool', false))
     {
       $handled = null;
-      $api->run_hooks('tasks_destruct', array(&$handled));
+      api()->run_hooks('tasks_destruct', array(&$handled));
 
       if($handled === null && count($this->tasks) > 0)
       {
-        # Arrays of goodness!
+        // Arrays of goodness!
         $deleted = array();
         $changed = array();
 
         foreach($this->tasks as $name => $task)
         {
-          # Deleted? As there is no point changing something that will be deleted, right?
+          // Deleted? As there is no point changing something that will be deleted, right?
           if(!empty($task['deleted']))
           {
             $deleted[] = $name;
           }
           elseif(!empty($task['added']) || !empty($task['updated']))
           {
-            # Doesn't matter whether it has been added or changed...
+            // Doesn't matter whether it has been added or changed...
             $changed[] = array(
                            $name, $task['last_ran'], $task['run_every'],
                            $task['file'], $task['location'], $task['func'],
@@ -517,10 +509,10 @@ class Tasks
           }
         }
 
-        # Anything need to be deleted? Do so!
+        // Anything need to be deleted? Do so!
         if(count($deleted) > 0)
         {
-          $db->query('
+          db()->query('
             DELETE FROM {db->prefix}tasks
             WHERE task_name IN({string_array:deleted})
             LIMIT {int:num_deleted}',
@@ -530,10 +522,10 @@ class Tasks
             ), 'tasks_destruct_delete_query');
         }
 
-        # How about changed?
+        // How about changed?
         if(count($changed) > 0)
         {
-          $db->insert('replace', '{db->prefix}tasks',
+          db()->insert('replace', '{db->prefix}tasks',
             array(
               'task_name' => 'string', 'last_ran' => 'int', 'run_every' => 'int',
               'file' => 'string', 'location' => 'string', 'func' => 'string',
@@ -547,21 +539,54 @@ class Tasks
   }
 }
 
-function init_tasks()
+/*
+	Function: tasks
+
+	Returns the current instance of the <Tasks> object, which can be used to
+	add and remove tasks. If no instance of the <Tasks> class exists, one will
+	be automatically created.
+
+	Parameters:
+		none
+
+	Returns:
+		object
+*/
+function tasks()
 {
-  global $api, $settings;
+	if(!isset($GLOBALS['tasks']))
+	{
+		$GLOBALS['tasks'] = api()->load_class('Tasks');
 
-  $tasks = $api->load_class('Tasks');
+		api()->run_hooks('post_init_tasks');
+	}
 
-  $api->run_hooks('post_init_tasks');
+  return $GLOBALS['tasks'];
 }
 
+/*
+	Functions: tasks_run
+
+	Runs tasks when accessed via index.php?action=tasks.
+
+	Parameters:
+		none
+
+	Returns:
+		void
+
+	Note:
+		This function should not be called directly, and will be called when a
+		user's browser accesses index.php?action=tasks, which is loaded by
+		tasks.js. This function will display a transparent pixel.
+*/
 function tasks_run()
 {
-	global $api;
+	api()->run_hooks('pre_run_tasks');
 
-	$tasks = $api->load_class('Tasks');
+	// Run those tasks... If there are any.
+	tasks()->run();
 
-	$tasks->run();
+	api()->run_hooks('post_run_tasks');
 }
 ?>

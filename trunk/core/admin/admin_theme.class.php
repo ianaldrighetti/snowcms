@@ -26,19 +26,15 @@ class Admin_Theme extends Theme
 {
   protected function init()
   {
-    global $member;
-
     $this->add_js_file(array('src' => themeurl. '/default/js/snowobj.js'));
     $this->add_js_var('base_url', baseurl);
-    $this->add_js_var('session_id', $member->session_id());
+    $this->add_js_var('session_id', member()->session_id());
 
     $this->set_current_area(null);
   }
 
   public function header()
   {
-    global $api, $member, $settings;
-
     echo '<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
@@ -461,7 +457,7 @@ class Admin_Theme extends Theme
     }
   </style>';
 
-    # Any meta tags?
+    // Any meta tags?
     if(count($this->meta))
     {
       foreach($this->meta as $meta)
@@ -472,9 +468,9 @@ class Admin_Theme extends Theme
     }
 
     echo '
-  <title>', $api->apply_filters('theme_title', (!empty($this->title) ? htmlchars($this->title). ' - ' : ''). (!empty($this->main_title) ? $this->main_title : '')), '</title>';
+  <title>', api()->apply_filters('theme_title', (!empty($this->title) ? htmlchars($this->title). ' - ' : ''). (!empty($this->main_title) ? $this->main_title : '')), '</title>';
 
-    # Links
+    // Links
     if(count($this->links))
     {
       foreach($this->links as $link)
@@ -484,7 +480,7 @@ class Admin_Theme extends Theme
       }
     }
 
-    # JavaScript variables :D
+    // JavaScript variables :D
     if(count($this->js_vars))
     {
       echo '
@@ -500,7 +496,7 @@ class Admin_Theme extends Theme
   // ]]></script>';
     }
 
-    # Now JavaScript files!
+    // Now JavaScript files!
     if(count($this->js_files))
     {
       foreach($this->js_files as $js_file)
@@ -516,38 +512,38 @@ class Admin_Theme extends Theme
 <div id="header">
   <div id="container">
     <div id="text">
-      <h1>', $settings->get('site_name', 'string'), ' <span class="visit_site"><a href="', baseurl, '" title="', l('Visit site'), '">&laquo; ', l('Visit site'), ' &raquo;</a></span></h1>
+      <h1>', settings()->get('site_name', 'string'), ' <span class="visit_site"><a href="', baseurl, '" title="', l('Visit site'), '">&laquo; ', l('Visit site'), ' &raquo;</a></span></h1>
       <h3>', l('Control Panel'), '</h3>
     </div>
 
     <div id="member_info">
-      <p>', l('Hello, <a href="%s" title="View your profile">%s</a>.', baseurl. '/index.php?action=profile', $member->display_name()), '</p>
-      <p class="links">', l('<a href="%s" title="Go to the Control Panel Home">Control Panel</a> | <a href="%s" title="Log out of your account">Log out</a>', baseurl. '/index.php?action=admin', baseurl. '/index.php?action=logout&amp;sc='. $member->session_id()), '</p>
+      <p>', l('Hello, <a href="%s" title="View your profile">%s</a>.', baseurl. '/index.php?action=profile', member()->display_name()), '</p>
+      <p class="links">', l('<a href="%s" title="Go to the Control Panel Home">Control Panel</a> | <a href="%s" title="Log out of your account">Log out</a>', baseurl. '/index.php?action=admin', baseurl. '/index.php?action=logout&amp;sc='. member()->session_id()), '</p>
     </div>
     <div class="break">
     </div>
   </div>
 </div>
-<div id="content">', $api->apply_filters('admin_theme_pre_content', '');
+<div id="content">', api()->apply_filters('admin_theme_pre_content', '');
   }
 
   public function footer()
   {
-    global $api, $db, $icons, $settings, $start_time;
+    global $icons, $start_time;
 
-    echo $api->apply_filters('admin_theme_post_content', ''), '
+    echo api()->apply_filters('admin_theme_post_content', ''), '
 </div>
 <div id="footer">
   <div id="version">
-    <p>', l('Powered by <a href="http://www.snowcms.com/" target="_blank" title="SnowCMS">SnowCMS</a> v%s.', $settings->get('version', 'string')), '</p>
-    <p>', l('Page created in %s seconds with %u queries.', round(microtime(true) - $start_time, 3), $db->num_queries), '</p>
+    <p>', l('Powered by <a href="http://www.snowcms.com/" target="_blank" title="SnowCMS">SnowCMS</a> v%s.', settings()->get('version', 'string')), '</p>
+    <p>', l('Page created in %s seconds with %u queries.', round(microtime(true) - $start_time, 3), db()->num_queries), '</p>
   </div>
   <div id="jump_to">
     <form action="#" method="post" onsubmit="return false;">
       <select name="jump_to_select" onchange="this.form.go.click();">
         <option value="">', l('Control Panel'), '</option>';
 
-    # Anything we need to display? :P
+    // Anything we need to display? :P
     foreach($icons as $icon_group => $icon)
     {
       echo '
