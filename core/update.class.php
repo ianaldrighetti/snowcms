@@ -30,8 +30,8 @@ if(!defined('IN_SNOW'))
 */
 class Update
 {
-  # Variable: filename
-  # The location of the update package.
+  // Variable: filename
+  // The location of the update package.
   private $filename;
 
   /*
@@ -87,38 +87,36 @@ class Update
   */
   public function download($download_url, $save_to, $checksum_url = null)
   {
-    global $api;
-
-    # No download or save to URL?
+    // No download or save to URL?
     if(empty($download_url) || empty($save_to))
     {
-      # Well we can't download it!
+      // Well we can't download it!
       return false;
     }
 
-    # Attempt to open the save to path...
+    // Attempt to open the save to path...
     $fp = fopen($save_to, 'w');
 
-    # Did it work?
+    // Did it work?
     if(empty($fp))
     {
-      # No it did not, so the download failed.
+      // No it did not, so the download failed.
       return array(
                 'downloaded' => false,
                 'valid' => !empty($checksum_url) ? false : null,
               );
     }
 
-    # Close it... We just needed to check.
+    // Close it... We just needed to check.
     fclose($fp);
 
-    # We need the HTTP class.
-    $http = $api->load_class('HTTP');
+    // We need the HTTP class.
+    $http = api()->load_class('HTTP');
 
-    # Now download the update package.
+    // Now download the update package.
     $downloaded = $http->request($download_url, array(), 0, $save_to);
 
-    # Did it download?
+    // Did it download?
     if(empty($downloaded))
     {
       return array(
@@ -127,27 +125,27 @@ class Update
               );
     }
 
-    # Do we need to download a checksum?
+    // Do we need to download a checksum?
     if(empty($checksum_url))
     {
-      # Nope.
+      // Nope.
       return array(
                 'downloaded' => true,
                 'valid' => null,
               );
     }
 
-    # Now time to download the checksum.
+    // Now time to download the checksum.
     $checksum = $http->request($checksum_url);
     $valid = strlen($checksum) == 40 ? sha1_file($save_to) == $checksum : (strlen($checksum) == 32 ? md5_file($save_to) == $checksum : false);
 
-    # Is it not valid? Then delete it!
+    // Is it not valid? Then delete it!
     if(empty($valid))
     {
       @unlink($save_to);
     }
 
-    # We are done, well, almost :P
+    // We are done, well, almost :P
     return array(
               'downloaded' => true,
               'valid' => $valid,
@@ -181,9 +179,7 @@ class Update
   */
   public function extract($filename, $path, $type = null)
   {
-    global $api;
-
-    # No supplied type? Try to auto-detect.
+    // No supplied type? Try to auto-detect.
     if(empty($type) && strpos($filename, '.') !== false)
     {
       $tmp = explode('.', $filename);
@@ -191,7 +187,7 @@ class Update
       $extension = strtolower(array_pop($tmp));
       if($extension == 'gz' || $extension == 'tgz' || $extension == 'tar')
       {
-        # It's a tarball...
+        // It's a tarball...
         if($extension == 'tar' || $extension == 'tgz' || strtolower(array_pop($tmp)) == 'tar')
         {
           $type = 'tar';
@@ -199,21 +195,21 @@ class Update
       }
       elseif($extension == 'zip')
       {
-        # Change the type to zip :-)
+        // Change the type to zip :-)
         $type = 'zip';
       }
     }
 
-    # Still empty..?
+    // Still empty..?
     if(empty($type))
     {
-      # Hmm... Try detecting it another way.
-      $zip = $api->load_class('Zip');
-      $tar = $api->load_class('Tar');
+      // Hmm... Try detecting it another way.
+      $zip = api()->load_class('Zip');
+      $tar = api()->load_class('Tar');
 
       if($zip->open($filename))
       {
-        # Looks like it's a zip! Cool.
+        // Looks like it's a zip! Cool.
         $type = 'zip';
         $zip->close();
       }
@@ -224,7 +220,7 @@ class Update
       }
     }
 
-    # Does the file not exist? Or the path (not writable either)? Or does is the type not supported?
+    // Does the file not exist? Or the path (not writable either)? Or does is the type not supported?
     if(!file_exists($filename) || !is_file($filename) || !file_exists($path) || !is_dir($path) || !is_writable($path) || ($type != 'tar' && $type != 'zip'))
     {
       return false;
@@ -232,7 +228,7 @@ class Update
 
     if($type == 'zip')
     {
-      $zip = $api->load_class('Zip');
+      $zip = api()->load_class('Zip');
 
       if(!$zip->open($filename))
       {
@@ -250,31 +246,31 @@ class Update
     }
     elseif($type == 'tar')
     {
-      # We need the Tar class.
-      $tar = $api->load_class('Tar');
+      // We need the Tar class.
+      $tar = api()->load_class('Tar');
 
-      # Now open the tarball, or at least try.
+      // Now open the tarball, or at least try.
       if(!$tar->open($filename))
       {
-        # Sorry, we couldn't open it for some reason.
+        // Sorry, we couldn't open it for some reason.
         return false;
       }
       else
       {
-        # Is it gzipped? If it is, remove it from its gzipped state.
+        // Is it gzipped? If it is, remove it from its gzipped state.
         if($tar->is_gzipped())
         {
           if(!$tar->ungzip())
           {
-            # Well, that sucked.
+            // Well, that sucked.
             return false;
           }
         }
 
-        # Now extract the tarball to the path specified.
+        // Now extract the tarball to the path specified.
         if(!$tar->extract($path))
         {
-          # That didn't work :/
+          // That didn't work :/
           return false;
         }
         else
@@ -285,7 +281,7 @@ class Update
       }
     }
 
-    # All done!
+    // All done!
     return true;
   }
 
@@ -305,29 +301,29 @@ class Update
   */
   public function get_listing($path, $implode = true)
   {
-    # Get the stuff in the specified path.
+    // Get the stuff in the specified path.
     $files = scandir($path);
     $listing = array();
 
-    # Was anything there (does it exist..?)
+    // Was anything there (does it exist..?)
     if(count($files) > 0)
     {
       foreach($files as $file)
       {
-        # Ignore the . and .. directories.
+        // Ignore the . and .. directories.
         if($file == '.' || $file == '..')
         {
           continue;
         }
 
-        # Is it a directory? As this index will contain the files and folders
-        # within an array.
+        // Is it a directory? As this index will contain the files and folders
+        // within an array.
         if(is_dir($path. '/'. $file))
         {
-          # Woo for recursion!
+          // Woo for recursion!
           $listing[$file. '/'] = $this->get_listing($path. '/'. $file, false);
         }
-        # Otherwise it will just be set to the files name ;-)
+        // Otherwise it will just be set to the files name ;-)
         else
         {
           $listing[$file] = $file;
@@ -336,11 +332,11 @@ class Update
     }
     else
     {
-      # Doesn't exist, sorry.
+      // Doesn't exist, sorry.
       return false;
     }
 
-    # This only happens on the very first call of the method.
+    // This only happens on the very first call of the method.
     if(!empty($implode))
     {
       $tmp = array();
@@ -431,30 +427,30 @@ class Update
   */
   public function copy($path, $new_path, $filename = null)
   {
-    # Make sure everything exists and what not.
+    // Make sure everything exists and what not.
     if(!file_exists($path) || !is_dir($path) || !is_readable($path) || !file_exists($new_path) || !is_dir($new_path) || !is_writable($new_path) || (!empty($filename) && !file_exists($path. '/'. $filename)))
     {
       return false;
     }
 
-    # One more check, make sure the specified file you want to move is actually in $path.
+    // One more check, make sure the specified file you want to move is actually in $path.
     $path = realpath($path);
     $tmp = realpath($path. '/'. $filename);
 
     if(substr($tmp, 0, strlen($path)) != $path)
     {
-      # It is not within the specified path, sorry! No trying to do something naughty ;-)
+      // It is not within the specified path, sorry! No trying to do something naughty ;-)
       return false;
     }
 
     if(empty($filename))
     {
-      # Get the directory ourself...
+      // Get the directory ourself...
       $listing = array_flip($this->get_listing($path));
 
       foreach($listing as $file => $d)
       {
-        # Now copy them!
+        // Now copy them!
         $listing[$file] = $this->copy($path, $new_path, $file);
       }
 
@@ -462,39 +458,39 @@ class Update
     }
     else
     {
-      # Time to copy! Woo!
-      # That is, if the file exists...
+      // Time to copy! Woo!
+      // That is, if the file exists...
       if(!file_exists($path. '/'. $filename))
       {
         return false;
       }
 
-      # Create the directory, if need be.
+      // Create the directory, if need be.
       $dirname = dirname($new_path. '/'. $filename);
       if(!file_exists($dirname))
       {
         @mkdir($dirname, 0755, true);
       }
 
-      # Is it not a directory? Must be a file we need to copy then.
+      // Is it not a directory? Must be a file we need to copy then.
       if(!is_dir($path. '/'. $filename))
       {
-        # Open up the file to be copied into in write and binary mode.
+        // Open up the file to be copied into in write and binary mode.
         $fp = fopen($new_path. '/'. $filename, 'wb');
 
-        # Failed to open? :-(
+        // Failed to open? :-(
         if(empty($fp))
         {
           return false;
         }
 
-        # It's mine!
+        // It's mine!
         flock($fp, LOCK_EX);
 
-        # Now the file we will get the data from.
+        // Now the file we will get the data from.
         $new_fp = fopen($path. '/'. $filename, 'rb');
 
-        # Failed to open? :-(
+        // Failed to open? :-(
         if(empty($new_fp))
         {
           return false;
@@ -502,24 +498,24 @@ class Update
 
         flock($new_fp, LOCK_SH);
 
-        # Now copy that data over :-)
+        // Now copy that data over :-)
         while(!feof($new_fp))
         {
           fwrite($fp, fread($new_fp, 8192));
         }
 
-        # We are done with these now.
+        // We are done with these now.
         flock($fp, LOCK_UN);
         flock($new_fp, LOCK_UN);
         fclose($fp);
         fclose($new_fp);
 
-        # It was done successfully!
+        // It was done successfully!
         return true;
       }
       else
       {
-        # Just incase :P
+        // Just incase :P
         if(!file_exists($new_path. '/'. $filename))
         {
           return @mkdir($new_path. '/'. $filename);
@@ -547,23 +543,23 @@ class Update
   */
   public function finish($path, $new_path)
   {
-    # Remove all files and folders in the update location.
+    // Remove all files and folders in the update location.
     if(!recursive_unlink($path))
     {
       return false;
     }
 
-    # Any update file? Run it then!
+    // Any update file? Run it then!
     if(file_exists($new_path. '/update.php'))
     {
-      # We run it by simply including it.
+      // We run it by simply including it.
       require_once($new_path. '/update.php');
 
-      # Now remove it.
+      // Now remove it.
       @unlink($new_path. '/update.php');
     }
 
-    # Alright! All done!
+    // Alright! All done!
     return true;
   }
 }

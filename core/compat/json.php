@@ -24,7 +24,7 @@ if(!defined('IN_SNOW'))
 
 if(!function_exists('json_encode'))
 {
-  # Bitmasks for the JSON functions.
+  // Bitmasks for the JSON functions.
   define('JSON_HEX_TAG', 0x00001);
   define('JSON_HEX_AMP', 0x00010);
   define('JSON_HEX_APOS', 0x00100);
@@ -43,7 +43,7 @@ if(!function_exists('json_encode'))
   */
   function json_encode($value, $options = 0)
   {
-    # Is it an array or object?
+    // Is it an array or object?
     if(is_array($value))
     {
       if(!__json_flat_array($value) || is_object($value) || ($options & JSON_FORCE_OBJECT))
@@ -67,17 +67,17 @@ if(!function_exists('json_encode'))
         return '['. implode(',', $values). ']';
       }
     }
-    # How about a bool?
+    // How about a bool?
     elseif(is_bool($value))
     {
       return $value ? 'true' : 'false';
     }
-    # A number, perhaps?
+    // A number, perhaps?
     elseif(is_numeric($value))
     {
       return $value;
     }
-    # A string?
+    // A string?
     elseif(is_string($value))
     {
       return '"'. __json_sanitize($value, $options). '"';
@@ -126,7 +126,7 @@ if(!function_exists('json_encode'))
   */
   function __json_sanitize($value, $options = 0)
   {
-    # These are things which need to be replaced.
+    // These are things which need to be replaced.
     $value = strtr($value, array(
                              "\b" => "\\b",
                              "\t" => "\\t",
@@ -137,7 +137,7 @@ if(!function_exists('json_encode'))
                              '\\' => '\\\\',
                            ));
 
-    # Anything special?
+    // Anything special?
     if($options & JSON_HEX_TAG)
     {
       $value = strtr($value, array('<' => '\u003C', '>' => '\u003E'));

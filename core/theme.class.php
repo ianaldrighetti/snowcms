@@ -31,38 +31,38 @@ if(!defined('IN_SNOW'))
 */
 abstract class Theme
 {
-  # Variable: main_title
-  # Contains the sites main title, this title is not independent per page
-  # but dependent on the whole sites name itself.
+  // Variable: main_title
+  // Contains the sites main title, this title is not independent per page
+  // but dependent on the whole sites name itself.
   protected $main_title;
 
-  # Variable: title
-  # The title specific to the current page.
+  // Variable: title
+  // The title specific to the current page.
   protected $title;
 
-  # Variable: url
-  # The URL of the current themes base directory.
+  // Variable: url
+  // The URL of the current themes base directory.
   protected $url;
 
-  # Variable: links
-  # An array containing all the <link> tags to be added inside the <head> of
-  # the document. Each array inside links can contain charset, href, hreflang,
-  # media, rel, rev, target, type, class, dir, id, lang, style, title and xml:lang.
+  // Variable: links
+  // An array containing all the <link> tags to be added inside the <head> of
+  // the document. Each array inside links can contain charset, href, hreflang,
+  // media, rel, rev, target, type, class, dir, id, lang, style, title and xml:lang.
   protected $links;
 
-  # Variable: js_vars
-  # An associative array (variable => value) containing JavaScript variables
-  # to be defined before including JavaScript files, if any.
+  // Variable: js_vars
+  // An associative array (variable => value) containing JavaScript variables
+  // to be defined before including JavaScript files, if any.
   protected $js_vars;
 
-  # Variable: js_files
-  # Contains JavaScript files to include in the documents <head> tag. Each array
-  # inside can contain type, charset, defer and src.
+  // Variable: js_files
+  // Contains JavaScript files to include in the documents <head> tag. Each array
+  // inside can contain type, charset, defer and src.
   protected $js_files;
 
-  # Variable: meta
-  # An array containing meta data to include in the documents <head> tag. Each
-  # array can contain content, http-equiv, name, scheme, dir, lang and xml:lang.
+  // Variable: meta
+  // An array containing meta data to include in the documents <head> tag. Each
+  // array can contain content, http-equiv, name, scheme, dir, lang and xml:lang.
   protected $meta;
 
   /*
@@ -74,7 +74,7 @@ abstract class Theme
   */
   public function __construct($main_title = null, $url = null)
   {
-    # Initiate the attributes.
+    // Initiate the attributes.
     $this->title = null;
     $this->url = null;
     $this->links = array();
@@ -82,22 +82,22 @@ abstract class Theme
     $this->js_files = array();
     $this->meta = array();
 
-    # Setting the main title?
+    // Setting the main title?
     if(!empty($main_title))
     {
       $this->set_main_title($main_title);
     }
 
-    # How about the URL to the themes folder?
+    // How about the URL to the themes folder?
     if(!empty($url))
     {
       $this->set_url($url);
     }
 
-    # Our first meta tag!
+    // Our first meta tag!
     $this->add_meta(array('http-equiv' => 'Content-Type', 'content' => 'text/html; charset=utf-8'));
 
-    # Do any possible specific theme stuff :)
+    // Do any possible specific theme stuff :)
     $this->init();
   }
 
@@ -114,7 +114,7 @@ abstract class Theme
   */
   public function set_main_title($main_title)
   {
-    # Make sure the title isn't empty.
+    // Make sure the title isn't empty.
     if(!empty($main_title))
     {
       $this->main_title = $main_title;
@@ -139,7 +139,7 @@ abstract class Theme
   */
   public function set_title($title)
   {
-    # Don't set it to nothing!
+    // Don't set it to nothing!
     if(!empty($title))
     {
       $this->title = $title;
@@ -164,7 +164,7 @@ abstract class Theme
   */
   public function set_url($url)
   {
-    # Can't have an empty URL, well, except if you never set it.
+    // Can't have an empty URL, well, except if you never set it.
     if(!empty($url))
     {
       $this->url = $url;
@@ -238,24 +238,24 @@ abstract class Theme
   */
   public function add_link($link)
   {
-    # Is href not set, link not an array, that link already exist?!?
+    // Is href not set, link not an array, that link already exist?!?
     if(count($link) == 0 || empty($link['href']) || !is_array($link) || $this->link_exists($link['href']) || count($link) > 15)
     {
       return false;
     }
 
-    # Make sure you don't have more attributes than allowed...
+    // Make sure you don't have more attributes than allowed...
     $allowed_attributes = array('charset', 'href', 'hreflang', 'media', 'rel', 'rev', 'target', 'type', 'class', 'dir', 'id', 'lang', 'style', 'title', 'xml:lang');
     foreach($link as $attr => $value)
     {
-      # Did we find an attribute which wasn't allowed? Uh oh!
+      // Did we find an attribute which wasn't allowed? Uh oh!
       if(!in_array($attr, $allowed_attributes))
       {
         return false;
       }
     }
 
-    # Still going? That means it's okay! ;-)
+    // Still going? That means it's okay! ;-)
     $this->links[] = $link;
     return true;
   }
@@ -275,24 +275,24 @@ abstract class Theme
   */
   public function link_exists($link_href)
   {
-    # No need to search if the URL is blank or if there are no links!
+    // No need to search if the URL is blank or if there are no links!
     if(empty($link_href) || count($this->links) == 0)
     {
       return false;
     }
 
-    # Look through them all.
+    // Look through them all.
     foreach($this->links as $key => $link)
     {
-      # Did we find it?
+      // Did we find it?
       if($link['href'] == $link_href)
       {
-        # Yup, we found it, so it exists!
+        // Yup, we found it, so it exists!
         return true;
       }
     }
 
-    # Still going? Then we didn't find it.
+    // Still going? Then we didn't find it.
     return false;
   }
 
@@ -309,7 +309,7 @@ abstract class Theme
   */
   public function remove_link($link_href)
   {
-    # Empty URL? No links? Doesn't exist? Then we can't remove it, can we?!
+    // Empty URL? No links? Doesn't exist? Then we can't remove it, can we?!
     if(empty($link_href) || count($this->links) == 0 || !$this->link_exists($link_href))
     {
       return false;
@@ -317,7 +317,7 @@ abstract class Theme
 
     foreach($this->links as $key => $link)
     {
-      # I think we found it, if they match!
+      // I think we found it, if they match!
       if($link['href'] == $link_href)
       {
         unset($this->links[$key]);
@@ -325,7 +325,7 @@ abstract class Theme
       }
     }
 
-    # This should never happen o.O
+    // This should never happen o.O
     return false;
   }
 
@@ -359,13 +359,13 @@ abstract class Theme
   */
   public function add_js_var($variable, $value)
   {
-    # You need a variable name, but if the variable already exists...
+    // You need a variable name, but if the variable already exists...
     if(empty($variable) || $this->js_var_exists($variable))
     {
       return false;
     }
 
-    # JSON encode the value :D
+    // JSON encode the value :D
     $this->js_vars[$variable] = $value;
     return true;
   }
@@ -383,7 +383,7 @@ abstract class Theme
   */
   public function js_var_exists($variable)
   {
-    # A simple check, really.
+    // A simple check, really.
     return isset($this->js_vars[$variable]);
   }
 
@@ -400,13 +400,13 @@ abstract class Theme
   */
   public function remove_js_var($variable)
   {
-    # We cannot remove something that doesn't exist, can we?
+    // We cannot remove something that doesn't exist, can we?
     if(!$this->js_var_exists($variable))
     {
       return false;
     }
 
-    # Simple enough, just unset it.
+    // Simple enough, just unset it.
     unset($this->js_vars[$variable]);
     return true;
   }
@@ -448,36 +448,36 @@ abstract class Theme
   */
   public function add_js_file($script)
   {
-    # We require you give us at least the source (src) of the script.
+    // We require you give us at least the source (src) of the script.
     if(empty($script) || !is_array($script) || empty($script['src']) || $this->js_file_exists($script['src']))
     {
       return false;
     }
 
-    # No type? Add it ourselves :P
+    // No type? Add it ourselves :P
     if(empty($script['type']))
     {
       $script['type'] = 'text/javascript';
     }
 
-    # No language? JavaScript then... Of course.
+    // No language? JavaScript then... Of course.
     if(empty($script['language']))
     {
       $script['language'] = 'JavaScript';
     }
 
-    # Let's make sure you aren't throwing some random crap in...
+    // Let's make sure you aren't throwing some random crap in...
     $allowed_attributes = array('type', 'charset', 'defer', 'src', 'language');
     foreach($script as $attr => $value)
     {
-      # Did you add an attribute which doesn't exist? Tisk tisk!
+      // Did you add an attribute which doesn't exist? Tisk tisk!
       if(!in_array($attr, $allowed_attributes))
       {
         return false;
       }
     }
 
-    # If false was never returned, everything is okay.
+    // If false was never returned, everything is okay.
     $this->js_files[] = $script;
     return true;
   }
@@ -495,23 +495,23 @@ abstract class Theme
   */
   public function js_file_exists($script_src)
   {
-    # No src? No JavaScript files currently? Then it definitely won't exist.
+    // No src? No JavaScript files currently? Then it definitely won't exist.
     if(empty($script_src) || count($this->js_files) == 0)
     {
       return false;
     }
 
-    # Try to find the file.
+    // Try to find the file.
     foreach($this->js_files as $js)
     {
-      # Do the src's match?
+      // Do the src's match?
       if($js['src'] == $script_src)
       {
         return true;
       }
     }
 
-    # Nope, didn't find one.
+    // Nope, didn't find one.
     return false;
   }
 
@@ -528,24 +528,24 @@ abstract class Theme
   */
   public function remove_js_file($script_src)
   {
-    # Does the JavaScript file not exist? Then we can't remove it.
+    // Does the JavaScript file not exist? Then we can't remove it.
     if(!$this->js_file_exists($script_src))
     {
       return false;
     }
 
-    # Hmm, let's looks, as we need the key of the index to delete it.
+    // Hmm, let's looks, as we need the key of the index to delete it.
     foreach($this->js_files as $key => $js)
     {
       if($js['src'] == $script_src)
       {
-        # Found it!
+        // Found it!
         unset($this->js_files[$key]);
         return true;
       }
     }
 
-    # This shouldn't happen o.O
+    // This shouldn't happen o.O
     return false;
   }
 
@@ -578,12 +578,12 @@ abstract class Theme
   */
   public function add_meta($meta)
   {
-    # No information given? Or no essential information given? Then sorry, can't add it!
+    // No information given? Or no essential information given? Then sorry, can't add it!
     if(empty($meta) || !is_array($meta) || count($meta) == 0 || ((isset($meta['name']) || isset($meta['http-equiv'])) && $this->meta_exists(isset($meta['name']) ? $meta['name'] : $meta['http-equiv'])))
     {
       return false;
     }
-    # You can only have a name OR http-equiv value, not both!
+    // You can only have a name OR http-equiv value, not both!
     elseif(!empty($meta['name']) && !empty($meta['http-equiv']))
     {
       return false;
@@ -592,14 +592,14 @@ abstract class Theme
     $allowed_attributes = array('content', 'http-equiv', 'name', 'scheme', 'dir', 'lang', 'xml:lang');
     foreach($meta as $attr => $value)
     {
-      # You trying to add some funky attribute? Sorry.
+      // You trying to add some funky attribute? Sorry.
       if(!in_array($attr, $allowed_attributes))
       {
         return false;
       }
     }
 
-    # Looks like it is okay, add it!
+    // Looks like it is okay, add it!
     $this->meta[] = $meta;
     return true;
   }
@@ -617,7 +617,7 @@ abstract class Theme
   */
   public function meta_exists($name)
   {
-    # No name supplied?
+    // No name supplied?
     if(empty($name) || count($this->meta) == 0)
     {
       return false;
@@ -625,14 +625,14 @@ abstract class Theme
 
     foreach($this->meta as $meta)
     {
-      # Check both the name and http-equiv value of the meta tag.
+      // Check both the name and http-equiv value of the meta tag.
       if((isset($meta['name']) && $meta['name'] == $name) || (isset($meta['http-equiv']) && $meta['http-equiv'] == $name))
       {
         return true;
       }
     }
 
-    # Sorry, doesn't exist. Or am I sorry? ;-)
+    // Sorry, doesn't exist. Or am I sorry? ;-)
     return false;
   }
 
@@ -649,7 +649,7 @@ abstract class Theme
   */
   public function remove_meta($name)
   {
-    # Can't remove something that doesn't exist, at least, in the real world.
+    // Can't remove something that doesn't exist, at least, in the real world.
     if(!$this->meta_exists($name))
     {
       return false;
@@ -657,16 +657,16 @@ abstract class Theme
 
     foreach($this->meta as $key => $meta)
     {
-      # Search for it!
+      // Search for it!
       if((isset($meta['name']) && $meta['name'] == $name) || (isset($meta['http-equiv']) && $meta['http-equiv'] == $name))
       {
-        # Remove it and we are done.
+        // Remove it and we are done.
         unset($this->meta[$key]);
         return true;
       }
     }
 
-    # Should never happen :/
+    // Should never happen :/
     return false;
   }
 
@@ -701,9 +701,9 @@ abstract class Theme
   */
   protected function init()
   {
-    # Blank? Yup... As nothing is here by default, but if your theme has anything special
-    # to add or do at startup, redefine this method in your class and the __construct
-    # will call it after all attribute initialization is completed.
+    // Blank? Yup... As nothing is here by default, but if your theme has anything special
+    // to add or do at startup, redefine this method in your class and the __construct
+    // will call it after all attribute initialization is completed.
   }
 
   /*
@@ -747,70 +747,75 @@ abstract class Theme
   */
   protected function generate_tag($name, $attributes, $self_closing = true)
   {
-    # Kinda need the name of a tag.
+    // Kinda need the name of a tag.
     if(empty($name))
     {
       return false;
     }
 
-    # Start to generate the tag.
+    // Start to generate the tag.
     $tag = '<'. strtolower($name);
 
-    # Any attributes to add? Maybe, maybe not.
+    // Any attributes to add? Maybe, maybe not.
     if(is_array($attributes) && count($attributes) > 0)
     {
       $attr = array();
 
       foreach($attributes as $name => $value)
       {
-        # As long as they aren't empty, add them.
+        // As long as they aren't empty, add them.
         if(!empty($value))
         {
           $attr[] = $name. '="'. addcslashes($value, '"'). '"';
         }
       }
 
-      # Now add them to the tag.
+      // Now add them to the tag.
       $tag .= ' '. implode(' ', $attr);
     }
 
-    # Now finally, return the tag, either self closing, or not!
-    # You can finish the rest if you don't have a self closing tag ;-)
+    // Now finally, return the tag, either self closing, or not!
+    // You can finish the rest if you don't have a self closing tag ;-)
     return ($tag. (!empty($self_closing) ? ' />' : '>'));
   }
 }
 
 /*
-  Function: init_theme
+  Function: theme
 
-  Creates the $theme object.
+  Initializes the system theme, if required. It will also return the current
+  instance of the <Theme> object as well, which can be used for, well,
+  theme purposes.
 
   Parameters:
     none
 
   Returns:
-    void - Nothing is returned by this function.
+    object
 */
-function init_theme()
+function theme()
 {
-  global $api, $member, $settings, $theme;
+	if(!isset($GLOBALS['theme']))
+	{
+		// Load up <theme_load> and <theme_list> :-)
+		require_once(coredir. '/theme.php');
 
-  # Load up <theme_load> and <theme_list> :-)
-  require_once(coredir. '/theme.php');
+		// Load the Implemented_Theme class...
+		require_once(themedir. '/'. settings()->get('theme', 'string', 'default'). '/implemented_theme.class.php');
+		$GLOBALS['theme'] = api()->load_class('Implemented_Theme', array(settings()->get('site_name', 'string'), themeurl. '/'. settings()->get('theme', 'string', 'default')));
 
-  # Load the Implemented_Theme class...
-  require_once(themedir. '/'. $settings->get('theme', 'string', 'default'). '/implemented_theme.class.php');
-  $theme = $api->load_class('Implemented_Theme', array($settings->get('site_name', 'string'), themeurl. '/'. $settings->get('theme', 'string', 'default')));
+		// Be sure that the snowobj.js file is in all themes.
+		theme()->add_js_file(array('src' => themeurl. '/default/js/snowobj.js'));
 
-  # Be sure that the snowobj.js file is in all themes.
-  $theme->add_js_file(array('src' => themeurl. '/default/js/snowobj.js'));
+		// Along with  JavaScript variables containing the base URL and theme URL.
+		theme()->add_js_var('base_url', baseurl);
+		theme()->add_js_var('theme_url', themeurl);
+		theme()->add_js_var('session_id', member()->session_id());
 
-  # Along with  JavaScript variables containing the base URL and theme URL.
-  $theme->add_js_var('base_url', baseurl);
-  $theme->add_js_var('theme_url', themeurl);
-  $theme->add_js_var('session_id', $member->session_id());
+		// You can hook into here to add all your theme stuffs (<link>'s, js vars, js files, etc).
+		api()->run_hooks('post_init_theme');
+  }
 
-  # You can hook into here to add all your theme stuffs (<link>'s, js vars, js files, etc).
-  $api->run_hooks('post_init_theme');
+  return $GLOBALS['theme'];
 }
 ?>

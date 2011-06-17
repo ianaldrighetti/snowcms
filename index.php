@@ -81,7 +81,7 @@ require(coredir. '/settings.class.php');
 
 // Load up the validation and settings class :)
 init_validation();
-init_settings();
+settings();
 
 require(coredir. '/func.php');
 
@@ -110,12 +110,12 @@ require(coredir. '/l.php');
 // Tasks tool, don't wanna forget that!
 require(coredir. '/tasks.class.php');
 
-init_tasks();
+tasks();
 
 require(coredir. '/theme.class.php');
 
 // Initialize the theme!!!
-init_theme();
+theme();
 
 // Now there is some stuff that the system itself needs to take care of :)
 require(coredir. '/core.php');

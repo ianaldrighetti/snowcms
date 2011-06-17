@@ -22,7 +22,7 @@ if(!defined('IN_SNOW'))
   die('Nice try...');
 }
 
-# Title: Control Panel - Plugins - Settings
+// Title: Control Panel - Plugins - Settings
 
 if(!function_exists('admin_plugins_settings'))
 {
@@ -45,25 +45,23 @@ if(!function_exists('admin_plugins_settings'))
   */
   function admin_plugins_settings()
   {
-    global $api, $member, $settings, $theme;
+    api()->run_hooks('admin_plugins_settings');
 
-    $api->run_hooks('admin_plugins_settings');
-
-    # Can you manage plugin settings?
-    if(!$member->can('manage_plugin_settings'))
+    // Can you manage plugin settings?
+    if(!member()->can('manage_plugin_settings'))
     {
-      # That's what I thought!
+      // That's what I thought!
       admin_access_denied();
     }
 
-    # We will need the form for this ;)
+    // We will need the form for this ;)
     admin_plugins_settings_generate_form();
-    $form = $api->load_class('Form');
+    $form = api()->load_class('Form');
 
-    # Submitting the form? Alright.
+    // Submitting the form? Alright.
     if(!empty($_POST['admin_plugins_settings_form']))
     {
-      # We shall process it! But through AJAX?
+      // We shall process it! But through AJAX?
       if(isset($_GET['ajax']))
       {
         echo $form->json_process('admin_plugins_settings_form');
@@ -71,39 +69,39 @@ if(!function_exists('admin_plugins_settings'))
       }
       else
       {
-        # Just regular ol' submitting ;)
+        // Just regular ol' submitting ;)
         $form->process('admin_plugins_settings_form');
       }
     }
 
-    $theme->set_current_area('plugins_settings');
+    theme()->set_current_area('plugins_settings');
 
-    $theme->set_title(l('Plugin settings'));
+    theme()->set_title(l('Plugin settings'));
 
-    $theme->header();
+    theme()->header();
 
     echo '
-  <h1><img src="', $theme->url(), '/plugins_settings-small.png" alt="" /> ', l('Manage plugin settings'), '</h1>
+  <h1><img src="', theme()->url(), '/plugins_settings-small.png" alt="" /> ', l('Manage plugin settings'), '</h1>
   <p>', l('Various plugin settings can be managed here.'), '</p>';
 
-    # Gotta run those hooks, in order to know the actual number of fields...
+    // Gotta run those hooks, in order to know the actual number of fields...
     $form->run_hooks('admin_plugins_settings_form');
 
-    # Are there even any settings?
-    # Of course there is one field, which is the form token...
+    // Are there even any settings?
+    // Of course there is one field, which is the form token...
     if($form->num_fields('admin_plugins_settings_form') > 1)
     {
-      # Yup, there are!
+      // Yup, there are!
       $form->show('admin_plugins_settings_form');
     }
     else
     {
-      # Nope, there is not.
+      // Nope, there is not.
       echo '
   <p style="margin-top: 10px; font-weight: bold; text-align: center;">', l('There are currently no plugin settings.'), '</p>';
     }
 
-    $theme->footer();
+    theme()->footer();
   }
 }
 
@@ -125,10 +123,8 @@ if(!function_exists('admin_plugins_settings_generate_form'))
   */
   function admin_plugins_settings_generate_form()
   {
-    global $api, $db, $settings;
-
-    # We need the Form class, that's for sure!
-    $form = $api->load_class('Form');
+    // We need the Form class, that's for sure!
+    $form = api()->load_class('Form');
 
     $form->add('admin_plugins_settings_form', array(
                                                 'action' => baseurl. '/index.php?action=admin&sa=plugins_settings',
@@ -137,7 +133,7 @@ if(!function_exists('admin_plugins_settings_generate_form'))
                                                 'submit' => l('Save settings'),
                                               ));
 
-    # There is actually nothing to add, lol... It's all for the plugins ;)
+    // There is actually nothing to add, lol... It's all for the plugins ;)
   }
 }
 
@@ -160,24 +156,22 @@ if(!function_exists('admin_plugins_settings_handle'))
   */
   function admin_plugins_settings_handle($data, &$errors = array())
   {
-    global $api, $settings;
+    // We will need to update the values so we don't have to redirect.
+    $form = api()->load_class('Form');
 
-    # We will need to update the values so we don't have to redirect.
-    $form = $api->load_class('Form');
-
-    # Loop through all the settings and save them!
+    // Loop through all the settings and save them!
     foreach($data as $variable => $value)
     {
-      # Set it :)
-      $settings->set($variable, $value, 'string');
+      // Set it :)
+      settings()->set($variable, $value, 'string');
 
-      # Update the value, otherwise we would need to refresh, which is unrequired.
+      // Update the value, otherwise we would need to refresh, which is unrequired.
       $form->edit_field('admin_plugins_settings_form', $variable, array(
                                                                     'value' => $value,
                                                                   ));
     }
 
-    $api->add_filter('admin_plugins_settings_form_message', create_function('$value', '
+    api()->add_filter('admin_plugins_settings_form_message', create_function('$value', '
                                                               return l(\'Plugin settings have been successfully updated.\');'));
 
     return true;

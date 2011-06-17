@@ -22,7 +22,7 @@ if(!defined('IN_SNOW'))
   die('Nice try...');
 }
 
-# Title: Control Panel - Plugins - Add
+// Title: Control Panel - Plugins - Add
 
 if(!function_exists('admin_plugins_add'))
 {
@@ -42,38 +42,36 @@ if(!function_exists('admin_plugins_add'))
   */
   function admin_plugins_add()
   {
-    global $api, $member, $settings, $theme;
+    api()->run_hooks('admin_plugins_add');
 
-    $api->run_hooks('admin_plugins_add');
-
-    # Can you add plugins?
-    if(!$member->can('add_plugins'))
+    // Can you add plugins?
+    if(!member()->can('add_plugins'))
     {
-      # That's what I thought!
+      // That's what I thought!
       admin_access_denied();
     }
 
     admin_plugins_add_generate_form();
-    $form = $api->load_class('Form');
+    $form = api()->load_class('Form');
 
     if(!empty($_POST['add_plugins_form']))
     {
       $form->process('add_plugins_form');
     }
 
-    $theme->set_current_area('plugins_add');
+    theme()->set_current_area('plugins_add');
 
-    $theme->set_title(l('Add plugin'));
+    theme()->set_title(l('Add plugin'));
 
-    $theme->header();
+    theme()->header();
 
     echo '
-  <h1><img src="', $theme->url(), '/plugins_add-small.png" alt="" /> ', l('Add a new plugin'), '</h1>
+  <h1><img src="', theme()->url(), '/plugins_add-small.png" alt="" /> ', l('Add a new plugin'), '</h1>
   <p>', l('Plugins can be added to your site by entering the plugins dependency name (the address at which the plugins package is downloaded) or by uploading the plugin package.'), '</p>';
 
     $form->show('add_plugins_form');
 
-    $theme->footer();
+    theme()->footer();
   }
 }
 
@@ -95,11 +93,9 @@ if(!function_exists('admin_plugins_add_generate_form'))
   */
   function admin_plugins_add_generate_form()
   {
-    global $api;
+    $form = api()->load_class('Form');
 
-    $form = $api->load_class('Form');
-
-    # Let's get to making our form, shall we?
+    // Let's get to making our form, shall we?
     $form->add('add_plugins_form', array(
                                      'action' => baseurl. '/index.php?action=admin&amp;sa=plugins_add',
                                      'callback' => 'admin_plugins_add_handle',
@@ -107,14 +103,14 @@ if(!function_exists('admin_plugins_add_generate_form'))
                                      'submit' => l('Add plugin'),
                                    ));
 
-    # Do you want to upload the plugin?
+    // Do you want to upload the plugin?
     $form->add_field('add_plugins_form', 'plugin_file', array(
                                                           'type' => 'file',
                                                           'label' => l('From a file:'),
                                                           'subtext' => l('Select the plugin file you want to install.'),
                                                         ));
 
-    # A URL? Sure!
+    // A URL? Sure!
     $form->add_field('add_plugins_form', 'plugin_url', array(
                                                          'type' => 'string',
                                                          'label' => l('From a URL:'),
@@ -145,35 +141,33 @@ if(!function_exists('admin_plugins_add_handle'))
   */
   function admin_plugins_add_handle($data, &$errors = array())
   {
-    global $api, $member;
-
-    # Where should this plugin go..?
+    // Where should this plugin go..?
     $filename = plugindir. '/'. uniqid('plugin_'). '.tmp';
     while(file_exists($filename))
     {
       $filename = plugindir. '/'. uniqid('plugin_'). '.tmp';
     }
 
-    # Uploading a file, are we?
+    // Uploading a file, are we?
     if(!empty($data['plugin_file']['tmp_name']))
     {
-      # Simply try to move the file now.
+      // Simply try to move the file now.
       if(!move_uploaded_file($data['plugin_file']['tmp_name'], $filename))
       {
-        # Woops, didn't work!
+        // Woops, didn't work!
         $errors[] = l('Plugin upload failed.');
         return false;
       }
     }
-    # You want us to download it? I can do that.
+    // You want us to download it? I can do that.
     elseif(!empty($data['plugin_url']) && strtolower($data['plugin_url']) != 'http://')
     {
-      # The HTTP class can do all this, awesomely, of course!
-      $http = $api->load_class('HTTP');
+      // The HTTP class can do all this, awesomely, of course!
+      $http = api()->load_class('HTTP');
 
       if(!$http->request($data['plugin_url'], array(), 0, $filename))
       {
-        # Sorry, but looks like it didn't work!!!
+        // Sorry, but looks like it didn't work!!!
         $errors[] = l('Failed to download the plugin from "%s"', htmlchars($data['plugin_url']));
         return false;
       }
@@ -184,8 +178,8 @@ if(!function_exists('admin_plugins_add_handle'))
       return false;
     }
 
-    # If it worked, we get redirected!
-    redirect(baseurl. '/index.php?action=admin&sa=plugins_add&install='. urlencode(basename($filename)). '&sid='. $member->session_id());
+    // If it worked, we get redirected!
+    redirect(baseurl. '/index.php?action=admin&sa=plugins_add&install='. urlencode(basename($filename)). '&sid='. member()->session_id());
   }
 }
 
@@ -208,18 +202,16 @@ if(!function_exists('admin_plugins_install'))
   */
   function admin_plugins_install()
   {
-    global $api, $db, $member, $theme;
-
-    $api->run_hooks('admin_plugins_install');
+    api()->run_hooks('admin_plugins_install');
 
     // Can you add plugins?
-    if(!$member->can('add_plugins'))
+    if(!member()->can('add_plugins'))
     {
       // That's what I thought!
       admin_access_denied();
     }
 
-    $theme->set_current_area('plugins_add');
+    theme()->set_current_area('plugins_add');
 
     // Check the session id.
     verify_request('get');
@@ -233,25 +225,25 @@ if(!function_exists('admin_plugins_install'))
     if(empty($filename) || !is_file($filename) || substr($filename, 0, strlen(realpath(plugindir))) != realpath(plugindir) || count($extension) < 2 || $extension[count($extension) - 1] != 'tmp')
     {
       // Must not be valid, from what we can tell.
-      $theme->set_title(l('An error has occurred'));
+      theme()->set_title(l('An error has occurred'));
 
-      $theme->header();
+      theme()->header();
 
       echo '
-  <h1><img src="', $theme->url(), '/plugins_add-small.png" alt="" /> ', l('An error has occurred'), '</h1>
+  <h1><img src="', theme()->url(), '/plugins_add-small.png" alt="" /> ', l('An error has occurred'), '</h1>
   <p>', l('Sorry, but the supplied plugin file either does not exist or is not a valid file.'), '</p>';
 
-      $theme->footer();
+      theme()->footer();
     }
     else
     {
       // Time to get to installation!
-      $theme->set_title(l('Installing plugin'));
+      theme()->set_title(l('Installing plugin'));
 
-      $theme->header();
+      theme()->header();
 
       echo '
-    <h1><img src="', $theme->url(), '/plugins_add-small.png" alt="" /> ', l('Installing plugin'), '</h1>
+    <h1><img src="', theme()->url(), '/plugins_add-small.png" alt="" /> ', l('Installing plugin'), '</h1>
     <p>', l('Please wait while the plugin is being installed.'), '</p>
 
     <h3>', l('Extracting plugin'), '</h3>';
@@ -268,7 +260,7 @@ if(!function_exists('admin_plugins_install'))
       */
 
       // The Update class will be very useful!
-      $update = $api->load_class('Update');
+      $update = api()->load_class('Update');
 
       // Get the name of the file.
       $name = explode('.', basename($filename), 2);
@@ -330,7 +322,7 @@ if(!function_exists('admin_plugins_install'))
 
         // Is the plugin safe to proceed?
         $install_proceed = isset($_GET['proceed']) || $status == 'approved';
-        $api->run_hooks('plugin_install_proceed', array(&$install_proceed, $status, 'plugin'));
+        api()->run_hooks('plugin_install_proceed', array(&$install_proceed, $status, 'plugin'));
 
         echo '
   <h3>', l('Verifying plugin status'), '</h3>
@@ -344,7 +336,7 @@ if(!function_exists('admin_plugins_install'))
   <h3>', l('Finishing installation'), '</h3>';
 
           // Add the plugin to the database.
-          $result= $db->insert('ignore', '{db->prefix}plugins',
+          $result= db()->insert('ignore', '{db->prefix}plugins',
             array(
               'dependency_name' => 'string-255', 'directory' => 'string-255',
             ),
@@ -398,13 +390,13 @@ if(!function_exists('admin_plugins_install'))
     <input type="hidden" name="action" value="admin" />
     <input type="hidden" name="sa" value="plugins_add" />
     <input type="hidden" name="install" value="', urlencode($_GET['install']), '" />
-    <input type="hidden" name="sid" value="', $member->session_id(), '" />
+    <input type="hidden" name="sid" value="', member()->session_id(), '" />
     <input type="hidden" name="proceed" value="true" />
   </form>';
         }
       }
 
-      $theme->footer();
+      theme()->footer();
     }
   }
 }
@@ -425,8 +417,6 @@ if(!function_exists('admin_plugins_get_message'))
   */
   function admin_plugins_get_message($status, $plugin_name, $reason = null, $is_theme = false)
   {
-    global $api;
-
     $response = array(
                   'color' => '',
                   'message' => '',
@@ -441,7 +431,7 @@ if(!function_exists('admin_plugins_get_message'))
     // Disapproved?
     elseif($status == 'disapproved')
     {
-      $response['color'] = '#DB2929';
+      $response['color'] = '//DB2929';
       $response['message'] = l('The '. (empty($is_theme) ? 'plugin' : 'theme'). ' "%s" has been reviewed and disapproved by the SnowCMS Dev Team.<br />Reason: %s<br />Proceed at your own risk.', $plugin_name, !empty($reason) ? l($reason) : l('None given.'));
     }
     // Deprecated? Pending..?
@@ -469,7 +459,7 @@ if(!function_exists('admin_plugins_get_message'))
     }
     else
     {
-      $api->run_hooks('admin_plugins_handle_status', array(&$response, $plugin_name, $reason, !empty($is_theme)));
+      api()->run_hooks('admin_plugins_handle_status', array(&$response, $plugin_name, $reason, !empty($is_theme)));
     }
 
     return $response;

@@ -31,8 +31,8 @@ if(!defined('IN_SNOW'))
 */
 class PHP_Mail
 {
-  # Variable: options
-  # Contains all the options for sending the email.
+  // Variable: options
+  // Contains all the options for sending the email.
   private $options;
 
   /*
@@ -125,12 +125,12 @@ class PHP_Mail
   {
     if(is_array($header) && is_array($value))
     {
-      # Not the same amount of headers and values? Tisk tisk!
+      // Not the same amount of headers and values? Tisk tisk!
       if(count($header) != count($value) || count($header) == 0)
         return false;
 
       foreach($header as $key => $val)
-        # :D
+        // :D
         $this->add_header($val, $value[$key]);
     }
     else
@@ -171,15 +171,15 @@ class PHP_Mail
   */
   public function send($to, $subject, $message, $alt_message = null)
   {
-    global $api, $func, $settings;
+    global $func;
 
     $handled = null;
-    $api->run_hooks('php_mail_send_pre', array(&$handled, $to, $subject, $message, $alt_message, $this->options));
+    api()->run_hooks('php_mail_send_pre', array(&$handled, $to, $subject, $message, $alt_message, $this->options));
 
     if($handled !== null)
       return !empty($handled);
 
-    # Set some headers...
+    // Set some headers...
     if(empty($this->options['headers']['DATE']))
       $this->options['headers']['DATE'] = date('r');
 
@@ -189,7 +189,7 @@ class PHP_Mail
     if(empty($this->options['headers']['MIME-VERSION']))
       $this->options['headers']['MIME-VERSION'] = '1.0';
 
-    # Any priority?
+    // Any priority?
     if(empty($this->options['headers']['X-PRIORITY']) && isset($this->options['priority']))
       $this->options['headers']['X-PRIORITY'] = $this->options['priority'];
 
@@ -209,64 +209,64 @@ class PHP_Mail
       $this->options['headers']['X-MS-PRIORITY'] = $priority;
     }
 
-    # Set the X-Mailer, just 'cause we are cool like that!
+    // Set the X-Mailer, just 'cause we are cool like that!
     $this->options['headers']['X-MAILER'] = 'PHP/'. version(). ' using SnowCMS';
 
-    # Gotta change the Content-Type?
+    // Gotta change the Content-Type?
     if($this->options['is_html'])
     {
-      # It's a message with multiple parts! (HTML and alternative!)
+      // It's a message with multiple parts! (HTML and alternative!)
       $boundary = substr(str_shuffle('abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_'), 0, 40);
       $this->headers['CONTENT-TYPE'] = 'multipart/alternative; boundary="'. $boundary. '"';
 
-      # No alternative message? That isn't a good idea!
+      // No alternative message? That isn't a good idea!
       if(empty($alt_message))
       {
-        $alt_message = $api->apply_filters('php_mail_alt_message_create', $message);
+        $alt_message = api()->apply_filters('php_mail_alt_message_create', $message);
 
         if($alt_message == $message)
           $alt_message = strip_tags($alt_message);
       }
     }
 
-    # Format all them headers right.
+    // Format all them headers right.
     $headers = array();
     foreach($this->headers as $header => $value)
       $headers[] = $header. ': '. $value;
 
-    # Implode! Implode! :0
-    $headers = wordwrap($api->apply_filters('php_mail_headers', implode("\r\n", $headers)), 70);
+    // Implode! Implode! :0
+    $headers = wordwrap(api()->apply_filters('php_mail_headers', implode("\r\n", $headers)), 70);
 
-    # Messages end with a \n not \r\n... Weird.
+    // Messages end with a \n not \r\n... Weird.
     $message = wordwrap(str_replace("\r\n", "\n", $message), 70);
 
-    # Just a little Windows fix.
+    // Just a little Windows fix.
     if(substr(PHP_OS, 0, 3) == 'WIN')
       $message = str_replace("\n.", "\n..", $message);
 
-    # Here we go! Finally!
+    // Here we go! Finally!
     if(isset($boundary))
     {
-      # Oops, I lied :P
+      // Oops, I lied :P
       $alt_message = wordwrap(str_replace("\r\n", "\n", $alt_message), 70);
 
       if(substr(PHP_OS, 0, 3) == 'WIN')
         $alt_message = str_replace("\n.", "\n..", $alt_message);
 
-      # Put it all together now!
+      // Put it all together now!
       $body = "--{$boundary}\r\nContent-Type: text/plain; charset={$this->options['charset']}\r\n\r\n{$alt_message}\r\n\r\n";
       $body .= "\r\n--{$boundary}\r\nContent-Type: text/html; charset={$this->options['charset']}\r\n\r\n{$message}\r\n\r\n";
       $body .= "--{$boundary}--\r\n.\r\n";
 
-      $message = $api->apply_filters('php_mail_multipart_body', $body);
+      $message = api()->apply_filters('php_mail_multipart_body', $body);
     }
     else
-      $message = $api->apply_filters('php_mail_message_body', $message);
+      $message = api()->apply_filters('php_mail_message_body', $message);
 
-    $mail = $api->apply_filters('php_mail_function', isset($func['mail']) ? $func['mail'] : 'mail');
+    $mail = api()->apply_filters('php_mail_function', isset($func['mail']) ? $func['mail'] : 'mail');
 
-    # Now it is time to send it with the appropriate function.
-    $sent = $mail($to, $subject, $message, $headers, $settings->get('mail_additional_parameters', 'string', ''));
+    // Now it is time to send it with the appropriate function.
+    $sent = $mail($to, $subject, $message, $headers, settings()->get('mail_additional_parameters', 'string', ''));
 
     $this->close();
     return !empty($sent);

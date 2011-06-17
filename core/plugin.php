@@ -22,7 +22,7 @@ if(!defined('IN_SNOW'))
   die('Nice try...');
 }
 
-# Title: Plugin information
+// Title: Plugin information
 
 /*
   Function: plugin_load
@@ -62,52 +62,50 @@ if(!defined('IN_SNOW'))
 */
 function plugin_load($plugin_id, $is_path = true)
 {
-  global $api;
-
-  # Is it a path? Make sure it exists...
+  // Is it a path? Make sure it exists...
   if(empty($plugin_id) || (!empty($is_path) && (!file_exists($plugin_id) || !is_dir($plugin_id) || !file_exists($plugin_id. '/plugin.php') || !file_exists($plugin_id. '/plugin.xml'))))
   {
     return false;
   }
-  # A dependency name? That's fine, but we need the path.
+  // A dependency name? That's fine, but we need the path.
   elseif(empty($is_path))
   {
-    # Get all the plugins, and attempt to interpret the depedency name into
-    # an actual path ;)
+    // Get all the plugins, and attempt to interpret the depedency name into
+    // an actual path ;)
     $list = plugin_list();
 
-    # No plugins? Then it definitely doesn't exist.
+    // No plugins? Then it definitely doesn't exist.
     if(count($list) > 0)
     {
       foreach($list as $path)
       {
-        # Load the plugins informaion with <plugin_load> and check to see
-        # if the dependency name matches :-).
+        // Load the plugins informaion with <plugin_load> and check to see
+        // if the dependency name matches :-).
         $plugin = plugin_load($path);
 
         if($plugin['guid'] == $plugin_id)
         {
-          # Found it! Just return it's information now.
+          // Found it! Just return it's information now.
           return $plugin;
         }
       }
     }
 
-    # Still running? Then we didn't find it!
+    // Still running? Then we didn't find it!
     return false;
   }
 
-  # The plugin.xml file is where it's at!!!
-  $xml = $api->load_class('XML');
+  // The plugin.xml file is where it's at!!!
+  $xml = api()->load_class('XML');
 
   $data = $xml->parse($plugin_id. '/plugin.xml');
 
   if(count($data) > 0)
   {
-    # Keep track of whether or not we are in the author tag.
+    // Keep track of whether or not we are in the author tag.
     $in_author = false;
 
-    # Keep track of the theme info.
+    // Keep track of the theme info.
     $plugin_info = array(
                      'guid' => null,
                      'author' => null,
@@ -119,7 +117,7 @@ function plugin_load($plugin_id, $is_path = true)
                   );
     foreach($data as $item)
     {
-      # Keep track of where we are.
+      // Keep track of where we are.
       if($item['tag'] == 'author' && $item['type'] == 'open')
       {
         $in_author = true;
@@ -129,7 +127,7 @@ function plugin_load($plugin_id, $is_path = true)
         $in_author = false;
       }
 
-      # Saving something?
+      // Saving something?
       if($item['tag'] == 'name' && $in_author)
       {
         $plugin_info['author'] = $item['value'];
@@ -144,7 +142,7 @@ function plugin_load($plugin_id, $is_path = true)
       }
     }
 
-    # No author? No name? No way!
+    // No author? No name? No way!
     if(empty($plugin_info['author']) || empty($plugin_info['name']) || empty($plugin_info['guid']) || empty($plugin_info['version']))
     {
       return false;
@@ -152,17 +150,17 @@ function plugin_load($plugin_id, $is_path = true)
   }
   else
   {
-    # Woops, that's not right!
+    // Woops, that's not right!
     return false;
   }
 
-  # Add the path, just incase :P
+  // Add the path, just incase :P
   $plugin_info['path'] = realpath($plugin_id);
 
   // For backwards compatibility.
   $plugin_info['dependency'] = $plugin_info['guid'];
 
-  # Now return the information.
+  // Now return the information.
   return $plugin_info;
 }
 
@@ -184,34 +182,34 @@ function plugin_load($plugin_id, $is_path = true)
 */
 function plugin_list()
 {
-  # Does the plugin directory not exist for some strange reason?
+  // Does the plugin directory not exist for some strange reason?
   if(!file_exists(plugindir) || !is_dir(plugindir))
   {
     return false;
   }
 
-  # Scan the plugins directory.
+  // Scan the plugins directory.
   $ls = scandir(plugindir);
 
   $list = array();
   foreach($ls as $file)
   {
-    # Skip the ., .. and .svn folders.
+    // Skip the ., .. and .svn folders.
     if(in_array($file, array('.', '..', '.svn')))
     {
       continue;
     }
 
-    # Only look in directories, of course! Then check and see if
-    # plugin.php and plugin.ini exists.
+    // Only look in directories, of course! Then check and see if
+    // plugin.php and plugin.ini exists.
     if(is_dir(plugindir. '/'. $file) && file_exists(plugindir. '/'. $file. '/plugin.php') && file_exists(plugindir. '/'. $file. '/plugin.xml'))
     {
-      # Yup, it was a valid (or most likely valid :-P) plugin.
+      // Yup, it was a valid (or most likely valid :-P) plugin.
       $list[] = realpath(plugindir. '/'. $file);
     }
   }
 
-  # Return the list, whether or not there are any.
+  // Return the list, whether or not there are any.
   return $list;
 }
 
@@ -260,44 +258,42 @@ function plugin_list()
 */
 function plugin_check_status($filename, &$reason = null)
 {
-  global $api;
-
-  # Does the file not exist..?
+  // Does the file not exist..?
   if(!file_exists($filename))
   {
-    # Kinda hard to check the status of that, other than not-exist :P
+    // Kinda hard to check the status of that, other than not-exist :P
     return false;
   }
 
-  # The HTTP class, please!
-  $http = $api->load_class('HTTP');
+  // The HTTP class, please!
+  $http = api()->load_class('HTTP');
 
-  if($response = $http->request($api->apply_filters('plugin_check_status_server', 'http://status.snowcms.com/'), array('sha1_hash' => sha1_file($filename))))
+  if($response = $http->request(api()->apply_filters('plugin_check_status_server', 'http://status.snowcms.com/'), array('sha1_hash' => sha1_file($filename))))
   {
     @list($status, $reason) = explode("\r\n", $response, 2);
 
     $status = trim(strtolower($status));
 
-    # Do we even know the status code?
-    if(!in_array($status, $api->apply_filters('plugin_check_status_codes', array('approved', 'disapproved', 'pending', 'unknown', 'deprecated', 'malicious', 'insecure'))))
+    // Do we even know the status code?
+    if(!in_array($status, api()->apply_filters('plugin_check_status_codes', array('approved', 'disapproved', 'pending', 'unknown', 'deprecated', 'malicious', 'insecure'))))
     {
-      # It is a status we don't know.
+      // It is a status we don't know.
       return false;
     }
 
-    # Any reason?
+    // Any reason?
     if(!empty($reason))
     {
-      # No HTML ;-)
+      // No HTML ;-)
       $reason = htmlchars($reason);
     }
 
-    # Alright, you can have them!
+    // Alright, you can have them!
     return $status;
   }
   else
   {
-    # Looks like we couldn't make a connection. Sorry.
+    // Looks like we couldn't make a connection. Sorry.
     return null;
   }
 }

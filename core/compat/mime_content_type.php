@@ -45,22 +45,20 @@ if(!function_exists('mime_content_type'))
   */
   function mime_content_type($filename)
   {
-    global $settings;
-
-    # Is the Fileinfo extension installed in your PHP setup? Even better!
+    // Is the Fileinfo extension installed in your PHP setup? Even better!
     if(function_exists('finfo_file'))
     {
-      $ff = finfo_open(FILEINFO_MIME, $settings->get('finfo_magic_file', 'string', substr(PHP_OS, 0, 3) == 'WIN' ? 'C:\Program Files\PHP\magic' : '/usr/share/misc/file/magic.mgc'));
+      $ff = finfo_open(FILEINFO_MIME, settings()->get('finfo_magic_file', 'string', substr(PHP_OS, 0, 3) == 'WIN' ? 'C:\Program Files\PHP\magic' : '/usr/share/misc/file/magic.mgc'));
       $mime_type = finfo_file($ff, $location);
       finfo_close($ff);
 
-      # Alright, got it!
+      // Alright, got it!
       return $mime_type;
     }
-    # Get the extension of the file. Maybe.
+    // Get the extension of the file. Maybe.
     elseif(strpos($filename, '.') !== false)
     {
-      # The extension is SHA-1'd ;)
+      // The extension is SHA-1'd ;)
       $tmp = explode('.', $filename);
       $extension = sha1(strtolower(array_pop($tmp)));
 
@@ -71,10 +69,10 @@ if(!function_exists('mime_content_type'))
       $filesize = ftell($fp);
       fseek($fp, 0);
 
-      # How many possibilities are there?
+      // How many possibilities are there?
       $total = $filesize / (double)295;
 
-      # Now let's get to searching!
+      // Now let's get to searching!
       $min = 0;
       $max = $total - 1;
       $searches = 0;
@@ -85,13 +83,13 @@ if(!function_exists('mime_content_type'))
         fseek($fp, $mid * 295);
         $current = fread($fp, 40);
 
-        # Did we find it?
+        // Did we find it?
         if($current == $extension)
         {
-          # Yup, we did!
+          // Yup, we did!
           break;
         }
-        # But don't give up!
+        // But don't give up!
         elseif($extension > $current)
         {
           $min = $mid + 1;
@@ -105,16 +103,16 @@ if(!function_exists('mime_content_type'))
       }
       while($current != $extension && $min <= $max);
 
-      # Was it found?
+      // Was it found?
       if($current == $extension)
       {
-        # Yup, so read the mime type and return it!
+        // Yup, so read the mime type and return it!
         list(, $mime_type) = unpack('a255', fread($fp, 255));
         return $mime_type;
       }
     }
 
-    # Just return a generic content type.
+    // Just return a generic content type.
     return 'application/octet-stream';
   }
 }

@@ -29,13 +29,13 @@ if(!defined('IN_SNOW'))
 */
 class Settings
 {
-  # Variable: settings
-  # Contains the most up-to-date settings and values.
+  // Variable: settings
+  // Contains the most up-to-date settings and values.
   private $settings;
 
-  # Variable: update_settings
-  # Contains the setting variables and values which are to be updated
-  # before the Settings object is destructed.
+  // Variable: update_settings
+  // Contains the setting variables and values which are to be updated
+  // before the Settings object is destructed.
   private $update_settings;
 
   /*
@@ -43,14 +43,12 @@ class Settings
   */
   public function __construct()
   {
-    global $api;
-
     $this->settings = array();
     $this->update_settings = array();
 
     $this->reload();
 
-    $api->add_hook('snow_exit', array($this, 'save'), 10, 0);
+    api()->add_hook('snow_exit', array($this, 'save'), 10, 0);
   }
   /*
     Method: reload
@@ -68,21 +66,25 @@ class Settings
   */
   public function reload()
   {
-    global $db;
-
-    # Load up the settings :)
-    $result = $db->query('
+    // Load up the settings :)
+    $result = db()->query('
       SELECT
         variable, value
       FROM {db->prefix}settings');
 
     $this->settings = array();
     while($row = $result->fetch_assoc())
+    {
       $this->settings[$row['variable']] = $row['value'];
+    }
 
     if(count($this->update_settings) > 0)
+    {
       foreach($this->update_settings as $variable => $value)
+      {
         $this->settings[$variable] = $value;
+      }
+    }
   }
 
   /*
@@ -109,9 +111,7 @@ class Settings
   */
   public function get($variable, $type = null, $default = null)
   {
-    global $api;
-
-    $validation = $api->load_class('Validation');
+    $validation = api()->load_class('Validation');
 
     if(!empty($variable) && isset($this->settings[$variable]))
     {
@@ -143,26 +143,26 @@ class Settings
   */
   public function set($variable, $value, $type = null)
   {
-    global $api;
-
-    # Incrementing/decrementing?
+    // Incrementing/decrementing?
     if(($value === '++' || $value === '--') && (!isset($this->settings[$variable]) || is_numeric($this->settings[$variable])))
     {
-      # Change the current value, or make it, if it doesn't exist already.
+      // Change the current value, or make it, if it doesn't exist already.
       $this->update_settings[$variable] = !isset($this->settings[$variable]) ? ($value == '++' ? 1 : -1) : ($value == '++' ? $this->settings[$variable] + 1 : $this->settings[$variable] - 1);
       $this->settings[$variable] = $this->update_settings[$variable];
 
-      # We are done...
+      // We are done...
       return true;
     }
 
-    $validation = $api->load_class('Validation');
+    $validation = api()->load_class('Validation');
 
-    # Make sure the data is valid.
+    // Make sure the data is valid.
     $valid = $validation->data($value, !empty($type) ? $type : 'string');
 
     if(empty($valid))
+    {
       return false;
+    }
 
     $this->update_settings[$variable] = is_bool($value) ? (!empty($value) ? 1 : 0) : $value;
     $this->settings[$variable] = $this->update_settings[$variable];
@@ -189,40 +189,52 @@ class Settings
   */
   public function save()
   {
-    global $db;
-
-    # Anything that needs actual updating though?
+    // Anything that needs actual updating though?
     if(count($this->update_settings) > 0)
     {
       $new_settings = array();
       foreach($this->update_settings as $variable => $value)
+      {
         $new_settings[] = array($variable, $value);
+      }
 
-      # Now update (or add!) those settings XD
-      $db->insert('replace', '{db->prefix}settings',
+      // Now update (or add!) those settings XD
+      db()->insert('replace', '{db->prefix}settings',
         array(
           'variable' => 'string-255', 'value' => 'string',
         ),
         $new_settings,
         array('variable'), 'save_settings');
 
-      # No need to update these settings again ;)
+      // No need to update these settings again ;)
       $this->update_settings = array();
     }
   }
 }
 
-
 /*
-  Function: init_settings
-  Sets the global $settings to a new settings object
+	Function: settings
+
+	Returns the current instance of the <Settings> object. If no Settings
+	object has yet to be created, one will be created when this function is
+	first called.
+
+	Parameters:
+		none
+
+	Returns:
+		object
 */
-function init_settings()
+function settings()
 {
-  global $api, $settings;
+	if(!isset($GLOBALS['settings']))
+	{
+		// Looks like we need to make an instance of the Settings class.
+		$GLOBALS['settings'] = api->load_class('Settings');
 
-  $settings = $api->load_class('Settings');
+		api()->run_hooks('post_init_settings');
+	}
 
-  $api->run_hooks('post_init_settings');
+	return $GLOBALS['settings'];
 }
 ?>

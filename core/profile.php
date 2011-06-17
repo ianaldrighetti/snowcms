@@ -22,7 +22,7 @@ if(!defined('IN_SNOW'))
   die('Nice try...');
 }
 
-# Title: Profile
+// Title: Profile
 
 if(!function_exists('profile_view'))
 {
@@ -43,62 +43,62 @@ if(!function_exists('profile_view'))
   */
   function profile_view()
   {
-    global $_GET, $api, $member, $settings, $theme;
+    global $_GET;
 
-    $api->run_hooks('profile_view');
+    api()->run_hooks('profile_view');
 
-    # We need to load a members information... So yeah.
+    // We need to load a members information... So yeah.
     if(empty($_GET['id']))
     {
-      # Use your member id.
-      $_GET['id'] = $member->id();
+      // Use your member id.
+      $_GET['id'] = member()->id();
     }
 
-    # Can you even view other profiles (If it is someone elses.)
-    if(!$member->can('view_other_profile') && $_GET['id'] != $member->id())
+    // Can you even view other profiles (If it is someone elses.)
+    if(!member()->can('view_other_profile') && $_GET['id'] != member()->id())
     {
-      # Nope, you cannot.
+      // Nope, you cannot.
       member_access_denied(null, l('Sorry, but you do not have permission to view other members profiles.'));
     }
     else
     {
-      # Does the member even exist..? If not, then we will show a denied page.
-      $members = $api->load_class('Members');
+      // Does the member even exist..? If not, then we will show a denied page.
+      $members = api()->load_class('Members');
       $members->load($_GET['id']);
 
       $member_info = $members->get($_GET['id']);
 
-      # So did it load?
+      // So did it load?
       if($member_info == false)
       {
-        # No it did not. So the member doesn't exist :-(
+        // No it did not. So the member doesn't exist :-(
         member_access_denied(l('Member doesn\'t exist'), l('Sorry, but the member you are requesting does not exist.'));
       }
     }
 
-    # Perhaps you want to edit the member?
+    // Perhaps you want to edit the member?
     if(isset($_GET['edit']))
     {
-      # Let's do it! (Permission checking is done in the profile_edit function.
+      // Let's do it! (Permission checking is done in the profile_edit function.
       profile_edit($member_info);
       exit;
     }
 
-    # Nope, you want to view it.
-    $theme->set_title(l('Viewing profile of %s', $member_info['name']));
+    // Nope, you want to view it.
+    theme()->set_title(l('Viewing profile of %s', $member_info['name']));
 
-    $theme->header();
+    theme()->header();
 
     $handled = false;
-    $api->run_hooks('profile_view_display', array(&$handled, &$member_info));
+    api()->run_hooks('profile_view_display', array(&$handled, &$member_info));
 
     if(empty($handled))
     {
       echo '
-      <h1>', l('%s\'s profile', $member_info['name']), ($member->can('edit_other_profiles') || $_GET['id'] == $member->id() ? ' <span style="font-size: 50%;">'. l('<a href="%s" title="Edit this account">Edit</a>', baseurl. '/index.php?action=profile&amp;id='. $_GET['id']. '&amp;edit'). '</span>' : ''), '</h1>
+      <h1>', l('%s\'s profile', $member_info['name']), (member()->can('edit_other_profiles') || $_GET['id'] == member()->id() ? ' <span style="font-size: 50%;">'. l('<a href="%s" title="Edit this account">Edit</a>', baseurl. '/index.php?action=profile&amp;id='. $_GET['id']. '&amp;edit'). '</span>' : ''), '</h1>
       <div class="profile_view_data">';
 
-      # You will be able to modify this later :P
+      // You will be able to modify this later :P
       $display_data = array(
                         array(
                           'label' => l('Name:'),
@@ -113,7 +113,7 @@ if(!function_exists('profile_view'))
                         array(
                           'label' => l('Email:'),
                           'value' => '<a href="mailto:'. $member_info['email']. '" title="'. $member_info['email']. '">'. $member_info['email']. '</a>',
-                          'show' => $_GET['id'] == $member->id() || $member->can('edit_other_profiles'),
+                          'show' => $_GET['id'] == member()->id() || member()->can('edit_other_profiles'),
                         ),
                         array(
                           'is_hr' => true,
@@ -137,7 +137,7 @@ if(!function_exists('profile_view'))
                           'label' => l('IP:'),
                           'title' => l('Last known IP address'),
                           'value' => $member_info['ip'],
-                          'show' => $_GET['id'] == $member->id() || $member->can('edit_other_profiles'),
+                          'show' => $_GET['id'] == member()->id() || member()->can('edit_other_profiles'),
                         ),
                         array(
                           'label' => l('Activated?'),
@@ -147,7 +147,7 @@ if(!function_exists('profile_view'))
                         ),
                       );
 
-      $display_data = $api->apply_filters('profile_view_data', $display_data);
+      $display_data = api()->apply_filters('profile_view_data', $display_data);
 
       if(is_array($display_data) && count($display_data) > 0)
       {
@@ -183,7 +183,7 @@ if(!function_exists('profile_view'))
       </div>';
     }
 
-    $theme->footer();
+    theme()->footer();
   }
 }
 
@@ -207,12 +207,10 @@ if(!function_exists('profile_edit'))
   */
   function profile_edit($member_info)
   {
-    global $api, $member, $settings, $theme;
-
-    $api->run_hooks('profile_edit', array(&$member_info));
+    api()->run_hooks('profile_edit', array(&$member_info));
 
     // We will need the Members class either way.
-    $members = $api->load_class('Members');
+    $members = api()->load_class('Members');
 
     // So an array?
     if(is_array($member_info))
@@ -229,7 +227,7 @@ if(!function_exists('profile_edit'))
     }
 
     // So can they edit anothers profile or manage another's profile?
-    if(!$member->can('edit_other_profiles') || !$member->can('manage_members'))
+    if(!member()->can('edit_other_profiles') || !member()->can('manage_members'))
     {
       member_access_denied(l('Access denied'), l('Sorry, but you do not have permission to edit other members profiles.'));
     }
@@ -242,22 +240,22 @@ if(!function_exists('profile_edit'))
     // Generate the form, now!
     profile_edit_generate_form(is_array($member_info) ? $member_info : $members->get($member_id));
 
-    $form = $api->load_class('Form');
+    $form = api()->load_class('Form');
 
     if(!empty($_POST['member_edit_'. $member_id]))
     {
       $form->process('member_edit_'. $member_id);
     }
 
-    $theme->header();
+    theme()->header();
 
     echo '
       <h1>', l('Editing %s\'s profile', $member_info['name']), '</h1>
-      <p>', l('You are currently editing %s\'s profile. <a href="%s" title="Back to profile">Back to profile</a>.', $member_info['name'], baseurl. '/index.php?action=profile'. ($member_info['id'] != $member->id() ? '&amp;id='. $member_info['id'] : '')), '</p>';
+      <p>', l('You are currently editing %s\'s profile. <a href="%s" title="Back to profile">Back to profile</a>.', $member_info['name'], baseurl. '/index.php?action=profile'. ($member_info['id'] != member()->id() ? '&amp;id='. $member_info['id'] : '')), '</p>';
 
     $form->show('member_edit_'. $member_id);
 
-    $theme->footer();
+    theme()->footer();
   }
 }
 
@@ -280,14 +278,12 @@ if(!function_exists('profile_edit_generate_form'))
   */
   function profile_edit_generate_form($member_info)
   {
-    global $api, $member, $settings;
-
     if(empty($member_info['id']))
     {
       return;
     }
 
-    $form = $api->load_class('Form');
+    $form = api()->load_class('Form');
 
     $form->add('member_edit_'. $member_info['id'], array(
                                                 'callback' => 'profile_edit_handle',
@@ -301,15 +297,13 @@ if(!function_exists('profile_edit_generate_form'))
                                                                       'label' => l('Display name:'),
                                                                       'subtext' => l('This does not change the name you log in with, simply the name that is displayed in your profile.'),
                                                                       'length' => array(
-                                                                                    'min' => $settings->get('members_min_name_length', 'int', 3),
-                                                                                    'max' => $settings->get('members_max_name_length', 'int', 80),
+                                                                                    'min' => settings()->get('members_min_name_length', 'int', 3),
+                                                                                    'max' => settings()->get('members_max_name_length', 'int', 80),
                                                                                   ),
                                                                       'function' => create_function('$value, $form_name, &$error', '
-                                                                                      global $api;
+                                                                                      $members = api()->load_class(\'Members\');
 
-                                                                                      $members = $api->load_class(\'Members\');
-
-                                                                                      # Is the name in use? Not by this member, though...
+                                                                                      // Is the name in use? Not by this member, though...
                                                                                       if(!$members->name_allowed($value, $_POST[\'member_id\']))
                                                                                       {
                                                                                         $error = l(\'That display name is in use by another member or not allowed.\');
@@ -324,11 +318,9 @@ if(!function_exists('profile_edit_generate_form'))
                                                                       'type' => 'string',
                                                                       'label' => l('Email address:'),
                                                                       'function' => create_function('$value, $form_name, &$error', '
-                                                                                      global $api;
+                                                                                      $members = api()->load_class(\'Members\');
 
-                                                                                      $members = $api->load_class(\'Members\');
-
-                                                                                      # Make sure the email address isn\'t in use or banned or anything.
+                                                                                      // Make sure the email address isn\'t in use or banned or anything.
                                                                                       if(!$members->email_allowed($value, $_POST[\'member_id\']))
                                                                                       {
                                                                                         $error = l(\'That email address is in use by another member or not allowed.\');
@@ -344,8 +336,6 @@ if(!function_exists('profile_edit_generate_form'))
                                                                           'label' => l('Password:'),
                                                                           'subtext' => l('Leave blank if you don\'t want to change your password.'),
                                                                           'function' => create_function('$value, $form_name, &$error', '
-                                                                                          global $api;
-
                                                                                           if(!empty($value) && (empty($_POST[\'verify_pass\']) || $_POST[\'verify_pass\'] != $value))
                                                                                           {
                                                                                             $error = l(\'The supplied passwords don\\\'t match.\');
@@ -353,7 +343,7 @@ if(!function_exists('profile_edit_generate_form'))
                                                                                           }
                                                                                           elseif(!empty($value) && !empty($_POST[\'verify_pass\']))
                                                                                           {
-                                                                                            $members = $api->load_class(\'Members\');
+                                                                                            $members = api()->load_class(\'Members\');
 
                                                                                             if(!$members->password_allowed($_POST[\'display_name\'], $value))
                                                                                             {
@@ -366,7 +356,7 @@ if(!function_exists('profile_edit_generate_form'))
                                                                           'value' => '',
                                                                         ));
 
-    # We will need you to verify that ;)
+    // We will need you to verify that ;)
     $form->add_field('member_edit_'. $member_info['id'], 'verify_pass', array(
                                                                           'type' => 'password',
                                                                           'label' => l('Verify password:'),
@@ -375,10 +365,10 @@ if(!function_exists('profile_edit_generate_form'))
                                                                           'save' => false,
                                                                         ));
 
-    # How about which groups they are in, whether they are activated or not? etc.
-    if($member->can('manage_members'))
+    // How about which groups they are in, whether they are activated or not? etc.
+    if(member()->can('manage_members'))
     {
-      # Are they an administrator?
+      // Are they an administrator?
       $form->add_field('member_edit_'. $member_info['id'], 'is_administrator', array(
                                                                                  'type' => 'checkbox',
                                                                                  'label' => l('Administrator?'),
@@ -386,10 +376,10 @@ if(!function_exists('profile_edit_generate_form'))
                                                                                  'value' => in_array('administrator', $member_info['groups']),
                                                                                ));
 
-      # Additional groups?
-      $groups = $api->return_group();
+      // Additional groups?
+      $groups = api()->return_group();
 
-      # Remove administrator and the member group.
+      // Remove administrator and the member group.
       unset($groups['administrator'], $groups['member']);
       $form->add_field('member_edit_'. $member_info['id'], 'member_groups', array(
                                                                               'type' => 'select-multi',
@@ -400,7 +390,7 @@ if(!function_exists('profile_edit_generate_form'))
                                                                               'value' => $member_info['groups'],
                                                                             ));
 
-      # Should the account be activated? ;)
+      // Should the account be activated? ;)
       $form->add_field('member_edit_'. $member_info['id'], 'member_activated', array(
                                                                                  'type' => 'checkbox',
                                                                                  'label' => l('Account activated:'),
@@ -409,31 +399,29 @@ if(!function_exists('profile_edit_generate_form'))
                                                                                ));
     }
 
-    # Just make sure it is you changing your stuffs!
+    // Just make sure it is you changing your stuffs!
     $form->add_field('member_edit_'. $member_info['id'], 'verify_password', array(
                                                                               'type' => 'password',
                                                                               'label' => l('Enter your password:'),
                                                                               'subtext' => l('For security purposes, please enter your current password.'),
                                                                               'function' => create_function('$value, $form_name, &$error', '
-                                                                                              global $api, $member;
+                                                                                              $members = api()->load_class(\'Members\');
 
-                                                                                              $members = $api->load_class(\'Members\');
-
-                                                                                              # Make sure their password is right!
-                                                                                              if($members->authenticate($member->name(), $value))
+                                                                                              // Make sure their password is right!
+                                                                                              if($members->authenticate(member()->name(), $value))
                                                                                               {
                                                                                                 return true;
                                                                                               }
                                                                                               else
                                                                                               {
-                                                                                                # Uh oh, wrong!
+                                                                                                // Uh oh, wrong!
                                                                                                 $error = l(\'The password you entered did not match your current password.\');
                                                                                                 return false;
                                                                                               }'),
                                                                               'save' => false,
                                                                             ));
 
-    # Lastly, a hidden field containing the members id. Pointless? I guess, but still :P
+    // Lastly, a hidden field containing the members id. Pointless? I guess, but still :P
     $form->add_field('member_edit_'. $member_info['id'], 'member_id', array(
                                                                         'type' => 'hidden',
                                                                         'value' => $member_info['id'],
@@ -460,9 +448,7 @@ if(!function_exists('profile_edit_handle'))
   */
   function profile_edit_handle($data, &$errors = array())
   {
-    global $api, $member;
-
-    $members = $api->load_class('Members');
+    $members = api()->load_class('Members');
     $members->load($data['member_id']);
 
     if($member_info = $members->get($data['member_id']))
@@ -477,10 +463,10 @@ if(!function_exists('profile_edit_handle'))
         $update_info['member_name'] = $member_info['username'];
         $update_info['member_pass'] = $data['member_pass'];
         $update_info['member_hash'] = $members->rand_str(16);
-        $redir_login = $member->id() == $member_info['id'];
+        $redir_login = member()->id() == $member_info['id'];
       }
 
-      if($member->can('manage_members'))
+      if(member()->can('manage_members'))
       {
         if(!empty($data['is_administrator']))
         {
@@ -515,7 +501,7 @@ if(!function_exists('profile_edit_handle'))
       }
       else
       {
-        redirect(baseurl. '/index.php?action=profile'. ($member->id() == $member_info['id'] ? '' : '&id='. $member_info['id']));
+        redirect(baseurl. '/index.php?action=profile'. (member()->id() == $member_info['id'] ? '' : '&id='. $member_info['id']));
       }
     }
     else

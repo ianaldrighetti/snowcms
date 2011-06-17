@@ -30,13 +30,13 @@ if(!defined('IN_SNOW'))
 */
 class XML
 {
-  # Variable: parser
-  # Holds the XML Parser resource.
+  // Variable: parser
+  // Holds the XML Parser resource.
   private $parser;
 
-  # Variable: options
-  # Holds all the set option, that way a new parser resource can
-  # automatically be created without disturbing the set options.
+  // Variable: options
+  // Holds all the set option, that way a new parser resource can
+  // automatically be created without disturbing the set options.
   private $options;
 
   /*
@@ -47,7 +47,7 @@ class XML
   */
   public function __construct($filename = null)
   {
-    # Create an XML Parser resource.
+    // Create an XML Parser resource.
     $this->parser = xml_parser_create();
     $this->options = array();
   }
@@ -90,7 +90,7 @@ class XML
   {
     if(xml_parser_set_option($this->parser, $option, $value))
     {
-      # It was a valid option, so save it!
+      // It was a valid option, so save it!
       $this->options[$option] = $value;
       return true;
     }
@@ -114,7 +114,7 @@ class XML
   */
   public function parse($filename)
   {
-    # We just load up the files contents and pass it to the load_string method.
+    // We just load up the files contents and pass it to the load_string method.
     return $this->parse_string(file_get_contents($filename));
   }
 
@@ -132,22 +132,22 @@ class XML
   */
   public function parse_string($data)
   {
-    # Call on the parser to, of course, parse the data.
+    // Call on the parser to, of course, parse the data.
     $values = array();
     $indexes = array();
     if(xml_parse_into_struct($this->parser, $data, $values, $indexes) == 1)
     {
-      # Let's make it pretty, shall we?
+      // Let's make it pretty, shall we?
       $data = array();
 
-      # But of course, we can only make it pretty if it is ugly.
+      // But of course, we can only make it pretty if it is ugly.
       if(count($values) > 0)
       {
         foreach($values as $value)
         {
           if(strtolower($value['type']) == 'cdata')
           {
-            # Useless crap.
+            // Useless crap.
             continue;
           }
 
@@ -161,14 +161,14 @@ class XML
         }
       }
 
-      # Reset!
+      // Reset!
       $this->reset();
 
       return $data;
     }
     else
     {
-      # Sorry, didn't work!
+      // Sorry, didn't work!
       $this->reset();
       return false;
     }
@@ -187,7 +187,7 @@ class XML
   */
   private function strtolower_array_keys($array)
   {
-    # Only if there is anything in the array, of course!
+    // Only if there is anything in the array, of course!
     if(count($array) > 0)
     {
       $tmp = array();
@@ -197,11 +197,11 @@ class XML
         $tmp[strtolower($key)] = $value;
       }
 
-      # Alright, done. :P Simple, no?
+      // Alright, done. :P Simple, no?
       return $tmp;
     }
 
-    # You gave us an empty array, I'll give it back!
+    // You gave us an empty array, I'll give it back!
     return array();
   }
 
@@ -224,7 +224,7 @@ class XML
     $this->__destruct();
     $this->parser = xml_parser_create();
 
-    # Custom options? We need to reapply them.
+    // Custom options? We need to reapply them.
     if(count($this->options) > 0)
     {
       foreach($this->options as $option => $value)
@@ -239,7 +239,7 @@ class XML
   */
   public function __destruct()
   {
-    # Free the XML Parser resource, no longer needed, as it appears.
+    // Free the XML Parser resource, no longer needed, as it appears.
     xml_parser_free($this->parser);
   }
 }

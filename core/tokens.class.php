@@ -32,8 +32,8 @@ if(!defined('IN_SNOW'))
 */
 class Tokens
 {
-  # Variable: tokens
-  # Contains the forms which are registered for the current member/guest.
+  // Variable: tokens
+  // Contains the forms which are registered for the current member/guest.
   private $tokens;
 
   /*
@@ -44,50 +44,50 @@ class Tokens
   */
   public function __construct()
   {
-    global $api, $db, $member;
-
     $this->tokens = array();
 
-    # Let's see if they have any registered forms :)
-    # and of course, only if they aren't older than 1 day.
-    $result = $db->query('
+    // Let's see if they have any registered forms :)
+    // and of course, only if they aren't older than 1 day.
+    $result = db()->query('
       SELECT
         token_name, token, token_registered
       FROM {db->prefix}tokens
       WHERE session_id = {string:session_id} AND token_registered >= {int:timeout}',
       array(
-        'session_id' => $member->is_logged() ? 'member_id-'. $member->id() : 'ip'. $member->ip(),
+        'session_id' => member()->is_logged() ? 'member_id-'. member()->id() : 'ip'. member()->ip(),
         'timeout' => time_utc() - 86400,
       ), 'token_load_registered_query');
 
     if($result->num_rows() > 0)
     {
       while($row = $result->fetch_assoc())
+      {
         $this->tokens[$row['token_name']] = array(
                                             'token' => $row['token'],
                                             'registered' => $row['token_registered'],
                                             'is_new' => false,
                                             'deleted' => false,
                                           );
+			}
     }
 
-    # Save the registered tokens right before exit...
-    $api->add_hook('snow_exit', create_function('', '
-      global $api, $db;
-
-      $token = $api->load_class(\'Tokens\');
+    // Save the registered tokens right before exit...
+    api()->add_hook('snow_exit', create_function('', '
+      $token = api()->load_class(\'Tokens\');
 
       $token->save();
 
-      # Maybe we should remove expired ones? But not every page load :P
-      # (Why 79? Because that\'s that Wolfram|Alpha answered to the query \'random number between 1 and 100\' :P)
+      // Maybe we should remove expired ones? But not every page load :P
+      // (Why 79? Because that\'s that Wolfram|Alpha answered to the query \'random number between 1 and 100\' :P)
       if(mt_rand(1, 100) == 79)
-        $db->query(\'
+      {
+        db()->query(\'
           DELETE FROM {db->prefix}tokens
           WHERE token_registered < {int:timeout}\',
           array(
             \'timeout\' => time_utc() - 86400,
-          ), \'token_delete_expired\');'));
+          ), \'token_delete_expired\');
+      }'));
   }
 
   /*
@@ -107,16 +107,14 @@ class Tokens
   */
   public function add($name, $token = null)
   {
-    global $api;
-
-    # Empty token? That's alright, we can fix that :)
+    // Empty token? That's alright, we can fix that :)
     if(empty($token))
     {
-      $members = $api->load_class('Members');
+      $members = api()->load_class('Members');
       $token = $members->rand_str(16);
     }
 
-    # Add it to the current forms.
+    // Add it to the current forms.
     $this->tokens[$name] = array(
                             'token' => $token,
                             'registered' => time_utc(),
@@ -202,8 +200,10 @@ class Tokens
       return true;
     }
     else
+    {
       return false;
-  }
+		}
+	}
 
   /*
     Method: clear
@@ -220,21 +220,23 @@ class Tokens
   */
   public function clear($session_id = null)
   {
-    global $db, $member;
-
-    # Is it the current session? Just mark them for deletion.
-    if(empty($session_id) || $session_id == ($member->is_logged() ? 'member_id-'. $member->id() : 'ip'. $member->ip()))
+    // Is it the current session? Just mark them for deletion.
+    if(empty($session_id) || $session_id == (member()->is_logged() ? 'member_id-'. member()->id() : 'ip'. member()->ip()))
     {
       if(count($this->tokens))
+      {
         foreach($this->tokens as $token_name => $form)
+        {
           $this->delete($token_name);
+        }
+      }
 
       return true;
     }
     else
     {
-      # It is a different session ID than the current, so do it RIGHT NOW! :P
-      $result = $db->query('
+      // It is a different session ID than the current, so do it RIGHT NOW! :P
+      $result = db()->query('
         DELETE FROM {db->prefix}tokens
         WHERE session_id = {string:session_id}',
         array(
@@ -262,41 +264,46 @@ class Tokens
   */
   public function save()
   {
-    global $db, $member;
-
     if(count($this->tokens) > 0)
     {
       $deleted = array();
       $changed = array();
       foreach($this->tokens as $token_name => $form)
       {
-        # Is it marked for deletion?
+        // Is it marked for deletion?
         if($form['deleted'])
+        {
           $deleted[] = $token_name;
-        # Maybe it is updated/new?
+        }
+        // Maybe it is updated/new?
         elseif($form['is_new'])
-          $changed[] = array($member->is_logged() ? 'member_id-'. $member->id() : 'ip'. $member->ip(), $token_name, $form['token'], $form['registered']);
-
+        {
+          $changed[] = array(member()->is_logged() ? 'member_id-'. member()->id() : 'ip'. member()->ip(), $token_name, $form['token'], $form['registered']);
+				}
       }
 
-      # Any deleted?
+      // Any deleted?
       if(count($deleted) > 0)
-        $db->query('
+      {
+        db()->query('
           DELETE FROM {db->prefix}tokens
           WHERE token_name IN({string_array:deleted})',
           array(
             'deleted' => $deleted,
           ), 'token_save_delete_query');
+			}
 
-      # So do any need adding, or deletion?
+      // So do any need adding, or deletion?
       if(count($changed) > 0)
-        $db->insert('replace', '{db->prefix}tokens',
+      {
+        db()->insert('replace', '{db->prefix}tokens',
           array(
             'session_id' => 'string', 'token_name' => 'string-100', 'token' => 'string-255',
             'token_registered' => 'int',
           ),
           $changed,
           array('sessiond_id', 'token_name'), 'token_save_replace_query');
+			}
     }
   }
 }

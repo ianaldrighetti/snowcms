@@ -30,10 +30,10 @@ if(!defined('IN_SNOW'))
 */
 class Zip
 {
-  # Variable: filename
+  // Variable: filename
   private $filename;
 
-  # Variable: fp
+  // Variable: fp
   private $fp;
 
   /*
@@ -69,39 +69,39 @@ class Zip
   */
   public function open($filename)
   {
-    # Already opened? Pfft. Can't open it again ;-) Nor can we open a file which doesn't exist.
+    // Already opened? Pfft. Can't open it again ;-) Nor can we open a file which doesn't exist.
     if(!empty($this->fp) || !file_exists($filename) || !is_file($filename))
     {
       return false;
     }
 
-    # Now open the zip archive, if it is one, that is :P
+    // Now open the zip archive, if it is one, that is :P
     $fp = fopen($filename, 'r');
 
-    # Couldn't open the archive? That really sucks.
+    // Couldn't open the archive? That really sucks.
     if(empty($fp))
     {
       return false;
     }
 
-    # Check the signature, it should be equal to 0x04034b50.
+    // Check the signature, it should be equal to 0x04034b50.
     list(, $signature) = unpack('V', fread($fp, 4));
 
-    # Not right?
+    // Not right?
     if($signature != 0x04034b50)
     {
       return false;
     }
 
-    # We are now locking this, it is ours! :P
+    // We are now locking this, it is ours! :P
     flock($fp, LOCK_SH);
     fseek($fp, 0);
 
-    # Save a couple things, we will need them.
+    // Save a couple things, we will need them.
     $this->filename = $filename;
     $this->fp = $fp;
 
-    # Alright, done. For now.
+    // Alright, done. For now.
     return true;
   }
 
@@ -120,78 +120,78 @@ class Zip
   */
   public function files()
   {
-    # Nothing opened? Then there are no files ;-)!
+    // Nothing opened? Then there are no files ;-)!
     if(empty($this->fp))
     {
       return false;
     }
 
-    # This will hold all the files and stuff :-)
+    // This will hold all the files and stuff :-)
     $files = array();
     $length = filesize($this->filename);
     $pos = 0;
 
-    # It's time to get loopy!!!
+    // It's time to get loopy!!!
     while($pos < $length)
     {
-      # Is this not a local file header..? :/
+      // Is this not a local file header..? :/
       fseek($this->fp, $pos);
       list(, $signature) = unpack('V', fread($this->fp, 4));
 
       if($signature != 0x04034b50)
       {
-        # It is not, so that's a no go.
+        // It is not, so that's a no go.
         break;
       }
 
-      # Skim past all the crap we don't care about...
+      // Skim past all the crap we don't care about...
       fseek($this->fp, $pos + 18);
 
-      # Read out the compressed and uncompressed size.
+      // Read out the compressed and uncompressed size.
       $file = unpack('Vcompressed_size/Vuncompressed_size', fread($this->fp, 8));
 
-      # We will need the file name and extra field length.
+      // We will need the file name and extra field length.
       $tmp = unpack('Sfilename_length/Sextra_length', fread($this->fp, 4));
 
-      # Now read the name of the file.
+      // Now read the name of the file.
       $file['name'] = fread($this->fp, $tmp['filename_length']);
 
-      # Is it a file or directory? Easy to tell, as the file names have a trailing /.
+      // Is it a file or directory? Easy to tell, as the file names have a trailing /.
       $file['is_dir'] = substr($file['name'], -1, 1) == '/';
 
-      # Skim past the extra field, if anything.
+      // Skim past the extra field, if anything.
       if($tmp['extra_length'] > 0)
       {
         fread($this->fp, $tmp['filename_length']);
       }
 
-      # Now to read the data of the file? Nope. But we will save the position
-      # at where the file data starts :-P
+      // Now to read the data of the file? Nope. But we will save the position
+      // at where the file data starts :-P
       $file['pos'] = ftell($this->fp);
 
-      # Save the files information, otherwise, why would we have done this?
+      // Save the files information, otherwise, why would we have done this?
       $files[] = $file;
 
-      # Though we will skim past the data, as we kinda need to :P
+      // Though we will skim past the data, as we kinda need to :P
       fseek($this->fp, $file['compressed_size'], SEEK_CUR);
 
-      # We might need to skim past the data descriptor as well, maybe.
+      // We might need to skim past the data descriptor as well, maybe.
       list(, $signature) = unpack('V', fread($this->fp, 4));
 
       if($signature == 0x04034b50)
       {
-        # No data descriptor... So set the current position back a bit ;-)
+        // No data descriptor... So set the current position back a bit ;-)
         $pos = ftell($this->fp) - 4;
       }
       else
       {
-        # Keep on going, for 8 more bytes.
+        // Keep on going, for 8 more bytes.
         fseek($this->fp, 8, SEEK_CUR);
         $pos = ftell($this->fp);
       }
     }
 
-    # You can have it now :-)
+    // You can have it now :-)
     return $files;
   }
 
@@ -214,46 +214,46 @@ class Zip
   */
   public function extract($destination, $safe_mode = true)
   {
-    # Can't extract the archive if it isn't opened, now can we?
+    // Can't extract the archive if it isn't opened, now can we?
     if(empty($this->fp))
     {
       return false;
     }
 
-    # Does the destination not exist? Then we shall try to create it!
+    // Does the destination not exist? Then we shall try to create it!
     if(!file_exists($destination))
     {
       $made = mkdir($destination, 0755, true);
 
       if(empty($made))
       {
-        # We tried to make it, but we couldn't! :(
+        // We tried to make it, but we couldn't! :(
         return false;
       }
     }
-    # Is it even a directory if it does happen to exist?
+    // Is it even a directory if it does happen to exist?
     elseif(file_exists($destination) && !is_dir($destination))
     {
       return false;
     }
 
-    # Get all the files that need to be extracted.
+    // Get all the files that need to be extracted.
     $files = $this->files();
 
     if(count($files > 0))
     {
       foreach($files as $file)
       {
-        # Prepend the destination to the files name!
+        // Prepend the destination to the files name!
         $file['name'] = $destination .'/'. $file['name'];
 
-        # "Safe Mode" on?
+        // "Safe Mode" on?
         if(!empty($safe_mode))
         {
           $file['name'] = strtr($file['name'], array('../' => '', '/..' => ''));
         }
 
-        # Is it a directory? Simple.
+        // Is it a directory? Simple.
         if($file['is_dir'])
         {
           if(!file_exists($file['name']))
@@ -261,13 +261,13 @@ class Zip
             @mkdir($file['name'], 0755, true);
           }
         }
-        # Nope, a file.
+        // Nope, a file.
         else
         {
-          # Move to where the files data is located.
+          // Move to where the files data is located.
           fseek($this->fp, $file['pos']);
 
-          # Open the file where it will reside ;-)
+          // Open the file where it will reside ;-)
           $fp = fopen($file['name'], 'wb');
 
           if(empty($fp))
@@ -275,19 +275,19 @@ class Zip
             continue;
           }
 
-          # Get the files data out (The compressed size, because, well, you know!)...
+          // Get the files data out (The compressed size, because, well, you know!)...
           $data = fread($this->fp, $file['compressed_size']);
 
-          # The compressed and not compressed size different? Inflate it!
+          // The compressed and not compressed size different? Inflate it!
           if($file['compressed_size'] != $file['uncompressed_size'])
           {
             $data = @gzinflate($data);
           }
 
-          # Now write the data.
+          // Now write the data.
           fwrite($fp, $data);
 
-          # And, done!
+          // And, done!
           fclose($fp);
           unset($data);
         }
@@ -317,13 +317,13 @@ class Zip
   {
     if(!empty($this->fp))
     {
-      # Release the lock, captain!
+      // Release the lock, captain!
       flock($this->fp, LOCK_UN);
 
-      # Now close it!
+      // Now close it!
       fclose($this->fp);
 
-      # Just forget the file name.
+      // Just forget the file name.
       $this->filename = null;
       $this->fp = null;
     }

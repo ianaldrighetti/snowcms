@@ -34,40 +34,40 @@ if(!defined('IN_SNOW'))
 */
 class RSS
 {
-  # Variable: title
+  // Variable: title
   private $title;
 
-  # Variable: link
+  // Variable: link
   private $link;
 
-  # Variable: description
+  // Variable: description
   private $description;
 
-  # Variable: language
+  // Variable: language
   private $language;
 
-  # Variable: pubDate
+  // Variable: pubDate
   private $pubDate;
 
-  # Variable: lastBuildDate
+  // Variable: lastBuildDate
   private $lastBuildDate;
 
-  # Variable: docs
+  // Variable: docs
   private $docs;
 
-  # Variable: managingEditor
+  // Variable: managingEditor
   private $managingEditor;
 
-  # Variable: copyright
+  // Variable: copyright
   private $copyright;
 
-  # Variable: category
+  // Variable: category
   private $category;
 
-  # Variable: ttl
+  // Variable: ttl
   private $ttl;
 
-  # Variable: items
+  // Variable: items
   private $items;
 
   /*
@@ -77,7 +77,7 @@ class RSS
   */
   public function __construct()
   {
-    # clear will set everything to empty and what not.
+    // clear will set everything to empty and what not.
     $this->clear();
   }
 
@@ -94,7 +94,7 @@ class RSS
   */
   public function clear()
   {
-    # Just empty everything, EVERYTHING!
+    // Just empty everything, EVERYTHING!
     $this->title = null;
     $this->link = null;
     $this->description = null;
@@ -210,7 +210,7 @@ class RSS
   */
   public function set_pubdate($timestamp)
   {
-    # Not an integer? Sorry.
+    // Not an integer? Sorry.
     if((string)$timestamp == (string)(int)$timestamp)
     {
       $this->pubDate = (int)$timestamp;
@@ -235,7 +235,7 @@ class RSS
   */
   public function set_lastbuilddate($timestamp)
   {
-    # Not an integer? Sorry.
+    // Not an integer? Sorry.
     if((string)$timestamp == (string)(int)$timestamp)
     {
       $this->lastBuildDate = (int)$timestamp;
@@ -566,45 +566,45 @@ class RSS
   */
   public function add_item($item, $prepend = false)
   {
-    # No title or description?
+    // No title or description?
     if(empty($item['title']) && empty($item['description']))
     {
-      # Sorry, but gotta have one.
+      // Sorry, but gotta have one.
       return false;
     }
 
-    # Only a couple of things need to be checked...
+    // Only a couple of things need to be checked...
     if(isset($item['category']) && empty($item['category']['value']))
     {
-      # Gotta have a value for the category, if you specified it!
+      // Gotta have a value for the category, if you specified it!
       return false;
     }
 
     if(isset($item['enclosure']) && (empty($item['enclosure']['url']) || empty($item['enclosure']['length']) || empty($item['enclosure']['type'])))
     {
-      # You must have all the attributes for the enclosure.
+      // You must have all the attributes for the enclosure.
       return false;
     }
 
     if(isset($item['source']) && (empty($item['source']['url'])))
     {
-      # A URL for the source is a must!
+      // A URL for the source is a must!
       return false;
     }
 
-    # So, do you want to prepend the item?
+    // So, do you want to prepend the item?
     if(!empty($prepend))
     {
-      # Simple enough, really.
+      // Simple enough, really.
       array_unshift($this->items, $item);
     }
     else
     {
-      # Nope, append. Simple too.
+      // Nope, append. Simple too.
       $this->items[] = $item;
     }
 
-    # Done!
+    // Done!
     return false;
   }
 
@@ -622,48 +622,48 @@ class RSS
   */
   public function remove_item($index)
   {
-    # Make sure the item exists... ;-)
+    // Make sure the item exists... ;-)
     if(!isset($this->items[$index]))
     {
-      # Nope, it does not.
+      // Nope, it does not.
       return false;
     }
 
-    # Removing the first item?
+    // Removing the first item?
     if($index == 0)
     {
       array_shift($this->items);
     }
     elseif($index == (count($this->items) - 1))
     {
-      # It can be just deleted.
+      // It can be just deleted.
       unset($this->items[$index]);
     }
     else
     {
-      # We need to completely rebuild it, otherwise indexing would
-      # become completely screwed up.
+      // We need to completely rebuild it, otherwise indexing would
+      // become completely screwed up.
       $items = array();
 
       $length = count($this->items);
       for($i = 0; $i < $length; $i++)
       {
-        # Is this the one to delete?
+        // Is this the one to delete?
         if($i == $index)
         {
-          # Yup, so skip it.
+          // Yup, so skip it.
           continue;
         }
 
-        # It's good, add it.
+        // It's good, add it.
         $items[] = $this->items[$i];
       }
 
-      # Copy it.
+      // Copy it.
       $this->items = $items;
     }
 
-    # Done!
+    // Done!
     return true;
   }
 
@@ -721,24 +721,22 @@ class RSS
   */
   public function generate($fp = null)
   {
-    global $api;
-
-    # You must have a title, link and description!
+    // You must have a title, link and description!
     if(empty($this->title) || empty($this->link) || empty($this->description))
     {
-      # Sorry... Can't do it without it.
+      // Sorry... Can't do it without it.
       return false;
     }
-    # Supplied a stream for us to write to?
+    // Supplied a stream for us to write to?
     elseif(!empty($fp) && !flock($fp, LOCK_EX))
     {
-      # It would be nice if we could have an exclusive lock...
+      // It would be nice if we could have an exclusive lock...
       return false;
     }
 
-    $api->run_hooks('rss_generate', array($this, &$fp));
+    api()->run_hooks('rss_generate', array($this, &$fp));
 
-    # We may need to output headers!
+    // We may need to output headers!
     if(empty($fp))
     {
       if(ob_get_length() > 0)
@@ -746,14 +744,14 @@ class RSS
         ob_clean();
       }
 
-      # Well, one ;-) The content type.
+      // Well, one ;-) The content type.
       header('Content-Type: application/rss+xml; charset=utf-8');
     }
 
-    # Make things a tad easier.
+    // Make things a tad easier.
     $crlf = "\r\n";
 
-    # Let's start shall we?
+    // Let's start shall we?
     $buffer = '<?xml version="1.0" encoding="UTF-8"?>'. $crlf.
               '<rss version="2.0">'. $crlf.
               '  <channel>'. $crlf.
@@ -762,7 +760,7 @@ class RSS
               '    <description>'. htmlchars($this->description). '</description>'. $crlf
               '    <generator>SnowCMS (http://www.snowcms.com/)</generator>'. $crlf;
 
-    # Well, we have part of it... Let's output!
+    // Well, we have part of it... Let's output!
     if(!empty($fp))
     {
       fwrite($fp, $buffer);
@@ -773,58 +771,58 @@ class RSS
       flush();
     }
 
-    # And empty the buffer data.
+    // And empty the buffer data.
     $buffer = '';
 
-    # Did you specify a language?
+    // Did you specify a language?
     if(!empty($this->language))
     {
       $buffer .= '    <language>'. htmlchars($this->language). '</language>'. $crlf;
     }
 
-    # Published date? Would be mighty nice :-)
+    // Published date? Would be mighty nice :-)
     if(!empty($this->pubDate) || $this->pubDate === 0)
     {
       $buffer .= '    <pubDate>'. date('r', $this->pubDate). '</pubDate>'. $crlf;
     }
 
-    # Last time it was built?
+    // Last time it was built?
     if(!empty($this->lastBuildDate) || $this->lastBuildDate === 0)
     {
       $buffer .= '    <lastBuildDate>'. date('r', $this->lastBuildDate). '</lastBuildDate>'. $crlf;
     }
 
-    # A docs URL? Weird.
+    // A docs URL? Weird.
     if(!empty($this->docs))
     {
       $buffer .= '    <docs>'. htmlchars($this->docs). '</docs>'. $crlf;
     }
 
-    # The managing editors name/email?
+    // The managing editors name/email?
     if(!empty($this->managingEditor))
     {
       $buffer .= '    <managingEditor>'. htmlchars($this->managingEditor). '</managingEditor>'. $crlf;
     }
 
-    # Do you like to copyright?
+    // Do you like to copyright?
     if(!empty($this->copyright))
     {
       $buffer .= '    <copyright>'. htmlchars($this->copyright). '</copyright>'. $crlf;
     }
 
-    # Category information..?
+    // Category information..?
     if(!empty($this->category['value']))
     {
       $buffer .= '    <category'. (!empty($this->category['domain']) ? ' domain="'. htmlchars($this->category['domain']). '"' : ''). '>'. htmlchars($this->category['value']). '</category>'. $crlf;
     }
 
-    # Did you decide how long you want it to live? :P
+    // Did you decide how long you want it to live? :P
     if(!empty($this->ttl) || $this->ttl === 0)
     {
       $buffer .= '    <ttl>'. (int)$this->ttl. '</ttl>'. $crlf;
     }
 
-    # Once again, we got a good chunk done :-) So output the buffer to the right place.
+    // Once again, we got a good chunk done :-) So output the buffer to the right place.
     if(!empty($fp))
     {
       fwrite($fp, $buffer);
@@ -835,19 +833,19 @@ class RSS
       flush();
     }
 
-    # Empty it, and move on to items!
+    // Empty it, and move on to items!
     $buffer = '';
 
-    # That is, if there are any at all.
+    // That is, if there are any at all.
     if(count($this->items) > 0)
     {
       foreach($this->items as $item)
       {
-        # Start the item out.
+        // Start the item out.
         $buffer = '    <item>'. $crlf;
 
-        # You aren't required to have a title, but if you don't have the
-        # title, then you have a description ;-)
+        // You aren't required to have a title, but if you don't have the
+        // title, then you have a description ;-)
         if(!empty($item['title']))
         {
           $buffer .= '      <title>'. htmlchars($item['title']). '</title>'. $crlf;
@@ -855,19 +853,19 @@ class RSS
 
         if(!empty($item['link']))
         {
-          # Links are always good in an RSS feed... Lol.
+          // Links are always good in an RSS feed... Lol.
           $buffer .= '      <link>'. htmlchars($item['link']). '</link>'. $crlf;
         }
 
         if(!empty($item['description']))
         {
-          # Mmm... Descriptiveness :-P.
+          // Mmm... Descriptiveness :-P.
           $buffer .= '      <description>'. htmlchars($item['description']). '</description>'. $crlf;
         }
 
         if(!empty($item['author']))
         {
-          # Someone had to make it...
+          // Someone had to make it...
           $buffer .= '      <author>'. htmlchars($item['author']). '</author>'. $crlf;
         }
 
@@ -878,38 +876,38 @@ class RSS
 
         if(!empty($item['comments']))
         {
-          # I would like to comment on your item. Please?
+          // I would like to comment on your item. Please?
           $buffer .= '      <comments>'. htmlchars($item['comments']). '</comments>'. $crlf;
         }
 
         if(!empty($item['enclosure']['url']))
         {
-          # Well aren't you Mr. Fancy Pants with your media in items!!!
+          // Well aren't you Mr. Fancy Pants with your media in items!!!
           $buffer .= '      <enclosure url="'. htmlchars($item['enclosure']['url']). '" length="'. (int)$item['enclosure']['length']. '" type="'. htmlchars($item['enclosure']['type']). '" />'. $crlf;
         }
 
         if(!empty($item['guid']))
         {
-          # Everything is unique! Well, unless you stole someone elses content. Tisk tisk!
+          // Everything is unique! Well, unless you stole someone elses content. Tisk tisk!
           $buffer .= '      <guid>'. htmlchars($item['guid']). '</guid>'. $crlf;
         }
 
         if(isset($item['pubdate']))
         {
-          # It had to be published at some point in time.
+          // It had to be published at some point in time.
           $buffer .= '      <pubDate>'. date('r', (int)$item['pubdate']). '</pubDate>'. $crlf;
         }
 
         if(!empty($item['source']['url']))
         {
-          # People have sources, you know?
+          // People have sources, you know?
           $buffer .= '      <source url="'. htmlchars($item['source']['url']). '">'. (!empty($item['source']['value']) ? htmlchars($item['source']['value']) : ''). '</source>'. $crlf;
         }
 
-        # And... CLOSE TAG!
+        // And... CLOSE TAG!
         $buffer .= '    </item>'. $crlf;
 
-        # Output that sucker!!!
+        // Output that sucker!!!
         if(!empty($fp))
         {
           fwrite($fp, $buffer);
@@ -922,7 +920,7 @@ class RSS
       }
     }
 
-    # Almost done!
+    // Almost done!
     $buffer = '  </channel>'. "\r\n".
               '</rss>';
 
@@ -930,7 +928,7 @@ class RSS
     {
       fwrite($fp, $buffer);
 
-      # And unlock it.
+      // And unlock it.
       flock($fp, LOCK_UN);
     }
     else
@@ -939,7 +937,7 @@ class RSS
       flush();
     }
 
-    # Woo! DONE!
+    // Woo! DONE!
     return true;
   }
 }

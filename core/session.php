@@ -22,9 +22,9 @@ if(!defined('IN_SNOW'))
   die('Nice try...');
 }
 
-# Title: Session
+// Title: Session
 
-# Another pluggable function, sessions!!! Woo!
+// Another pluggable function, sessions!!! Woo!
 if(!function_exists('init_session'))
 {
   /*
@@ -46,43 +46,41 @@ if(!function_exists('init_session'))
   */
   function init_session()
   {
-    global $api, $settings;
-
-    # Are sessions set to automatically start upon load? Turn it off :P
+    // Are sessions set to automatically start upon load? Turn it off :P
     if(@ini_get('session.auto_start') == 1)
     {
       session_write_close();
     }
 
-    # Custom session save path..? Make sure it is readable and writeable.
-    if(strlen($settings->get('session.save_path', 'string', '')) > 0 && is_writeable($settings->get('session.save_path', 'string')) && is_readable($settings->get('session.save_path', 'string')))
+    // Custom session save path..? Make sure it is readable and writeable.
+    if(strlen(settings()->get('session.save_path', 'string', '')) > 0 && is_writeable(settings()->get('session.save_path', 'string')) && is_readable(settings()->get('session.save_path', 'string')))
     {
-      @ini_set('session.save_path', $settings->get('session.save_path', 'string'));
+      @ini_set('session.save_path', settings()->get('session.save_path', 'string'));
     }
 
-    # Use cookies, mmm...
+    // Use cookies, mmm...
     @ini_set('session.use_cookies', 1);
 
-    # Increase the GC probability a bit.
-    @ini_set('session.gc_divisor', $settings->get('session.gc_divisor', 'int', 0) > 0 ? $settings->get('session.gc_divisor', 'int') : 200);
+    // Increase the GC probability a bit.
+    @ini_set('session.gc_divisor', settings()->get('session.gc_divisor', 'int', 0) > 0 ? settings()->get('session.gc_divisor', 'int') : 200);
 
-    # Extend the lifetime of the sessions.
-    @ini_set('session.gc_maxlifetime', $settings->get('session.gc_maxlifetime', 'int', 0) > 0 ? $settings->get('session.gc_maxlifetime', 'int') : 3600);
+    // Extend the lifetime of the sessions.
+    @ini_set('session.gc_maxlifetime', settings()->get('session.gc_maxlifetime', 'int', 0) > 0 ? settings()->get('session.gc_maxlifetime', 'int') : 3600);
 
-    # Along with the cookie itself.
+    // Along with the cookie itself.
     @ini_set('session.cookie_lifetime', time_utc() + 432000);
 
-    # And use ONLY cookies! Otherwise people can do that ?PHPSESSID attack crap...
+    // And use ONLY cookies! Otherwise people can do that ?PHPSESSID attack crap...
     @ini_set('session.use_only_cookies', 1);
 
-    # Only allow the cookie to be accessed via HTTP, not something like JavaScript.
-    # Though, not all browsers currently support it.
+    // Only allow the cookie to be accessed via HTTP, not something like JavaScript.
+    // Though, not all browsers currently support it.
     @ini_set('session.cookie_httponly', 1);
 
-    # Maybe you have something to add, or change?
-    $api->run_hooks('init_session');
+    // Maybe you have something to add, or change?
+    api()->run_hooks('init_session');
 
-    # Now start the session.
+    // Now start the session.
     session_start();
   }
 }
@@ -113,17 +111,15 @@ if(!function_exists('verify_request'))
   */
   function verify_request($where = 'request')
   {
-    global $member, $theme;
-
     $where = strtolower($where);
 
-    # Make sure it is a known where.
+    // Make sure it is a known where.
     if(!in_array($where, array('get', 'post', 'request')))
     {
       return false;
     }
 
-    # Now fetch the session id, or at least, try.
+    // Now fetch the session id, or at least, try.
     if($where == 'get')
     {
       $sid = !empty($_GET['sid']) ? $_GET['sid'] : '';
@@ -137,10 +133,10 @@ if(!function_exists('verify_request'))
       $sid = !empty($_REQUEST['sid']) ? $_REQUEST['sid'] : '';
     }
 
-    # So do they match?
-    if($member->session_id() != $sid)
+    // So do they match?
+    if(member()->session_id() != $sid)
     {
-      # We have a function to do this already ;-)
+      // We have a function to do this already ;-)
       member_access_denied(null, l('Sorry, but session verification failed. Please go back and try again.'));
     }
 
@@ -169,8 +165,6 @@ if(!function_exists('member_access_denied'))
   */
   function member_access_denied($title = null, $message = null)
   {
-    global $theme;
-
     @ob_clean();
 
     if(empty($title))
@@ -183,19 +177,19 @@ if(!function_exists('member_access_denied'))
       $message = l('Sorry, but you are not allowed to access the page you have requested.');
     }
 
-    $theme->set_title($title);
+    theme()->set_title($title);
 
-    $theme->add_meta(array('name' => 'robots', 'content' => 'noindex'));
+    theme()->add_meta(array('name' => 'robots', 'content' => 'noindex'));
 
-    $theme->header();
+    theme()->header();
 
     echo '
     <h1>', $title, '</h1>
     <p>', $message, '</p>';
 
-    $theme->footer();
+    theme()->footer();
 
-    # Exit!
+    // Exit!
     exit;
   }
 }

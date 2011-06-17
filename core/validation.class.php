@@ -35,8 +35,8 @@ if(!defined('IN_SNOW'))
 */
 class Validation
 {
-  # Variable: types
-  # An array containing the registered types.
+  // Variable: types
+  // An array containing the registered types.
   private $types;
 
   /*
@@ -44,11 +44,11 @@ class Validation
   */
   public function __construct()
   {
-    global $api, $func;
+    global $func;
 
     $this->types = array();
 
-    # Add some default types.
+    // Add some default types.
     $this->add_type('bool', create_function('&$data, $min = null, $max = null, $truncate = false', '
                               if(is_bool($data) || $data == 0 || $data == 1)
                               {
@@ -137,8 +137,8 @@ class Validation
                                 else
                                   return false;'));
 
-    # Here is a wise place to add your types... :P
-    $api->run_hooks('validation_construct', array(&$this));
+    // Here is a wise place to add your types... :P
+    api()->run_hooks('validation_construct', array(&$this));
   }
 
   /*
@@ -176,13 +176,13 @@ class Validation
   */
   public function add_type($name, $callback, $filename = null)
   {
-    # Can't have an empty name or class name.
+    // Can't have an empty name or class name.
     if(empty($name) || empty($callback))
     {
       return false;
     }
 
-    # Does the file exist? That is, unless the function isn't already defined.
+    // Does the file exist? That is, unless the function isn't already defined.
     if(!is_callable($callback) && (empty($filename) || !file_exists($filename)))
     {
       return false;
@@ -191,20 +191,20 @@ class Validation
     {
       require_once($filename);
 
-      # Function still not defined? That's no good :(
+      // Function still not defined? That's no good :(
       if(!is_callable($callback))
       {
         return false;
       }
     }
 
-    # Not callable? Not good!
+    // Not callable? Not good!
     if(!is_callable($callback))
     {
       return false;
     }
 
-    # Alright, save the callback, and we are good!
+    // Alright, save the callback, and we are good!
     $this->types[strtolower($name)] = $callback;
 
     return true;
@@ -224,7 +224,7 @@ class Validation
   */
   public function types()
   {
-    # Simple enough, right?
+    // Simple enough, right?
     return array_keys($this->types);
   }
 
@@ -311,32 +311,32 @@ class Validation
   {
     global $func;
 
-    # Is the type empty?
+    // Is the type empty?
     if(empty($type))
     {
-      # Can't check the data, so delete it!
+      // Can't check the data, so delete it!
       $data = null;
 
       return false;
     }
 
-    # Case insensitivity please ;)
+    // Case insensitivity please ;)
     $type = strtolower($type);
 
-    # Is it of the formatted type?
+    // Is it of the formatted type?
     if($type == 'formatted')
     {
-      # $data needs to be an array, otherwise, this is the wrong thing.
+      // $data needs to be an array, otherwise, this is the wrong thing.
       if(!is_array($data))
       {
         $data = null;
         return false;
       }
 
-      # Now real quick like! Is the format just a type or an array?
+      // Now real quick like! Is the format just a type or an array?
       if(!is_array($format) || (is_array($format) && isset($format[0]) && $format[0] != 'formatted'))
       {
-        # Not much to do, is there?
+        // Not much to do, is there?
         if(count($data) == 0)
         {
           return true;
@@ -347,33 +347,33 @@ class Validation
           $format = (string)$format[0];
         }
 
-        # Just a single type, so yeah.
+        // Just a single type, so yeah.
         $new = array();
         foreach($data as $key => $value)
         {
-          # Simply use the data method, hehe :)
+          // Simply use the data method, hehe :)
           if($this->data($value, $format))
           {
-            # It was valid, so just add it.
+            // It was valid, so just add it.
             $new[$key] = $value;
           }
           else
           {
-            # Oh noes! It was bad.
+            // Oh noes! It was bad.
             $data = null;
 
             return false;
           }
         }
 
-        # All done? No issues? Great!
+        // All done? No issues? Great!
         $data = $new;
         return true;
       }
       else
       {
-        # Quick check! If they both don't have the same amount of indices,
-        # then something is already wrong ;)
+        // Quick check! If they both don't have the same amount of indices,
+        // then something is already wrong ;)
         if(count($data) != count($format) || count($data) == 0)
         {
           $data = null;
@@ -381,11 +381,11 @@ class Validation
           return false;
         }
 
-        # Now it is time to check!
+        // Now it is time to check!
         $new = array();
         foreach($format as $key => $value)
         {
-          # Is the key not in $data..?
+          // Is the key not in $data..?
           if(!isset($data[$key]))
           {
             $data = null;
@@ -394,7 +394,7 @@ class Validation
 
           $valid = $this->data($data[$key], is_array($format[$key]) ? $value[0] : $value, is_array($format[$key]) ? array_slice($value, 1) : null);
 
-          # Was the data valid?
+          // Was the data valid?
           if(empty($valid))
           {
             $data = null;
@@ -406,41 +406,41 @@ class Validation
           }
         }
 
-        # If we are still going, it worked!
+        // If we are still going, it worked!
         $data = $new;
         return true;
       }
     }
     elseif(isset($this->types[$type]))
     {
-      # Any type of callback, maybe? :-(
+      // Any type of callback, maybe? :-(
       if(isset($format[3]) && is_callable($format[3]))
       {
         if(!$format[3]($data))
         {
-          # Something must have went wrong, don't know what, though.
+          // Something must have went wrong, don't know what, though.
           $data = null;
 
           return false;
         }
       }
 
-      # Now let the type handle the validity checking...
+      // Now let the type handle the validity checking...
       if($this->types[$type]($data, isset($format[0]) && is_numeric($format[0]) ? (int)$format[0] : null, isset($format[1]) && is_numeric($format[1]) ? (int)$format[1] : null, isset($format[2]) && is_bool($format[2]) ? $format[2] : false))
       {
-        # Alright, it was alright!!! :)
+        // Alright, it was alright!!! :)
         return true;
       }
       else
       {
-        # Uh oh, it was invalid!
+        // Uh oh, it was invalid!
         $data = null;
 
         return false;
       }
     }
 
-    # Nope, the type wasn't defined, so bad!
+    // Nope, the type wasn't defined, so bad!
     $data = null;
     return false;
   }
@@ -459,9 +459,9 @@ class Validation
 */
 function init_validation()
 {
-  global $api, $validation;
+  global $validation;
 
-  # You can hook into validation_construct to add types ;)
-  $validation = $api->load_class('Validation');
+  // You can hook into validation_construct to add types ;)
+  $validation = api()->load_class('Validation');
 }
 ?>
