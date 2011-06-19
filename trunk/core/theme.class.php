@@ -45,25 +45,32 @@ abstract class Theme
   protected $url;
 
   // Variable: links
-  // An array containing all the <link> tags to be added inside the <head> of
-  // the document. Each array inside links can contain charset, href, hreflang,
-  // media, rel, rev, target, type, class, dir, id, lang, style, title and xml:lang.
+  // An array containing all the <link> tags to be added inside the <head>
+  // of the document. Each array inside links can contain charset, href,
+  // hreflang, media, rel, rev, target, type, class, dir, id, lang, style,
+  // title and xml:lang.
   protected $links;
 
   // Variable: js_vars
-  // An associative array (variable => value) containing JavaScript variables
-  // to be defined before including JavaScript files, if any.
+  // An associative array (variable => value) containing JavaScript
+  // variables to be defined before including JavaScript files, if any.
   protected $js_vars;
 
   // Variable: js_files
-  // Contains JavaScript files to include in the documents <head> tag. Each array
-  // inside can contain type, charset, defer and src.
+  // Contains JavaScript files to include in the documents <head> tag. Each
+  // array inside can contain type, charset, defer and src.
   protected $js_files;
 
   // Variable: meta
-  // An array containing meta data to include in the documents <head> tag. Each
-  // array can contain content, http-equiv, name, scheme, dir, lang and xml:lang.
+  // An array containing meta data to include in the documents <head> tag.
+  // Each array can contain content, http-equiv, name, scheme, dir, lang and
+  // xml:lang.
   protected $meta;
+
+  // Variable: templates
+  // An array containing the recognized templates which can be loaded with
+  // the <Theme::render> method.
+  protected $templates;
 
   /*
     Constructor: __construct
@@ -81,6 +88,7 @@ abstract class Theme
     $this->js_vars = array();
     $this->js_files = array();
     $this->meta = array();
+    $this->templates = array();
 
     // Setting the main title?
     if(!empty($main_title))
@@ -96,6 +104,8 @@ abstract class Theme
 
     // Our first meta tag!
     $this->add_meta(array('http-equiv' => 'Content-Type', 'content' => 'text/html; charset=utf-8'));
+
+		// Load up the default templates.
 
     // Do any possible specific theme stuff :)
     $this->init();
@@ -157,7 +167,8 @@ abstract class Theme
     Sets the URL of the current theme, with no trailing /!
 
     Parameters:
-      string $url - The URL of the current themes base directory (No trailing /!)
+      string $url - The URL of the current themes base directory (No
+										trailing /!)
 
     Returns:
       bool - Returns true on success, false on failure.
@@ -332,7 +343,8 @@ abstract class Theme
   /*
     Method: return_links
 
-    Returns all the links (and their information) currently added to the theme.
+    Returns all the links (and their information) currently added to the
+    theme.
 
     Parameters:
       none
@@ -352,7 +364,8 @@ abstract class Theme
 
     Parameters:
       string $variable - The name of the JavaScript variable to define.
-      mixed $value - The value of the variable. Can either be a string, int or float.
+      mixed $value - The value of the variable. Can either be a string, int
+      or float.
 
     Returns:
       bool - Returns true on success, false on failure.
@@ -421,14 +434,15 @@ abstract class Theme
                          all JavaScript variables will be returned.
 
     Returns:
-      mixed - Returns the set value for the specified variable, if $variable is set
-              (false if it does not exist), if $variable is not set, then an array
-              containing all the current variables is returned.
+      mixed - Returns the set value for the specified variable, if $variable
+							is set (false if it does not exist), if $variable is not set,
+							then an array containing all the current variables is returned.
 
     Note:
-      Even though false is returned if the a variable is specified does not necessarily
-      mean it is not set, since the variables value can also be set to false. In which
-      case, you should check with <Theme::js_var_exists>.
+      Even though false is returned if the a variable is specified does not
+      necessarily mean it is not set, since the variables value can also be
+      set to false. In which case, you should check with
+      <Theme::js_var_exists>.
   */
   public function return_js_var($variable = null)
   {
@@ -578,7 +592,8 @@ abstract class Theme
   */
   public function add_meta($meta)
   {
-    // No information given? Or no essential information given? Then sorry, can't add it!
+    // No information given? Or no essential information given? Then sorry,
+    // can't add it!
     if(empty($meta) || !is_array($meta) || count($meta) == 0 || ((isset($meta['name']) || isset($meta['http-equiv'])) && $this->meta_exists(isset($meta['name']) ? $meta['name'] : $meta['http-equiv'])))
     {
       return false;
@@ -649,7 +664,8 @@ abstract class Theme
   */
   public function remove_meta($name)
   {
-    // Can't remove something that doesn't exist, at least, in the real world.
+    // Can't remove something that doesn't exist, at least, in the real
+    // world.
     if(!$this->meta_exists($name))
     {
       return false;
@@ -687,11 +703,155 @@ abstract class Theme
   }
 
   /*
+		Method: add_template
+
+		Adds a template to the templates that the Theme system recognizes as
+		valid themes which can be loaded via <Theme::render>.
+
+		Parameters:
+			string $name - The name of the template, which will be used when
+										 calling <Theme::render>.
+			string $filename - The name of the file to be associated with the
+												 template being added.
+
+		Returns:
+			bool - Returns true if the template was added, false on failure, such
+						 as if the template already exists, or if the file does not
+						 exist.
+
+		Note:
+			Templates can be mass added by leaving the filename parameter blank,
+			and then passing an array in the following format in the name
+			parameter:
+				array(
+					array(
+						'name' => 'template_1',
+						'filename' => 'location of template_1',
+					),
+					array(
+						'name' => ...,
+						'filename' => ...,
+					),
+				)
+
+			Please note that in this case, this method will return the number of
+			templates which were added.
+	*/
+	public function add_template($name, $filename = null)
+	{
+		// First, let's see if this is a bulk amount of templates that are going
+		// to be added.
+		if(is_array($name))
+		{
+			$total = 0;
+			foreach($name as $item)
+			{
+				// Make sure a couple things are set.
+				if(isset($item['name']) && isset($item['filename']) && $this->add_template($item['name'], $item['filename']))
+				{
+					// That was a success.
+					$total++;
+				}
+			}
+
+			// We will return how many templates were added successfully.
+			return $total;
+		}
+
+		// Now, does this template already exist (among other things)?
+		if(empty($name) || $this->template_exists($name) || !file_exists($filename) || !is_file($filename) || !is_readable($filename))
+		{
+			// Nope.
+			return false;
+		}
+
+		// Add the template. Easy enough, right?
+		$this->templates[strtolower($name)] = $filename;
+
+		return true;
+	}
+
+	/*
+		Method: template_exists
+
+		Checks to see if there is a template with the specified name already
+		registered.
+
+		Parameters:
+			string $name - The name of the template to check for.
+
+		Returns:
+			bool - Returns true if a template with that name is already
+						 registered, false if not.
+	*/
+	public function template_exists($name)
+	{
+		// Simply enough :-)
+		return isset($this->templates[strtolower($name)]);
+	}
+
+	/*
+		Method: remove_template
+
+		Removes the specified template from the recognized templates.
+
+		Parameters:
+			string $name - The name of the template to remove.
+
+		Returns:
+			bool - Returns true if the template was removed successfully, false if
+						 the template was not registered in the first place.
+	*/
+	public function remove_template($name)
+	{
+		// So can we remove it?
+		if(!$this->template_exists($name))
+		{
+			// Hard to remove something that doesn't exist... I could be wrong,
+			// though.
+			return false;
+		}
+
+		// Remove it!
+		unset($this->templates[strtolower($name)]);
+
+		return true;
+	}
+
+	/*
+		Method: return_template
+
+		Returns all the currently recognized templates, or the location of the
+		specified template.
+
+		Parameters:
+			string $name - The name of the template you wish to obtain the
+										 location of, if any.
+
+		Returns:
+			mixed - Returns an array if the name parameter is left empty, but a
+							string if the template name is registered which will contain
+						  the location of the template, but false if the template name
+						  is not registered.
+	*/
+	public function return_template($name = null)
+	{
+		if($name === null)
+		{
+			// Return everything we got!
+			return $this->templates;
+		}
+
+		// Return the templates location, if there is one.
+		return $this->template_exists($name) ? $this->templates[$name] : false;
+	}
+
+  /*
     Method: init
 
-    This is a protected method, which can be overloaded by the Implemented_Theme
-    class, which can be used to add any required CSS, JavaScript, or what-have-you
-    without hardcoding it :)
+    This is a protected method, which can be overloaded by the
+    Implemented_Theme class, which can be used to add any required CSS,
+    JavaScript, or what-have-you without hardcoding it :)
 
     Parameters:
       none
@@ -701,9 +861,10 @@ abstract class Theme
   */
   protected function init()
   {
-    // Blank? Yup... As nothing is here by default, but if your theme has anything special
-    // to add or do at startup, redefine this method in your class and the __construct
-    // will call it after all attribute initialization is completed.
+    // Blank? Yup... As nothing is here by default, but if your theme has
+    // anything special to add or do at startup, redefine this method in
+    // your class and the __construct will call it after all attribute
+    // initialization is completed.
   }
 
   /*
@@ -733,6 +894,73 @@ abstract class Theme
       void - Nothing is returned by this method.
   */
   abstract public function footer();
+
+	/*
+		Method: render
+
+		This method is aptly named: it renders the current web page. Simply
+		specify the template wished to be loaded at the time you wish it to be
+		done, and it does it -- simple, no? This method will also call the
+		header and footer methods as well.
+
+		Parameters:
+			string $template - The name of the template to be loaded.
+
+		Returns:
+			void - Nothing is returned by this method.
+
+		Note:
+			The template name is simply the name of the file in the
+			coredir/templates directory, without the .template.php part.
+
+			Also, plugins may add their own templates as well, by calling on the
+			<Theme::add_template> method. These templates can be added one by one
+			or specify multiple via an array.
+
+			Plugins may override built-in templates (the ones in the
+			aforementioned templates directory) by hooking into template_location
+			which will supply the templates name as the first parameter, and the
+			templates currently set location. These parameters will be passed by
+			reference, so simply set the new desired location for the template.
+
+			Templates may also be overridden by having them removed via the
+			<Theme::remove_template> method, and then adding them with
+			<Theme::add_template>.
+	*/
+	public function render($template)
+	{
+		// Which template you loading? We don't care if it exists, yet.
+		api()->add_hook('template_location', array(&$template, &$template_location));
+
+		// Make sure the template location exists.
+		if(empty($template_location) || !file_exists($template_location) || !is_file($template_location) || !is_readable($template_location))
+		{
+			// Alright, we will try the more conventional method.
+			$template_location = $this->return_template($template);
+		}
+
+		// One last check, can we load this template?
+		if(!file_exists($template_location))
+		{
+			// Uh, that'd be a big fat NO.
+			$this->header();
+
+			echo '
+			<h1>', l('Theme Error'), '</h1>
+			<p>', l('Sorry, but the specified theme &ndash; &quot;%s&quot; &ndash; could not be loaded, as it is not registered with the Theme system.', htmlchars($template)), '</p>';
+
+			$this->footer();
+
+			exit;
+		}
+
+		// This is pretty simple to do.
+		$this->header();
+
+		require($template_location);
+
+		$this->footer();
+	}
 
   /*
     Method: generate_tag
@@ -812,7 +1040,8 @@ function theme()
 		theme()->add_js_var('theme_url', themeurl);
 		theme()->add_js_var('session_id', member()->session_id());
 
-		// You can hook into here to add all your theme stuffs (<link>'s, js vars, js files, etc).
+		// You can hook into here to add all your theme stuffs (<link>'s,
+		// js vars, js files, etc).
 		api()->run_hooks('post_init_theme');
   }
 
