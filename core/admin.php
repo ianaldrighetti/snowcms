@@ -50,7 +50,7 @@ if(!function_exists('admin_prepend'))
     // Whether or not you can view the Admin Control Panel, load the theme!
     require_once(coredir. '/admin/admin_theme.class.php');
 
-    $theme = api()->load_class(api()->apply_filters('admin_theme_class', 'Admin_Theme'), array(l('Control Panel'). ' - '. settings()->get('site_name', 'string'), api()->apply_filters('admin_theme_image_url', themeurl. '/default/style/images/admincp')));
+    $GLOBALS['theme'] = api()->load_class(api()->apply_filters('admin_theme_class', 'Admin_Theme'), array(l('Control Panel'). ' - '. settings()->get('site_name', 'string'), api()->apply_filters('admin_theme_image_url', themeurl. '/default/style/images/admincp')));
 
     if(member()->can('access_admin_cp'))
     {

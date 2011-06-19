@@ -48,7 +48,7 @@ if(!function_exists('checkcookie_verify'))
     $cookie = isset($_COOKIE[cookiename]) ? $_COOKIE[cookiename] : '';
     list($member_id) = explode('|', $cookie);
 
-    if(empty($cookie) || empty($_GET['id']) || $_GET['id'] != $member_id)
+    if(api()->apply_filters('checkcookie_check', empty($cookie) || empty($_GET['id']) || $_GET['id'] != $member_id))
     {
       // The cookie didn't save :(
       api()->add_filter('login_message', create_function('$value', '
@@ -72,7 +72,7 @@ if(!function_exists('checkcookie_verify'))
     api()->run_hooks('checkcookie_success');
 
     // Seemed to have worked, so let's go home!
-    redirect();
+    redirect(baseurl. '/index.php');
 
     exit;
   }
