@@ -227,7 +227,7 @@ if(!function_exists('profile_edit'))
     }
 
     // So can they edit anothers profile or manage another's profile?
-    if(!member()->can('edit_other_profiles') || !member()->can('manage_members'))
+    if($member_id != member()->id() && !member()->can('edit_other_profiles') && !member()->can('manage_members'))
     {
       member_access_denied(l('Access denied'), l('Sorry, but you do not have permission to edit other members profiles.'));
     }

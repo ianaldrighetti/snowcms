@@ -135,13 +135,18 @@ if(!function_exists('clean_request'))
     the cache is cleared, which can be bad if you don't want the browser to
     assume anything. Did that help? Bet not.
 */
-function redirect($location, $status = 307)
+function redirect($location = null, $status = 307)
 {
   // Simply clear all headers, and redirect.
   if(ob_get_length() > 0)
   {
     // Well, if there are any.
     @ob_clean();
+  }
+
+  if(empty($location))
+  {
+		$location = baseurl;
   }
 
   // What type of redirect?

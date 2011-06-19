@@ -60,19 +60,19 @@ if(!function_exists('admin_update'))
       $latest_info = @unserialize($http->request(api()->apply_filters('admin_update_version_url', 'http://download.snowcms.com/news/v2.x-line/latest.php'). '?version='. settings()->get('version', 'string')));
 
       settings()->set('system_last_update_check', time(), 'int');
-      settings()->set('system_latest_version', $latest_version, 'string');
+      settings()->set('system_latest_version', serialize($latest_version), 'string');
       settings()->set('system_latest_info', serialize($latest_info), 'string');
 
       redirect('index.php?action=admin&sa=update');
     }
     else
     {
-      $latest_version = settings()->get('system_latest_version', 'string', null);
+      $latest_version = @unserialize(settings()->get('system_latest_version', 'string', 'b:0;'));
       $latest_info = @unserialize(settings()->get('system_latest_info', 'string', 'a:0:{}'));
     }
 
     // Is an update required?
-    $is_update_required = version_compare(settings()->get('version', 'string'), $latest_version) == -1;
+    $is_update_required = $latest_version !== false ? version_compare(settings()->get('version', 'string'), $latest_version) == -1 : false;
     $latest_info = array_merge(array('header' => '', 'text' => ''), $latest_info);
 
     theme()->set_current_area('system_update');
@@ -86,7 +86,7 @@ if(!function_exists('admin_update'))
   <p>', l('Just as with computers, it is a good idea to ensure that your system is up to date to make sure that you are not vulnerable to any security issues, or just to fix any bugs in the system.'), '</p>
   <br />
   <p>Your version: <span class="', !empty($is_update_required) ? 'red bold' : 'green', '">', settings()->get('version', 'string'), '</span></p>
-  <p>Latest version: ', $latest_version, '</p>
+  <p>Latest version: ', ($latest_version === false ? '<span class="red">'. l('Could not connect to update server. Please check again later.'). '</span>' : $latest_version), '</p>
 
   <h1 style="font-size: 14px;">', l($latest_info['header']), '</h1>
   <p>', l($latest_info['text']), '</p>

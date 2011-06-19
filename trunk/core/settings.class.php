@@ -230,7 +230,7 @@ function settings()
 	if(!isset($GLOBALS['settings']))
 	{
 		// Looks like we need to make an instance of the Settings class.
-		$GLOBALS['settings'] = api->load_class('Settings');
+		$GLOBALS['settings'] = api()->load_class('Settings');
 
 		api()->run_hooks('post_init_settings');
 	}
