@@ -19,11 +19,11 @@ _SnowCMS 2.0 alpha 2 is currently a work-in-progress. You can monitor changes th
 
 A lot will change in 2.0 alpha 2, however, little will change that would be noticed by the one using the system, these are all underlying (unless there are bug fixes).
 
-Currently in order to access $api, $member, etc. you must first _global_ them. This can be quite a pain, so these objects will be encapsulated in a function (api(), member(), etc.) which will return these objects, and can be used like you would its variable counterpart (member()->is_logged() instead of $member->is_logged()).
+Currently in order to access $api, $member, etc. you must first _global_ them. This can be quite a pain, so these objects will be encapsulated in a function (api(), member(), etc.) which will return these objects, and can be used like you would its variable counterpart (member()->is_logged() instead of $member->is_logged()) (√, 6/19/2011).
 
 Not only will the objects be accessed without needing to _global_ them, system variables such as $base_url, $core_dir, $plugin_dir and so forth will be converted to constants, such as baseurl, coredir, plugindir which means no globaling needed (√).
 
-There will be one other major change: the Theme class. Currently the source files have embedded HTML, which means if a plugin really wanted to they could not easily modify the HTML. In order to get past this both the Theme methods header and footer will be removed, and when the page is finally to be displayed a new method called render will be called, which will be passed a parameter called $template, this is a template file containing the HTML in between the overall header and footer of the page. Plugins can then hook into the render method and reroute the location of the template file to wherever they please.
+There will be one other major change: the Theme class. Currently the source files have embedded HTML, which means if a plugin really wanted to they could not easily modify the HTML. In order to get passed this both the Theme methods header and footer will be removed, and when the page is finally to be displayed a new method called render will be called, which will be passed a parameter called $template, this is a template file containing the HTML in between the overall header and footer of the page. Plugins can then hook into the render method and reroute the location of the template file to wherever they please.
 
 === 2.0 alpha 3 ===
 
