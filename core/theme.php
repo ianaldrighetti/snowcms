@@ -63,7 +63,7 @@ if(!defined('IN_SNOW'))
 function theme_load($path)
 {
   // Doesn't exist? Then we can't load it!
-  if(!file_exists($path) || !is_dir($path) || !file_exists($path. '/implemented_theme.class.php') || !file_exists($path. '/theme.xml'))
+  if(!file_exists($path) || !is_dir($path) || !file_exists($path. '/header.template.php') || !file_exists($path. '/footer.template.php') || !file_exists($path. '/theme.xml'))
   {
     return false;
   }
@@ -174,7 +174,7 @@ function theme_list()
 
     // Only look in directories, they are themes if they have the
     // implemented_theme.class.php file.
-    if(is_dir(themedir. '/'. $path) && file_exists(themedir. '/'. $path. '/implemented_theme.class.php') && file_exists(themedir. '/'. $path. '/theme.xml'))
+    if(is_dir(themedir. '/'. $path) && file_exists(themedir. '/'. $path. '/header.template.php') && file_exists(themedir. '/'. $path. '/footer.template.php') && file_exists(themedir. '/'. $path. '/theme.xml'))
     {
       $list[] = realpath(themedir. '/'. $path);
     }
@@ -182,5 +182,183 @@ function theme_list()
 
   // Whether or not there were any themes found, return the array.
   return $list;
+}
+
+/*
+	Function: theme_title
+
+	Outputs the current title of the web page. This function is meant to be
+	used when creating a theme.
+
+	Parameters:
+		none
+
+	Returns:
+		void - Nothing is returned by this function, as the title is output with
+					 an echo.
+*/
+function theme_title()
+{
+	echo api()->apply_filters('theme_title', (strlen(theme()->title()) > 0 ? htmlchars(theme()->title()). ' - ' : ''). (strlen(theme()->main_title()) > 0 ? theme()->main_title() : ''));
+}
+
+/*
+	Function: theme_head
+
+	Outputs the HTML which is displayed between the <head> tags in a theme.
+
+	Parameters:
+		none
+
+	Returns:
+		void - Nothing is returned by this function.
+*/
+function theme_head()
+{
+	api()->run_hooks('pre_theme_head');
+
+	// Got any meta tags?
+	if(count(theme()->return_meta()) > 0)
+	{
+		foreach(theme()->return_meta() as $meta)
+		{
+			echo '
+	', theme()->generate_tag('meta', $meta);
+		}
+	}
+
+	// Now for links... Whatever those may be.
+	if(count(theme()->return_links()) > 0)
+	{
+		foreach(theme()->return_links() as $link)
+		{
+			echo '
+	', theme()->generate_tag('link', $link);
+		}
+	}
+
+	// JavaScript variables! Yippe!
+	if(count(theme()->return_js_var()) > 0)
+	{
+		echo '
+	<script type="text/javascript" language="JavaScript"><!-- // --><![CDATA[';
+
+		foreach(theme()->return_js_var() as $variable => $value)
+		{
+			echo '
+		var ', $variable, ' = ', json_encode($value), ';';
+		}
+
+		echo '
+	</script>';
+	}
+
+	// Finally, any JavaScript files?
+	if(count(theme()->return_js_files()) > 0)
+	{
+		foreach(theme()->return_js_files() as $js_file)
+		{
+        echo '
+  <script', !empty($js_file['language']) ? ' language="'. $js_file['language']. '"' : '', !empty($js_file['type']) ? ' type="'. $js_file['type']. '"' : '', !empty($js_file['src']) ? ' src="'. $js_file['src']. '"' : '', !empty($js_file['defer']) ? ' defer="defer"' : '', !empty($js_file['charset']) ? ' charset="'. $js_file['charset']. '"' : '', '></script>';
+		}
+	}
+
+	// Now you can add anything if you want.
+	echo api()->apply_filters('theme_head', '');
+
+	api()->run_hooks('post_theme_head');
+}
+
+/*
+	Function: theme_site_name
+
+	Outputs the name of the website.
+
+	Parameters:
+		none
+
+	Returns:
+		void
+*/
+function theme_site_name()
+{
+	echo api()->apply_filters('theme_site_name', settings()->get('site_name', 'string', l('SnowCms')));
+}
+
+/*
+	Function: theme_sub_title
+
+	Outputs the sub title of the website (slogan, if you will).
+
+	Parameters:
+		none
+
+	Returns:
+		void
+*/
+function theme_sub_title()
+{
+	echo api()->apply_filters('theme_sub_title', settings()->get('sub_title', 'string', l('Light, simple, free. It&#039;s all you need, and just that.')));
+}
+
+/*
+	Function: theme_menu
+
+	Outputs the desired menu.
+
+	Parameters:
+		string $menu - The name of the menu to display, defaults to "main."
+
+	Returns:
+		void
+
+	Note:
+		If a theme needs to change the before and after HTML surrounding the
+		links they can apply filters to theme_menu_before and theme_menu_after.
+*/
+function theme_menu($menu = 'main')
+{
+	api()->run_hooks('pre_theme_menu', array(&$menu));
+
+	// Load'em up! Maybe.
+	$menu_items = api()->return_menu_items($menu);
+
+	if(!empty($menu_items) && count($menu_items) > 0)
+	{
+		foreach($menu_items as $item)
+		{
+			// We won't give it the content or extra stuff, but we will *need* the
+			// content stuff ourselves.
+			$content = $item['content'];
+			unset($item['content'], $item['extra']);
+
+			echo '
+	', api()->apply_filters('theme_menu_before', '<li>'), theme()->generate_tag('a', $item, false), $content, '</a>', api()->apply_filters('theme_menu_after', '</li>');
+		}
+	}
+
+	api()->run_hooks('post_theme_menu', array(&$menu));
+}
+
+/*
+	Function: theme_foot
+
+	Outputs the information displayed in the sites footer area.
+
+	Parameters:
+		none
+
+	Returns:
+		void
+
+	Note:
+		There is a filter called theme_foot which can be used to modify the
+		information displayed, except for the "Powered by SnowCMS" part.
+*/
+function theme_foot()
+{
+	global $start_time;
+
+	echo api()->apply_filters('theme_foot', l('Page created in %s seconds with %u queries.', round(microtime(true) - $start_time, 3), db()->num_queries)). (settings()->get('show_version', 'bool', true) ? ' | '. l('Powered by <a href="http://www.snowcms.com/" target="_blank" title="SnowCMS">SnowCMS</a> v%s', settings()->get('version', 'string')) : '');
 }
 ?>

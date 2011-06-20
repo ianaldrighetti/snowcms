@@ -126,12 +126,12 @@ init_core();
 if(!empty($_SERVER['QUERY_STRING']))
 {
   // One is, but is it registered? Let's see!
-  $event = $api->return_event($_SERVER['QUERY_STRING']);
+  $event = api()->return_event($_SERVER['QUERY_STRING']);
 }
 else
 {
   // We shall use the default event!
-  $event = $api->return_event($settings->get('default_event', 'string', ''));
+  $event = api()->return_event($settings->get('default_event', 'string', ''));
 }
 
 // So did we get an event, or not? If not, that's bad news!!!
@@ -151,17 +151,11 @@ else
 {
   // There is an event request, but none to go with it, so add a noindex robots tag
   // just incase, we don't want anything to index this since it doesn't exist!
-  $theme->add_meta(array('name' => 'robots', 'content' => 'noindex'));
+  theme()->add_meta(array('name' => 'robots', 'content' => 'noindex'));
 
   // Now show an UH OH! page.
-  $theme->set_title(l('An error has occurred'));
+  theme()->set_title(l('An error has occurred'));
 
-  $theme->header();
-
-  echo '
-    <h1>', l('Request error'), '</h1>
-    <p>', l('Sorry, but we could not find a way to properly execute your request.'), '</p>';
-
-  $theme->footer();
+  theme()->render('request_error');
 }
 ?>

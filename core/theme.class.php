@@ -25,52 +25,52 @@ if(!defined('IN_SNOW'))
 /*
   Class: Theme
 
-  This is an abstract class that a theme extends, and implements header
-  and footer, but also incorporates the information that is gathered
-  and stored within the arrays contained inside this class definition.
+  This is the Theme system, everything that has pretty much anything to do
+  with the theme of a SnowCMS powered website is here, or maybe in the
+  theme.php file.
 */
-abstract class Theme
+class Theme
 {
   // Variable: main_title
   // Contains the sites main title, this title is not independent per page
   // but dependent on the whole sites name itself.
-  protected $main_title;
+  private $main_title;
 
   // Variable: title
   // The title specific to the current page.
-  protected $title;
+  private $title;
 
   // Variable: url
   // The URL of the current themes base directory.
-  protected $url;
+  private $url;
 
   // Variable: links
   // An array containing all the <link> tags to be added inside the <head>
   // of the document. Each array inside links can contain charset, href,
   // hreflang, media, rel, rev, target, type, class, dir, id, lang, style,
   // title and xml:lang.
-  protected $links;
+  private $links;
 
   // Variable: js_vars
   // An associative array (variable => value) containing JavaScript
   // variables to be defined before including JavaScript files, if any.
-  protected $js_vars;
+  private $js_vars;
 
   // Variable: js_files
   // Contains JavaScript files to include in the documents <head> tag. Each
   // array inside can contain type, charset, defer and src.
-  protected $js_files;
+  private $js_files;
 
   // Variable: meta
   // An array containing meta data to include in the documents <head> tag.
   // Each array can contain content, http-equiv, name, scheme, dir, lang and
   // xml:lang.
-  protected $meta;
+  private $meta;
 
   // Variable: templates
   // An array containing the recognized templates which can be loaded with
   // the <Theme::render> method.
-  protected $templates;
+  private $templates;
 
   /*
     Constructor: __construct
@@ -106,9 +106,22 @@ abstract class Theme
     $this->add_meta(array('http-equiv' => 'Content-Type', 'content' => 'text/html; charset=utf-8'));
 
 		// Load up the default templates.
+		$files = scandir(coredir. '/templates/');
 
-    // Do any possible specific theme stuff :)
-    $this->init();
+		// There better be stuff in there!
+		if(count($files) > 0)
+		{
+			foreach($files as $filename)
+			{
+				if($filename == '.' || $filename == '..' || substr($filename, -13, 13) != '.template.php')
+				{
+					continue;
+				}
+
+				// Seems like it is a valid template file. Add it, then.
+				$this->add_template(substr($filename, 0, strlen($filename) - 13), realpath(coredir. '/templates/'. $filename));
+			}
+		}
   }
 
   /*
@@ -846,55 +859,6 @@ abstract class Theme
 		return $this->template_exists($name) ? $this->templates[$name] : false;
 	}
 
-  /*
-    Method: init
-
-    This is a protected method, which can be overloaded by the
-    Implemented_Theme class, which can be used to add any required CSS,
-    JavaScript, or what-have-you without hardcoding it :)
-
-    Parameters:
-      none
-
-    Returns:
-      void - Nothing is returned by this method.
-  */
-  protected function init()
-  {
-    // Blank? Yup... As nothing is here by default, but if your theme has
-    // anything special to add or do at startup, redefine this method in
-    // your class and the __construct will call it after all attribute
-    // initialization is completed.
-  }
-
-  /*
-    Method: header
-
-    This is a method which the Implemented_Theme class must implement!
-    The method outputs the themes header HTML.
-
-    Parameters:
-      none
-
-    Returns:
-      void - Nothing is returned by this method.
-  */
-  abstract public function header();
-
-  /*
-    Method: footer
-
-    This is a method which the Implemented_Theme class must implement!
-    The method outputs the themes footer HTML.
-
-    Parameters:
-      none
-
-    Returns:
-      void - Nothing is returned by this method.
-  */
-  abstract public function footer();
-
 	/*
 		Method: render
 
@@ -939,27 +903,39 @@ abstract class Theme
 			$template_location = $this->return_template($template);
 		}
 
-		// One last check, can we load this template?
+		// Make sure the required theme files exist.
+		if(!file_exists(themedir. '/'. settings()->get('theme', 'string', 'default'). '/header.template.php'))
+		{
+			die(l('<strong>Fatal theme error:</strong> Could not locate the header.template.php file.'));
+		}
+		elseif(!file_exists(themedir. '/'. settings()->get('theme', 'string', 'default'). '/footer.template.php'))
+		{
+			die(l('<strong>Fatal theme error:</strong> Could not locate the footer.template.php file.'));
+		}
+
+		api()->run_hooks('pre_render_theme');
+
+		// This is pretty simple to do.
+		require(themedir. '/'. settings()->get('theme', 'string', 'default'). '/header.template.php');
+
+		api()->run_hooks('pre_theme_content');
+
 		if(!file_exists($template_location))
 		{
-			// Uh, that'd be a big fat NO.
-			$this->header();
-
 			echo '
 			<h1>', l('Theme Error'), '</h1>
 			<p>', l('Sorry, but the specified theme &ndash; &quot;%s&quot; &ndash; could not be loaded, as it is not registered with the Theme system.', htmlchars($template)), '</p>';
-
-			$this->footer();
-
-			exit;
+		}
+		else
+		{
+			require($template_location);
 		}
 
-		// This is pretty simple to do.
-		$this->header();
+		api()->run_hooks('post_theme_content');
 
-		require($template_location);
+		require(themedir. '/'. settings()->get('theme', 'string', 'default'). '/footer.template.php');
 
-		$this->footer();
+		api()->run_hooks('post_render_theme');
 	}
 
   /*
@@ -973,7 +949,7 @@ abstract class Theme
     Returns:
       string - Returns the formed tag.
   */
-  protected function generate_tag($name, $attributes, $self_closing = true)
+  public function generate_tag($name, $attributes, $self_closing = true)
   {
     // Kinda need the name of a tag.
     if(empty($name))
@@ -1029,8 +1005,13 @@ function theme()
 		require_once(coredir. '/theme.php');
 
 		// Load the Implemented_Theme class...
-		require_once(themedir. '/'. settings()->get('theme', 'string', 'default'). '/implemented_theme.class.php');
-		$GLOBALS['theme'] = api()->load_class('Implemented_Theme', array(settings()->get('site_name', 'string'), themeurl. '/'. settings()->get('theme', 'string', 'default')));
+		$GLOBALS['theme'] = api()->load_class('Theme', array(settings()->get('site_name', 'string'), themeurl. '/'. settings()->get('theme', 'string', 'default')));
+
+		// Does the theme have any initialization stuff? If so, get it!
+		if(file_exists(themedir. '/'. settings()->get('theme', 'string', 'default'). '/init.php'))
+		{
+			require_once(themedir. '/'. settings()->get('theme', 'string', 'default'). '/init.php');
+		}
 
 		// Be sure that the snowobj.js file is in all themes.
 		theme()->add_js_file(array('src' => themeurl. '/default/js/snowobj.js'));
