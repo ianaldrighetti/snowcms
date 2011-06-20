@@ -68,8 +68,16 @@ class API
   private $plugins;
 
   // Variable: resources
-  // A resource is something such as an image, style sheet, or anything, really.
+  // A resource is something such as an image, style sheet, or anything,
+  // really.
   private $resources;
+
+  // Variable: context
+  // An array containing information which is used within the context of the
+  // current page. This can be used to easily transmit information from one
+  // place to another, such as information that needs to be used by a
+  // template.
+  public $context;
 
   /*
     Constructor: __construct
@@ -101,6 +109,7 @@ class API
     $this->objects = array();
     $this->plugins = array();
     $this->resources = array();
+    $this->context = array();
   }
 
   /*
