@@ -47,6 +47,9 @@ if(!function_exists('profile_view'))
 
     api()->run_hooks('profile_view');
 
+		// Just in case.
+		$_GET['id'] = (int)$_GET['id'] > 0 ? (int)$_GET['id'] : 0;
+
     // We need to load a members information... So yeah.
     if(empty($_GET['id']))
     {
@@ -84,19 +87,12 @@ if(!function_exists('profile_view'))
       exit;
     }
 
-    // Nope, you want to view it.
-    theme()->set_title(l('Viewing profile of %s', $member_info['name']));
-
-    theme()->header();
-
     $handled = false;
     api()->run_hooks('profile_view_display', array(&$handled, &$member_info));
 
     if(empty($handled))
     {
-      echo '
-      <h1>', l('%s\'s profile', $member_info['name']), (member()->can('edit_other_profiles') || $_GET['id'] == member()->id() ? ' <span style="font-size: 50%;">'. l('<a href="%s" title="Edit this account">Edit</a>', baseurl. '/index.php?action=profile&amp;id='. $_GET['id']. '&amp;edit'). '</span>' : ''), '</h1>
-      <div class="profile_view_data">';
+			theme()->set_title(l('Viewing profile of %s', $member_info['name']));
 
       // You will be able to modify this later :P
       $display_data = array(
@@ -121,7 +117,7 @@ if(!function_exists('profile_view'))
                         array(
                           'label' => l('Last active:'),
                           'title' => l('The last time this member browsed the site'),
-                          'value' => '...',
+                          'value' => timeformat($member_info['last_active']),
                           'show' => true,
                         ),
                         array(
@@ -147,43 +143,11 @@ if(!function_exists('profile_view'))
                         ),
                       );
 
-      $display_data = api()->apply_filters('profile_view_data', $display_data);
+			api()->context['display_data'] = api()->apply_filters('profile_view_data', $display_data);
+			api()->context['member_info'] = $member_info;
 
-      if(is_array($display_data) && count($display_data) > 0)
-      {
-        foreach($display_data as $data)
-        {
-          if(!empty($data['is_hr']))
-          {
-            echo '
-        <p>&nbsp;</p>
-        <hr class="profile_view" size="1" />
-        <p>&nbsp;</p>';
-
-            continue;
-          }
-          elseif(empty($data['label']) || empty($data['value']) || empty($data['show']))
-          {
-            continue;
-          }
-
-          echo '
-        <div class="left">
-          <label', (!empty($data['title']) ? ' title="'. $data['title']. '"' : ''), '>', $data['label'], '</label>
-        </div>
-        <div class="right">
-          ', $data['value'], '
-        </div>
-        <div class="break">
-        </div>';
-        }
-      }
-
-      echo '
-      </div>';
+      theme()->render('profile_view');
     }
-
-    theme()->footer();
   }
 }
 

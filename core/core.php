@@ -145,8 +145,8 @@ if(!function_exists('core_popup'))
 <head>
   <title>', $func['htmlspecialchars']($popup['title']), '</title>
   <style type="text/css">
-    ', api()->apply_filters('core_popup_css', 'body { background: //FFFFFF; font-family: Tahoma, Arial, sans-serif; font-size: 90%; }
-h1 { font-size: 115%; color: //3465A7; margin-top: 15px; }'), '
+    ', api()->apply_filters('core_popup_css', 'body { background: #FFFFFF; font-family: Tahoma, Arial, sans-serif; font-size: 90%; }
+h1 { font-size: 115%; color: #3465A7; margin-top: 15px; }'), '
   </style>
 </head>
 <body>

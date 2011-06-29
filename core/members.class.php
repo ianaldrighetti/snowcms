@@ -132,6 +132,7 @@ class Members
                         'email' => $row['member_email'],
                         'groups' => explode(',', $row['member_groups']),
                         'member_groups' => explode(',', $row['member_groups']),
+                        'last_active' => $row['member_last_active'],
                         'registered' => $row['member_registered'],
                         'ip' => $row['member_ip'],
                         'is_activated' => !empty($row['member_activated']),

@@ -44,6 +44,7 @@ CREATE TABLE `{db->prefix}members`
   `member_email` VARCHAR(100) NOT NULL,
   `member_groups` VARCHAR(255) NOT NULL DEFAULT 'member',
   `member_last_active` INT(10) UNSIGNED NOT NULL DEFAULT '0',
+  `member_last_login` INT(10) UNSIGNED NOT NULL DEFAULT '0',
   `member_registered` INT(10) UNSIGNED NOT NULL,
   `member_ip` VARCHAR(150) NOT NULL DEFAULT '127.0.0.1',
   `member_activated` TINYINT(3) UNSIGNED NOT NULL DEFAULT '0',

@@ -156,6 +156,9 @@ else
   // Now show an UH OH! page.
   theme()->set_title(l('An error has occurred'));
 
-  theme()->render('request_error');
+	api()->context['error_title'] = l('Request Error');
+	api()->context['error_message'] = l('Sorry, but we could not find a way to properly execute your request.');
+
+  theme()->render('error');
 }
 ?>

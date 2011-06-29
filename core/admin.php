@@ -327,18 +327,9 @@ if(!function_exists('admin_prompt_password'))
 
       theme()->set_title(l('Log in'));
 
-      theme()->header();
+			api()->context['form'] = $form;
 
-      echo '
-      <h1>', l('Login'), '</h1>
-      <p>', l('For security purposes, please enter your account password below. This is done to help make sure that you are who you say you are.'), '</p>
-      <script type="text/javascript">
-        s.onload(function() { document.getElementById(\'admin_prompt_form_admin_verification_password_input\').focus(); });
-      </script>';
-
-      $form->show('admin_prompt_form');
-
-      theme()->footer();
+      theme()->render('admin_prompt_password');
 
       // Don't execute anything else.
       exit;
@@ -474,13 +465,10 @@ if(!function_exists('admin_access_denied'))
 
     theme()->set_title($title);
 
-    theme()->header();
+		api()->context['error_title'] = $title;
+		api()->context['error_message'] = $message;
 
-    echo '
-    <h1>', $title, '</h1>
-    <p>', $message, '</p>';
-
-    theme()->footer();
+    theme()->render('error');
 
     // Exit!
     exit;
