@@ -122,9 +122,9 @@ if(!class_exists('Member'))
       $this->ip = isset($_SERVER['HTTP_X_FORWARDED_FOR']) ? $_SERVER['HTTP_X_FORWARDED_FOR'] : $_SERVER['REMOTE_ADDR'];
 
       // Get that cookie, mmm..!
-      if(!empty($_COOKIE[cookiename]))
+      if(!empty($_COOKIE[api()->apply_filters('login_cookie_name', cookiename)]))
       {
-        list($member_id, $passwrd) = @explode('|', $_COOKIE[cookiename]);
+        list($member_id, $passwrd) = @explode('|', $_COOKIE[api()->apply_filters('login_cookie_name', cookiename)]);
 
         $member_id = (string)$member_id == (string)(int)$member_id && (int)$member_id > 0 && $func['strlen']($passwrd) == 40 ? (int)$member_id : 0;
         $passwrd = $member_id > 0 && $func['strlen']($passwrd) == 40 ? $passwrd : '';
@@ -182,6 +182,19 @@ if(!class_exists('Member'))
             $this->email = $member['email'];
             $this->registered = $member['registered'];
             $this->groups = @explode(',', $member['groups']);
+
+						// Let's update their last active time, along with their current
+						// IP address.
+						db()->query('
+							UPDATE {db->prefix}members
+							SET member_last_active = {int:cur_time}, member_ip = {string:member_ip}
+							WHERE member_id = {int:member_id}
+							LIMIT 1',
+							array(
+								'cur_time' => time_utc(),
+								'member_ip' => $this->ip,
+								'member_id' => $this->id,
+							), 'member_update_last_info');
 
             // Time to load their other data from the {db->prefix}member_data table :)
             $this->data = array();
@@ -275,7 +288,7 @@ if(!class_exists('Member'))
       if(empty($_SESSION['session_id']) || empty($_SESSION['session_assigned']) || ((int)$_SESSION['session_assigned'] + 86400) < time_utc())
       {
         $rand = mt_rand(1, 2);
-        $_SESSION['session_id'] = sha1(($rand == 1 ? session_id() : ''). substr(str_shuffle('abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890-_'), 0, mt_rand(16, 32)). ($rand == 2 ? session_id() : ''));
+        $_SESSION['session_id'] = sha1(($rand == 1 ? session_id() : ''). substr(str_shuffle('abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890-_!@#$%^&*()[]{}:;,.\\|\'"'), 0, mt_rand(16, 32)). ($rand == 2 ? session_id() : ''));
         $_SESSION['session_assigned'] = time_utc();
       }
 

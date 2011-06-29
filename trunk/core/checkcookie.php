@@ -45,7 +45,7 @@ if(!function_exists('checkcookie_verify'))
     api()->run_hooks('checkcookie_verify');
 
     // This is a pretty simple check...
-    $cookie = isset($_COOKIE[cookiename]) ? $_COOKIE[cookiename] : '';
+    $cookie = isset($_COOKIE[api()->apply_filters('login_cookie_name', cookiename)]) ? $_COOKIE[api()->apply_filters('login_cookie_name', cookiename)] : '';
     list($member_id) = explode('|', $cookie);
 
     if(api()->apply_filters('checkcookie_check', empty($cookie) || empty($_GET['id']) || $_GET['id'] != $member_id))

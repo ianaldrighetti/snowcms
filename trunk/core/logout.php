@@ -56,13 +56,10 @@ if(!function_exists('logout_process'))
       theme()->set_title(l('An error has occurred'));
       theme()->add_meta(array('name' => 'robots', 'content' => 'noindex'));
 
-      theme()->header();
+			api()->context['error_title'] = l('Logging out failed');
+			api()->context['error_message'] = l('Sorry, but the supplied session identifider was invalid, so your request to be logged out was denied. Please try again.');
 
-      echo '
-      <h1>', l('Logging out failed'), '</h1>
-      <p>', l('Sorry, but the supplied session identifier was invalid, so your request to be logged out failed. Please try again.'), '</p>';
-
-      theme()->footer();
+      theme()->render('error');
       exit;
     }
 
@@ -73,7 +70,7 @@ if(!function_exists('logout_process'))
     api()->run_hooks('logout_success');
 
     // Let's go home...
-    redirect(baseurl);
+    redirect(baseurl. '/index.php');
   }
 }
 ?>

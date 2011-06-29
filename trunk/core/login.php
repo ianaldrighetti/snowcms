@@ -54,20 +54,11 @@ if(!function_exists('login_view'))
 
     theme()->set_title(l('Log in'));
 
-    theme()->header();
-
-    echo '
-      <h1>', l('Log in to your account'), '</h1>
-      <p>', l('Here you can log in to your account, if you do not have an account, you can <a href="%s">register one</a>. Did you forget your password? Request a new one <a href="%s">here</a>.', baseurl. '/index.php?action=register', baseurl. '/index.php?action=reminder'), '</p>';
-
     // Generate that lovely login form.
     login_generate_form();
-    $form = api()->load_class('Form');
+    api()->context['form'] = api()->load_class('Form');
 
-    // We added the overall form, now we need to add
-    $form->show('login_form');
-
-    theme()->footer();
+    theme()->render('login_view');
   }
 }
 
@@ -176,7 +167,7 @@ if(!function_exists('login_view2'))
   */
   function login_view2()
   {
-    global $api, $theme, $member;
+    global $api, $member;
 
     // Are you logged in? You Silly Pants you!
     if(member()->is_logged())
