@@ -211,15 +211,10 @@ if(!function_exists('profile_edit'))
       $form->process('member_edit_'. $member_id);
     }
 
-    theme()->header();
+    api()->context['form'] = $form;
+    api()->context['member_info'] = $member_info;
 
-    echo '
-      <h1>', l('Editing %s\'s profile', $member_info['name']), '</h1>
-      <p>', l('You are currently editing %s\'s profile. <a href="%s" title="Back to profile">Back to profile</a>.', $member_info['name'], baseurl. '/index.php?action=profile'. ($member_info['id'] != member()->id() ? '&amp;id='. $member_info['id'] : '')), '</p>';
-
-    $form->show('member_edit_'. $member_id);
-
-    theme()->footer();
+    theme()->render('profile_edit');
   }
 }
 

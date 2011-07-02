@@ -72,6 +72,11 @@ class Theme
   // the <Theme::render> method.
   private $templates;
 
+  // Variable: themedir
+  // A string containing the base directory of the current theme, which is
+  // where the header.template.php and footer.template.php files are located.
+  private $themedir;
+
   /*
     Constructor: __construct
 
@@ -79,7 +84,7 @@ class Theme
       string $main_title - The value to set the main_title attribute to.
       string $url - The URL to the base directory of the current theme.
   */
-  public function __construct($main_title = null, $url = null)
+  public function __construct($main_title = null, $url = null, $themedir = null)
   {
     // Initiate the attributes.
     $this->title = null;
@@ -89,6 +94,7 @@ class Theme
     $this->js_files = array();
     $this->meta = array();
     $this->templates = array();
+    $this->themedir = null;
 
     // Setting the main title?
     if(!empty($main_title))
@@ -100,6 +106,11 @@ class Theme
     if(!empty($url))
     {
       $this->set_url($url);
+    }
+
+    if(!empty($themedir))
+    {
+			$this->set_themedir($themedir);
     }
 
     // Our first meta tag!
@@ -125,6 +136,32 @@ class Theme
   }
 
   /*
+		Method: clear
+
+		Clears all current links, JavaScript files, variables, meta tags, etc.
+
+		Parameters:
+			none
+
+		Returns:
+			void - Nothing is returned by this method.
+
+		Note:
+			This method will clear the following attributes: title, url, links,
+			js_vars, js_files, meta, and themedir.
+	*/
+	public function clear()
+	{
+    $this->title = null;
+    $this->url = null;
+    $this->links = array();
+    $this->js_vars = array();
+    $this->js_files = array();
+    $this->meta = array();
+    $this->themedir = null;
+	}
+
+  /*
     Method: set_main_title
 
     Sets the main title of the page.
@@ -141,6 +178,7 @@ class Theme
     if(!empty($main_title))
     {
       $this->main_title = $main_title;
+
       return false;
     }
     else
@@ -166,6 +204,7 @@ class Theme
     if(!empty($title))
     {
       $this->title = $title;
+
       return true;
     }
     else
@@ -192,6 +231,7 @@ class Theme
     if(!empty($url))
     {
       $this->url = $url;
+
       return true;
     }
     else
@@ -199,6 +239,34 @@ class Theme
       return false;
     }
   }
+
+  /*
+		Method: set_themedir
+
+		Sets the base directory of the current theme, which is where the
+		header.template.php and footer.template.php files are located.
+
+		Parameters:
+			string $themedir
+
+		Returns:
+			bool - Returns true on success, false on failure.
+	*/
+	public function set_themedir($themedir)
+	{
+		// Can't have a non-existent location for a theme!
+		if(is_dir($themedir) && file_exists($themedir. '/header.template.php') && file_exists($themedir. '/footer.template.php'))
+		{
+			// Seems like this'll work.
+			$this->themedir = realpath($themedir);
+
+			return true;
+		}
+		else
+		{
+			return false;
+		}
+	}
 
   /*
     Method: main_title
@@ -247,6 +315,23 @@ class Theme
   {
     return $this->url;
   }
+
+	/*
+		Method: themedir
+
+		Returns the currently set theme directory where the header and footer
+		templates reside.
+
+		Parameters:
+			none
+
+		Returns:
+			string - Returns the directory of the current theme.
+	*/
+	public function themedir()
+	{
+		return $this->themedir;
+	}
 
   /*
     Method: add_link
@@ -904,11 +989,11 @@ class Theme
 		}
 
 		// Make sure the required theme files exist.
-		if(!file_exists(themedir. '/'. settings()->get('theme', 'string', 'default'). '/header.template.php'))
+		if(!file_exists($this->themedir. '/header.template.php'))
 		{
 			die(l('<strong>Fatal theme error:</strong> Could not locate the header.template.php file.'));
 		}
-		elseif(!file_exists(themedir. '/'. settings()->get('theme', 'string', 'default'). '/footer.template.php'))
+		elseif(!file_exists($this->themedir. '/footer.template.php'))
 		{
 			die(l('<strong>Fatal theme error:</strong> Could not locate the footer.template.php file.'));
 		}
@@ -916,7 +1001,7 @@ class Theme
 		api()->run_hooks('pre_render_theme');
 
 		// This is pretty simple to do.
-		require(themedir. '/'. settings()->get('theme', 'string', 'default'). '/header.template.php');
+		require($this->themedir. '/header.template.php');
 
 		api()->run_hooks('pre_theme_content');
 
@@ -933,7 +1018,7 @@ class Theme
 
 		api()->run_hooks('post_theme_content');
 
-		require(themedir. '/'. settings()->get('theme', 'string', 'default'). '/footer.template.php');
+		require($this->themedir. '/footer.template.php');
 
 		api()->run_hooks('post_render_theme');
 	}
@@ -1005,7 +1090,7 @@ function theme()
 		require_once(coredir. '/theme.php');
 
 		// Load the Implemented_Theme class...
-		$GLOBALS['theme'] = api()->load_class('Theme', array(settings()->get('site_name', 'string'), themeurl. '/'. settings()->get('theme', 'string', 'default')));
+		$GLOBALS['theme'] = api()->load_class('Theme', array(settings()->get('site_name', 'string'), themeurl. '/'. settings()->get('theme', 'string', 'default'), themedir. '/'. settings()->get('theme', 'string', 'default')));
 
 		// Does the theme have any initialization stuff? If so, get it!
 		if(file_exists(themedir. '/'. settings()->get('theme', 'string', 'default'). '/init.php'))
