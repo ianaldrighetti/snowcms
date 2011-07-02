@@ -47,8 +47,7 @@ if(!function_exists('reminder_view'))
 
     if(member()->is_logged())
     {
-      header('Location: '. baseurl);
-      exit;
+      redirect(baseurl. '/index.php');
     }
 
     // We just need a form for you to enter your username ;)
@@ -80,27 +79,15 @@ if(!function_exists('reminder_view'))
 
     // Submitting the form? Process it...
     if(!empty($_POST['reminder_form']))
-      $form->process('reminder_form');
-
-    theme()->set_title(l('Request a password reset'));
-
-    theme()->header();
-
-    echo '
-      <h1>', l('Request a password reset'), '</h1>
-      <p>', l('Did you forget your password? No problem! Just enter your username into the form below, and you can then start the process of resetting your password. Due to how the passwords are stored, we cannot give you your currently stored password.'), '</p>';
-
-    if(strlen(api()->apply_filters('reminder_message', '')) > 0)
     {
-      echo '
-      <div id="', api()->apply_filters('reminder_message_id', 'reminder_success'), '">
-        ', api()->apply_filters('reminder_message', ''), '
-      </div>';
+      $form->process('reminder_form');
     }
 
-    $form->show('reminder_form');
+    theme()->set_title(l('Request Password Reset'));
 
-    theme()->footer();
+    api()->context['form'] = $form;
+
+    theme()->render('reminder_view');
   }
 }
 
@@ -198,8 +185,7 @@ if(!function_exists('reminder_view2'))
 
     if(member()->is_logged())
     {
-      header('Location: '. baseurl);
-      exit;
+      redirect(baseurl. '/index.php');
     }
 
     // Do you have the data required?
@@ -258,34 +244,27 @@ if(!function_exists('reminder_view2'))
 
           // Process the form?
           if(!empty($_POST['reset_password_form']))
+          {
             $form->process('reset_password_form');
+          }
 
-          theme()->set_title(l('Set your new password'));
+          theme()->set_title(l('Reset Password'));
 
-          theme()->header();
+          api()->context['form'] = $form;
 
-          echo '
-      <h1>', l('Set your new password'), '</h1>
-      <p>', l('Simply enter your new password below to reset your password.'), '</p>';
-
-          $form->show('reset_password_form');
-
-          theme()->footer();
+          theme()->render('reminder_view2');
           exit;
         }
       }
     }
 
     // We will just say the information you submitted was wrong, but calling exit; before this will stop it ;)
-    theme()->set_title(l('An error has occurred'));
+    theme()->set_title(l('An Error Occurred'));
 
-    theme()->header();
+		api()->context['error_title'] = l('An Error Occurred');
+		api()->context['error_message'] = l('Sorry, but your password change request could not be completed as the information you supplied was incorrect or the password request has expired.');
 
-    echo '
-      <h1>', l('An error has occurred'), '</h1>
-      <p>', l('Sorry, but your password change request could not be completed as the information you supplied was incorrect or the password request has expired.'), '</p>';
-
-    theme()->footer();
+    theme()->render('error');
   }
 }
 
@@ -337,8 +316,7 @@ if(!function_exists('reminder_process2'))
     api()->run_hook('password_reset', array($member_info));
 
     // Alright, redirecting you to the login screen :)
-    header('Location: '. baseurl. '/index.php?action=login&member_name='. urlencode($member_info['username']));
-    exit;
+    redirect(baseurl. '/index.php?action=login&member_name='. urlencode($member_info['username']));
   }
 }
 ?>

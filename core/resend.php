@@ -46,7 +46,7 @@ if(!function_exists('resend_view'))
 
     if(member()->is_logged())
     {
-      redirect(baseurl);
+      redirect(baseurl. '/index.php');
     }
     elseif(settings()->get('registration_type', 'int', 0) != 2)
     {
@@ -54,14 +54,12 @@ if(!function_exists('resend_view'))
 
       theme()->header();
 
-      echo '
-      <h1>', l('An error has occurred'), '</h1>
-      <p>', l('It appears that the current type of registration isn\'t email activation, so you cannot resend your activation email.'), '</p>';
+      api()->context['error_title'] = l('An error has occurred');
+      api()->context['error_message'] = l('It appears that the current type of registration isn\'t email activation, so you cannot resend your activation email.');
 
-      theme()->footer();
+      theme()->render('error');
       exit;
     }
-
 
     $form = api()->load_class('Form');
 
@@ -93,25 +91,11 @@ if(!function_exists('resend_view'))
       $form->process('resend_form');
     }
 
-    theme()->set_title(l('Resend your activation email'));
+    theme()->set_title(l('Resend Activation Email'));
 
-    theme()->header();
+    api()->context['form'] = $form;
 
-    echo '
-      <h1>', l('Resend your activation email'), '</h1>
-      <p>', l('If for some reason you didn\'t receive your activation email, you can request to have it resent by entering your username below.'), '</p>';
-
-    if(strlen(api()->apply_filters('resend_message', '')) > 0)
-    {
-      echo '
-      <div id="', api()->apply_filters('resend_message_id', 'resend_success'), '">
-        ', api()->apply_filters('resend_message', ''), '
-      </div>';
-    }
-
-    $form->show('resend_form');
-
-    theme()->footer();
+    theme()->render('resend_form');
   }
 }
 
@@ -166,7 +150,9 @@ if(!function_exists('resend_process'))
 
     // Resend it! Woo!
     if(!function_exists('register_send_email'))
+    {
       require_once(coredir. '/register.php');
+    }
 
     register_send_email($member_id);
 

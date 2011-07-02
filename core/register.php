@@ -47,42 +47,32 @@ if(!function_exists('register_view'))
     // Are you logged in? You don't need to register an account because you obviously have one!
     if(member()->is_logged())
     {
-      redirect(baseurl);
+      redirect(baseurl. '/index.php');
     }
 
     // Is registration enabled?
     if(!settings()->get('registration_enabled', 'bool'))
     {
-      theme()->set_title(l('Registration disabled'));
+      theme()->set_title(l('Registration Disabled'));
       theme()->add_meta(array('name' => 'robots', 'content' => 'noindex'));
 
       api()->run_hooks('registration_disabled');
 
-      theme()->header();
+			api()->context['error_title'] = l('Registration Disabled');
+			api()->context['error_message'] = l('We apologize for the inconvience, but registration is currently not open to the public. Please check back at a later time.')
 
-      echo '
-      <h1>', l('Registration disabled'), '</h1>
-      <p>', l('We apologize for the inconvience, but registration is currently not open to the public. Please check back at a later time.'), '</p>';
-
-      theme()->footer();
+      theme()->render('error');
       exit;
     }
 
     // Generate that form, pretty please!
     register_generate_form();
-    $form = api()->load_class('Form');
 
     theme()->set_title(l('Register'));
 
-    theme()->header();
+		api()->context['form'] = api()->load_class('Form');
 
-    echo '
-    <h1>', l('Register an account'), '</h1>
-    <p>', l('Here you can register an account on %s and get access to certain features that only registered members are allowed to use.', settings()->get('site_name')), '</p>';
-
-    $form->show('registration_form');
-
-    theme()->footer();
+    theme()->render('register_view');
   }
 }
 
@@ -107,7 +97,7 @@ if(!function_exists('register_process'))
     // Already logged in? You don't need another account! ;)
     if(member()->is_logged())
     {
-      redirect(baseurl);
+      redirect(baseurl. '/index.php');
     }
 
     // Registration disabled? We will let register_view() handle that.
@@ -132,21 +122,15 @@ if(!function_exists('register_process'))
     else
     {
       // Now just output a message ;)
-      theme()->set_title(l('Registration complete'));
-
-      theme()->header();
+      theme()->set_title(l('Registration Complete'));
 
       // Let's get some member information, shall we?
       $members = api()->load_class('Members');
       $members->load($member_id);
 
-      $member_info = $members->get($member_id);
+      api()->context['member_info'] = $members->get($member_id);
 
-      echo '
-      <h1>', l('Registration successful'), '</h1>
-      <p>', l('Thank you for registering %s.', $member_info['name']), ' ', (!empty($member_info['is_activated']) ? l('You may now proceed to <a href="%s">log in to your account</a>.', baseurl. '/index.php?action=login') : (settings()->get('registration_type') == 1 ? l('The site requires an administrator to activate new accounts. You will receive an email once your account has been activated.') : (settings()->get('registration_type') == 2 ? l('The site requires you to activate your account via email, so check you email (%s) for your activation link.', $member_info['email']) : api()->apply_filters('registration_message_other', '')))), '</p>';
-
-      theme()->footer();
+      theme()->render('register_process');
     }
   }
 }
@@ -173,7 +157,9 @@ if(!function_exists('register_generate_form'))
 
     // Already been done? Don't need to do it again.
     if(!empty($generated))
+    {
       return;
+    }
 
     // Let's get that form going!
     $form = api()->load_class('Form');
@@ -296,7 +282,9 @@ if(!function_exists('register_member'))
     api()->run_hooks('register_member', array(&$handled, $options, &$errors));
 
     if($handled !== null)
+    {
       return $handled;
+    }
 
     // Sweet! Registration time!
     // So we will need the Members class, super useful!
@@ -320,14 +308,18 @@ if(!function_exists('register_member'))
 
     // Just incase if any hooks added any errors.
     if(count($errors) > 0)
+    {
       return false;
+    }
 
     // Now add that member, or at least, try.
     $member_id = $members->add($options['member_name'], $options['member_pass'], $options['member_email'], $add_options);
 
     // Was it a success? Do we need to send an activation email?
     if($member_id > 0 && settings()->get('registration_type', 'int', 0) == 2)
+    {
       register_send_email($member_id);
+    }
 
     // Now return the member id.
     return $member_id;
@@ -361,7 +353,9 @@ if(!function_exists('register_send_email'))
     $member_info = $members->get($member_id);
 
     if(empty($member_info))
+    {
       return false;
+    }
 
     // We need the Mail class to do this, of course!
     $mail = api()->load_class('Mail');
@@ -395,7 +389,9 @@ if(!function_exists('register_send_welcome_email'))
   function register_send_welcome_email($member_id)
   {
     if(!is_array($member_id))
+    {
       $member_id = array($member_id);
+    }
 
     // Validation is useful :)
     $validation = api()->load_class('Validation');
