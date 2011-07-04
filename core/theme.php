@@ -17,7 +17,7 @@
 //                       File version: SnowCMS 2.0                        //
 ////////////////////////////////////////////////////////////////////////////
 
-if(!defined('IN_SNOW'))
+if(!defined('INSNOW'))
 {
   die('Nice try...');
 }
@@ -357,8 +357,6 @@ function theme_menu($menu = 'main')
 */
 function theme_foot()
 {
-	global $start_time;
-
-	echo api()->apply_filters('theme_foot', l('Page created in %s seconds with %u queries.', round(microtime(true) - $start_time, 3), db()->num_queries)). (settings()->get('show_version', 'bool', true) ? ' | '. l('Powered by <a href="http://www.snowcms.com/" target="_blank" title="SnowCMS">SnowCMS</a> v%s', settings()->get('version', 'string')) : '');
+	echo api()->apply_filters('theme_foot', l('Page created in %s seconds with %u queries.', round(microtime(true) - starttime, 3), db()->num_queries)). (settings()->get('show_version', 'bool', true) ? ' | '. l('Powered by <a href="http://www.snowcms.com/" target="_blank" title="SnowCMS">SnowCMS</a> v%s', settings()->get('version', 'string')) : '');
 }
 ?>

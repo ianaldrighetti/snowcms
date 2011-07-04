@@ -17,21 +17,21 @@
 //                       File version: SnowCMS 2.0                        //
 ////////////////////////////////////////////////////////////////////////////
 
-if(!defined('IN_SNOW'))
+if(!defined('INSNOW'))
 {
   die('Nice try...');
 }
 
-# Title: Secure login plugin
+// Title: Secure login plugin
 
-# Only generate the login hash if you are not logged in ;)
-$api->add_hook('post_init_member', create_function('', '
-                                     global $api, $member;
-
-                                     # As stated, only if the current user isn\'t logged in.
-                                     if($member->is_guest())
-                                       # Adding a hook inside a hook? Just weird, weird I say!
-                                       $api->add_hook(\'post_init_theme\', \'secure_login_guest_login_prep\');'));
+// Only generate the login hash if you are not logged in ;)
+api()->add_hook('post_init_member', create_function('', '
+                                     // As stated, only if the current user isn\'t logged in.
+                                     if(member()->is_guest())
+                                     {
+                                       // Adding a hook inside a hook? Just weird, weird I say!
+                                       api()->add_hook(\'post_init_theme\', \'secure_login_guest_login_prep\');
+                                     }'));
 
 /*
   Function: member_guest_login_prep
@@ -48,29 +48,31 @@ $api->add_hook('post_init_member', create_function('', '
 */
 function secure_login_guest_login_prep()
 {
-  global $api, $theme;
+  // The Members class has a random string generator :)
+  $members = api()->load_class('Members');
 
-  # The Members class has a random string generator :)
-  $members = $api->load_class('Members');
-
-  # Do we need to store the last random string?
+  // Do we need to store the last random string?
   if(!empty($_SESSION['guest_rand_str']))
+  {
     $_SESSION['last_guest_rand_str'] = $_SESSION['guest_rand_str'];
+  }
 
   $_SESSION['guest_rand_str'] = $members->rand_str(mt_rand(20, 40));
 
-  $theme->add_js_var('login_salt', $_SESSION['guest_rand_str']);
+  theme()->add_js_var('login_salt', $_SESSION['guest_rand_str']);
 
-  # Add the JavaScript file, we need it ;)
-  $theme->add_js_file(array('src' => pluginurl. '/securelogin/secure_form.js'));
+  // Add the JavaScript file, we need it ;)
+  theme()->add_js_file(array('src' => pluginurl. '/securelogin/secure_form.js'));
 }
 
 # Add the hook which checks the validity of the secured password :)
-$api->add_hook('login_process_check_custom', create_function('&$login_success, $login, $row, &$errors', '
+api()->add_hook('login_process_check_custom', create_function('&$login_success, $login, $row, &$errors', '
                                                global $func;
 
                                                if(!empty($_POST[\'secured_password\']) && !empty($_SESSION[\'last_guest_rand_str\']) && $func[\'strlen\']($_POST[\'secured_password\']) == 40 && $_POST[\'secured_password\'] == sha1($row[\'member_pass\']. $_SESSION[\'last_guest_rand_str\']))
-                                                 $login_success = true;'));
+                                               {
+                                                 $login_success = true;
+                                               }'));
 
 
 ?>

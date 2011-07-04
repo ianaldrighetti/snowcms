@@ -1,4 +1,9 @@
 <?php
+if(!defined('INSNOW'))
+{
+	die('Nice try...');
+}
+
 	echo '
   <div id="sidebar">
     <h3 style="margin-top: 0px !important;">', l('Notifications'), '</h3>';

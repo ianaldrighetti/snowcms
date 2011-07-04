@@ -1,4 +1,9 @@
 <?php
+if(!defined('INSNOW'))
+{
+	die('Nice try...');
+}
+
       echo '
       <h1>', l('%s\'s profile', api()->context['member_info']['name']), (member()->can('edit_other_profiles') || $_GET['id'] == member()->id() ? ' <span style="font-size: 50%;">'. l('<a href="%s" title="Edit this account">Edit</a>', baseurl. '/index.php?action=profile&amp;id='. $_GET['id']. '&amp;edit'). '</span>' : ''), '</h1>
       <div class="profile_view_data">';

@@ -1,8 +1,13 @@
-</div>
+<?php
+if(!defined('INSNOW'))
+{
+  die('Nice try...');
+}
+?></div>
 <div id="footer">
   <div id="version">
     <p><?php echo l('Powered by <a href="http://www.snowcms.com/" target="_blank" title="SnowCMS">SnowCMS</a> v%s.', settings()->get('version', 'string')); ?></p>
-    <p><?php echo l('Page created in %s seconds with %u queries.', round(microtime(true) - $GLOBALS['start_time'], 3), db()->num_queries); ?></p>
+    <p><?php echo l('Page created in %s seconds with %u queries.', round(microtime(true) - starttime, 3), db()->num_queries); ?></p>
   </div>
   <div id="jump_to">
     <form action="#" method="post" onsubmit="return false;">

@@ -17,7 +17,7 @@
 //                       File version: SnowCMS 2.0                        //
 ////////////////////////////////////////////////////////////////////////////
 
-if(!defined('IN_SNOW'))
+if(!defined('INSNOW'))
 {
   die('Nice try...');
 }
@@ -53,7 +53,7 @@ if(!defined('IN_SNOW'))
 function errors_handler($error_type, $error_message, $error_file = null, $error_line = 0, $error_context = array())
 {
   global $api_force_log;
-
+echo '~'. $error_type. '~'. $error_message;
   // Sorry, we can only do this if the API class has been declared and instantiated.
   $handled = null;
   if(isset($GLOBALS['api']))
@@ -62,7 +62,7 @@ function errors_handler($error_type, $error_message, $error_file = null, $error_
 	}
 
   // Not handled? We will do it then! That is, if it's enabled.
-  if($handled === null && ((isset($settings) && is_object($settings) && settings()->get('errors_log', 'bool')) || !empty($api_force_log)))
+  if($handled === null && ((isset($GLOBALS['settings']) && is_object($GLOBALS['settings']) && settings()->get('errors_log', 'bool')) || !empty($api_force_log)))
   {
     // In order to stop any possible recursion, don't log errors coming from this file.
     if(substr($error_file, strlen($error_file) - 10, strlen($error_file)) == 'errors.php')
@@ -71,9 +71,9 @@ function errors_handler($error_type, $error_message, $error_file = null, $error_
 		}
 
     // Just for the record, we need your IP!
-    $member_id = (int)(isset($member) && is_object($member) ? member()->id() : 0);
-    $member_name = isset($member) && is_object($member) ? member()->name() : '';
-    $member_ip = isset($member) && is_object($member) ? member()->ip() : (isset($_SERVER['HTTP_X_FORWARDED_FOR']) ? $_SERVER['HTTP_X_FORWARDED_FOR'] : $_SERVER['REMOTE_ADDR']);
+    $member_id = (int)(isset($GLOBALS['member']) && is_object($GLOBALS['member']) ? member()->id() : 0);
+    $member_name = isset($GLOBALS['member']) && is_object($GLOBALS['member']) ? member()->name() : '';
+    $member_ip = isset($GLOBALS['member']) && is_object($GLOBALS['member']) ? member()->ip() : (isset($_SERVER['HTTP_X_FORWARDED_FOR']) ? $_SERVER['HTTP_X_FORWARDED_FOR'] : $_SERVER['REMOTE_ADDR']);
 
     // Simply insert the error into the database now.
     $result = db()->insert('insert', '{db->prefix}error_log',

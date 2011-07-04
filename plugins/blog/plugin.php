@@ -17,12 +17,12 @@
 //                       File version: SnowCMS 2.0                        //
 ////////////////////////////////////////////////////////////////////////////
 
-if(!defined('IN_SNOW'))
+if(!defined('INSNOW'))
 {
   die('Nice try...');
 }
 
-# Title: Blog plugin
+// Title: Blog plugin
 
 # Add the icons to the control panel...
 $api->add_filter('admin_icons', 'blog_add_admin_icons');
