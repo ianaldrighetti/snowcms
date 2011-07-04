@@ -41,7 +41,7 @@ else
 }
 
 // We are currently in SnowCMS :)
-define('IN_SNOW', true, true);
+define('INSNOW', true, true);
 
 // We want to see those errors...
 error_reporting(E_STRICT | E_ALL);
@@ -318,7 +318,7 @@ function generate_config($db_host, $db_user, $db_pass, $db_name, $tbl_prefix, &$
 //                       File version: SnowCMS 2.0                        //
 ////////////////////////////////////////////////////////////////////////////
 
-if(!defined(\'IN_SNOW\'))
+if(!defined(\'INSNOW\'))
 {
   die(\'Nice try...\');
 }

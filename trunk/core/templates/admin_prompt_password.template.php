@@ -1,4 +1,9 @@
 <?php
+if(!defined('INSNOW'))
+{
+	die('Nice try...');
+}
+
       echo '
       <h1>', l('Password Required'), '</h1>
       <p>', l('For security purposes, please enter your account password below. This is done to help make sure that you are who you say you are.'), '</p>

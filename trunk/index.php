@@ -17,7 +17,7 @@
 //                       File version: SnowCMS 2.0                        //
 ////////////////////////////////////////////////////////////////////////////
 
-$start_time = microtime(true);
+define('STARTTIME', microtime(true), true);
 
 // Magic quotes, what a joke!!!
 if(function_exists('set_magic_quotes_runtime'))
@@ -36,7 +36,7 @@ else
 }
 
 // We are currently in SnowCMS :)
-define('IN_SNOW', true, true);
+define('INSNOW', true, true);
 
 // We want to see those errors...
 error_reporting(E_STRICT | E_ALL);

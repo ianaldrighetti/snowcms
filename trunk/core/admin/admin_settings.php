@@ -17,7 +17,7 @@
 //                       File version: SnowCMS 2.0                        //
 ////////////////////////////////////////////////////////////////////////////
 
-if(!defined('IN_SNOW'))
+if(!defined('INSNOW'))
 {
   die('Nice try...');
 }
@@ -70,19 +70,13 @@ if(!function_exists('admin_settings'))
       }
     }
 
-    theme()->set_current_area('system_settings');
+    admin_current_area('system_settings');
 
     theme()->set_title(l('System settings'));
 
-    theme()->header();
+		api()->context['form'] = $form;
 
-    echo '
-  <h1><img src="', theme()->url(), '/settings-small.png" alt="" /> ', l('System Settings'), '</h1>
-  <p>', l('Manage some basic, though core, system settings including your sites name, email address, and so forth.'), '</p>';
-
-    $form->show('admin_settings_form');
-
-    theme()->footer();
+    theme()->render('admin_settings');
   }
 }
 

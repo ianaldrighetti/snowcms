@@ -1,5 +1,5 @@
 <?php
-if(!defined('IN_SNOW'))
+if(!defined('INSNOW'))
 {
   die('Nice try...');
 }

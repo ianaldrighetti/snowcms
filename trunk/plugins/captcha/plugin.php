@@ -17,12 +17,12 @@
 //                       File version: SnowCMS 2.0                        //
 ////////////////////////////////////////////////////////////////////////////
 
-if(!defined('IN_SNOW'))
+if(!defined('INSNOW'))
 {
   die('Nice try...');
 }
 
-# Title: CAPTCHA plugin
+// Title: CAPTCHA plugin
 
 # Register the CAPTCHA image action.
 $api->add_event('action=captcha', 'captcha_display', dirname(__FILE__). '/captcha.php');

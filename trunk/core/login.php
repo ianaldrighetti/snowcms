@@ -17,7 +17,7 @@
 //                       File version: SnowCMS 2.0                        //
 ////////////////////////////////////////////////////////////////////////////
 
-if(!defined('IN_SNOW'))
+if(!defined('INSNOW'))
 {
   die('Nice try...');
 }
@@ -293,7 +293,7 @@ if(!function_exists('login_process'))
     // A more specific time?
     elseif(!empty($login['session_length']))
     {
-      $cookies_expires = time_utc() + $login['session_length'];
+      $cookie_expires = time_utc() + $login['session_length'];
     }
     // Just until you close your browser?
     else

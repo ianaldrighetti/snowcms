@@ -17,12 +17,12 @@
 //                       File version: SnowCMS 2.0                        //
 ////////////////////////////////////////////////////////////////////////////
 
-if(!defined('IN_SNOW'))
+if(!defined('INSNOW'))
 {
   die('Nice try...');
 }
 
-# Title: Blog plugin - Add
+// Title: Blog plugin - Add
 
 /*
   Function: blog_add

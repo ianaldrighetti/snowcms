@@ -1,4 +1,9 @@
 <?php
+if(!defined('INSNOW'))
+{
+	die('Nice try...');
+}
+
     echo '
       <h1>', l('Activate your account'), '</h1>
       <p>', l('If your account has not yet been activated, you can enter your activation information here. If you have yet to receive your activation email, you can <a href="%s">request for it to be resent</a>.', baseurl. '/index.php?action=resend'), '</p>';

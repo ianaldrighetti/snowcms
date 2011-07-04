@@ -1,4 +1,9 @@
 <?php
+if(!defined('INSNOW'))
+{
+	die('Nice try...');
+}
+
     echo '
       <h1>', l('Resend your activation email'), '</h1>
       <p>', l('If for some reason you didn\'t receive your activation email, you can request to have it resent by entering your username below.'), '</p>';
