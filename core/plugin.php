@@ -36,7 +36,7 @@ if(!defined('INSNOW'))
   Parameters:
     string $plugin_id - The plugins identifier, this could be the path
                         to the root directory of the plugin (if is_path
-                        is true), or the dependency name of the plugin.
+                        is true), or the guid of the plugin.
     bool $is_path - If the plugin_id is a path, set this to true, if it
                     is a depedency name, this should be false.
 
@@ -67,7 +67,7 @@ function plugin_load($plugin_id, $is_path = true)
   {
     return false;
   }
-  // A dependency name? That's fine, but we need the path.
+  // A guid? That's fine, but we need the path.
   elseif(empty($is_path))
   {
     // Get all the plugins, and attempt to interpret the depedency name into
@@ -80,7 +80,7 @@ function plugin_load($plugin_id, $is_path = true)
       foreach($list as $path)
       {
         // Load the plugins informaion with <plugin_load> and check to see
-        // if the dependency name matches :-).
+        // if the guid matches :-).
         $plugin = plugin_load($path);
 
         if($plugin['guid'] == $plugin_id)
@@ -156,9 +156,6 @@ function plugin_load($plugin_id, $is_path = true)
 
   // Add the path, just incase :P
   $plugin_info['path'] = realpath($plugin_id);
-
-  // For backwards compatibility.
-  $plugin_info['dependency'] = $plugin_info['guid'];
 
   // Now return the information.
   return $plugin_info;

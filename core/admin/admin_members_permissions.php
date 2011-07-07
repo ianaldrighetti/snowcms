@@ -50,33 +50,23 @@ if(!function_exists('admin_members_manage_permissions'))
       admin_access_denied();
     }
 
-    theme()->set_current_area('members_permissions');
+    admin_current_area('members_permissions');
 
     theme()->set_title(l('Manage permissions'));
 
-    theme()->header();
-
-    echo '
-  <h1><img src="', theme()->url(), '/members_permissions-small.png" alt="" /> ', l('Manage permissions'), '</h1>
-  <p>', l('The permissions of member groups can all be modified here. Simply click on the member group below to edit their permissions.'), '</p>';
-
     // Add the guest group.
-    $groups = array_merge(array('guest' => l('Guest')), api()->return_group());
+    api()->context['groups'] = array_merge(array('guest' => l('Guest')), api()->return_group());
 
     // Remove the administrator group, as administrators are ALL POWERFUL!
-    unset($groups['administrator']);
+    unset(api()->context['groups']['administrator']);
 
-    $group_list = array();
-    foreach($groups as $group_id => $group_name)
+    api()->context['group_list'] = array();
+    foreach(api()->context['groups'] as $group_id => $group_name)
     {
-      $group_list[] = '<a href="'. baseurl. '/index.php?action=admin&amp;sa=members_permissions&amp;grp='. urlencode($group_id). '">'. $group_name. '</a>';
+      api()->context['group_list'][] = '<a href="'. baseurl. '/index.php?action=admin&amp;sa=members_permissions&amp;grp='. urlencode($group_id). '">'. $group_name. '</a>';
     }
 
-    echo '
-  <h3>', l('Member groups'), '</h3>
-  <p>', implode(', ', $group_list), '</p>';
-
-    theme()->footer();
+    theme()->render('admin_members_manage_permissions');
   }
 }
 
@@ -107,20 +97,17 @@ if(!function_exists('admin_members_manage_group_permissions'))
       admin_access_denied();
     }
 
-    theme()->set_current_area('members_permissions');
+    admin_current_area('members_permissions');
 
     // Check to see if the specified group even exists!
     if(!api()->return_group($group_id) && strtolower($group_id) != 'guest')
     {
-      theme()->set_title(l('An error has occurred'));
+      theme()->set_title(l('An Error Occurred'));
 
-      theme()->header();
+			api()->context['error_title'] = l('Group Not Found');
+			api()->context['error_message'] = l('Sorry, but it appears that the group you have requested does not exist.');
 
-      echo '
-    <h1>', l('An error has occurred'), '</h1>
-    <p>', l('Sorry, but it appears the group you have requested doesn\'t exist.'), '</p>';
-
-      theme()->footer();
+      theme()->render('error');
     }
     else
     {
@@ -143,17 +130,12 @@ if(!function_exists('admin_members_manage_group_permissions'))
         }
       }
 
-      theme()->set_title(l('Managing %s permissions', api()->return_group($group_id)));
+      theme()->set_title(l('Managing %s Permissions', htmlchars(api()->return_group($group_id))));
 
-      theme()->header();
+      api()->context['group_id'] = $group_id;
+      api()->context['form'] = $form;
 
-      echo '
-    <h1><img src="', theme()->url(), '/members_permissions-small.png" alt="" /> ', l('Managing %s permissions', api()->return_group($group_id)), '</h1>
-    <p>', l('Changes to member groups permissions can be applied here. If deny is selected, no matter what other groups the member may be in, the permission will be denied. If disallow is selected and another one of the member groups they are in allows the permission, the disallow will be overridden. <a href="%s" title="Back to Manage Permissions">Back to Manage Permissions</a>.', baseurl. '/index.php?action=admin&amp;sa=members_permissions'), '</p>';
-
-      $form->show($group_id. '_permissions');
-
-      theme()->footer();
+      theme()->render('admin_members_manage_group_permissions');
     }
   }
 }
@@ -283,7 +265,9 @@ if(!function_exists('admin_members_permissions_generate_form'))
 
         $loaded = array();
         while($row = $result->fetch_assoc())
+        {
           $loaded[$row['permission']] = $row['status'];
+        }
       }
 
       foreach($permissions as $permission)
@@ -329,7 +313,7 @@ if(!function_exists('admin_members_permissions_handle'))
   */
   function admin_members_permissions_handle($data, &$errors = array())
   {
-    $group_id = $_GET['grp'];
+    $group_id = strtolower($_GET['grp']);
 
     // We will need to update the value in the form.
     $form = api()->load_class('Form');

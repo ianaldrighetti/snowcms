@@ -69,19 +69,13 @@ if(!function_exists('admin_members_add'))
       }
     }
 
-    theme()->set_current_area('members_add');
+    admin_current_area('members_add');
 
     theme()->set_title(l('Add a new member'));
 
-    theme()->header();
+		api()->context['form'] = $form;
 
-    echo '
-  <h1><img src="', theme()->url(), '/members_add-small.png" alt="" /> ', l('Add a new member'), '</h1>
-  <p>', l('If registration is enabled, guests on your site can create their own member, but if you need to create a new member, you can do so here.'), '</p>';
-
-    $form->show('admin_members_add_form');
-
-    theme()->footer();
+    theme()->render('admin_members_add');
   }
 }
 
