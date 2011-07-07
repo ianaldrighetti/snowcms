@@ -35,7 +35,7 @@ The first objective will be accomplished by remaking the Form class, and separat
 
 In celebration of finally leaving the alpha stages, there will be a brand new (and much better) default administrative control panel layout! Yay. You can check out a [http://www.snowcms.com/sneak-peak-beta-cp-102/ sneak peak of the new layout on the SnowCMS blog].
 
-Resolve issue #69.
+Resolve issue #69 and issue #71.
 
 === 2.0 RC ===
 
