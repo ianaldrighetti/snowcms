@@ -1387,21 +1387,21 @@ class API
     Adds an enabled plugin to the list of, you guessed it, enabled plugins!
 
     Parameters:
-      string $dependency_name - The plugins dependency name.
+      string $guid - The plugins guid.
 
     Returns:
       bool - Returns true on success, false on failure.
   */
-  public function add_plugin($dependency_name)
+  public function add_plugin($guid)
   {
-    // Empty dependency name? Or is the plugin already added?
-    if(empty($dependency_name) || $this->plugin_exists($dependency_name))
+    // Empty guid? Or is the plugin already added?
+    if(empty($guid) || $this->plugin_exists($guid))
     {
       return false;
     }
 
-    // Simply add the dependency name ;)
-    $this->plugins[] = strtolower($dependency_name);
+    // Simply add the guid ;)
+    $this->plugins[] = strtolower($guid);
     return true;
   }
 
@@ -1411,14 +1411,14 @@ class API
     Removes the specified plugin from the list of enabled plugins.
 
     Parameters:
-      string $dependency_name - The plugins dependency name.
+      string $guid - The plugins guid.
 
     Returns:
       bool - Returns true on success, false on failure.
   */
-  public function remove_plugin($dependency_name)
+  public function remove_plugin($guid)
   {
-    if(empty($dependency_name) || !$this->plugin_exists($dependency_name))
+    if(empty($guid) || !$this->plugin_exists($guid))
     {
       return false;
     }
@@ -1426,7 +1426,7 @@ class API
     foreach($this->plugins as $key => $name)
     {
       // Is it the right one?
-      if($name == strtolower($dependency_name))
+      if($name == strtolower($guid))
       {
         unset($this->plugins[$key]);
         return true;
@@ -1443,20 +1443,20 @@ class API
     Checks to see if the specified plugin is enabled.
 
     Parameters:
-      string $dependency_name - The plugins dependency name.
+      string $guid - The plugins guid.
 
     Returns:
       bool - Returns true if the plugin is enabled, false if not.
   */
-  public function plugin_exists($dependency_name)
+  public function plugin_exists($guid)
   {
-    if(empty($dependency_name))
+    if(empty($guid))
     {
       // Sorry, we need a name ;)
       return false;
     }
 
-    return in_array(strtolower($dependency_name), $this->plugins);
+    return in_array(strtolower($guid), $this->plugins);
   }
 
   /*
@@ -1679,7 +1679,7 @@ function load_api()
   // Find all activated plugins, that way we can load them up.
   $result = db()->query('
     SELECT
-      dependency_name, directory
+      guid, directory
     FROM {db->prefix}plugins
     WHERE is_activated = 1 AND runtime_error = 0');
 
@@ -1701,12 +1701,12 @@ function load_api()
       if(!file_exists(plugindir. '/'. $row['directory']. '/plugin.php'))
       {
         // Mark it for a 'runtime error'
-        $bad_plugins[] = $row['dependency_name'];
+        $bad_plugins[] = $row['guid'];
       }
       else
       {
         // Add the plugin, for now.
-        $plugins[strtolower($row['dependency_name'])] = plugindir. '/'. $row['directory']. '/plugin.php';
+        $plugins[strtolower($row['guid'])] = plugindir. '/'. $row['directory']. '/plugin.php';
       }
     }
 
@@ -1716,22 +1716,22 @@ function load_api()
       db()->query('
         UPDATE {db->prefix}plugins
         SET runtime_error = 1
-        WHERE dependency_name IN({string_array:bad_plugins})',
+        WHERE guid IN({string_array:bad_plugins})',
         array(
           'bad_plugins' => $bad_plugins,
         ));
     }
 
     // Now for the actual loading of the plugins!
-    if(count($plugins))
+    if(count($plugins) > 0)
     {
-      foreach($plugins as $dependency => $plugin)
+      foreach($plugins as $guid => $plugin)
       {
         // Well well, load the plugin!
         require_once($plugin);
 
         // The plugin is now enabled :-)
-        api()->add_plugin($dependency);
+        api()->add_plugin($guid);
       }
 
       // Alright, one of our first hooks! :D Just a simple one that plugins
@@ -1838,10 +1838,10 @@ function api_catch_fatal()
             db()->query('
               UPDATE {db->prefix}plugins
               SET runtime_error = 2
-              WHERE dependency_name = {string:dependency_name}
+              WHERE guid = {string:guid}
               LIMIT 1',
               array(
-                'dependency_name' => $plugin['guid'],
+                'guid' => $plugin['guid'],
               ));
 
             // Log the error.

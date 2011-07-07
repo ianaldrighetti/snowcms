@@ -101,12 +101,12 @@ CREATE TABLE `{db->prefix}permissions`
 ##
 CREATE TABLE `{db->prefix}plugins`
 (
-  `dependency_name` VARCHAR(255) NOT NULL,
+  `guid` VARCHAR(255) NOT NULL,
   `directory` VARCHAR(255) NOT NULL,
   `runtime_error` TINYINT(1) UNSIGNED NOT NULL DEFAULT '0',
   `is_activated` TINYINT(1) UNSIGNED NOT NULL DEFAULT '0',
   `available_update` VARCHAR(255) NULL,
-  PRIMARY KEY (`dependency_name`),
+  PRIMARY KEY (`guid`),
   KEY (`runtime_error`),
   KEY (`is_activated`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;

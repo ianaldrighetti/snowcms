@@ -74,34 +74,13 @@ if(!function_exists('admin_plugins_settings'))
       }
     }
 
-    theme()->set_current_area('plugins_settings');
+    admin_current_area('plugins_settings');
 
-    theme()->set_title(l('Plugin settings'));
+    theme()->set_title(l('Plugin Settings'));
 
-    theme()->header();
+    api()->context['form'] = $form;
 
-    echo '
-  <h1><img src="', theme()->url(), '/plugins_settings-small.png" alt="" /> ', l('Manage plugin settings'), '</h1>
-  <p>', l('Various plugin settings can be managed here.'), '</p>';
-
-    // Gotta run those hooks, in order to know the actual number of fields...
-    $form->run_hooks('admin_plugins_settings_form');
-
-    // Are there even any settings?
-    // Of course there is one field, which is the form token...
-    if($form->num_fields('admin_plugins_settings_form') > 1)
-    {
-      // Yup, there are!
-      $form->show('admin_plugins_settings_form');
-    }
-    else
-    {
-      // Nope, there is not.
-      echo '
-  <p style="margin-top: 10px; font-weight: bold; text-align: center;">', l('There are currently no plugin settings.'), '</p>';
-    }
-
-    theme()->footer();
+    theme()->render('admin_plugins_settings');
   }
 }
 

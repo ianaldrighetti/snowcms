@@ -53,24 +53,17 @@ if(!function_exists('admin_members_manage'))
 
     // Generate our table ;)
     admin_members_manage_generate_table();
-    $table = api()->load_class('Table');
 
-    theme()->set_current_area('members_manage');
+    admin_current_area('members_manage');
 
     theme()->set_title(l('Manage Members'));
 
     theme()->add_js_var('delete_confirm', l('Are you sure you want to delete the selected members?\\r\\nThis cannot be undone!'));
     theme()->add_js_file(array('src' => themeurl. '/default/js/members_manage.js'));
 
-    theme()->header();
+    api()->context['table'] = api()->load_class('Table');
 
-    echo '
-  <h1><img src="', theme()->url(), '/members_manage-small.png" alt="" /> ', l('Manage Members'), '</h1>
-  <p>', l('All existing members can be managed here, such as editing, deleting, approving, etc.'), '</p>';
-
-    $table->show('admin_members_manage_table');
-
-    theme()->footer();
+    theme()->render('admin_members_manage');
   }
 }
 
@@ -173,7 +166,9 @@ if(!function_exists('admin_members_manage_table_handle'))
   {
     // No point on executing anything if nothing was selected.
     if(!is_array($selected) || count($selected) == 0)
+    {
       return;
+    }
 
     // Activating accounts?
     if($action == 'activate')
