@@ -4,15 +4,16 @@ if(!defined('INSNOW'))
   die('Nice try...');
 }
 ?>
-    </div>
-    <div id="sidebar">
-      Right Column
-    </div>
-    <div id="footer">
-      <p><?php theme_foot(); echo ' | '. l('Theme by %s.', ' <a href="http://www.sorenstudios.com/" target="_blank" title="Soren Studios">Soren Studios</a>'); ?></p>
-    </div>
-    <div style="clear: both;">
-    </div>
-  </div>
+		</div>
+		<div id="sidebar-container">
+			<div id="sidebar">
+				<?php theme_menu(); ?>
+			</div>
+			<p id="footer">
+				<?php theme_foot(); ?>
+			</p>
+		</div>
+		<div style="clear:both;"></div>
+	</div>
 </body>
 </html>
