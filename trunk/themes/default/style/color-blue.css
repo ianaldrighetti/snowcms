@@ -1,0 +1,28 @@
+a, a:link {
+	color: #2882e0;
+}
+
+a:visited {
+	color: #3d6ea3;
+}
+
+h3 {
+	color: #2d6db0;
+}
+
+#header {
+	background: #2B5AB3;
+}
+
+#wrapper h2 {
+	color: #fff;
+}
+
+#sidebar {
+	color: #000;
+	border-color: #ccc !important;
+}
+
+#footer {
+	color: #ccc;
+}

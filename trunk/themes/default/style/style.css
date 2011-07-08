@@ -1,350 +1,87 @@
+@import url('color-blue.css');
+
 * {
-	margin: 0;
 	padding: 0;
+	margin: 0;
+}
+
+html, body {
+	height: 100%;
 }
 
 body {
-	font-family: Georgia, Times, sans-serif;
-	background: #F5F5F5;
+	background: #fff;
+	font-family: "Segoe UI", Helvetica, Tahoma, sans-serif;
 }
 
-input
-{
-  font-family: Georgia, Times, sans-serif;
+h3 {
+	font-size: 1.3em;
 }
 
-#wrapper {
-	width: 935px;
-	height: 100%;
-	min-height: 100%;
-	margin: 0px auto;
-	padding-left: 44px;
-	background: url('images/bodybg.png') repeat-y;
+p {
+	margin-bottom: 5px;
+	font-size: 1em;
+}
+
+ul {
+	margin: 10px 0 10px 40px;
+}
+
+ul li {
+	font-size: .9em;
 }
 
 #header {
-	width: 835px;
-	height: 175px;
-	background: url('images/colorbg.png') no-repeat;
+	height: 165px;
+	width: 100%;
 }
 
-#header h2 {
-	color: #fff;
-	font-size: 2.1em;
-	text-shadow: #000 0px 5px 10px;
-	text-align: center;
-	padding-top: 40px;
-	font-family: "Trebuchet MS", sans;
+#wrapper {
+	margin: 0 auto 30px auto;
+	min-width: 775px;
+	max-width: 1100px;
+	position: relative;
 }
 
-#header p {
-	color: #fff;
-	font-size: 0.9em;
-	text-shadow: #000 0px 5px 5px;
-	text-align: center;
-	font-family: "Trebuchet MS", sans;
-}
-
-#header div#menu-outer {
-	height: 30px;
-	margin-top: 45px;
-}
-
-#header div div#menu-inner {
-	display: table;
-	margin: 0 auto;
-}
-
-#header div div ul {
-	min-width: 100px;
-}
-
-#header div ul li {
-	display: inline;
-	list-style-type: none;
-	width: 100px;
-	height: 30px;
-	margin-right: 0;
-	background: url('images/linkbg.png') repeat-x;
-	padding: 5px 15px;
-}
-
-#content a
-{
-  color: #1E262E !important;
-  text-decoration: none;
-}
-
-#content a:hover
-{
-  text-decoration: underline;
-}
-
-#content h1
-{
-  font-size: 150%;
+#wrapper h2 {
+	font-size: 4.8em;
+	text-align: left;
+	float: left;
+	position: absolute;
+	left: 7%;
+	top: -80px;
+	letter-spacing: -2px;
 }
 
 #content {
-	width: 560px;
-	min-height: 300px;
-	padding: 10px 10px 10px 20px;
+	min-width: 655px;
+	max-width: 830px;
+	padding: 2% 1% 1% 7%;
+	float: left;
+}
+
+#content img {
+	max-width: 97%;
+}
+
+#sidebar-container {
+	width: 200px;
 	float: left;
 }
 
 #sidebar {
-	width: 225px;
-	padding: 10px;
-	min-height: 300px;
-	float: left;
+	min-height: 500px;
+	border: 1px solid;
+	border-top: 0;
+}
+
+#sidebar * {
+	padding: 2% 1% 1% 1%;
 }
 
 #footer {
-	width: 835px;
-	height: 24px;
-	background: #1e262c url('images/colorbg.png') no-repeat;
-	clear: both;
-	font-size: 0.7em;
-	color: #fff;
+	font-size: 0.8em;
+	margin-top: 5px;
 	text-align: center;
+	padding: 0;
 }
-
-#footer p {
-	padding-top: 4px;
-}
-
-#footer a, a:visited, a:link {
-	color: #fff;
-}
-
-fieldset
-{
-  border: none;
-}
-
-/* Login form CSS */
-#login_form input
-{
-  font-size: 120%;
-  width: 250px !important;
-}
-
-#login_form table
-{
-  text-align: center;
-  margin: 10px auto auto auto;
-}
-
-#login_form .td_left
-{
-  padding-right: 5px;
-}
-
-#login_form .label
-{
-  font-weight: normal;
-}
-
-#login_form .td_left, .td_right
-{
-  text-align: left !important;
-}
-
-#login_form .buttons input
-{
-  margin-top: 10px !important;
-  font-size: 14px;
-  padding: 2px;
-}
-
-.form .errors
-{
-  margin: 15px 10px 15px 10px;
-  padding: 5px;
-  background: #FFCCCC;
-  border: 2px solid #EE0000;
-  text-align: center;
-  color: #000000;
-}
-
-/* Registration form CSS */
-.form table
-{
-  text-align: center;
-  margin: 10px auto;
-}
-
-.form .label
-{
-  font-weight: bold;
-}
-
-#registration_form .subtext
-{
-  font-size: 11px;
-}
-
-#registration_form .td_left
-{
-  text-align: left !important;
-}
-
-#registration_form input
-{
-  width: 200px;
-  font-size: 15px;
-}
-
-#registration_form input[type="submit"]
-{
-  font-weight: bold;
-}
-
-/* Activation form CSS */
-#activation_form table
-{
-  text-align: center !important;
-  margin: 10px auto auto auto;
-}
-
-#activation_form .td_left
-{
-  padding-right: 5px !important;
-}
-
-#activation_form .td_left, #activation_form .td_right
-{
-  text-align: left !important;
-}
-
-#activation_form input
-{
-  font-size: 120%;
-  width: 250px !important;
-}
-
-#activation_form .buttons input
-{
-  margin-top: 10px !important;
-  font-size: 14px;
-  padding: 2px;
-}
-
-#activation_error
-{
-  margin: 15px 10px 15px 10px;
-  padding: 5px;
-  background: #FFCCCC;
-  border: 2px solid #EE0000;
-  text-align: center;
-  color: #000000;
-}
-
-#activation_success
-{
-  margin: 15px 10px 15px 10px;
-  padding: 5px;
-  background: #A6D785;
-  border: 2px solid #458B00;
-  text-align: center;
-  color: #000000;
-}
-
-/* Resend and reminder form CSS */
-#resend_form table, #reminder_form table, #reset_password_form table
-{
-  text-align: center !important;
-  margin: 10px auto;
-}
-
-#resend_form .td_left, #reminder_form .td_left, #reset_password_form .td_left
-{
-  padding-right: 5px;
-}
-
-#resend_form .td_left, #resend_form .td_right, #reminder_form .td_left, #reminder_form .td_right, #reset_password_form .td_left, #reset_password_form .td_right
-{
-  text-align: left !important;
-}
-
-#resend_form .label, #reminder_form .label, #reset_password_form .label
-{
-  font-weight: bold;
-}
-
-#resend_form .subtext, #reminder_form .subtext, #reset_password_form .subtext
-{
-  font-size: 11px;
-}
-
-#resend_success, #reminder_success, #reset_password_success
-{
-  margin: 15px 10px 15px 10px;
-  padding: 5px;
-  background: #A6D785;
-  border: 2px solid #458B00;
-  text-align: center;
-  color: #000000;
-}
-
-.profile_view_data .left
-{
-  float: left;
-  width: 32%;
-  text-align: right;
-  padding: 4px;
-}
-
-.profile_view_data .left label
-{
-  text-align: right;
-  color: #B0B0B0;
-  font-weight: bold;
-}
-
-.profile_view_data .right
-{
-  float: right;
-  width: 65%;
-  text-align: left;
-  padding: 4px;
-}
-
-.break
-{
-  clear: both;
-}
-
-.profile_view hr
-{
-  border: 1px solid #000000;
-}
-
-#member_edit table
-{
-  text-align: left !important;
-}
-
-#member_edit .subtext
-{
-  font-size: 11px;
-}
-
-#member_edit .td_right
-{
-  text-align: center !important;
-}
-
-#member_edit .buttons
-{
-  text-align: center !important;
-}
-
-#member_edit input
-{
-  font-size: 14px;
-  padding: 2px;
-}
-
-.red { color: red; }
-.green { color: green; }
