@@ -135,28 +135,32 @@ if(!defined('E_DEPRECATED'))
   directory itself.
 
   Parameters:
-    string $path
+    string $directory - The name of the directory to delete, along with the
+												contents that reside within it.
 
   Returns:
-    void - Nothing is returned by this function.
+    bool - Returns true if the contents of the directory were removed, along
+					 with the directory itself, false will be returned in the case
+					 that either certain files/directories couldn't be removed, or the
+					 directory itself.
 */
-function recursive_unlink($path)
+function recursive_unlink($directory)
 {
   // Does the directory not exist? Then we cannot delete it!
-  if(!file_exists($path))
+  if(!file_exists($directory))
   {
     return false;
   }
   // Is it a file? Just delete it!
-  elseif(is_file($path))
+  elseif(is_file($directory))
   {
-    return unlink($path);
+    return unlink($directory);
   }
   // Nope, it is a directory.
   else
   {
     // So get all the files and what not.
-    $files = scandir($path);
+    $files = scandir($directory);
 
     if(count($files) > 0)
     {
@@ -169,20 +173,20 @@ function recursive_unlink($path)
         }
 
         // Is it a directory? Recursion!
-        if(is_dir($path. '/'. $file))
+        if(is_dir($directory. '/'. $file))
         {
-          recursive_unlink($path. '/'. $file);
+          recursive_unlink($directory. '/'. $file);
         }
         // Just a file, so delete it :-)
         else
         {
-          unlink($path. '/'. $file);
+          unlink($directory. '/'. $file);
         }
       }
     }
 
     // Now to delete the directory itself!
-    return rmdir($path);
+    return rmdir($directory);
   }
 }
 
@@ -256,5 +260,138 @@ function is_flat_array($array)
   }
 
   return true;
+}
+
+/*
+	Function: format_filesize
+
+	Returns a string containing a nicer representation of the specified file
+	size, instead of just in bytes as <www.php.net/filesize> provides. There
+	are two ways to use this function, one would be to provide the name of the
+	file, or to provide the size of the file itself.
+
+	Parameters:
+		string $filename - The name of the file to format the file size of,
+											 unless $is_filesize is set to true, in which case
+											 this parameter is now the file size.
+		bool $is_filesize - This should be set to true if you do not want to
+												provide the file name, but the size of a file (or
+												something else, such as a string). Defaults to
+												false.
+		int $precision - The number of decimals to round to on the right side of
+										 the period. Defaults to 2.
+
+	Returns:
+		string - Returns a string containing the formatted file size, however
+						 false will be returned in the case that the file does not
+						 exist or if the file size supplied is not valid (< 0).
+
+	Note:
+		Please note that if a directory is specified, the function will
+		calculate the entire size of the directories contents, including all
+		nested directories as well.
+
+		Credit for the formatting of the file size:
+			<www.php.net/manual/en/function.filesize.php#100097>
+*/
+function format_filesize($filename, $is_filesize = false, $precision = 2)
+{
+	// Not a file size? Then we shall fetch it!
+	if(empty($is_filesize))
+	{
+		// Make sure the file, or directory, exists.
+		if(!file_exists($filename))
+		{
+			// We can't calculate the size of nothing, well, we could, but we
+			// won't!
+			return false;
+		}
+		// Maybe it is a directory?
+		elseif(is_dir($filename))
+		{
+			// Recursively calculate the directory size.
+			$filename = recursive_filesize($filename);
+		}
+		else
+		{
+			// Must be a file.
+			$filename = filesize($filename);
+		}
+	}
+
+	// Let's just make sure...
+	if((string)$filename != (string)(int)$filename || $filename < 0)
+	{
+		return false;
+	}
+
+	// Alright, here we go!!
+	$units = array('B', 'KB', 'MB', 'GB', 'TB');
+	for($i = 0; $i < 4 && $filename >= 1024; $i++)
+	{
+		$filename = $filename / 1024;
+	}
+
+	return round($filename, (int)$precision > 0 ? $precision : 0). ' '. $units[$i];
+}
+
+/*
+	Function: recursive_filesize
+
+	Calculates the size of a directory's files, along with all nested
+	directories.
+
+	Parameters:
+		string $directory - The directory to calculate the size of.
+
+	Returns:
+		int - Returns the size of the specified directory, but false if the
+					directory does not exist.
+*/
+function recursive_filesize($directory)
+{
+  // Does the directory not exist? Then we cannot calculate it's size!
+  if(!file_exists($directory))
+  {
+    return false;
+  }
+  // Is it a file? Just get the size, then.
+  elseif(is_file($directory))
+  {
+    return filesize($directory);
+  }
+  // Nope, it is a directory.
+  else
+  {
+    // So get all the files and what not.
+    $files = scandir($directory);
+    $filesize = 0;
+
+    if(count($files) > 0)
+    {
+      foreach($files as $file)
+      {
+        // Skip . and ..
+        if($file == '.' || $file == '..')
+        {
+          continue;
+        }
+
+        // Is it a directory? Recursion!
+        if(is_dir($directory. '/'. $file))
+        {
+          $filesize += recursive_filesize($directory. '/'. $file);
+        }
+        // Just a file, so add it's size.
+        else
+        {
+          $filesize += filesize($directory. '/'. $file);
+        }
+      }
+    }
+
+    // Return the size of all the files.
+    return $filesize;
+  }
 }
 ?>
