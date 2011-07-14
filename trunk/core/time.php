@@ -19,111 +19,111 @@
 
 if(!defined('INSNOW'))
 {
-  die('Nice try...');
+	die('Nice try...');
 }
 
 /*
-  Title: Time functions
+	Title: Time functions
 
-  Function: time_utc
+	Function: time_utc
 
-  Returns the current timestamp in UTC.
+	Returns the current timestamp in UTC.
 
-  Parameters:
-    none
+	Parameters:
+		none
 
-  Returns:
-    int - Returns the current timestamp in UTC.
+	Returns:
+		int - Returns the current timestamp in UTC.
 
-  Note:
-    Use this function instead of the <http://www.php.net/time> function
-    otherwise when using <timeformat>, the actual time will not be properly
-    displayed.
+	Note:
+		Use this function instead of the <http://www.php.net/time> function
+		otherwise when using <timeformat>, the actual time will not be properly
+		displayed.
 */
 function time_utc()
 {
-  return time() - date('Z');
+	return time() - date('Z');
 }
 
 /*
-  Function: timeformat
+	Function: timeformat
 
-  Returns a human readable time/date.
+	Returns a human readable time/date.
 
-  Parameters:
-    int $timestamp - A UTC timestamp.
-    string $format - Either datetime to include both the date and time,
-                     date for only date or time for only time.
-    bool $today_yesterday - Set to true if you want the time for be formatted
-                            like Today at {TIME} or Yesterday at {TIME}, false
-                            if no matter what, to just display a date.
+	Parameters:
+		int $timestamp - A UTC timestamp.
+		string $format - Either datetime to include both the date and time,
+										 date for only date or time for only time.
+		bool $today_yesterday - Set to true if you want the time for be formatted
+														like Today at {TIME} or Yesterday at {TIME}, false
+														if no matter what, to just display a date.
 
-  Returns:
-    string - Returns the human readable time/date.
+	Returns:
+		string - Returns the human readable time/date.
 
-  Note:
-    This function is overloadable.
+	Note:
+		This function is overloadable.
 */
 if(!function_exists('timeformat'))
 {
-  function timeformat($timestamp = 0, $format = 'datetime', $today_yesterday = true)
-  {
-    $return = null;
-    api()->run_hooks('timeformat', array(&$return, &$timestamp, &$format, &$today_yesterday));
+	function timeformat($timestamp = 0, $format = 'datetime', $today_yesterday = true)
+	{
+		$return = null;
+		api()->run_hooks('timeformat', array(&$return, &$timestamp, &$format, &$today_yesterday));
 
-    // Did the hooks do anything?
-    if(!empty($return))
-    {
-      return $return;
-    }
+		// Did the hooks do anything?
+		if(!empty($return))
+		{
+			return $return;
+		}
 
-    // Is the format acceptable?
-    $format = strtolower($format);
-    if(!in_array($format, array('datetime', 'date', 'time')))
-    {
-      return false;
-    }
+		// Is the format acceptable?
+		$format = strtolower($format);
+		if(!in_array($format, array('datetime', 'date', 'time')))
+		{
+			return false;
+		}
 
-    // No timestamp specified? We will use the current time then!
-    if(empty($timestamp))
-    {
-      $timestamp = time_utc();
-    }
+		// No timestamp specified? We will use the current time then!
+		if(empty($timestamp))
+		{
+			$timestamp = time_utc();
+		}
 
-    // Want to change the time, perhaps? Timezone, maybe? :P
-    $timestamp = api()->apply_filters('timeformat_timestamp', $timestamp);
+		// Want to change the time, perhaps? Timezone, maybe? :P
+		$timestamp = api()->apply_filters('timeformat_timestamp', $timestamp);
 
-    // Do you want that fancy Today at or Yesterday at stuff? : )
-    if(!empty($today_yesterday))
-    {
-      // We need to get the current time.
-      $cur_time = api()->apply_filters('timeformat_timestamp', time_utc());
+		// Do you want that fancy Today at or Yesterday at stuff? : )
+		if(!empty($today_yesterday))
+		{
+			// We need to get the current time.
+			$cur_time = api()->apply_filters('timeformat_timestamp', time_utc());
 
-      // Get useful information.
-      $cur_time = getdate($cur_time);
-      $supplied = getdate($timestamp);
+			// Get useful information.
+			$cur_time = getdate($cur_time);
+			$supplied = getdate($timestamp);
 
-      // Is it today?
-      $is_today = $supplied['yday'] == $cur_time['yday'] && $supplied['year'] == $cur_time['year'];
+			// Is it today?
+			$is_today = $supplied['yday'] == $cur_time['yday'] && $supplied['year'] == $cur_time['year'];
 
-      // How about yesterday?
-      $is_yesterday = !$is_today && ($supplied['yday'] == $cur_time['yday'] - 1 && $supplied['year'] == $cur_time['year']) || ($cur_time['yday'] == 0 && $supplied['year'] == $cur_time['year'] - 1 && $supplied['mday'] == 31 && $supplied['mon'] == 12);
+			// How about yesterday?
+			$is_yesterday = !$is_today && ($supplied['yday'] == $cur_time['yday'] - 1 && $supplied['year'] == $cur_time['year']) || ($cur_time['yday'] == 0 && $supplied['year'] == $cur_time['year'] - 1 && $supplied['mday'] == 31 && $supplied['mon'] == 12);
 
-      // Was it within a few hours ago?
-      if($is_today && abs($supplied[0] - $cur_time[0]) <= 10800)
-      {
+			// Was it within a few hours ago?
+			if($is_today && abs($supplied[0] - $cur_time[0]) <= 10800)
+			{
 				return time_diff($supplied[0], $cur_time[0]);
-      }
-      if($is_today || $is_yesterday)
-      {
-        // For the date format, we just return Today or Yesterday ;)
-        return '<strong>'. ($is_today ? l('Today') : l('Yesterday')). '</strong>'. ($format != 'date' ? ' '. l('at'). ' '. strftime(settings()->get('time_format', 'string', '%I:%M:%S %p'), $timestamp) : '');
-      }
-    }
+			}
+			if($is_today || $is_yesterday)
+			{
+				// For the date format, we just return Today or Yesterday ;)
+				return '<strong>'. ($is_today ? l('Today') : l('Yesterday')). '</strong>'. ($format != 'date' ? ' '. l('at'). ' '. strftime(settings()->get('time_format', 'string', '%I:%M:%S %p'), $timestamp) : '');
+			}
+		}
 
-    // Nothing special, huh?
-    return strftime(settings()->get($format. '_format', 'string'), $timestamp);
-  }
+		// Nothing special, huh?
+		return strftime(settings()->get($format. '_format', 'string'), $timestamp);
+	}
 }
 
 /*

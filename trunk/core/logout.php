@@ -19,58 +19,58 @@
 
 if(!defined('INSNOW'))
 {
-  die('Nice try...');
+	die('Nice try...');
 }
 
 // Title: Logout Handler
 
 if(!function_exists('logout_process'))
 {
-  /*
-    Function: logout_process
+	/*
+		Function: logout_process
 
-    Logs you out of your account, as long as your session id is supplied.
+		Logs you out of your account, as long as your session id is supplied.
 
-    Parameters:
-      none
+		Parameters:
+			none
 
-    Returns:
-      void - Nothing is returned by this function.
+		Returns:
+			void - Nothing is returned by this function.
 
-    Note:
-      This function is overloadable.
-  */
-  function logout_process()
-  {
-    // Not even logged in? Then you can't log out!
-    if(member()->is_guest())
-    {
-      redirect(baseurl);
-    }
+		Note:
+			This function is overloadable.
+	*/
+	function logout_process()
+	{
+		// Not even logged in? Then you can't log out!
+		if(member()->is_guest())
+		{
+			redirect(baseurl);
+		}
 
-    // Check that session identifier, make sure it is yours.
-    if(empty($_GET['sc']) || $_GET['sc'] != member()->session_id())
-    {
-      api()->run_hooks('logout_failed');
+		// Check that session identifier, make sure it is yours.
+		if(empty($_GET['sc']) || $_GET['sc'] != member()->session_id())
+		{
+			api()->run_hooks('logout_failed');
 
-      theme()->set_title(l('An error has occurred'));
-      theme()->add_meta(array('name' => 'robots', 'content' => 'noindex'));
+			theme()->set_title(l('An error has occurred'));
+			theme()->add_meta(array('name' => 'robots', 'content' => 'noindex'));
 
 			api()->context['error_title'] = l('Logging out failed');
 			api()->context['error_message'] = l('Sorry, but the supplied session identifider was invalid, so your request to be logged out was denied. Please try again.');
 
-      theme()->render('error');
-      exit;
-    }
+			theme()->render('error');
+			exit;
+		}
 
-    // Remove the cookie and session information.
-    setcookie(cookiename, '', time_utc() - 604800);
-    unset($_SESSION['member_id'], $_SESSION['member_pass']);
+		// Remove the cookie and session information.
+		setcookie(cookiename, '', time_utc() - 604800);
+		unset($_SESSION['member_id'], $_SESSION['member_pass']);
 
-    api()->run_hooks('logout_success');
+		api()->run_hooks('logout_success');
 
-    // Let's go home...
-    redirect(baseurl. '/index.php');
-  }
+		// Let's go home...
+		redirect(baseurl. '/index.php');
+	}
 }
 ?>

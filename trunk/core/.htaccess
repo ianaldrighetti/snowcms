@@ -1,5 +1,2 @@
-<Files *>
-	Order Deny,Allow
-	Deny from all
-	Allow from localhost
-</Files>
+# Disable people from snooping around!
+Options -Indexes

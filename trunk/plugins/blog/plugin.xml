@@ -1,12 +1,12 @@
 <?xml version="1.0"?>
 <plugin-info xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://plugins.snowcms.com/xml plugin-info.xsd">
-  <author>
-    <name>SnowCMS Dev Team</name>
-    <website>http://www.snowcms.com/</website>
-    <email>dev@snowcms.com</email>
-  </author>
-  <guid>plugins.snowcms.com/snowcms/blog</guid>
-  <name>Blog</name>
-  <description>With the Blog plugin, you can add a blog of your very own to your SnowCMS powered site.</description>
-  <version>1.0</version>
+	<author>
+		<name>SnowCMS Dev Team</name>
+		<website>http://www.snowcms.com/</website>
+		<email>dev@snowcms.com</email>
+	</author>
+	<guid>plugins.snowcms.com/snowcms/blog</guid>
+	<name>Blog</name>
+	<description>With the Blog plugin, you can add a blog of your very own to your SnowCMS powered site.</description>
+	<version>1.0</version>
 </plugin-info>

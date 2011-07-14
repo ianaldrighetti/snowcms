@@ -19,46 +19,46 @@
 
 if(!defined('INSNOW'))
 {
-  die('Nice try...');
+	die('Nice try...');
 }
 
 // Title: Install
 
 /*
-  Function: plugin_install
+	Function: plugin_install
 
-  A function which is called when the CAPTCHA plugin is installed.
+	A function which is called when the CAPTCHA plugin is installed.
 
-  Parameters:
-    none
+	Parameters:
+		none
 
-  Returns:
-    void - Nothing is returned by this function.
+	Returns:
+		void - Nothing is returned by this function.
 */
 function plugin_install()
 {
-  global $settings;
+	global $settings;
 
-  # All we need to do is set a couple settings.
-  # That is, unless they already exist. In which case, we won't bother them!
-  if($settings->get('captcha_enable', 'int', -1) == -1)
-  {
-    $settings->set('captcha_enable', 1);
-  }
+	# All we need to do is set a couple settings.
+	# That is, unless they already exist. In which case, we won't bother them!
+	if($settings->get('captcha_enable', 'int', -1) == -1)
+	{
+		$settings->set('captcha_enable', 1);
+	}
 
-  if($settings->get('captcha_width', 'int', 0) == 0)
-  {
-    $settings->set('captcha_width', 200);
-  }
+	if($settings->get('captcha_width', 'int', 0) == 0)
+	{
+		$settings->set('captcha_width', 200);
+	}
 
-  if($settings->get('captcha_height', 'int', 0) == 0)
-  {
-    $settings->set('captcha_height', 50);
-  }
+	if($settings->get('captcha_height', 'int', 0) == 0)
+	{
+		$settings->set('captcha_height', 50);
+	}
 
-  if($settings->get('captcha_num_chars', 'int', 0) == 0)
-  {
-    $settings->set('captcha_num_chars', 6);
-  }
+	if($settings->get('captcha_num_chars', 'int', 0) == 0)
+	{
+		$settings->set('captcha_num_chars', 6);
+	}
 }
 ?>

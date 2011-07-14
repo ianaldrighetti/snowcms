@@ -27,17 +27,17 @@ session_start();
 // Magic quotes, what a joke!!!
 if(function_exists('set_magic_quotes_runtime'))
 {
-  @set_magic_quotes_runtime(0);
+	@set_magic_quotes_runtime(0);
 }
 
 // All time/date stuff should be considered UTC, makes life easier!
 if(function_exists('date_default_timezone_set'))
 {
-  date_default_timezone_set('UTC');
+	date_default_timezone_set('UTC');
 }
 else
 {
-  @ini_set('date.timezone', 'UTC');
+	@ini_set('date.timezone', 'UTC');
 }
 
 // We are currently in SnowCMS :)
@@ -49,39 +49,39 @@ error_reporting(E_STRICT | E_ALL);
 // Remove magic quotes, if it is on...
 if((function_exists('get_magic_quotes_gpc') && @get_magic_quotes_gpc() == 1) || @ini_get('magic_quotes_sybase'))
 {
-  $_COOKIE = remove_magic($_COOKIE);
-  $_GET = remove_magic($_GET);
-  $_POST = remove_magic($_POST);
+	$_COOKIE = remove_magic($_COOKIE);
+	$_GET = remove_magic($_GET);
+	$_POST = remove_magic($_POST);
 }
 
 function remove_magic($array, $depth = 5)
 {
-  // Nothing in the array? No need!
-  if(count($array) == 0)
-  {
-    return array();
-  }
-  // Exceeded our maximum depth? Just return the array, untouched.
-  elseif($depth <= 0)
-  {
-    return $array;
-  }
+	// Nothing in the array? No need!
+	if(count($array) == 0)
+	{
+		return array();
+	}
+	// Exceeded our maximum depth? Just return the array, untouched.
+	elseif($depth <= 0)
+	{
+		return $array;
+	}
 
-  foreach($array as $key => $value)
-  {
-    // Gotta remember that the key needs to have magic quote crud removed
-    // as well!
-    if(!is_array($value))
-    {
-      $array[stripslashes($key)] = stripslashes($value);
-    }
-    else
-    {
-      $array[stripslashes($key)] = remove_magic($value, $depth - 1);
-    }
-  }
+	foreach($array as $key => $value)
+	{
+		// Gotta remember that the key needs to have magic quote crud removed
+		// as well!
+		if(!is_array($value))
+		{
+			$array[stripslashes($key)] = stripslashes($value);
+		}
+		else
+		{
+			$array[stripslashes($key)] = remove_magic($value, $depth - 1);
+		}
+	}
 
-  return $array;
+	return $array;
 }
 
 // Alright, let's do this thing!
@@ -320,7 +320,7 @@ function generate_config($db_host, $db_user, $db_pass, $db_name, $tbl_prefix, &$
 
 if(!defined(\'INSNOW\'))
 {
-  die(\'Nice try...\');
+	die(\'Nice try...\');
 }
 
 //

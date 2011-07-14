@@ -19,7 +19,7 @@
 
 if(!defined('INSNOW'))
 {
-  die('Nice try...');
+	die('Nice try...');
 }
 
 // Title: CAPTCHA plugin
@@ -34,106 +34,106 @@ $api->add_hook('registration_form', 'captcha_add_field');
 $api->add_hook('admin_plugins_settings_form', 'captcha_add_settings');
 
 /*
-  Function: add_captcha_field
+	Function: add_captcha_field
 
-  This hook adds a CAPTCHA field to the registration form.
+	This hook adds a CAPTCHA field to the registration form.
 
-  Parameters:
-    none
+	Parameters:
+		none
 
-  Returns:
-    void - Nothing is returned by this function.
+	Returns:
+		void - Nothing is returned by this function.
 */
 function captcha_add_field()
 {
-  global $api, $func, $settings;
+	global $api, $func, $settings;
 
-  # Is CAPTCHA not enabled?
-  if(!$settings->get('captcha_enable', 'bool', 1))
-  {
-    # Nope, it is not, so don't add the CAPTCHA image.
-    return;
-  }
+	# Is CAPTCHA not enabled?
+	if(!$settings->get('captcha_enable', 'bool', 1))
+	{
+		# Nope, it is not, so don't add the CAPTCHA image.
+		return;
+	}
 
-  $form = $api->load_class('Form');
+	$form = $api->load_class('Form');
 
-  # Add our field which displays the CAPTCHA image.
-  $form->add_field('registration_form', 'captcha_text', array(
-                                                          'type' => 'custom-function',
-                                                          'label' => l('Image verification:'),
-                                                          'subtext' => l('In order to prevent spam, please enter the text you see inside the image. There are no zeros, and it is case-insensitive.'),
-                                                          'function' => create_function('$value, $form_name, &$error', '
-                                                            global $func;
+	# Add our field which displays the CAPTCHA image.
+	$form->add_field('registration_form', 'captcha_text', array(
+																													'type' => 'custom-function',
+																													'label' => l('Image verification:'),
+																													'subtext' => l('In order to prevent spam, please enter the text you see inside the image. There are no zeros, and it is case-insensitive.'),
+																													'function' => create_function('$value, $form_name, &$error', '
+																														global $func;
 
-                                                            # Did you enter it right?
-                                                            if(isset($_SESSION[\'captcha_text\'][\'registration_form\']) && strtolower($_SESSION[\'captcha_text\'][\'registration_form\']) == $func[\'strtolower\']($value))
-                                                              return true;
-                                                            else
-                                                            {
-                                                              $error = l(\'Image verification failed.\');
-                                                              return false;
-                                                            }'),
-                                                          'value' => create_function('', '
-                                                            global $base_url;
+																														# Did you enter it right?
+																														if(isset($_SESSION[\'captcha_text\'][\'registration_form\']) && strtolower($_SESSION[\'captcha_text\'][\'registration_form\']) == $func[\'strtolower\']($value))
+																															return true;
+																														else
+																														{
+																															$error = l(\'Image verification failed.\');
+																															return false;
+																														}'),
+																													'value' => create_function('', '
+																														global $base_url;
 
-                                                            return \'<p><img src="\'. $base_url. \'/index.php?action=captcha&amp;id=registration_form" alt="" title="\'. l(\'Image verification\'). \'" /></p><p><input type="text" name="captcha_text" value="" /></p>\';'),
-                                                          'save'=> false,
-                                                        ));
+																														return \'<p><img src="\'. $base_url. \'/index.php?action=captcha&amp;id=registration_form" alt="" title="\'. l(\'Image verification\'). \'" /></p><p><input type="text" name="captcha_text" value="" /></p>\';'),
+																													'save'=> false,
+																												));
 }
 
 /*
-  Function: captcha_add_settings
+	Function: captcha_add_settings
 
-  Adds CAPTCHA settings to the plugins settings form.
+	Adds CAPTCHA settings to the plugins settings form.
 
-  Parameters:
-    none
+	Parameters:
+		none
 
-  Returns:
-    void - Nothing is returned by this function.
+	Returns:
+		void - Nothing is returned by this function.
 */
 function captcha_add_settings()
 {
-  global $api, $settings;
+	global $api, $settings;
 
-  # Load the Form class, so we can add some fields.
-  $form = $api->load_class('Form');
+	# Load the Form class, so we can add some fields.
+	$form = $api->load_class('Form');
 
-  $form->add_field('admin_plugins_settings_form', 'captcha_enable', array(
-                                                                      'type' => 'checkbox',
-                                                                      'label' => l('Enable CAPTCHA:'),
-                                                                      'subtext' => l('Whether or not to enable CAPTCHA on such pages as registration.'),
-                                                                      'value' => $settings->get('captcha_enable', 'int', 1),
-                                                                    ));
+	$form->add_field('admin_plugins_settings_form', 'captcha_enable', array(
+																																			'type' => 'checkbox',
+																																			'label' => l('Enable CAPTCHA:'),
+																																			'subtext' => l('Whether or not to enable CAPTCHA on such pages as registration.'),
+																																			'value' => $settings->get('captcha_enable', 'int', 1),
+																																		));
 
-  $form->add_field('admin_plugins_settings_form', 'captcha_width', array(
-                                                                     'type' => 'int',
-                                                                     'label' => l('CAPTCHA width:'),
-                                                                     'subtext' => l('The width of the CAPTCHA image (in pixels).'),
-                                                                     'length' => array(
-                                                                                   'min' => 100,
-                                                                                 ),
-                                                                     'value' => $settings->get('captcha_width', 'int', 200),
-                                                                   ));
+	$form->add_field('admin_plugins_settings_form', 'captcha_width', array(
+																																		 'type' => 'int',
+																																		 'label' => l('CAPTCHA width:'),
+																																		 'subtext' => l('The width of the CAPTCHA image (in pixels).'),
+																																		 'length' => array(
+																																									 'min' => 100,
+																																								 ),
+																																		 'value' => $settings->get('captcha_width', 'int', 200),
+																																	 ));
 
-  $form->add_field('admin_plugins_settings_form', 'captcha_height', array(
-                                                                      'type' => 'int',
-                                                                      'label' => l('CAPTCHA height:'),
-                                                                      'subtext' => l('The height of the CAPTCHA image (in pixels).'),
-                                                                      'length' => array(
-                                                                                    'min' => 50,
-                                                                                  ),
-                                                                      'value' => $settings->get('captcha_height', 'int', 50),
-                                                                    ));
+	$form->add_field('admin_plugins_settings_form', 'captcha_height', array(
+																																			'type' => 'int',
+																																			'label' => l('CAPTCHA height:'),
+																																			'subtext' => l('The height of the CAPTCHA image (in pixels).'),
+																																			'length' => array(
+																																										'min' => 50,
+																																									),
+																																			'value' => $settings->get('captcha_height', 'int', 50),
+																																		));
 
-  $form->add_field('admin_plugins_settings_form', 'captcha_num_chars', array(
-                                                                         'type' => 'int',
-                                                                         'label' => l('Characters in CAPTCHA:'),
-                                                                         'subtext' => l('How many characters should be in the image? Be sure not to have too many, they might not all fit!'),
-                                                                         'length' => array(
-                                                                                       'min' => 1,
-                                                                                     ),
-                                                                         'value' => $settings->get('captcha_num_chars', 'int', 6),
-                                                                       ));
+	$form->add_field('admin_plugins_settings_form', 'captcha_num_chars', array(
+																																				 'type' => 'int',
+																																				 'label' => l('Characters in CAPTCHA:'),
+																																				 'subtext' => l('How many characters should be in the image? Be sure not to have too many, they might not all fit!'),
+																																				 'length' => array(
+																																											 'min' => 1,
+																																										 ),
+																																				 'value' => $settings->get('captcha_num_chars', 'int', 6),
+																																			 ));
 }
 ?>

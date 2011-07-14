@@ -1,12 +1,12 @@
 <?xml version="1.0"?>
 <theme-info xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://themes.snowcms.com/xml theme-info.xsd">
-  <author>
-    <name>SnowCMS Dev Team</name>
-    <website>http://www.snowcms.com/</website>
-    <email>dev@snowcms.com</email>
-  </author>
-  <name>Default</name>
-  <description>The default theme for SnowCMS v2.0</description>
-  <version>1.0</version>
-  <update-url>themes.snowcms.com/snowcms/default</update-url>
+	<author>
+		<name>SnowCMS Dev Team</name>
+		<website>http://www.snowcms.com/</website>
+		<email>dev@snowcms.com</email>
+	</author>
+	<name>Default</name>
+	<description>The default theme for SnowCMS v2.0</description>
+	<version>1.0</version>
+	<update-url>themes.snowcms.com/snowcms/default</update-url>
 </theme-info>

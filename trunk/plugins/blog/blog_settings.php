@@ -19,7 +19,7 @@
 
 if(!defined('INSNOW'))
 {
-  die('Nice try...');
+	die('Nice try...');
 }
 
 // Title: Blog plugin - Settings

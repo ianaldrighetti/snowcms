@@ -22,17 +22,17 @@ define('STARTTIME', microtime(true), true);
 // Magic quotes, what a joke!!!
 if(function_exists('set_magic_quotes_runtime'))
 {
-  @set_magic_quotes_runtime(0);
+	@set_magic_quotes_runtime(0);
 }
 
 // All time/date stuff should be considered UTC, makes life easier!
 if(function_exists('date_default_timezone_set'))
 {
-  date_default_timezone_set('UTC');
+	date_default_timezone_set('UTC');
 }
 else
 {
-  @ini_set('date.timezone', 'UTC');
+	@ini_set('date.timezone', 'UTC');
 }
 
 // We are currently in SnowCMS :)
@@ -45,8 +45,8 @@ error_reporting(E_STRICT | E_ALL);
 if(!file_exists('config.php'))
 {
 	header('HTTP/1.1 307 Temporary Redirect');
-  header('Location: setup.php');
-  exit;
+	header('Location: setup.php');
+	exit;
 }
 
 require(dirname(__FILE__). '/config.php');
@@ -76,11 +76,10 @@ api();
 api()->run_hooks('pre_start');
 
 require(coredir. '/time.php');
-require(coredir. '/validation.class.php');
+require(coredir. '/typecast.class.php');
 require(coredir. '/settings.class.php');
 
-// Load up the validation and settings class :)
-init_validation();
+// Load up the settings with the Settings class.
 settings();
 
 require(coredir. '/func.php');
@@ -125,40 +124,40 @@ init_core();
 // Now it is time to check and see if an event is being requested.
 if(!empty($_SERVER['QUERY_STRING']))
 {
-  // One is, but is it registered? Let's see!
-  $event = api()->return_event($_SERVER['QUERY_STRING']);
+	// One is, but is it registered? Let's see!
+	$event = api()->return_event($_SERVER['QUERY_STRING']);
 }
 else
 {
-  // We shall use the default event!
-  $event = api()->return_event($settings->get('default_event', 'string', ''));
+	// We shall use the default event!
+	$event = api()->return_event($settings->get('default_event', 'string', ''));
 }
 
 // So did we get an event, or not? If not, that's bad news!!!
 if(!empty($event))
 {
-  // The event exists! Awesome!
-  // Include the right file, if we need too.
-  if(!empty($event['filename']) && !is_callable($event['callback']))
-  {
-    require_once($event['filename']);
-  }
+	// The event exists! Awesome!
+	// Include the right file, if we need too.
+	if(!empty($event['filename']) && !is_callable($event['callback']))
+	{
+		require_once($event['filename']);
+	}
 
-  // Now call on the callback, after all, that's what it's for!
-  call_user_func($event['callback']);
+	// Now call on the callback, after all, that's what it's for!
+	call_user_func($event['callback']);
 }
 else
 {
-  // There is an event request, but none to go with it, so add a noindex robots tag
-  // just incase, we don't want anything to index this since it doesn't exist!
-  theme()->add_meta(array('name' => 'robots', 'content' => 'noindex'));
+	// There is an event request, but none to go with it, so add a noindex robots tag
+	// just incase, we don't want anything to index this since it doesn't exist!
+	theme()->add_meta(array('name' => 'robots', 'content' => 'noindex'));
 
-  // Now show an UH OH! page.
-  theme()->set_title(l('An error has occurred'));
+	// Now show an UH OH! page.
+	theme()->set_title(l('An error has occurred'));
 
 	api()->context['error_title'] = l('Request Error');
 	api()->context['error_message'] = l('Sorry, but we could not find a way to properly execute your request.');
 
-  theme()->render('error');
+	theme()->render('error');
 }
 ?>

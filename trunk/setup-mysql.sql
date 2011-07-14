@@ -3,21 +3,21 @@
 ##
 CREATE TABLE `{db->prefix}error_log`
 (
-  `error_id` INT(11) UNSIGNED NOT NULL AUTO_INCREMENT,
-  `error_time` INT(10) UNSIGNED NOT NULL DEFAULT '0',
-  `member_id` INT(11) UNSIGNED NOT NULL DEFAULT '0',
-  `member_name` VARCHAR(255) NOT NULL,
-  `member_ip` VARCHAR(150) NOT NULL,
-  `error_type` VARCHAR(40) NOT NULL,
-  `error_message` TEXT NOT NULL,
-  `error_file` VARCHAR(255) NOT NULL,
-  `error_line` INT(11) UNSIGNED NOT NULL DEFAULT '0',
-  `error_url` VARCHAR(255) NOT NULL,
-  PRIMARY KEY (`error_id`),
-  KEY (`error_time`),
-  KEY (`member_name`),
-  KEY (`member_ip`),
-  KEY (`error_type`)
+	`error_id` INT(11) UNSIGNED NOT NULL AUTO_INCREMENT,
+	`error_time` INT(10) UNSIGNED NOT NULL DEFAULT '0',
+	`member_id` INT(11) UNSIGNED NOT NULL DEFAULT '0',
+	`member_name` VARCHAR(255) NOT NULL,
+	`member_ip` VARCHAR(150) NOT NULL,
+	`error_type` VARCHAR(40) NOT NULL,
+	`error_message` TEXT NOT NULL,
+	`error_file` VARCHAR(255) NOT NULL,
+	`error_line` INT(11) UNSIGNED NOT NULL DEFAULT '0',
+	`error_url` VARCHAR(255) NOT NULL,
+	PRIMARY KEY (`error_id`),
+	KEY (`error_time`),
+	KEY (`member_name`),
+	KEY (`member_ip`),
+	KEY (`error_type`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 
 ##
@@ -25,10 +25,10 @@ CREATE TABLE `{db->prefix}error_log`
 ##
 CREATE TABLE `{db->prefix}member_data`
 (
-  `member_id` INT(11) UNSIGNED NOT NULL,
-  `variable` VARCHAR(255) NOT NULL,
-  `value` TEXT NOT NULL,
-  PRIMARY KEY (`member_id`, `variable`)
+	`member_id` INT(11) UNSIGNED NOT NULL,
+	`variable` VARCHAR(255) NOT NULL,
+	`value` TEXT NOT NULL,
+	PRIMARY KEY (`member_id`, `variable`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 
 ##
@@ -36,23 +36,23 @@ CREATE TABLE `{db->prefix}member_data`
 #-
 CREATE TABLE `{db->prefix}members`
 (
-  `member_id` INT(11) UNSIGNED NOT NULL AUTO_INCREMENT,
-  `member_name` VARCHAR(80) NOT NULL,
-  `member_pass` VARCHAR(40) NOT NULL,
-  `member_hash` VARCHAR(16) NOT NULL,
-  `display_name` VARCHAR(255) NOT NULL,
-  `member_email` VARCHAR(100) NOT NULL,
-  `member_groups` VARCHAR(255) NOT NULL DEFAULT 'member',
-  `member_last_active` INT(10) UNSIGNED NOT NULL DEFAULT '0',
-  `member_last_login` INT(10) UNSIGNED NOT NULL DEFAULT '0',
-  `member_registered` INT(10) UNSIGNED NOT NULL,
-  `member_ip` VARCHAR(150) NOT NULL DEFAULT '127.0.0.1',
-  `member_activated` TINYINT(3) UNSIGNED NOT NULL DEFAULT '0',
-  `member_acode` VARCHAR(40) NULL,
-  PRIMARY KEY (`member_id`),
-  KEY (`member_name`),
-  KEY (`display_name`),
-  KEY (`member_activated`)
+	`member_id` INT(11) UNSIGNED NOT NULL AUTO_INCREMENT,
+	`member_name` VARCHAR(80) NOT NULL,
+	`member_pass` VARCHAR(40) NOT NULL,
+	`member_hash` VARCHAR(16) NOT NULL,
+	`display_name` VARCHAR(255) NOT NULL,
+	`member_email` VARCHAR(100) NOT NULL,
+	`member_groups` VARCHAR(255) NOT NULL DEFAULT 'member',
+	`member_last_active` INT(10) UNSIGNED NOT NULL DEFAULT '0',
+	`member_last_login` INT(10) UNSIGNED NOT NULL DEFAULT '0',
+	`member_registered` INT(10) UNSIGNED NOT NULL,
+	`member_ip` VARCHAR(150) NOT NULL DEFAULT '127.0.0.1',
+	`member_activated` TINYINT(3) UNSIGNED NOT NULL DEFAULT '0',
+	`member_acode` VARCHAR(40) NULL,
+	PRIMARY KEY (`member_id`),
+	KEY (`member_name`),
+	KEY (`display_name`),
+	KEY (`member_activated`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 
 ##
@@ -60,29 +60,29 @@ CREATE TABLE `{db->prefix}members`
 ##
 CREATE TABLE `{db->prefix}messages`
 (
-  `area_name` VARCHAR(255) NOT NULL,
-  `area_id` INT(11) UNSIGNED NOT NULL,
-  `message_id` INT(11) UNSIGNED NOT NULL AUTO_INCREMENT,
-  `member_id` INT(11) UNSIGNED NOT NULL DEFAULT '0',
-  `member_name` VARCHAR(255) NOT NULL,
-  `member_email` VARCHAR(255) NOT NULL,
-  `member_ip` VARCHAR(150) NOT NULL,
-  `modified_id` INT(11) UNSIGNED NOT NULL DEFAULT '0',
-  `modified_name` VARCHAR(255) NOT NULL DEFAULT '',
-  `modified_email` VARCHAR(255) NOT NULL DEFAULT '',
-  `modified_ip` VARCHAR(150) NOT NULL DEFAULT '',
-  `subject` VARCHAR(255) NOT NULL DEFAULT '',
-  `poster_time` INT(10) UNSIGNED NOT NULL DEFAULT '0',
-  `modified_time` INT(10) UNSIGNED NOT NULL DEFAULT '0',
-  `message` TEXT NOT NULL,
-  `message_type` VARCHAR(16) NOT NULL DEFAULT '',
-  `message_status` VARCHAR(40) NOT NULL DEFAULT 'unapproved',
-  `extra` TEXT NOT NULL,
-  PRIMARY KEY (`area_name`, `area_id`, `message_id`),
-  KEY (`poster_time`),
-  KEY (`modified_time`),
-  KEY (`message_status`),
-  KEY (`extra`(255))
+	`area_name` VARCHAR(255) NOT NULL,
+	`area_id` INT(11) UNSIGNED NOT NULL,
+	`message_id` INT(11) UNSIGNED NOT NULL AUTO_INCREMENT,
+	`member_id` INT(11) UNSIGNED NOT NULL DEFAULT '0',
+	`member_name` VARCHAR(255) NOT NULL,
+	`member_email` VARCHAR(255) NOT NULL,
+	`member_ip` VARCHAR(150) NOT NULL,
+	`modified_id` INT(11) UNSIGNED NOT NULL DEFAULT '0',
+	`modified_name` VARCHAR(255) NOT NULL DEFAULT '',
+	`modified_email` VARCHAR(255) NOT NULL DEFAULT '',
+	`modified_ip` VARCHAR(150) NOT NULL DEFAULT '',
+	`subject` VARCHAR(255) NOT NULL DEFAULT '',
+	`poster_time` INT(10) UNSIGNED NOT NULL DEFAULT '0',
+	`modified_time` INT(10) UNSIGNED NOT NULL DEFAULT '0',
+	`message` TEXT NOT NULL,
+	`message_type` VARCHAR(16) NOT NULL DEFAULT '',
+	`message_status` VARCHAR(40) NOT NULL DEFAULT 'unapproved',
+	`extra` TEXT NOT NULL,
+	PRIMARY KEY (`area_name`, `area_id`, `message_id`),
+	KEY (`poster_time`),
+	KEY (`modified_time`),
+	KEY (`message_status`),
+	KEY (`extra`(255))
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 
 ##
@@ -90,10 +90,10 @@ CREATE TABLE `{db->prefix}messages`
 ##
 CREATE TABLE `{db->prefix}permissions`
 (
-  `group_id` VARCHAR(128) NOT NULL,
-  `permission` VARCHAR(128) NOT NULL,
-  `status` TINYINT(1) NOT NULL DEFAULT '1',
-  PRIMARY KEY (`group_id`, `permission`)
+	`group_id` VARCHAR(128) NOT NULL,
+	`permission` VARCHAR(128) NOT NULL,
+	`status` TINYINT(1) NOT NULL DEFAULT '1',
+	PRIMARY KEY (`group_id`, `permission`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 
 ##
@@ -101,14 +101,14 @@ CREATE TABLE `{db->prefix}permissions`
 ##
 CREATE TABLE `{db->prefix}plugins`
 (
-  `guid` VARCHAR(255) NOT NULL,
-  `directory` VARCHAR(255) NOT NULL,
-  `runtime_error` TINYINT(1) UNSIGNED NOT NULL DEFAULT '0',
-  `is_activated` TINYINT(1) UNSIGNED NOT NULL DEFAULT '0',
-  `available_update` VARCHAR(255) NULL,
-  PRIMARY KEY (`guid`),
-  KEY (`runtime_error`),
-  KEY (`is_activated`)
+	`guid` VARCHAR(255) NOT NULL,
+	`directory` VARCHAR(255) NOT NULL,
+	`runtime_error` TINYINT(1) UNSIGNED NOT NULL DEFAULT '0',
+	`is_activated` TINYINT(1) UNSIGNED NOT NULL DEFAULT '0',
+	`available_update` VARCHAR(255) NULL,
+	PRIMARY KEY (`guid`),
+	KEY (`runtime_error`),
+	KEY (`is_activated`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 
 ##
@@ -116,9 +116,9 @@ CREATE TABLE `{db->prefix}plugins`
 ##
 CREATE TABLE `{db->prefix}settings`
 (
-  `variable` VARCHAR(255) NOT NULL,
-  `value` TEXT NOT NULL,
-  PRIMARY KEY (`variable`)
+	`variable` VARCHAR(255) NOT NULL,
+	`value` TEXT NOT NULL,
+	PRIMARY KEY (`variable`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 
 INSERT INTO `{db->prefix}settings` (`variable`, `value`) VALUES('show_version', 1),('version', '2.0-alpha'),('password_security', 1),('reserved_names', ''),('disallowed_emails', ''),('default_event', '');
@@ -133,18 +133,18 @@ INSERT INTO `{db->prefix}settings` (`variable`, `value`) VALUES('date_format', '
 ##
 CREATE TABLE `{db->prefix}tasks`
 (
-  `task_name` VARCHAR(255) NOT NULL,
-  `last_ran` INT(10) UNSIGNED NOT NULL DEFAULT '0',
-  `run_every` INT(10) UNSIGNED NOT NULL DEFAULT '86400',
-  `file` VARCHAR(255) NOT NULL DEFAULT '',
-  `location` VARCHAR(32) NOT NULL DEFAULT '',
-  `func` VARCHAR(255) NOT NULL DEFAULT '',
-  `queued` TINYINT(1) UNSIGNED NOT NULL DEFAULT '0',
-  `enabled` TINYINT(1) UNSIGNED NOT NULL DEFAULT '1',
-  PRIMARY KEY (`task_name`),
-  KEY (`last_ran`),
-  KEY (`queued`),
-  KEY (`enabled`)
+	`task_name` VARCHAR(255) NOT NULL,
+	`last_ran` INT(10) UNSIGNED NOT NULL DEFAULT '0',
+	`run_every` INT(10) UNSIGNED NOT NULL DEFAULT '86400',
+	`file` VARCHAR(255) NOT NULL DEFAULT '',
+	`location` VARCHAR(32) NOT NULL DEFAULT '',
+	`func` VARCHAR(255) NOT NULL DEFAULT '',
+	`queued` TINYINT(1) UNSIGNED NOT NULL DEFAULT '0',
+	`enabled` TINYINT(1) UNSIGNED NOT NULL DEFAULT '1',
+	PRIMARY KEY (`task_name`),
+	KEY (`last_ran`),
+	KEY (`queued`),
+	KEY (`enabled`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 
 INSERT INTO `{db->prefix}tasks` (`task_name`, `file`, `location`, `func`) VALUES('plugins_update_check', 'admin/admin_plugins_manage.php', 'core_dir', 'admin_plugins_check_updates');
@@ -155,12 +155,12 @@ INSERT INTO `{db->prefix}tasks` (`task_name`, `file`, `location`, `func`) VALUES
 ##
 CREATE TABLE `{db->prefix}tokens`
 (
-  `session_id` VARCHAR(150) NOT NULL,
-  `token_name` VARCHAR(100) NOT NULL,
-  `token` VARCHAR(255) NOT NULL,
-  `token_registered` INT(10) UNSIGNED NOT NULL DEFAULT '0',
-  PRIMARY KEY (`session_id`,`token_name`),
-  KEY (`token_registered`)
+	`session_id` VARCHAR(150) NOT NULL,
+	`token_name` VARCHAR(100) NOT NULL,
+	`token` VARCHAR(255) NOT NULL,
+	`token_registered` INT(10) UNSIGNED NOT NULL DEFAULT '0',
+	PRIMARY KEY (`session_id`,`token_name`),
+	KEY (`token_registered`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 
 ##
@@ -168,29 +168,29 @@ CREATE TABLE `{db->prefix}tokens`
 ##
 CREATE TABLE `{db->prefix}uploads`
 (
-  `area_name` VARCHAR(255) NOT NULL,
-  `area_id` INT(11) UNSIGNED NOT NULL,
-  `upload_id` INT(11) UNSIGNED NOT NULL AUTO_INCREMENT,
-  `upload_time` INT(10) UNSIGNED NOT NULL,
-  `member_id` INT(11) UNSIGNED NOT NULL DEFAULT '0',
-  `member_name` VARCHAR(255) NOT NULL,
-  `member_email` VARCHAR(255) NOT NULL,
-  `member_ip` VARCHAR(150) NOT NULL,
-  `modified_time` INT(10) UNSIGNED NOT NULL DEFAULT '0',
-  `modified_id` INT(11) UNSIGNED NOT NULL DEFAULT '0',
-  `modified_name` VARCHAR(255) NULL,
-  `modified_email` VARCHAR(255) NULL,
-  `modified_ip` VARCHAR(150) NULL,
-  `filename` VARCHAR(255) NOT NULL,
-  `file_ext` VARCHAR(100) NOT NULL,
-  `filelocation` VARCHAR(255) NOT NULL,
-  `filesize` INT(11) UNSIGNED NOT NULL DEFAULT '0',
-  `downloads` INT(11) UNSIGNED NOT NULL DEFAULT '0',
-  `upload_type` VARCHAR(100) NOT NULL,
-  `mime_type` VARCHAR(255) NOT NULL,
-  `checksum` VARCHAR(40) NOT NULL,
-  PRIMARY KEY (`area_name`, `area_id`, `upload_id`),
-  KEY (`member_id`),
-  KEY (`member_name`),
-  KEY (`member_ip`)
+	`area_name` VARCHAR(255) NOT NULL,
+	`area_id` INT(11) UNSIGNED NOT NULL,
+	`upload_id` INT(11) UNSIGNED NOT NULL AUTO_INCREMENT,
+	`upload_time` INT(10) UNSIGNED NOT NULL,
+	`member_id` INT(11) UNSIGNED NOT NULL DEFAULT '0',
+	`member_name` VARCHAR(255) NOT NULL,
+	`member_email` VARCHAR(255) NOT NULL,
+	`member_ip` VARCHAR(150) NOT NULL,
+	`modified_time` INT(10) UNSIGNED NOT NULL DEFAULT '0',
+	`modified_id` INT(11) UNSIGNED NOT NULL DEFAULT '0',
+	`modified_name` VARCHAR(255) NULL,
+	`modified_email` VARCHAR(255) NULL,
+	`modified_ip` VARCHAR(150) NULL,
+	`filename` VARCHAR(255) NOT NULL,
+	`file_ext` VARCHAR(100) NOT NULL,
+	`filelocation` VARCHAR(255) NOT NULL,
+	`filesize` INT(11) UNSIGNED NOT NULL DEFAULT '0',
+	`downloads` INT(11) UNSIGNED NOT NULL DEFAULT '0',
+	`upload_type` VARCHAR(100) NOT NULL,
+	`mime_type` VARCHAR(255) NOT NULL,
+	`checksum` VARCHAR(40) NOT NULL,
+	PRIMARY KEY (`area_name`, `area_id`, `upload_id`),
+	KEY (`member_id`),
+	KEY (`member_name`),
+	KEY (`member_ip`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
