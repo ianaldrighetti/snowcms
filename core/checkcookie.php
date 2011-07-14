@@ -19,62 +19,62 @@
 
 if(!defined('INSNOW'))
 {
-  die('Nice try...');
+	die('Nice try...');
 }
 
 // Title: Cookie verification
 
 if(!function_exists('checkcookie_verify'))
 {
-  /*
-    Function: checkcookie_verify
+	/*
+		Function: checkcookie_verify
 
-    Verifies that your login cookie was actually saved by the browser.
+		Verifies that your login cookie was actually saved by the browser.
 
-    Parameters:
-      none
+		Parameters:
+			none
 
-    Returns:
-      void - Nothing is returned by this function.
+		Returns:
+			void - Nothing is returned by this function.
 
-    Note:
-      This function is overloadable.
-  */
-  function checkcookie_verify()
-  {
-    api()->run_hooks('checkcookie_verify');
+		Note:
+			This function is overloadable.
+	*/
+	function checkcookie_verify()
+	{
+		api()->run_hooks('checkcookie_verify');
 
-    // This is a pretty simple check...
-    $cookie = isset($_COOKIE[api()->apply_filters('login_cookie_name', cookiename)]) ? $_COOKIE[api()->apply_filters('login_cookie_name', cookiename)] : '';
-    list($member_id) = explode('|', $cookie);
+		// This is a pretty simple check...
+		$cookie = isset($_COOKIE[api()->apply_filters('login_cookie_name', cookiename)]) ? $_COOKIE[api()->apply_filters('login_cookie_name', cookiename)] : '';
+		list($member_id) = explode('|', $cookie);
 
-    if(api()->apply_filters('checkcookie_check', empty($cookie) || empty($_GET['id']) || $_GET['id'] != $member_id))
-    {
-      // The cookie didn't save :(
-      api()->add_filter('login_message', create_function('$value', '
-        return l(\'It appears your login cookie couldn\\\'t be saved. Please be sure you have cookies enabled in your browser settings and try again.\');'));
+		if(api()->apply_filters('checkcookie_check', empty($cookie) || empty($_GET['id']) || $_GET['id'] != $member_id))
+		{
+			// The cookie didn't save :(
+			api()->add_filter('login_message', create_function('$value', '
+				return l(\'It appears your login cookie couldn\\\'t be saved. Please be sure you have cookies enabled in your browser settings and try again.\');'));
 
-      api()->run_hooks('checkcookie_failed');
+			api()->run_hooks('checkcookie_failed');
 
-      // Login view function exist?
-      $login_view_func = api()->apply_filters('login_view_function', 'login_view');
-      if(!function_exists($login_view_func))
-      {
-        require_once(api()->apply_filters('login_view_path', coredir. '/login.php'));
-      }
+			// Login view function exist?
+			$login_view_func = api()->apply_filters('login_view_function', 'login_view');
+			if(!function_exists($login_view_func))
+			{
+				require_once(api()->apply_filters('login_view_path', coredir. '/login.php'));
+			}
 
-      theme()->add_meta(array('name' => 'robots', 'content' => 'noindex'));
+			theme()->add_meta(array('name' => 'robots', 'content' => 'noindex'));
 
-      $login_view_func();
-      exit;
-    }
+			$login_view_func();
+			exit;
+		}
 
-    api()->run_hooks('checkcookie_success');
+		api()->run_hooks('checkcookie_success');
 
-    // Seemed to have worked, so let's go home!
-    redirect(baseurl. '/index.php');
+		// Seemed to have worked, so let's go home!
+		redirect(baseurl. '/index.php');
 
-    exit;
-  }
+		exit;
+	}
 }
 ?>

@@ -1,7 +1,7 @@
 <?php
 if(!defined('INSNOW'))
 {
-  die('Nice try...');
+	die('Nice try...');
 }
 ?>
 		</div>

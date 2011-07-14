@@ -197,7 +197,7 @@ class Input
 		$this->value = null;
 		$this->error = null;
 		$this->error_type = null;
-		$this->valid = false;
+		$this->valid = null;
 		$this->errors = array();
 
 		// Let's see, did you want to set anything?
@@ -1138,6 +1138,11 @@ class Input
 	*/
 	public function validate()
 	{
+		if(count($this->errors) > 0)
+		{
+			return false;
+		}
+
 		// We need options if the type is select, select-multi, checkbox-multi
 		// or radio.
 		if(in_array($this->type, array('select', 'select-multi', 'checkbox-multi', 'radio')))
@@ -1267,6 +1272,8 @@ class Input
 		// Make sure all options are in order.
 		if(!$this->validate())
 		{
+			$this->valid = false;
+
 			// Uh, no... They are not. Something is wrong.
 			return false;
 		}
@@ -1342,7 +1349,7 @@ class Input
 		elseif($this->type == 'checkbox')
 		{
 			// All we care about is whether they were checked or not.
-			$value = !empty($value) ? 1 : 0;
+			$value = !empty($value);
 		}
 		// Now for select's, whether it be a single one or multiple.
 		elseif($this->type == 'select' || $this->type == 'select-multi')
@@ -1391,10 +1398,10 @@ class Input
 
 			if(is_array($value) && count($value) > 0)
 			{
-				foreach($value as $option_id => $checked)
+				foreach($value as $option_id => $is_checked)
 				{
 					// Did they check a valid option?
-					if($checked == 1 && in_array($option_id, $options))
+					if($is_checked == 1 && in_array($option_id, $options))
 					{
 						// Seems like they did.
 						$checked[] = $option_id;
@@ -1561,9 +1568,10 @@ class Input
 	private function changed()
 	{
 		// Reset the value information.
+		$this->errors = array();
 		$this->error = null;
 		$this->error_type = null;
-		$this->valid = false;
+		$this->valid = null;
 		$this->value = null;
 	}
 
@@ -1757,7 +1765,7 @@ class Input
 		elseif($this->type != 'file')
 		{
 			// Get the value from where ever it is supposed to come from.
-			$value = $this->request_type == 'post' ? (isset($_POST[$this->name]) ? $_POST[$this->name] : null) : ($this->request_type == 'get' ? (isset($_GET[$this->name]) ? $_GET[$this->name] : null) : (isset($_REQUEST[$this->name]) ? $_REQUEST[$this->name] : null));
+			$value = $this->request_type == 'post' ? (isset($_POST[$this->name]) ? $_POST[$this->name] : $this->default_value) : ($this->request_type == 'get' ? (isset($_GET[$this->name]) ? $_GET[$this->name] : $this->default_value) : (isset($_REQUEST[$this->name]) ? $_REQUEST[$this->name] : $this->default_value));
 
 			// We may need to do something a little special if we are dealing with
 			// a checkbox-multi type.
@@ -1815,7 +1823,7 @@ class Input
 
 			foreach($this->options as $index => $label)
 			{
-				$checkboxes[] = '<label><input name="'. $this->name. '" id="'. $element_id. '"'. (!empty($css_class) ? ' class="'. $css_class. '"' : ''). ' type="checkbox" value="1"'. (in_array($index, $value) ? ' checked="checked"' : ''). (!empty($this->disabled) ? ' disabled="disabled"' : ''). (!empty($this->readonly) ? ' readonly="readonly"' : ''). ' /> '. htmlchars($label). '</label>';
+				$checkboxes[] = '<label><input name="'. $this->name. '['. htmlchars($index). ']" id="'. $element_id. '"'. (!empty($css_class) ? ' class="'. $css_class. '"' : ''). ' type="checkbox" value="1"'. (in_array($index, $value) ? ' checked="checked"' : ''). (!empty($this->disabled) ? ' disabled="disabled"' : ''). (!empty($this->readonly) ? ' readonly="readonly"' : ''). ' /> '. htmlchars($label). '</label>';
 			}
 
 			return implode('<br />', $checkboxes);
@@ -1824,7 +1832,7 @@ class Input
 		elseif($this->type == 'select' || $this->type == 'select-multi')
 		{
 			$select = array(
-									'<select name="'. $this->name. '" id="'. $element_id. '"'. (!empty($css_class) ? ' class="'. $css_class. '"' : ''). ($this->type == 'select-multi' ? ' multiple="multiple"' : ''). ($this->type == 'select-multi' && $this->rows > 0 ? ' size="'. $this->rows. '"' : ''). (!empty($this->disabled) ? ' disabled="disabled"' : ''). '>',
+									'<select name="'. $this->name. ($this->type == 'select-multi' ? '[]' : ''). '" id="'. $element_id. '"'. (!empty($css_class) ? ' class="'. $css_class. '"' : ''). ($this->type == 'select-multi' ? ' multiple="multiple"' : ''). ($this->type == 'select-multi' && $this->rows > 0 ? ' size="'. $this->rows. '"' : ''). (!empty($this->disabled) ? ' disabled="disabled"' : ''). '>',
 								);
 
 			// Now to add all the options!
@@ -1860,14 +1868,5 @@ class Input
 			return call_user_func($this->callback, false, false, false, true);
 		}
 	}
-	/*
-
-		Notes:
-			be sure to run options through htmlchars before displaying
-
-		typecast class (typecast()) methods:
-			type(mixed value) - returns type of value
-			is_a(string type, mixed value) - returns true if value is of type
-	*/
 }
 ?>

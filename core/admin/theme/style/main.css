@@ -1,0 +1,169 @@
+a { text-decoration: none; color: #3465A7; }
+a:hover { text-decoration: underline; }
+input, textarea, option, select { font: 13px Verdana, Tahoma, Arial, sans-serif; }
+fieldset, img { border: 0; }
+
+body
+{
+	margin-top: 0;
+	font: 13px Verdana, Tahoma, Arial, sans-serif;
+}
+
+/* Start #container section. */
+#container
+{
+	width: 900px;
+	margin: auto;
+}
+
+/* End #container section. Begin #header-container section. */
+
+#header-container
+{
+	padding: 5px;
+	background: #3465A7;
+	border-radius: 0 0 10px 10px;
+}
+
+#header-container h1
+{
+	float: left;
+	display: inline-block;
+	margin: 17px auto auto 10px;
+	font: 28px normal Verdana, Tahoma, Arial, serif;
+	color: white;
+}
+
+#header-container h1 a
+{
+	text-decoration: none;
+	color: white;
+}
+
+#header-container h1 a:hover
+{
+	color: #DDDDDD;
+}
+
+#member-box
+{
+	float: right;
+	margin: 10px 10px 10px 0;
+	padding: 5px 5px 0 5px;
+	background: #729FCF;
+	color: white;
+}
+
+#member-box p
+{
+	margin: 0 auto 5px auto;
+}
+
+#member-box a
+{
+	color: #DDDDDD;
+	text-decoration: none;
+}
+
+#member-box a:hover
+{
+	text-decoration: underline;
+}
+
+/* End #header-container section. Begin #link-tree section. */
+#link-tree
+{
+	margin: 5px auto 5px auto;
+	background: #F2F2F2;
+	border: 1px solid #DEDEDE;
+	border-radius: 8px;
+}
+
+#link-tree p
+{
+	margin: 0;
+	padding: 5px 9px;
+	font-size: 12px;
+}
+
+/* End #link-tree section. Begin #footer-container section. */
+#footer-container
+{
+	margin-top: 5px;
+	padding: 5px 5px 0 5px;
+	border-top: 1px solid #DEDEDE;
+}
+
+#footer-container p
+{
+	margin: 2px auto 0 auto;
+	font-size: 75%;
+	color: #363636;
+}
+
+#footer-text
+{
+	float: left;
+}
+
+#jump-to
+{
+	float: right;
+}
+
+#jump-to input, #jump-to select
+{
+	padding: 3px;
+}
+
+/* End #footer-container section. Begin Misc. crap. */
+.break
+{
+	clear: both;
+}
+
+.float-left { float: left; }
+.float-right { float: right; }
+
+.left { text-align: left !important; }
+.center { text-align: center !important; }
+.right { text-align: right !important; }
+
+.bold { font-weight: bold !important; }
+.italic { font-style: italic !important; }
+.normal { font-weight: normal !important; }
+
+.red { color: red !important; }
+
+.no-margin { margin: 0 !important; }
+
+.error-message, .alert-message, .message-box
+{
+	margin: 10px auto 10px auto;
+	padding: 5px 5px 0 5px;
+	border-radius: 5px;
+	text-align: center;
+}
+
+.error-message
+{
+	background: #FFEC8B;
+	border: 1px solid #F0A804;
+}
+
+.alert-message
+{
+	background: #FCE94F;
+	border: 1px solid #C4A000;
+}
+
+.message-box
+{
+	background: #98FB98;
+	border: 1px solid #004F00;
+}
+
+.error-message p, .alert-message p, .message-box p
+{
+	margin: 0 auto 5px auto;
+}
