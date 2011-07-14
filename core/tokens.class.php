@@ -23,288 +23,312 @@ die('Nice try...');
 }
 
 /*
-Class: Tokens
+	Class: Tokens
 
-Allows the registration and validation of registered form data, or any
-other kinda of data you expect to get from the end-user. This class is
-included with SnowCMS in the hopes that developers will use this tool
-to help prevent CSRF (Cross-Site Request Forgery).
+	The Tokens class allows tokens to be registered with the system which
+	can then be used to validate whether or not a user submitted a form, or
+	other type of request. This class was created in the hopes that developers
+	would use this tool to prevent CSRF, or Cross-Site Request Forgery. This
+	tool is automatically utilized by the <Form> class, unless otherwise
+	specified.
 */
 class Tokens
 {
-// Variable: tokens
-// Contains the forms which are registered for the current member/guest.
-private $tokens;
+	// Variable: tokens
+	// An array containing information about all the tokens associated with
+	// the current member or guest.
+	private $tokens;
 
-/*
-	Constructor: __construct
+	/*
+		Constructor: __construct
 
-	Parameters:
-		none
-*/
-public function __construct()
-{
-	$this->tokens = array();
+		Initializes the tokens attribute, such as loading all valid tokens for
+		the current user, along with registering a shut down function which will
+		save all tokens and possibly delete any expired tokens from the tokens
+		table.
 
-	// Let's see if they have any registered forms :)
-	// and of course, only if they aren't older than 1 day.
-	$result = db()->query('
-		SELECT
-			token_name, token, token_registered
-		FROM {db->prefix}tokens
-		WHERE session_id = {string:session_id} AND token_registered >= {int:timeout}',
-		array(
-			'session_id' => member()->is_logged() ? 'member_id-'. member()->id() : 'ip'. member()->ip(),
-			'timeout' => time_utc() - 86400,
-		), 'token_load_registered_query');
-
-	if($result->num_rows() > 0)
+		Parameters:
+			none
+	*/
+	public function __construct()
 	{
-		while($row = $result->fetch_assoc())
+		$this->tokens = array();
+
+		// Let's load up all the tokens associated with the current user, only
+		// if they are less than a week old, though.
+		$result = db()->query('
+			SELECT
+				token_name, token, token_registered
+			FROM {db->prefix}tokens
+			WHERE session_id = {string:session_id} AND token_registered >= {int:timeout}',
+			array(
+				'session_id' => member()->is_logged() ? 'member_id-'. member()->id() : 'ip'. member()->ip(),
+				'timeout' => time_utc() - 604800,
+			), 'token_load_registered_query');
+
+		// Did we find any?
+		if($result->num_rows() > 0)
 		{
-			$this->tokens[$row['token_name']] = array(
-																					'token' => $row['token'],
-																					'registered' => $row['token_registered'],
-																					'is_new' => false,
-																					'deleted' => false,
-																				);
+			while($row = $result->fetch_assoc())
+			{
+				$this->tokens[$row['token_name']] = array(
+																						'token' => $row['token'],
+																						'registered' => $row['token_registered'],
+																						'is_new' => false,
+																						'deleted' => false,
+																					);
+			}
+		}
+
+		// Save the registered tokens right before exit...
+		api()->add_hook('snow_exit', create_function('', '
+			$token = api()->load_class(\'Tokens\');
+
+			$token->save();
+
+			// Maybe we should remove expired ones? But not every page load.
+			// (Why 79? Because that\'s that Wolfram|Alpha answered to the query
+			// \'random number between 1 and 100\' :P)
+			if(mt_rand(1, 100) == 79)
+			{
+				db()->query(\'
+					DELETE FROM {db->prefix}tokens
+					WHERE token_registered < {int:timeout}\',
+					array(
+						\'timeout\' => time_utc() - 604800,
+					), \'token_delete_expired\');
+			}'));
+	}
+
+	/*
+		Method: add
+
+		Associates the specified token string with the given name.
+
+		Parameters:
+			string $name - The name of the token.
+			string $token - The token string to be associated with the name given,
+											this should of course be as random as possible. This
+											parameter may be left blank, in which case a random
+											token string will be generated with a length of 64 to
+											128 characters (inclusive).
+
+		Returns:
+			string - Returns the token string which was associated with the given
+							 name.
+	*/
+	public function add($name, $token = null)
+	{
+		// Empty token? That's alright, we can fix that :)
+		if(empty($token))
+		{
+			$members = api()->load_class('Members');
+
+			// Super random, please!
+			$token = $members->rand_str(mt_rand(64, 128));
+		}
+
+		// Now add that token to the list!
+		$this->tokens[$name] = array(
+														'token' => $token,
+														'registered' => time_utc(),
+														'is_new' => true,
+														'deleted' => false,
+													);
+
+		return $token;
+	}
+
+	/*
+		Method: exists
+
+		Checks whether the specified token is registered with the Token system.
+
+		Parameters:
+			string $name - The name of the token.
+
+		Returns:
+			bool - Returns true if the token exists, false if not.
+	*/
+	public function exists($name)
+	{
+		return isset($this->tokens[$name]) && !$this->tokens[$name]['deleted'];
+	}
+
+	/*
+		Method: is_valid
+
+		Checks to see if the supplied token matches the one with the token name.
+
+		Parameters:
+			string $name - The name of the token.
+			string $token - The token to check the validity of.
+			int $max_age - The maximum age of the token, in seconds. Defaults to
+										 86400 seconds (1 day). See the notes below for more
+										 information.
+
+		Returns:
+			bool - Returns true if the token is valid, false if it is not.
+
+		Note:
+			If the token is not valid, depending upon the scenario, don't get rid
+			of the information (such as a page editing, forum post, etc.) ust say
+			that the form token was incorrect and have them resubmit the data,
+			if it is theirs of course...
+
+			The system will only load tokens which are younger than one week, so
+			if $max_age is larger than 604800, it won't make any difference.
+	*/
+	public function is_valid($name, $token, $max_age = 86400)
+	{
+		return $this->exists($name) && $this->tokens[$name]['token'] == $token && ($this->tokens[$name]['registered'] + $max_age) >= time_utc();
+	}
+
+	/*
+		Method: token
+
+		Returns the token associated with the specified name.
+
+		Parameters:
+			string $name - The name of the token.
+
+		Returns:
+			string - Returns the token string of the identified token name, but
+							 will return false if no token by the supplied name exists.
+	*/
+	public function token($name)
+	{
+		return $this->exists($name) ? $this->tokens[$name]['token'] : false;
+	}
+
+	/*
+		Method: delete
+
+		Deletes the specified token.
+
+		Parameters:
+			string $name - The name of the token.
+
+		Returns:
+			bool - Returns true on success, false on failure.
+	*/
+	public function delete($name)
+	{
+		if($this->exists($name))
+		{
+			$this->tokens[$name]['deleted'] = true;
+
+			return true;
+		}
+		else
+		{
+			return false;
 		}
 	}
 
-	// Save the registered tokens right before exit...
-	api()->add_hook('snow_exit', create_function('', '
-		$token = api()->load_class(\'Tokens\');
+	/*
+		Method: clear
 
-		$token->save();
+		Marks all tokens for deletion.
 
-		// Maybe we should remove expired ones? But not every page load :P
-		// (Why 79? Because that\'s that Wolfram|Alpha answered to the query \'random number between 1 and 100\' :P)
-		if(mt_rand(1, 100) == 79)
+		Parameters:
+			string $session_id - The session ID of which all registered tokens
+													 are to be removed from the tokens table, whether
+													 or not they are expired. If this is left empty,
+													 then all tokens from the current session will be
+													 removed.
+
+		Returns:
+			bool - Returns TRUE on success, FALSE on failure.
+	*/
+	public function clear($session_id = null)
+	{
+		// Is it the current session? Just mark them for deletion.
+		if(empty($session_id) || $session_id == (member()->is_logged() ? 'member_id-'. member()->id() : 'ip'. member()->ip()))
 		{
-			db()->query(\'
+			if(count($this->tokens))
+			{
+				foreach($this->tokens as $token_name => $form)
+				{
+					$this->delete($token_name);
+				}
+			}
+
+			return true;
+		}
+		else
+		{
+			// It is a different session ID than the current, so do it RIGHT NOW! :P
+			$result = db()->query('
 				DELETE FROM {db->prefix}tokens
-				WHERE token_registered < {int:timeout}\',
+				WHERE session_id = {string:session_id}',
 				array(
-					\'timeout\' => time_utc() - 86400,
-				), \'token_delete_expired\');
-		}'));
-}
+					'sessiond_id' => $session_id,
+				), 'token_clear_query');
 
-/*
-	Method: add
-
-	Associates the specified token with the form name.
-
-	Parameters:
-		string $name - The name of the token.
-		string $token - The token to associate with the form
-										name, make sure it is random, however,
-										you can leave this parameter blank, and
-										one will be generated for you.
-
-	Returns:
-		string - Returns a string which is the forms token.
-*/
-public function add($name, $token = null)
-{
-	// Empty token? That's alright, we can fix that :)
-	if(empty($token))
-	{
-		$members = api()->load_class('Members');
-		$token = $members->rand_str(16);
+			return $result->success();
+		}
 	}
 
-	// Add it to the current forms.
-	$this->tokens[$name] = array(
-													'token' => $token,
-													'registered' => time_utc(),
-													'is_new' => true,
-													'deleted' => false,
-												);
+	/*
+		Method: save
 
-	return $token;
-}
+		Saves any new information about the tokens in the database, such as
+		adding new tokens, updating current ones or deleting, well, deleted
+		ones!
 
-/*
-	Method: exists
+		Parameters:
+			none
 
-	Parameters:
-		string $name - The name of the token.
+		Returns:
+			void - Nothing is returned by this method.
 
-	Returns:
-		bool - Returns TRUE if the form exists, FALSE if not.
-*/
-public function exists($name)
-{
-	return isset($this->tokens[$name]) && !$this->tokens[$name]['deleted'];
-}
-
-/*
-	Method: is_valid
-
-	Checks to see if the supplied token matches the one with the token name.
-
-	Parameters:
-		string $name - The name of the token.
-		string $token - The token to check the validity of.
-		int $max_age - The maximum age of the token, in seconds. Defaults to
-									 86400 seconds (1 day).
-
-	Returns:
-		bool - Returns TRUE if the token is correct, FALSE if not.
-
-	Note:
-		Just incase :P If the token is not valid, depending upon the scenario,
-		don't get rid of the information (such as a page editing, forum post, etc.)
-		just say that the form token was incorrect and have them resubmit the data,
-		if it is theirs of course :P.
-*/
-public function is_valid($name, $token, $max_age = 86400)
-{
-	return $this->exists($name) && $this->tokens[$name]['token'] == $token && ($this->tokens[$name]['registered'] + $max_age) >= time_utc();
-}
-
-/*
-	Method: token
-
-	Returns the token associated with the specified form name.
-
-	Parameters:
-		string $token_name - The form name of which you want to retrieve the token of.
-
-	Returns:
-		string - Returns the token of the specified form name, an empty string if
-						 there was no form name found.
-*/
-public function token($token_name)
-{
-	return $this->exists($token_name) ? $this->tokens[$token_name]['token'] : '';
-}
-
-/*
-	Method: delete
-
-	Deletes the specified token.
-
-	Parameters:
-		string $name - The name of the token.
-
-	Returns:
-		bool - Returns TRUE on success, FALSE on failure.
-*/
-public function delete($name)
-{
-	if($this->exists($name))
+		Note:
+			You should not call on this method, as it will be done automatically.
+	*/
+	public function save()
 	{
-		$this->tokens[$name]['deleted'] = true;
-		return true;
-	}
-	else
-	{
-		return false;
-	}
-}
-
-/*
-	Method: clear
-
-	Marks all tokens for deletion.
-
-	Parameters:
-		string $session_id - The session ID to clear all the forms of,
-												 by default, it will do the current end-users,
-												 but you can supply a custom one.
-
-	Returns:
-		bool - Returns TRUE on success, FALSE on failure.
-*/
-public function clear($session_id = null)
-{
-	// Is it the current session? Just mark them for deletion.
-	if(empty($session_id) || $session_id == (member()->is_logged() ? 'member_id-'. member()->id() : 'ip'. member()->ip()))
-	{
-		if(count($this->tokens))
+		if(count($this->tokens) > 0)
 		{
+			$deleted = array();
+			$changed = array();
 			foreach($this->tokens as $token_name => $form)
 			{
-				$this->delete($token_name);
+				// Is it marked for deletion?
+				if(!empty($form['deleted']))
+				{
+					$deleted[] = $token_name;
+				}
+				// Maybe it is updated/new?
+				elseif(!empty($form['is_new']))
+				{
+					$changed[] = array(member()->is_logged() ? 'member_id-'. member()->id() : 'ip'. member()->ip(), $token_name, $form['token'], $form['registered']);
+				}
 			}
-		}
 
-		return true;
-	}
-	else
-	{
-		// It is a different session ID than the current, so do it RIGHT NOW! :P
-		$result = db()->query('
-			DELETE FROM {db->prefix}tokens
-			WHERE session_id = {string:session_id}',
-			array(
-				'sessiond_id' => $session_id,
-			), 'token_clear_query');
-
-		return $result->success();
-	}
-}
-
-/*
-	Method: save
-
-	Saves any new information about the tokens in the database, such as
-	adding new tokens, updating current ones or deleting, well, deleted ones!
-
-	Parameters:
-		none
-
-	Returns:
-		void - Nothing is returned by this method.
-
-	Note:
-		You should not call on this method, as it will be done automatically ;)
-*/
-public function save()
-{
-	if(count($this->tokens) > 0)
-	{
-		$deleted = array();
-		$changed = array();
-		foreach($this->tokens as $token_name => $form)
-		{
-			// Is it marked for deletion?
-			if($form['deleted'])
+			// Any deleted?
+			if(count($deleted) > 0)
 			{
-				$deleted[] = $token_name;
+				db()->query('
+					DELETE FROM {db->prefix}tokens
+					WHERE token_name IN({string_array:deleted})',
+					array(
+						'deleted' => $deleted,
+					), 'token_save_delete_query');
 			}
-			// Maybe it is updated/new?
-			elseif($form['is_new'])
+
+			// So do any need adding, or deletion?
+			if(count($changed) > 0)
 			{
-				$changed[] = array(member()->is_logged() ? 'member_id-'. member()->id() : 'ip'. member()->ip(), $token_name, $form['token'], $form['registered']);
+				db()->insert('replace', '{db->prefix}tokens',
+					array(
+						'session_id' => 'string', 'token_name' => 'string-100', 'token' => 'string-255',
+						'token_registered' => 'int',
+					),
+					$changed,
+					array('sessiond_id', 'token_name'), 'token_save_replace_query');
 			}
-		}
-
-		// Any deleted?
-		if(count($deleted) > 0)
-		{
-			db()->query('
-				DELETE FROM {db->prefix}tokens
-				WHERE token_name IN({string_array:deleted})',
-				array(
-					'deleted' => $deleted,
-				), 'token_save_delete_query');
-		}
-
-		// So do any need adding, or deletion?
-		if(count($changed) > 0)
-		{
-			db()->insert('replace', '{db->prefix}tokens',
-				array(
-					'session_id' => 'string', 'token_name' => 'string-100', 'token' => 'string-255',
-					'token_registered' => 'int',
-				),
-				$changed,
-				array('sessiond_id', 'token_name'), 'token_save_replace_query');
 		}
 	}
-}
 }
 ?>
