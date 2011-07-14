@@ -303,6 +303,7 @@ class Input
 
 		Note:
 			The following types are supported:
+
 				hidden - A hidden input field, which can contain any value that is a
 								 string or number.
 				int - An integer.
@@ -329,6 +330,7 @@ class Input
 									 information.
 
 		This is how the types will be returned via <Input::value>:
+
 			hidden - As is (see string).
 			int - As is.
 			double - As is.
