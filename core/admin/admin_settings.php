@@ -51,30 +51,45 @@ if(!function_exists('admin_settings'))
 			admin_access_denied();
 		}
 
-		admin_settings_generate_form();
+		// We have a few different settings forms we can display.
+		$form_types = api()->apply_filters('admin_settings_forms', array(
+																															   'basic' => l('Basic Settings'),
+																															   'date' => l('Date/Time Settings'),
+																															   'mail' => l('Email Settings'),
+																															   'other' => l('Miscellaneous Settings'),
+																															 ));
+
+		// Which one are we going to generate?
+		$form_type = !empty($_GET['type']) && isset($form_types[$_GET['type']]) ? $_GET['type'] : 'basic';
+
+		// Just to make sure.
+		$GLOBALS['_GET']['type'] = $form_type;
+
+		admin_settings_generate_form($form_type);
 		$form = api()->load_class('Form');
 
 		// Submitting the form? Alright.
-		if(!empty($_POST['admin_settings_form']))
+		if(!empty($_POST[$form_type. '_settings_form']))
 		{
 			// We shall process it! But through AJAX?
 			if(isset($_GET['ajax']))
 			{
-				echo $form->json_process('admin_settings_form');
+				echo $form->json_process($form_type. '_settings_form');
 				exit;
 			}
 			else
 			{
 				// Just regular ol' submitting ;)
-				$form->process('admin_settings_form');
+				$form->process($form_type. '_settings_form');
 			}
 		}
 
 		admin_current_area('system_settings');
 
-		theme()->set_title(l('System settings'));
+		theme()->set_title($form_types[$form_type]);
 
 		api()->context['form'] = $form;
+		api()->context['form_type'] = $form_type;
 
 		theme()->render('admin_settings');
 	}
@@ -85,10 +100,10 @@ if(!function_exists('admin_settings_generate_form'))
 	/*
 		Function: admin_settings_generate_form
 
-		Generates the form which allows you to edit core system settings.
+		Generates the right settings form according to the type requested.
 
 		Parameters:
-			none
+			string $form_type - The settings form to generate.
 
 		Returns:
 			void - Nothing is returned by this function.
@@ -96,180 +111,260 @@ if(!function_exists('admin_settings_generate_form'))
 		Note:
 			This function is overloadable.
 	*/
-	function admin_settings_generate_form()
+	function admin_settings_generate_form($form_type)
 	{
 		$form = api()->load_class('Form');
 
-		$form->add('admin_settings_form', array(
-																				'action' => baseurl. '/index.php?action=admin&sa=settings',
-																				'ajax_submit' => true,
+		$form->add($form_type. '_settings_form', array(
+																				'action' => baseurl. '/index.php?action=admin&amp;sa=settings&amp;type='. $form_type,
 																				'callback' => 'admin_settings_handle',
-																				'submit' => l('Save settings'),
+																				'submit' => l('Update settings'),
 																			));
 
-		// The name of the site, simple enough!
-		$form->add_field('admin_settings_form', 'site_name', array(
-																													 'type' => 'string',
-																													 'label' => l('Site name:'),
-																													 'subtext' => l('The name of your website.'),
-																													 'value' => settings()->get('site_name', 'string'),
-																												 ));
+		$form->current($form_type. '_settings_form');
 
-		// The email address to, of course, send any emails from.
-		$form->add_field('admin_settings_form', 'site_email', array(
-																														'type' => 'string',
-																														'label' => l('Site email address:'),
-																														'subtext' => l('The email address from which emails will appear to come from.'),
-																														'value' => settings()->get('site_email', 'string'),
-																													));
+		// Now, which input's do we need to add?
+		if($form_type == 'basic')
+		{
+			// Basic includes things such as website name, sub title, description
+			// and so on.
+			$form->add_input(array(
+												 'name' => 'site_name',
+												 'type' => 'string',
+												 'label' => l('Website name'),
+												 'subtext' => l('The name of your website.'),
+												 'default_value' => htmlchars_decode(settings()->get('site_name', 'string')),
+											 ));
 
-		// Whether or not to display your systems SnowCMS version.
-		$form->add_field('admin_settings_form', 'show_version', array(
-																															'type' => 'checkbox',
-																															'label' => l('Show SnowCMS version:'),
-																															'subtext' => l('If enabled, the current SnowCMS version you are running will be displayed.'),
-																															'value' => settings()->get('show_version', 'int'),
-																														));
+			// The sub title for the website. Kind of like a slogan.
+			$form->add_input(array(
+												 'name' => 'site_sub_title',
+												 'type' => 'string',
+												 'label' => l('Website subtitle'),
+												 'subtext' => l('Kind of like a slogan.'),
+												 'default_value' => htmlchars_decode(settings()->get('site_sub_title', 'string')),
+											 ));
 
-		// Whether or not you want to enable the task system.
-		$form->add_field('admin_settings_form', 'enable_tasks', array(
-																															'type' => 'checkbox',
-																															'label' => l('Enable tasks:'),
-																															'subtext' => l('If enabled, scheduled tasks will be allowed to run, this is not run by a cron, but by people browsing your site.'),
-																															'value' => settings()->get('enable_tasks', 'int'),
-																														));
+			// Website description.
+			$form->add_input(array(
+												 'name' => 'site_meta_desc',
+												 'type' => 'textarea',
+												 'label' => l('Website description'),
+												 'subtext' => l('A description of your website which will appear in the &lt;head&gt; of your website.'),
+												 'default_value' => htmlchars_decode(settings()->get('site_meta_desc')),
+												 'rows' => 4,
+											 ));
 
-		// The maximum number of tasks to run at a time.
-		$form->add_field('admin_settings_form', 'max_tasks', array(
-																													 'type' => 'int',
-																													 'label' => l('Maximum tasks to run at a time:'),
-																													 'subtext' => l('The maximum number of tasks which can be ran at once at any given time.'),
-																													 'length' => array(
-																																				 'min' => 0,
-																																			 ),
-																													 'value' => settings()->get('max_tasks', 'int'),
-																												 ));
+			// Some keywords, perhaps.
+			$form->add_input(array(
+												 'name' => 'site_meta_keywords',
+												 'type' => 'string',
+												 'label' => l('Website keywords'),
+												 'subtext' => l('A list of a comma separated keywords which will appear in the &lt;head&gt; of your website.'),
+												 'default_value' => htmlchars_decode(settings()->get('site_meta_keywords')),
+											 ));
 
-		// Enable even more UTF8 support? You crazy! :P
-		$form->add_field('admin_settings_form', 'enable_utf8', array(
-																														 'type' => 'checkbox',
-																														 'label' => l('Enable UTF8 support:'),
-																														 'subtext' => l('If enabled (and if the Multibyte PHP extension is enabled), UTF8 capable functions will be used to handle data. Please note that this can, in cases, slow your site down.'),
-																														 'disabled' => !function_exists('mb_internal_encoding'),
-																														 'value' => settings()->get('enable_utf8', 'int'),
-																													 ));
+			// Whether or not to display your systems SnowCMS version.
+			$form->add_input(array(
+												 'name' => 'show_version',
+												 'type' => 'checkbox',
+												 'label' => l('Display SnowCMS version'),
+												 'subtext' => l('When enabled the version of SnowCMS you are running will be displayed.'),
+												 'default_value' => htmlchars_decode(settings()->get('show_version', 'int')),
+											 ));
 
-		// Disable admin security? Not a good idea, but hey, it's your site!!!
-		$form->add_field('admin_settings_form', 'disable_admin_security', array(
-																																				'type' => 'checkbox',
-																																				'label' => l('Disable administrative security:'),
-																																				'subtext' => l('Though not a good idea, if disabled, accessors of the control panel won\'t have to authenticate themselves periodically.'),
-																																				'value' => settings()->get('disable_admin_security', 'int'),
-																																			));
+		}
+		// Anything relating to date and time should go here.
+		elseif($form_type == 'date')
+		{
+			// Time formatting information!
+			// This is for when strictly the date (no time) is to be shown.
+			$form->add_input(array(
+												 'name' => 'date_format',
+												 'type' => 'string-html',
+												 'label' => l('Date format:'),
+												 'subtext' => l('Date only format. See the <a href="http://www.php.net/strftime" title="PHP: strftime function">strftime</a> documentation for more formatting information. <span class="bold">HTML is allowed.</span>'),
+												 'default_value' => settings()->get('date_format', 'string'),
+											 ));
 
-		// Log errors in the database?
-		$form->add_field('admin_settings_form', 'errors_log', array(
-																														'type' => 'checkbox',
-																														'label' => l('Log errors in database:'),
-																														'subtext' => l('When enabled, SnowCMS will log any PHP errors (not fatal errors) in the database, instead of the error logging system set in the php.ini.'),
-																														'value' => settings()->get('errors_log', 'int'),
-																													));
+			// This one is for just when time is to be displayed.
+			$form->add_input(array(
+												 'name' => 'time_format',
+												 'type' => 'string-html',
+												 'label' => l('Time format:'),
+												 'subtext' => l('Time only format. See the <a href="http://www.php.net/strftime" title="PHP: strftime function">strftime</a> documentation for more formatting information. <span class="bold">HTML is allowed.</span>'),
+												 'default_value' => settings()->get('time_format', 'string'),
+											 ));
 
-		// What should handle sending emails..?
-		$form->add_field('admin_settings_form', 'mail_handler', array(
-																															'type' => 'select',
-																															'label' => l('Mail handler:'),
-																															'subtext' => l('Allows you to set which protocol (or function) handles sending emails.'),
-																															'options' => api()->apply_filters('admin_mail_handler', array(
-																																																											 'smtp' => 'SMTP',
-																																																											 'mail' => 'PHP mail()',
-																																																										 )),
-																															'value' => settings()->get('mail_handler', 'string'),
-																														));
+			// As you probably guessed, this is a combination.
+			$form->add_input(array(
+												 'name' => 'datetime_format',
+												 'type' => 'string-html',
+												 'label' => l('Date and time format:'),
+												 'subtext' => l('Date and time format. See the <a href="http://www.php.net/strftime" title="PHP: strftime function">strftime</a> documentation for more formatting information. <span class="bold">HTML is allowed.</span>'),
+												 'default_value' => settings()->get('datetime_format', 'string'),
+											 ));
 
-		// Your SMTP host, quite important, you know?
-		$form->add_field('admin_settings_form', 'smtp_host', array(
-																													 'type' => 'string',
-																													 'label' => l('SMTP host:'),
-																													 'subtext' => l('The host address of the SMTP server.'),
-																													 'value' => settings()->get('smtp_host', 'string'),
-																												 ));
+			// The timeformat function will say Today at ... or Yesterday at ...
+			// when it is relevant, but not everyone likes that. Maybe.
+			$form->add_input(array(
+												 'name' => 'disable_today_yesterday',
+												 'type' => 'checkbox',
+												 'label' => l('Disable today/yesterday feature'),
+												 'subtext' => l('Disable date and times from being displayed as <strong>Today</strong> at <em>[...]</em> and <strong>Yesterday</strong> at <em>[...]</em>.'),
+												 'default_value' => settings()->get('disable_today_yesterday', 'string', false),
+											 ));
+		}
+		// Sending email, SMTP and mail settings belong here.
+		elseif($form_type == 'mail')
+		{
+			// The email address to, of course, send any emails from.
+			$form->add_input(array(
+												 'name' => 'site_email',
+												 'type' => 'string',
+												 'label' => l('Website email address'),
+												 'subtext' => l('The email address from which emails will appear to come from.'),
+												 'default_value' => htmlchars_decode(settings()->get('site_email', 'string')),
+											 ));
 
-		// The port of the SMTP server.
-		$form->add_field('admin_settings_form', 'smtp_port', array(
-																													 'type' => 'int',
-																													 'label' => l('SMTP port:'),
-																													 'subtext' => l('The port of the SMTP server, usually 25 or 465 (if it uses SSL).'),
-																													 'length' => array(
-																																				 'min' => 1,
-																																				 'max' => 65535,
-																																			 ),
-																													 'value' => settings()->get('smtp_port', 'int'),
-																												 ));
+			// What should handle sending emails..?
+			$form->add_input(array(
+												 'name' => 'mail_handler',
+												 'type' => 'select',
+												 'label' => l('Mail handler'),
+												 'subtext' => l('Allows you to set which protocol (or function) handles sending emails.'),
+												 'options' => api()->apply_filters('admin_mail_handler', array(
+																																									 'smtp' => 'SMTP',
+																																									 'mail' => 'PHP mail()',
+																																								 )),
+												 'default_value' => htmlchars_decode(settings()->get('mail_handler', 'string')),
+											 ));
 
-		// SMTP username
-		$form->add_field('admin_settings_form', 'smtp_user', array(
-																													 'type' => 'string',
-																													 'label' => l('SMTP username:'),
-																													 'value' => settings()->get('smtp_user', 'string'),
-																												 ));
-		// SMTP username
-		$form->add_field('admin_settings_form', 'smtp_pass', array(
-																													 'type' => 'password',
-																													 'label' => l('SMTP password:'),
-																													 'subtext' => l('Your SMTP password will only be updated if this field is set.'),
-																													 'value' => '',
-																												 ));
+			// Your SMTP host, quite important, you know?
+			$form->add_input(array(
+												 'name' => 'smtp_host',
+												 'type' => 'string',
+												 'label' => l('SMTP host'),
+												 'subtext' => l('The host address of the SMTP server.'),
+												 'default_value' => htmlchars_decode(settings()->get('smtp_host', 'string')),
+											 ));
 
-		// Does the SMTP host use TLS?
-		$form->add_field('admin_settings_form', 'smtp_is_tls', array(
-																														'type' => 'checkbox',
-																														'label' => l('SMTP host uses TLS:'),
-																														'subtext' => l('Check this box if the SMTP host uses TLS, such as Gmail.'),
-																														'value' => settings()->get('smtp_is_tls', 'int'),
-																													 ));
+			// The port of the SMTP server.
+			$form->add_input(array(
+												 'name' => 'smtp_port',
+												 'type' => 'int',
+												 'label' => l('SMTP port'),
+												 'subtext' => l('The port of the SMTP server, usually 25 or 465 (if it uses SSL).'),
+												 'length' => array(
+																			 'min' => 1,
+																			 'max' => 65535,
+																		 ),
+												 'default_value' => settings()->get('smtp_port', 'int'),
+											 ));
 
-		// Number of seconds before the SMTP connection attempt is aborted.
-		$form->add_field('admin_settings_form', 'smtp_timeout', array(
-																															'type' => 'int',
-																															'label' => l('SMTP timeout:'),
-																															'subtext' => l('The maximum number, in seconds, that the server will wait for a response from the SMTP host.'),
-																															'length' => array(
-																																						'min' => 1,
-																																					),
-																															'value' => settings()->get('smtp_timeout', 'int'),
-																														));
+			// SMTP username.
+			$form->add_input(array(
+												 'name' => 'smtp_user',
+												 'type' => 'string',
+												 'label' => l('SMTP username'),
+												 'default_value' => htmlchars_decode(settings()->get('smtp_user', 'string')),
+											 ));
 
-		// Additional mail parameters.
-		$form->add_field('admin_settings_form', 'mail_additional_parameters', array(
-																																						'type' => 'string',
-																																						'label' => l('Additional mail parameters:'),
-																																						'subtext' => l('Any additional PHP mail() function parameters (the $additional_parameters parameter).'),
-																																						'value' => settings()->get('mail_additional_parameters', 'string'),
-																																					));
+			// SMTP password.
+			$form->add_input(array(
+												 'name' => 'smtp_pass',
+												 'type' => 'password',
+												 'label' => l('SMTP password'),
+												 'subtext' => l('Your SMTP password will only be updated if this field is set.'),
+												 'default_value' => '',
+											 ));
 
-		// Time formatting information!
-		$form->add_field('admin_settings_form', 'date_format', array(
-																														 'type' => 'string-html',
-																														 'label' => l('Date format:'),
-																														 'subtext' => l('Date only format. See the <a href="http://www.php.net/strftime" title="PHP: strftime function">strftime</a> documentation for more formatting information.'),
-																														 'value' => settings()->get('date_format', 'string'),
-																													 ));
+			// Does the SMTP host use TLS?
+			$form->add_input(array(
+												 'name' => 'smtp_is_tls',
+												 'type' => 'checkbox',
+												 'label' => l('SMTP host uses TLS'),
+												 'subtext' => l('Check this box if the SMTP host uses TLS, such as Gmail or Hotmail.'),
+												 'default_value' => settings()->get('smtp_is_tls', 'int'),
+												));
 
-		$form->add_field('admin_settings_form', 'time_format', array(
-																														 'type' => 'string-html',
-																														 'label' => l('Time format:'),
-																														 'subtext' => l('Time only format. See the <a href="http://www.php.net/strftime" title="PHP: strftime function">strftime</a> documentation for more formatting information.'),
-																														 'value' => settings()->get('time_format', 'string'),
-																													 ));
+			// Number of seconds before the SMTP connection attempt is aborted.
+			$form->add_input(array(
+												 'name' => 'smtp_timeout',
+												 'type' => 'int',
+												 'label' => l('SMTP timeout'),
+												 'subtext' => l('The maximum number, in seconds, that the server will wait for a response from the SMTP host.'),
+												 'length' => array(
+																			 'min' => 1,
+																		 ),
+												 'default_value' => settings()->get('smtp_timeout', 'int'),
+											 ));
 
-		$form->add_field('admin_settings_form', 'datetime_format', array(
-																																 'type' => 'string-html',
-																																 'label' => l('Date and time format:'),
-																																 'subtext' => l('Date and time format. See the <a href="http://www.php.net/strftime" title="PHP: strftime function">strftime</a> documentation for more formatting information.'),
-																																 'value' => settings()->get('datetime_format', 'string'),
-																															 ));
+			// Additional mail parameters.
+			$form->add_input(array(
+												 'name' => 'mail_additional_parameters',
+												 'type' => 'string',
+												 'label' => l('Additional mail parameters'),
+												 'subtext' => l('Any additional PHP mail() function parameters (the $additional_parameters parameter).'),
+												 'default_value' => htmlchars_decode(settings()->get('mail_additional_parameters', 'string')),
+											 ));
 
+		}
+		// Anything else belongs here.
+		elseif($form_type == 'other')
+		{
+			// Whether or not you want to enable the task system.
+			$form->add_input(array(
+												 'name' => 'enable_tasks',
+												 'type' => 'checkbox',
+												 'label' => l('Enable tasks'),
+												 'subtext' => l('If enabled, scheduled tasks will be allowed to run, this is not run by a cron, but by people browsing your site.'),
+												 'default_value' => settings()->get('enable_tasks', 'int'),
+											 ));
+
+			// The maximum number of tasks to run at a time.
+			$form->add_input(array(
+												 'name' => 'max_tasks',
+												 'type' => 'int',
+												 'label' => l('Maximum tasks to run at a time'),
+												 'subtext' => l('The maximum number of tasks which can be ran at once at any given time.'),
+												 'length' => array(
+																			 'min' => 0,
+																		 ),
+												 'default_value' => settings()->get('max_tasks', 'int'),
+											 ));
+
+			// Enable even more UTF8 support? You crazy! :P
+			$form->add_input(array(
+												 'name' => 'enable_utf8',
+												 'type' => 'checkbox',
+												 'label' => l('Enable UTF8 support'),
+												 'subtext' => l('If enabled (and if the Multibyte PHP extension is enabled), UTF8 capable functions will be used to handle data. Please note that this can, in cases, slow your site down.'),
+												 'disabled' => !function_exists('mb_internal_encoding'),
+												 'default_value' => settings()->get('enable_utf8', 'int'),
+											 ));
+
+			// Disable admin security? Not a good idea, but hey, it's your site!!!
+			$form->add_input(array(
+												 'name' => 'disable_admin_security',
+												 'type' => 'checkbox',
+												 'label' => l('Disable administrative security'),
+												 'subtext' => l('Though not a good idea, if disabled, accessors of the control panel won\'t have to authenticate themselves periodically.'),
+												 'default_value' => settings()->get('disable_admin_security', 'int'),
+											 ));
+
+			// Log errors in the database?
+			$form->add_input(array(
+												 'name' => 'errors_log',
+												 'type' => 'checkbox',
+												 'label' => l('Log errors in database'),
+												 'subtext' => l('When enabled, SnowCMS will log any PHP errors (not fatal errors) in the database, instead of the error logging system set in the php.ini.'),
+												 'default_value' => settings()->get('errors_log', 'int'),
+											 ));
+		}
+
+		// You may need to do this yourself.
+		api()->run_hooks('admin_settings_generate_form', array($form_type));
 	}
 }
 
@@ -299,8 +394,11 @@ if(!function_exists('admin_settings_handle'))
 		$form = api()->load_class('Form');
 
 		// Loop through all the settings and save them!
-		foreach($data as $variable => $value)
+		foreach($form->inputs($_GET['type']. '_settings_form') as $input)
 		{
+			$variable = $input->name();
+			$value = $data[$variable];
+
 			// This one is special :P
 			if($variable == 'smtp_pass')
 			{
@@ -317,14 +415,15 @@ if(!function_exists('admin_settings_handle'))
 			// Update the value, unless it is the SMTP password!
 			if($variable != 'smtp_pass')
 			{
-				$form->edit_field('admin_settings_form', $variable, array(
+				/*$form->edit_field('admin_settings_form', $variable, array(
 																															'value' => $value,
-																														));
+																														));*/
+
 			}
 		}
 
-		api()->add_filter('admin_settings_form_message', create_function('$value', '
-																											return l(\'Settings have been updated successfully.\');'));
+		api()->add_hook('admin_settings_form_messages', create_function('&$value', '
+																											$value[] = l(\'Settings have been updated successfully.\');'), 10, 1);
 
 		return true;
 	}

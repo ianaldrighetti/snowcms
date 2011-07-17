@@ -29,4 +29,5 @@ if(!defined('INSNOW'))
 */
 
 theme()->add_link(array('rel' => 'stylesheet', 'type' => 'text/css', 'href' => theme()->url(). '/style/style.css'));
+theme()->add_link(array('rel' => 'stylesheet', 'type' => 'text/css', 'href' => theme()->url(). '/style/global.css'));
 ?>

@@ -45,29 +45,36 @@ function time_utc()
 	return time() - date('Z');
 }
 
-/*
-	Function: timeformat
-
-	Returns a human readable time/date.
-
-	Parameters:
-		int $timestamp - A UTC timestamp.
-		string $format - Either datetime to include both the date and time,
-										 date for only date or time for only time.
-		bool $today_yesterday - Set to true if you want the time for be formatted
-														like Today at {TIME} or Yesterday at {TIME}, false
-														if no matter what, to just display a date.
-
-	Returns:
-		string - Returns the human readable time/date.
-
-	Note:
-		This function is overloadable.
-*/
 if(!function_exists('timeformat'))
 {
+	/*
+		Function: timeformat
+
+		Returns a human readable time/date.
+
+		Parameters:
+			int $timestamp - A UTC timestamp.
+			string $format - Either datetime to include both the date and time,
+											 date for only date or time for only time.
+			bool $today_yesterday - Set to true if you want the time for be formatted
+															like Today at {TIME} or Yesterday at {TIME}, false
+															if no matter what, to just display a date.
+
+		Returns:
+			string - Returns the human readable time/date.
+
+		Note:
+			This function is overloadable.
+	*/
 	function timeformat($timestamp = 0, $format = 'datetime', $today_yesterday = true)
 	{
+		if(settings()->get('disable_today_yesterday', 'bool', false) == true)
+		{
+			// Looks like the website administrator wants this permanently
+			// disabled. Oh well!
+			$today_yesterday = false;
+		}
+
 		$return = null;
 		api()->run_hooks('timeformat', array(&$return, &$timestamp, &$format, &$today_yesterday));
 
@@ -110,7 +117,7 @@ if(!function_exists('timeformat'))
 			$is_yesterday = !$is_today && ($supplied['yday'] == $cur_time['yday'] - 1 && $supplied['year'] == $cur_time['year']) || ($cur_time['yday'] == 0 && $supplied['year'] == $cur_time['year'] - 1 && $supplied['mday'] == 31 && $supplied['mon'] == 12);
 
 			// Was it within a few hours ago?
-			if($is_today && abs($supplied[0] - $cur_time[0]) <= 10800)
+			if($is_today && $format != 'date' && abs($supplied[0] - $cur_time[0]) <= 10800)
 			{
 				return time_diff($supplied[0], $cur_time[0]);
 			}

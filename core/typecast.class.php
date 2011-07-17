@@ -315,7 +315,7 @@ function typecast_string($value, $typecast = false)
 	}
 	else
 	{
-		return (string)$value == (string)$value;
+		return $value == (string)$value;
 	}
 }
 

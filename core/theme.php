@@ -250,7 +250,7 @@ function theme_head()
 		}
 
 		echo '
-	</script>';
+	// ]]></script>';
 	}
 
 	// Finally, any JavaScript files?
@@ -298,7 +298,7 @@ function theme_site_name()
 */
 function theme_sub_title()
 {
-	echo api()->apply_filters('theme_sub_title', settings()->get('sub_title', 'string', l('Light, simple, free. It&#039;s all you need, and just that.')));
+	echo api()->apply_filters('theme_sub_title', settings()->get('site_sub_title', 'string', l('Light, simple, free. It&#039;s all you need, and just that.')));
 }
 
 /*

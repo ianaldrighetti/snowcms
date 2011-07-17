@@ -64,5 +64,5 @@ if(!defined('INSNOW'))
 	<h1>', l('Install a theme'), '</h1>
 	<p>', l('Below you can specify a file to upload or a URL at which to download a theme (zip, tar and tar.gz only).'), '</p>';
 
-		api()->context['form']->show('install_theme_form');
+		api()->context['form']->render('install_theme_form');
 ?>
