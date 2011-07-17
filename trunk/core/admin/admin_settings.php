@@ -53,10 +53,31 @@ if(!function_exists('admin_settings'))
 
 		// We have a few different settings forms we can display.
 		$form_types = api()->apply_filters('admin_settings_forms', array(
-																															   'basic' => l('Basic Settings'),
-																															   'date' => l('Date/Time Settings'),
-																															   'mail' => l('Email Settings'),
-																															   'other' => l('Miscellaneous Settings'),
+																															   'basic' => array(
+																																							l('Basic Settings'),
+																																							l('Manage basic settings'),
+																																							l('Basic settings include changing the name of your website, along with a website description keywords, and more.'),
+																																						),
+																															   'date' => array(
+																																						 l('Date/Time Settings'),
+																																						 l('Manage date and time settings'),
+																																						 l('The format of how a date or time is displayed can be modified here.'),
+																																					 ),
+																															   'mail' => array(
+																																						 l('Email Settings'),
+																																						 l('Manage email settings'),
+																																						 l('In order for activation, password resetting and other email messages to be sent to your users, you must select how these emails are sent. If SMTP is chosen, then you may be required to supply information such as the location of the server, a username, and password.'),
+																																					 ),
+																																 'security' => array(
+																																								 l('Security Settings'),
+																																								 l('Manage security related settings'),
+																																								 l('There are a couple administrative security options which can be configured, such as disabling administrative security all together and also the timeout period for administrative authentication.'),
+																																							 ),
+																															   'other' => array(
+																																							l('Miscellaneous Settings'),
+																																							l('Manage miscellaneous settings'),
+																																							l('Other settings that do not belong to any other category can be found here, such as UTF-8 support, disabling administrative security, and others.'),
+																																						),
 																															 ));
 
 		// Which one are we going to generate?
@@ -64,6 +85,23 @@ if(!function_exists('admin_settings'))
 
 		// Just to make sure.
 		$GLOBALS['_GET']['type'] = $form_type;
+
+		// This will come in handy.
+		api()->context['section_menu'] = array();
+		$is_first = true;
+		foreach($form_types as $type_id => $type_info)
+		{
+			api()->context['section_menu'][] = array(
+																					 'href' => baseurl. '/index.php?action=admin&amp;sa=settings&amp;type='. $type_id,
+																					 'title' => $type_info[1],
+																					 'is_first' => $is_first,
+																					 'is_selected' => $form_type == $type_id,
+																					 'text' => $type_info[0],
+																				 );
+
+			// Nothing else will be first.
+			$is_first = false;
+		}
 
 		admin_settings_generate_form($form_type);
 		$form = api()->load_class('Form');
@@ -86,10 +124,12 @@ if(!function_exists('admin_settings'))
 
 		admin_current_area('system_settings');
 
-		theme()->set_title($form_types[$form_type]);
+		theme()->set_title($form_types[$form_type][0]);
 
 		api()->context['form'] = $form;
 		api()->context['form_type'] = $form_type;
+		api()->context['settings_title'] = $form_types[$form_type][0];
+		api()->context['settings_description'] = $form_types[$form_type][2];
 
 		theme()->render('admin_settings');
 	}
@@ -310,6 +350,29 @@ if(!function_exists('admin_settings_generate_form'))
 											 ));
 
 		}
+		elseif($form_type == 'security')
+		{
+			// How long should their authentication last?
+			$form->add_input(array(
+												 'name' => 'admin_login_timeout',
+												 'type' => 'int',
+												 'length' => array(
+																			 'min' => 1,
+																		 ),
+												 'label' => l('Authentication timeout'),
+												 'subtext' => l('How often should a user have to authenticate themselves by entering their password in order to access the control panel, in minutes. Requires administrative security to be enabled.'),
+												 'default_value' => settings()->get('admin_login_timeout', 'int', 15),
+											 ));
+
+			// Disable admin security? Not a good idea, but hey, it's your site!!!
+			$form->add_input(array(
+												 'name' => 'disable_admin_security',
+												 'type' => 'checkbox',
+												 'label' => l('Disable administrative security'),
+												 'subtext' => l('If administrative security is disabled, then users who are allowed to access the control panel will never be prompted for their password. It is <em>not</em> recommended that this be disabled.'),
+												 'default_value' => settings()->get('disable_admin_security', 'int'),
+											 ));
+		}
 		// Anything else belongs here.
 		elseif($form_type == 'other')
 		{
@@ -342,15 +405,6 @@ if(!function_exists('admin_settings_generate_form'))
 												 'subtext' => l('If enabled (and if the Multibyte PHP extension is enabled), UTF8 capable functions will be used to handle data. Please note that this can, in cases, slow your site down.'),
 												 'disabled' => !function_exists('mb_internal_encoding'),
 												 'default_value' => settings()->get('enable_utf8', 'int'),
-											 ));
-
-			// Disable admin security? Not a good idea, but hey, it's your site!!!
-			$form->add_input(array(
-												 'name' => 'disable_admin_security',
-												 'type' => 'checkbox',
-												 'label' => l('Disable administrative security'),
-												 'subtext' => l('Though not a good idea, if disabled, accessors of the control panel won\'t have to authenticate themselves periodically.'),
-												 'default_value' => settings()->get('disable_admin_security', 'int'),
 											 ));
 
 			// Log errors in the database?
@@ -422,8 +476,8 @@ if(!function_exists('admin_settings_handle'))
 			}
 		}
 
-		api()->add_hook('admin_settings_form_messages', create_function('&$value', '
-																											$value[] = l(\'Settings have been updated successfully.\');'), 10, 1);
+		api()->add_hook($_GET['type']. '_settings_form_messages', create_function('&$value', '
+																																$value[] = l(\'Settings have been updated successfully.\');'), 10, 1);
 
 		return true;
 	}

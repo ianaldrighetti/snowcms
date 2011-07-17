@@ -143,6 +143,10 @@ class Input
 	// An array containing any errors with the input field.
 	private $errors;
 
+	// Variable: required
+	// Whether or not the input needs to contain a value.
+	private $required;
+
 	/*
 		Constructor: __construct
 
@@ -179,12 +183,14 @@ class Input
 									more information.
 			int $columns - The number of columns in the textarea. See
 										 <Input::columns> for more information.
+			bool $required - Whether the input needs to be filled out to be
+											 considered valid. Defaults to true.
 
 		Note:
 			If you would rather use a method which can return whether or not your
 			settings did not contain any errors, please use <Input::set>.
 	*/
-	public function __construct($name = null, $label = null, $subtext = null, $type = null, $request_type = null, $length = null, $truncate = false, $options = array(), $callback = null, $default_value = null, $disabled = false, $readonly = false, $rows = null, $columns = null)
+	public function __construct($name = null, $label = null, $subtext = null, $type = null, $request_type = null, $length = null, $truncate = false, $options = array(), $callback = null, $default_value = null, $disabled = false, $readonly = false, $rows = null, $columns = null, $required = true)
 	{
 		// Set everything to blanks and what not.
 		$this->name = null;
@@ -210,11 +216,12 @@ class Input
 		$this->error_type = null;
 		$this->valid = null;
 		$this->errors = array();
+		$this->required = true;
 
 		// Let's see, did you want to set anything?
 		if(!empty($name))
 		{
-			$this->set($name, $label, $subtext, $type, $request_type, $length, $truncate, $options, $callback, $default_value, $disabled, $readonly, $rows, $columns);
+			$this->set($name, $label, $subtext, $type, $request_type, $length, $truncate, $options, $callback, $default_value, $disabled, $readonly, $rows, $columns, $required);
 		}
 	}
 
@@ -1033,6 +1040,34 @@ class Input
 	}
 
 	/*
+		Method: required
+
+		Sets and returns whether the input field can be empty or not.
+
+		Parameters:
+			bool $required - Set this to true if the field needs to be filled out
+											 and valid, or false if not. This field can be left
+											 empty to have the current value of this option
+											 returned.
+
+		Returns:
+			bool - Returns the current value of this setting.
+
+		Note:
+			The only type of input this option actually affects is the file type.
+	*/
+	public function required($required = null)
+	{
+		// Setting a new value?
+		if($required !== null)
+		{
+			$this->required = !empty($required);
+		}
+
+		return $this->required;
+	}
+
+	/*
 		Method: set
 
 		This method can be used to set all options for the input field with just
@@ -1053,6 +1088,7 @@ class Input
 			bool $readonly - See <Input::readonly>.
 			int $rows - See <Input::rows>.
 			int $columns - See <Input::columns>.
+			bool $required - See <Input::required>.
 
 		Returns:
 			bool - Returns true if all the options set would allow this instance
@@ -1067,7 +1103,7 @@ class Input
 			If any error occurs, the previous state of this instance will be
 			restored, as if this method were never called.
 	*/
-	public function set($name, $label = null, $subtext = null, $type = null, $request_type = null, $length = null, $truncate = null, $options = null, $callback = null, $default_value = null, $disabled = null, $readonly = null, $rows = null, $columns = null)
+	public function set($name, $label = null, $subtext = null, $type = null, $request_type = null, $length = null, $truncate = null, $options = null, $callback = null, $default_value = null, $disabled = null, $readonly = null, $rows = null, $columns = null, $required = true)
 	{
 		// We may need to revert back later.
 		$prev_options = array(
@@ -1085,6 +1121,7 @@ class Input
 											'readonly' => $this->readonly,
 											'rows' => $this->rows,
 											'columns' => $this->columns,
+											'required' => $this->required,
 										);
 
 		// Set the name, type, length, etc. etc.
@@ -1159,6 +1196,7 @@ class Input
 		$this->readonly($readonly);
 		$this->rows($rows);
 		$this->columns($columns);
+		$this->required($required);
 
 		// Well, we did part of the job here... Now to do the rest in validate.
 		if($this->validate())
@@ -1289,6 +1327,7 @@ class Input
 		$this->readonly = $prev_options['readonly'];
 		$this->rows = $prev_options['rows'];
 		$this->columns = $prev_options['columns'];
+		$this->required = $prev_options['required'];
 	}
 
 	/*
@@ -1497,13 +1536,19 @@ class Input
 			{
 				$value = $_FILES[$name];
 			}
-			else
+			// In reality, only files need to be treated differently if the field
+			// isn't required.
+			elseif($this->required)
 			{
 				// Was not an uploaded file. Hmmm...
 				$this->error = l('The file uploaded for the field "%s" was not a valid.', htmlchars($this->label));
 				$this->error_type = I_FILE_ERROR;
 
 				return false;
+			}
+			else
+			{
+				$value = null;
 			}
 		}
 

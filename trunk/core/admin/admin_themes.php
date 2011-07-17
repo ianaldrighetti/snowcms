@@ -55,14 +55,10 @@ if(!function_exists('admin_themes'))
 		admin_themes_generate_form();
 		$form = api()->load_class('Form');
 
-		if(isset($_POST['install_theme_form']))
-		{
-			$form->process('install_theme_form');
-		}
-
-		// A couple things could happen :P
-		// So let's just group them.
-		if((!empty($_GET['set']) || !empty($_GET['delete'])) && verify_request('get'))
+		// You should only be able to set or delete a theme if you are in the
+		// right section of the control panel. The same goes for installing a
+		// new theem.
+		if((!isset($_GET['do']) || $_GET['do'] != 'install') && (!empty($_GET['set']) || !empty($_GET['delete'])) && verify_request('get'))
 		{
 			if(!empty($_GET['set']))
 			{
@@ -93,12 +89,21 @@ if(!function_exists('admin_themes'))
 			// Let's get you out of here now :-)
 			redirect(baseurl. '/index.php?action=admin&sa=themes');
 		}
+		// So are you wanting to install a new theme?
+		elseif(isset($_GET['do']) && $_GET['do'] == 'install' && isset($_POST['install_theme_form']))
+		{
+			// Process that form!
+			$form->process('install_theme_form');
+		}
 
 		admin_current_area('manage_themes');
 
 		theme()->set_title(l('Manage Themes'));
 
+		api()->context['themes'] = theme_list();
+		api()->context['current_theme'] = theme_load(themedir. '/'. settings()->get('theme', 'string', 'default'));
 		api()->context['form'] = $form;
+		api()->context['viewing_installer'] = isset($_GET['do']) && $_GET['do'] == 'install';
 
 		theme()->render('admin_themes');
 	}
@@ -125,7 +130,7 @@ if(!function_exists('admin_themes_generate_form'))
 		$form = api()->load_class('Form');
 
 		$form->add('install_theme_form', array(
-																			 'action' => baseurl. '/index.php?action=admin&amp;sa=themes',
+																			 'action' => baseurl. '/index.php?action=admin&amp;sa=themes&amp;do=install',
 																			 'method' => 'post',
 																			 'callback' => 'admin_themes_handle',
 																			 'submit' => l('Install theme'),
@@ -140,6 +145,7 @@ if(!function_exists('admin_themes_generate_form'))
 											 'type' => 'file',
 											 'label' => l('From a file:'),
 											 'subtext' => l('Select the theme file you want to install as a theme.'),
+											 'required' => false,
 										 ));
 
 		$form->add_input(array(
@@ -147,7 +153,7 @@ if(!function_exists('admin_themes_generate_form'))
 											 'type' => 'string',
 											 'label' => l('From a URL:'),
 											 'subtext' => l('Enter the URL of the theme you want to download and install.'),
-											 'value' => 'http://',
+											 'default_value' => 'http://',
 										 ));
 	}
 }

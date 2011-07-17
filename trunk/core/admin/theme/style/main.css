@@ -240,7 +240,7 @@ body
 .form table .label
 {
 	font-weight: bold;
-	font-size: 110%;
+	font-size: 95%;
 }
 
 .form table .subtext
@@ -251,6 +251,54 @@ body
 .form table .buttons
 {
 	text-align: center;
+}
+
+/* Theme List section. */
+.theme_list
+{
+	text-align: center;
+}
+
+.theme_list a
+{
+	display: block;
+	width: 250px;
+	height: 150px;
+	padding: 5px;
+	text-align: center;
+	font-size: 90%;
+	text-decoration: none;
+	border: 1px solid #FFFFFF;
+	color: #000000;
+}
+
+.theme_list a:hover
+{
+	border-radius: 5px;
+	border: 1px solid #C9C9C9;
+	background: #EDEDED;
+}
+
+#content .theme_list .button
+{
+	display: inline;
+	border: 1px solid #FFFFFF;
+	background: transparent;
+	margin-top: 10px;
+	margin-left: 5px;
+}
+
+#content .theme_list .important
+{
+	border-radius: 5px;
+	border: 1px solid #CD0000;
+	background: #FFC1C1;
+}
+
+#content .theme_list .important:hover
+{
+	border-color: #CD0000;
+	background: #FF6A6A;
 }
 
 /* System Settings */
