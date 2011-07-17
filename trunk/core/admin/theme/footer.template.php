@@ -3,6 +3,14 @@ if(!defined('INSNOW'))
 {
   die('Nice try...');
 }
+
+if(!admin_prompt_required() && admin_show_sidebar())
+{
+	echo '
+			</div>
+			<div class="break">
+			</div>';
+}
 ?>
 		</div>
 		<!-- /END CONTENT -->
@@ -24,7 +32,7 @@ if(!admin_prompt_required())
     foreach($GLOBALS['icons'] as $icon_group => $icon)
     {
       echo '
-        <optgroup label="', $icon_group, '">';
+        <optgroup label="', htmlchars($icon_group), '">';
 
       foreach($icon as $i)
       {
@@ -38,7 +46,7 @@ if(!admin_prompt_required())
 
     echo '
       </select>
-      <input type="submit" name="go" title="', l('Go'), '" value="', l('Go'), '" onclick="if(this.form.jump_to_select.value == \'\') { location.href = \'', baseurl, '/index.php?action=admin\'; } else { location.href = decodeURIComponent(this.form.jump_to_select.value); }" />';
+      <input type="submit" name="go" title="', l('Go'), '" value="', l('Go'), '" onclick="if(this.form.jump_to_select.value == \'', l('Control Panel'), '\') { location.href = \'', baseurl, '/index.php?action=admin\'; } else { location.href = decodeURIComponent(this.form.jump_to_select.value); }" />';
 ?>
 				</form>
 			</div>

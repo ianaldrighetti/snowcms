@@ -6,21 +6,39 @@ if(!defined('INSNOW'))
 // !!! TODO: Allow log in if they are not logged in yet.
 
 			echo '
-			<h1>Log In</h1>
+			<h1>Log In</h1>';
 
+// Should we show the message as to why they are here, or errors?
+if(count(api()->context['form']->errors()) > 0)
+{
+	echo '
+			<div class="error-message">';
+
+	foreach(api()->context['form']->errors() as $error_message)
+	{
+		echo '
+				<p>', $error_message, '</p>';
+	}
+
+	echo '
+			</div>';
+}
+else
+{
+	echo '
 			<div class="alert-message">
 				<p>', l('Please enter your password for security purposes.'), '</p>
-			</div>
+			</div>';
+}
 
-			<form action="" method="post" id="login-form">
+			echo '
+			', api()->context['form']->open(), '
 				<p class="label"><label for="member_name">', l('Username:'), '</label></p>
-				<p class="input"><input type="text" name="member_name" id="member_name" value="', member()->name(), '" disabled="disabled" /></p>
+				<p class="input">', api()->context['form']->generate('member_name'), '</p>
 				<p class="label"><label for="member_pass">', l('Password:'), '</label></p>
-				<p class="input"><input type="password" name="member_pass" id="member_pass" value="" /></p>
+				<p class="input">', api()->context['form']->generate('member_pass'), '</p>
 				<div class="float-left">
-					<p class="no-margin">Session length: <select name="session_length">
-																								 <option>Forever</option>
-																							 </select></p>
+					<p class="no-margin">', l('Session length:'), ' ', api()->context['form']->generate('session_length'), '</p>
 				</div>
 				<div class="float-right">
 					<p class="no-margin"><input type="submit" name="proc_login" value="', l('Log in'), '" /></p>
@@ -30,12 +48,18 @@ if(!defined('INSNOW'))
 
 			foreach($_POST as $index => $value)
 			{
+				// Don't put the hidden field in if it is for the log in form.
+				if(in_array($index, array('member_name', 'member_pass', 'session_length', 'proc_login')))
+				{
+					continue;
+				}
+
 				echo '
 				<input type="hidden" name="', htmlchars($index), '" value="', htmlchars($value), '" />';
 			}
 
 			echo '
-			</form>
+			', api()->context['form']->close(), '
 			<script type="text/javascript">
 				s.onload(function() { document.getElementById(\'member_pass\').focus(); });
 			</script>

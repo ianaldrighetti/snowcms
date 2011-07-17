@@ -86,7 +86,14 @@ body
 	font-size: 12px;
 }
 
-/* End #link-tree section. Begin #footer-container section. */
+/* End #link-tree section. Begin #main-content section. */
+#main-content h3 img, #side-content h3 img
+{
+	position: relative;
+	top: 3px;
+}
+
+/* End #main-content section. Begin #footer-container section. */
 #footer-container
 {
 	margin-top: 5px;
@@ -145,16 +152,16 @@ body
 	text-align: center;
 }
 
-.error-message
-{
-	background: #FFEC8B;
-	border: 1px solid #F0A804;
-}
-
 .alert-message
 {
-	background: #FCE94F;
-	border: 1px solid #C4A000;
+	background: #FFEC8B !important;
+	border: 1px solid #F0A804 !important;
+}
+
+.error-message
+{
+	background: #FFC1C1 !important;
+	border: 1px solid #EE0000 !important;
 }
 
 .message-box
@@ -166,4 +173,88 @@ body
 .error-message p, .alert-message p, .message-box p
 {
 	margin: 0 auto 5px auto;
+}
+
+/* Section tabs */
+.section-tabs
+{
+	background: #F2F2F2;
+	border: 1px solid #DEDEDE;
+	border-radius: 5px;
+	z-index: 2;
+}
+
+.section-tabs ul
+{
+	margin: 0;
+	padding: 0;
+	list-style: none;
+}
+
+.section-tabs li
+{
+	float: left;
+	display: inline;
+}
+
+.section-tabs li a
+{
+	display: block;
+	padding: 10px;
+	color: #333333;
+	text-decoration: none;
+	border-right: 1px solid #DEDEDE;
+}
+
+.section-tabs li a:hover, .section-tabs .selected
+{
+	background: white;
+	color: black;
+	z-index: 1;
+}
+
+.section-tabs li .first
+{
+	border-radius: 5px 0 0 5px;
+}
+
+/* Form formatting */
+.form table
+{
+	margin: auto;
+	text-align: center;
+}
+
+.form table .td-left
+{
+	width: 50%;
+	text-align: left !important;
+}
+
+.form table .td-right
+{
+	width: 50%;
+	text-align: center;
+}
+
+.form table .label
+{
+	font-weight: bold;
+	font-size: 110%;
+}
+
+.form table .subtext
+{
+	font-size: 85%;
+}
+
+.form table .buttons
+{
+	text-align: center;
+}
+
+/* System Settings */
+#admin_settings_form table
+{
+	width: 90%;
 }

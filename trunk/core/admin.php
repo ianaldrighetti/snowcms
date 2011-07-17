@@ -69,19 +69,6 @@ if(!function_exists('admin_prepend'))
 		theme()->add_js_var('session_id', member()->session_id());
 		theme()->add_link(array('rel' => 'stylesheet', 'type' => 'text/css', 'href' => theme()->url(). '/style/main.css'));
 
-		// If we need to have them log in, then there will be a different style
-		// sheet, and a different container type.
-		if(admin_prompt_required())
-		{
-			theme()->add_link(array('rel' => 'stylesheet', 'type' => 'text/css', 'href' => theme()->url(). '/style/login.css'));
-			api()->add_filter('admin_theme_container_id', create_function('$element_id', '
-																											return \'login-box\';'));
-		}
-		else
-		{
-			theme()->add_link(array('rel' => 'stylesheet', 'type' => 'text/css', 'href' => theme()->url(). '/style/index.css'));
-		}
-
 		api()->run_hooks('post_admin_theme_init');
 
 		if(member()->can('access_admin_cp'))
@@ -259,6 +246,8 @@ if(!function_exists('admin_prepend'))
 			admin_prompt_password();
 		}
 
+		theme()->add_link(array('rel' => 'stylesheet', 'type' => 'text/css', 'href' => theme()->url(). '/style/index.css'));
+
 		// You can make changes to the theme and what not now :)
 		api()->run_hooks('admin_prepend_authenticated', array('ajax' => substr($_SERVER['QUERY_STRING'], 0, 20) == 'action=admin&sa=ajax'));
 	}
@@ -343,18 +332,12 @@ if(!function_exists('admin_prompt_password'))
 			admin_prompt_generate_form();
 
 			$form = api()->load_class('Form');
-			if(!empty($_POST['proc_login']))
-			{
-				// !!! TODO: Get rid of this!
-				$_POST['admin_prompt_form'] = 'Log in';
-				$GLOBALS['_POST']['admin_verification_password'] = $_POST['member_pass'];
-			}
 
 			// Has the form been submitted? Process it!
-			if(isset($_POST['admin_prompt_form']))
+			if(isset($_POST['proc_login']))
 			{
-				$success = $form->process('admin_prompt_form');
-var_dump($form);
+				$success = $form->process('admin_prompt');
+
 				// Did they pass?
 				if(!empty($success))
 				{
@@ -362,6 +345,11 @@ var_dump($form);
 					return;
 				}
 			}
+
+			// We need a couple things.
+			theme()->add_link(array('rel' => 'stylesheet', 'type' => 'text/css', 'href' => theme()->url(). '/style/login.css'));
+			api()->add_filter('admin_theme_container_id', create_function('$element_id', '
+																											return \'login-box\';'));
 
 			theme()->set_title(l('Log in'));
 
@@ -396,24 +384,57 @@ if(!function_exists('admin_prompt_generate_form'))
 		// Create the form so you can enter your password.
 		$form = api()->load_class('Form');
 
-		$form->add('admin_prompt_form', array(
-																			'action' => '',
-																			'callback' => 'admin_prompt_handle',
-																			'submit' => l('Login'),
-																		));
+		// Create our authentication form.
+		$form->add('admin_prompt', array(
+																 'action' => member()->is_guest() ? api()->apply_filters('login_url', baseurl. '/index.php?action=login2') : '',
+																 'callback' => 'admin_prompt_handle',
+																 'id' => 'login-form',
+																 'submit' => l('Log in'),
+															 ));
 
-		$form->add_field('admin_prompt_form', 'admin_verification_password', array(
-																																					 'type' => 'password',
-																																					 'label' => l('Password:'),
-																																				 ));
+		$form->current('admin_prompt');
+
+		// Add the username input, but that may just be disabled anyways.
+		$form->add_input(array(
+											 'name' => 'member_name',
+											 'label' => l('Username'),
+											 'type' => 'string',
+											 'default_value' => member()->is_logged() ? member()->name() : '',
+											 'disabled' => member()->is_logged(),
+										 ));
+
+		// Now for their password.
+		$form->add_input(array(
+											 'name' => 'member_pass',
+											 'label' => l('Password'),
+											 'type' => 'password',
+										 ));
+
+		$form->add_input(array(
+											 'name' => 'session_length',
+											 'type' => 'select',
+											 'label' => l('Stay logged in for'),
+											 'options' => array(
+																			0 => l('This session'),
+																			3600 => l('An hour'),
+																			86400 => l('A day'),
+																			604800 => l('A week'),
+																			2419200 => l('A month'),
+																			31536000 => l('A year'),
+																			-1 => l('Forever'),
+																		),
+											 'default_value' => !empty($_REQUEST['session_length']) ? (int)$_REQUEST['session_length'] : -1,
+										 ));
+
 
 		// Let's add all the post data you were entering before ;)
 		foreach($_POST as $key => $value)
 		{
-			$form->add_field('admin_prompt_form', $key, array(
-																										'type' => 'hidden',
-																										'value' => $value,
-																									));
+			$form->add_input(array(
+												 'name' => $key,
+												 'type' => 'hidden',
+												 'default_value' => $value,
+											 ));
 		}
 	}
 }
@@ -441,7 +462,7 @@ if(!function_exists('admin_prompt_handle'))
 		global $func;
 
 		// No password? Pfft.
-		if(empty($data['admin_verification_password']) || $func['strlen']($data['admin_verification_password']) == 0)
+		if(empty($data['member_pass']) || $func['strlen']($data['member_pass']) == 0)
 		{
 			$errors[] = l('Please enter your password.');
 			return false;
@@ -451,7 +472,7 @@ if(!function_exists('admin_prompt_handle'))
 		$members = api()->load_class('Members');
 
 		// Pretty simple to do. There are a couple hooks in that method, fyi.
-		if($members->authenticate(member()->name(), $data['admin_verification_password']))
+		if($members->authenticate(member()->name(), $data['member_pass']))
 		{
 			// Set the last time you verified in your session information ;)
 			$_SESSION['admin_password_prompted'] = time_utc();
@@ -546,5 +567,33 @@ if(!function_exists('admin_current_area'))
 			return isset($GLOBALS['admin_current_area']) ? $GLOBALS['admin_current_area'] : null;
 		}
 	}
+}
+
+/*
+	Function: admin_show_sidebar
+
+	Determines whether or not the sidebar in the control panel should be
+	displayed. This function can also be used to hide or show the sidebar as
+	well.
+
+	Parameters:
+		bool $show - Whether or not to display the sidebar. If left blank, then
+								 this function will return whether the sidebar should be
+								 shown.
+
+	Returns:
+		bool - Returns whether the sidebar should be displayed in the control
+					 panel.
+*/
+function admin_show_sidebar($show = null)
+{
+	static $show_sidebar = true;
+
+	if($show !== null)
+	{
+		$show_sidebar = !empty($show);
+	}
+
+	return $show_sidebar;
 }
 ?>

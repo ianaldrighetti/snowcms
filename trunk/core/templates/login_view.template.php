@@ -9,5 +9,5 @@ if(!defined('INSNOW'))
 			<p>', l('Here you can log in to your account, if you do not have an account, you can <a href="%s">register one</a>. Did you forget your password? Request a new one <a href="%s">here</a>.', baseurl. '/index.php?action=register', baseurl. '/index.php?action=reminder'), '</p>';
 
 		// Display that lovely login form.
-		api()->context['form']->show('login_form');
+		api()->context['form']->render('login_form');
 ?>

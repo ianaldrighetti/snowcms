@@ -1106,6 +1106,24 @@ function theme()
 		theme()->add_js_var('theme_url', themeurl);
 		theme()->add_js_var('session_id', member()->session_id());
 
+		// Now for some meta tags.
+		// But only if there is anything to add.
+		if(strlen(settings()->get('site_meta_desc', 'string', '')) > 0)
+		{
+			theme()->add_meta(array(
+													'name' => 'description',
+													'content' => substr(settings()->get('site_meta_desc', 'string'), 0, 255),
+												));
+		}
+
+		if(strlen(settings()->get('site_meta_keywords', 'string', '')) > 0)
+		{
+			theme()->add_meta(array(
+													'name' => 'keywords',
+													'content' => substr(settings()->get('site_meta_keywords', 'string'), 0, 255),
+												));
+		}
+
 		// You can hook into here to add all your theme stuffs (<link>'s,
 		// js vars, js files, etc).
 		api()->run_hooks('post_init_theme');

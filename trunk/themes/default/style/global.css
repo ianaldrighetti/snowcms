@@ -1,0 +1,33 @@
+.error-message, .alert-message, .message-box
+{
+	margin: 10px auto 10px auto;
+	padding: 5px 5px 0 5px;
+	border-radius: 5px;
+	text-align: center;
+
+}
+
+.alert-message
+{
+	background: #FFEC8B !important;
+	border: 1px solid #F0A804 !important;
+}
+
+.error-message
+{
+	background: #FFC1C1 !important;
+	border: 1px solid #EE0000 !important;
+}
+
+.message-box
+{
+	background: #98FB98;
+	border: 1px solid #004F00;
+}
+
+.error-message p, .alert-message p, .message-box p
+{
+	margin: 0 auto 5px auto;
+}
+
+fieldset { border: none; }

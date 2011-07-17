@@ -181,7 +181,26 @@ class Tokens
 	*/
 	public function is_valid($name, $token, $max_age = 86400)
 	{
-		return $this->exists($name) && $this->tokens[$name]['token'] == $token && ($this->tokens[$name]['registered'] + $max_age) >= time_utc();
+		return !$this->is_expired($name, $max_age) && $this->token($name) == $token;
+	}
+
+	/*
+		Method: is_expired
+
+		Checks to see if the token is expired according to the supplied maximum
+		age.
+
+		Parameters:
+			string $name - The name of the token.
+			int $max_age - The maximum age that the token can be in order to be
+										 considered valid. Defaults to 86400 seconds, or 1 day.
+
+		Returns:
+			bool - Returns true if the token is expired, false if not.
+	*/
+	public function is_expired($name, $max_age = 86400)
+	{
+		return !$this->exists($name) || ($this->tokens[$name]['registered'] + $max_age) < time_utc();
 	}
 
 	/*

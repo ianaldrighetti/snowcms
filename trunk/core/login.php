@@ -94,55 +94,61 @@ if(!function_exists('login_generate_form'))
 															 'callback' => 'login_process',
 															 'action' => api()->apply_filters('login_action_url', baseurl. '/index.php?action=login2'),
 															 'method' => 'post',
-															 'submit' => l('Login'),
+															 'submit' => l('Log In'),
 														 ));
 
+		// Let's make this a bit easier.
+		$form->current('login_form');
+
 		// Now the rest of the stuff.
-		$form->add_field('login_form', 'member_name', array(
-																										'type' => 'string',
-																										'label' => l('Username:'),
-																										'function' => create_function('&$value, $form_name, &$error', '
-																																		if(empty($value))
-																																		{
-																																			api()->run_hooks(\'login_process_empty_username\');
+		$form->add_input(array(
+											 'name' => 'member_name',
+											 'type' => 'string',
+											 'label' => l('Username:'),
+											 'callback' => create_function('$name, &$value, &$error', '
+																			 if(empty($value))
+																			 {
+																				 api()->run_hooks(\'login_process_empty_username\');
 
-																																			$error = l(\'Please enter a username.\');
-																																			return false;
-																																		}
+																				 $error = l(\'Please enter a username.\');
+																				 return false;
+																			 }
 
-																																		return true;'),
-																										'value' => !empty($_REQUEST['member_name']) ? $_REQUEST['member_name'] : '',
-																									));
+																			 return true;'),
+											 'default_value' => !empty($_REQUEST['member_name']) ? $_REQUEST['member_name'] : '',
+										 ));
 
-		$form->add_field('login_form', 'member_pass', array(
-																										'type' => 'password',
-																										'label' => l('Password:'),
-																										'function' => create_function('&$value, $form_name, &$error', '
-																																		if(empty($value) && empty($_POST[\'secured_password\']))
-																																		{
-																																			api()->run_hooks(\'login_process_empty_password\');
+		$form->add_input(array(
+											 'name' => 'member_pass',
+											 'type' => 'password',
+										 	 'label' => l('Password:'),
+											 'callback' => create_function('$name, &$value, &$error', '
+																			 if(empty($value) && empty($_POST[\'secured_password\']))
+																			 {
+																				 api()->run_hooks(\'login_process_empty_password\');
 
-																																			$error = l(\'Please enter a password.\');
-																																			return false;
-																																		}
+																				 $error = l(\'Please enter a password.\');
+																				 return false;
+																			 }
 
-																																		return true;'),
-																									));
+																			 return true;'),
+										 ));
 
-		$form->add_field('login_form', 'session_length', array(
-																											 'type' => 'select',
-																											 'label' => l('Stay logged in for'),
-																											 'options' => array(
-																																			0 => l('This session'),
-																																			3600 => l('An hour'),
-																																			86400 => l('A day'),
-																																			604800 => l('A week'),
-																																			2419200 => l('A month'),
-																																			31536000 => l('A year'),
-																																			-1 => l('Forever'),
-																																		),
-																											 'value' => !empty($_REQUEST['session_length']) ? (int)$_REQUEST['session_length'] : -1,
-																										 ));
+		$form->add_input(array(
+											 'name' => 'session_length',
+											 'type' => 'select',
+											 'label' => l('Stay logged in for'),
+											 'options' => array(
+																			0 => l('This session'),
+																			3600 => l('An hour'),
+																			86400 => l('A day'),
+																			604800 => l('A week'),
+																			2419200 => l('A month'),
+																			31536000 => l('A year'),
+																			-1 => l('Forever'),
+																		),
+											 'default_value' => !empty($_REQUEST['session_length']) ? (int)$_REQUEST['session_length'] : -1,
+										 ));
 
 		// It has been generated, so don't generate it again!
 		$generated = true;
@@ -167,8 +173,6 @@ if(!function_exists('login_view2'))
 	*/
 	function login_view2()
 	{
-		global $api, $member;
-
 		// Are you logged in? You Silly Pants you!
 		if(member()->is_logged())
 		{
@@ -279,6 +283,7 @@ if(!function_exists('login_process'))
 		if(empty($login_success))
 		{
 			api()->run_hooks('login_process_failed', array($login));
+
 			$errors[] = l('Invalid username or password supplied.');
 
 			return false;

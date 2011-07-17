@@ -182,8 +182,9 @@ class Form
 			reference parameter which contains an array, which is to be used if
 			any more errors occurred with the data received. This is useful if
 			there is any extra validation that needs to be done. The callback also
-			needs to return true if no errors occurred and false if there are
-			errors which need to be displayed.
+			needs to return false if there were any more errors generated, but
+			can return whatever it wants if the form was successfully processed.
+			Excluding false, of course.
 
 			PLEASE NOTE: The Form class automatically adds an input of its own,
 			which is called {form name}_token, which is used for CSRF (Cross Site
@@ -221,6 +222,12 @@ class Form
 														'submit' => l('Submit'),
 													);
 
+		// Enable CSRF by default if not set.
+		if(!isset($options['csrf-token']))
+		{
+			$options['csrf-token'] = true;
+		}
+
 		// We will simply edit the form, and if the edit method returns false,
 		// that means one of your options was incorrect.
 		if(!$this->edit($name, $options))
@@ -229,49 +236,6 @@ class Form
 			$this->remove($name);
 
 			return false;
-		}
-
-		// Do you want us to automatically add a token input which will be used
-		// in the battle against CSRF attacks?!
-		if(!isset($options['csrf-token']) || !empty($options['csrf-token']))
-		{
-			// Load up the Tokens class.
-			$token = api()->load_class('Tokens');
-
-			// We only want to recreate the token if it doesn't exist.
-			if(!$token->exists($name. '_token'))
-			{
-				$token->add($name. '_token');
-			}
-
-			// Add the input.
-			$this->add_input(array(
-												 'name' => $name. '_token',
-												 'label' => l('Token'),
-												 'type' => 'hidden',
-												 'request_type' => $this->forms[$name]['method'],
-												 'callback' => create_function('$name, $value, &$error', '
-
-																				 // Load up the Tokens class.
-																				 $token = api()->load_class(\'Tokens\');
-
-																				 // So, is this token valid?
-																				 if($token->is_valid($name, $value))
-																				 {
-																					 // Everything is hunky dory!
-																					 return true;
-																				 }
-																				 else
-																				 {
-																					 // Sorry, but we have reason to
-																					 // believe you didn\'t submit
-																					 // this form!!
-																					 $error = l(\'Your security key is invalid. Please try resubmitting the form.\');
-
-																					 return false;
-																				 }'),
-												 'default_value' => $token->token($name),
-											 ), $name);
 		}
 
 		// Everything checks out. Now get to adding those inputs!
@@ -291,14 +255,6 @@ class Form
 		Returns:
 			bool - Returns true if the forms options were successfully edited,
 						 false on failure (e.g. the form doesn't exist).
-
-		Note:
-			For options which can be edited, see <Form::add>, but there is one
-			exception: you can not disable CSRF protection or enable it if it
-			wasn't initially.
-
-			However, you may easily disable CSRF protection by removing the input
-			with a name of {form name}_token with <Form::remove_input>.
 	*/
 	public function edit($name, $options)
 	{
@@ -317,6 +273,11 @@ class Form
 			$this->forms[$name]['accept-charset'] = $options['accept-charset'];
 		}
 
+		if(isset($options['action']))
+		{
+			$this->forms[$name]['action'] = $options['action'];
+		}
+
 		// How about the callback? This we need to make sure is actually valid.
 		if(isset($options['callback']) && is_callable($options['callback']))
 		{
@@ -326,6 +287,73 @@ class Form
 		elseif(isset($options['callback']))
 		{
 			return false;
+		}
+
+		// The way the form is submitted?
+		if(isset($options['method']) && in_array(strtolower($options['method']), array('get', 'post')))
+		{
+			$this->forms[$name]['method'] = strtolower($options['method']);
+		}
+		elseif(isset($options['method']))
+		{
+			return false;
+		}
+
+		// Enabling or disabling CSRF protection?
+		if(isset($options['csrf-token']))
+		{
+			// Are you enabling it? Is it already enabled..?
+			if(!empty($options['csrf-token']) && !$this->input_exists($name. '_token'))
+			{
+				// Load up the Tokens class.
+				$token = api()->load_class('Tokens');
+
+				// We only want to recreate the token if it doesn't exist, or if it
+				// is expired.
+				if(!$token->exists($name. '_token') || $token->is_expired($name. '_token'))
+				{
+					$token->add($name. '_token');
+				}
+
+				// Add the input.
+				$this->add_input(array(
+													 'name' => $name. '_token',
+													 'label' => l('Token'),
+													 'type' => 'hidden',
+													 'request_type' => $this->forms[$name]['method'],
+													 'callback' => create_function('$name, $value, &$error', '
+
+																					 // Load up the Tokens class.
+																					 $token = api()->load_class(\'Tokens\');
+
+																					 // So, is this token valid?
+																					 if($token->is_valid($name, $value))
+																					 {
+																						 // Everything is hunky dory!
+																						 // But now that the token is
+																						 // used, delete it.
+																						 $token->delete($name. \'_token\');
+
+																						 return true;
+																					 }
+																					 else
+																					 {
+																						 // Sorry, but we have reason to
+																						 // believe you didn\'t submit
+																						 // this form!!
+																						 $error = l(\'Your security key is invalid. Please try resubmitting the form.\');
+
+																						 return false;
+																					 }'),
+													 'default_value' => $token->token($name. '_token'),
+												 ), $name);
+			}
+			// Maybe disabling it?
+			elseif(empty($options['csrf-token']) && $this->input_exists($name. '_token'))
+			{
+				// To disable it, we simply delete it!
+				$this->remove_input($name. '_token', $name);
+			}
 		}
 
 		// Changing the encoding type of the form?
@@ -338,16 +366,6 @@ class Form
 		if(isset($options['id']))
 		{
 			$this->forms[$name]['id'] = $options['id'];
-		}
-
-		// The way the form is submitted?
-		if(isset($options['method']) && in_array(strtolower($options['method']), array('get', 'post')))
-		{
-			$this->forms[$name]['method'] = strtolower($options['method']);
-		}
-		elseif(isset($options['method']))
-		{
-			return false;
 		}
 
 		// Last, but not least, the text on the submit button... Maybe?
@@ -466,7 +484,11 @@ class Form
 		{
 			// We shall attempt to instantiate an Input based upon your options,
 			// then.
-			$input = new Input($input);
+			$input = new Input(isset($input['name']) ? $input['name'] : null, isset($input['label']) ? $input['label'] : null, isset($input['subtext']) ? $input['subtext'] : null,
+													isset($input['type']) ? $input['type'] : null, isset($input['request_type']) ? $input['request_type'] : null, isset($input['length']) ? $input['length'] : null,
+													isset($input['truncate']) ? $input['truncate'] : null, isset($input['options']) ? $input['options'] : null, isset($input['callback']) ? $input['callback'] : null,
+													isset($input['default_value']) ? $input['default_value'] : null, isset($input['disabled']) ? $input['disabled'] : null, isset($input['readonly']) ? $input['readonly'] : null,
+													isset($input['rows']) ? $input['rows'] : null, isset($input['columns']) ? $input['columns'] : null);
 		}
 		// Could it be an Input?
 		elseif(!is_object($input) || !($input instanceof Input))
@@ -482,16 +504,16 @@ class Form
 		}
 
 		// Alright, so do you want this Input to go in a specific place?
-		if(!isset($position) || $position === null || count($this->forms[$name]['inputs']) <= $position)
+		if(!isset($position) || $position === null || count($this->forms[$form_name]['inputs']) <= $position)
 		{
 			// Nope, you obviously don't care, so we will plop it in at the end!
-			$this->forms[$name]['inputs'][strtolower($input->name())] = $input;
+			$this->forms[$form_name]['inputs'][strtolower($input->name())] = $input;
 		}
 		else
 		{
 			// We shall use the function array_insert, which resides within the
 			// compat.php file.
-			$this->forms[$name]['inputs'] = array_insert($this->forms[$name], $input, $position, $input->name());
+			$this->forms[$form_name]['inputs'] = array_insert($this->forms[$form_name], $input, $position, $input->name());
 		}
 
 		// Did you add an input which is the type of a file? Then we will want
@@ -499,7 +521,7 @@ class Form
 		// won't work.
 		if($input->type() == 'file')
 		{
-			$this->forms[$name]['enctype'] = 'multipart/form-data';
+			$this->forms[$form_name]['enctype'] = 'multipart/form-data';
 		}
 
 		// Alright. Everything seems to check out.
@@ -530,6 +552,40 @@ class Form
 
 		// Pretty simple.
 		return $this->exists($form_name) && isset($this->forms[$form_name]['inputs'][strtolower($name)]);
+	}
+
+	/*
+		Method: remove_input
+
+		Removes the specified input from the form.
+
+		Parameters:
+			string $name - The name of the input to remove.
+			string $form_name - The name of the form which contains the input.
+
+		Returns:
+			bool - Returns true if the input was removed successfully, false if
+						 not.
+
+		Note:
+			The $form_name parameter does not need to be supplied if one was set
+			with the <Form::current> method.
+	*/
+	public function remove_input($name, $form_name = null)
+	{
+		// Get the name of the form?
+		$form_name = strtolower(!empty($form_name) ? $form_name : $this->current());
+
+		// The input must exist!
+		if(!$this->input_exists($name, $form_name))
+		{
+			return false;
+		}
+
+		// Delete it!
+		unset($this->forms[strtolower($form_name)]['inputs'][strtolower($name)]);
+
+		return true;
 	}
 
 	/*
@@ -595,14 +651,407 @@ class Form
 	}
 
 	/*
-		Methods left:
-			open - returns a string containing the whole <form ...> tag.
-			close - returns a string containing the whole ... </form> tag, along
-							with the CSRF protection tag, if there is one.
-			generate - Calls on the Input's generate method
-			render - Renders the entire form, in a table-like format
-			process - Processes the submitted form
-			errors - Returns an array containing all errors generated by the forms
-							 submission. Can also display them too.
+		Method: open
+
+		Returns the opening of the form, which would be the <form action="...
+		tag. All options set for the form will be used to determine the action,
+		method, etc. attributes of the tag.
+
+		Parameters:
+			string $form_name - The name of the form.
+
+		Returns:
+			string - A string containing the opening form tag.
+
+		Note:
+			The $form_name parameter does not need to be supplied if one was set
+			with the <Form::current> method.
+
+			This method is only to be used if you do not want to have the form
+			rendered automatically in a table-like format with <Input::render>.
+
+			If you do use this method, you should also use <Form::close> as well.
+
+			Please note that before anything is generated a hook called
+			form_{form name} is ran. This hook may also be called in
+			<Form::process> if it is called before <Form::open>, in which case the
+			hook will not be ran again in this method.
+	*/
+	public function open($form_name = null)
+	{
+		// Get the form name, if one was supplied.
+		$form_name = strtolower(!empty($form_name) ? $form_name : $this->current());
+
+		// Make sure the form exists.
+		if(!$this->exists($form_name))
+		{
+			return false;
+		}
+
+		// Run that hook, just in case! But only if it wasn't ran already, such
+		// as before the form was processed.
+		if(!$this->hooked($form_name))
+		{
+			api()->run_hooks('form_'. $form_name, array(&$this));
+
+			$this->hooked($form_name, true);
+		}
+
+		// Now put together that <form> tag. We can use the Theme's generate
+		// tag to make things easier!
+		return theme()->generate_tag('form', array(
+																						'accept-charset' => $this->forms[$form_name]['accept-charset'],
+																						'action' => $this->forms[$form_name]['action'],
+																						'class' => 'form',
+																						'enctype' => $this->forms[$form_name]['enctype'],
+																						'id' => !empty($this->forms[$form_name]['id']) ? $this->forms[$form_name]['id'] : $name,
+																						'method' => $this->forms[$form_name]['method'],
+																					), false). "\r\n". '<fieldset>';
+	}
+
+	/*
+		Method: close
+
+		Returns the closing of the form, which would be the ...</form> part. If
+		there is a CSRF protection token ({form name}_token would be the input's
+		name) it will be contained within the string returned as well.
+
+		Parameters:
+			string $form_name - The name of the form.
+
+		Returns:
+			string - A string containing the opening form tag.
+
+		Note:
+			The $form_name parameter does not need to be supplied if one was set
+			with the <Form::current> method.
+	*/
+	public function close($form_name = null)
+	{
+		// Get the form name, if one wasn't supplied.
+		$form_name = strtolower(!empty($form_name) ? $form_name : $this->current());
+
+		// Make sure the form exists.
+		if(!$this->exists($form_name))
+		{
+			return false;
+		}
+
+		// We may need to include the CSRF token as well.
+		return ($this->input_exists($form_name. '_token', $form_name) ? $this->generate($form_name. '_token', $form_name). "\r\n" : ''). '</form>';
+	}
+
+	/*
+		Method: generate
+
+		Generates the HTML for the input specified in the form.
+
+		Parameters:
+			string $name - The name of the input to generate.
+			string $element_id - A string containing the HTML element's id. If
+													 none is supplied, it will default to the input's
+													 name.
+			string $css_class - A string (or array) containing CSS classes to
+													assign to the HTML element.
+			string $form_name - The name of the form which contains the input.
+
+		Returns:
+			string - Returns a string containing the generated input, however, if
+							 if <Input::validate> determines that the current options for
+							 the <Input> are invalid, false will be returned.
+
+		Note:
+			The $form_name parameter does not need to be supplied if one was set
+			with the <Form::current> method.
+	*/
+	public function generate($name, $element_id = null, $css_class = null, $form_name = null)
+	{
+		// Get the form name, if one wasn't supplied.
+		$form_name = strtolower(!empty($form_name) ? $form_name : $this->current());
+
+		// Make sure the input exists.
+		if(!$this->input_exists($name, $form_name))
+		{
+			return false;
+		}
+
+		// Just call on the generate method.
+		return $this->input($name, $form_name)->generate($element_id, !empty($css_class) ? $css_class : 'form-input');
+	}
+
+	/*
+		Method: render
+
+		Renders the entire form, from beginning to end, in a table-like format,
+		just as was done with the previous Form class (in SnowCMS 2.0 alpha).
+		This is only recommended for such things as settings forms.
+
+		Parameters:
+			string $form_name - The name of the form to render.
+
+		Returns:
+			void - Nothing is returned by this method.
+
+		Note:
+			The $form_name parameter does not need to be supplied if one was set
+			with the <Form::current> method.
+	*/
+	public function render($form_name = null)
+	{
+		$form_name = strtolower(!empty($form_name) ? $form_name : $this->current());
+
+		// Make sure the form exists.
+		if(!$this->exists($form_name))
+		{
+			// No, it doesn't. Darn.
+			return false;
+		}
+
+		// To make my life easier!
+		$form_id = !empty($this->forms[$form_name]['id']) ? $this->forms[$form_name]['id'] : $form_name;
+
+		// Here we go!
+		echo '
+			', $this->open($form_name), '
+				<table>
+					<tr>
+						<td class="message_td" colspan="2" id="', $form_id, '_messages">';
+
+		// Any messages to display?
+		$messages = array();
+		api()->run_hooks($form_name. '_messages', array(&$messages, $form_name));
+
+		if(count($messages) > 0)
+		{
+			echo '
+							<div class="message-box">';
+
+			foreach($messages as $message)
+			{
+				echo '
+								<p>', $message, '</p>';
+			}
+
+			echo '
+							</div>';
+		}
+
+		echo '
+						</td>
+					</tr>
+					<tr>
+						<td class="errors_td" colspan="2" id="', $form_id, '_errors">';
+
+		// Maybe there are some errors?
+		$error_messages = array();
+		api()->run_hooks($form_name. '_errors', array(&$error_messages, $form_name));
+
+		if(count($error_messages) > 0)
+		{
+			echo '
+							<div class="error-message">';
+
+			foreach($error_messages as $error_message)
+			{
+				echo '
+								<p>', $error_message, '</p>';
+			}
+
+			echo '
+							</div>';
+		}
+
+		echo '
+						</td>
+					</tr>';
+
+		// Now it is time to show all the inputs!
+		foreach($this->forms[$form_name]['inputs'] as $input)
+		{
+			// Is this a hidden field..? Then we don't need any of the stuff
+			// below!!
+			if($input->type() == 'hidden')
+			{
+				echo $input->generate();
+
+				// Move along.
+				continue;
+			}
+
+			echo '
+					<tr class="form-row">
+						<td id="', $form_id, '_', $input->name(), '_left" class="td-left"><p class="label"><label for="', $input->name(), '">', $input->label(), '</label></p>', (strlen($input->subtext()) > 0 ? '<p class="subtext">'. $input->subtext(). '</p>' : ''), '</td>
+						<td id="', $form_id, '_', $input->name(), '_right" class="td-right">', $input->generate($input->name(), 'form-input'), '</td>
+					</tr>';
+		}
+
+		echo '
+					<tr id="', $form_id, '_submit">
+						<td class="buttons" colspan="2"><input type="submit" name="', $form_name, '" value="', htmlchars($this->forms[$form_name]['submit']), '" /></td>
+					</tr>
+				</table>
+			</fieldset>
+		</form>';
+	}
+
+	/*
+		Method: process
+
+		By calling this method, the entire form will be processed, which
+		involves determining any errors caused by user input. If the form is
+		processed successfully (which means there were no errors) then the
+		callback assigned in <Form::add> will be called upon and passed all the
+		data submitted by the user.
+
+		Parameters:
+			string $form_name - The name of the form to process.
+
+		Returns:
+			mixed - Returns false if the form was not processed successfully
+							(which means the form has errors which need correcting by the
+							user), however on success the value returned will be anything
+							the callback returns when the form was processed without any
+							issues.
+
+		Note:
+			The $form_name parameter does not need to be supplied if one was set
+			with the <Form::current> method.
+	*/
+	public function process($form_name = null)
+	{
+		$form_name = strtolower(!empty($form_name) ? $form_name : $this->current());
+
+		// The form needs to exist in order to process it.
+		if(!$this->exists($form_name))
+		{
+			return false;
+		}
+
+		// Run that hook?
+		if(!$this->hooked($form_name))
+		{
+			api()->run_hooks('form_'. $form_name, array(&$this));
+
+			$this->hooked($form_name, true);
+		}
+
+		// If you want to handle the form processing, be my guest!
+		$errors = null;
+		$handled = null;
+
+		api()->run_hooks('form_process', array(&$handled, &$form_name, &$this->forms[$form_name], &$errors));
+
+		if($handled !== null)
+		{
+			// Did any errors occur?
+			if(is_array($errors))
+			{
+				$this->forms[$form_name]['errors'] = $errors;
+			}
+
+			return $handled;
+		}
+		else
+		{
+			// Guess we will have to handle everything ourselves.
+			// Not a big deal, though.
+			$errors = array();
+			$data = array();
+			$handled = false;
+
+			foreach($this->forms[$form_name]['inputs'] as $input)
+			{
+				// Make sure the Input will work right.
+				if(!$input->validate())
+				{
+					$errors[] = l('The input "%s" in the form "%s" is not configured correctly.', htmlchars($input->name()), htmlchars($form_name));
+				}
+				elseif(!$input->valid())
+				{
+					// Well, something went wrong with user input, but luckily the
+					// Input class deals with that.
+					$errors[] = $input->error();
+				}
+				else
+				{
+					// The data they entered was just fine.
+					$data[strtolower($input->name())] = $input->value();
+				}
+			}
+
+			// If no errors occurred, then we can call on the registered callback.
+			if(count($errors) == 0)
+			{
+				$handled = call_user_func_array($this->forms[$form_name]['callback'], array($data, &$errors));
+			}
+
+			$this->forms[$form_name]['errors'] = $errors;
+		}
+
+		api()->add_hook($form_name. '_errors', create_function('&$errors, $form_name', '
+																					 $form = api()->load_class(\'Form\');
+
+																					 $errors = array_merge($errors, $form->errors($form_name));'));
+
+		return $handled;
+	}
+
+	/*
+		Method: errors
+
+		Returns an array containing any errors generated when processing the
+		specified form.
+
+		Parameters:
+			string $form_name - The name of the form to obtain the errors from.
+
+		Returns:
+			array - Returns the array containing any generated errors.
+
+		Note:
+			The $form_name parameter does not need to be supplied if one was set
+			with the <Form::current> method.
+	*/
+	public function errors($form_name = null)
+	{
+		$form_name = strtolower(!empty($form_name) ? $form_name : $this->current());
+
+		// We can't return errors if the form doesn't exist.
+		if(!$this->exists($form_name))
+		{
+			return false;
+		}
+
+		return $this->forms[$form_name]['errors'];
+	}
+
+	/*
+		Method: hooked
+
+		Determines whether or not the form has already had hooks ran.
+
+		Parameters:
+			string $form_name - The name of the form.
+			bool $hooks_ran - Set to true if the hooks have just been run.
+
+		Returns:
+			bool - Returns true if the form has already had the hooks run, false
+						 if not.
+
+		Note:
+			This is a private method which cannot be used outside of the Form
+			class.
+	*/
+	private function hooked($form_name, $hooks_ran = false)
+	{
+		static $hooked = array();
+
+		if(!empty($hooks_ran))
+		{
+			$hooked[$form_name] = true;
+		}
+
+		return !empty($hooked[$form_name]);
+	}
 }
 ?>

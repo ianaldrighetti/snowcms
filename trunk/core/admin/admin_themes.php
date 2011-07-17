@@ -131,18 +131,24 @@ if(!function_exists('admin_themes_generate_form'))
 																			 'submit' => l('Install theme'),
 																		 ));
 
-		$form->add_field('install_theme_form', 'theme_file', array(
-																													 'type' => 'file',
-																													 'label' => l('From a file:'),
-																													 'subtext' => l('Select the theme file you want to install as a theme.'),
-																												 ));
+		$form->current('install_theme_form');
 
-		$form->add_field('install_theme_form', 'theme_url', array(
-																													'type' => 'string',
-																													'label' => l('From a URL:'),
-																													'subtext' => l('Enter the URL of the theme you want to download and install.'),
-																													'value' => 'http://',
-																												));
+		// There are a couple ways you can install a theme, either by uploading
+		// a file directly or supplying a download address.
+		$form->add_input(array(
+											 'name' => 'theme_file',
+											 'type' => 'file',
+											 'label' => l('From a file:'),
+											 'subtext' => l('Select the theme file you want to install as a theme.'),
+										 ));
+
+		$form->add_input(array(
+											 'name' => 'theme_url',
+											 'type' => 'string',
+											 'label' => l('From a URL:'),
+											 'subtext' => l('Enter the URL of the theme you want to download and install.'),
+											 'value' => 'http://',
+										 ));
 	}
 }
 

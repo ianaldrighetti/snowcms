@@ -54,7 +54,7 @@ if(!function_exists('admin_home'))
 
 		// Do we need to fetch the news from the SnowCMS site..?
 		$handled = false;
-		api()->run_hooks('admin_fetch_news', array(&$handled, 'http://download.snowcms.com/news/v2.x-line/news.php'));
+		api()->run_hooks('admin_fetch_news', array(&$handled, api()->apply_filters('admin_news_location', 'http://update.snowcms.com/news.txt')));
 
 		// If you didn't handle it (even if the news didn't need fetching, still set it to true!!!), we will.
 		// So either it is just plain time to check again, OR the news is empty, for some weird reason.
@@ -64,7 +64,7 @@ if(!function_exists('admin_home'))
 			$http = api()->load_class('HTTP');
 
 			// Make an HTTP request for it.
-			$fetched_news = $http->request(api()->apply_filters('admin_news_url', 'http://download.snowcms.com/news/v2.x-line/news.php'));
+			$fetched_news = $http->request(api()->apply_filters('admin_news_location', 'http://update.snowcms.com/news.txt'));
 
 			// If the hashes are the same, no need to continue.
 			if(settings()->get('admin_news_hash', 'string', '') != sha1($fetched_news))
@@ -76,27 +76,31 @@ if(!function_exists('admin_home'))
 				$parsed = array();
 				while($func['strlen']($fetched_news) > 0)
 				{
-					// Get the headers.
+					// Separate the headers from the rest of the news which still
+					// needs to be parsed.
 					list($headers, $fetched_news) = explode("\n\n", $fetched_news, 2);
 
-					$headers = explode("\n", $headers);
+					// Now we will need to separate each header from one another.
 					$tmp = array();
-					foreach($headers as $header)
+					foreach(explode("\n", $headers) as $header)
 					{
+						// The header name and value are separated by a colon.
 						list($key, $value) = explode(':', $header, 2);
 
 						$tmp[strtolower(trim($key))] = trim($value);
 					}
-					$headers = $tmp;
 
+					// Now save the information, otherwise this was kind of a waste
+					// of time. Don't ya think?
 					$parsed[] = array(
-												'subject' => $headers['subject'],
-												'href' => isset($headers['url']) ? $headers['url'] : false,
-												'date' => $headers['date'],
-												'content' => $func['substr']($fetched_news, 0, $headers['content-length']),
+												'subject' => htmlchars($tmp['subject']),
+												'href' => isset($tmp['href']) ? htmlchars($tmp['href']) : false,
+												'timestamp' => strtotime($tmp['date']),
+												'message' => $func['substr']($fetched_news, 0, $tmp['content-length']),
 											);
 
-					$fetched_news = ltrim($func['substr']($fetched_news, $headers['content-length'], $func['strlen']($fetched_news)));
+					// Setup the fetched news string needs to be touched up a bit.
+					$fetched_news = ltrim($func['substr']($fetched_news, $tmp['content-length'], $func['strlen']($fetched_news)));
 				}
 
 				// Save the parsed news, in a serialized array!
@@ -108,7 +112,7 @@ if(!function_exists('admin_home'))
 		}
 
 		// Load up the news.
-		$current_news = @unserialize(settings()->get('admin_news_cache', 'string'));
+		$current_news = isset($parsed) ? $parsed : @unserialize(settings()->get('admin_news_cache', 'string'));
 
 		api()->context['current_news'] = $current_news;
 

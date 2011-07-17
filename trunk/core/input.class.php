@@ -22,6 +22,8 @@ if(!defined('INSNOW'))
   die('Nice try...');
 }
 
+// Title: Input
+
 // Constant: I_NO_ERROR
 define('I_NO_ERROR', null, true);
 
@@ -61,6 +63,11 @@ class Input
 	// A label, or nice name, for this input field, used for notifying users
 	// of any errors with their data they have entered.
 	private $label;
+
+	// Variable: subtext
+	// Subtext, which is used to describe the purpose of the input, mainly
+	// used for the <Form::render> method.
+	private $subtext;
 
 	// Variable: type
 	// The type of the input field. See <Input::type> for more information.
@@ -145,6 +152,9 @@ class Input
 		Parameters:
 			string $name - The name of the input field.
 			string $label - The label, or nice name, for the input field.
+			string $subtext - The subtext, which is a description of the
+												purpose of the input, mainly used with
+												<Form::render>.
 			string $type - The type of the input field. See <Input::type> for a
 										 list of valid types.
 			string $request_type - Where the variables value is expected to come
@@ -174,11 +184,12 @@ class Input
 			If you would rather use a method which can return whether or not your
 			settings did not contain any errors, please use <Input::set>.
 	*/
-	public function __construct($name = null, $label = null, $type = null, $request_type = null, $length = null, $truncate = false, $options = array(), $callback = null, $default_value = null, $disabled = false, $readonly = false, $rows = null, $columns = null)
+	public function __construct($name = null, $label = null, $subtext = null, $type = null, $request_type = null, $length = null, $truncate = false, $options = array(), $callback = null, $default_value = null, $disabled = false, $readonly = false, $rows = null, $columns = null)
 	{
 		// Set everything to blanks and what not.
 		$this->name = null;
 		$this->label = null;
+		$this->subtext = null;
 		$this->type = null;
 		$this->request_type = 'post';
 		$this->length = array(
@@ -203,7 +214,7 @@ class Input
 		// Let's see, did you want to set anything?
 		if(!empty($name))
 		{
-			$this->set($name, $label, $type, $request_type, $length, $truncate, $options, $callback, $default_value, $disabled, $readonly, $rows, $columns);
+			$this->set($name, $label, $subtext, $type, $request_type, $length, $truncate, $options, $callback, $default_value, $disabled, $readonly, $rows, $columns);
 		}
 	}
 
@@ -285,6 +296,45 @@ class Input
 		{
 			// Just return the current label.
 			return $this->label;
+		}
+	}
+
+	/*
+		Method: subtext
+
+		Sets or returns the currently set subtext of the input field. This
+		subtext is mainly used when a form is being rendered with
+		<Form::render>. This subtext is simply a quick description of what the
+		input is for.
+
+		Parameters:
+			string $subtext - The subtext for the input field.
+
+		Returns:
+			mixed - Returns the current subtext is $subtext is left empty, but
+							true on success when the subtext is being set, and false on
+							failure.
+	*/
+	public function subtext($subtext = null)
+	{
+		if($subtext !== null)
+		{
+			// The subtext cannot be empty.
+			if(strlen($subtext) > 0)
+			{
+				$this->subtext = $subtext;
+
+				return true;
+			}
+			else
+			{
+				return false;
+			}
+		}
+		else
+		{
+			// Just return the current subtext.
+			return $this->subtext;
 		}
 	}
 
@@ -790,7 +840,7 @@ class Input
 		{
 			// Looks like it.
 			// There are two types we are expecting, one of which is a string.
-			if(is_string($default_value))
+			if($default_value == (string)$default_value)
 			{
 				// Not much validation can be done, yet.
 				$this->default_value = $default_value;
@@ -991,6 +1041,7 @@ class Input
 		Parameters:
 			string $name - See <Input::name>.
 			string $label - See <Input::label>.
+			string $subtext - See <Input::subtext>.
 			string $type - See <Input::type>.
 			string $request_type - See <Input::request_type>.
 			array $length - See <Input::length>.
@@ -1016,12 +1067,13 @@ class Input
 			If any error occurs, the previous state of this instance will be
 			restored, as if this method were never called.
 	*/
-	public function set($name, $label, $type, $request_type, $length, $truncate, $options, $callback, $default_value, $disabled, $readonly, $rows, $columns)
+	public function set($name, $label = null, $subtext = null, $type = null, $request_type = null, $length = null, $truncate = null, $options = null, $callback = null, $default_value = null, $disabled = null, $readonly = null, $rows = null, $columns = null)
 	{
 		// We may need to revert back later.
 		$prev_options = array(
 											'name' => $this->name,
 											'label' => $this->label,
+											'subtext' => $this->subtext,
 											'type' => $this->type,
 											'request_type' => $this->request_type,
 											'length' => $this->length,
@@ -1053,6 +1105,9 @@ class Input
 
 			return false;
 		}
+
+		// Subtext isn't required.
+		$this->subtext($subtext);
 
 		// The type must be valid as well.
 		if(!$this->type($type))
@@ -1158,7 +1213,7 @@ class Input
 			}
 
 			// Need to make sure the default value is actually an option.
-			if(($this->type == 'select' || $this->type == 'radio') && (!is_string($this->default_value) || !in_array($this->default_value, $this->options)))
+			if(($this->type == 'select' || $this->type == 'radio') && ($this->default_value != (string)$this->default_value || !in_array($this->default_value, array_keys($this->options))))
 			{
 				// Just chuck it out, then.
 				$this->default_value = null;
@@ -1222,6 +1277,7 @@ class Input
 		// Just set them all back.
 		$this->name = $prev_options['name'];
 		$this->label = $prev_options['label'];
+		$this->subtext = $prev_options['subtext'];
 		$this->type = $prev_options['type'];
 		$this->request_type = $prev_options['request_type'];
 		$this->length = $prev_options['length'];
@@ -1291,10 +1347,18 @@ class Input
 		// will be used.
 		$value = $this->request_type == 'post' ? (isset($_POST[$this->name]) ? $_POST[$this->name] : null) : ($this->request_type == 'get' ? (isset($_GET[$this->name]) ? $_GET[$this->name] : null) : (isset($_REQUEST[$this->name]) ? $_REQUEST[$this->name] : null));
 
-		// I just wanted to make life a bit easier with what I did above, so:
-		if(!isset($value) || $this->disabled || $this->readonly)
+		// I just wanted to make life a bit easier with what I did above... But
+		// seeing as checkboxes are a bit more complicated, they will need to be
+		// dealt with differently.
+		if((!isset($value) || $this->disabled || $this->readonly) && $this->type != 'checkbox' && $this->type != 'checkbox-multi')
 		{
 			// Default value it is, then!
+			$value = $this->default_value;
+		}
+		// This could have been done together up above, but it would have been
+		// somewhat long, and confusing to look at.
+		elseif($this->type == 'checkbox' && ($this->disabled || $this->readonly || count($this->request_type == 'post' ? $_POST : ($this->request_type == 'get' ? $_GET : $_REQUEST)) == 0))
+		{
 			$value = $this->default_value;
 		}
 
@@ -1321,7 +1385,7 @@ class Input
 																		'textarea-html', 'password')))
 		{
 			// Make sure it is a string...
-			if(!typecast()->is_a('string', $value))
+			if($value != (string)$value)
 			{
 				$this->error = l('The field &quot;%s&quot; must be a string.', htmlchars($this->label));
 				$this->error_type = I_TYPE_ERROR;
@@ -1375,6 +1439,8 @@ class Input
 						$selected[] = $option_id;
 					}
 				}
+
+				$value = $selected;
 			}
 			else
 			{
@@ -1387,9 +1453,6 @@ class Input
 					return false;
 				}
 			}
-
-			// Everything is fine, so save those options selected.
-			return $value;
 		}
 		// Multiple checkboxes? Crazy!
 		elseif($this->type == 'checkbox-multi')
@@ -1802,11 +1865,17 @@ class Input
 			}
 		}
 
+		// Use the default value if we need too.
+		if($value === null)
+		{
+			$value = $this->default_value;
+		}
+
 		// Now, let's get started! Is it hidden, a string, password, or number?
 		if(in_array($this->type, array('hidden', 'string', 'string-html',
 																		'password', 'int', 'double')))
 		{
-			return '<input name="'. $this->name. '" id="'. $element_id. '"'. (!empty($css_class) ? ' class="'. $css_class. '"' : ''). ' type="'. (in_array($this->type, array('hidden', 'password')) ? $this->type : 'text'). '" value="'. $value. '"'. ($this->type != 'int' && $this->type != 'double' && isset($this->length['max']) ? ' maxlength="'. $this->length['max']. '"' : ''). (!empty($this->disabled) ? ' disabled="disabled"' : ''). (!empty($this->readonly) ? ' readonly="readonly"' : ''). ' />';
+			return '<input name="'. $this->name. '" id="'. $element_id. '"'. (!empty($css_class) ? ' class="'. $css_class. '"' : ''). ' type="'. (in_array($this->type, array('hidden', 'password')) ? $this->type : 'text'). '" value="'. ($this->type != 'password' ? $value : ''). '"'. ($this->type != 'int' && $this->type != 'double' && isset($this->length['max']) ? ' maxlength="'. $this->length['max']. '"' : ''). (!empty($this->disabled) ? ' disabled="disabled"' : ''). (!empty($this->readonly) ? ' readonly="readonly"' : ''). ' />';
 		}
 		// How about a big ol' textarea?
 		elseif($this->type == 'textarea' || $this->type == 'textarea-html')

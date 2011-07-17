@@ -37,3 +37,31 @@ if(!admin_prompt_required())
 			</div>
 		</div>
 		<div id="<?php echo api()->apply_filters('admin_theme_container_id', 'content-container'); ?>">
+<?php
+// Did you want to display the sidebar?
+if(!admin_prompt_required() && admin_show_sidebar())
+{
+	echo '
+			<div id="side-bar">';
+
+	foreach($GLOBALS['icons'] as $group_label => $items)
+	{
+		echo '
+				<p class="sidebar-header">', $group_label, '</p>
+				<ul>';
+
+		// Now for each link.
+		foreach($items as $item)
+		{
+			echo '
+					<li><a href="', $item['href'], '" title="', $item['title'], '">', $item['label'], '</a></li>';
+		}
+
+		echo '
+				</ul>';
+	}
+	echo '
+			</div>
+			<div id="side-content">';
+}
+?>
