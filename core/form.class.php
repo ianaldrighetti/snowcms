@@ -488,7 +488,7 @@ class Form
 													isset($input['type']) ? $input['type'] : null, isset($input['request_type']) ? $input['request_type'] : null, isset($input['length']) ? $input['length'] : null,
 													isset($input['truncate']) ? $input['truncate'] : null, isset($input['options']) ? $input['options'] : null, isset($input['callback']) ? $input['callback'] : null,
 													isset($input['default_value']) ? $input['default_value'] : null, isset($input['disabled']) ? $input['disabled'] : null, isset($input['readonly']) ? $input['readonly'] : null,
-													isset($input['rows']) ? $input['rows'] : null, isset($input['columns']) ? $input['columns'] : null);
+													isset($input['rows']) ? $input['rows'] : null, isset($input['columns']) ? $input['columns'] : null, isset($input['required']) ? $input['required'] : true);
 		}
 		// Could it be an Input?
 		elseif(!is_object($input) || !($input instanceof Input))
@@ -697,6 +697,10 @@ class Form
 			$this->hooked($form_name, true);
 		}
 
+		// We can run a hook right before the form's open tag is displayed (or
+		// likely to be displayed).
+		api()->run_hooks('before_form_open', array($form_name));
+
 		// Now put together that <form> tag. We can use the Theme's generate
 		// tag to make things easier!
 		return theme()->generate_tag('form', array(
@@ -736,6 +740,10 @@ class Form
 		{
 			return false;
 		}
+
+		// But as for after the closing of the form's tag, we can't really do
+		// that...
+		api()->run_hooks('before_form_close', array($form_name));
 
 		// We may need to include the CSRF token as well.
 		return ($this->input_exists($form_name. '_token', $form_name) ? $this->generate($form_name. '_token', $form_name). "\r\n" : ''). '</form>';

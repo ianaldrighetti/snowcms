@@ -5,35 +5,46 @@ if(!defined('INSNOW'))
 }
 
 		echo '
-	<h1><img src="', theme()->url(), '/style/images/manage_themes-small.png" alt="" /> ', l('Manage themes'), '</h1>
-	<p style="margin-bottom: 20px;">', l('Here you can set the sites theme and also install themes as well.'), '</p>';
+	<div class="section-tabs">
+		<ul>
+			<li><a href="', baseurl, '/index.php?action=admin&amp;sa=themes" class="first', !api()->context['viewing_installer'] ? ' selected' : '', '">', l('Manage Themes'), '</a></li>
+			<li><a href="', baseurl, '/index.php?action=admin&amp;sa=themes&amp;do=install"', api()->context['viewing_installer'] ? ' class="selected"' : '', '>', l('Install Themes'), '</a></li>
+		</ul>
+		<div class="break">
+		</div>
+	</div>';
 
-		// Get a listing of all the themes :-).
-		$themes = theme_list();
-
-		// Now load the information of the current theme.
-		$current_theme = theme_load(themedir. '/'. settings()->get('theme', 'string', 'default'));
-
+	// Are you viewing the installer or the page to choose your theme?
+	if(api()->context['viewing_installer'])
+	{
 		echo '
+	<h3><img src="', theme()->url(), '/style/images/manage_themes-small.png" alt="" /> ', l('Install a Theme'), '</h3>
+	<p>', l('A theme can be installed two different ways, either by uploading a from your computer (such as a zip) or you can enter the URL where the theme can be downloaded from the Internet.'), '</p>';
+
+		api()->context['form']->render('install_theme_form');
+	}
+	else
+	{
+		echo '
+	<h3><img src="', theme()->url(), '/style/images/manage_themes-small.png" alt="" /> ', l('Current Theme'), '</h3>
 	<div style="float: left; width: 200px;">
-		<img src="', themeurl, '/', settings()->get('theme', 'string', 'default'), '/image.png" alt="" title="', $current_theme['name'], '" />
+		<img src="', themeurl, '/', settings()->get('theme', 'string', 'default'), '/image.png" alt="" title="', api()->context['current_theme']['name'], '" />
 	</div>
-	<div style="float: right; width: 590px;">
-		<h1 style="margin-top: 0px;">', l('Current theme: %s', $current_theme['name']), '</h1>
-		<h3 style="margin-top: 0px;">', l('By %s', (!empty($current_theme['website']) ? '<a href="'. $current_theme['website']. '">' : ''). $current_theme['author']. (!empty($current_theme['website']) ? '</a>' : '')), '</h3>
-		<p>', $current_theme['description'], '</p>
+	<div style="float: left; margin-left: 10px;">
+		<p class="bold no-margin">', l('%s by %s', api()->context['current_theme']['name'], (!empty(api()->context['current_theme']['website']) ? '<a href="'. api()->context['current_theme']['website']. '">' : ''). api()->context['current_theme']['author']. (!empty(api()->context['current_theme']['website']) ? '</a>' : '')), '</p>
+		<p>', api()->context['current_theme']['description'], '</p>
 	</div>
 	<div class="break">
 	</div>
-	<h1 style="margin-top: 20px;">', l('Available themes'), '</h1>
+	<h3>', l('Available Themes'), '</h3>
 	<table class="theme_list">
 		<tr>';
 
 		// List all the themes ;-)
-		$length = count($themes);
+		$length = count(api()->context['themes']);
 		for($i = 0; $i < $length; $i++)
 		{
-			$theme_info = theme_load($themes[$i]);
+			$theme_info = theme_load(api()->context['themes'][$i]);
 
 			if(($i + 1) % 3 == 1)
 			{
@@ -59,10 +70,6 @@ if(!defined('INSNOW'))
 
 		echo '
 		</tr>
-	</table>
-
-	<h1>', l('Install a theme'), '</h1>
-	<p>', l('Below you can specify a file to upload or a URL at which to download a theme (zip, tar and tar.gz only).'), '</p>';
-
-		api()->context['form']->render('install_theme_form');
+	</table>';
+	}
 ?>

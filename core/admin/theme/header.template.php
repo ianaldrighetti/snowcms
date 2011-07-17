@@ -21,7 +21,7 @@ if(!defined('INSNOW'))
 			</div>
 		</div>
 		<div id="link-tree">
-			<p><a href="#">Control Panel</a></p>
+			<p><a href="<?php echo baseurl. '/index.php?action=admin'; ?>">Control Panel</a></p>
 <?php
 // Don't show the notifications area unless they are logged in.
 if(!admin_prompt_required())

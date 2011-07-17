@@ -73,7 +73,8 @@
 #side-content
 {
 	float: right;
-	width: 710px;
+	width: 704px;
+	padding: 0 8px;
 }
 
 #snowcms-news
