@@ -79,6 +79,11 @@ class API
 	// template.
 	public $context;
 
+	// Variable: locations
+	// An array which contains an events location identifier, which is used
+	// when building a link tree.
+	private $locations;
+
 	/*
 		Constructor: __construct
 
@@ -110,6 +115,7 @@ class API
 		$this->plugins = array();
 		$this->resources = array();
 		$this->context = array();
+		$this->locations = array();
 	}
 
 	/*
@@ -326,7 +332,7 @@ class API
 
 		Note:
 			Original function available at
-			<http://mschat.net/forum/index.php?topic=1609.0>.
+			<http://www.todayinwindows.com/forum/index.php?topic=1609.0>.
 	*/
 	private function sort(&$array)
 	{
@@ -1636,6 +1642,11 @@ class API
 			return false;
 		}
 	}
+
+	/*
+		Method: add_location
+
+		Adds a location identifier to the specified event.*/
 }
 
 /*

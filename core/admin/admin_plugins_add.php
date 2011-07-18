@@ -257,6 +257,7 @@ if(!function_exists('admin_plugins_get_message'))
 		$response = array(
 									'color' => '',
 									'message' => '',
+									'div-class' => '',
 								);
 
 		// Is the package approved?
@@ -264,18 +265,21 @@ if(!function_exists('admin_plugins_get_message'))
 		{
 			$response['color'] = 'green';
 			$response['message'] =  l('The '. (empty($is_theme) ? 'plugin' : 'theme'). ' "%s" has been reviewed and approved by the SnowCMS '. (empty($is_theme) ? 'Plugin' : 'Theme'). ' Database.<br />Proceeding...', $plugin_name);
+			$response['div-class'] = 'message-box';
 		}
 		// Disapproved?
 		elseif($status == 'disapproved')
 		{
-			$response['color'] = '//DB2929';
+			$response['color'] = '#DB2929';
 			$response['message'] = l('The '. (empty($is_theme) ? 'plugin' : 'theme'). ' "%s" has been reviewed and disapproved by the SnowCMS Dev Team.<br />Reason: %s<br />Proceed at your own risk.', $plugin_name, !empty($reason) ? l($reason) : l('None given.'));
+			$response['div-class'] = 'error-message';
 		}
 		// Deprecated? Pending..?
 		elseif($status == 'deprecated' || $status == 'pending')
 		{
 			$response['color'] = '#1874CD';
 			$response['message'] = ($status == 'deprecated' ? l('The '. (empty($is_theme) ? 'plugin' : 'theme'). ' "%s" is deprecated and a newer version is available at the <a href="http://'. (empty($is_theme) ? 'plugins' : 'themes'). '.snowcms.com/" target="_blank" title="SnowCMS '. (empty($is_theme) ? 'Plugin' : 'Theme'). ' Database">SnowCMS '. (empty($is_theme) ? 'Plugin' : 'Theme'). ' Database</a> site.<br />Proceed at your own risk.', $plugin_name) : l('The '. (empty($is_theme) ? 'plugin' : 'theme'). ' "%s" is currently under review by the SnowCMS '. (empty($is_theme) ? 'Plugin' : 'Theme'). ' Database, so no definitive status can be given.<br />Proceed at your own risk.', $plugin_name));
+			$response['div-class'] = 'alert-message';
 		}
 		elseif(in_array($status, array('unknown', 'malicious', 'insecure')))
 		{
@@ -293,10 +297,11 @@ if(!function_exists('admin_plugins_get_message'))
 			}
 
 			$response['color'] = '#DB2929';
+			$response['div-class'] = 'error-message';
 		}
 		else
 		{
-			api()->run_hooks('admin_plugins_handle_status', array(&$response, $plugin_name, $reason, !empty($is_theme)));
+			api()->run_hooks('admin_plugins_handle_status', array(&$response, $plugin_name, &$reason, !empty($is_theme)));
 		}
 
 		return $response;

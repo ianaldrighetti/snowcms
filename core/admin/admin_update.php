@@ -72,7 +72,7 @@ if(!function_exists('admin_update'))
 		}
 
 		// Is an update required?
-		$is_update_required = $latest_version !== false ? version_compare(settings()->get('version', 'string'), $latest_version) == -1 : false;
+		$is_update_required = $latest_version !== false ? compare_versions(settings()->get('version', 'string'), $latest_version) == -1 : false;
 		$latest_info = array_merge(array('header' => '', 'text' => ''), $latest_info);
 
 		admin_current_area('system_update');
@@ -124,7 +124,7 @@ if(!function_exists('admin_update_apply'))
 		// !!! TODO: Make sure $version is a number.
 
 		// Do we not need to apply an update?
-		if(version_compare(settings()->get('version', 'string', null), $version) > -1)
+		if(compare_versions(settings()->get('version', 'string', null), $version) > -1)
 		{
 			theme()->set_title(l('An error has occurred'));
 
