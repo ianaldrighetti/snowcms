@@ -394,4 +394,87 @@ function recursive_filesize($directory)
 		return $filesize;
 	}
 }
+
+/*
+	Function: compare_versions
+
+	Compares two version numbers. This is practically the same as the built-in
+	<www.php.net/version_compare> function, but with a slight addition. This
+	function should be used instead of version_compare. See the notes for more
+	information.
+
+	Parameters:
+		string $version1 - First version number.
+		string $version2 - Second version number.
+		string $operator - Just as with the built-in version_compare function,
+											 you can specify a comparison operator, such as: <,
+											 lt, <=, le, >, gt, >=, ge, ==, =, eq, !=, <>,  or ne.
+
+	Returns:
+		mixed - Returns -1 if $version1 is lower than $version2, 0 if equal, and
+						1 if $version1 is greater than $version 2, that is if no
+						$operator is specified. If an operator is supplied true will be
+						returned if the relationship is that of the specified operator,
+						false if not.
+
+	Note:
+		As stated, this is very similar to that of the built-in version_compare
+		function, however there is a weird "thing" the built-in function does.
+
+		For example, if $version1 is 1.0 and $version2 is 1.0.0, version_compare
+		will return -1, i.e. 1.0 is less than 1.0.0. This is of course not
+		something that should happen.
+
+		This function fixes that by adding .0's to the end of the shortest
+		version (the one with less .'s, and as many as required) before
+		supplying the parameters to the real version_compare.
+
+		Please note that such things as dev, beta, rc, etc. will be removed
+		before adding any .0's to the end of the version numbers ONLY IF they
+		are separated by a space or a dash (-)!
+*/
+function compare_versions($version1, $version2, $operator = null)
+{
+	// Count the number of .'s in each version.
+	$version1_dots = substr_count($version1, '.');
+	$version2_dots = substr_count($version2, '.');
+
+	// Now, which one has less?
+	if($version1_dots > $version2_dots)
+	{
+		// Looks like version2 needs some more.
+		// But maybe there is -beta or something?
+		if(strpos($version2, ' ') !== false)
+		{
+			list($version2, $after) = explode(' ', $version2, 2);
+		}
+		elseif(strpos($version2, '-') !== false)
+		{
+			list($version2, $after) = explode('-', $version2, 2);
+		}
+
+		// Add as many .0's as we need! Also add back $after, if we need to.
+		$version2 .= str_repeat('.0', $version1_dots - $version2_dots). (isset($after) ? $after : '');
+	}
+	elseif($version2_dots > $version1_dots)
+	{
+		// Do the same thing, but for the other version.
+		// Looks like version2 needs some more.
+		// But maybe there is -beta or something?
+		if(strpos($version1, ' ') !== false)
+		{
+			list($version1, $after) = explode(' ', $version1, 2);
+		}
+		elseif(strpos($version1, '-') !== false)
+		{
+			list($version1, $after) = explode('-', $version1, 2);
+		}
+
+		// Add as many .0's as we need! Also add back $after, if we need to.
+		$version1 .= str_repeat('.0', $version2_dots - $version1_dots). (isset($after) ? $after : '');
+	}
+
+	// Alright, now we can call version_compare.
+	return $operator !== null ? version_compare($version1, $version2, $operator) : version_compare($version1, $version2);
+}
 ?>

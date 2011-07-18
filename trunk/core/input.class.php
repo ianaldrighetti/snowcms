@@ -1534,7 +1534,7 @@ class Input
 			// Make sure the file is valid.
 			if(isset($_FILES[$this->name]) && is_uploaded_file($_FILES[$this->name]['tmp_name']))
 			{
-				$value = $_FILES[$name];
+				$value = $_FILES[$this->name];
 			}
 			// In reality, only files need to be treated differently if the field
 			// isn't required.

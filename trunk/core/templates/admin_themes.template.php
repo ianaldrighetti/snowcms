@@ -6,16 +6,22 @@ if(!defined('INSNOW'))
 
 		echo '
 	<div class="section-tabs">
-		<ul>
-			<li><a href="', baseurl, '/index.php?action=admin&amp;sa=themes" class="first', !api()->context['viewing_installer'] ? ' selected' : '', '">', l('Manage Themes'), '</a></li>
-			<li><a href="', baseurl, '/index.php?action=admin&amp;sa=themes&amp;do=install"', api()->context['viewing_installer'] ? ' class="selected"' : '', '>', l('Install Themes'), '</a></li>
+		<ul>';
+
+		foreach(api()->context['section_menu'] as $item)
+		{
+			echo '
+			<li><a href="', $item['href'], '" title="', $item['title'], '"', ($item['is_first'] || $item['is_selected'] ? ' class="'. ($item['is_first'] ? 'first' : ''). ($item['is_selected'] ? ($item['is_first'] ? ' ' : ''). 'selected' : ''). '"' : ''), '>', $item['text'], '</a></li>';
+		}
+
+	echo '
 		</ul>
 		<div class="break">
 		</div>
 	</div>';
 
 	// Are you viewing the installer or the page to choose your theme?
-	if(api()->context['viewing_installer'])
+	if(api()->context['section'] == 'install')
 	{
 		echo '
 	<h3><img src="', theme()->url(), '/style/images/manage_themes-small.png" alt="" /> ', l('Install a Theme'), '</h3>
@@ -23,7 +29,7 @@ if(!defined('INSNOW'))
 
 		api()->context['form']->render('install_theme_form');
 	}
-	else
+	elseif(api()->context['section'] == 'manage')
 	{
 		echo '
 	<h3><img src="', theme()->url(), '/style/images/manage_themes-small.png" alt="" /> ', l('Current Theme'), '</h3>
@@ -31,45 +37,52 @@ if(!defined('INSNOW'))
 		<img src="', themeurl, '/', settings()->get('theme', 'string', 'default'), '/image.png" alt="" title="', api()->context['current_theme']['name'], '" />
 	</div>
 	<div style="float: left; margin-left: 10px;">
-		<p class="bold no-margin">', l('%s by %s', api()->context['current_theme']['name'], (!empty(api()->context['current_theme']['website']) ? '<a href="'. api()->context['current_theme']['website']. '">' : ''). api()->context['current_theme']['author']. (!empty(api()->context['current_theme']['website']) ? '</a>' : '')), '</p>
-		<p>', api()->context['current_theme']['description'], '</p>
+		<p class="bold no-margin">', api()->context['current_theme']['name'], ' ', l('by'), ' ', api()->context['current_theme']['author'], '</p>
+		<p>', api()->context['current_theme']['description'], '</p>', !empty(api()->context['current_theme']['update_available']) ? '
+		<p><a href="'. api()->context['current_theme']['update_href']. '" title="'. l('Update &quot;%s&quot; from v%s to v%s', api()->context['current_theme']['name'], api()->context['current_theme']['version'], api()->context['current_theme']['update_version']). '" class="red bold">'. l('Update'). '</a></p>' : '', '
 	</div>
 	<div class="break">
 	</div>
 	<h3>', l('Available Themes'), '</h3>
-	<table class="theme_list">
+	<table class="theme_list" width="', api()->context['table_width'], '">
 		<tr>';
 
-		// List all the themes ;-)
-		$length = count(api()->context['themes']);
-		for($i = 0; $i < $length; $i++)
+		if(count(api()->context['theme_list']) > 0)
 		{
-			$theme_info = theme_load(api()->context['themes'][$i]);
-
-			if(($i + 1) % 3 == 1)
+			// Generate a table containing all the themes and what not.
+			foreach(api()->context['theme_list'] as $theme)
 			{
 				echo '
-		</tr>
-	</table>
-	<table class="theme_list">
-		<tr>';
+				<td valign="top" width="33%">
+					<a href="', $theme['select_href'], '" title="', l('Select &quot;%s&quot; as the website theme', $theme['name']), '"><img src="', $theme['image_url'], '" alt="" title="" /></a>
+					<p class="bold">', $theme['name'], ' ', l('by'), ' ', $theme['author'], '</p>
+					<p class="italic small">', $theme['description'], '</p>
+					<p class="center"><a href="', $theme['select_href'], '" title="', l('Select &quot;%s&quot; as the website theme', $theme['name']), '">', l('Select'), '</a> | <a href="', $theme['delete_href'], '" title="', l('Delete &quot;%s&quot;', $theme['name']), '" onclick="return confirm(\'', l('Do you really want to delete the theme &quot;%s&quot;?\r\nThis can not be undone!', $theme['name']), '\');">', l('Delete'), '</a>', (!empty($theme['update_available']) ? ' | <a href="'. $theme['update_href']. '" title="'. l('Update &quot;%s&quot; from v%s to v%s', $theme['name'], $theme['version'], $theme['update_version']). '" class="bold red">'. l('Update'). '</a>' : ''), '</p>
+				</td>';
+
+				if($theme['new_row'])
+				{
+					echo '
+			</tr>
+		</table>
+		<table class="theme_list" width="', api()->context['table_width'], '">
+			<tr>';
+				}
 			}
-
-			// Check to see if there is an update available.
-			$update_available = false;
-
-			// There is a file containing the new version...
-			if(file_exists($theme_info['path']. '/available-update') && version_compare(file_get_contents($theme_info['path']. '/available-update'), $theme_info['version'], '>'))
-			{
-				$update_available = file_get_contents($theme_info['path']. '/available-update');
-			}
-
+		}
+		else
+		{
 			echo '
-			<td><a href="', baseurl, '/index.php?action=admin&amp;sa=themes&amp;set=', urlencode(basename($theme_info['path'])), '&amp;sid=', member()->session_id(), '" title="', l('Set as site theme'), '"', (basename($theme_info['path']) == settings()->get('theme', 'string', 'default') ? ' class="selected"' : ''), '><img src="', themeurl, '/', basename($theme_info['path']), '/image.png" alt="" title="', $theme_info['description'], '" /><br />', $theme_info['name'], ' </a><br /><a href="', baseurl, '/index.php?action=admin&amp;sa=themes&amp;delete=', urlencode(basename($theme_info['path'])), '&amp;sid=', member()->session_id(), '" title="', l('Delete %s', $theme_info['name']), '" onclick="', (settings()->get('theme', 'string', 'default') == basename($theme_info['path']) ? 'alert(\''. l('You cannot delete the current theme.'). '\'); return false;' : 'return confirm(\''. l('Are you sure you want to delete this theme?\r\nThis cannot be undone!'). '\');"'), '" class="button">', l('Delete'), '</a>', !empty($update_available) ? '<a href="'. baseurl. '/index.php?action=admin&amp;sa=themes&amp;update='. urlencode(basename($theme_info['path'])). '&amp;version='. urlencode($update_available). '&amp;sid='. member()->session_id(). '" title="'. l('Update theme to version %s', htmlchars($update_available)). '" class="button important">'. l('Update available'). '</a>' : '', '</td>';
+				<td><p class="bold center">', l('No other themes installed.'), '</p></td>';
 		}
 
 		echo '
 		</tr>
 	</table>';
+	}
+	else
+	{
+		// You probably have something else in mind.
+		api()->run_hooks('admin_theme_display', array(api()->context['section']));
 	}
 ?>

@@ -138,8 +138,11 @@ class Settings
 
 		Note:
 			Please note that all values supplied will be typecasted into a string.
+			The $type parameter is just there until all references to such a
+			parameter are removed.
+			!!! TODO
 	*/
-	public function set($variable, $value)
+	public function set($variable, $value, $type = null)
 	{
 		// Incrementing/decrementing?
 		if(($value === '++' || $value === '--') && (!isset($this->settings[$variable]) || is_numeric($this->settings[$variable])))
@@ -153,7 +156,7 @@ class Settings
 		}
 
 		// Typecast the value to the appropriate type.
-		$this->update_settings[$variable] = typecast()->to(!empty($type) ? $type : 'string', $value);
+		$this->update_settings[$variable] = typecast()->to('string', $value);
 		$this->settings[$variable] = $this->update_settings[$variable];
 
 		return true;

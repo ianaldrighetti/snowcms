@@ -140,6 +140,9 @@ body
 .italic { font-style: italic !important; }
 .normal { font-weight: normal !important; }
 
+.large { font-size: 110% !important; }
+.small { font-size: 85% !important; }
+
 .red { color: red !important; }
 
 .no-margin { margin: 0 !important; }
@@ -256,27 +259,29 @@ body
 /* Theme List section. */
 .theme_list
 {
-	text-align: center;
 }
 
-.theme_list a
+.theme_list a img
 {
 	display: block;
-	width: 250px;
-	height: 150px;
+	width: 210px;
+	height: 130px;
 	padding: 5px;
 	text-align: center;
-	font-size: 90%;
-	text-decoration: none;
 	border: 1px solid #FFFFFF;
 	color: #000000;
 }
 
-.theme_list a:hover
+.theme_list a:hover img
 {
 	border-radius: 5px;
 	border: 1px solid #C9C9C9;
 	background: #EDEDED;
+}
+
+.theme_list td
+{
+	padding: 3px;
 }
 
 #content .theme_list .button

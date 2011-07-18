@@ -90,6 +90,12 @@ abstract class Database
 	public function __construct($db_result_class = null)
 	{
 		$this->result_class = $db_result_class;
+
+		// Is debugging enabled?
+		if(defined('DBDEBUG') && DBDEBUG)
+		{
+			$this->debug = true;
+		}
 	}
 
 	/*

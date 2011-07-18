@@ -137,7 +137,7 @@ if(!function_exists('verify_request'))
 		if(member()->session_id() != $sid)
 		{
 			// We have a function to do this already ;-)
-			member_access_denied(null, l('Sorry, but session verification failed. Please go back and try again.'));
+			member_access_denied(l('Session Verification Error'), l('Sorry, but session verification failed. Please <a href="javascript:history.go(-1);">go back</a> and try again.'));
 		}
 
 		return true;
@@ -181,13 +181,10 @@ if(!function_exists('member_access_denied'))
 
 		theme()->add_meta(array('name' => 'robots', 'content' => 'noindex'));
 
-		theme()->header();
+		api()->context['error_title'] = $title;
+		api()->context['error_message'] = $message;
 
-		echo '
-		<h1>', $title, '</h1>
-		<p>', $message, '</p>';
-
-		theme()->footer();
+		theme()->render('error');
 
 		// Exit!
 		exit;

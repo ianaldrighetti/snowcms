@@ -355,6 +355,9 @@ if(!function_exists('admin_plugins_check_updates'))
 	*/
 	function admin_plugins_check_updates($guids = array())
 	{
+		// This array will keep track of available updates.
+		$plugin_updates = array();
+
 		// No GUIDs supplied?
 		if(count($guids) == 0)
 		{
@@ -421,7 +424,7 @@ if(!function_exists('admin_plugins_check_updates'))
 					WHERE guid = {string:guid}
 					LIMIT 1',
 					array(
-						'version_available' => version_compare($request, $plugin_info['version'], '>') ? $request : '',
+						'version_available' => compare_versions($request, $plugin_info['version'], '>') ? $request : '',
 						'guid' => $plugin_info['guid'],
 					), 'plugins_check_updates_query');
 			}
