@@ -52,7 +52,7 @@ if(!function_exists('login_view'))
 			redirect(baseurl. '/index.php');
 		}
 
-		theme()->set_title(l('Log in'));
+		theme()->set_title(l('Log In'));
 
 		// Generate that lovely login form.
 		login_generate_form();
@@ -150,6 +150,13 @@ if(!function_exists('login_generate_form'))
 											 'default_value' => !empty($_REQUEST['session_length']) ? (int)$_REQUEST['session_length'] : -1,
 										 ));
 
+		$form->add_input(array(
+											 'name' => 'redir_to',
+											 'type' => 'hidden',
+											 'label' => true,
+											 'default_value' => !empty($_REQUEST['redir_to']) ? $_REQUEST['redir_to'] : '',
+										 ));
+
 		// It has been generated, so don't generate it again!
 		$generated = true;
 	}
@@ -197,7 +204,7 @@ if(!function_exists('login_view2'))
 		}
 
 		// Redirect to check that login cookie! :)
-		redirect(baseurl. '/index.php?action=checkcookie&id='. $member_id);
+		redirect(baseurl. '/index.php?action=checkcookie&id='. $member_id. (!empty($_POST['redir_to']) ? '&redir_to='. urlencode($_POST['redir_to']) : ''));
 	}
 }
 

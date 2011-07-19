@@ -147,6 +147,10 @@ class Input
 	// Whether or not the input needs to contain a value.
 	private $required;
 
+	// Variable: cleared
+	// Whether or not the value has been cleared.
+	private $cleared;
+
 	/*
 		Constructor: __construct
 
@@ -217,6 +221,7 @@ class Input
 		$this->valid = null;
 		$this->errors = array();
 		$this->required = true;
+		$this->cleared = false;
 
 		// Let's see, did you want to set anything?
 		if(!empty($name))
@@ -1243,9 +1248,9 @@ class Input
 		if(in_array($this->type, array('select', 'select-multi', 'checkbox-multi', 'radio')))
 		{
 			// No options, at all?
-			if(!is_array($this->options) || count($this->options) == 0)
+			if(!is_array($this->options))
 			{
-				$this->errors[] = l('Type &quot;%s&quot; requires options to be specified.', htmlchars($this->type));
+				$this->errors[] = l('Type &quot;%s&quot; requires options to be an array.', htmlchars($this->type));
 
 				return false;
 			}
@@ -1254,6 +1259,7 @@ class Input
 			if(($this->type == 'select' || $this->type == 'radio') && ($this->default_value != (string)$this->default_value || !in_array($this->default_value, array_keys($this->options))))
 			{
 				// Just chuck it out, then.
+				$this->default_value = null;
 				$this->default_value = null;
 			}
 			elseif($this->type == 'select-multi' || $this->type == 'checkbox-multi')
@@ -1361,9 +1367,14 @@ class Input
 
 		// Do we have a value, if we do, then we don't need to go through this
 		// again.
-		if(!empty($this->valid))
+		if(!empty($this->valid) && !$this->cleared)
 		{
 			return $this->value;
+		}
+		// Has this been cleared?
+		elseif($this->cleared)
+		{
+			return null;
 		}
 
 		// Make sure all options are in order.
@@ -1481,7 +1492,7 @@ class Input
 
 				$value = $selected;
 			}
-			else
+			elseif(!$is_multiple)
 			{
 				// Make sure they selected a valid option.
 				if(!in_array($value, $options))
@@ -1983,6 +1994,23 @@ class Input
 			// We have no idea how to handle this, but the callback should!
 			return call_user_func($this->callback, false, false, false, true);
 		}
+	}
+
+	/*
+		Method: clear
+
+		Forcibly clears the input's value to always be empty, regardless of
+		whether or not there is actually a value available.
+
+		Parameters:
+			none
+
+		Returns:
+			void - Nothing is returned by this method.
+	*/
+	public function clear()
+	{
+		$this->cleared = true;
 	}
 }
 ?>

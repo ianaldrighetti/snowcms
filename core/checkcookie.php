@@ -71,10 +71,22 @@ if(!function_exists('checkcookie_verify'))
 
 		api()->run_hooks('checkcookie_success');
 
-		// Seemed to have worked, so let's go home!
-		redirect(baseurl. '/index.php');
+		// Seemed to have worked, so let's go home! Unless you had somewhere
+		// else in mind.
+		if(!empty($_GET['redir_to']))
+		{
+			// Let's just check and see.
+			$redir_to = $_GET['redir_to'];
 
-		exit;
+			// It shouldn't have any slashes in it.
+			if(strpos($redir_to, '/') === false)
+			{
+				redirect(baseurl. '/index.php?'. $redir_to);
+			}
+		}
+
+		// Guess not.
+		redirect(baseurl. '/index.php');
 	}
 }
 ?>
