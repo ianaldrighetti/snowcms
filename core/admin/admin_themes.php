@@ -651,6 +651,28 @@ if(!function_exists('admin_themes_update'))
 
 						// Okay, now get the response!
 						$response = admin_plugins_get_message($status, $updated_theme_info['name'], $reason, true);
+						
+						// But we're not done yet! We have to run a compatibility check first!
+						// So let's load the XML class so we can check out the theme's XML file.
+						$xml = api()->load_class('XML');
+						
+						// Parse the XML file now.
+						$theme_xml = $xml->parse($update_dir. '/theme-update/theme.xml');
+						
+						if(array_key_exists('compatible-with', $item))
+						{
+							foreach($theme_xml as $item)
+							{
+								if(!is_compatible($item['compatible-with']))
+								{
+									$compatible = false;
+								}
+								break;
+							}
+						}
+						
+						// Unload the XML class. We don't need it anymore. Go, shoo XML class.
+						unset($xml);
 
 						// Is it okay? Can we continue without prompting?
 						$install_proceed = isset($_GET['proceed']) || $status == 'approved';
@@ -697,10 +719,9 @@ if(!function_exists('admin_themes_update'))
 						}
 						else
 						{
-							// Uh oh!
-							// It was not safe, but if you still want to continue installing
-							// it, be my guest! Just be sure you know what you're getting
-							// yourself into, please!
+							// Uh oh! It's not safe!
+							// If you still want to continue installing it, do it yourself!
+							// Just be sure you know what you're getting yourself into, please!
 							// We will delete the extracted theme, you know, just incase ;).
 							recursive_unlink($update_dir. '/theme-update');
 
