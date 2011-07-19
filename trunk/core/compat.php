@@ -37,6 +37,17 @@ if(!function_exists('mime_content_type'))
 	require_once(coredir. '/compat/mime_content_type.php');
 }
 
+// Windows also doesn't have fnmatch if you're using a PHP version lower
+// than 5.3.0.
+if(!function_exists('fnmatch'))
+{
+	function fnmatch($pattern, $string)
+	{
+		return preg_match("#^".strtr(preg_quote($pattern, '#'), array('\*' => '.*', '\?' => '.', '\[' => '[', '\]' => ']'))."$#i", $string);
+	}
+
+}
+
 // The following are a bit simpler ;-) or just plain don't exist on
 // any version of PHP...
 
@@ -477,4 +488,61 @@ function compare_versions($version1, $version2, $operator = null)
 	// Alright, now we can call version_compare.
 	return $operator !== null ? version_compare($version1, $version2, $operator) : version_compare($version1, $version2);
 }
+
+/*
+	Function: is_compatible
+
+	Checks to see if this version of SnowCMS is compatible with
+	whatever you're checking, be it plugin, theme, etc.
+
+	Parameters:
+		string $versions - The string of versions that this thing is
+								compatible with. Should be comma
+								delimited.
+
+	Returns:
+		bool - True if this version of SnowCMS is listed, false if it isn't.
+*/
+function is_compatible($versions)
+{
+	// Did you really give us a string?
+	if(!is_string($versions))
+	{
+		// You lied!
+		return false;
+	}
+	
+	// Good, you gave us a string! Let's manipulate it now.
+	$versions = str_replace(' ', '', $versions);
+	$versions = explode(',', $versions);
+	
+	// That's done, now we can check out all those version numbers.
+	foreach($versions as $index => $version)
+	{
+		// Does this version number have a wildcard?
+		if(strpos($version, '*'))
+		{
+			// Check the wildcard to see if this version of Snow matches it.
+			if(fnmatch($version, settings()->get('version', 'string')))
+			{
+				// It's your lucky day!
+				return true;
+			}
+		}
+		
+		// No, it doesn't. That simplifies things for us!
+		else
+		{
+			if($version == settings()->get('version', 'string'))
+			{
+				// Good, it's compatible!
+				return true;
+			}
+		}
+	}
+	
+	// Aww, this...thing we're testing isn't compatible :(
+	return false;
+}
+
 ?>
