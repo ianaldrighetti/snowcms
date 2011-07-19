@@ -591,7 +591,7 @@ class Table
 
 		// Continue the output of the table now.
 		echo '
-				<table id="', $tbl_name, '" class="table" cellpadding="', $table['cellpadding'], '" cellspacing="', $table['cellspacing'], '">';
+				<table id="', $tbl_name, '" cellpadding="', $table['cellpadding'], '" cellspacing="', $table['cellspacing'], '">';
 
 		// Were any columns defined, by chance?
 		if(count($table['columns']))
@@ -699,6 +699,12 @@ class Table
 					</tr>';
 			}
 
+			echo '
+					<tr class="header">
+						<td colspan="', ($is_options ? count($table['columns']) + 1 : count($table['columns'])), '">', $pagination, '</td>
+					</tr>';
+
+
 			if($is_options)
 			{
 				echo '
@@ -721,7 +727,9 @@ class Table
 		else
 		{
 			echo '
-					<td class="errors">', l('No columns added.'), '</td>';
+				<tr>
+					<td class="errors">', l('No columns added.'), '</td>
+				</tr>';
 		}
 
 		echo '
