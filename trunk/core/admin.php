@@ -346,12 +346,7 @@ if(!function_exists('admin_prompt_password'))
 				}
 			}
 
-			// We need a couple things.
-			theme()->add_link(array('rel' => 'stylesheet', 'type' => 'text/css', 'href' => theme()->url(). '/style/login.css'));
-			api()->add_filter('admin_theme_container_id', create_function('$element_id', '
-																											return \'login-box\';'));
-
-			theme()->set_title(l('Log in'));
+			theme()->set_title(l('Log In'));
 
 			api()->context['form'] = $form;
 
@@ -381,6 +376,11 @@ if(!function_exists('admin_prompt_generate_form'))
 	*/
 	function admin_prompt_generate_form()
 	{
+		// We need a couple things.
+		theme()->add_link(array('rel' => 'stylesheet', 'type' => 'text/css', 'href' => theme()->url(). '/style/login.css'));
+		api()->add_filter('admin_theme_container_id', create_function('$element_id', '
+																										return \'login-box\';'));
+
 		// Create the form so you can enter your password.
 		$form = api()->load_class('Form');
 
@@ -509,27 +509,51 @@ if(!function_exists('admin_access_denied'))
 	*/
 	function admin_access_denied($title = null, $message = null)
 	{
-		// No title? Just use a generic one, then.
-		if(empty($title))
+		// But hold on! If the user isn't logged in, why don't we show a log in
+		// form.
+		if(member()->is_guest())
 		{
-			$title = l('Access denied');
+			admin_prompt_generate_form();
+			$form = api()->load_class('Form');
+
+			// Most of the form was generated... Except one last thing!
+			$form->add_input(array(
+												 'name' => 'redir_to',
+												 'label' => true,
+												 'type' => 'hidden',
+												 'default_value' => $_SERVER['QUERY_STRING'],
+											 ));
+
+			theme()->set_title(l('Log In'));
+
+			api()->context['form'] = $form;
+
+			theme()->render('admin_prompt_password');
+		}
+		else
+		{
+			// No title? Just use a generic one, then.
+			if(empty($title))
+			{
+				$title = l('Access Denied');
+			}
+
+			// No special message? We will take it that they just don't have the
+			// right to access whatever it is you are wanting to block them from :P
+			if(empty($message))
+			{
+				$message = l('Sorry, but you are not allowed to access the page you have requested.');
+			}
+
+			theme()->set_title($title);
+
+			api()->context['error_title'] = $title;
+			api()->context['error_message'] = $message;
+
+			theme()->render('error');
 		}
 
-		// No special message? We will take it that they just don't have the
-		// right to access whatever it is you are wanting to block them from :P
-		if(empty($message))
-		{
-			$message = l('Sorry, but you are not allowed to access the page you have requested.');
-		}
-
-		theme()->set_title($title);
-
-		api()->context['error_title'] = $title;
-		api()->context['error_message'] = $message;
-
-		theme()->render('error');
-
-		// Exit!
+		// Either way, we won't continue executing.
 		exit;
 	}
 }

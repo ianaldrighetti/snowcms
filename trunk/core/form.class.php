@@ -1034,6 +1034,41 @@ class Form
 	}
 
 	/*
+		Method: clear_data
+
+		Clears data from the specified forms input.
+
+		Parameters:
+			string $form_name - The name of the form to clear the data from.
+
+		Returns:
+			bool - Returns true if the data was successfully cleared, false if
+						 not.
+
+		Note:
+			The $form_name parameter does not need to be supplied if one was set
+			with the <Form::current> method.
+	*/
+	public function clear_data($form_name = null)
+	{
+		$form_name = strtolower(!empty($form_name) ? $form_name : $this->current());
+
+		// We can't empty the data if the form doesn't exist.
+		if(!$this->exists($form_name))
+		{
+			return false;
+		}
+
+		// Now loop through all the inputs and clear the data.
+		foreach($this->inputs($form_name) as $input)
+		{
+			$input->clear();
+		}
+
+		return true;
+	}
+
+	/*
 		Method: hooked
 
 		Determines whether or not the form has already had hooks ran.

@@ -14,8 +14,20 @@ if(!defined('INSNOW'))
 		<div id="header-container">
 			<h1><a href="<?php echo baseurl; ?>"><?php echo settings()->get('site_name', 'string'); ?></a></h1>
 			<div id="member-box">
-				<p><?php echo l('Hey, %s!', '<a href="'. baseurl. '/index.php?action=profile">'. member()->display_name(). '</a>'); ?></p>
-				<p><?php echo l('<a href="%s" title="View your profile">My Profile</a> | <a href="%s" title="Log out of your account">Log out</a>', baseurl. '/index.php?action=profile', baseurl. '/index.php?action=logout&amp;sc='. member()->session_id()); ?></p>
+<?php
+if(member()->is_logged())
+{
+	echo '
+				<p>', l('Hey, %s!', '<a href="'. baseurl. '/index.php?action=profile">'. member()->display_name(). '</a>'), '</p>
+				<p>',  l('<a href="%s" title="View your profile">My Profile</a> | <a href="%s" title="Log out of your account">Log out</a>', baseurl. '/index.php?action=profile', baseurl. '/index.php?action=logout&amp;sc='. member()->session_id()), '</p>';
+}
+else
+{
+	echo '
+				<p>', l('Hey, Guest!'), '</p>
+				<p>', l('<a href="%s" title="Create a new account">Register</a>', baseurl. '/index.php?action=register'), '</p>';
+}
+?>
 			</div>
 			<div class="break">
 			</div>

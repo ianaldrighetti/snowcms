@@ -5,8 +5,8 @@ if(!defined('INSNOW'))
 }
 
 		echo '
-	<h1><img src="', theme()->url(), '/style/images/members_add-small.png" alt="" /> ', l('Add a new member'), '</h1>
-	<p>', l('If registration is enabled, guests on your site can create their own member, but if you need to create a new member, you can do so here.'), '</p>';
+	<h3><img src="', theme()->url(), '/style/images/members_add-small.png" alt="" /> ', l('Add a new member'), '</h3>
+	<p>', l('If registration is enabled, guests on your site can create their own account, but if registration is not open someone will have to create an account for them.'), '</p>';
 
-		api()->context['form']->show('admin_members_add_form');
+		api()->context['form']->render('admin_members_add_form');
 ?>

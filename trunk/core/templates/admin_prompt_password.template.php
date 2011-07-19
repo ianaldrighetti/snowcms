@@ -58,6 +58,13 @@ else
 				<input type="hidden" name="', htmlchars($index), '" value="', htmlchars($value), '" />';
 			}
 
+			// Redirect back to hidden field? Perhaps.
+			if(api()->context['form']->input_exists('redir_to'))
+			{
+				echo '
+				', api()->context['form']->generate('redir_to');
+			}
+
 			echo '
 			', api()->context['form']->close(), '
 			<script type="text/javascript">

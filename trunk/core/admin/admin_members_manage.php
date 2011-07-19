@@ -58,7 +58,7 @@ if(!function_exists('admin_members_manage'))
 
 		theme()->set_title(l('Manage Members'));
 
-		theme()->add_js_var('delete_confirm', l('Are you sure you want to delete the selected members?\\r\\nThis cannot be undone!'));
+		theme()->add_js_var('delete_confirm', l('Are you sure you want to delete the selected members?'. "\r\n". 'This cannot be undone!'));
 		theme()->add_js_file(array('src' => themeurl. '/default/js/members_manage.js'));
 
 		api()->context['table'] = api()->load_class('Table');
