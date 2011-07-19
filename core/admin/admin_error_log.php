@@ -89,7 +89,8 @@ if(!function_exists('admin_error_log_generate_table'))
 															 'base_url' => baseurl. '/index.php?action=admin&amp;sa=error_log',
 															 'db_query' => '
 																							SELECT
-																								error_id, error_time, member_id, member_name, member_ip, error_type, error_message, error_file, error_line, error_url
+																								error_id, error_time, member_id, member_name, member_ip,
+																								error_type, error_message, error_file, error_line, error_url
 																							FROM {db->prefix}error_log',
 															 'primary' => 'error_id',
 															 'options' => array(
@@ -108,7 +109,7 @@ if(!function_exists('admin_error_log_generate_table'))
 																									'label' => l('ID'),
 																									'function' => create_function('$row', '
 																																	return \'<a href="\'. baseurl. \'/index.php?action=admin&amp;sa=error_log&amp;id=\'. $row[\'error_id\']. \'" title="\'. l(\'View full error\'). \'">\'. $row[\'error_id\']. \'</a>\';'),
-																									'width' => '6%',
+																									'width' => '8%',
 																								));
 
 		// When did it occur?
@@ -124,6 +125,8 @@ if(!function_exists('admin_error_log_generate_table'))
 		$table->add_column('error_log', 'error_message', array(
 																											 'column' => 'error_message',
 																											 'label' => l('Error message'),
+																											 'function' => create_function('$row', '
+																																			 return wordwrap($row[\'error_message\'], 48, \'<br />\', true);'),
 																										 ));
 
 		$table->add_column('error_log', 'error_type', array(
@@ -282,10 +285,8 @@ if(!function_exists('admin_error_log_view'))
 			// Nope, it does not exist.
 			theme()->set_title(l('An Error Occurred'));
 
-			theme()->header();
-
-			api()->context['error_title'] = '<img src="'. theme()->url(). '/style/images/error_log-small.png" alt="" /> '. l('An error has occurred');
-			api()->context['error_message'] = l('The error you are trying to view does not exist. <a href="%s/index.php?action=admin&amp;sa=error_log" title="Back to error log">Back to error log</a>.', baseurl);
+			api()->context['error_title'] = '<img src="'. theme()->url(). '/style/images/error_log-small.png" alt="" /> '. l('Error Not Found');
+			api()->context['error_message'] = l('The error you are trying to view does not exist. <a href="%s" title="Back to error log">Back to error log</a>.', baseurl. '/index.php?action=admin&amp;sa=error_log');
 
 			theme()->render('error');
 		}
@@ -314,8 +315,27 @@ if(!function_exists('admin_error_log_view'))
 			theme()->set_title(l('Viewing Error #%s', $error_id));
 
 			api()->context['error_id'] = $error_id;
-			api()->context['error'] = $error;
+			api()->context['error'] = array(
+																	'time' => timeformat($error['error_time']),
+																	'type' => isset($error_const[$error['error_type']]) ? $error_const[$error['error_type']][1] : l('Unknown'),
+																	'const' => isset($error_const[$error['error_type']]) ? $error_const[$error['error_type']][0] : false,
+																	'generated_by' => l('Guest (IP: %s)', $error['member_ip']),
+																	'file' => $error['error_file'],
+																	'line' => $error['error_line'],
+																	'url' => '<a href="'. htmlchars($error['error_url']). '">'. htmlchars($error['error_url']). '</a>',
+																	'message' => $error['error_message'],
+																);
 			api()->context['error_const'] = $error_const;
+
+			$members = api()->load_class('Members');
+			$members->load($error['member_id']);
+			$member = $members->get($error['member_id']);
+
+			// Does the member exist? Alright.
+			if($member !== false)
+			{
+				api()->context['error']['generated_by'] = l('<a href="%s">%s</a> (IP: %s)', baseurl. '/index.php?action=profile&amp;id='. $member['id'], $member['name'], $member['ip']);
+			}
 
 			theme()->render('admin_error_log_view');
 		}
