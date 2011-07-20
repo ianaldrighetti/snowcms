@@ -458,10 +458,12 @@ function compare_versions($version1, $version2, $operator = null)
 		if(strpos($version2, ' ') !== false)
 		{
 			list($version2, $after) = explode(' ', $version2, 2);
+			$after = ' '. $after;
 		}
 		elseif(strpos($version2, '-') !== false)
 		{
 			list($version2, $after) = explode('-', $version2, 2);
+			$after = '-'. $after;
 		}
 
 		// Add as many .0's as we need! Also add back $after, if we need to.
@@ -496,53 +498,167 @@ function compare_versions($version1, $version2, $operator = null)
 	whatever you're checking, be it plugin, theme, etc.
 
 	Parameters:
-		string $versions - The string of versions that this thing is
-								compatible with. Should be comma
-								delimited.
+		string $versions - The string of versions that this thing is compatible
+											 with. Should be comma delimited.
+		string $version - An optional version to check against the supplied
+											$versions string. If no version is supplied, the
+											current version of the SnowCMS is used.
 
 	Returns:
 		bool - True if this version of SnowCMS is listed, false if it isn't.
 */
-function is_compatible($versions)
+function is_compatible($versions, $version = null)
 {
+	// Was a version supplied? If not, we will use the current version of
+	// SnowCMS.
+	if(empty($version))
+	{
+		$version = settings()->get('version', 'string');
+	}
+
 	// Did you really give us a string?
 	if(!is_string($versions))
 	{
 		// You lied!
 		return false;
 	}
-	
+
 	// Good, you gave us a string! Let's manipulate it now.
-	$versions = str_replace(' ', '', $versions);
 	$versions = explode(',', $versions);
-	
+
 	// That's done, now we can check out all those version numbers.
-	foreach($versions as $index => $version)
+	foreach($versions as $index => $_version)
 	{
+		$_version = trim($_version);
+
 		// Does this version number have a wildcard?
-		if(strpos($version, '*'))
+		if(strpos($_version, '*') !== false)
 		{
+			// We may need to add some .0's.
+			if(substr_count($version, '.') < substr_count($_version, '.'))
+			{
+				$prev_version = $version;
+
+				if(strpos($version, '-') !== false)
+				{
+					list($version, $after) = explode('-', $version, 2);
+					$after = '-'. $after;
+				}
+				elseif(strpos($version, ' ') !== false)
+				{
+					list($version, $after) = explode(' ', $version, 2);
+					$after = ' '. $after;
+				}
+
+				$version .= str_repeat('.0', substr_count($_version, '.') - substr_count($version, '.')). (isset($after) ? $after : '');
+				unset($after);
+			}
+
 			// Check the wildcard to see if this version of Snow matches it.
-			if(fnmatch($version, settings()->get('version', 'string')))
+			if(fnmatch($_version, $version))
 			{
 				// It's your lucky day!
 				return true;
 			}
-		}
-		
-		// No, it doesn't. That simplifies things for us!
-		else
-		{
-			if($version == settings()->get('version', 'string'))
+
+			// Put back the old version. Just in case.
+			if(isset($prev_version))
 			{
-				// Good, it's compatible!
-				return true;
+				$version = $prev_version;
+				unset($prev_version);
 			}
 		}
+		// No, it doesn't. That simplifies things for us!
+		elseif(compare_versions($_version, $version) == 0)
+		{
+			// Good, it's compatible!
+			return true;
+		}
 	}
-	
+
 	// Aww, this...thing we're testing isn't compatible :(
 	return false;
 }
 
+if(!function_exists('is_email'))
+{
+	/*
+		Function: is_email
+
+		Checks to see whether or not the supplied value is an email address.
+
+		Parameters:
+			string $email - The email address to validate.
+
+		Returns:
+			bool - Returns true if the supplied email address is actually valid,
+						 false if not.
+
+		Note:
+			This function is overloadable.
+	*/
+	function is_email($email)
+	{
+		return preg_match('~^([a-z0-9._-](\+[a-z0-9])*)+@[a-z0-9.-]+\.[a-z]{2,6}$~i', $email);
+	}
+}
+
+if(!function_exists('is_url'))
+{
+	/*
+		Function: is_url
+
+		Checks to see whether or not the supplied value is a URL.
+
+		Parameters:
+			string $url - The URL to validate.
+			array $protocols - An array containing protocols which should be
+												 considered valid (without the :// part). Defaults
+												 to http and https.
+
+		Returns:
+			bool - Returns true if the supplied URL is actually valid, false if
+						 not.
+
+		Note:
+			This function is overloadable.
+	*/
+	function is_url($url, $protocols = array())
+	{
+		// Don't even try it...
+		if(strtolower(trim(substr($url, 0, 11))) == 'javascript:')
+		{
+			return false;
+		}
+
+		// Any protocols supplied?
+		if(!is_array($protocols) || count($protocols) == 0)
+		{
+			// None I see, so just HTTP and HTTPS then.
+			$protocols = array('http', 'https');
+		}
+
+		// The PHP documentation says parse_url isn't meant to validate URL's,
+		// but we are sure going to use it to check! :-P
+		$parsed = parse_url($url);
+
+		// Is the protocol valid?
+		if(empty($parsed['scheme']) || !in_array(strtolower($parsed['scheme']), $protocols))
+		{
+			// No, it is not.
+			return false;
+		}
+		// Is there a host supplied?
+		elseif(empty($parsed['host']))
+		{
+			// Nope.
+			return false;
+		}
+		else
+		{
+			// Hopefully this is okay >.<
+			return true;
+		}
+	}
+}
 ?>

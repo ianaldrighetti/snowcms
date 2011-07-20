@@ -461,23 +461,55 @@ if(!function_exists('admin_themes_install'))
 				api()->context['status_class'] = $response['div-class'];
 				api()->context['proceed'] = $install_proceed;
 
-				// So is everything okay?
+				// So is everything okay? Make sure that no version compatibility
+				// was specified, or that it is compatible.
 				if(!empty($install_proceed))
 				{
-					// Execute install.php, if there is one.
-					if(file_exists($theme_info['path']. '/install.php'))
+					// We are almost there... Really! We are! We just need to check
+					// the themes compatibility.
+					api()->context['is_compatible'] = $theme_info['is_compatible'];
+					api()->context['compatible_is_error'] = false;
+
+					// We will continue if it is compatible, if no compatibility was
+					// supplied or if you choose to ignore the warning.
+					if($theme_info['is_compatible'] === true || $theme_info['is_compatible'] === null || (isset($_GET['compat']) && $_GET['compat'] == 'ignore'))
 					{
-						// We will just include it.
-						require($theme_info['path']. '/install.php');
+						if($theme_info['is_compatible'] !== false)
+						{
+							api()->context['compatible_message'] = l('The theme &quot;%s&quot; is compatible with your version of SnowCMS. Proceeding...', $theme_info['name']);
+						}
+						else
+						{
+							api()->context['compatible_message'] = l('The theme &quot;%s&quot; is not compatible with your version of SnowCMS. Proceeding with installation anyways...', $theme_info['name']);
+						}
 
-						// Now delete it.
-						unlink($theme_info['path']. '/install.php');
+						// Execute install.php, if there is one.
+						if(file_exists($theme_info['path']. '/install.php'))
+						{
+							// We will just include it.
+							require($theme_info['path']. '/install.php');
+
+							// Now delete it.
+							unlink($theme_info['path']. '/install.php');
+						}
+
+						// The theme was valid... It was also approved, so here ya go!
+						// We have no message to save, as it will always be the same.
+						// But we do need to do this:
+						unlink($filename);
 					}
+					else
+					{
+						// Shucks! The theme author says it isn't compatible with your
+						// current version of SnowCMS. Do you want to continue?
+						api()->context['compatible_is_error'] = true;
+						api()->context['install_filename'] = urlencode($_GET['install']);
+						api()->context['compatible_message'] = l('The theme &quot;%s&quot; is not compatible with your version of SnowCMS. You may continue with the installation anyways, if you choose.', $theme_info['name']);
 
-					// The theme was valid... It was also approved, so here ya go!
-					// We have no message to save, as it will always be the same.
-					// But we do need to do this:
-					unlink($filename);
+						// Just in case you decide to do nothing, let's not have it kept
+						// on the server. (The extracted part, at least)
+						recursive_unlink(themedir. '/'. $name);
+					}
 				}
 				else
 				{
@@ -651,28 +683,6 @@ if(!function_exists('admin_themes_update'))
 
 						// Okay, now get the response!
 						$response = admin_plugins_get_message($status, $updated_theme_info['name'], $reason, true);
-						
-						// But we're not done yet! We have to run a compatibility check first!
-						// So let's load the XML class so we can check out the theme's XML file.
-						$xml = api()->load_class('XML');
-						
-						// Parse the XML file now.
-						$theme_xml = $xml->parse($update_dir. '/theme-update/theme.xml');
-						
-						if(array_key_exists('compatible-with', $item))
-						{
-							foreach($theme_xml as $item)
-							{
-								if(!is_compatible($item['compatible-with']))
-								{
-									$compatible = false;
-								}
-								break;
-							}
-						}
-						
-						// Unload the XML class. We don't need it anymore. Go, shoo XML class.
-						unset($xml);
 
 						// Is it okay? Can we continue without prompting?
 						$install_proceed = isset($_GET['proceed']) || $status == 'approved';
@@ -685,37 +695,68 @@ if(!function_exists('admin_themes_update'))
 						// So is everything okay?
 						if(!empty($install_proceed))
 						{
-							// Since everything is alright, the update stuff needs to be
-							// moved into its permanent location.
-							$update->copy($update_dir. '/theme-update', $update_dir);
+							// We are almost there... Really! We are! We just need to check
+							// the themes compatibility.
+							api()->context['is_compatible'] = $updated_theme_info['is_compatible'];
+							api()->context['compatible_is_error'] = false;
 
-							// Execute install.php, if there is one.
-							if(file_exists($theme_info['path']. '/install.php'))
+							// We will continue if it is compatible, if no compatibility was
+							// supplied or if you choose to ignore the warning.
+							if($updated_theme_info['is_compatible'] === true || $updated_theme_info['is_compatible'] === null || (isset($_GET['compat']) && $_GET['compat'] == 'ignore'))
 							{
-								// But set the $updating_from variable.
-								$updating_from = $theme_info['version'];
+								if($updated_theme_info['is_compatible'] !== false)
+								{
+									api()->context['compatible_message'] = l('v%s of the theme &quot;%s&quot; is compatible with your version of SnowCMS. Proceeding...', $updated_theme_info['version'], $theme_info['name']);
+								}
+								else
+								{
+									api()->context['compatible_message'] = l('v%s of the theme &quot;%s&quot; is not compatible with your version of SnowCMS. Proceeding with update anyways...', $updated_theme_info['version'], $theme_info['name']);
+								}
 
-								// We will just include it.
-								require($theme_info['path']. '/install.php');
+								// Since everything is alright, the update stuff needs to be
+								// moved into its permanent location.
+								$update->copy($update_dir. '/theme-update', $update_dir);
 
-								// Now delete it.
-								unlink($theme_info['path']. '/install.php');
+								// Execute install.php, if there is one.
+								if(file_exists($theme_info['path']. '/install.php'))
+								{
+									// But set the $updating_from variable.
+									$updating_from = $theme_info['version'];
+
+									// We will just include it.
+									require($theme_info['path']. '/install.php');
+
+									// Now delete it.
+									unlink($theme_info['path']. '/install.php');
+								}
+
+								// The theme was valid... It was also approved, so here ya go!
+								// We have no message to save, as it will always be the same.
+								// But we do need to do this:
+								recursive_unlink($update_dir. '/theme-update');
+								unlink($update_dir. '/theme-update.tmp');
+
+								// Oh, and mark this theme as up-to-date.
+								$theme_updates = settings()->get('theme_updates', 'array', array());
+
+								// Remove this theme from the list of updates required.
+								unset($theme_updates[basename($theme_info['path'])]);
+
+								// And put it back.
+								settings()->set('theme_updates', $theme_updates);
 							}
+							else
+							{
+								// Shucks! The theme author says it isn't compatible with your
+								// current version of SnowCMS. Do you want to continue?
+								api()->context['compatible_is_error'] = true;
+								api()->context['update_theme'] = urlencode($update_theme);
+								api()->context['compatible_message'] = l('v%s of the theme &quot;%s&quot; is not compatible with your version of SnowCMS. You may continue with the update anyways, if you choose.', $updated_theme_info['version'], $theme_info['name']);
 
-							// The theme was valid... It was also approved, so here ya go!
-							// We have no message to save, as it will always be the same.
-							// But we do need to do this:
-							recursive_unlink($update_dir. '/theme-update');
-							unlink($update_dir. '/theme-update.tmp');
-
-							// Oh, and mark this theme as up-to-date.
-							$theme_updates = settings()->get('theme_updates', 'array', array());
-
-							// Remove this theme from the list of updates required.
-							unset($theme_updates[basename($theme_info['path'])]);
-
-							// And put it back.
-							settings()->set('theme_updates', $theme_updates);
+								// Just in case you decide to do nothing, let's not have it kept
+								// on the server. (The extracted part, at least)
+								recursive_unlink($update_dir. '/theme-update');
+							}
 						}
 						else
 						{
