@@ -661,4 +661,25 @@ if(!function_exists('is_url'))
 		}
 	}
 }
+
+/*
+	Function: format_number
+
+	Formats a number by adding commas, or whatever the administrator has
+	chosen to use as a separator.
+
+	Parameters:
+		float $number - The number being formatted.
+		int $decimals - The number of decimals points allowed.
+
+	Returns:
+		string - Returns the formatted number.
+
+	Note:
+		This should be used instead of <www.php.net/number_format>.
+*/
+function format_number($number, $decimals = 0)
+{
+	return number_format($number, $decimals);
+}
 ?>

@@ -4,12 +4,33 @@ if(!defined('INSNOW'))
 	die('Nice try...');
 }
 
-		echo '
-	<h1><img src="', theme()->url(), '/style/images/members_permissions-small.png" alt="" /> ', l('Manage permissions'), '</h1>
-	<p>', l('The permissions of member groups can all be modified here. Simply click on the member group below to edit their permissions.'), '</p>';
+echo '
+	<h3><img src="', theme()->url(), '/style/images/members_permissions-small.png" alt="" /> ', l('Manage Permissions'), '</h3>
+	<p>', l('Each member group can have their own unique permissions assigned to them, which then users of the group inherit.'), '</p>
 
+	<div class="table">
+		<table width="100%" cellspacing="0" cellpadding="4px">
+			<tr class="columns">
+				<th width="50%">Name</th>
+				<th>Denied</th>
+				<th>Disallowed</th>
+				<th>Allowed</th>
+				<th>Members</th>
+			</tr>';
 
-		echo '
-	<h3>', l('Member groups'), '</h3>
-	<p>', implode(', ', api()->context['group_list']), '</p>';
+foreach(api()->context['group_list'] as $group)
+{
+	echo '
+			<tr class="tr_', ($group['position'] % 2), '">
+				<td>', (!empty($group['href']) ? '<a href="'. $group['href']. '" title="'. l('Manage permissions for the group &quot;%s&quot;', $group['name']). '">' : '<span title="'. l('This group&#039;s permissions cannot be modified'). '">'), $group['name'], (!empty($group['href']) ? '</a>' : '</span>'), '</td>
+				<td class="center">', $group['assigned']['deny'], '</td>
+				<td class="center">', $group['assigned']['disallow'], '</td>
+				<td class="center">', $group['assigned']['allow'], '</td>
+				<td class="center">', $group['members'], '</td>
+			</tr>';
+}
+
+echo '
+		</table>
+	</div>';
 ?>

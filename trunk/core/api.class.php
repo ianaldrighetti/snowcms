@@ -854,7 +854,7 @@ class API
 		Method: add_group
 
 		Adds a group which can be assigned to members, which can be used by
-		plugins for permission checking with $member->is_a('group_identifier');
+		plugins for permission checking with member()->is_a('group_identifier');
 
 		Parameters:
 			string $group_identifier - The groups identifier, which is stored in

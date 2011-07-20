@@ -103,6 +103,16 @@ if(!function_exists('admin_members_manage_generate_table'))
 																															 'deactivate' => 'Deactivate',
 																															 'delete' => 'Delete',
 																														 ),
+																								'filters' => array(
+																															 'activated' => array(
+																																								'label' => l('Activated'),
+																																								'where' => 'member_activated = 1',
+																																							),
+																															 'unactivated' => array(
+																																									'label' => l('Pending Activation'),
+																																									'where' => 'member_activated = 0',
+																																								),
+																														 ),
 																							));
 
 		// Their member id!
