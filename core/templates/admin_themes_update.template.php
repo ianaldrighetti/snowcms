@@ -1,8 +1,27 @@
 <?php
+////////////////////////////////////////////////////////////////////////////
+//                              SnowCMS v2.0                              //
+//                           By the SnowCMS Team                          //
+//                             www.snowcms.com                            //
+//            Released under the Microsoft Reciprocal License             //
+//                 www.opensource.org/licenses/ms-rl.html                 //
+////////////////////////////////////////////////////////////////////////////
+//                                                                        //
+//       SnowCMS originally pawned by soren121 started in early 2008      //
+//                                                                        //
+////////////////////////////////////////////////////////////////////////////
+//                                                                        //
+//                  SnowCMS v2.0 began in November 2009                   //
+//                                                                        //
+////////////////////////////////////////////////////////////////////////////
+//                       File version: SnowCMS 2.0                        //
+////////////////////////////////////////////////////////////////////////////
+
 if(!defined('INSNOW'))
 {
 	die('Nice try...');
 }
+
 echo '
 		<h3><img src="', theme()->url(), '/style/images/manage_themes-small.png" alt="" /> ', l('Updating Theme &quot;%s&quot;', api()->context['theme_name']), '</h3>
 		<p>', l('Please wait while the theme is being updated from v%s to v%s.', api()->context['theme_version'], api()->context['update_version']), '</p>
