@@ -114,8 +114,8 @@ if(!function_exists('admin_members_add_generate_form'))
 											 'label' => l('New username'),
 											 'subtext' => l('The username of the new member.'),
 											 'length' => array(
-																		 'min' => 1,
-																		 'max' => 80,
+																		 'min' => settings()->get('members_min_name_length', 'int', 1),
+																		 'max' => settings()->get('members_max_name_length', 'int', 80),
 																	 ),
 											 'callback' => create_function('$name, $value, &$error', '
 																			 $members = api()->load_class(\'Members\');
@@ -156,15 +156,19 @@ if(!function_exists('admin_members_add_generate_form'))
 
 																				 if($security == 1)
 																				 {
-																					 $error = l(\'Your password must be at least 3 characters long.\');
+																					 $error = l(\'The password must be at least 3 characters long.\');
 																				 }
 																				 elseif($security == 2)
 																				 {
-																					 $error = l(\'Your password must be at least 4 characters long and cannot contain your username.\');
+																					 $error = l(\'The password must be at least 4 characters long and cannot contain your username.\');
+																				 }
+																				 elseif($security == 3)
+																				 {
+																					 $error = l(\'The password must be at least 5 characters long, cannot contain your username and contain at least 1 number.\');
 																				 }
 																				 else
 																				 {
-																					 $error = l(\'Your password must be at least 5 characters long, cannot contain your username and contain at least 1 number.\');
+																					 api()->run_hooks(\'password_error_message\', array(&$security, &$error));
 																				 }
 
 																				 return false;

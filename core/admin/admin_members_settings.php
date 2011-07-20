@@ -51,30 +51,75 @@ if(!function_exists('admin_members_settings'))
 			admin_access_denied();
 		}
 
+		// We have a few different settings forms we can display.
+		$form_types = api()->apply_filters('admin_settings_forms', array(
+																															   'register' => array(
+																																								 l('Registration Settings'),
+																																								 l('Manage registration settings'),
+																																								 l('Registration settings can be managed here, such as choosing the process of a user activating their account.'),
+																																							 ),
+																															   'disallowed' => array(
+																																									 l('Disallowed Names &amp; Emails'),
+																																									 l('Manage usernames and email addresses which are not allowed to be used'),
+																																									 l('If you want to prevent members (and possibly guests) from using certain names and email addresses, you may add them to the lists below.'),
+																																								 ),
+																																 'other' => array(
+																																						  l('Password &amp; Username Settings'),
+																																						  l('Manage security related settings'),
+																																						  l('Password requirements and username length requirements can be changed here.'),
+																																					  ),
+																															 ));
+
+		// Which one are we going to generate?
+		$form_type = !empty($_GET['type']) && isset($form_types[$_GET['type']]) ? $_GET['type'] : 'register';
+
+		// Just to make sure.
+		$GLOBALS['_GET']['type'] = $form_type;
+
+		// This will come in handy.
+		api()->context['section_menu'] = array();
+		$is_first = true;
+		foreach($form_types as $type_id => $type_info)
+		{
+			api()->context['section_menu'][] = array(
+																					 'href' => baseurl. '/index.php?action=admin&amp;sa=members_settings&amp;type='. $type_id,
+																					 'title' => $type_info[1],
+																					 'is_first' => $is_first,
+																					 'is_selected' => $form_type == $type_id,
+																					 'text' => $type_info[0],
+																				 );
+
+			// Nothing else will be first.
+			$is_first = false;
+		}
+
 		// Generate our form!
-		admin_members_settings_generate_form();
+		admin_members_settings_generate_form($form_type);
 		$form = api()->load_class('Form');
 
 		// Time to save?
-		if(!empty($_POST['admin_members_settings_form']))
+		if(!empty($_POST[$form_type. '_settings_form']))
 		{
 			// Save all the data.
 			if(isset($_GET['ajax']))
 			{
-				echo $form->json_process('admin_members_settings_form');
+				echo $form->json_process($form_type. '_settings_form');
 				exit;
 			}
 			else
 			{
-				$form->process('admin_members_settings_form');
+				$form->process($form_type. '_settings_form');
 			}
 		}
 
 		admin_current_area('members_settings');
 
-		theme()->set_title(l('Member settings'));
+		theme()->set_title(htmlchars_decode($form_types[$form_type][0]));
 
 		api()->context['form'] = $form;
+		api()->context['form_type'] = $form_type;
+		api()->context['settings_title'] = $form_types[$form_type][0];
+		api()->context['settings_description'] = $form_types[$form_type][2];
 
 		theme()->render('admin_members_settings');
 	}
@@ -85,10 +130,10 @@ if(!function_exists('admin_members_settings_generate_form'))
 	/*
 		Function: admin_members_settings_generate_form
 
-		Generates the member settings form.
+		Generates the right settings form according to the type requested.
 
 		Parameters:
-			none
+			string $form_type - The settings form to generate.
 
 		Returns:
 			void - Nothing is returned by this function.
@@ -96,114 +141,126 @@ if(!function_exists('admin_members_settings_generate_form'))
 		Note:
 			This function is overloadable.
 	*/
-	function admin_members_settings_generate_form()
+	function admin_members_settings_generate_form($form_type)
 	{
 		$form = api()->load_class('Form');
 
-		$form->add('admin_members_settings_form', array(
-																								'action' => baseurl. '/index.php?action=admin&sa=members_settings',
-																								'ajax_submit' => true,
-																								'callback' => 'admin_members_settings_handle',
-																								'submit' => l('Save settings'),
-																							));
+		$form->add($form_type. '_settings_form', array(
+																							 'action' => baseurl. '/index.php?action=admin&sa=members_settings&amp;type='. $form_type,
+																							 'callback' => 'admin_members_settings_handle',
+																							 'submit' => l('Save settings'),
+																						 ));
 
-		// Registration enabled?
-		$form->add_field('admin_members_settings_form', 'registration_enabled', array(
-																																							'type' => 'checkbox',
-																																							'label' => l('Enable registration:'),
-																																							'subtext' => l('If disabled, people won\'t be able to manually create accounts through the registration feature.'),
-																																							'value' => settings()->get('registration_enabled', 'int'),
-																																						));
+		$form->current($form_type. '_settings_form');
 
-		// Types of registration.
-		$types = api()->apply_filters('registration_types', array(
-																												 0 => l('Instant activation'),
-																												 1 => l('Administrative activation'),
-																												 2 => l('Email activation'),
-																											 ));
-		$form->add_field('admin_members_settings_form', 'registration_type', array(
-																																					 'type' => 'select',
-																																					 'label' => l('Registration mode:'),
-																																					 'subtext' => l('Instant activation: no further action, Administrative activation: administrators must activate accounts, Email activation: new registrations must verify their email address.'),
-																																					 'options' => $types,
-																																					 'value' => settings()->get('registration_type', 'int'),
-																																				 ));
+		// You viewing registration settings?
+		if($form_type == 'register')
+		{
+			// Types of registration.
+			$types = api()->apply_filters('registration_types', array(
+																													 0 => l('Disabled'),
+																													 1 => l('Instant activation'),
+																													 2 => l('Administrative activation'),
+																													 3 => l('Email activation'),
+																												 ));
+			$form->add_input(array(
+												 'name' => 'registration_type',
+												 'type' => 'select',
+												 'label' => l('Registration mode'),
+												 'subtext' => l('<em>Disabled</em> - Registration disabled.<br /><em>Instant activation</em> - account activated upon registration.<br /><em>Administrative activation</em> - administrators must activate new accounts.<br /><em>Email activation:</em> new registrations must verify their email address.'),
+												 'options' => $types,
+												 'default_value' => settings()->get('registration_type', 'int'),
+											 ));
+		}
+		// How about disallowed names and email addresses?
+		elseif($form_type == 'disallowed')
+		{
+			// Disallowed names...
+			$form->add_input(array(
+												 'name' => 'disallowed_names',
+												 'type' => 'textarea',
+												 'label' => l('Disallowed names'),
+												 'subtext' => l('These are names which cannot be registered or used by members (such as display names). Enter one name per line, with an asterisk (*) denoting a wildcard.'),
+												 'rows' => 5,
+												 'columns' => 35,
+												 'default_value' => settings()->get('disallowed_names', 'string'),
+											 ));
 
-		// Minimum length of a username/display name.
-		$form->add_field('admin_members_settings_form', 'members_min_name_length', array(
-																																								 'type' => 'int',
-																																								 'label' => l('Minimum username length:'),
-																																								 'subtext' => l('Can be from 1 to 80. This also applies to display names.'),
-																																								 'length' => array(
-																																															 'min' => 1,
-																																															 'max' => 80,
-																																														 ),
-																																									'function' => create_function('$value, $form_name, &$error', '
+			// Disallowed email addresses.
+			$form->add_input(array(
+												 'name' => 'disallowed_emails',
+												 'type' => 'textarea',
+												 'label' => l('Disallowed email addresses'),
+												 'subtext' => l('These are email addresses which cannot be registered with or used by members. Enter an email address per line, with an asterisk (*) denoting a wildcard. To disallow entire domains, do: *@domain.com.'),
+												 'rows' => 5,
+												 'columns' => 35,
+												 'default_value' => settings()->get('disallowed_emails', 'string'),
+											 ));
+		}
+		elseif($form_type == 'other')
+		{
+			// Password security :P
+			$levels = api()->apply_filters('password_security_levels', array(
+																																	1 => 'Low',
+																																	2 => 'Medium',
+																																	3 => 'High',
+																																));
 
-																																																	if((int)$value > (int)$_POST[\'members_max_name_length\'])
-																																																	{
-																																																		$error = l(\'Minimum username length can\\\'t be larger than the maximum username length.\');
-																																																		return false;
-																																																	}
+			$form->add_input(array(
+												 'name' => 'password_security',
+												 'type' => 'select',
+												 'label' => l('Password security'),
+												 'subtext' => l('<em>Low</em> - must be at least 4 characters.<br /><em>Medium</em> - Must be at least 6 characters, cannot contain username.<br /><em>High</em> - Must be at least 8 characters, be alphanumeric and cannot contain their username.'),
+												 'options' => $levels,
+												 'default_value' => settings()->get('password_security', 'int'),
+											 ));
 
-																																																	return true;'),
-																																									'value' => settings()->get('members_min_name_length', 'int'),
-																																								));
+			// Minimum length of a username/display name.
+			$form->add_input(array(
+												 'name' => 'members_min_name_length',
+												 'type' => 'int',
+												 'label' => l('Minimum username length'),
+												 'subtext' => l('The minimum length of a username can range from 1 to 80 characters. This also applies to display names.'),
+												 'length' => array(
+																			 'min' => 1,
+																			 'max' => 80,
+																		 ),
+													'callback' => create_function('$name, $value, &$error', '
 
-		// Maximum length of a username/display name.
-		$form->add_field('admin_members_settings_form', 'members_max_name_length', array(
-																																								 'type' => 'int',
-																																								 'label' => l('Maximum username length:'),
-																																								 'subtext' => l('Can be from 1 to 80. This also applies to display names.'),
-																																								 'length' => array(
-																																															 'min' => 1,
-																																															 'max' => 80,
-																																														 ),
-																																									'function' => create_function('$value, $form_name, &$error', '
+																					if((int)$value > (int)$_POST[\'members_max_name_length\'])
+																					{
+																						$error = l(\'Minimum username length can\\\'t be larger than the maximum username length.\');
+																						return false;
+																					}
 
-																																																	if((int)$value < (int)$_POST[\'members_min_name_length\'])
-																																																	{
-																																																		return false;
-																																																	}
+																					return true;'),
+													'default_value' => settings()->get('members_min_name_length', 'int', 1),
+												));
 
-																																																	return true;'),
-																																									'value' => settings()->get('members_max_name_length', 'int'),
-																																								));
+			// Maximum length of a username/display name.
+			$form->add_input(array(
+												 'name' => 'members_max_name_length',
+												 'type' => 'int',
+												 'label' => l('Maximum username length'),
+												 'subtext' => l('The maximum length of a username can range from 1 to 80 characters. This also applies to display names.'),
+												 'length' => array(
+																			 'min' => 1,
+																			 'max' => 80,
+																		 ),
+													'callback' => create_function('$name, $value, &$error', '
 
-		// Password security :P
-		$levels = api()->apply_filters('password_security_levels', array(
-																																1 => 'Must be at least 3 characters',
-																																2 => 'Must be at least 4 chars, cannot contain name',
-																																3 => 'Must be at least 5 chars, cannot contain name, must contain a number',
-																															));
+																					if((int)$value < (int)$_POST[\'members_min_name_length\'])
+																					{
+																						return false;
+																					}
 
-		$form->add_field('admin_members_settings_form', 'password_security', array(
-																																					 'type' => 'select',
-																																					 'label' => l('Password security:'),
-																																					 'options' => $levels,
-																																					 'value' => settings()->get('password_security', 'int'),
-																																				 ));
+																					return true;'),
+													'default_value' => settings()->get('members_max_name_length', 'int', 80),
+												));
+		}
 
-		// Reserved names...
-		$form->add_field('admin_members_settings_form', 'reserved_names', array(
-																																				'type' => 'textarea',
-																																				'label' => l('Reserved names:'),
-																																				'subtext' => l('These are names which cannot be registered or used. Simply enter one name per line, an asterisk (*) denotes a wildcard.'),
-																																				'rows' => 5,
-																																				'cols' => 25,
-																																				'value' => settings()->get('reserved_names', 'string'),
-																																			));
-
-		// Disallowed email addresses.
-		$form->add_field('admin_members_settings_form', 'disallowed_emails', array(
-																																					 'type' => 'textarea',
-																																					 'label' => l('Disallowed email addresses:'),
-																																					 'subtext' => l('Enter an email address per line, An asterisk (*) denotes a wildcard. To disallow an entire domain (in this case, Yahoo), do this: *@yahoo.com.'),
-																																					 'rows' => 5,
-																																					 'cols' => 25,
-																																					 'value' => settings()->get('disallowed_emails', 'string'),
-																																				 ));
-
+		// You may need to do this yourself.
+		api()->run_hooks('admin_member_settings_generate_form', array($form_type));
 	}
 }
 
@@ -232,16 +289,11 @@ if(!function_exists('admin_members_settings_handle'))
 		foreach($data as $variable => $value)
 		{
 			// Save it.
-			settings()->set($variable, $value, is_int($value) ? 'int' : (is_double($value) ? 'double' : 'string'));
-
-			// Update the value in the form ;)
-			$form->edit_field('admin_members_settings_form', $variable, array(
-																																		'value' => $value,
-																																	));
+			settings()->set($variable, $value);
 		}
 
-		api()->add_filter('admin_members_settings_form_message', create_function('$value', '
-																															return l(\'Member settings have been successfully updated.\');'));
+		api()->add_hook($_GET['type']. '_settings_form_messages', create_function('&$value', '
+																																$value[] = l(\'Settings have been updated successfully.\');'));
 
 		return true;
 	}

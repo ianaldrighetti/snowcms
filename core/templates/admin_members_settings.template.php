@@ -3,10 +3,24 @@ if(!defined('INSNOW'))
 {
 	die('Nice try...');
 }
+		echo '
+	<div class="section-tabs">
+		<ul>';
+
+		foreach(api()->context['section_menu'] as $item)
+		{
+			echo '
+			<li><a href="', $item['href'], '" title="', $item['title'], '"', ($item['is_first'] || $item['is_selected'] ? ' class="'. ($item['is_first'] ? 'first' : ''). ($item['is_selected'] ? ($item['is_first'] ? ' ' : ''). 'selected' : ''). '"' : ''), '>', $item['text'], '</a></li>';
+		}
 
 		echo '
-	<h1><img src="', theme()->url(), '/style/images/members_settings-small.png" alt="" /> ', l('Member settings'), '</h1>
-	<p>', l('Member settings can be managed here, which includes setting the registration mode, or disabling it all together.'), '</p>';
+		</ul>
+		<div class="break">
+		</div>
+	</div>
+	<h3><img src="', theme()->url(), '/style/images/members_settings-small.png" alt="" /> ', api()->context['settings_title'], '</h3>
+	<p>', api()->context['settings_description'], '</p>';
 
-		api()->context['form']->show('admin_members_settings_form');
+
+		api()->context['form']->render(api()->context['form_type']. '_settings_form');
 ?>

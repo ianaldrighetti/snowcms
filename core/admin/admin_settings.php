@@ -59,7 +59,7 @@ if(!function_exists('admin_settings'))
 																																							l('Basic settings include changing the name of your website, along with a website description keywords, and more.'),
 																																						),
 																															   'date' => array(
-																																						 l('Date/Time Settings'),
+																																						 l('Date &amp; Time Settings'),
 																																						 l('Manage date and time settings'),
 																																						 l('The format of how a date or time is displayed can be modified here.'),
 																																					 ),
@@ -74,7 +74,7 @@ if(!function_exists('admin_settings'))
 																																								 l('There are a couple administrative security options which can be configured, such as disabling administrative security all together and also the timeout period for administrative authentication.'),
 																																							 ),
 																															   'other' => array(
-																																							l('Miscellaneous Settings'),
+																																							l('Other Settings'),
 																																							l('Manage miscellaneous settings'),
 																																							l('Other settings that do not belong to any other category can be found here, such as UTF-8 support, disabling administrative security, and others.'),
 																																						),
@@ -124,7 +124,7 @@ if(!function_exists('admin_settings'))
 
 		admin_current_area('system_settings');
 
-		theme()->set_title($form_types[$form_type][0]);
+		theme()->set_title(htmlchars_decode($form_types[$form_type][0]));
 
 		api()->context['form'] = $form;
 		api()->context['form_type'] = $form_type;
@@ -465,15 +465,6 @@ if(!function_exists('admin_settings_handle'))
 
 			// Set it :)
 			settings()->set($variable, $value, 'string');
-
-			// Update the value, unless it is the SMTP password!
-			if($variable != 'smtp_pass')
-			{
-				/*$form->edit_field('admin_settings_form', $variable, array(
-																															'value' => $value,
-																														));*/
-
-			}
 		}
 
 		api()->add_hook($_GET['type']. '_settings_form_messages', create_function('&$value', '

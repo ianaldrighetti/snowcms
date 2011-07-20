@@ -266,7 +266,7 @@ if(!function_exists('login_process'))
 			}
 			else
 			{
-				$errors[] = l('Your account has not yet been activated.'. (settings()->get('registration_type', 'int') == 1 ? ' An administrator should approve your account shortly.' : (settings()->get('registration_type', 'int') == 2 ? ' Check your email for further instructions.' : '')));
+				$errors[] = l('Your account has not yet been activated.'. (settings()->get('registration_type', 'int') == 2 ? ' An administrator should approve your account shortly.' : (settings()->get('registration_type', 'int') == 3 ? ' Check your email for further instructions.' : '')));
 			}
 
 			return false;

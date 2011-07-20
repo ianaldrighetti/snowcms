@@ -95,7 +95,7 @@ if(!function_exists('admin_members_manage_generate_table'))
 																								'db_vars' => array(),
 																								'callback' => 'admin_members_manage_table_handle',
 																								'primary' => 'member_id',
-																								'sort' => array('member_id', 'asc'),
+																								'sort' => array('member_id', 'desc'),
 																								'base_url' => baseurl. '/index.php?action=admin&sa=members_manage',
 																								'cellpadding' => '4px',
 																								'options' => array(
