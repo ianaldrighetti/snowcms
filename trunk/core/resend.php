@@ -48,13 +48,13 @@ if(!function_exists('resend_view'))
 		{
 			redirect(baseurl. '/index.php');
 		}
-		elseif(settings()->get('registration_type', 'int', 0) != 2)
+		elseif(settings()->get('registration_type', 'int', 1) != 3)
 		{
-			theme()->set_title(l('An error has occurred'));
+			theme()->set_title(l('An Error Occurred'));
 
 			theme()->header();
 
-			api()->context['error_title'] = l('An error has occurred');
+			api()->context['error_title'] = l('Registration Error');
 			api()->context['error_message'] = l('It appears that the current type of registration isn\'t email activation, so you cannot resend your activation email.');
 
 			theme()->render('error');

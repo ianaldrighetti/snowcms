@@ -51,7 +51,7 @@ if(!function_exists('register_view'))
 		}
 
 		// Is registration enabled?
-		if(!settings()->get('registration_enabled', 'bool'))
+		if(settings()->get('registration_type', 'int', 1) == 0)
 		{
 			theme()->set_title(l('Registration Disabled'));
 			theme()->add_meta(array('name' => 'robots', 'content' => 'noindex'));
@@ -101,7 +101,7 @@ if(!function_exists('register_process'))
 		}
 
 		// Registration disabled? We will let register_view() handle that.
-		if(!settings()->get('registration_enabled', 'bool'))
+		if(settings()->get('registration_type', 'int', 1) == 0)
 		{
 			register_view();
 			exit;
@@ -293,11 +293,11 @@ if(!function_exists('register_member'))
 		// A couple things, possibly.
 		$add_options = array(
 										 'member_groups' => explode(',', settings()->get('default_member_groups', 'string', 'member')),
-										 'member_activated' => settings()->get('registration_type', 'int', 0) == 0,
+										 'member_activated' => settings()->get('registration_type', 'int', 1) == 1,
 									 );
 
 		// Hmm, is it administrative approval?
-		if(settings()->get('registration_type', 'int', 0) == 1)
+		if(settings()->get('registration_type', 'int', 0) == 2)
 		{
 			// Set their activation code to admin_approval.
 			$add_options['member_acode'] = 'admin_approval';
@@ -316,7 +316,7 @@ if(!function_exists('register_member'))
 		$member_id = $members->add($options['member_name'], $options['member_pass'], $options['member_email'], $add_options);
 
 		// Was it a success? Do we need to send an activation email?
-		if($member_id > 0 && settings()->get('registration_type', 'int', 0) == 2)
+		if($member_id > 0 && settings()->get('registration_type', 'int', 1) == 3)
 		{
 			register_send_email($member_id);
 		}

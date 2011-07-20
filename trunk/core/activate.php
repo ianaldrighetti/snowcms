@@ -53,11 +53,11 @@ if(!function_exists('activate_view'))
 			redirect(baseurl. '/index.php');
 		}
 		// What is the registration type? Is it actually email?
-		elseif(settings()->get('registration_type', 'int', 0) != 2)
+		elseif(settings()->get('registration_type', 'int', 0) != 3)
 		{
-			theme()->set_title(l('An error has occurred'));
+			theme()->set_title(l('An Error Occurred'));
 
-			api()->context['error_title'] = l('An error has occurred');
+			api()->context['error_title'] = l('Registration Error');
 			api()->context['error_message'] = l('It appears that either registration is disabled or the administrator must manually activate your account.');
 
 			theme()->render('error');
@@ -95,7 +95,7 @@ if(!function_exists('activate_view'))
 					$_REQUEST['name'] = $member_info['username'];
 				}
 				// Do the codes not match?
-				elseif($member_info['acode'] != $_REQUEST['code'] || strlen($member_info['acode']) == 0)
+				elseif($member_info['acode'] != $_REQUEST['code'] || strlen($member_info['acode']) == 0 || $member_info['acode'] == 'admin_approval')
 				{
 					api()->add_filter('activation_message', create_function('$value', '
 																									 return l(\'The supplied activation code is invalid.\');'));

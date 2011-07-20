@@ -389,12 +389,12 @@ class Members
 
 		// You know what to do, set it to a bool if you handle it ;)
 		$handled = null;
-		api()->run_hooks('members_name_allowed', array(&$handled, $member_name));
+		api()->run_hooks('members_name_allowed', array(&$handled, &$member_name));
 
 		if($handled === null)
 		{
 			// Make sure the name isn't too long, or too short!
-			if($func['strlen']($member_name) < settings()->get('members_min_name_length', 'int', 3) || $func['strlen']($member_name) > settings()->get('members_max_name_length', 'int', 80))
+			if($func['strlen']($member_name) < settings()->get('members_min_name_length', 'int', 1) || $func['strlen']($member_name) > settings()->get('members_max_name_length', 'int', 80))
 			{
 				return false;
 			}
@@ -403,23 +403,23 @@ class Members
 			$member_name = $func['strtolower'](htmlchars($member_name));
 
 			// First check to see if it is a reserved name...
-			$reserved_names = explode("\n", $func['strtolower'](settings()->get('reserved_names', 'string')));
+			$disallowed_names = explode("\n", $func['strtolower'](settings()->get('disallowed_names', 'string')));
 
-			if(count($reserved_names))
+			if(count($disallowed_names))
 			{
-				foreach($reserved_names as $reserved_name)
+				foreach($disallowed_names as $disallowed_name)
 				{
-					$reserved_name = trim($reserved_name);
+					$disallowed_name = trim($disallowed_name);
 
 					// Any wildcards?
-					if($func['strpos']($reserved_name, '*') !== false)
+					if($func['strpos']($disallowed_name, '*') !== false)
 					{
-						if(preg_match('~^'. str_replace('*', '(?:.*?)?', $reserved_name). '$~i', $member_name))
+						if(preg_match('~^'. str_replace('*', '(?:.*?)?', $disallowed_name). '$~i', $member_name))
 						{
 							return false;
 						}
 					}
-					elseif($member_name == $reserved_name)
+					elseif($member_name == $disallowed_name)
 					{
 						return false;
 					}
@@ -554,20 +554,23 @@ class Members
 
 		if($handled === null)
 		{
-			// Just a low setting? So must have at least 3 characters...
+			// Just a low setting? So the password must have at least 3
+			// characters.
 			if(settings()->get('password_security', 'int') == 1)
 			{
-				$handled = $func['strlen']($member_pass) >= 3;
+				$handled = $func['strlen']($member_pass) >= 4;
 			}
-			// Must be at least 4 characters long and cannot contain their username ;)
+			// Medium requires the password be at least 6 characters and cannot
+			// contain the users name.
 			elseif(settings()->get('password_security', 'int') == 2)
 			{
-				$handled = $func['strlen']($member_pass) >= 4 && $func['stripos']($member_pass, $member_name) === false;
+				$handled = $func['strlen']($member_pass) >= 6 && $func['stripos']($member_pass, $member_name) === false;
 			}
-			// At least 5 characters in length and must contain at least 1 number.
+			// High requires that the password be at least 8 characters, cannot
+			// contain the users name and it also must be alphanumeric.
 			else
 			{
-				$handled = $func['strlen']($member_pass) >= 5 && $func['stripos']($member_pass, $member_name) === false && preg_match('~[0-9]+~', $member_pass);
+				$handled = $func['strlen']($member_pass) >= 8 && $func['stripos']($member_pass, $member_name) === false && preg_match('~[0-9]+~', $member_pass);
 			}
 		}
 
