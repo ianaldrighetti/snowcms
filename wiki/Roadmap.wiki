@@ -15,7 +15,7 @@ What won't be quite working: anything but MySQL.
 
 === 2.0 alpha 2 ===
 
-_SnowCMS 2.0 alpha 2 is currently a work-in-progress. You can monitor changes through the [http://code.google.com/p/snowcms/source/list commit changes list]._
+_Note: while we will not be releasing a 2.0 alpha 2 version, this stage is currently completed._
 
 A lot will change in 2.0 alpha 2, however, little will change that would be noticed by the one using the system, these are all underlying (unless there are bug fixes).
 
@@ -23,15 +23,19 @@ Currently in order to access $api, $member, etc. you must first _global_ them. T
 
 Not only will the objects be accessed without needing to _global_ them, system variables such as $base_url, $core_dir, $plugin_dir and so forth will be converted to constants, such as baseurl, coredir, plugindir which means no globaling needed (√).
 
-There will be one other major change: the Theme class. Currently the source files have embedded HTML, which means if a plugin really wanted to they could not easily modify the HTML. In order to get passed this both the Theme methods header and footer will be removed, and when the page is finally to be displayed a new method called render will be called, which will be passed a parameter called $template, this is a template file containing the HTML in between the overall header and footer of the page. Plugins can then hook into the render method and reroute the location of the template file to wherever they please.
+There will be one other major change: the Theme class. Currently the source files have embedded HTML, which means if a plugin really wanted to they could not easily modify the HTML. In order to get passed this both the Theme methods header and footer will be removed, and when the page is finally to be displayed a new method called render will be called, which will be passed a parameter called $template, this is a template file containing the HTML in between the overall header and footer of the page. Plugins can then hook into the render method and reroute the location of the template file to wherever they please (√).
 
 === 2.0 alpha 3 ===
+
+_Note: there will be no 2.0 alpha 3 release, as we will skip right to SnowCMS 2.0 beta. However part of this stage has been completed, that being the new Form and Input classes._
 
 This alpha release will have two main objectives: allow the creation of forms in a much more flexible manner while still having the security functionality of the Form class... and *SQLite*!
 
 The first objective will be accomplished by remaking the Form class, and separating it into two components. Any part of the system using the Form class will operate without any (or very little... we'll see!) modifications, a new class called FormProcessor (name not final) which will process the submission of the Form. The FormProcessor will be passed all the information about the inputs in the form to be processed and sanitize, check, verify, etc. the data of the form, the added bonus is you can code the form yourself.
 
 === 2.0 beta ===
+
+_SnowCMS 2.0 beta is currently a work-in-progress. You can monitor changes through the [http://code.google.com/p/snowcms/source/list commit changes list]._
 
 In celebration of finally leaving the alpha stages, there will be a brand new (and much better) default administrative control panel layout! Yay. You can check out a [http://www.snowcms.com/sneak-peak-beta-cp-102/ sneak peak of the new layout on the SnowCMS blog].
 
