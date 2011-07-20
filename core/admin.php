@@ -247,6 +247,8 @@ if(!function_exists('admin_prepend'))
 		}
 
 		theme()->add_link(array('rel' => 'stylesheet', 'type' => 'text/css', 'href' => theme()->url(). '/style/index.css'));
+		api()->add_filter('admin_theme_container_id', create_function('$element_id', '
+																										return \'content-container\';'));
 
 		// You can make changes to the theme and what not now :)
 		api()->run_hooks('admin_prepend_authenticated', array('ajax' => substr($_SERVER['QUERY_STRING'], 0, 20) == 'action=admin&sa=ajax'));
@@ -425,17 +427,6 @@ if(!function_exists('admin_prompt_generate_form'))
 																		),
 											 'default_value' => !empty($_REQUEST['session_length']) ? (int)$_REQUEST['session_length'] : -1,
 										 ));
-
-
-		// Let's add all the post data you were entering before ;)
-		foreach($_POST as $key => $value)
-		{
-			$form->add_input(array(
-												 'name' => $key,
-												 'type' => 'hidden',
-												 'default_value' => $value,
-											 ));
-		}
 	}
 }
 

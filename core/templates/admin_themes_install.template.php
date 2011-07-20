@@ -21,9 +21,32 @@ if(!empty(api()->context['status_message']))
 	// Did installation proceed?
 	if(!empty(api()->context['proceed']))
 	{
+		// Yes, but what about compatibility?
 		echo '
+		<p class="bold">', l('Checking Compatibility'), '</p>
+		<p', !empty(api()->context['compatible_is_error']) ? ' class="red"' : '', '">', api()->context['compatible_message'], '</p>';
+
+		if(empty(api()->context['compatible_is_error']))
+		{
+			// We're done! Awesome!
+			echo '
 		<h3>', l('Installation Complete'), '</h3>
 		<p>', l('The theme was successfully installed.'), '</p>';
+		}
+		else
+		{
+			// You may continue with the installation anyways, if you want.
+			echo '
+		<form action="', baseurl, '/index.php" method="get" onsubmit="return confirm(\'', l('Do you really want to install this theme which isn\\\'t compatible with your version of SnowCMS?'), '\');" class="right">
+			<input type="submit" value="', l('Proceed anyways'), ' &raquo;" />
+			<input type="hidden" name="action" value="admin" />
+			<input type="hidden" name="sa" value="themes" />
+			<input type="hidden" name="install" value="', api()->context['install_filename'], '" />
+			<input type="hidden" name="sid" value="', member()->session_id(), '" />
+			<input type="hidden" name="proceed" value="true" />
+			<input type="hidden" name="compat" value="ignore" />
+		</form>';
+		}
 	}
 	else
 	{

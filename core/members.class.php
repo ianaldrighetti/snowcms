@@ -477,8 +477,8 @@ class Members
 		{
 			$member_email = $func['strtolower'](htmlchars($member_email));
 
-			// Check the email with regex!
-			if(!preg_match('~^([a-z0-9._-](\+[a-z0-9])*)+@[a-z0-9.-]+\.[a-z]{2,6}$~i', $member_email))
+			// Check the email checker function.
+			if(!is_email($member_email))
 			{
 				return false;
 			}

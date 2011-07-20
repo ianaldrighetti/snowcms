@@ -27,9 +27,31 @@ if(!empty(api()->context['extract_message']))
 		// Did installation proceed?
 		if(!empty(api()->context['proceed']))
 		{
+			// Check compatibility before calling it all good.
 			echo '
+			<p class="bold">', l('Checking Compatibility'), '</p>
+			<p', !empty(api()->context['compatible_is_error']) ? ' class="red"' : '', '">', api()->context['compatible_message'], '</p>';
+
+			if(empty(api()->context['compatible_is_error']))
+			{
+				echo '
 			<h3>', l('Update Complete'), '</h3>
 			<p>', l('The theme was successfully updated.'), '</p>';
+			}
+			else
+			{
+				// You may continue with the installation anyways, if you want.
+				echo '
+			<form action="', baseurl, '/index.php" method="get" onsubmit="return confirm(\'', l('Do you really want to update to this theme version which isn\\\'t compatible with your version of SnowCMS?\r\nThis could stop the theme from working properly.'), '\');" class="right">
+				<input type="submit" value="', l('Proceed anyways'), ' &raquo;" />
+				<input type="hidden" name="action" value="admin" />
+				<input type="hidden" name="sa" value="themes" />
+				<input type="hidden" name="update" value="', api()->context['update_theme'], '" />
+				<input type="hidden" name="sid" value="', member()->session_id(), '" />
+				<input type="hidden" name="proceed" value="true" />
+				<input type="hidden" name="compat" value="ignore" />
+			</form>';
+			}
 		}
 		else
 		{

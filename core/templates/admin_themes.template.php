@@ -37,7 +37,7 @@ if(!defined('INSNOW'))
 		<img src="', themeurl, '/', settings()->get('theme', 'string', 'default'), '/image.png" alt="" title="', api()->context['current_theme']['name'], '" />
 	</div>
 	<div style="float: left; margin-left: 10px;">
-		<p class="bold no-margin">', api()->context['current_theme']['name'], ' ', l('by'), ' ', api()->context['current_theme']['author'], '</p>
+		<p class="bold no-margin">', api()->context['current_theme']['name'], ' v', api()->context['current_theme']['version'], ' ', l('by'), ' ', api()->context['current_theme']['author'], '</p>
 		<p>', api()->context['current_theme']['description'], '</p>', !empty(api()->context['current_theme']['update_available']) ? '
 		<p><a href="'. api()->context['current_theme']['update_href']. '" title="'. l('Update &quot;%s&quot; from v%s to v%s', api()->context['current_theme']['name'], api()->context['current_theme']['version'], api()->context['current_theme']['update_version']). '" class="red bold">'. l('Update'). '</a></p>' : '', '
 	</div>
@@ -55,7 +55,7 @@ if(!defined('INSNOW'))
 				echo '
 				<td valign="top" width="33%">
 					<a href="', $theme['select_href'], '" title="', l('Select &quot;%s&quot; as the website theme', $theme['name']), '"><img src="', $theme['image_url'], '" alt="" title="" /></a>
-					<p class="bold">', $theme['name'], ' ', l('by'), ' ', $theme['author'], '</p>
+					<p class="bold">', $theme['name'], ' v', $theme['version'], ' ', l('by'), ' ', $theme['author'], '</p>
 					<p class="italic small">', $theme['description'], '</p>
 					<p class="center"><a href="', $theme['select_href'], '" title="', l('Select &quot;%s&quot; as the website theme', $theme['name']), '">', l('Select'), '</a> | <a href="', $theme['delete_href'], '" title="', l('Delete &quot;%s&quot;', $theme['name']), '" onclick="return confirm(\'', l('Do you really want to delete the theme &quot;%s&quot;?\r\nThis can not be undone!', $theme['name']), '\');">', l('Delete'), '</a>', (!empty($theme['update_available']) ? ' | <a href="'. $theme['update_href']. '" title="'. l('Update &quot;%s&quot; from v%s to v%s', $theme['name'], $theme['version'], $theme['update_version']). '" class="bold red">'. l('Update'). '</a>' : ''), '</p>
 				</td>';
@@ -73,7 +73,7 @@ if(!defined('INSNOW'))
 		else
 		{
 			echo '
-				<td><p class="bold center">', l('No other themes installed.'), '</p></td>';
+				<td><p class="bold center">', l('No other themes installed. Would you like to <a href="%s">install a new theme</a>?', baseurl. '/index.php?action=admin&amp;sa=themes&amp;section=install'), '</p></td>';
 		}
 
 		echo '

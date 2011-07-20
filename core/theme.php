@@ -54,9 +54,20 @@ if(!defined('INSNOW'))
 
 			string version - The themes current version.
 
-			string update_url - The URL where updates for the theme can be retrieved from.
+			string update_url - The URL where updates for the theme can be
+													retrieved from.
 
 			string directory - The directory where the theme is located.*
+
+			string compatible_with - A string containing a comma separated list of
+															 versions (SnowCMS versions, that is) the
+															 theme is compatible with.
+
+			bool is_compatible - This index will contain true if the theme is
+													 compatible with the currently running version of
+													 SnowCMS, false if not. However if no versions
+													 were specified in compatible_with, it will
+													 contain null.
 
 		* (asterisk) Indicates this index will never be null.
 */
@@ -74,65 +85,62 @@ function theme_load($path)
 	// Parse the XML file now.
 	$data = $xml->parse($path. '/theme.xml');
 
-	if(count($data) > 0)
+	// So, did it work?
+	if($data === false)
 	{
-		// Keep track of whether or not we are in the author tag.
-		$in_author = false;
-
-		// Keep track of the theme info.
-		$theme_info = array(
-										'author' => null,
-										'website' => null,
-										'email' => null,
-										'name' => null,
-										'description' => null,
-										'version' => null,
-										'update_url' => null,
-									);
-		foreach($data as $item)
-		{
-			// Keep track of where we are.
-			if($item['tag'] == 'author' && $item['type'] == 'open')
-			{
-				$in_author = true;
-			}
-			elseif($item['tag'] == 'author' && $item['type'] == 'close')
-			{
-				$in_author = false;
-			}
-
-			// Saving something?
-			if($item['tag'] == 'name' && $in_author)
-			{
-				$theme_info['author'] = $item['value'];
-			}
-			elseif($item['tag'] == 'update-url')
-			{
-				$theme_info['update_url'] = $item['value'];
-			}
-			elseif(array_key_exists($item['tag'], $theme_info) && $item['type'] != 'close')
-			{
-				$theme_info[$item['tag']] = $item['value'];
-			}
-		}
-
-		// No author? No name? No way!
-		if(empty($theme_info['author']) || empty($theme_info['name']))
-		{
-			return false;
-		}
-	}
-	else
-	{
-		// Woops, that's not right!
+		// No, it did not.
 		return false;
+	}
+
+	// Save the theme information from the parsed XML file.
+	$theme_info = array(
+									'author' => htmlchars($xml->get_value($xml->value('name', 'author'))),
+									'website' => htmlchars($xml->get_value($xml->value('website', 'author'))),
+									'email' => htmlchars($xml->get_value($xml->value('email', 'author'))),
+									'name' => htmlchars($xml->get_value($xml->value('name', 'theme-info'))),
+									'description' => htmlchars($xml->get_value($xml->value('description', 'theme-info'))),
+									'version' => htmlchars($xml->get_value($xml->value('version', 'theme-info'))),
+									'update_url' => htmlchars($xml->get_value($xml->value('update-url', 'theme-info'))),
+									'compatible_with' => htmlchars($xml->get_value($xml->value('compatible-with', 'theme-info'))),
+									'is_compatible' => null,
+								);
+
+	// No need to fetch the data again.
+	if(!empty($theme_info['compatible_with']))
+	{
+		$theme_info['is_compatible'] = is_compatible($theme_info['compatible_with']);
+	}
+
+	// No author? No name? No way!
+	if(empty($theme_info['author']) || empty($theme_info['name']))
+	{
+		return false;
+	}
+
+	// Just a couple more things... Is the email address valid?
+	if(!is_email($theme_info['email']))
+	{
+		// Forget it, then.
+		$theme_info['email'] = null;
+	}
+
+	// Same goes for the website URL.
+	if(!is_url($theme_info['website']))
+	{
+		$theme_info['website'] = null;
+	}
+
+	// Oh, and the update URL.
+	if(!is_url((strtolower(substr($theme_info['update_url'], 0, 7)) != 'http://' && strtolower(substr($theme_info['update_url'], 0, 8)) != 'https://' ? 'http://' : ''). $theme_info['update_url']))
+	{
+		$theme_info['update_url'] = null;
 	}
 
 	// Add the path, just incase :P
 	$theme_info['path'] = realpath($path);
 	$theme_info['directory'] = $theme_info['path'];
 
-	// Alright, here ya go.
+	// Alright, we will put together the information array.
 	return $theme_info;
 }
 
@@ -164,19 +172,19 @@ function theme_list()
 	$ls = scandir(themedir);
 
 	$list = array();
-	foreach($ls as $path)
+	foreach($ls as $directory)
 	{
 		// Skip ., .. and .svn.
-		if(in_array($path, array('.', '..', '.svn')))
+		if(in_array($directory, array('.', '..', '.svn')))
 		{
 			continue;
 		}
 
 		// Only look in directories, they are themes if they have the
 		// implemented_theme.class.php file.
-		if(is_dir(themedir. '/'. $path) && file_exists(themedir. '/'. $path. '/header.template.php') && file_exists(themedir. '/'. $path. '/footer.template.php') && file_exists(themedir. '/'. $path. '/theme.xml'))
+		if(is_dir(themedir. '/'. $directory) && file_exists(themedir. '/'. $directory. '/header.template.php') && file_exists(themedir. '/'. $directory. '/footer.template.php') && file_exists(themedir. '/'. $directory. '/theme.xml'))
 		{
-			$list[] = realpath(themedir. '/'. $path);
+			$list[] = realpath(themedir. '/'. $directory);
 		}
 	}
 

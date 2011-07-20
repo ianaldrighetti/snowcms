@@ -9,5 +9,5 @@
 	<description>The default theme for SnowCMS v2.0</description>
 	<version>1.0</version>
 	<update-url>themes.snowcms.com/snowcms/default</update-url>
-	<compatible-with>2.0.x</compatible-with>
+	<compatible-with>2.0.*</compatible-with>
 </theme-info>
