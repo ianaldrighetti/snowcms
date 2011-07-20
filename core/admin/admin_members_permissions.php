@@ -52,19 +52,86 @@ if(!function_exists('admin_members_manage_permissions'))
 
 		admin_current_area('members_permissions');
 
-		theme()->set_title(l('Manage permissions'));
+		theme()->set_title(l('Manage Permissions'));
 
 		// Add the guest group.
 		api()->context['groups'] = array_merge(array('guest' => l('Guest')), api()->return_group());
 
-		// Remove the administrator group, as administrators are ALL POWERFUL!
-		unset(api()->context['groups']['administrator']);
-
-		api()->context['group_list'] = array();
+		$group_list = array();
+		$count = 0;
 		foreach(api()->context['groups'] as $group_id => $group_name)
 		{
-			api()->context['group_list'][] = '<a href="'. baseurl. '/index.php?action=admin&amp;sa=members_permissions&amp;grp='. urlencode($group_id). '">'. $group_name. '</a>';
+			$group = array(
+								 'id' => htmlchars($group_id),
+								 'name' => htmlchars($group_name),
+								 'href' => $group_id == 'administrator' ? false : baseurl. '/index.php?action=admin&amp;sa=members_permissions&amp;grp='. urlencode($group_id),
+								 'members' => $group_id == 'guest' ? '&ndash;' : 0,
+								 'assigned' => array(
+																 'deny' => 0,
+																 'disallow' => 0,
+																 'allow' => 0,
+															 ),
+								'position' => $count++,
+							);
+
+			// How many members are in this group? Of course, none can be in the
+			// Guest group, so skip that.
+			if($group_id != 'guest')
+			{
+				$result = db()->query('
+										SELECT
+											COUNT(*)
+										FROM {db->prefix}members
+										WHERE FIND_IN_SET({string:group_id}, member_groups)',
+										array(
+											'group_id' => $group_id,
+										));
+
+				list($group['members']) = $result->fetch_row();
+
+				// Format the number.
+				$group['members'] = format_number($group['members']);
+			}
+
+			// Now how about the total number of permissions assigned, and to each
+			// section (denied, disallowed or allowed). If this isn't the
+			// administrator group, which can do everything!
+			if($group_id != 'administrator')
+			{
+				$result = db()->query('
+										SELECT
+											status, COUNT(*) AS assigned
+										FROM {db->prefix}permissions
+										WHERE group_id = {string:group_id}
+										GROUP BY status',
+										array(
+											'group_id' => $group_id,
+										));
+
+				// Save the totals.
+				while($row = $result->fetch_assoc())
+				{
+					if($row['status'] <= 1 && $row['status'] >= -1)
+					{
+						$group['assigned'][$row['status'] == -1 ? 'deny' : ($row['status'] == 0 ? 'disallow' : 'allow')] = $row['assigned'];
+					}
+				}
+			}
+			else
+			{
+				$group['assigned'] = array(
+															 'deny' => '&ndash;',
+															 'disallow' => '&ndash;',
+															 'allow' => '&ndash;',
+														 );
+			}
+
+			// Add this group to the list.
+			$group_list[] = $group;
 		}
+
+		// The template will be needing this.
+		api()->context['group_list'] = $group_list;
 
 		theme()->render('admin_members_manage_permissions');
 	}
@@ -104,8 +171,17 @@ if(!function_exists('admin_members_manage_group_permissions'))
 		{
 			theme()->set_title(l('An Error Occurred'));
 
-			api()->context['error_title'] = l('Group Not Found');
-			api()->context['error_message'] = l('Sorry, but it appears that the group you have requested does not exist.');
+			api()->context['error_title'] = '<img src="'. theme()->url(). '/style/images/members_permissions-small.png" alt="" /> '. l('Group Not Found');
+			api()->context['error_message'] = l('Sorry, but it appears that the group you have requested does not exist. <a href="%s" title="Back to Manage Permissions">Back to permissions management &raquo;</a>', baseurl. '/index.php?action=admin&amp;sa=members_permissions');
+
+			theme()->render('error');
+		}
+		elseif($group_id == 'administrator')
+		{
+			theme()->set_title('An Error Occurred');
+
+			api()->context['error_title'] = '<img src="'. theme()->url(). '/style/images/members_permissions-small.png" alt="" /> '. l('Cannot Edit Group');
+			api()->context['error_message'] = l('Sorry, but the administrator group&#039;s permissions cannot be modified. <a href="%s" title="Back to Manage Permissions">Back to permissions management &raquo;</a>', baseurl. '/index.php?action=admin&amp;sa=members_permissions');
 
 			theme()->render('error');
 		}
@@ -133,6 +209,7 @@ if(!function_exists('admin_members_manage_group_permissions'))
 			theme()->set_title(l('Managing %s Permissions', htmlchars(api()->return_group($group_id))));
 
 			api()->context['group_id'] = $group_id;
+			api()->context['group_name'] = $group_id != 'guest' ? htmlchars(api()->return_group($group_id)) : l('Guest');
 			api()->context['form'] = $form;
 
 			theme()->render('admin_members_manage_group_permissions');
@@ -163,12 +240,13 @@ if(!function_exists('admin_members_permissions_generate_form'))
 
 		// Add our form, before we do anything else, of course!
 		$form->add($form_name, array(
-														 'action' => baseurl. '/index.php?action=admin&sa=members_permissions&grp='. $_GET['grp'],
-														 'ajax_submit' => true,
+														 'action' => baseurl. '/index.php?action=admin&sa=members_permissions&grp='. urlencode($_GET['grp']),
 														 'callback' => 'admin_members_permissions_handle',
 														 'method' => 'post',
 														 'submit' => l('Save'),
 													 ));
+
+		$form->current($form_name);
 
 		// Now is your time to add your permission!
 		$permissions = array(
@@ -278,17 +356,18 @@ if(!function_exists('admin_members_permissions_generate_form'))
 					continue;
 				}
 
-				$form->add_field($form_name, $permission['permission'], array(
-																																	'type' => 'select',
-																																	'label' => isset($permission['label']) ? $permission['label'] : '',
-																																	'subtext' => isset($permission['subtext']) ? $permission['subtext'] : '',
-																																	'options' => array(
-																																								 -1 => l('Deny'),
-																																								 0 => l('Disallow'),
-																																								 1 => l('Allow'),
-																																							 ),
-																																	'value' => isset($loaded[$permission['permission']]) ? $loaded[$permission['permission']] : 0,
-																																));
+				$form->add_input(array(
+													 'name' => $permission['permission'],
+													 'type' => 'select',
+													 'label' => isset($permission['label']) ? $permission['label'] : '',
+													 'subtext' => isset($permission['subtext']) ? $permission['subtext'] : '',
+													 'options' => array(
+																					-1 => l('Deny'),
+																					0 => l('Disallow'),
+																					1 => l('Allow'),
+																				),
+													 'default_value' => isset($loaded[$permission['permission']]) ? $loaded[$permission['permission']] : 0,
+												 ));
 			}
 		}
 	}
@@ -336,11 +415,13 @@ if(!function_exists('admin_members_permissions_handle'))
 		$rows = array();
 		foreach($data as $permission => $status)
 		{
-			$rows[] = array($group_id, $permission, $status);
+			// Ignore the security token.
+			if($permission == $group_id. '_permissions_token')
+			{
+				continue;
+			}
 
-			$form->edit_field(strtolower($group_id). '_permissions', $permission, array(
-																																							'value' => $status,
-																																						));
+			$rows[] = array($group_id, $permission, $status);
 		}
 
 		// Now save the new permissions.
@@ -351,8 +432,12 @@ if(!function_exists('admin_members_permissions_handle'))
 			$rows,
 			array('group_id', 'permission'), 'permissions_handle_query');
 
-		api()->add_filter(strtolower($group_id). '_permissions_message', create_function('$value', '
-																																			return l(\'%s permissions have been updated successfully.\', ($_GET[\'grp\'] == \'guest\' ? l(\'Guest\') : api()->return_group($_GET[\'grp\'])));'));
+		// This will force the form to use the data we just inserted into the
+		// permissions table.
+		$form->clear_data();
+
+		api()->add_hook(strtolower($group_id). '_permissions_messages', create_function('&$value', '
+																																			$value[] = l(\'%s permissions have been updated successfully.\', ($_GET[\'grp\'] == \'guest\' ? l(\'Guest\') : htmlchars(api()->return_group($_GET[\'grp\']))));'));
 
 		return true;
 	}

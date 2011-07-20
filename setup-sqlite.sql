@@ -81,6 +81,35 @@ CREATE TABLE '{db->prefix}permissions'
 	PRIMARY KEY ('group_id', 'permission')
 );
 
+INSERT INTO '{db->prefix}permissions' ('group_id', 'permission', 'status') VALUES('member', 'manage_system_settings', 0);
+INSERT INTO '{db->prefix}permissions' ('group_id', 'permission', 'status') VALUES('member', 'manage_themes', 0);
+INSERT INTO '{db->prefix}permissions' ('group_id', 'permission', 'status') VALUES('member', 'update_system', 0);
+INSERT INTO '{db->prefix}permissions' ('group_id', 'permission', 'status') VALUES('member', 'view_error_log', 0);
+INSERT INTO '{db->prefix}permissions' ('group_id', 'permission', 'status') VALUES('member', 'add_new_member', 0);
+INSERT INTO '{db->prefix}permissions' ('group_id', 'permission', 'status') VALUES('member', 'manage_members', 0);
+INSERT INTO '{db->prefix}permissions' ('group_id', 'permission', 'status') VALUES('member', 'search_members', 0);
+INSERT INTO '{db->prefix}permissions' ('group_id', 'permission', 'status') VALUES('member', 'manage_member_settings', 0);
+INSERT INTO '{db->prefix}permissions' ('group_id', 'permission', 'status') VALUES('member', 'manage_permissions', 0);
+INSERT INTO '{db->prefix}permissions' ('group_id', 'permission', 'status') VALUES('member', 'add_plugins', 0);
+INSERT INTO '{db->prefix}permissions' ('group_id', 'permission', 'status') VALUES('member', 'manage_plugins', 0);
+INSERT INTO '{db->prefix}permissions' ('group_id', 'permission', 'status') VALUES('member', 'manage_plugin_settings', 0);
+INSERT INTO '{db->prefix}permissions' ('group_id', 'permission', 'status') VALUES('member', 'view_other_profiles', 0);
+INSERT INTO '{db->prefix}permissions' ('group_id', 'permission', 'status') VALUES('member', 'edit_other_profiles', 0);
+INSERT INTO '{db->prefix}permissions' ('group_id', 'permission', 'status') VALUES('guest', 'manage_system_settings', -1);
+INSERT INTO '{db->prefix}permissions' ('group_id', 'permission', 'status') VALUES('guest', 'manage_themes', -1);
+INSERT INTO '{db->prefix}permissions' ('group_id', 'permission', 'status') VALUES('guest', 'update_system', -1);
+INSERT INTO '{db->prefix}permissions' ('group_id', 'permission', 'status') VALUES('guest', 'view_error_log', -1);
+INSERT INTO '{db->prefix}permissions' ('group_id', 'permission', 'status') VALUES('guest', 'add_new_member', -1);
+INSERT INTO '{db->prefix}permissions' ('group_id', 'permission', 'status') VALUES('guest', 'manage_members', -1);
+INSERT INTO '{db->prefix}permissions' ('group_id', 'permission', 'status') VALUES('guest', 'search_members', -1);
+INSERT INTO '{db->prefix}permissions' ('group_id', 'permission', 'status') VALUES('guest', 'manage_member_settings', -1);
+INSERT INTO '{db->prefix}permissions' ('group_id', 'permission', 'status') VALUES('guest', 'manage_permissions', -1);
+INSERT INTO '{db->prefix}permissions' ('group_id', 'permission', 'status') VALUES('guest', 'add_plugins', -1);
+INSERT INTO '{db->prefix}permissions' ('group_id', 'permission', 'status') VALUES('guest', 'manage_plugins', -1);
+INSERT INTO '{db->prefix}permissions' ('group_id', 'permission', 'status') VALUES('guest', 'manage_plugin_settings', -1);
+INSERT INTO '{db->prefix}permissions' ('group_id', 'permission', 'status') VALUES('guest', 'view_other_profiles', 0);
+INSERT INTO '{db->prefix}permissions' ('group_id', 'permission', 'status') VALUES('guest', 'edit_other_profiles', -1);
+
 CREATE TABLE '{db->prefix}plugins'
 (
 	'guid' VARCHAR(255) NOT NULL,

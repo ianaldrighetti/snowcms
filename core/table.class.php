@@ -74,8 +74,13 @@ class Table
 									 of the table, you can supply a function which is expected
 									 to return an array containing nested arrays for each row.
 									 The following parameters will be supplied: page_num, per_page,
-									 order_by (column), order (asc|desc) and a reference parameter
-									 which contains the total number of rows possible.
+									 order_by (column), order (asc|desc), a reference parameter
+									 which contains the total number of rows being displayed,
+									 a reference parameter containing the total number of rows
+									 possible and a reference parameter containing the filters
+									 that have been added, which are to have their count index
+									 set to the proper value (the number of rows available
+									 under that filter).
 
 				primary - The primary column of the query. Only required if you want
 									to allow users to select rows, this should be a column
@@ -97,8 +102,39 @@ class Table
 
 				cellspacing - The tables cellspacing attribute value.
 
+				filters - An array containing filtering options, which will generate
+									links for users to click to filter the data they view.
+									See below for an example.
+
 			Do NOT add any ORDER BY or LIMIT clauses in the query! This will cause the query
 			to not work. This is all done automatically.
+
+			Here is an example of filters:
+				array(
+					'activated' => array(
+													 'label' => l('Activated'),
+													 'where' => 'is_activated = 1',
+												 ),
+			    'unactivated' => array(
+														 'label' => l('Pending Activation'),
+														 'where' => 'is_activated = 0',
+													 ),
+				)
+
+			This will generate links to the left of the pagination like so:
+				All (1,124) | Activated (902) | Pending Activation (222)
+			As you can see, an 'All' link will be automatically generated, and the
+			database will be queried for the amount of items under that filter.
+			If your supplied database query already has a WHERE clause, in order
+			for this to work without issue you must add {where_filter} to that
+			WHERE clause. For example:
+				SELECT
+					*
+				FROM {db->prefix}some_table
+				WHERE something = 1 {where_filter}
+			If this {where_filter} is found, it will be replaced with the 'where'
+			index like so: AND (is_activated = 0) [with the AND and paranthesis
+			added automatically].
 	*/
 	public function add($tbl_name, $options = array())
 	{
@@ -121,6 +157,7 @@ class Table
 																 'sort' => array(),
 																 'cellpadding' => '0px',
 																 'cellspacing' => '0px',
+																 'filters' => array(),
 															 );
 
 		// Now try to edit it.
@@ -247,6 +284,29 @@ class Table
 		if(isset($options['cellspacing']))
 		{
 			$this->tables[$tbl_name]['cellspacing'] = $options['cellspacing'];
+		}
+
+		// Got some sort of filters?
+		if(isset($options['filters']) && is_array($options['filters']))
+		{
+			// Make sure it is valid, though.
+			foreach($options['filters'] as $filter_id => $filter_options)
+			{
+				// The label cannot be empty, and the where needs to exist.
+				if(empty($filter_options['label']) || !isset($filter_options['where']))
+				{
+					return false;
+				}
+
+				// We will use this later!
+				$options['filters'][$filter_id]['count'] = 0;
+			}
+
+			$this->tables[$tbl_name]['filters'] = $options['filters'];
+		}
+		elseif(isset($options['filters']) && $options['filters'] === false)
+		{
+			$this->tables[$tbl_name]['filters'] = array();
 		}
 
 		return true;
@@ -557,8 +617,9 @@ class Table
 	{
 		if(!$this->table_exists($tbl_name))
 		{
-			echo l('The table "%s" doesn\'t exist.', htmlchars($tbl_name));
-			return;
+			echo l('The table &quot;%s&quot; doesn&#039;t exist.', htmlchars($tbl_name));
+
+			return false;
 		}
 
 		// Do any changes!
@@ -594,7 +655,7 @@ class Table
 				<table id="', $tbl_name, '" cellpadding="', $table['cellpadding'], '" cellspacing="', $table['cellspacing'], '">';
 
 		// Were any columns defined, by chance?
-		if(count($table['columns']))
+		if(count($table['columns']) > 0)
 		{
 			// Let's get a few things before we get too far, such as if anything is being sorted.
 			if(!empty($_GET['sort']))
@@ -612,6 +673,17 @@ class Table
 				$is_default_sort = true;
 			}
 
+			// Is there a filter applied?
+			if(!empty($_GET['filter']) && isset($table['filters'][$_GET['filter']]))
+			{
+				// Seems to be valid too, so...
+				$filter = $_GET['filter'];
+			}
+			else
+			{
+				$filter = 'all';
+			}
+
 			// Where we startin'?
 			$page = !empty($_GET['page']) && (string)$_GET['page'] == (string)(int)$_GET['page'] ? (int)$_GET['page'] : 1;
 
@@ -619,32 +691,96 @@ class Table
 			// But will we query the database, or something else?
 			if(empty($table['function']))
 			{
-				// Get the number of rows, change that query a bit ;)
-				$result = db()->query('
+				$add_where = stripos($table['db_query'], 'WHERE ') === false;
+
+				// Get the number of rows, but we will need to change the query a
+				// but first.
+				$count_query = '
 										SELECT
 											COUNT(*)
-										'. substr($table['db_query'], stripos($table['db_query'], 'FROM')),
+										'. substr($table['db_query'], stripos($table['db_query'], 'FROM '));
+
+				if($add_where)
+				{
+					$count_query .= "\r\n{where_filter}";
+				}
+
+				// Get the totals for each filter.
+				// If there are any, of course!
+				if(count($table['filters']) > 0)
+				{
+					foreach($table['filters'] as $filter_id => $filter_options)
+					{
+						$result = db()->query(str_ireplace('{where_filter}', ($add_where ? 'WHERE ' : 'AND '). '('. $filter_options['where']. ')', $count_query),
+												$table['db_vars'], $tbl_name. '_count_query_'. $filter_id);
+
+						list($table['filters'][$filter_id]['count']) = $result->fetch_row();
+					}
+				}
+
+				// Now for the overall total.
+				$result = db()->query(str_ireplace('{where_filter}', '', $count_query),
 										$table['db_vars'], $tbl_name. '_count_query');
 
-				list($num_rows) = $result->fetch_row();
+				list($overall_rows) = $result->fetch_row();
+
+				// How many rows are we going to be dealing with?
+				if($filter == 'all')
+				{
+					$num_rows = $overall_rows;
+				}
+				else
+				{
+					$num_rows = $table['filters'][$filter]['count'];
+				}
 			}
 			else
 			{
 				// Gimme that dataz!
-				$function_data = call_user_func_array($table['function'], array($page, $table['per_page'], $sort, $order, &$num_rows));
+				$function_data = call_user_func_array($table['function'], array($page, $table['per_page'], $sort, $order, &$num_rows, &$overall_rows, &$filters));
 			}
 
 			// Create our pagination!!!
 			$start = $page;
 
-			$pagination = create_pagination($table['base_url']. (empty($is_default_sort) ? '&amp;sort='. $sort. '&amp;order='. strtolower($order) : ''), $start, $num_rows, $table['per_page']);
+			$pagination = create_pagination($table['base_url']. (empty($is_default_sort) ? '&amp;sort='. $sort. '&amp;order='. strtolower($order) : ''). ($filter != 'all' ? '&amp;filter='. urlencode($filter) : ''), $start, $num_rows, $table['per_page']);
 
 			$page = ceil(($start + 1 * $table['per_page']) / $table['per_page']);
 
-			// Now output the pagination and the column headers.
+			// Generate the filters, if there are any.
+			if(count($table['filters']) > 0)
+			{
+				$filters = array(
+										 ($filter != 'all' ? '<a href="'. $table['base_url']. '">' : ''). l('All (%u)', format_number($overall_rows)). ($filter != 'all' ? '</a>' : ''),
+									 );
+
+				foreach($table['filters'] as $filter_id => $filter_options)
+				{
+					$filters[] = ($filter != $filter_id ? '<a href="'. $table['base_url']. '&amp;filter='. urlencode($filter_id). '">' : ''). $filter_options['label']. ' ('. format_number($filter_options['count']). ')'. ($filter != $filter_id ? '</a>' : '');
+				}
+			}
+
+			// Now output the pagination and the column headers, and the filters!
 			echo '
 					<tr class="header">
-						<td colspan="', ($is_options ? count($table['columns']) + 1 : count($table['columns'])), '">', $pagination, '</td>
+						<td colspan="', ($is_options ? count($table['columns']) + 1 : count($table['columns'])), '">';
+
+			if(isset($filters))
+			{
+				echo '
+							<span class="float-left table-filters">', implode(' | ', $filters), '</span>
+							<span class="float-right">', $pagination, '</span>
+							<div class="break">
+							</div>';
+			}
+			else
+			{
+				echo '
+							', $pagination;
+			}
+
+			echo '
+						</td>
 					</tr>
 					<tr class="columns">';
 
@@ -666,9 +802,24 @@ class Table
 			// Do we need to do a query?
 			if(empty($table['function']))
 			{
+				// We may need to make a modification... Maybe.
+				if($filter != 'all')
+				{
+					// Looks like we may have to. But is there a WHERE already?
+					if(stripos($table['db_query'], 'WHERE ') !== false)
+					{
+						$data_query = str_ireplace('{where_filter}', 'AND ('. $table['filters'][$filter]['where']. ')', $table['db_query']);
+					}
+					else
+					{
+						// We will add it ourselves, then.
+						$data_query = $table['db_query']. "\r\nWHERE ". $table['filters'][$filter]['where'];
+					}
+				}
+
 				// Now to query the real data!
 				$result = db()->query(
-												 $table['db_query']. '
+												 (isset($data_query) ? $data_query : $table['db_query']). '
 												 '. (!empty($sort) ? 'ORDER BY '. $table['columns'][$sort]['column']. ' '. $order : ''). '
 												 LIMIT '. (int)$start. ','. (int)$table['per_page'],
 												 $table['db_vars'], $tbl_name. '_query');
