@@ -461,8 +461,7 @@ if(!function_exists('admin_themes_install'))
 				api()->context['status_class'] = $response['div-class'];
 				api()->context['proceed'] = $install_proceed;
 
-				// So is everything okay? Make sure that no version compatibility
-				// was specified, or that it is compatible.
+				// So is everything okay?
 				if(!empty($install_proceed))
 				{
 					// We are almost there... Really! We are! We just need to check

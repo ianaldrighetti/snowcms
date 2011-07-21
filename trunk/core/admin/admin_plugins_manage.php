@@ -348,15 +348,30 @@ if(!function_exists('admin_plugins_check_updates'))
 			array $guids - An array of plugin guid's to check for updates.
 
 		Returns:
-			void - Nothing is returned by this function.
+			mixed - Returns an array containing all the plugins that have an
+							update available, if multiple plugins were supplied in the
+							$guids parameter. If only one plugin was supplied then the
+							update version available will be returned (a string) or false
+							if there are no updates available.
 
 		Note:
 			This function is overloadable.
+
+			If the $guids parameter is empty, it is assumed that this function is
+			being called upon by the SnowCMS task system and will check for
+			updates for all existing plugins, so long as it hasn't been done
+			within the last hour.
 	*/
 	function admin_plugins_check_updates($guids = array())
 	{
 		// This array will keep track of available updates.
 		$plugin_updates = array();
+
+		// No an array? We'll make it one!
+		if(!is_array($guids))
+		{
+			$guids = array($guids);
+		}
 
 		// No GUIDs supplied?
 		if(count($guids) == 0)
@@ -375,6 +390,9 @@ if(!function_exists('admin_plugins_check_updates'))
 
 				// Woops! Don't forget to set the last time we checked for updates!
 				settings()->set('last_plugin_update_check', time_utc(), 'int');
+
+				// This is a system update check... So yeah.
+				$system_update_check = true;
 			}
 		}
 
@@ -415,19 +433,41 @@ if(!function_exists('admin_plugins_check_updates'))
 					continue;
 				}
 
-				// Even if there isn't a newer version, still update the plugins
-				// information. This is just incase, for some odd reason, an update
-				// has been taken down.
-				db()->query('
-					UPDATE {db->prefix}plugins
-					SET available_update = {string:version_available}
-					WHERE guid = {string:guid}
-					LIMIT 1',
-					array(
-						'version_available' => compare_versions($request, $plugin_info['version'], '>') ? $request : '',
-						'guid' => $plugin_info['guid'],
-					), 'plugins_check_updates_query');
+				// Is this version actually newer? Save it!
+				if(compare_versions($request, $plugin_info['version'], '>'))
+				{
+					// The GUID will be the index and the value will be the version
+					// available.
+					$plugin_updates[$plugin_info['guid']] = $request;
+				}
 			}
+		}
+
+		// Save the available updates to the database, if this was invoked by
+		// the tasks system, that is.
+		if(!empty($system_update_check))
+		{
+			settings()->set('plugin_updates', $plugin_updates);
+		}
+
+		// Did you give us one plugin to check for updates?
+		if(count($guids) == 0)
+		{
+			// Yup, so let's see if we can return a version.
+			if(count($plugin_updates) > 0)
+			{
+				// Take it off the bottom!
+				return array_pop($plugin_updates);
+			}
+			else
+			{
+				// No update was available.
+				return false;
+			}
+		}
+		else
+		{
+			return $plugin_updates;
 		}
 	}
 }

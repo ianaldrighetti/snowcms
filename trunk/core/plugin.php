@@ -46,19 +46,32 @@ if(!defined('INSNOW'))
 
 	Note:
 		Here are the following indexes in the array returned:
-			string guid - The plugins globally unique identifier.
 
-			string name - The name of the plugin.
+			string guid - The plugins globally unique identifier.*
 
-			string author - The author of the plugin.
+			string name - The name of the plugin.*
 
-			string version - The version of the plugin.
+			string author - The author of the plugin.*
+
+			string version - The version of the plugin.*
 
 			string description - The description of the plugin.
 
 			string website - The authors website.
 
-			string path - The root directory of the plugin.
+			string directory - The root directory of the plugin.*
+
+			string compatible_with - A string containing a comma separated list of
+															 versions (SnowCMS versions, that is) the
+															 plugin is compatible with.
+
+			bool is_compatible - This index will contain true if the plugin is
+													 compatible with the currently running version of
+													 SnowCMS, false if not. However if no versions
+													 were specified in compatible_with, it will
+													 contain null.
+
+		* (asterisk) Indicates this index will never be null.
 */
 function plugin_load($plugin_id, $is_path = true)
 {
@@ -100,62 +113,58 @@ function plugin_load($plugin_id, $is_path = true)
 
 	$data = $xml->parse($plugin_id. '/plugin.xml');
 
-	if(count($data) > 0)
+	// Make sure nothing went wrong when parsing the XML file.
+	if($data === false)
 	{
-		// Keep track of whether or not we are in the author tag.
-		$in_author = false;
-
-		// Keep track of the theme info.
-		$plugin_info = array(
-										 'guid' => null,
-										 'author' => null,
-										 'website' => null,
-										 'email' => null,
-										 'name' => null,
-										 'description' => null,
-										 'version' => null,
-									);
-		foreach($data as $item)
-		{
-			// Keep track of where we are.
-			if($item['tag'] == 'author' && $item['type'] == 'open')
-			{
-				$in_author = true;
-			}
-			elseif($item['tag'] == 'author' && $item['type'] == 'close')
-			{
-				$in_author = false;
-			}
-
-			// Saving something?
-			if($item['tag'] == 'name' && $in_author)
-			{
-				$plugin_info['author'] = $item['value'];
-			}
-			elseif($item['tag'] == 'guid')
-			{
-				$plugin_info['guid'] = $item['value'];
-			}
-			elseif(array_key_exists($item['tag'], $plugin_info) && $item['type'] != 'close')
-			{
-				$plugin_info[$item['tag']] = $item['value'];
-			}
-		}
-
-		// No author? No name? No way!
-		if(empty($plugin_info['author']) || empty($plugin_info['name']) || empty($plugin_info['guid']) || empty($plugin_info['version']))
-		{
-			return false;
-		}
+		return false;
 	}
-	else
+
+	$plugin_info = array(
+									 'guid' => htmlchars($xml->get_value($xml->value('guid', 'plugin-info'))),
+									 'author' => htmlchars($xml->get_value($xml->value('name', 'author'))),
+									 'website' => htmlchars($xml->get_value($xml->value('website', 'author'))),
+									 'email' => htmlchars($xml->get_value($xml->value('email', 'author'))),
+									 'name' => htmlchars($xml->get_value($xml->value('name', 'plugin-info'))),
+									 'description' => htmlchars($xml->get_value($xml->value('description', 'plugin-info'))),
+									 'version' => htmlchars($xml->get_value($xml->value('version', 'plugin-info'))),
+									 'compatible_with' => htmlchars($xml->get_value($xml->value('compatible-with', 'plugin-info'))),
+									 'is_compatible' => null,
+								 );
+
+	// Check to see if the plugin is compatible.
+	if(!empty($plugin_info['compatible_with']))
 	{
-		// Woops, that's not right!
+		$plugin_info['is_compatible'] = is_compatible($plugin_info['compatible_with']);
+	}
+
+	// No author? No name? No way!
+	if(empty($plugin_info['author']) || empty($plugin_info['name']) || empty($plugin_info['guid']) || empty($plugin_info['version']))
+	{
+		return false;
+	}
+
+	// Make sure the email address is valid.
+	if(!is_email($plugin_info['email']))
+	{
+		$plugin_info['email'] = null;
+	}
+
+	// Same goes for the website URL.
+	if(!is_url($plugin_info['website']))
+	{
+		$plugin_info['website'] = null;
+	}
+
+	// Oh, and the GUID (which is basically a URL).
+	if(!is_url((strtolower(substr($plugin_info['guid'], 0, 7)) != 'http://' && strtolower(substr($plugin_info['guid'], 0, 8)) != 'https://' ? 'http://' : ''). $plugin_info['guid']))
+	{
+		// The GUID is REQUIRED.
 		return false;
 	}
 
 	// Add the path, just incase :P
 	$plugin_info['path'] = realpath($plugin_id);
+	$plugin_info['directory'] = $plugin_info['path'];
 
 	// Now return the information.
 	return $plugin_info;
