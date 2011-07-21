@@ -116,7 +116,6 @@ CREATE TABLE '{db->prefix}plugins'
 	'directory' VARCHAR(255) NOT NULL,
 	'runtime_error' SMALLINT NOT NULL DEFAULT '0',
 	'is_activated' SMALLINT NOT NULL DEFAULT '0',
-	'available_update' VARCHAR(255) NULL,
 	PRIMARY KEY ('guid')
 );
 

@@ -113,7 +113,6 @@ CREATE TABLE `{db->prefix}plugins`
 	`directory` VARCHAR(255) NOT NULL,
 	`runtime_error` TINYINT(1) UNSIGNED NOT NULL DEFAULT '0',
 	`is_activated` TINYINT(1) UNSIGNED NOT NULL DEFAULT '0',
-	`available_update` VARCHAR(255) NULL,
 	PRIMARY KEY (`guid`),
 	KEY (`runtime_error`),
 	KEY (`is_activated`)
