@@ -425,7 +425,7 @@ class Extraction
 			return false;
 		}
 
-		return $extractor->read($filename, $file, $destination);
+		return $extractor->read($file, $destination);
 	}
 
 	/*

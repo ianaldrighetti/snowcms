@@ -708,4 +708,90 @@ if(!function_exists('interface_exists'))
 		return class_exists($interface_name, $autoload);
 	}
 }
+
+/*
+	Function: copydir
+
+	Copies the contents of a directory from one location to another,
+	recursively, of course!
+
+	Parameters:
+		string $dirname - The name of the directory to copy.
+		string $destination - The destination of the new directory's contents.
+
+	Returns:
+		bool - Returns true on success, false on failure.
+
+	Note:
+		Any file which is being copied from $dirname to $destination will be
+		overwritten.
+*/
+function copydir($dirname, $destination)
+{
+	// Make sure the directory you want to copy exists.
+	if(!file_exists($dirname) || !is_dir($dirname) || (!file_exists($destination) && !@mkdir($destination, 0755, true)))
+	{
+		return false;
+	}
+
+	// Get all the files within the directory you are copying.
+	$files = scandir($dirname);
+	foreach($files as $filename)
+	{
+		// We can't copy . or .. ;-)
+		if(in_array($filename, array('.', '..')))
+		{
+			continue;
+		}
+
+		// Is it a directory or file?
+		if(is_dir($dirname. '/'. $filename))
+		{
+			// The recursion part comes in here.
+			copydir($dirname. '/'. $filename, $destination. '/'. $filename);
+		}
+		else
+		{
+			// Sweet. Time to get copying!
+			$fp = fopen($dirname. '/'. $filename, 'r');
+
+			// Could it be opened?
+			if(empty($fp))
+			{
+				continue;
+			}
+
+			// Now try to open the destination file.
+			$destfp = fopen($destination. '/'. $filename, 'w');
+
+			// We need to make sure we could open/create the file in the
+			// destination directory too.
+			if(empty($destfp))
+			{
+				continue;
+			}
+
+			// Lock the files.
+			flock($fp, LOCK_SH);
+			flock($destfp, LOCK_EX);
+
+			// Now we will do the copying.
+			while(!feof($fp))
+			{
+				// We do this just in case the file we are copying is large. We
+				// don't want to run out or memory!
+				fwrite($destfp, fread($fp, 8192));
+			}
+
+			// Now unlock the files and close them.
+			flock($fp, LOCK_UN);
+			fclose($fp);
+
+			flock($destfp, LOCK_UN);
+			fclose($destfp);
+		}
+	}
+
+	return true;
+}
 ?>

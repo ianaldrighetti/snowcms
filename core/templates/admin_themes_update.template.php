@@ -29,11 +29,11 @@ echo '
 		<p class="bold">', l('Downloading Update'), '</p>
 		<p', !empty(api()->context['download_is_error']) ? ' class="red"' : '', '>', api()->context['download_message'], '</p>';
 
-if(!empty(api()->context['extract_message']))
+if(!empty(api()->context['validate_message']))
 {
 	echo '
-			<p class="bold">', l('Extracting Theme'), '</p>
-			<p', !empty(api()->context['extract_is_error']) ? ' class="red"' : '', '>', api()->context['extract_message'], '</p>';
+		<p class="bold">', l('Validating Theme'), '</p>
+		<p', !empty(api()->context['validate_is_error']) ? ' class="red"' : '', '>', api()->context['validate_message'], '</p>';
 
 	if(!empty(api()->context['status_message']))
 	{
@@ -43,29 +43,45 @@ if(!empty(api()->context['extract_message']))
 				<p>', api()->context['status_message'], '</p>
 			</div>';
 
-		// Did installation proceed?
+		// Did the update process continue?
 		if(!empty(api()->context['proceed']))
 		{
-			// Check compatibility before calling it all good.
+			// Yes, but what about compatibility?
 			echo '
 			<p class="bold">', l('Checking Compatibility'), '</p>
-			<p', !empty(api()->context['compatible_is_error']) ? ' class="red"' : '', '">', api()->context['compatible_message'], '</p>';
+			<div', !empty(api()->context['compatible_is_error']) ? ' class="error-message"' : '', '>
+				<p>', api()->context['compatible_message'], '</p>
+			</div>';
 
 			if(empty(api()->context['compatible_is_error']))
 			{
 				echo '
-			<h3>', l('Update Complete'), '</h3>
-			<p>', l('The theme was successfully updated.'), '</p>';
+			<p class="bold">', l('Extracting Theme'), '</p>
+			<p', !empty(api()->context['extract_is_error']) ? ' class="red"' : '', '>', api()->context['extract_message'], '</p>';
+
+				if(empty(api()->context['extract_is_error']) && !empty(api()->context['completed']))
+				{
+					// We're done! Awesome!
+					echo '
+			<p class="bold">', l('Update Complete'), '</p>
+			<p>', l('The theme was successfully updated to v%s.', api()->context['update_version']), '</p>';
+				}
+				elseif(empty(api()->context['extract_is_error']))
+				{
+					echo '
+			<p class="bold">', l('Update Failed'), '</p>
+			<p>', l('The theme was not successfully update due to the update package not being a valid theme.'), '</p>';
+				}
 			}
 			else
 			{
 				// You may continue with the installation anyways, if you want.
 				echo '
-			<form action="', baseurl, '/index.php" method="get" onsubmit="return confirm(\'', l('Do you really want to update to this theme version which isn\\\'t compatible with your version of SnowCMS?\r\nThis could stop the theme from working properly.'), '\');" class="right">
+			<form action="', baseurl, '/index.php" method="get" onsubmit="return confirm(\'', l('Do you really want to update to a version of this theme which isn\\\'t compatible with your version of SnowCMS?'), '\');" class="right">
 				<input type="submit" value="', l('Proceed anyways'), ' &raquo;" />
 				<input type="hidden" name="action" value="admin" />
 				<input type="hidden" name="sa" value="themes" />
-				<input type="hidden" name="update" value="', api()->context['update_theme'], '" />
+				<input type="hidden" name="update" value="', api()->context['update'], '" />
 				<input type="hidden" name="sid" value="', member()->session_id(), '" />
 				<input type="hidden" name="proceed" value="true" />
 				<input type="hidden" name="compat" value="ignore" />
@@ -75,17 +91,18 @@ if(!empty(api()->context['extract_message']))
 		else
 		{
 			echo '
-			<form action="', baseurl, '/index.php" method="get" onsubmit="return confirm(\'', l('Do you really want to install this theme update?\r\nThis should only be done if you trust the source of this theme package.'), '\');" class="right">
+			<form action="', baseurl, '/index.php" method="get" onsubmit="return confirm(\'', l('Do you really want to update this theme?\r\nThis should only be done if you trust the source of this theme.'), '\');" class="right">
 				<input type="submit" value="', l('Proceed anyways'), ' &raquo;" />
 				<input type="hidden" name="action" value="admin" />
 				<input type="hidden" name="sa" value="themes" />
-				<input type="hidden" name="update" value="', api()->context['update_theme'], '" />
+				<input type="hidden" name="update" value="', api()->context['update'], '" />
 				<input type="hidden" name="sid" value="', member()->session_id(), '" />
 				<input type="hidden" name="proceed" value="true" />
 			</form>';
 		}
 	}
 }
+
 echo '
 		<p class="right"><a href="', baseurl, '/index.php?action=admin&amp;sa=themes">Back to theme management &raquo;</a></p>';
 ?>
