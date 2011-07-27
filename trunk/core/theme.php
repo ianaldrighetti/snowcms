@@ -79,11 +79,43 @@ function theme_load($path)
 		return false;
 	}
 
+	// Everything else will be handled by theme_get_info.
+	return theme_get_info($path. '/theme.xml');
+}
+
+/*
+	Function: theme_get_info
+
+	Parses the specified theme.xml file into an array containing the
+	information about a theme.
+
+	Parameters:
+		string $filename - The name of the theme XML file.
+
+	Returns:
+		array - See notes on <theme_load> for more information.
+
+	Note:
+		This function is used to only parse a theme.xml file, but it does not
+		validate whether or not a directory is a theme like <theme_load> does,
+		but <theme_load> does use this function.
+
+		If the required information (such as author and theme name) is not found
+		false will be returned.
+*/
+function theme_get_info($filename)
+{
+	// The file needs to exist, of course!
+	if(!file_exists($filename) || !is_file($filename))
+	{
+		return false;
+	}
+
 	// We need the XML class to do this.
 	$xml = api()->load_class('XML');
 
 	// Parse the XML file now.
-	$data = $xml->parse($path. '/theme.xml');
+	$data = $xml->parse($filename);
 
 	// So, did it work?
 	if($data === false)
@@ -137,7 +169,7 @@ function theme_load($path)
 	}
 
 	// Add the path, just incase :P
-	$theme_info['path'] = realpath($path);
+	$theme_info['path'] = realpath(dirname($filename));
 	$theme_info['directory'] = $theme_info['path'];
 
 	// Alright, we will put together the information array.
