@@ -22,13 +22,23 @@ if(!defined('INSNOW'))
 	die('Nice try...');
 }
 
+// We need that Extractor interface.
+if(!interface_exists('Extractor'))
+{
+	// Get it!
+	require(coredir. '/extractor.interface.php');
+}
+
 /*
 	Class: Zip
 
-	Allows the extraction of zip archives according to the Wikipedia's (don't
-	you just love Wikipedia?) zip file format information.
+	The Zip class enables the extraction of zip archives according to
+	Wikipedia's zip file format information (don't you just love Wikipedia?).
+
+	Note:
+		This class implements the <Extractor> interface.
 */
-class Zip
+class Zip implements Extractor
 {
 	// Variable: filename
 	private $filename;
@@ -39,13 +49,15 @@ class Zip
 	/*
 		Constructor: __construct
 
-		Allows the opening of a zip archive.
+		Initializes all attributes to null and can also be used to open a zipped
+		archive.
 
 		Parameters:
 			string $filename - The name of the zip to open.
 	*/
 	public function __construct($filename = null)
 	{
+		// Everything needs to be set to null.
 		$this->filename = null;
 		$this->fp = null;
 
@@ -65,35 +77,41 @@ class Zip
 
 		Returns:
 			bool - Returns true if the zip archive was opened successfully, false
-						 if the file does not exist, or is not a valid zip archive.
+						 if the file does not exist or is not a valid zip archive.
+
+		Note:
+			This method may also return false if extracting zip archives are not
+			supported on this system. See <Zip::is_supported> for more details.
 	*/
 	public function open($filename)
 	{
-		// Already opened? Pfft. Can't open it again ;-) Nor can we open a file which doesn't exist.
-		if(!empty($this->fp) || !file_exists($filename) || !is_file($filename))
+		// Already doing something else? Maybe the file doesn't exist? We will
+		// make sure of that. Also make sure we can even extract zip archives.
+		if(!$this->is_supported() || !empty($this->fp) || !file_exists($filename) || !is_file($filename))
 		{
 			return false;
 		}
 
-		// Now open the zip archive, if it is one, that is :P
+		// Now open the alleged zip archive.
 		$fp = fopen($filename, 'r');
 
-		// Couldn't open the archive? That really sucks.
+		// Couldn't open the file? That really sucks.
 		if(empty($fp))
 		{
 			return false;
 		}
 
-		// Check the signature, it should be equal to 0x04034b50.
+		// Check the signature, it should be 0x04034b50.
 		list(, $signature) = unpack('V', fread($fp, 4));
 
 		// Not right?
 		if($signature != 0x04034b50)
 		{
+			// Then I guess this isn't a zip archive.
 			return false;
 		}
 
-		// We are now locking this, it is ours! :P
+		// We are now locking this to prevent any tampering.
 		flock($fp, LOCK_SH);
 		fseek($fp, 0);
 
@@ -109,7 +127,7 @@ class Zip
 		Method: files
 
 		Returns an array containing all the files and folders contained within
-		the currently opened zip archive.
+		the current zip archive.
 
 		Parameters:
 			none
@@ -149,6 +167,9 @@ class Zip
 
 			// Read out the compressed and uncompressed size.
 			$file = unpack('Vcompressed_size/Vuncompressed_size', fread($this->fp, 8));
+
+			// Just so we can follow the Extractor interface guidelines.
+			$file['size'] = $file['uncompressed_size'];
 
 			// We will need the file name and extra field length.
 			$tmp = unpack('Sfilename_length/Sextra_length', fread($this->fp, 4));
@@ -198,7 +219,7 @@ class Zip
 	/*
 		Method: extract
 
-		Extracts the currently opened zip archive to the specified location.
+		Extracts the current zip archive to the specified location.
 
 		Parameters:
 			string $destination - Where the contents of the zip archive will be
@@ -223,15 +244,13 @@ class Zip
 		// Does the destination not exist? Then we shall try to create it!
 		if(!file_exists($destination))
 		{
-			$made = mkdir($destination, 0755, true);
-
-			if(empty($made))
+			if(!@mkdir($destination, 0755, true))
 			{
 				// We tried to make it, but we couldn't! :(
 				return false;
 			}
 		}
-		// Is it even a directory if it does happen to exist?
+		// Is it even a directory? That is if it happens to exist.
 		elseif(file_exists($destination) && !is_dir($destination))
 		{
 			return false;
@@ -240,17 +259,17 @@ class Zip
 		// Get all the files that need to be extracted.
 		$files = $this->files();
 
-		if(count($files > 0))
+		if(count($files) > 0)
 		{
 			foreach($files as $file)
 			{
 				// Prepend the destination to the files name!
-				$file['name'] = $destination .'/'. $file['name'];
+				$file['name'] = $destination. '/'. $file['name'];
 
 				// "Safe Mode" on?
 				if(!empty($safe_mode))
 				{
-					$file['name'] = strtr($file['name'], array('../' => '', '/..' => ''));
+					$file['name'] = strtr($file['name'], array('../' => '', '/..' => '', './' => ''));
 				}
 
 				// Is it a directory? Simple.
@@ -300,6 +319,118 @@ class Zip
 	}
 
 	/*
+		Method: read
+
+		Reads the specified file from the current zip archive and returns the
+		contents of the file or saves it to the specified file.
+
+		Parameters:
+			string $filename - The name of the file in the zip archive to read.
+			string $destination - The location where $filename should be saved to,
+														if left blank the contents will be returned.
+
+		Returns:
+			mixed - Returns a string containing the files contents if $destination
+							is left empty but false if the file does not exist. If
+							a destination is supplied, true will be returned on success
+							and false on failure (e.g. the file does not exist).
+
+		Note:
+			File names are case-sensitive!
+
+			This does not work on directories in the archives, only files can be
+			retrieved.
+
+			If you want to retrieve a list of all the directories (and files)
+			within a zip archive, check out <Zip::files>.
+	*/
+	public function read($filename, $destination = null)
+	{
+		// Nothing open?
+		if(empty($this->fp))
+		{
+			return false;
+		}
+
+		// Load up the files in the zip archive.
+		$files = $this->files();
+
+		// Now, let's see if the file exists. In order to do that, we must
+		// search the files array.
+		$found = false;
+		foreach($files as $file)
+		{
+			// Make sure it isn't a directory.
+			if($file['name'] == $filename && !$file['is_dir'])
+			{
+				// Found it!
+				$found = $file;
+
+				break;
+			}
+		}
+
+		// Was that search successful?
+		if($found === false)
+		{
+			// No, it wasn't. Sorry.
+			return false;
+		}
+
+		// Whether or not you want it in a file, we must take out the contents
+		// of the file in order to decompress it.
+		fseek($this->fp, $file['pos']);
+
+		// Now read the files data.
+		$file_data = fread($this->fp, $file['compressed_size']);
+
+		// Move the pointer back to the beginning of the file.
+		fseek($this->fp, 0);
+
+		// If the compressed and uncompressed sizes are different, then we
+		// should decompress it.
+		if($file['compressed_size'] != $file['uncompressed_size'])
+		{
+			$file_data = @gzinflate($file_data);
+		}
+
+		// Now, do you want the data returned or in a file?
+		if(empty($destination))
+		{
+			return $file_data;
+		}
+		else
+		{
+			// I guess you want us to save it somewhere. First, let's make sure
+			// the directory exists in which you want to save it.
+			if(!is_dir(dirname($destination)) || !file_exists(dirname($destination)))
+			{
+				// Try to make it.
+				if(!@mkdir(dirname($destination), 0755, true))
+				{
+					return false;
+				}
+			}
+
+			// Now try to make the file.
+			$fp = fopen($destination, 'wb');
+
+			if(empty($fp))
+			{
+				// Shoot! Couldn't do it!
+				return false;
+			}
+
+			flock($fp, LOCK_EX);
+			fwrite($fp, $file_data);
+			flock($fp, LOCK_SH);
+			fclose($fp);
+
+			return true;
+		}
+	}
+
+	/*
 		Method: close
 
 		Closes the zip archive currently being read.
@@ -335,6 +466,29 @@ class Zip
 	public function __destruct()
 	{
 		$this->close();
+	}
+
+	/*
+		Method: is_supported
+
+		Returns whether or not a zip archive could be extracted on the current
+		system.
+
+		Parameters:
+			none
+
+		Returns:
+			bool - Returns true if a zip archive could be extracted on the current
+						 system, false if not.
+
+		Note:
+			In order for a zip archive to be extracted the Zip class requires the
+			use of the <www.php.net/gzinflate> function which is part of the
+			<www.php.net/zlib> extension.
+	*/
+	public function is_supported()
+	{
+		return function_exists('gzinflate');
 	}
 }
 ?>
