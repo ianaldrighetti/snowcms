@@ -682,4 +682,30 @@ function format_number($number, $decimals = 0)
 {
 	return number_format($number, $decimals);
 }
+
+if(!function_exists('interface_exists'))
+{
+	/*
+		Function: interface_exists
+
+		Checks to see whether or not the specified interface is defined.
+
+		Parameters:
+			string $interface_name - The name of the interface.
+			bool $autoload - Whether to call <www.php.net/__autoload> or not by
+											 default.
+
+		Returns:
+			bool - Returns true if the interface exists, false if not.
+
+		Note:
+			This function does not exist until PHP 5.0.2, for some odd reason.
+	*/
+	function interface_exists($interface_name, $autoload = true)
+	{
+		// It may not exist until PHP 5.0.2, but class_exists does the same,
+		// until PHP 5.0.2, that is.
+		return class_exists($interface_name, $autoload);
+	}
+}
 ?>
