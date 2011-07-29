@@ -1,3 +1,15 @@
+CREATE TABLE '{db->prefix}auth_tokens'
+(
+	'member_id' INT(11) UNSIGNED NOT NULL DEFAULT '0',
+	'token_id' VARCHAR(255) NOT NULL,
+	'token_assigned' INT(10) UNSIGNED NOT NULL DEFAULT '0',
+	'token_expires' INT(10) UNSIGNED NOT NULL DEFAULT '0',
+	'token_data' TEXT NOT NULL,
+	PRIMARY KEY ('member_id', 'token_id')
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+
+CREATE UNIQUE INDEX '{db->prefix}auth_tokens_token_id' ON '{db->prefix}auth_tokens' ('token_id');
+
 CREATE TABLE '{db->prefix}error_log'
 (
 	'error_id' INTEGER PRIMARY KEY,
@@ -112,11 +124,11 @@ INSERT INTO '{db->prefix}permissions' ('group_id', 'permission', 'status') VALUE
 
 CREATE TABLE '{db->prefix}plugins'
 (
-	'guid' VARCHAR(255) NOT NULL,
 	'directory' VARCHAR(255) NOT NULL,
 	'runtime_error' SMALLINT NOT NULL DEFAULT '0',
+	'error_message' TEXT NULL,
 	'is_activated' SMALLINT NOT NULL DEFAULT '0',
-	PRIMARY KEY ('guid')
+	PRIMARY KEY ('directory')
 );
 
 CREATE INDEX '{db->prefix}plugins_runtime_error' ON '{db->prefix}plugins' ('runtime_error');

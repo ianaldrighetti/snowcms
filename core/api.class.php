@@ -1676,10 +1676,6 @@ function load_api()
 	// disabled :)
 	register_shutdown_function('api_catch_fatal');
 
-	// We are about to load the plugins!
-	// (fyi, this is used to help api_catch_fatal, specifically for PHP 5.2.0 <)
-	$loading_plugins = true;
-
 	// Instantiate the API class.
 	$GLOBALS['api'] = new API();
 
@@ -1690,7 +1686,7 @@ function load_api()
 	// Find all activated plugins, that way we can load them up.
 	$result = db()->query('
 		SELECT
-			guid, directory
+			directory
 		FROM {db->prefix}plugins
 		WHERE is_activated = 1 AND runtime_error = 0');
 
@@ -1712,12 +1708,12 @@ function load_api()
 			if(!file_exists(plugindir. '/'. $row['directory']. '/plugin.php'))
 			{
 				// Mark it for a 'runtime error'
-				$bad_plugins[] = $row['guid'];
+				$bad_plugins[] = $row['directory'];
 			}
 			else
 			{
 				// Add the plugin, for now.
-				$plugins[strtolower($row['guid'])] = plugindir. '/'. $row['directory']. '/plugin.php';
+				$plugins[strtolower($row['directory'])] = plugindir. '/'. $row['directory']. '/plugin.php';
 			}
 		}
 
@@ -1727,7 +1723,7 @@ function load_api()
 			db()->query('
 				UPDATE {db->prefix}plugins
 				SET runtime_error = 1
-				WHERE guid IN({string_array:bad_plugins})',
+				WHERE directory IN({string_array:bad_plugins})',
 				array(
 					'bad_plugins' => $bad_plugins,
 				));
@@ -1741,8 +1737,10 @@ function load_api()
 				// Well well, load the plugin!
 				require_once($plugin);
 
+				$plugin_info = plugin_load(plugindir. '/'. $directory);
+
 				// The plugin is now enabled :-)
-				api()->add_plugin($guid);
+				api()->add_plugin($plugin_info['guid']);
 			}
 
 			// Alright, one of our first hooks! :D Just a simple one that plugins
@@ -1752,9 +1750,6 @@ function load_api()
 			api()->run_hooks('post_plugin_activation');
 		}
 	}
-
-	// We have now loaded all plugins.
-	$loading_plugins = false;
 
 	// Simple hook, something you can hook onto if you want to do something
 	// right before SnowCMS stops executing.
@@ -1779,19 +1774,19 @@ function load_api()
 */
 function api_catch_fatal()
 {
-	global $loading_plugins;
-
-	// Not loading plugins?
-	if(empty($loading_plugins))
+	// Make sure this isn't being called after the page has loaded without
+	// any issue.
+	if(stripos(ob_get_contents(), '<html') !== false)
 	{
-		// Then don't worry about it!
 		return;
 	}
 
 	// Only PHP 5.2.0 >= supports error_get_last :/
-	if(!function_exists('error_get_last'))
+	if(function_exists('error_get_last'))
 	{
 		$last_error = error_get_last();
+
+		$last_error['message'] .= ' in '. $last_error['file']. ' on line '. $last_error['line'];
 	}
 	else
 	{
@@ -1799,11 +1794,11 @@ function api_catch_fatal()
 		$error_string = ob_get_contents();
 
 		// Is it a parse error?
-		if(stripos($error_string, 'parse error') !== false)
+		if(stripos($error_string, 'parse error') !== false || stripos($error_string, 'fatal error') !== false)
 		{
 			// Now that we know it is a parse error, try to get the path.
 			$last_error = array(
-											'type' => E_PARSE,
+											'type' => stripos($error_string, 'fatal error') !== false ? E_ERROR : E_PARSE,
 											'file' => null,
 											'message' => $error_string,
 										);
@@ -1824,7 +1819,7 @@ function api_catch_fatal()
 	}
 
 	// Parse error? That's what we are looking for, after all!
-	if($last_error['type'] == E_PARSE)
+	if(in_array($last_error['type'], array(E_ERROR, E_PARSE, E_COMPILE_ERROR)))
 	{
 		// Did it come from the plugin directory?
 		if(substr($last_error['file'], 0, strlen(plugindir)) == realpath(plugindir))
@@ -1840,19 +1835,18 @@ function api_catch_fatal()
 
 				if(file_exists($cur_path. '/plugin.xml'))
 				{
-					$plugin = plugin_load($cur_path, true);
-
-					// Is the GUID in there?
-					if(isset($plugin['guid']))
+					// Did we find the plugins base directory?
+					if(plugin_load($cur_path) !== false)
 					{
 						// We do, so disable that dern thing!
 						db()->query('
 							UPDATE {db->prefix}plugins
-							SET runtime_error = 2
-							WHERE guid = {string:guid}
+							SET runtime_error = 2, is_activated = 0, error_message = {string:error_message}
+							WHERE directory = {string:directory}
 							LIMIT 1',
 							array(
-								'guid' => $plugin['guid'],
+								'directory' => basename($cur_path),
+								'error_message' => htmlspecialchars(strip_tags($last_error['message']), ENT_QUOTES, 'UTF-8'),
 							));
 
 						// Log the error.
@@ -1862,7 +1856,7 @@ function api_catch_fatal()
 						}
 
 						// Well, now log the error.
-						errors_handler($last_error['type'], $last_error['message'], $last_error['file'], null);
+						errors_handler($last_error['type'], $last_error['message'], $last_error['file'], $last_error['line']);
 
 						// Redirect, maybe.
 						if(!isset($_SESSION['last_error_fix']) || ((int)$_SESSION['last_error_fix'] + 10) < time())
@@ -1872,7 +1866,7 @@ function api_catch_fatal()
 							ob_clean();
 
 							header('HTTP/1.1 307 Temporary Redirect');
-							header('Location: '. baseurl. $_SERVER['REQUEST_URI']);
+							header('Location: '. $_SERVER['REQUEST_URI']);
 
 							exit;
 						}

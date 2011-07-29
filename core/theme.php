@@ -195,7 +195,7 @@ function theme_get_info($filename)
 function theme_list()
 {
 	// Doesn't exist?!
-	if(!file_exists(themedir) || !is_dir(themedir))
+	if(!defined('themedir') || !file_exists(themedir) || !is_dir(themedir))
 	{
 		return false;
 	}
@@ -222,6 +222,64 @@ function theme_list()
 
 	// Whether or not there were any themes found, return the array.
 	return $list;
+}
+
+/*
+	Function: theme_package_valid
+
+	Checks to see whether or not the specified file contains a valid theme.
+
+	Parameters:
+		string $filename - The name of the file to check.
+
+	Returns:
+		bool - Returns true if the file contains a valid theme, false if not.
+
+	Note:
+		This function uses the <Extraction> class in order to check whether or
+		not the following files exist within a compressed file:
+		header.template.php, footer.template.php and theme.xml.
+*/
+function theme_package_valid($filename)
+{
+	$extraction = api()->load_class('Extraction');
+
+	// Get the list of files.
+	$file_list = $extraction->files($filename);
+
+	// Make sure there was anything in there.
+	if(count($file_list) > 0)
+	{
+		// Make sure the files we require exist.
+		$found = 0;
+		foreach($file_list as $file)
+		{
+			if(in_array($file['name'], array('header.template.php', 'footer.template.php', 'theme.xml')))
+			{
+				$found++;
+			}
+		}
+
+		if($found == 3)
+		{
+			// They exist, but is the theme.xml file valid?
+			$tmp_filename = tempnam(dirname(__FILE__), 'theme_');
+			if($extraction->read($filename, 'theme.xml', $tmp_filename))
+			{
+				$theme_info = theme_get_info($tmp_filename);
+
+				// We no longer need the temporary file.
+				unlink($tmp_filename);
+
+				// The theme information array shouldn't be false.
+				return $theme_info !== false;
+			}
+
+			unlink($tmp_filename);
+		}
+	}
+
+	return false;
 }
 
 /*

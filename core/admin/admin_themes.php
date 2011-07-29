@@ -762,6 +762,15 @@ if(!function_exists('admin_themes_update'))
 
 											api()->context['completed'] = true;
 
+											// Woopsie! Forgot to mark this theme as up-to-date.
+											$theme_updates = settings()->get('theme_updates', 'array', array());
+
+											// We can do that by deleting the entry, like so:
+											unset($theme_updates[basename($theme_info['path'])]);
+
+											// Then putting it back.
+											settings()->get('theme_updates', $theme_updates);
+
 											// Delete the stuff we no longer need.
 											unlink($filename);
 											unlink($tmp_filename);
@@ -823,64 +832,6 @@ if(!function_exists('admin_themes_update'))
 			}
 		}
 	}
-}
-
-/*
-	Function: theme_package_valid
-
-	Checks to see whether or not the specified file contains a valid theme.
-
-	Parameters:
-		string $filename - The name of the file to check.
-
-	Returns:
-		bool - Returns true if the file contains a valid theme, false if not.
-
-	Note:
-		This function uses the <Extraction> class in order to check whether or
-		not the following files exist within a compressed file:
-		header.template.php, footer.template.php and theme.xml.
-*/
-function theme_package_valid($filename)
-{
-	$extraction = api()->load_class('Extraction');
-
-	// Get the list of files.
-	$file_list = $extraction->files($filename);
-
-	// Make sure there was anything in there.
-	if(count($file_list) > 0)
-	{
-		// Make sure the files we require exist.
-		$found = 0;
-		foreach($file_list as $file)
-		{
-			if(in_array($file['name'], array('header.template.php', 'footer.template.php', 'theme.xml')))
-			{
-				$found++;
-			}
-		}
-
-		if($found == 3)
-		{
-			// They exist, but is the theme.xml file valid?
-			$tmp_filename = tempnam(dirname(__FILE__), 'theme_');
-			if($extraction->read($filename, 'theme.xml', $tmp_filename))
-			{
-				$theme_info = theme_get_info($tmp_filename);
-
-				// We no longer need the temporary file.
-				unlink($tmp_filename);
-
-				// The theme information array shouldn't be false.
-				return $theme_info !== false;
-			}
-
-			unlink($tmp_filename);
-		}
-	}
-
-	return false;
 }
 
 if(!function_exists('admin_themes_check_updates'))

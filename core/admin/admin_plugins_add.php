@@ -244,136 +244,164 @@ if(!function_exists('admin_plugins_install'))
 
 			api()->context['filename'] = $filename;
 
-			// The Update class probably should be renamed, seeing as it is mainly
-			// used for it's extract method. But whatever!
-			$update = api()->load_class('Update');
+			// The new Extraction class is mighty handy!
+			$extraction = api()->load_class('Extraction');
 
-			// Get just the name of the file, without the extension.
-			$name = explode('.', basename($filename), 2);
-			$name = $name[0];
-
-			// We will create the directory where everything will go. So let's
-			// see if we can make it.
-			if(!file_exists(plugindir. '/'. $name) && !@mkdir(plugindir. '/'. $name, 0755, true))
+			// We need to make sure the uploaded package is a valid plugin.
+			if(!($is_valid = plugin_package_valid($filename)) || !$extraction->is_supported($filename))
 			{
-				api()->context['extract_message'] = l('Please make sure the plugin directory is writable and try installing the plugin again.');
-				api()->context['extract_is_error'] = true;
-			}
-			// Now try to extract the stuff!
-			elseif($update->extract($filename, plugindir. '/'. $name))
-			{
-				// Just because we could extract the package doesn't mean it was
-				// actually a plugin. We can check that with the plugin_load
-				// function.
-				if(plugin_load(plugindir. '/'. $name) === false)
-				{
-					api()->context['extract_message'] = l('The file you have requested to install is not a valid plugin.');
-					api()->context['extract_is_error'] = true;
-
-					// Remove the theme, I mean the file that's not a theme.
-					recursive_unlink(plugindir. '/'. $name);
-					unlink($filename);
-				}
-				else
-				{
-					// Looks like everything worked out. So far.
-					api()->context['extract_message'] = l('The plugin was successfully extracted. Proceeding...');
-					$plugin_extracted = true;
-				}
+				// Sorry, it's not a valid theme.
+				api()->context['validate_message'] = !$is_valid ? l('The file you have requested to install is not a valid plugin.') : l('The file you have requested to install could not be extracted because it is an unsupported file type.');
+				api()->context['validate_is_error'] = true;
 			}
 			else
 			{
-				// Looks like the file could not be extracted. So it is probably
-				// some unsupported compression format.
-				api()->context['extract_message'] = l('The file you have requested to install could not be extracted.');
-				api()->context['extract_is_error'] = true;
+				api()->context['validate_message'] = l('The plugin package was successfully validated. Proceeding...');
 
-				recursive_unlink(plugindir. '/'. $name);
-				unlink($filename);
-			}
+				// Let's get out the plugin.xml file, we will need that for a couple
+				// of things.
+				$tmp_filename = tempnam(dirname(__FILE__), 'plugin_');
 
-			// We will only need to continue if the plugin was extracted
-			// successfully.
-			if(!empty($plugin_extracted))
-			{
-				// Yes, yes I know! This is for checking the status of a plugin, but
-				// it can do themes too! (Not like it knows better)
-				// Why are we checking, you ask? Well, think about it! A theme is
-				// also PHP, and in reality, it can do just as much as any plugin
-				// can, meaning it can be as dangerous as any plugin.
-				$status = plugin_check_status($filename, $reason);
-				$plugin_info = plugin_load(plugindir. '/'. $name);
-
-				// Okay, now get the response!
-				$response = admin_plugins_get_message($status, $plugin_info['name'], $reason);
-
-				// Is it okay? Can we continue without prompting?
-				$install_proceed = isset($_GET['proceed']) || $status == 'approved';
-				api()->run_hooks('plugin_install_proceed', array(&$install_proceed, $status, 'plugin'));
-
-				api()->context['status_message'] = $response['message'];
-				api()->context['status_class'] = $response['div-class'];
-				api()->context['proceed'] = $install_proceed;
-
-				// So is everything okay?
-				if(!empty($install_proceed))
+				if(!$extraction->read($filename, 'plugin.xml', $tmp_filename))
 				{
-					// We are almost there... Really! We are! We just need to check
-					// the plugins compatibility.
-					api()->context['is_compatible'] = $plugin_info['is_compatible'];
-					api()->context['compatible_is_error'] = false;
-
-					// We will continue if it is compatible, if no compatibility was
-					// supplied or if you choose to ignore the warning.
-					if($plugin_info['is_compatible'] === true || $plugin_info['is_compatible'] === null || (isset($_GET['compat']) && $_GET['compat'] == 'ignore'))
-					{
-						if($plugin_info['is_compatible'] !== false)
-						{
-							api()->context['compatible_message'] = l('The plugin &quot;%s&quot; is compatible with your version of SnowCMS. Proceeding...', $plugin_info['name']);
-						}
-						else
-						{
-							api()->context['compatible_message'] = l('The plugin &quot;%s&quot; is not compatible with your version of SnowCMS. Proceeding with installation anyways...', $plugin_info['name']);
-						}
-
-						// Execute install.php, if there is one.
-						if(file_exists($plugin_info['path']. '/install.php'))
-						{
-							// We will just include it.
-							require($plugin_info['path']. '/install.php');
-
-							// Now delete it.
-							unlink($plugin_info['path']. '/install.php');
-						}
-
-						// The plugin was valid... It was also approved, so here ya go!
-						// We have no message to save, as it will always be the same.
-						// But we do need to do this:
-						unlink($filename);
-					}
-					else
-					{
-						// Shucks! The plugin author says it isn't compatible with your
-						// current version of SnowCMS. Do you want to continue?
-						api()->context['compatible_is_error'] = true;
-						api()->context['install_filename'] = urlencode($_GET['install']);
-						api()->context['compatible_message'] = l('The plugin &quot;%s&quot; is not compatible with your version of SnowCMS. You may continue with the installation anyways, if you choose.', $plugin_info['name']);
-
-						// Just in case you decide to do nothing, let's not have it kept
-						// on the server. (The extracted part, at least)
-						recursive_unlink(plugindir. '/'. $name);
-					}
+					api()->context['status_message'] = l('The plugin.xml file failed to be extracted from the plugin package.');
+					api()->context['status_class'] = 'red';
+					api()->context['proceed'] = false;
 				}
 				else
 				{
-					// Uh oh!
-					// It was not safe, but if you still want to continue installing
-					// it, be my guest! Just be sure you know what you're getting
-					// yourself into, please!
-					// We will delete the extracted plugin, you know, just incase ;).
-					recursive_unlink(plugindir. '/'. $name);
+					// Now load the plugin information.
+					$plugin_info = plugin_get_info($tmp_filename);
 
-					api()->context['install_filename'] = urlencode($_GET['install']);
+					// Alright, we will now check whether or not the plugin is
+					// approved by SnowCMS.
+					$status = plugin_check_status($filename, $reason);
+
+					// Okay, now get the response!
+					$response = admin_plugins_get_message($status, $plugin_info['name'], $reason, false);
+
+					// Is it okay? Can we continue without prompting?
+					$install_proceed = isset($_GET['proceed']) || $status == 'approved';
+					api()->run_hooks('plugin_install_proceed', array(&$install_proceed, $status, 'plugin'));
+
+					api()->context['status_message'] = $response['message'];
+					api()->context['status_class'] = $response['div-class'];
+					api()->context['proceed'] = $install_proceed;
+
+					// Shall we proceed?
+					if(!empty($install_proceed))
+					{
+						// We are almost there... Really! We are! We just need to check
+						// the themes compatibility.
+						api()->context['is_compatible'] = $plugin_info['is_compatible'];
+						api()->context['compatible_is_error'] = false;
+
+						// We will continue if it is compatible, if no compatibility was
+						// supplied or if you choose to ignore the warning.
+						if($plugin_info['is_compatible'] === true || $plugin_info['is_compatible'] === null || (isset($_GET['compat']) && $_GET['compat'] == 'ignore'))
+						{
+							if($plugin_info['is_compatible'] !== false)
+							{
+								api()->context['compatible_message'] = l('The plugin &quot;%s&quot; is compatible with your version of SnowCMS. Proceeding...', $plugin_info['name']);
+							}
+							else
+							{
+								api()->context['compatible_message'] = l('The plugin &quot;%s&quot; is not compatible with your version of SnowCMS. Proceeding with installation anyways...', $plugin_info['name']);
+							}
+
+							// Now just one last thing, extracting!
+							// Let's get a nice name for the plugins directory, how about
+							// the name of the theme itself?
+							$name = sanitize_filename($plugin_info['name']);
+
+							// But you may already have a plugin with the same name, so...
+							if(file_exists(plugindir. '/'. $name))
+							{
+								$count = 1;
+								while(file_exists(plugindir. '/'. $name. ' ('. $count. ')'))
+								{
+									// Keep going.
+									$count++;
+								}
+
+								// Looks like we found a suitable match!
+								$name .= ' ('. $count. ')';
+							}
+
+							// Now attempt to extract the package. Well, first try to make
+							// the directory.
+							if(!file_exists(plugindir. '/'. $name) && !@mkdir(plugindir. '/'. $name, 0755, true))
+							{
+								api()->context['extract_message'] = l('Please make sure the plugin directory is writable and try installing the plugin again.');
+								api()->context['extract_is_error'] = true;
+
+								unlink($tmp_filename);
+							}
+							// Ok, now try to extract it.
+							elseif($extraction->extract($filename, plugindir. '/'. $name))
+							{
+								api()->context['extract_message'] = l('The plugin was successfully extracted. Proceeding...');
+
+								// Now if the plugin is valid, which is should be since we
+								// checked before, we can complete the installation.
+								if(plugin_load(plugindir. '/'. $name) !== false)
+								{
+									// Execute install.php, if there is one.
+									if(file_exists(plugindir. '/'. $name. '/install.php'))
+									{
+										// We will just include it.
+										require(plugindir. '/'. $name. '/install.php');
+
+										// Now delete it.
+										unlink(plugindir. '/'. $name. '/install.php');
+									}
+
+									api()->context['completed'] = true;
+
+									// Delete the stuff we no longer need.
+									unlink($filename);
+									unlink($tmp_filename);
+								}
+								else
+								{
+									api()->context['completed'] = false;
+
+									unlink($tmp_filename);
+									unlink($filename);
+									recursive_unlink(plugindir. '/'. $name);
+								}
+							}
+							else
+							{
+								// Hmm, something went wrong.
+								api()->context['extract_message'] = l('The plugin package could not be extracted for an unknown reason.');
+								api()->context['extract_is_error'] = true;
+
+								unlink($tmp_filename);
+								recursive_unlink(plugindir. '/'. $name);
+							}
+						}
+						else
+						{
+							// Shucks! The theme author says it isn't compatible with your
+							// current version of SnowCMS. Do you want to continue?
+							api()->context['compatible_is_error'] = true;
+							api()->context['install'] = htmlchars($_GET['install']);
+							api()->context['compatible_message'] = l('The plugin &quot;%s&quot; is not compatible with your version of SnowCMS. You may continue with the installation anyways, if you choose.', $plugin_info['name']);
+
+							unlink($tmp_filename);
+						}
+					}
+					else
+					{
+						// Uh oh!
+						// It was not safe, but if you still want to continue installing
+						// it, be my guest! Just be sure you know what you're getting
+						// yourself into, please!
+						unlink($tmp_filename);
+
+						api()->context['install'] = htmlchars($_GET['install']);
+					}
 				}
 			}
 

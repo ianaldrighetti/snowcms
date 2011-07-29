@@ -59,7 +59,7 @@ if(!function_exists('register_view'))
 			api()->run_hooks('registration_disabled');
 
 			api()->context['error_title'] = l('Registration Disabled');
-			api()->context['error_message'] = l('We apologize for the inconvience, but registration is currently not open to the public. Please check back at a later time.')
+			api()->context['error_message'] = l('We apologize for the inconvience, but registration is currently not open to the public. Please check back at a later time.');
 
 			theme()->render('error');
 			exit;
@@ -169,87 +169,107 @@ if(!function_exists('register_generate_form'))
 																			'submit' => l('Register account'),
 																		));
 
+		$form->current('registration_form');
+
 		// Add the fields we need you to fill out.
 		// Your requested member name, you know? That thing you use to login.
-		$form->add_field('registration_form', 'member_name', array(
-																													 'type' => 'string',
-																													 'label' => l('Choose username:'),
-																													 'subtext' => l('Used to log in to your account.'),
-																													 'length' => array(
-																																				 'min' => 1,
-																																				 'max' => 80,
-																																			 ),
-																													 'function' => create_function('$value, $form_name, &$error', '
-																														 $members = api()->load_class(\'Members\');
+		$form->add_input(array(
+											 'name' => 'member_name',
+											 'type' => 'string',
+											 'label' => l('Username'),
+											 'subtext' => l('Used to log in to your account.'),
+											 'length' => array(
+																		 'min' => 1,
+																		 'max' => 80,
+																	 ),
+											 'callback' => create_function('$name, $value, &$error', '
+																			 $members = api()->load_class(\'Members\');
 
-																														 if($members->name_allowed($value))
-																															 return true;
-																														 else
-																														 {
-																															 $error = l(\'The requested username is already in use or not allowed.\');
-																															 return false;
-																														 }'),
-																													 'value' => !empty($_REQUEST['member_name']) ? $_REQUEST['member_name'] : '',
-																												 ));
+																			 if($members->name_allowed($value))
+																			 {
+																				 return true;
+																			 }
+																			 else
+																			 {
+																				 $error = l(\'The requested username is already in use or not allowed.\');
+																				 return false;
+																			 }'),
+										 ));
 
 		// Your password.
-		$form->add_field('registration_form', 'member_pass', array(
-																													 'type' => 'password',
-																													 'label' => l('Password:'),
-																													 'subtext' => l('Be sure to use a strong password!'),
-																													 'function' => create_function('$value, $form_name, &$error', '
-																														 // Passwords don\'t match? That isn\'t right.
-																														 if(empty($_POST[\'pass_verification\']) || $_POST[\'pass_verification\'] != $value)
-																														 {
-																															 $error = l(\'Your passwords do not match.\');
-																															 return false;
-																														 }
+		$form->add_input(array(
+											 'name' => 'member_pass',
+											 'type' => 'password',
+											 'label' => l('Password'),
+											 'subtext' => l('Be sure to use a strong password!'),
+											 'callback' => create_function('$name, $value, &$error', '
+																			 // Passwords don\'t match? That isn\'t right.
+																			 if(empty($_POST[\'pass_verification\']) || $_POST[\'pass_verification\'] != $value)
+																			 {
+																				 $error = l(\'Your passwords do not match.\');
+																				 return false;
+																			 }
 
-																														 $members = api()->load_class(\'Members\');
+																			 $members = api()->load_class(\'Members\');
 
-																														 if($members->password_allowed($_POST[\'member_name\'], $value))
-																															 return true;
-																														 else
-																														 {
-																															 $security = settings()->get(\'password_security\', \'int\');
+																			 if($members->password_allowed($_POST[\'member_name\'], $value))
+																			 {
+																				 return true;
+																			 }
+																			 else
+																			 {
+																				 $security = settings()->get(\'password_security\', \'int\');
 
-																															 if($security == 1)
-																																 $error = l(\'Your password must be at least 3 characters long.\');
-																															 elseif($security == 2)
-																																 $error = l(\'Your password must be at least 4 characters long and cannot contain your username.\');
-																															 else
-																																 $error = l(\'Your password must be at least 5 characters long, cannot contain your username and contain at least 1 number.\');
+																				 if($security == 1)
+																				 {
+																					 $error = l(\'The password must be at least 3 characters long.\');
+																				 }
+																				 elseif($security == 2)
+																				 {
+																					 $error = l(\'The password must be at least 4 characters long and cannot contain your username.\');
+																				 }
+																				 elseif($security == 3)
+																				 {
+																					 $error = l(\'The password must be at least 5 characters long, cannot contain your username and contain at least 1 number.\');
+																				 }
+																				 else
+																				 {
+																					 api()->run_hooks(\'password_error_message\', array(&$security, &$error));
+																				 }
 
-																															 return false;
-																														 }')));
+																				 return false;
+																			 }')));
 
 		// Just to make sure you didn't type your password wrong or anything ;)
-		$form->add_field('registration_form', 'pass_verification', array(
-																																'type' => 'password',
-																																'label' => l('Verify password:'),
-																																'subtext' => l('Please enter your password here again.'),
-																																'save' => false,
-																															));
-		// Email address is important too!
-		$form->add_field('registration_form', 'member_email', array(
-																														'type' => 'string',
-																														'label' => l('Email:'),
-																														'subtext' => l('Please enter a valid email address.'),
-																														'length' => array(
-																																					'max' => 255,
-																																				),
-																														'function' => create_function('$value, $form_name, &$error', '
-																															$members = api()->load_class(\'Members\');
+		$form->add_input(array(
+											 'name' => 'pass_verification',
+											 'type' => 'password',
+											 'label' => l('Verify password:'),
+											 'subtext' => l('Please enter your password here again.'),
+										 ));
 
-																															if($members->email_allowed($value))
-																																return true;
-																															else
-																															{
-																																$error = l(\'The supplied email address is already in use or not allowed.\');
-																																return false;
-																															}'),
-																														'value' => !empty($_REQUEST['member_email']) ? $_REQUEST['member_email'] : '',
-																													));
+		// Email address is important too!
+		$form->add_input(array(
+											 'name' => 'member_email',
+											 'type' => 'string',
+											 'label' => l('Email:'),
+											 'subtext' => l('Please enter a valid email address.'),
+											 'length' => array(
+																		 'max' => 255,
+																	 ),
+											'callback' => create_function('$name, $value, &$error', '
+																			$members = api()->load_class(\'Members\');
+
+																			if($members->email_allowed($value))
+																			{
+																				return true;
+																			}
+																			else
+																			{
+																				$error = l(\'The supplied email address is already in use or not allowed.\');
+																				return false;
+																			}'),
+										));
 
 		// Add the agreement here... Eventually ;)
 

@@ -1,4 +1,19 @@
 ##
+# Authentication tokens are stored here, and used in place of storing a
+# users password hash in their log in cookie.
+##
+CREATE TABLE `{db->prefix}auth_tokens`
+(
+	`member_id` INT(11) UNSIGNED NOT NULL DEFAULT '0',
+	`token_id` VARCHAR(255) NOT NULL,
+	`token_assigned` INT(10) UNSIGNED NOT NULL DEFAULT '0',
+	`token_expires` INT(10) UNSIGNED NOT NULL DEFAULT '0',
+	`token_data` TEXT NOT NULL,
+	PRIMARY KEY (`member_id`, `token_id`),
+	UNIQUE KEY (`token_id`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+
+##
 # Holds all the PHP errors which have occurred!
 ##
 CREATE TABLE `{db->prefix}error_log`
@@ -109,11 +124,11 @@ INSERT INTO `{db->prefix}permissions` (`group_id`, `permission`, `status`) VALUE
 ##
 CREATE TABLE `{db->prefix}plugins`
 (
-	`guid` VARCHAR(255) NOT NULL,
 	`directory` VARCHAR(255) NOT NULL,
 	`runtime_error` TINYINT(1) UNSIGNED NOT NULL DEFAULT '0',
+	`error_message` TEXT NULL,
 	`is_activated` TINYINT(1) UNSIGNED NOT NULL DEFAULT '0',
-	PRIMARY KEY (`guid`),
+	PRIMARY KEY (`directory`),
 	KEY (`runtime_error`),
 	KEY (`is_activated`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;

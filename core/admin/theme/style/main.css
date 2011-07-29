@@ -376,3 +376,27 @@ body
 {
 	font-size: 80%;
 }
+
+/* Plugin Management */
+.plugin-name
+{
+	display: block;
+	margin-bottom: 5px;
+	font-weight: bold;
+}
+
+.plugin-link-list
+{
+	font-size: 12px;
+}
+
+.plugin-description
+{
+	display: block;
+	margin-bottom: 10px;
+}
+
+.plugin-info
+{
+	font-size: 11px;
+}

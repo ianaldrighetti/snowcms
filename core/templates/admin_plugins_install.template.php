@@ -26,8 +26,8 @@ echo '
 		<h3><img src="', theme()->url(), '/style/images/plugins_add-small.png" alt="" /> ', l('Installing Plugin'), '</h3>
 		<p>', l('Please wait while the plugin is being installed.'), '</p>
 
-		<p class="bold">', l('Extracting Plugin'), '</p>
-		<p', !empty(api()->context['extract_is_error']) ? ' class="red"' : '', '>', api()->context['extract_message'], '</p>';
+		<p class="bold">', l('Validating Plugin'), '</p>
+		<p', !empty(api()->context['validate_is_error']) ? ' class="red"' : '', '>', api()->context['validate_message'], '</p>';
 
 if(!empty(api()->context['status_message']))
 {
@@ -43,14 +43,29 @@ if(!empty(api()->context['status_message']))
 		// Yes, but what about compatibility?
 		echo '
 		<p class="bold">', l('Checking Compatibility'), '</p>
-		<p', !empty(api()->context['compatible_is_error']) ? ' class="red"' : '', '">', api()->context['compatible_message'], '</p>';
+		<div', !empty(api()->context['compatible_is_error']) ? ' class="error-message"' : '', '>
+			<p>', api()->context['compatible_message'], '</p>
+		</div>';
 
 		if(empty(api()->context['compatible_is_error']))
 		{
-			// We're done! Awesome!
 			echo '
-		<h3>', l('Installation Complete'), '</h3>
+		<p class="bold">', l('Extracting Plugin'), '</p>
+		<p', !empty(api()->context['extract_is_error']) ? ' class="red"' : '', '>', api()->context['extract_message'], '</p>';
+
+			if(empty(api()->context['extract_is_error']) && !empty(api()->context['completed']))
+			{
+				// We're done! Awesome!
+				echo '
+		<p class="bold">', l('Installation Complete'), '</p>
 		<p>', l('The plugin was successfully installed.'), '</p>';
+			}
+			elseif(empty(api()->context['extract_is_error']))
+			{
+				echo '
+		<p class="bold">', l('Installation Failed'), '</p>
+		<p>', l('The plugin was not successfully installed due to it not being a valid plugin.'), '</p>';
+			}
 		}
 		else
 		{
@@ -60,7 +75,7 @@ if(!empty(api()->context['status_message']))
 			<input type="submit" value="', l('Proceed anyways'), ' &raquo;" />
 			<input type="hidden" name="action" value="admin" />
 			<input type="hidden" name="sa" value="plugins_add" />
-			<input type="hidden" name="install" value="', api()->context['install_filename'], '" />
+			<input type="hidden" name="install" value="', api()->context['install'], '" />
 			<input type="hidden" name="sid" value="', member()->session_id(), '" />
 			<input type="hidden" name="proceed" value="true" />
 			<input type="hidden" name="compat" value="ignore" />
@@ -74,7 +89,7 @@ if(!empty(api()->context['status_message']))
 			<input type="submit" value="', l('Proceed anyways'), ' &raquo;" />
 			<input type="hidden" name="action" value="admin" />
 			<input type="hidden" name="sa" value="plugins_add" />
-			<input type="hidden" name="install" value="', api()->context['install_filename'], '" />
+			<input type="hidden" name="install" value="', api()->context['install'], '" />
 			<input type="hidden" name="sid" value="', member()->session_id(), '" />
 			<input type="hidden" name="proceed" value="true" />
 		</form>';
