@@ -669,7 +669,7 @@ class Table
 			{
 				// Just go straight to the default!
 				$sort = !empty($table['sort'][0]) && !empty($table['columns'][$table['sort'][0]]['sortable']) ? $table['sort'][0] : '';
-				$order = in_array(strtolower($table['sort'][1]), array('asc', 'desc')) ? strtoupper($table['sort'][1]) : 'ASC';
+				$order = isset($table['sort'][1]) && in_array(strtolower($table['sort'][1]), array('asc', 'desc')) ? strtoupper($table['sort'][1]) : 'ASC';
 				$is_default_sort = true;
 			}
 
@@ -827,7 +827,8 @@ class Table
 
 			$tr_num = 0;
 			$iterator = create_function('$arg', '
-										return is_array($arg) ? next($arg) : $arg->fetch_assoc();');
+										static $index = 0;
+										return is_array($arg) ? (isset($arg[$index++]) ? $arg[$index - 1] : false) : $arg->fetch_assoc();');
 			while($row = $iterator(isset($function_data) ? $function_data : $result))
 			{
 				echo '

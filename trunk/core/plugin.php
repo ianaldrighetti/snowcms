@@ -83,8 +83,8 @@ function plugin_load($plugin_id, $is_path = true)
 	// A guid? That's fine, but we need the path.
 	elseif(empty($is_path))
 	{
-		// Get all the plugins, and attempt to interpret the depedency name into
-		// an actual path ;)
+		// Get all the plugins, and attempt to interpret the guid into an actual
+		// path ;)
 		$list = plugin_list();
 
 		// No plugins? Then it definitely doesn't exist.
@@ -108,10 +108,41 @@ function plugin_load($plugin_id, $is_path = true)
 		return false;
 	}
 
-	// The plugin.xml file is where it's at!!!
+	// The plugin_get_info function will do the rest of the work.
+	return plugin_get_info($plugin_id. '/plugin.xml');
+}
+
+/*
+	Function: plugin_get_info
+
+	Parses the specified plugin.xml file into an array containing the
+	information about a plugin.
+
+	Parameters:
+		string $filename - The name of the plugin XML file.
+
+	Returns:
+		array - See notes on <plugin_load> for more information.
+
+	Note:
+		This function is used to only parse a plugin.xml file so it does not
+		validate whether or not a directory is a plugin like <plugin_load> does,
+		but <plugin_load> does use this function.
+
+		If the required information (such as author, version, guid, plugin name
+		and so on) is not found false will be returned.
+*/
+function plugin_get_info($filename)
+{
+	if(!file_exists($filename) || !is_file($filename))
+	{
+		return false;
+	}
+
+	// Load up the XML parsing class.
 	$xml = api()->load_class('XML');
 
-	$data = $xml->parse($plugin_id. '/plugin.xml');
+	$data = $xml->parse($filename);
 
 	// Make sure nothing went wrong when parsing the XML file.
 	if($data === false)
@@ -120,14 +151,14 @@ function plugin_load($plugin_id, $is_path = true)
 	}
 
 	$plugin_info = array(
-									 'guid' => htmlchars($xml->get_value($xml->value('guid', 'plugin-info'))),
-									 'author' => htmlchars($xml->get_value($xml->value('name', 'author'))),
-									 'website' => htmlchars($xml->get_value($xml->value('website', 'author'))),
-									 'email' => htmlchars($xml->get_value($xml->value('email', 'author'))),
-									 'name' => htmlchars($xml->get_value($xml->value('name', 'plugin-info'))),
-									 'description' => htmlchars($xml->get_value($xml->value('description', 'plugin-info'))),
-									 'version' => htmlchars($xml->get_value($xml->value('version', 'plugin-info'))),
-									 'compatible_with' => htmlchars($xml->get_value($xml->value('compatible-with', 'plugin-info'))),
+									 'guid' => htmlspecialchars($xml->get_value($xml->value('guid', 'plugin-info')), ENT_QUOTES, 'UTF-8'),
+									 'author' => htmlspecialchars($xml->get_value($xml->value('name', 'author')), ENT_QUOTES, 'UTF-8'),
+									 'website' => htmlspecialchars($xml->get_value($xml->value('website', 'author')), ENT_QUOTES, 'UTF-8'),
+									 'email' => htmlspecialchars($xml->get_value($xml->value('email', 'author')), ENT_QUOTES, 'UTF-8'),
+									 'name' => htmlspecialchars($xml->get_value($xml->value('name', 'plugin-info')), ENT_QUOTES, 'UTF-8'),
+									 'description' => htmlspecialchars($xml->get_value($xml->value('description', 'plugin-info')), ENT_QUOTES, 'UTF-8'),
+									 'version' => htmlspecialchars($xml->get_value($xml->value('version', 'plugin-info')), ENT_QUOTES, 'UTF-8'),
+									 'compatible_with' => htmlspecialchars($xml->get_value($xml->value('compatible-with', 'plugin-info')), ENT_QUOTES, 'UTF-8'),
 									 'is_compatible' => null,
 								 );
 
@@ -144,26 +175,26 @@ function plugin_load($plugin_id, $is_path = true)
 	}
 
 	// Make sure the email address is valid.
-	if(!is_email($plugin_info['email']))
+	if(function_exists('is_email') && !is_email($plugin_info['email']))
 	{
 		$plugin_info['email'] = null;
 	}
 
 	// Same goes for the website URL.
-	if(!is_url($plugin_info['website']))
+	if(function_exists('is_url') && !is_url($plugin_info['website']))
 	{
 		$plugin_info['website'] = null;
 	}
 
 	// Oh, and the GUID (which is basically a URL).
-	if(!is_url((strtolower(substr($plugin_info['guid'], 0, 7)) != 'http://' && strtolower(substr($plugin_info['guid'], 0, 8)) != 'https://' ? 'http://' : ''). $plugin_info['guid']))
+	if(function_exists('is_url') && !is_url((strtolower(substr($plugin_info['guid'], 0, 7)) != 'http://' && strtolower(substr($plugin_info['guid'], 0, 8)) != 'https://' ? 'http://' : ''). $plugin_info['guid']))
 	{
 		// The GUID is REQUIRED.
 		return false;
 	}
 
 	// Add the path, just incase :P
-	$plugin_info['path'] = realpath($plugin_id);
+	$plugin_info['path'] = realpath(dirname($filename));
 	$plugin_info['directory'] = $plugin_info['path'];
 
 	// Now return the information.
@@ -189,7 +220,7 @@ function plugin_load($plugin_id, $is_path = true)
 function plugin_list()
 {
 	// Does the plugin directory not exist for some strange reason?
-	if(!file_exists(plugindir) || !is_dir(plugindir))
+	if(!defined('plugindir') || !file_exists(plugindir) || !is_dir(plugindir))
 	{
 		return false;
 	}
@@ -220,6 +251,64 @@ function plugin_list()
 }
 
 /*
+	Function: plugin_package_valid
+
+	Checks to see whether or not the specified file contains a valid plugin.
+
+	Parameters:
+		string $filename - The name of the file to check.
+
+	Returns:
+		bool - Returns true if the file contains a valid plugin, false if not.
+
+	Note:
+		This function uses the <Extraction> class in order to check whether or
+		not the following files exist within a compressed file: plugin.php and
+		plugin.xml.
+*/
+function plugin_package_valid($filename)
+{
+	$extraction = api()->load_class('Extraction');
+
+	// Get the list of files.
+	$file_list = $extraction->files($filename);
+
+	// Make sure there was anything in there.
+	if(count($file_list) > 0)
+	{
+		// Make sure the files we require exist.
+		$found = 0;
+		foreach($file_list as $file)
+		{
+			if(in_array($file['name'], array('plugin.php', 'plugin.xml')))
+			{
+				$found++;
+			}
+		}
+
+		if($found == 2)
+		{
+			// They exist, but is the plugin.xml file valid?
+			$tmp_filename = tempnam(dirname(__FILE__), 'plugin_');
+			if($extraction->read($filename, 'plugin.xml', $tmp_filename))
+			{
+				$plugin_info = plugin_get_info($tmp_filename);
+
+				// We no longer need the temporary file.
+				unlink($tmp_filename);
+
+				// The plugin information array shouldn't be false.
+				return $plugin_info !== false;
+			}
+
+			unlink($tmp_filename);
+		}
+	}
+
+	return false;
+}
+
+/*
 	Function: plugin_check_status
 
 	Checks the status of the plugin by sending the SHA-1 hash of the plugin
@@ -239,6 +328,7 @@ function plugin_list()
 
 	Note:
 		These are the possible status codes to expect:
+
 			approved - Reviewed and approved by the hash database.
 
 			disapproved - Means the hash is known, however, for whatever reason,
@@ -291,7 +381,7 @@ function plugin_check_status($filename, &$reason = null)
 		if(!empty($reason))
 		{
 			// No HTML ;-)
-			$reason = htmlchars($reason);
+			$reason = htmlspecialchars($reason);
 		}
 
 		// Alright, you can have them!

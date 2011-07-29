@@ -45,7 +45,7 @@ if(!function_exists('logout_process'))
 		// Not even logged in? Then you can't log out!
 		if(member()->is_guest())
 		{
-			redirect(baseurl);
+			redirect(baseurl. '/index.php');
 		}
 
 		// Check that session identifier, make sure it is yours.
@@ -64,7 +64,17 @@ if(!function_exists('logout_process'))
 		}
 
 		// Remove the cookie and session information.
-		setcookie(cookiename, '', time_utc() - 604800);
+		setcookie(api()->apply_filters('login_cookie_name', cookiename), '', time_utc() - 604800);
+
+		// This token is now done with!
+		db()->query('
+			DELETE FROM {db->prefix}auth_tokens
+			WHERE member_id = {int:member_id} AND token_id = {string:auth_token}
+			LIMIT 1',
+			array(
+				'member_id' => member()->id(),
+				'auth_token' => $_SESSION['auth_token'],
+			));
 
 		// Destroy their session.
 		session_destroy();

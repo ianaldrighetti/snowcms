@@ -679,7 +679,7 @@ class Members
 		// If for some very strange, unknown reason you want to do a random string, be my guest!
 		$handled = null;
 		$str = '';
-		api()->run_hooks('members_rand_str', array(&$handled, $length, &$str));
+		api()->run_hooks('members_rand_str', array(&$handled, &$length, &$str));
 
 		if($handled === null)
 		{

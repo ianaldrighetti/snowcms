@@ -139,7 +139,7 @@ if(!function_exists('login_generate_form'))
 											 'type' => 'select',
 											 'label' => l('Stay logged in for'),
 											 'options' => array(
-																			0 => l('This session'),
+																			// !!! TODO: 0 => l('This session'),
 																			3600 => l('An hour'),
 																			86400 => l('A day'),
 																			604800 => l('A week'),
@@ -296,33 +296,152 @@ if(!function_exists('login_process'))
 			return false;
 		}
 
-		// So how long did you want to be remembered?
-		// Forever?
+		// So how long do you want your log in session to be valid for?
+		// Forever? Well, we won't do forever, but we will do 3 years.
 		if(isset($login['session_length']) && $login['session_length'] == -1)
 		{
-			$cookie_expires = time_utc() + 315360000;
+			$token_expires = time_utc() + 94608000;
 		}
 		// A more specific time?
-		elseif(!empty($login['session_length']))
+		elseif(!empty($login['session_length']) && (int)$login['session_length'] > 0)
 		{
-			$cookie_expires = time_utc() + $login['session_length'];
+			$token_expires = time_utc() + $login['session_length'];
 		}
 		// Just until you close your browser?
 		else
 		{
-			$cookie_expires = 0;
+			$token_expires = 0;
 		}
 
-		// Set the cookie, a chocolate chip cookie :) No one likes oatmeal cookies, they are nasty...
-		// Oh yeah, and give the password a touch of salt, :D Take that HTTP sniffers!
-		setcookie(api()->apply_filters('login_cookie_name', cookiename), api()->apply_filters('login_cookie_value', $row['member_id']. '|'. sha1($row['member_pass']. $row['member_hash'])), $cookie_expires);
+		// Set the cookie, a chocolate chip cookie :) No one likes oatmeal
+		// cookies, they are nasty... But this isn't just any cookie containing
+		// their member ID and hashed password, but an authentication token!
+		$auth_token = login_generate_token($row['member_id'], $token_expires);
+		setcookie(api()->apply_filters('login_cookie_name', cookiename), api()->apply_filters('login_cookie_value', $row['member_id']. '|'. $auth_token), $token_expires);
 
 		$_SESSION['member_id'] = (int)$row['member_id'];
-		$_SESSION['member_pass'] = sha1($row['member_pass']. $row['member_hash']);
+		$_SESSION['auth_token'] = $auth_token;
+
+		// Whether or not you are an administrator, we can still set this.
+		$_SESSION['admin_password_prompted'] = time_utc();
 
 		api()->run_hooks('login_success', array($row));
 
 		return (int)$row['member_id'];
+	}
+}
+
+if(!function_exists('login_generate_token'))
+{
+	/*
+		Function: login_generate_token
+
+		Generates and assigns an authentication token for the specified member.
+
+		Parameters:
+			int $member_id - The id of the member the token is being assigned to.
+			int $expires - The time at which the token is to expire.
+			array $data - Any extra data to be stored with the authentication
+										token.
+
+		Returns:
+			string - Returns the authentication token for the member, or false on
+							 failure.
+	*/
+	function login_generate_token($member_id, $expires, $data = array())
+	{
+		// The member id cannot be empty, and neither can the expires parameter.
+		if(!typecast()->is_a('int', $member_id) || $member_id < 0 || !typecast()->is_a('int', $expires) || $expires < 0)
+		{
+			return false;
+		}
+
+		// Make sure the data is an array.
+		if(!is_array($data))
+		{
+			$data = array();
+		}
+
+		// We want to save a couple things ourselves.
+		$data['member_ip'] = member()->ip();
+		$data['user_agent'] = $_SERVER['HTTP_USER_AGENT'];
+
+		// Maybe you would like to add some more?
+		$data = api()->apply_filters('login_token_data', $data);
+
+		// Let's just make sure this member even exists.
+		$result = db()->query('
+			SELECT
+				member_id
+			FROM {db->prefix}members
+			WHERE member_id = {int:member_id}
+			LIMIT 1',
+			array(
+				'member_id' => $member_id,
+			));
+
+		// If we found nothing, then this isn't a valid member id, which means
+		// it would be silly to assign an authentication token for an account
+		// which does not exist!
+		if($result->num_rows() == 0)
+		{
+			return false;
+		}
+
+		$members = api()->load_class('Members');
+
+		// We need to generate a unique random string for the authentication
+		// token.
+		$auth_token = $members->rand_str(mt_rand(192, 255));
+
+		// It's probably not likely that we will generate an already existing
+		// token, but hey, it could still happen!
+		$result = db()->query('
+			SELECT
+				token_id
+			FROM {db->prefix}auth_tokens
+			WHERE token_id = {string:token_id}
+			LIMIT 1',
+			array(
+				'token_id' => $auth_token,
+			));
+		while($result->num_rows() > 0)
+		{
+			// Looks like we need to try again.
+			$auth_token = $members->rand_str(mt_rand(192, 255));
+
+			$result = db()->query('
+				SELECT
+					token_id
+				FROM {db->prefix}auth_tokens
+				WHERE token_id = {string:token_id}
+				LIMIT 1',
+				array(
+					'token_id' => $auth_token,
+				));
+		}
+
+		$result = db()->insert('insert', '{db->prefix}auth_tokens',
+								array(
+									'member_id' => 'int', 'token_id' => 'string-255', 'token_assigned' => 'int',
+									'token_expires' => 'int', 'token_data' => 'string',
+								),
+								array(
+									$member_id, $auth_token, time_utc(),
+									$expires, serialize($data),
+								), null, 'login_generate_token_insert');
+
+		// Did it work?
+		if($result->affected_rows() > 0)
+		{
+			// Have the authentication token.
+			return $auth_token;
+		}
+		else
+		{
+			// Something went wrong.
+			return false;
+		}
 	}
 }
 ?>

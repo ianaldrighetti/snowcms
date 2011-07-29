@@ -93,33 +93,13 @@ if(!function_exists('admin_plugins_manage_generate_table'))
 	*/
 	function admin_plugins_manage_generate_table()
 	{
-		// Only display plugins for directories that exist.
-		$plugin_dirs = scandir(plugindir);
-
-		foreach($plugin_dirs as $index => $directory)
-		{
-			// We don't want ., .., or objects that are not directories.
-			if($directory == '.' || $directory == '..' || !is_dir(plugindir. '/'. $directory))
-			{
-				unset($plugin_dirs[$index]);
-			}
-		}
-
 		$table = api()->load_class('Table');
 
 		// Add our table.
 		$table->add('manage_plugins_table', array(
 																					'base_url' => baseurl. '/index.php?action=admin&amp;sa=plugins_manage',
-																					'db_query' => '
-																						SELECT
-																							guid, directory, runtime_error, is_activated, available_update
-																						FROM {db->prefix}plugins
-																						WHERE directory IN('. (count($plugin_dirs) > 0 ? '{string_array:directories}' : 'NULL'). ')',
-																					'db_vars' => array(
-																												 'directories' => $plugin_dirs,
-																											 ),
-																					'primary' => 'guid',
-																					'sort' => array('guid', 'desc'),
+																					'function' => 'admin_plugins_manage_table_data',
+																					'primary' => 'directory',
 																					'options' => array(
 																												 'activate' => l('Activate'),
 																												 'deactivate' => l('Deactivate'),
@@ -133,10 +113,28 @@ if(!function_exists('admin_plugins_manage_generate_table'))
 		$table->add_column('manage_plugins_table', 'name', array(
 																												 'label' => l('Plugin'),
 																												 'title' => l('Plugin name'),
-																												 'function' => create_function('$row', '
-																																				 $plugin_info = plugin_load(plugindir. \'/\'. $row[\'directory\']);
+																												 'function' => create_function('$plugin', '
+																																				 // Let\'s generate a list of links.
+																																				 $link_list = array();
 
-																																				 return \'<p style="font-weight: bold; margin-bottom: 10px;">\'. $plugin_info[\'name\']. \'</p><p>\'. (!empty($row[\'is_activated\']) ? \'<a href="\'. baseurl. \'/index.php?action=admin&amp;sa=plugins_manage&amp;deactivate=\'. urlencode($row[\'guid\']). \'&amp;sid=\'. member()->session_id(). \'" title="\'. l(\'Deactivate this plugin\'). \'">\'. l(\'Deactivate\'). \'</a>\' : \'<a href="\'. baseurl. \'/index.php?action=admin&amp;sa=plugins_manage&amp;activate=\'. urlencode($row[\'guid\']). \'&amp;sid=\'. member()->session_id(). \'" title="\'. l(\'Activate this plugin\'). \'">\'. l(\'Activate\'). \'</a> | <a href="\'. baseurl. \'/index.php?action=admin&amp;sa=plugins_manage&amp;delete=\'. urlencode($row[\'guid\']). \'&amp;sid=\'. member()->session_id(). \'" title="\'. l(\'Delete this plugin\'). \'" onclick="return confirm(\\\'\'. l(\'Are you sure you want to delete this plugin?\'). \'\\\');">\'. l(\'Delete\'). \'</a>\'). \'</p>\';'),
+																																				 // Is the plugin activated?
+																																				 if($plugin[\'is_activated\'])
+																																				 {
+																																					 // Then we shall show you a link to deactivate the plugin, along with deleting it.
+																																					 $link_list[] = \'<a href="\'. baseurl. \'/index.php?action=admin&amp;sa=plugins_manage&amp;deactivate=\'. htmlchars(basename($plugin[\'directory\'])). \'&amp;sid=\'. member()->session_id(). \'" title="\'. l(\'Deactivate this plugin\'). \'">\'. l(\'Deactivate\'). \'</a>\';
+																																				 }
+																																				 else
+																																				 {
+																																					 $link_list[] = \'<a href="\'. baseurl. \'/index.php?action=admin&amp;sa=plugins_manage&amp;activate=\'. htmlchars(basename($plugin[\'directory\'])). \'&amp;sid=\'. member()->session_id(). \'" title="\'. l(\'Activate this plugin\'). \'">\'. l(\'Activate\'). \'</a>\';
+																																					 $link_list[] = \'<a href="\'. baseurl. \'/index.php?action=admin&amp;sa=plugins_manage&amp;delete=\'. htmlchars(basename($plugin[\'directory\'])). \'&amp;sid=\'. member()->session_id(). \'" title="\'. l(\'Delete this plugin\'). \'" class="red">\'. l(\'Delete\'). \'</a>\';
+																																				 }
+
+																																				 // Is there an update available?
+																																				 if($plugin[\'is_update_available\'])
+																																				 {
+																																					 $link_list[] = \'<a href="\'. baseurl. \'/index.php?action=admin&amp;sa=plugins_manage&amp;update=\'. htmlchars(basename($plugin[\'directory\'])). \'&amp;sid=\'. member()->session_id(). \'" title="\'. l(\'v%s of this plugin is available! Click to update\', $plugin[\'update_version\']). \'" class="bold red">\'. l(\'Update\'). \'</a>\';
+																																				 }
+																																				 return \'<span class="plugin-name">\'. $plugin[\'name\']. \'</span><span class="plugin-link-list">\'. implode(\' | \', $link_list). \'</span>\';'),
 																												 'width' => '20%',
 																											 ));
 
@@ -144,25 +142,23 @@ if(!function_exists('admin_plugins_manage_generate_table'))
 																																'label' => l('Description'),
 																																 'title' => l('Plugin information'),
 																																 'sortable' => true,
-																																 'function' => create_function('$row', '
-																																								 $plugin_info = plugin_load(plugindir. \'/\'. $row[\'directory\']);
-
+																																 'function' => create_function('$plugin', '
 																																								 // Let\'s get some extra information displayed too.
 																																								 $plugin_data = array();
 
-																																								 if(!empty($plugin_info[\'version\']))
+																																								 if(!empty($plugin[\'version\']))
 																																								 {
-																																									 $plugin_data[] = \'Version \'. $plugin_info[\'version\'];
+																																									 $plugin_data[] = \'Version \'. $plugin[\'version\'];
 																																								 }
 
-																																								 if(!empty($plugin_info[\'author\']))
+																																								 if(!empty($plugin[\'author\']))
 																																								 {
-																																									 $plugin_data[] = l(\'By %s\', ((!empty($plugin_info[\'website\']) ? \'<a href="\'. $plugin_info[\'website\']. \'" target="_blank">\' : \'\'). $plugin_info[\'author\']. (!empty($plugin_info[\'website\']) ? \'</a>\' : \'\')));
+																																									 $plugin_data[] = l(\'By %s\', ((!empty($plugin[\'website\']) ? \'<a href="\'. $plugin[\'website\']. \'" target="_blank">\' : \'\'). $plugin[\'author\']. (!empty($plugin[\'website\']) ? \'</a>\' : \'\')));
 																																								 }
 
-																																								 if(!empty($row[\'runtime_error\']))
+																																								 if(!empty($plugin[\'runtime_error\']))
 																																								 {
-																																									 switch($row[\'runtime_error\'])
+																																									 switch($plugin[\'runtime_error\'])
 																																									 {
 																																										 case 1:
 																																											 $error_string = l(\'Could not find plugin.php\');
@@ -175,18 +171,97 @@ if(!function_exists('admin_plugins_manage_generate_table'))
 
 																																									 if(!empty($error_string))
 																																									 {
-																																										 $plugin_data[] = \'<span style="font-weight: bold;">\'. l(\'Error:\'). \'</span> <span style="color: red;">\'. $error_string. \'</span>\';
+																																										 $plugin_data[] = \'<span style="font-weight: bold;">\'. l(\'Error:\'). \'</span> <span style="color: red;" title="\'. $plugin[\'error_message\']. \'">\'. $error_string. \'</span>\';
 																																									 }
 																																								 }
 
-																																								 if(!empty($row[\'available_update\']))
-																																								 {
-																																									 $plugin_data[] = \'<span style="font-weight: bold;">\'. l(\'v%s of this plugin is available! <a href="%s/index.php?action=admin&amp;sa=plugins_manage&amp;update=%s&amp;version=%s&amp;sid=%s">Update now</a>.\', $row[\'available_update\'], baseurl, urlencode($row[\'guid\']), urlencode($row[\'available_update\']), member()->session_id()). \'</span>\';
-																																								 }
-
-																																								 return \'<p style="margin-bottom: 10px;">\'. $plugin_info[\'description\']. \'</p><p>\'. implode(\' | \', $plugin_data). \'</p>\';'),
+																																								 return \'<span class="plugin-description">\'. $plugin[\'description\']. \'</span><span class="plugin-info">\'. implode(\' | \', $plugin_data). \'</span>\';'),
 																																 'width' => '78%',
 																															 ));
+	}
+}
+
+if(!function_exists('admin_plugins_manage_table_data'))
+{
+	/*
+		Function: admin_plugins_manage_table_data
+
+		Loads the data for the plugin management table.
+
+		Parameters:
+			int $page - The current page being viewed.
+			int $per_page - The number of items per page.
+			string $sort - The column being sorted.
+			string $order - The order in which $column is being sorted.
+			int &$num_rows - The total number of items to display on the current
+											page.
+			int &$overall_rows - The total number of rows overall.
+			array &$filters
+
+		Returns:
+			array - Returns an array containing the data to pass on.
+	*/
+	function admin_plugins_manage_table_data($page, $per_page, $sort, $order, &$num_rows, &$overall_rows, &$filters)
+	{
+		// Alrighty then. We shall load all the plugins!
+		$plugin_list = plugin_list();
+
+		// Which plugins are activated?
+		$result = db()->query('
+			SELECT
+				directory, is_activated, runtime_error, error_message
+			FROM {db->prefix}plugins',
+			array());
+
+		$db_plugin_list = array();
+		while($row = $result->fetch_assoc())
+		{
+			$db_plugin_list[$row['directory']] = array(
+																						 'is_activated' => !empty($row['is_activated']),
+																						 'runtime_error' => $row['runtime_error'],
+																						 'error_message' => $row['error_message'],
+																					 );
+		}
+
+		// Get the plugin updates array, just in case there are any updates
+		// available!
+		$plugin_updates = settings()->get('plugin_updates', 'array', array());
+
+		$plugins = array();
+		foreach($plugin_list as $plugindir)
+		{
+			// Load the plugins information.
+			$plugin_info = plugin_load($plugindir);
+
+			$plugins[] = array_merge($plugin_info, array(
+																							 'is_activated' => isset($db_plugin_list[basename($plugin_info['directory'])]) ? $db_plugin_list[basename($plugin_info['directory'])]['is_activated'] : false,
+																							 'runtime_error' => isset($db_plugin_list[basename($plugin_info['directory'])]) ? $db_plugin_list[basename($plugin_info['directory'])]['runtime_error'] : 0,
+																							 'is_update_available' => isset($plugin_updates[basename($plugin_info['directory'])]) && compare_versions($plugin_updates[basename($plugin_info['directory'])], $plugin_info['version'], '>'),
+																							 'update_version' => isset($plugin_updates[basename($plugin_info['directory'])]) ? $plugin_updates[basename($plugin_info['directory'])] : false,
+																							 'error_message' => isset($db_plugin_list[basename($plugin_info['directory'])]) ? $db_plugin_list[basename($plugin_info['directory'])]['error_message'] : false,
+																						 ));
+		}
+
+		$num_rows = count($plugins);
+		$overall_rows = $num_rows;
+
+		// Time for some sorting action!
+		for($comparison = 0; $comparison < ($overall_rows - 1); $comparison++)
+		{
+			$address = $comparison;
+			$dummy = $plugins[$address + 1];
+
+			while($address >= 0 && $dummy['name'] < $plugins[$address]['name'])
+			{
+				$plugins[$address + 1] = $plugins[$address];
+				$address--;
+			}
+
+			$plugins[$address + 1] = $dummy;
+		}
+
+
+		return $plugins;
 	}
 }
 
@@ -215,12 +290,12 @@ if(!function_exists('admin_plugins_manage_table_handle'))
 
 		if(count($selected) > 0)
 		{
-			foreach($selected as $plugin_id)
+			foreach($selected as $plugindir)
 			{
 				// This will check to see if it is a valid plugin.
-				if($plugin_info = plugin_load($plugin_id, false))
+				if($plugin_info = plugin_load(plugindir. '/'. $plugindir))
 				{
-					$plugins[$plugin_id] = $plugin_info;
+					$plugins[$plugindir] = $plugin_info;
 				}
 			}
 		}
@@ -233,24 +308,28 @@ if(!function_exists('admin_plugins_manage_table_handle'))
 
 		if($action == 'activate')
 		{
-			// Activating a plugin, are we? Alright. Simple enough.
-			db()->query('
-				UPDATE {db->prefix}plugins
-				SET is_activated = 1, runtime_error = 0
-				WHERE guid IN({array_string:plugin_ids})',
+			// Activating a plugin, are we? Alright, I can handle that.
+			$rows = array();
+			foreach($plugins as $plugindir => $plugin_info)
+			{
+				$rows[] = array($plugindir, 1);
+			}
+
+			db()->insert('replace', '{db->prefix}plugins',
 				array(
-					'plugin_ids' => array_keys($plugins),
-				), 'admin_plugins_manage_activate_query');
+					'directory' => 'string-255', 'is_activated' => 'int',
+				),
+				$rows,
+				array('directory'), 'admin_plugins_manage_activate_query');
 		}
 		elseif($action == 'deactivate')
 		{
 			// Looks like we are deactivating a plugin.
 			db()->query('
-				UPDATE {db->prefix}plugins
-				SET is_activated = 0
-				WHERE guid IN({array_string:plugin_ids})',
+				DELETE FROM {db->prefix}plugins
+				WHERE directory IN({array_string:plugin_ids})',
 				array(
-					'plugin_ids' => array_keys($plugins),
+					'plugindirs' => array_keys($plugins),
 				), 'admin_plugins_manage_deactivate_query');
 		}
 		elseif($action == 'delete')
@@ -258,16 +337,16 @@ if(!function_exists('admin_plugins_manage_table_handle'))
 			// Deleting, huh? Well... Delete it from the database then.
 			db()->query('
 				DELETE FROM {db->prefix}plugins
-				WHERE guid IN({array_string:plugin_ids})',
+				WHERE directory IN({array_string:plugin_ids})',
 				array(
-					'plugin_ids' => array_keys($plugins),
+					'plugindirs' => array_keys($plugins),
 				), 'admin_plugins_manage_delete_query');
 
 			// Remove it from the plugins directory too.
 			foreach($plugins as $plugin_info)
 			{
 				// Recursive unlink, please!
-				recursive_unlink($plugin_info['path']);
+				recursive_unlink($plugin_info['directory']);
 			}
 		}
 
@@ -385,11 +464,17 @@ if(!function_exists('admin_plugins_check_updates'))
 				// But, we only need the GUIDs!
 				foreach($plugins as $plugin)
 				{
-					$guids[] = $plugin['guid'];
+					$plugin_info = plugin_load($plugin);
+
+					// This shouldn't be empty, but hey, just to be sure!
+					if(!empty($plugin_info['guid']))
+					{
+						$guids[] = $plugin_info['guid'];
+					}
 				}
 
 				// Woops! Don't forget to set the last time we checked for updates!
-				settings()->set('last_plugin_update_check', time_utc(), 'int');
+				//settings()->set('last_plugin_update_check', time_utc(), 'int');
 
 				// This is a system update check... So yeah.
 				$system_update_check = true;
@@ -434,11 +519,11 @@ if(!function_exists('admin_plugins_check_updates'))
 				}
 
 				// Is this version actually newer? Save it!
-				if(compare_versions($request, $plugin_info['version'], '>'))
+				if(compare_versions($request, $plugin_info['version'], '>') && !isset($plugin_updates[strtolower($plugin_info['guid'])]))
 				{
 					// The GUID will be the index and the value will be the version
 					// available.
-					$plugin_updates[$plugin_info['guid']] = $request;
+					$plugin_updates[strtolower($plugin_info['guid'])] = $request;
 				}
 			}
 		}

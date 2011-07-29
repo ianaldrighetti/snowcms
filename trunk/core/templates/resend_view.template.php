@@ -34,5 +34,5 @@ if(!defined('INSNOW'))
 			</div>';
 		}
 
-		api()->context['form']->show('resend_form');
+		api()->context['form']->render('resend_form');
 ?>

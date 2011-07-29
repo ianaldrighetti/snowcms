@@ -39,7 +39,7 @@ else
 define('INSNOW', true, true);
 
 // We want to see those errors...
-error_reporting(E_STRICT | E_ALL);
+error_reporting(defined('E_STRICT') ? E_STRICT | E_ALL : E_ALL);
 
 // config.php not exist? A good sign SnowCMS isn't installed :P
 if(!file_exists('config.php'))

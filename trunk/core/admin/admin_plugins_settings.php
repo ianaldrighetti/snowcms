@@ -107,12 +107,12 @@ if(!function_exists('admin_plugins_settings_generate_form'))
 
 		$form->add('admin_plugins_settings_form', array(
 																								'action' => baseurl. '/index.php?action=admin&sa=plugins_settings',
-																								'ajax_submit' => true,
 																								'callback' => 'admin_plugins_settings_handle',
 																								'submit' => l('Save settings'),
 																							));
 
 		// There is actually nothing to add, lol... It's all for the plugins ;)
+		api()->run_hooks('admin_plugins_settings_add');
 	}
 }
 
@@ -142,16 +142,11 @@ if(!function_exists('admin_plugins_settings_handle'))
 		foreach($data as $variable => $value)
 		{
 			// Set it :)
-			settings()->set($variable, $value, 'string');
-
-			// Update the value, otherwise we would need to refresh, which is unrequired.
-			$form->edit_field('admin_plugins_settings_form', $variable, array(
-																																		'value' => $value,
-																																	));
+			settings()->set($variable, $value);
 		}
 
-		api()->add_filter('admin_plugins_settings_form_message', create_function('$value', '
-																															return l(\'Plugin settings have been successfully updated.\');'));
+		api()->add_hook('admin_plugins_settings_form_messages', create_function('&$value', '
+																															$value[] = l(\'Plugin settings have been successfully updated.\');'));
 
 		return true;
 	}

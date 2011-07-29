@@ -124,55 +124,83 @@ if(!class_exists('Member'))
 			// Get that cookie, mmm..!
 			if(!empty($_COOKIE[api()->apply_filters('login_cookie_name', cookiename)]))
 			{
-				list($member_id, $passwrd) = @explode('|', $_COOKIE[api()->apply_filters('login_cookie_name', cookiename)]);
+				list($member_id, $auth_token) = @explode('|', $_COOKIE[api()->apply_filters('login_cookie_name', cookiename)]);
 
-				$member_id = (string)$member_id == (string)(int)$member_id && (int)$member_id > 0 && $func['strlen']($passwrd) == 40 ? (int)$member_id : 0;
-				$passwrd = $member_id > 0 && $func['strlen']($passwrd) == 40 ? $passwrd : '';
+				$member_id = (string)$member_id == (string)(int)$member_id && (int)$member_id > 0 && $func['strlen']($auth_token) > 0 ? (int)$member_id : 0;
+				$auth_token = $member_id > 0 ? $auth_token : '';
 
-				api()->run_hooks('cookie_data', array(&$member_id, &$passwrd));
+				api()->run_hooks('cookie_data', array(&$member_id, &$auth_token));
 
 				// Only set this if the data was previously empty.
-				if(empty($_SESSION['member_id']) || empty($_SESSION['member_pass']))
+				if(empty($_SESSION['member_id']) || empty($_SESSION['auth_token']))
 				{
 					$_SESSION['member_id'] = $member_id;
-					$_SESSION['member_pass'] = $passwrd;
+					$_SESSION['auth_token'] = $auth_token;
 				}
 			}
 			else
 			{
-				api()->run_hooks('cookie_empty', array(&$member_id, &$passwrd));
+				api()->run_hooks('cookie_empty', array(&$member_id, &$auth_token));
 			}
 
-			// Are you trying to steal someone else's session? Tisk tisk tisk! I just won't put up with that :P
-			if(!empty($_SESSION['member_id']) && !empty($_SESSION['passwrd']) && ($_SESSION['member_id'] != $member_id || $_SESSION['member_pass'] != $passwrd))
+			// Are you trying to steal someone else's session? Tisk tisk tisk! I
+			// just won't put up with that :P
+			if(!empty($_SESSION['member_id']) && !empty($_SESSION['auth_token']) && ($_SESSION['member_id'] != $member_id || $_SESSION['auth_token'] != $auth_token))
 			{
 				// Nice try, but better luck next time...
-				unset($member_id, $passwrd);
+				unset($member_id, $auth_token);
 			}
 
 			// So after ALL that, did your member id get set?
 			if(isset($member_id) && $member_id > 0)
 			{
-				// Alright, let's see if what you have is right :P
+				// Check the authentication token.
 				$result = db()->query('
 					SELECT
-						member_id AS id, member_name AS name, member_pass AS pass, member_hash AS hash, display_name,
-						member_email AS email, member_groups AS groups, member_registered AS registered
-					FROM {db->prefix}members
-					WHERE member_id = {int:member_id} AND member_activated = 1
+						member_id, token_id, token_assigned, token_expires, token_data
+					FROM {db->prefix}auth_tokens
+					WHERE member_id = {int:member_id} AND token_id = {string:auth_token} AND token_expires > {int:cur_time}
 					LIMIT 1',
 					array(
 						'member_id' => $member_id,
-					), 'login_query');
+						'auth_token' => $auth_token,
+						'cur_time' => time_utc(),
+					));
 
-				// Did we find a member by that id?
+				// Did we find that this token is valid?
 				if($result->num_rows() > 0)
 				{
-					$member = $result->fetch_assoc();
+					// Yes, it is.
+					$auth_token_valid = true;
 
-					// Now one last check, then we will know if it is who you are claiming to be!
-					if(!empty($member['hash']) && sha1($member['pass']. $member['hash']) == $passwrd)
+					$row = $result->fetch_assoc();
+
+					// Make the data an array.
+					$row['token_data'] = @unserialize($row['token_data']);
+
+					// Maybe you want to check a couple extra things?
+					api()->run_hooks('member_auth_validate', array($row, &$auth_token_valid));
+				}
+
+				if(!empty($auth_token_valid))
+				{
+					// Alright, let's see if what you have is right :P
+					$result = db()->query('
+						SELECT
+							member_id AS id, member_name AS name, member_pass AS pass, member_hash AS hash, display_name,
+							member_email AS email, member_groups AS groups, member_registered AS registered
+						FROM {db->prefix}members
+						WHERE member_id = {int:member_id} AND member_activated = 1
+						LIMIT 1',
+						array(
+							'member_id' => $member_id,
+						), 'login_query');
+
+					// Did we find a member by that id?
+					if($result->num_rows() > 0)
 					{
+						$member = $result->fetch_assoc();
+
 						// Now we can get some stuff done... ;)
 						$this->id = $member['id'];
 						$this->name = $member['name'];
@@ -646,6 +674,18 @@ if(!function_exists('load_member'))
 		{
 			$GLOBALS['member'] = api()->load_class('Member');
 		}
+
+		// Every once in awhile we should remove expired tokens.
+		if(mt_rand(1, 100) == 12)
+		{
+			db()->query('
+				DELETE FROM {db->prefix}auth_tokens
+				WHERE token_expires < {int:cur_time}',
+				array(
+					'cur_time' => time_utc(),
+				));
+		}
+
 		api()->run_hooks('post_init_member');
 	}
 }

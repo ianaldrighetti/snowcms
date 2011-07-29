@@ -23,8 +23,7 @@ if(!defined('INSNOW'))
 }
 
 		echo '
-	<h1><img src="', theme()->url(), '/style/images/plugins_manage-small.png" alt="" /> ', l('Manage plugins'), '</h1>
-	<p>', l('Manage your current plugins.'), '</p>';
+	<h3><img src="', theme()->url(), '/style/images/plugins_manage-small.png" alt="" /> ', l('Manage Plugins'), '</h3>';
 
 		api()->context['table']->show('manage_plugins_table');
 ?>
