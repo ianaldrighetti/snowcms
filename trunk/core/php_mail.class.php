@@ -127,15 +127,20 @@ class PHP_Mail
 		{
 			// Not the same amount of headers and values? Tisk tisk!
 			if(count($header) != count($value) || count($header) == 0)
+			{
 				return false;
+			}
 
 			foreach($header as $key => $val)
+			{
 				// :D
 				$this->add_header($val, $value[$key]);
+			}
 		}
 		else
 		{
 			$this->options['headers'][strtoupper($header)] = $value;
+
 			return true;
 		}
 	}
@@ -174,37 +179,57 @@ class PHP_Mail
 		global $func;
 
 		$handled = null;
-		api()->run_hooks('php_mail_send_pre', array(&$handled, $to, $subject, $message, $alt_message, $this->options));
+		api()->run_hooks('php_mail_send_pre', array(&$handled, &$to, &$subject, &$message, &$alt_message, $this->options));
 
 		if($handled !== null)
+		{
 			return !empty($handled);
+		}
 
 		// Set some headers...
 		if(empty($this->options['headers']['DATE']))
+		{
 			$this->options['headers']['DATE'] = date('r');
+		}
 
 		if(empty($this->options['headers']['CONTENT-TYPE']))
-			$this->options['headers']['CONTENT-TYPE'] = (!empty($this->options['is_html']) ? 'text/html' : 'text/plain'). ';charset='. $this->charset;
+		{
+			$this->options['headers']['CONTENT-TYPE'] = (!empty($this->options['is_html']) ? 'text/html' : 'text/plain'). ';charset='. $this->options['charset'];
+		}
 
 		if(empty($this->options['headers']['MIME-VERSION']))
+		{
 			$this->options['headers']['MIME-VERSION'] = '1.0';
+		}
 
 		// Any priority?
 		if(empty($this->options['headers']['X-PRIORITY']) && isset($this->options['priority']))
+		{
 			$this->options['headers']['X-PRIORITY'] = $this->options['priority'];
+		}
 
-		if(empty($this->headers['X-MS-PRIORITY']) && isset($this->options['priority']))
+		if(empty($this->options['headers']['X-MS-PRIORITY']) && isset($this->options['priority']))
 		{
 			if($this->options['priority'] == 1)
+			{
 				$priority = 'Highest';
+			}
 			elseif($this->options['priority'] == 2)
+			{
 				$priority = 'High';
+			}
 			elseif($this->options['priority'] == 3)
+			{
 				$priority = 'normal';
+			}
 			elseif($this->options['priority'] == 4)
+			{
 				$priority = 'belownormal';
+			}
 			else
+			{
 				$priority = 'low';
+			}
 
 			$this->options['headers']['X-MS-PRIORITY'] = $priority;
 		}
@@ -217,7 +242,7 @@ class PHP_Mail
 		{
 			// It's a message with multiple parts! (HTML and alternative!)
 			$boundary = substr(str_shuffle('abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_'), 0, 40);
-			$this->headers['CONTENT-TYPE'] = 'multipart/alternative; boundary="'. $boundary. '"';
+			$this->options['headers']['CONTENT-TYPE'] = 'multipart/alternative; boundary="'. $boundary. '"';
 
 			// No alternative message? That isn't a good idea!
 			if(empty($alt_message))
@@ -225,14 +250,18 @@ class PHP_Mail
 				$alt_message = api()->apply_filters('php_mail_alt_message_create', $message);
 
 				if($alt_message == $message)
+				{
 					$alt_message = strip_tags($alt_message);
+				}
 			}
 		}
 
 		// Format all them headers right.
 		$headers = array();
-		foreach($this->headers as $header => $value)
+		foreach($this->options['headers'] as $header => $value)
+		{
 			$headers[] = $header. ': '. $value;
+		}
 
 		// Implode! Implode! :0
 		$headers = wordwrap(api()->apply_filters('php_mail_headers', implode("\r\n", $headers)), 70);
@@ -242,7 +271,9 @@ class PHP_Mail
 
 		// Just a little Windows fix.
 		if(substr(PHP_OS, 0, 3) == 'WIN')
+		{
 			$message = str_replace("\n.", "\n..", $message);
+		}
 
 		// Here we go! Finally!
 		if(isset($boundary))
@@ -251,7 +282,9 @@ class PHP_Mail
 			$alt_message = wordwrap(str_replace("\r\n", "\n", $alt_message), 70);
 
 			if(substr(PHP_OS, 0, 3) == 'WIN')
+			{
 				$alt_message = str_replace("\n.", "\n..", $alt_message);
+			}
 
 			// Put it all together now!
 			$body = "--{$boundary}\r\nContent-Type: text/plain; charset={$this->options['charset']}\r\n\r\n{$alt_message}\r\n\r\n";
@@ -261,7 +294,9 @@ class PHP_Mail
 			$message = api()->apply_filters('php_mail_multipart_body', $body);
 		}
 		else
+		{
 			$message = api()->apply_filters('php_mail_message_body', $message);
+		}
 
 		$mail = api()->apply_filters('php_mail_function', isset($func['mail']) ? $func['mail'] : 'mail');
 
@@ -269,6 +304,7 @@ class PHP_Mail
 		$sent = $mail($to, $subject, $message, $headers, settings()->get('mail_additional_parameters', 'string', ''));
 
 		$this->close();
+
 		return !empty($sent);
 	}
 
@@ -309,6 +345,7 @@ class PHP_Mail
 	public function set_html($is_html = true)
 	{
 		$this->options['is_html'] = !empty($is_html);
+
 		return true;
 	}
 
@@ -327,9 +364,12 @@ class PHP_Mail
 	public function set_priority($priority = 3)
 	{
 		if((string)$priority != (string)(int)$priority || $priority > 5 || $priority < 1)
+		{
 			return false;
+		}
 
-		$this->priority = (int)$priority;
+		$this->options['priority'] = (int)$priority;
+
 		return true;
 	}
 
@@ -346,7 +386,8 @@ class PHP_Mail
 	*/
 	public function set_charset($charset = 'utf-8')
 	{
-		$this->charset = $charset;
+		$this->options['charset'] = $charset;
+
 		return true;
 	}
 
