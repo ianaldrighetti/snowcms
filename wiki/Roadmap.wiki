@@ -41,6 +41,10 @@ In celebration of finally leaving the alpha stages, there will be a brand new (a
 
 Resolve issue #69 and issue #71.
 
+=== 2.0 beta 2 ===
+
+Not much in this release except for SQLite support, other than bug fixes and what not, of course.
+
 === 2.0 RC ===
 
 Just a few bugs left to squash, almost there! But just to be sure...
