@@ -22,7 +22,7 @@ if(!defined('INSNOW'))
 	die('Nice try...');
 }
 
-// Title: Cookie verification
+// Title: Cookie Verification
 
 if(!function_exists('checkcookie_verify'))
 {

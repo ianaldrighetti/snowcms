@@ -22,7 +22,7 @@ if(!defined('INSNOW'))
 	die('Nice try...');
 }
 
-// Title: Control Panel - Plugins - Manage
+// Title: Manage Plugins
 
 if(!function_exists('admin_plugins_manage'))
 {
@@ -129,7 +129,7 @@ if(!function_exists('admin_plugins_manage_generate_table'))
 																																					 $link_list[] = \'<a href="\'. baseurl. \'/index.php?action=admin&amp;sa=plugins_manage&amp;delete=\'. htmlchars(basename($plugin[\'directory\'])). \'&amp;sid=\'. member()->session_id(). \'" title="\'. l(\'Delete this plugin\'). \'" class="red" onclick="return confirm(\\\'\'. l(\'Are you sure you want to delete this plugin?\'). \'\\\');">\'. l(\'Delete\'). \'</a>\';
 																																				 }
 
-																																				 return \'<span class="plugin-name">\'. $plugin[\'name\']. \'</span><span class="plugin-link-list">\'. implode(\' | \', $link_list). \'</span>\';'),
+																																				 return \'<a name="p\'. sha1(basename($plugin[\'directory\'])). \'"></a><span class="plugin-name">\'. $plugin[\'name\']. \'</span><span class="plugin-link-list">\'. implode(\' | \', $link_list). \'</span>\';'),
 																												 'width' => '20%',
 																											 ));
 

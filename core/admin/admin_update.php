@@ -22,7 +22,7 @@ if(!defined('INSNOW'))
 	die('Nice try...');
 }
 
-// Title: Control Panel - System Update
+// Title: System Update
 
 if(!function_exists('admin_update'))
 {
@@ -51,37 +51,43 @@ if(!function_exists('admin_update'))
 			admin_access_denied();
 		}
 
-		// When was the last time we checked for system updates? (Or do you want us to check anyways?)
-		if((settings()->get('system_last_update_check', 'int', 0) + settings()->get('system_update_interval', 'int', 3600)) < time() || isset($_REQUEST['check']))
+		// Do you want to force an update check? Well, if you say so.
+		if(isset($_REQUEST['check']))
 		{
-			$http = api()->load_class('HTTP');
-
-			$latest_version = $http->request(api()->apply_filters('admin_update_version_url', 'http://download.snowcms.com/news/v2.x-line/latest.php'));
-			$latest_info = @unserialize($http->request(api()->apply_filters('admin_update_version_url', 'http://download.snowcms.com/news/v2.x-line/latest.php'). '?version='. settings()->get('version', 'string')));
-
-			settings()->set('system_last_update_check', time(), 'int');
-			settings()->set('system_latest_version', serialize($latest_version), 'string');
-			settings()->set('system_latest_info', serialize($latest_info), 'string');
+			admin_update_check(true);
 
 			redirect('index.php?action=admin&sa=update');
 		}
+
+		// Get the information.
+		$latest_version = settings()->get('system_latest_version', 'string', settings()->get('version', 'string'));
+		$latest_info = settings()->get('system_latest_info', 'array', array('up-to-date' => null));
+
+		// Was there an update?
+		if($latest_info['up-to-date'] === null)
+		{
+			// Couldn't get anything!
+			$latest_info['header'] = l('Connection Failed');
+			$latest_info['message'] = l('Sorry, but it appears that the update server is down. Please try again later.');
+		}
+		elseif($latest_info['up-to-date'] === false)
+		{
+			$latest_info['header'] = l('There is an Update Available');
+		}
 		else
 		{
-			$latest_version = @unserialize(settings()->get('system_latest_version', 'string', 'b:0;'));
-			$latest_info = @unserialize(settings()->get('system_latest_info', 'string', 'a:0:{}'));
+			$latest_info['header'] = l('No Update Available');
+			$latest_info['message'] = l('There is no update available for your version of SnowCMS.');
 		}
-
-		// Is an update required?
-		$is_update_required = $latest_version !== false ? compare_versions(settings()->get('version', 'string'), $latest_version) == -1 : false;
-		$latest_info = array_merge(array('header' => '', 'text' => ''), $latest_info);
 
 		admin_current_area('system_update');
 
 		theme()->set_title(l('Update'));
 
+		api()->context['current_version'] = settings()->get('version', 'string');
 		api()->context['latest_version'] = $latest_version;
 		api()->context['latest_info'] = $latest_info;
-		api()->context['is_update_required'] = $is_update_required;
+		api()->context['update_available'] = $latest_version !== false ? compare_versions($latest_version, settings()->get('version', 'string'), '>') : false;
 
 		theme()->render('admin_update');
 	}
@@ -147,6 +153,64 @@ if(!function_exists('admin_update_apply'))
 
 			theme()->render('admin_update_apply');
 		}
+	}
+}
+
+/*
+	Function: admin_update_check
+
+	Checks for any available update for SnowCMS.
+
+	Parameters:
+		bool $force_check - Forces the function to check for updates, regardless
+												of how long ago updates were checked for.
+
+	Returns:
+		void - Nothing is returned by this function.
+
+	Note:
+		This function is automatically called by the <Task> system if enabled.
+		If the task system is disabled the user must manually check for updates
+		under the System Update section of the control panel.
+*/
+function admin_update_check($force_check = false)
+{
+	if(!empty($force_check) || (settings()->get('system_last_update_check', 'int', 0) + settings()->get('system_update_interval', 'int', 3600)) < time_utc())
+	{
+		$http = api()->load_class('HTTP');
+
+		// Let's get the latest version of SnowCMS.
+		$latest_version = $http->request(api()->apply_filters('admin_update_version_url', 'http://download.snowcms.com/updates/latest-version.php'), array('version' => settings()->get('version', 'string')));
+
+		if(!empty($latest_version))
+		{
+			// Now the information about the current version you are running.
+			$latest_info = $http->request(api()->apply_filters('admin_update_version_url', 'http://download.snowcms.com/updates/latest-version.php'), array('version' => settings()->get('version', 'string'), 'news' => 'true'));
+
+			// Alright, separate the headers from the message.
+			list($tmp, $message) = explode("\r\n\r\n", $latest_info);
+
+			// Now separate the headers from one another.
+			$headers = array();
+			foreach(explode("\r\n", $tmp) as $header)
+			{
+				list($key, $value) = explode(':', $header);
+
+				$headers[strtolower($key)] = trim($value);
+			}
+
+			// Trim up the message, just in case.
+			$message = trim($message);
+
+			settings()->set('system_last_update_check', time_utc());
+			settings()->set('system_latest_info', array(
+																							'version' => isset($headers['version']) ? $headers['version'] : false,
+																							'up-to-date' => $headers['up-to-date'] == 'null' ? null : ($headers['up-to-date'] == 'true' ? true : false),
+																							'message' => $message,
+																						));
+		}
+
+		settings()->set('system_latest_version', $latest_version);
 	}
 }
 ?>

@@ -22,7 +22,7 @@ if(!defined('INSNOW'))
 	die('Nice try...');
 }
 
-// Title: Control Panel - Plugins - Settings
+// Title: Plugin Settings
 
 if(!function_exists('admin_plugins_settings'))
 {

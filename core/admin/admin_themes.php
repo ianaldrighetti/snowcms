@@ -22,7 +22,7 @@ if(!defined('INSNOW'))
 	die('Nice try...');
 }
 
-// Title: Control Panel - Themes
+// Title: Add and Manage Themes
 
 if(!function_exists('admin_themes'))
 {
@@ -146,6 +146,7 @@ if(!function_exists('admin_themes'))
 
 				// Build an array containing the themes information.
 				$theme = array(
+									 'anchor' => 't'. sha1(basename($theme_info['directory'])),
 									 'name' => $theme_info['name'],
 									 'description' => $theme_info['description'],
 									 'author' => (!empty($theme_info['website']) ? '<a href="'. $theme_info['website']. '" target="_blank">' : ''). $theme_info['author']. (!empty($theme_info['website']) ? '</a>' : ''),

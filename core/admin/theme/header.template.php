@@ -50,15 +50,39 @@ else
 			<div class="break">
 			</div>
 		</div>
+<?php
+if(!admin_prompt_required())
+{
+	// Any important notifications?
+	$important_notifications = api()->apply_filters('admin_important_notifications', array());
+	if(count($important_notifications) > 0)
+	{
+		// Display them...
+		foreach($important_notifications as $notification)
+		{
+			// A message is required.
+			if(empty($notification['message']))
+			{
+				continue;
+			}
+
+			echo '
+		<div style="margin: 3px auto;" class="', !empty($notification['attr_class']) ? $notification['attr_class'] : 'alert-message', '">
+			', $notification['message'], '
+		</div>';
+		}
+	}
+}
+?>
 		<div id="link-tree">
-			<p><a href="<?php echo baseurl. '/index.php?action=admin'; ?>">Control Panel</a></p>
+			<p><?php echo admin_link_tree(admin_prompt_required()); ?></p>
 <?php
 // Don't show the notifications area unless they are logged in.
 if(!admin_prompt_required())
 {
 ?>
 			<div id="notifications">
-				<p><a href="javascript:void(0);" onclick="openNotificationWindow();"><?php echo l('Notifications'); ?></a> (0)</p>
+				<p><a href="javascript:void(0);" onclick="openNotificationWindow();"><?php echo l('Notifications'); ?></a> (<?php echo count($GLOBALS['notifications']); ?>)</p>
 			</div>
 <?php
 }
@@ -90,6 +114,7 @@ if(!admin_prompt_required() && admin_show_sidebar())
 		echo '
 				</ul>';
 	}
+
 	echo '
 			</div>
 			<div id="side-content">';

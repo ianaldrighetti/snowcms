@@ -193,7 +193,7 @@ function plugin_get_info($filename)
 		return false;
 	}
 	// Why don't we chop off the http://?
-	elseif(strtolower(substr($plugin_info['guid']), 0, 7) == 'http://')
+	elseif(strtolower(substr($plugin_info['guid'], 0, 7)) == 'http://')
 	{
 		// It is assumed, after all.
 		$plugin_info['guid'] = substr($plugin_info['guid'], 7);

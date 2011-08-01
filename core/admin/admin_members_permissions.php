@@ -22,7 +22,7 @@ if(!defined('INSNOW'))
 	die('Nice try...');
 }
 
-// Title: Control Panel - Member - Permissions
+// Title: Member Group Permissions
 
 if(!function_exists('admin_members_manage_permissions'))
 {

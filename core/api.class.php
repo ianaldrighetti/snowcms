@@ -79,10 +79,9 @@ class API
 	// template.
 	public $context;
 
-	// Variable: locations
-	// An array which contains an events location identifier, which is used
-	// when building a link tree.
-	private $locations;
+	// Variable: linktree
+	// An array which contains the current link tree.
+	private $linktree;
 
 	/*
 		Constructor: __construct
@@ -115,7 +114,7 @@ class API
 		$this->plugins = array();
 		$this->resources = array();
 		$this->context = array();
-		$this->locations = array();
+		$this->linktree = array();
 	}
 
 	/*
@@ -530,6 +529,9 @@ class API
 			string $query_string - The query string that should be matched in
 														 order to execute the supplied callback.
 			callback $callback - The callback to associate with the event.
+			mixed $identifier - An identifier used when generating a link tree,
+													which can either be a string or a callback which
+													will return a string.
 			string $filename - The file which is included before the callback is
 												 executed. Not required unless the callback is not
 												 currently callable.
@@ -574,11 +576,11 @@ class API
 			Query strings are CASE SENSITIVE! so action=something is not the
 			same as Action=something!
 	*/
-	public function add_event($query_string, $callback, $filename = null)
+	public function add_event($query_string, $callback, $identifier, $filename = null)
 	{
 		// Is the callback not callable? Does the file not exist? Does the
 		// event already exist?
-		if(empty($query_string) || (empty($filename) && !is_callable($callback)) || (!empty($filename) && !file_exists($filename)) || $this->event_exists($query_string) || !($query = $this->parse_query($query_string)))
+		if(empty($query_string) || (empty($filename) && !is_callable($callback)) || !isset($identifier) || ($identifier !== null && !is_string($identifier) && !is_callable($identifier)) || (!empty($filename) && !file_exists($filename)) || $this->event_exists($query_string) || !($query = $this->parse_query($query_string)))
 		{
 			return false;
 		}
@@ -614,6 +616,7 @@ class API
 						$events[$key][$value] = array(
 																			'callback' => $callback,
 																			'filename' => $filename,
+																			'identifier' => isset($identifier) ? $identifier : null,
 																			'children' => array(),
 																		);
 					}
@@ -622,6 +625,11 @@ class API
 						// Don't mess anything up ;)
 						$events[$key][$value]['callback'] = $callback;
 						$events[$key][$value]['filename'] = $filename;
+
+						if(!empty($identifier))
+						{
+							$events[$key][$value]['identifier'] = $identifier;
+						}
 					}
 
 					// Added, we are done!
@@ -635,6 +643,7 @@ class API
 				$events[$key][$value] = array(
 																	'callback' => false,
 																	'filename' => null,
+																	'identifier' => null,
 																	'children' => array(),
 																);
 			}
@@ -708,16 +717,25 @@ class API
 
 		Parameters:
 			string $query_string - The query string to get the event of.
+			bool $generate_link_tree - Whether to generate a link tree while
+																 parsing the query string.
 
 		Returns:
 			array - Returns an array containing the callback, false on failure
 							to find a match.
 	*/
-	public function return_event($query_string)
+	public function return_event($query_string, $generate_link_tree = false)
 	{
 		if(!($query = $this->parse_query($query_string)))
 		{
 			return false;
+		}
+
+		// Generating a link tree?
+		if(!empty($generate_link_tree))
+		{
+			// Make sure it is empty.
+			$this->linktree = array();
 		}
 
 		// Keep track of the last known working event, right now, nothing!
@@ -731,6 +749,11 @@ class API
 			if(($found = !empty($events[$key][$value]['callback'])) || $wildcard)
 			{
 				$event = $events[$key][!empty($wildcard) ? '*' : $value];
+				$this->linktree[] = array(
+															'identifier' => $event['identifier'],
+															'query_string' => urlencode($key). '='. urlencode($value),
+															'value' => $value,
+														);
 			}
 
 			// Move on to the next... Maybe.
@@ -851,6 +874,23 @@ class API
 	}
 
 	/*
+		Method: return_linktree
+
+		Returns an array containing event identifiers.
+
+		Parameters:
+			none
+
+		Returns:
+			array - Returns an array containing identifiers to generate a link
+							tree.
+	*/
+	public function return_linktree()
+	{
+		return $this->linktree;
+	}
+
+	/*
 		Method: add_group
 
 		Adds a group which can be assigned to members, which can be used by
@@ -878,7 +918,7 @@ class API
 			return false;
 		}
 
-		$this->groups[strtolower($group_identifier)] = $group_name;
+		$this->groups[strtolower($group_identifier)] = htmlchars($group_name);
 		return true;
 	}
 
@@ -907,6 +947,7 @@ class API
 
 		// Simply unset it!
 		unset($this->groups[$group_identifier]);
+
 		return true;
 	}
 
@@ -1642,11 +1683,6 @@ class API
 			return false;
 		}
 	}
-
-	/*
-		Method: add_location
-
-		Adds a location identifier to the specified event.*/
 }
 
 /*

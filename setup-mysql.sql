@@ -169,8 +169,9 @@ CREATE TABLE `{db->prefix}tasks`
 	KEY (`enabled`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 
-INSERT INTO `{db->prefix}tasks` (`task_name`, `file`, `location`, `func`) VALUES('plugins_update_check', 'admin/admin_plugins_manage.php', 'core_dir', 'admin_plugins_check_updates');
-INSERT INTO `{db->prefix}tasks` (`task_name`, `file`, `location`, `func`) VALUES('themes_update_check', 'admin/admin_themes.php', 'core_dir', 'admin_themes_check_updates');
+INSERT INTO `{db->prefix}tasks` (`task_name`, `file`, `location`, `func`) VALUES('plugins_update_check', 'admin/admin_plugins_manage.php', 'coredir', 'admin_plugins_check_updates');
+INSERT INTO `{db->prefix}tasks` (`task_name`, `file`, `location`, `func`) VALUES('themes_update_check', 'admin/admin_themes.php', 'coredir', 'admin_themes_check_updates');
+INSERT INTO `{db->prefix}tasks` (`task_name`, `file`, `location`, `func`) VALUES('system_update_check', 'admin/admin_update.php', 'coredir', 'admin_update_check');
 
 ##
 # Holds registered tokens...

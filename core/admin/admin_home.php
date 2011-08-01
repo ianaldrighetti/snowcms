@@ -22,7 +22,7 @@ if(!defined('INSNOW'))
 	die('Nice try...');
 }
 
-// Title: Control Panel - Home
+// Title: Home
 
 if(!function_exists('admin_home'))
 {

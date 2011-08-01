@@ -17,6 +17,8 @@
 //                       File version: SnowCMS 2.0                        //
 ////////////////////////////////////////////////////////////////////////////
 
+// Title: SnowCMS Installer
+
 // Setting this to true will prevent the setup.php and setup SQL files
 // from being deleted, just in case any modifications were made to these
 // files... Wouldn't want any work to be lost!

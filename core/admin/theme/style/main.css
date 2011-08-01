@@ -145,6 +145,7 @@ body
 .small { font-size: 85% !important; }
 
 .red { color: red !important; }
+.green { color: green !important; }
 
 .no-margin { margin: 0 !important; }
 
@@ -156,19 +157,27 @@ body
 	text-align: center;
 }
 
-.alert-message
+.error-notification, .alert-notification, .notification-message
+{
+	margin: 5px 5px;
+	padding: 5px;
+	border-radius: 5px;
+	/*text-align: center;*/
+}
+
+.alert-message, .alert-notification
 {
 	background: #FFEC8B !important;
 	border: 1px solid #F0A804 !important;
 }
 
-.error-message
+.error-message, .error-notification
 {
 	background: #FFC1C1 !important;
 	border: 1px solid #EE0000 !important;
 }
 
-.message-box
+.message-box, .notification-message
 {
 	background: #98FB98;
 	border: 1px solid #004F00;
@@ -399,4 +408,14 @@ body
 .plugin-info
 {
 	font-size: 11px;
+}
+
+/* Notifications */
+#notification-box
+{
+}
+
+.notification-message
+{
+	margin: 10px;
 }

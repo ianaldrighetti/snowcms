@@ -22,6 +22,8 @@ if(!defined('INSNOW'))
 	die('Nice try...');
 }
 
+// Title: JSON
+
 if(!function_exists('json_encode'))
 {
 	// Bitmasks for the JSON functions.
