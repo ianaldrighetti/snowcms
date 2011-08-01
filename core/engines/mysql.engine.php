@@ -259,7 +259,7 @@ class MySQL extends Database
 				}
 
 				// Maybe replace the variables in the query?
-				if(count($replacements))
+				if(count($replacements) > 0)
 				{
 					$db_query = strtr($db_query, $replacements);
 				}

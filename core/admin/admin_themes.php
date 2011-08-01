@@ -385,172 +385,27 @@ if(!function_exists('admin_themes_install'))
 			// Install that theme! Maybe.
 			theme()->set_title(l('Installing Theme'));
 
-			api()->context['filename'] = $filename;
+			// Thankfully the theme will be installed with the Component class.
+			$component = api()->load_class('Component');
 
-			// The new Extraction class is mighty handy!
-			$extraction = api()->load_class('Extraction');
+			$result = $component->install($filename, 'theme', array(
+																													'ignore_status' => isset($_GET['status']) && $_GET['status'] == 'ignore',
+																													'ignore_compatibility' => isset($_GET['compat']) && $_GET['compat'] == 'ignore',
+																												));
 
-			// We need to make sure the uploaded package is a valid theme.
-			if(!($is_valid = theme_package_valid($filename)) || !$extraction->is_supported($filename))
+			// Let's make this a bit easier.
+			foreach($result as $index => $value)
 			{
-				// Sorry, it's not a valid theme.
-				api()->context['validate_message'] = !$is_valid ? l('The file you have requested to install is not a valid theme.') : l('The file you have requested to install could not be extracted because it is an unsupported file type.');
-				api()->context['validate_is_error'] = true;
+				api()->context[$index] = $value;
 			}
-			else
+
+			// If the installation was a success we can delete the theme.
+			if(!empty($result['completed']))
 			{
-				api()->context['validate_message'] = l('The theme package was successfully validated. Proceeding...');
-
-				// Let's get out the theme.xml file, we will need that for a couple
-				// of things.
-				$tmp_filename = tempnam(dirname(__FILE__), 'theme_');
-
-				if(!$extraction->read($filename, 'theme.xml', $tmp_filename))
-				{
-					api()->context['status_message'] = l('The theme.xml file failed to be extracted from the theme package.');
-					api()->context['status_class'] = 'red';
-					api()->context['proceed'] = false;
-				}
-				else
-				{
-					// Now load the themes information.
-					$theme_info = theme_get_info($tmp_filename);
-
-					// Alright, we will now check whether or not the theme is
-					// approved by SnowCMS.
-					$status = plugin_check_status($filename, $reason);
-
-					// Get the status message, and the color that the message should be.
-					// But first, include a file.
-					require_once(coredir. '/admin/admin_plugins_add.php');
-
-					// Okay, now get the response!
-					$response = admin_plugins_get_message($status, $theme_info['name'], $reason, true);
-
-					// Is it okay? Can we continue without prompting?
-					$install_proceed = isset($_GET['proceed']) || $status == 'approved';
-					api()->run_hooks('plugin_install_proceed', array(&$install_proceed, $status, 'theme'));
-
-					api()->context['status_message'] = $response['message'];
-					api()->context['status_class'] = $response['div-class'];
-					api()->context['proceed'] = $install_proceed;
-
-					// Shall we proceed?
-					if(!empty($install_proceed))
-					{
-						// We are almost there... Really! We are! We just need to check
-						// the themes compatibility.
-						api()->context['is_compatible'] = $theme_info['is_compatible'];
-						api()->context['compatible_is_error'] = false;
-
-						// We will continue if it is compatible, if no compatibility was
-						// supplied or if you choose to ignore the warning.
-						if($theme_info['is_compatible'] === true || $theme_info['is_compatible'] === null || (isset($_GET['compat']) && $_GET['compat'] == 'ignore'))
-						{
-							if($theme_info['is_compatible'] !== false)
-							{
-								api()->context['compatible_message'] = l('The theme &quot;%s&quot; is compatible with your version of SnowCMS. Proceeding...', $theme_info['name']);
-							}
-							else
-							{
-								api()->context['compatible_message'] = l('The theme &quot;%s&quot; is not compatible with your version of SnowCMS. Proceeding with installation anyways...', $theme_info['name']);
-							}
-
-							// Now just one last thing, extracting!
-							// Let's get a nice name for the themes directory, how about
-							// the name of the theme itself?
-							$name = sanitize_filename($theme_info['name']);
-
-							// But you may already have a theme with the same name, so...
-							if(file_exists(themedir. '/'. $name))
-							{
-								$count = 1;
-								while(file_exists(themedir. '/'. $name. ' ('. $count. ')'))
-								{
-									// Keep going.
-									$count++;
-								}
-
-								// Looks like we found a suitable match!
-								$name .= ' ('. $count. ')';
-							}
-
-							// Now attempt to extract the package. Well, first try to make
-							// the directory.
-							if(!file_exists(themedir. '/'. $name) && !@mkdir(themedir. '/'. $name, 0755, true))
-							{
-								api()->context['extract_message'] = l('Please make sure the theme directory is writable and try installing the theme again.');
-								api()->context['extract_is_error'] = true;
-
-								unlink($tmp_filename);
-							}
-							// Ok, now try to extract it.
-							elseif($extraction->extract($filename, themedir. '/'. $name))
-							{
-								api()->context['extract_message'] = l('The theme was successfully extracted. Proceeding...');
-
-								// Now if the theme is valid, which is should be since we
-								// checked before, we can complete the installation.
-								if(theme_load(themedir. '/'. $name) !== false)
-								{
-									// Execute install.php, if there is one.
-									if(file_exists(themedir. '/'. $name. '/install.php'))
-									{
-										// We will just include it.
-										require(themedir. '/'. $name. '/install.php');
-
-										// Now delete it.
-										unlink(themedir. '/'. $name. '/install.php');
-									}
-
-									api()->context['completed'] = true;
-
-									// Delete the stuff we no longer need.
-									unlink($filename);
-									unlink($tmp_filename);
-								}
-								else
-								{
-									api()->context['completed'] = false;
-
-									unlink($tmp_filename);
-									unlink($filename);
-									recursive_unlink(themedir. '/'. $name);
-								}
-							}
-							else
-							{
-								// Hmm, something went wrong.
-								api()->context['extract_message'] = l('The theme package could not be extracted for an unknown reason.');
-								api()->context['extract_is_error'] = true;
-
-								unlink($tmp_filename);
-								recursive_unlink(themedir. '/'. $name);
-							}
-						}
-						else
-						{
-							// Shucks! The theme author says it isn't compatible with your
-							// current version of SnowCMS. Do you want to continue?
-							api()->context['compatible_is_error'] = true;
-							api()->context['install'] = htmlchars($_GET['install']);
-							api()->context['compatible_message'] = l('The theme &quot;%s&quot; is not compatible with your version of SnowCMS. You may continue with the installation anyways, if you choose.', $theme_info['name']);
-
-							unlink($tmp_filename);
-						}
-					}
-					else
-					{
-						// Uh oh!
-						// It was not safe, but if you still want to continue installing
-						// it, be my guest! Just be sure you know what you're getting
-						// yourself into, please!
-						unlink($tmp_filename);
-
-						api()->context['install'] = htmlchars($_GET['install']);
-					}
-				}
+				unlink($filename);
 			}
+
+			api()->context['install'] = htmlchars($_GET['install']);
 
 			theme()->render('admin_themes_install');
 		}
@@ -607,10 +462,7 @@ if(!function_exists('admin_themes_update'))
 		{
 			// Get the latest version of this theme.
 			// This function will handle that for us.
-			$update_version = admin_themes_check_updates(themedir. '/'. $update_theme);
-
-			// Let's make our lives a bit easier...
-			$update_dir = themedir. '/'. $update_theme;
+			$update_version = admin_themes_check_updates($theme_info['directory']);
 
 			// So, how did that go?
 			if($update_version === false || compare_versions($theme_info['version'], $update_version, '>=') || $theme_info['update_url'] === false)
@@ -625,208 +477,51 @@ if(!function_exists('admin_themes_update'))
 			}
 			else
 			{
-				// There is an update for this theme! This process is almost the
-				// same as installing a theme, only we have to download the update
-				// ourselves from the update location before we can begin.
-				// So let's get to it!
-				$http = api()->load_class('HTTP');
+				// The Component class makes this very easy :-)
+				$component = api()->load_class('Component');
 
-				// We need to make sure the directory is writable.
-				if(!is_writable($update_dir))
+				$result = $component->update($theme_info['directory'], $update_version, 'theme', array(
+																																													 'ignore_status' => isset($_GET['status']) && $_GET['status'] == 'ignore',
+																																													 'ignore_compatibility' => isset($_GET['compat']) && $_GET['compat'] == 'ignore',
+																																												 ));
+
+				// Let's make this a bit easier.
+				foreach($result as $index => $value)
 				{
-					api()->context['download_message'] = l('Please make sure the theme directory is writable and try updating the theme again.');
-					api()->context['download_is_error'] = true;
+					api()->context[$index] = $value;
 				}
-				elseif(!$http->request($theme_info['update_url'], array('download' => 1, 'version' => $update_version), 0, $update_dir. '/theme-update.tmp'))
+
+				// Was the update a success? Awesome.
+				if(!empty($result['completed']))
 				{
-					// That didn't go so well.
-					api()->context['download_message'] = l('Failed to download the theme update file. Please make sure that either <a href="http://www.php.net/fsockopen" target="_blank">fsockopen</a> or <a href="http://www.php.net/curl" target="_blank">cURL</a> is enabled. This error could also be caused by being unable to contact the theme&#039;s update server.');
-					api()->context['download_is_error'] = true;
-				}
-				// Did we download it? Sweet!
-				else
-				{
-					api()->context['download_message'] = l('The theme update was successfully downloaded. Proceeding...');
+					// But we need to remove the update notification, after we check
+					// for any more updates, that is.
+					$response = admin_themes_update_check($theme_info['directory']);
 
-					// This will come in handy.
-					$filename = $update_dir. '/theme-update.tmp';
+					$theme_updates = settings()->get('theme_updates', 'array', array());
 
-					// The new Extraction class is mighty handy!
-					$extraction = api()->load_class('Extraction');
-
-					// We need to make sure the uploaded package is a valid theme.
-					if(!($is_valid = theme_package_valid($filename)) || !$extraction->is_supported($filename))
+					// So, delete it or change it?
+					if(empty($response))
 					{
-						// Sorry, it's not a valid theme.
-						api()->context['validate_message'] = !$is_valid ? l('The theme update package downloaded is not a valid theme.') : l('The theme update package downloaded could not be extracted because it is an unsupported file type.');
-						api()->context['validate_is_error'] = true;
-
-						unlink($filename);
+						// Delete it.
+						unset($theme_updates[basename($theme_info['directory'])]);
 					}
 					else
 					{
-						api()->context['validate_message'] = l('The theme update package was successfully validated. Proceeding...');
-
-						// Let's get out the theme.xml file, we will need that for a couple
-						// of things.
-						$tmp_filename = tempnam(dirname(__FILE__), 'theme_');
-
-						if(!$extraction->read($filename, 'theme.xml', $tmp_filename))
-						{
-							api()->context['status_message'] = l('The theme.xml file failed to be extracted from the theme update package.');
-							api()->context['status_class'] = 'red';
-							api()->context['proceed'] = false;
-
-							unlink($tmp_filename);
-							unlink($filename);
-						}
-						else
-						{
-							// Now load the themes information.
-							$updated_theme_info = theme_get_info($tmp_filename);
-
-							// Alright, we will now check whether or not the theme is
-							// approved by SnowCMS.
-							$status = plugin_check_status($filename, $reason);
-
-							// Get the status message, and the color that the message should be.
-							// But first, include a file.
-							require_once(coredir. '/admin/admin_plugins_add.php');
-
-							// Okay, now get the response!
-							$response = admin_plugins_get_message($status, $updated_theme_info['name'], $reason, true);
-
-							// Is it okay? Can we continue without prompting?
-							$install_proceed = isset($_GET['proceed']) || $status == 'approved';
-							api()->run_hooks('plugin_install_proceed', array(&$install_proceed, $status, 'theme'));
-
-							api()->context['status_message'] = $response['message'];
-							api()->context['status_class'] = $response['div-class'];
-							api()->context['proceed'] = $install_proceed;
-
-							// Shall we proceed?
-							if(!empty($install_proceed))
-							{
-								// We are almost there... Really! We are! We just need to check
-								// the themes compatibility.
-								api()->context['is_compatible'] = $updated_theme_info['is_compatible'];
-								api()->context['compatible_is_error'] = false;
-
-								// We will continue if it is compatible, if no compatibility was
-								// supplied or if you choose to ignore the warning.
-								if($updated_theme_info['is_compatible'] === true || $updated_theme_info['is_compatible'] === null || (isset($_GET['compat']) && $_GET['compat'] == 'ignore'))
-								{
-									if($updated_theme_info['is_compatible'] !== false)
-									{
-										api()->context['compatible_message'] = l('The theme update is compatible with your version of SnowCMS. Proceeding...', $updated_theme_info['name']);
-									}
-									else
-									{
-										api()->context['compatible_message'] = l('The theme update is not compatible with your version of SnowCMS. Proceeding with update anyways...', $updated_theme_info['name']);
-									}
-
-									// Now attempt to extract the package. Well, first try to
-									// extract the update to a temporary location.
-									if(!file_exists($update_dir. '/theme-update/') && !@mkdir($update_dir. '/theme-update/', 0755, true))
-									{
-										api()->context['extract_message'] = l('Please make sure the theme&#039;s directory is writable and try updating the theme again.');
-										api()->context['extract_is_error'] = true;
-
-										unlink($tmp_filename);
-										unlink($filename);
-									}
-									// Ok, now try to extract it.
-									elseif($extraction->extract($filename, $update_dir. '/theme-update/'))
-									{
-										api()->context['extract_message'] = l('The theme update was successfully extracted. Proceeding...');
-
-										// Now if the theme is valid, which is should be since we
-										// checked before, we can complete the installation.
-										if(theme_load($update_dir. '/theme-update/') !== false && copydir($update_dir. '/theme-update/', $update_dir))
-										{
-											// We are done with this!
-											recursive_unlink($update_dir. '/theme-update/');
-
-											// Execute install.php, if there is one.
-											if(file_exists($update_dir. '/install.php'))
-											{
-												// Set a variable just in case.
-												$updating_from = $theme_info['version'];
-
-												// We will just include it.
-												require($update_dir. '/install.php');
-
-												// Now delete it.
-												unlink($update_dir. '/install.php');
-											}
-
-											api()->context['completed'] = true;
-
-											// Woopsie! Forgot to mark this theme as up-to-date.
-											$theme_updates = settings()->get('theme_updates', 'array', array());
-
-											// We can do that by deleting the entry, like so:
-											unset($theme_updates[basename($theme_info['path'])]);
-
-											// Then putting it back.
-											settings()->get('theme_updates', $theme_updates);
-
-											// Delete the stuff we no longer need.
-											unlink($filename);
-											unlink($tmp_filename);
-										}
-										else
-										{
-											api()->context['completed'] = false;
-
-											unlink($tmp_filename);
-											unlink($filename);
-											recursive_unlink($update_dir. '/theme-update/');
-										}
-									}
-									else
-									{
-										// Hmm, something went wrong.
-										api()->context['extract_message'] = l('The theme update package could not be extracted for an unknown reason.');
-										api()->context['extract_is_error'] = true;
-
-										unlink($tmp_filename);
-										unlink($filename);
-										recursive_unlink($update_dir. '/theme-update/');
-									}
-								}
-								else
-								{
-									// Shucks! The theme author says it isn't compatible with your
-									// current version of SnowCMS. Do you want to continue?
-									api()->context['compatible_is_error'] = true;
-									api()->context['update'] = htmlchars(basename($theme_info['path']));
-									api()->context['compatible_message'] = l('The theme &quot;%s&quot; is not compatible with your version of SnowCMS. You may continue with the update anyways, if you choose.', $updated_theme_info['name']);
-
-									unlink($tmp_filename);
-									unlink($filename);
-								}
-							}
-							else
-							{
-								// Uh oh!
-								// It was not safe, but if you still want to continue installing
-								// it, be my guest! Just be sure you know what you're getting
-								// yourself into, please!
-								unlink($tmp_filename);
-								unlink($filename);
-
-								api()->context['update'] = htmlchars(basename($theme_info['path']));
-							}
-						}
+						// Looks like you have some more updates to do.
+						$theme_updates[basename($theme_info['directory'])] = $response;
 					}
+
+					// Now save it.
+					settings()->set('theme_updates', $theme_updates);
 				}
 
-				theme()->set_title(l('Updating Theme'));
-
+				api()->context['update'] = htmlchars($_GET['update']);
 				api()->context['theme_name'] = $theme_info['name'];
 				api()->context['theme_version'] = $theme_info['version'];
 				api()->context['update_version'] = $update_version;
+
+				theme()->set_title(l('Updating Theme'));
 
 				theme()->render('admin_themes_update');
 			}
@@ -864,6 +559,8 @@ if(!function_exists('admin_themes_check_updates'))
 	*/
 	function admin_themes_check_updates($themes = array(), $force_check = false)
 	{
+		global $func;
+
 		// We will save available updates to an array, which will then be saved
 		// to the settings table.
 		$theme_updates = array();
@@ -915,13 +612,23 @@ if(!function_exists('admin_themes_check_updates'))
 					continue;
 				}
 
+				// Set up the POST data we will be sending.
+				$post_data = array('requesttype' => 'updatecheck', 'version' => $theme_info['version']);
+
+				// Want to add some sort of update key or something?
+				if($func['strlen'](api()->apply_filters(sha1($theme_info['directory']). '_updatekey'), '') > 0)
+				{
+					$post_data['updatekey'] = api()->apply_filters(sha1($theme_info['directory']). '_updatekey', '');
+				}
+
 				// We will use the supplied update URL to query for any available
 				// updates. This of course requires both the update URL (of course)
-				// and a current version to be supplied.
-				$request = $http->request('http://'. $theme_info['update_url'], array('updatecheck' => 1, 'version' => $theme_info['version']));
+				// and a current version to be supplied. See
+				// http://code.google.com/p/snowcms/wiki/SUTP for more information.
+				$request = $http->request('http://'. $theme_info['update_url'], $post_data);
 
 				// Did we get an answer?
-				if(empty($request))
+				if(empty($request) || trim(strtolower($request)) == 'UPTODATE')
 				{
 					// Nope, nothing. How rude!
 					continue;
