@@ -111,8 +111,7 @@ class Zip implements Extractor
 			return false;
 		}
 
-		// We are now locking this to prevent any tampering.
-		flock($fp, LOCK_SH);
+		// Move the pointer to the beginning of the file.
 		fseek($fp, 0);
 
 		// Save a couple things, we will need them.
@@ -143,6 +142,9 @@ class Zip implements Extractor
 		{
 			return false;
 		}
+
+		// Lock the file.
+		flock($this->fp, LOCK_SH);
 
 		// This will hold all the files and stuff :-)
 		$files = array();
@@ -212,6 +214,9 @@ class Zip implements Extractor
 			}
 		}
 
+		// ... and unlock.
+		flock($this->fp, LOCK_UN);
+
 		// You can have it now :-)
 		return $files;
 	}
@@ -258,6 +263,9 @@ class Zip implements Extractor
 
 		// Get all the files that need to be extracted.
 		$files = $this->files();
+
+		// Lock it up.
+		flock($this->fp, LOCK_SH);
 
 		if(count($files) > 0)
 		{
@@ -314,6 +322,9 @@ class Zip implements Extractor
 
 			fseek($this->fp, 0);
 		}
+
+		// No need to lock it any more.
+		flock($this->fp, LOCK_UN);
 
 		return true;
 	}
@@ -377,6 +388,9 @@ class Zip implements Extractor
 			return false;
 		}
 
+		// Lock it.
+		flock($this->fp, LOCK_SH);
+
 		// Whether or not you want it in a file, we must take out the contents
 		// of the file in order to decompress it.
 		fseek($this->fp, $file['pos']);
@@ -386,6 +400,10 @@ class Zip implements Extractor
 
 		// Move the pointer back to the beginning of the file.
 		fseek($this->fp, 0);
+
+		// And unlock the file.
+		flock($this->fp, LOCK_UN);
+
 
 		// If the compressed and uncompressed sizes are different, then we
 		// should decompress it.
@@ -448,7 +466,7 @@ class Zip implements Extractor
 	{
 		if(!empty($this->fp))
 		{
-			// Release the lock, captain!
+			// Just in case we forgot to unlock it.
 			flock($this->fp, LOCK_UN);
 
 			// Now close it!

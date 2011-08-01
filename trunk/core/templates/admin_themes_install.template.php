@@ -27,9 +27,9 @@ echo '
 		<p>', l('Please wait while the theme is being installed.'), '</p>
 
 		<p class="bold">', l('Validating Theme'), '</p>
-		<p', !empty(api()->context['validate_is_error']) ? ' class="red"' : '', '>', api()->context['validate_message'], '</p>';
+		<p', empty(api()->context['validated']) ? ' class="red"' : '', '>', api()->context['validate_message'], '</p>';
 
-if(!empty(api()->context['status_message']))
+if(!empty(api()->context['validated']))
 {
 	echo '
 		<p class="bold">', l('Checking Theme Status'), '</p>
@@ -38,33 +38,31 @@ if(!empty(api()->context['status_message']))
 		</div>';
 
 	// Did installation proceed?
-	if(!empty(api()->context['proceed']))
+	if(!empty(api()->context['status_proceed']))
 	{
 		// Yes, but what about compatibility?
 		echo '
 		<p class="bold">', l('Checking Compatibility'), '</p>
-		<div', !empty(api()->context['compatible_is_error']) ? ' class="error-message"' : '', '>
-			<p>', api()->context['compatible_message'], '</p>
-		</div>';
+		<p', empty(api()->context['is_compatible']) ? ' class="red"' : '', '>', api()->context['compatibility_message'], '</p>';
 
-		if(empty(api()->context['compatible_is_error']))
+		if(!empty(api()->context['is_compatible']))
 		{
 			echo '
 		<p class="bold">', l('Extracting Theme'), '</p>
-		<p', !empty(api()->context['extract_is_error']) ? ' class="red"' : '', '>', api()->context['extract_message'], '</p>';
+		<p', empty(api()->context['extracted']) ? ' class="red"' : '', '>', api()->context['extract_message'], '</p>';
 
-			if(empty(api()->context['extract_is_error']) && !empty(api()->context['completed']))
+			if(!empty(api()->context['completed']))
 			{
 				// We're done! Awesome!
 				echo '
 		<p class="bold">', l('Installation Complete'), '</p>
-		<p>', l('The theme was successfully installed.'), '</p>';
+		<p>', api()->context['complete_message'], '</p>';
 			}
-			elseif(empty(api()->context['extract_is_error']))
+			elseif(!empty(api()->context['extracted']))
 			{
 				echo '
 		<p class="bold">', l('Installation Failed'), '</p>
-		<p>', l('The theme was not successfully installed due to it not being a valid theme.'), '</p>';
+		<p>', api()->context['complete_message'], '</p>';
 			}
 		}
 		else
@@ -77,7 +75,7 @@ if(!empty(api()->context['status_message']))
 			<input type="hidden" name="sa" value="themes" />
 			<input type="hidden" name="install" value="', api()->context['install'], '" />
 			<input type="hidden" name="sid" value="', member()->session_id(), '" />
-			<input type="hidden" name="proceed" value="true" />
+			<input type="hidden" name="status" value="ignore" />
 			<input type="hidden" name="compat" value="ignore" />
 		</form>';
 		}
@@ -91,11 +89,11 @@ if(!empty(api()->context['status_message']))
 			<input type="hidden" name="sa" value="themes" />
 			<input type="hidden" name="install" value="', api()->context['install'], '" />
 			<input type="hidden" name="sid" value="', member()->session_id(), '" />
-			<input type="hidden" name="proceed" value="true" />
+			<input type="hidden" name="status" value="ignore" />
 		</form>';
 	}
 }
 
 echo '
-		<p class="right"><a href="', baseurl, '/index.php?action=admin&amp;sa=themes">Back to theme management &raquo;</a></p>';
+		<p class="right"><a href="', baseurl, '/index.php?action=admin&amp;sa=themes">', l('Back to theme management'), ' &raquo;</a></p>';
 ?>

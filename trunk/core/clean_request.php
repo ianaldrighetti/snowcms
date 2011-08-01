@@ -159,6 +159,11 @@ function redirect($location = null, $status = 307)
 		header('HTTP/1.0 301 Moved Permanently');
 	}
 
+	// Don't cache this! Geez. (This is done because browsers still send the
+	// POST data when doing a 307 redirect, but then with a 301 redirect they
+	// cache the resulting redirect)
+	header('Cache-Control: no-cache');
+
 	// Now redirect to the location of your desire!
 	header('Location: '. $location);
 

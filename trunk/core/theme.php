@@ -264,7 +264,7 @@ function theme_package_valid($filename)
 		{
 			// They exist, but is the theme.xml file valid?
 			$tmp_filename = tempnam(dirname(__FILE__), 'theme_');
-			if($extraction->read($filename, 'theme.xml', $tmp_filename))
+			if(!empty($tmp_filename) && $extraction->read($filename, 'theme.xml', $tmp_filename))
 			{
 				$theme_info = theme_get_info($tmp_filename);
 
