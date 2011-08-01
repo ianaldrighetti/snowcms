@@ -22,7 +22,7 @@ if(!defined('INSNOW'))
 	die('Nice try...');
 }
 
-// Title: Control Panel - Members - Settings
+// Title: Member Settings
 
 if(!function_exists('admin_members_settings'))
 {
@@ -78,9 +78,12 @@ if(!function_exists('admin_members_settings'))
 
 		// This will come in handy.
 		api()->context['section_menu'] = array();
+		$GLOBALS['settings_identifiers'] = array();
 		$is_first = true;
 		foreach($form_types as $type_id => $type_info)
 		{
+			$GLOBALS['settings_identifiers'][$type_id] = $type_info[0];
+
 			api()->context['section_menu'][] = array(
 																					 'href' => baseurl. '/index.php?action=admin&amp;sa=members_settings&amp;type='. $type_id,
 																					 'title' => $type_info[1],

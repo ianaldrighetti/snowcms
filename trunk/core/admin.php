@@ -250,6 +250,34 @@ if(!function_exists('admin_prepend'))
 		api()->add_filter('admin_theme_container_id', create_function('$element_id', '
 																										return \'content-container\';'));
 
+		// Load some default notifications and what not.
+		api()->add_filter('admin_notifications', 'admin_load_notifications');
+		api()->add_filter('admin_important_notifications', 'admin_important_notifications');
+
+		// Do we have any notifications?
+		$admin_notifications = api()->apply_filters('admin_notifications', array());
+		$GLOBALS['notifications'] = array();
+
+		if(is_array($admin_notifications) && count($admin_notifications) > 0)
+		{
+			// Yes, there are notifications.
+			foreach($admin_notifications as $message)
+			{
+				// A message is required.
+				if(empty($message['message']))
+				{
+					continue;
+				}
+
+				$GLOBALS['notifications'][] = array(
+																				'attr_class' => !empty($message['attr_class']) ? $message['attr_class'] : 'notification-message',
+																				'message' => $message['message'],
+																			);
+			}
+		}
+
+		theme()->add_js_var('notifications', $GLOBALS['notifications']);
+
 		// You can make changes to the theme and what not now :)
 		api()->run_hooks('admin_prepend_authenticated', array('ajax' => substr($_SERVER['QUERY_STRING'], 0, 20) == 'action=admin&sa=ajax'));
 	}
@@ -585,6 +613,75 @@ if(!function_exists('admin_current_area'))
 }
 
 /*
+	Function: admin_link_tree
+
+	Generates a link tree to display in the control panel.
+
+	Parameters:
+		bool $displaying_login - Whether the log in form is being displayed.
+
+	Returns:
+		string - Returns a string containing the link tree.
+*/
+function admin_link_tree($displaying_login = false)
+{
+	// If the log in form is being displayed, show a different link tree.
+	if(!empty($displaying_login))
+	{
+		return '<a href="'. baseurl. '/index.php?action=admin">'. l('Control Panel'). '</a> &raquo; '. l('Log In');
+	}
+
+	$linktree = array();
+	$query_strings = array();
+	$current = 0;
+	foreach(api()->return_linktree() as $link)
+	{
+		// Is the identifier a callback?
+		if(is_callable($link['identifier']))
+		{
+			// Then we shall go ahead and call it.
+			$link['identifier'] = call_user_func($link['identifier'], $link['value']);
+		}
+
+		if(!is_array($link['identifier']))
+		{
+			$link['identifier'] = array(
+															array(
+																'query_string' => $link['query_string'],
+																'identifier' => $link['identifier'],
+															),
+														);
+		}
+
+		foreach($link['identifier'] as $_link)
+		{
+			$query_strings[] = $_link['query_string'];
+			$linktree[$current++] = array(
+																'href' => baseurl. '/index.php?'. implode('&amp;', $query_strings),
+																'text' => $_link['identifier'],
+																'is_last' => true,
+															);
+
+			// Mark the previous as not last any more. If there is a previous,
+			// that is.
+			if($current - 2 >= 0)
+			{
+				$linktree[$current - 2]['is_last'] = false;
+			}
+		}
+	}
+
+	// Yeah, I know, we have to go through this AGAIN.
+	$links = array();
+	foreach($linktree as $link)
+	{
+		$links[] = (!$link['is_last'] ? '<a href="'. $link['href']. '">' : ''). $link['text']. (!$link['is_last'] ? '</a>' : '');
+	}
+
+	return implode(' &raquo; ', $links);
+}
+
+/*
 	Function: admin_show_sidebar
 
 	Determines whether or not the sidebar in the control panel should be
@@ -610,5 +707,131 @@ function admin_show_sidebar($show = null)
 	}
 
 	return $show_sidebar;
+}
+
+/*
+	Function: admin_load_notifications
+
+	A function called upon by the admin_notifications filter. This function
+	will return any default system notifications, such as available plugin
+	and theme updates.
+
+	Parameters:
+		array $notifications - An array containing any notifications.
+
+	Returns:
+		array - Returns an array containing the notifications.
+*/
+function admin_load_notifications($notifications)
+{
+	// So, do we have any notifications we need to add?
+	$plugin_updates = settings()->get('plugin_updates', 'array', array());
+
+	$tmp = array();
+	foreach($plugin_updates as $plugindir => $version)
+	{
+		$plugin_info = plugin_load(plugindir. '/'. basename($plugindir));
+
+		// Make sure the plugin even exists.
+		if($plugin_info === false)
+		{
+			continue;
+		}
+
+		$tmp[] = '<a href="'. baseurl. '/index.php?action=admin&amp;sa=plugins_manage'. (!isset($_GET['go']) ? '&amp;go=1' : ''). '#p'. sha1($plugindir). '" title="'. l('v%s of this plugin is available', htmlchars($version)). '">'. $plugin_info['name']. '</a>';
+	}
+
+	// So, were there any plugin updates?
+	if(count($tmp) > 0)
+	{
+		// Yup, there is!
+		if(count($tmp) > 1)
+		{
+			// Let's make this purty!
+			$last = $tmp[count($tmp) - 1];
+			unset($tmp[count($tmp) - 1]);
+
+			$updates = implode(', ', $tmp). ' '. l('and'). ' '. $last;
+		}
+		else
+		{
+			$updates = $tmp[0];
+		}
+
+		$notifications[] = array(
+												 'attr_class' => 'alert-notification',
+												 'message' => l('The following plugins have updates available: %s.', $updates),
+											 );
+	}
+
+	// Now, what about themes?
+	$theme_updates = settings()->get('theme_updates', 'array', array());
+
+	$tmp = array();
+	foreach($theme_updates as $themedir => $version)
+	{
+		$theme_info = theme_load(themedir. '/'. basename($themedir));
+
+		// Make sure the theme exists.
+		if($theme_info === false)
+		{
+			continue;
+		}
+
+		$tmp[] = '<a href="'. baseurl. '/index.php?action=admin&amp;sa=themes'. (!isset($_GET['go']) ? '&amp;go=1' : ''). '#t'. sha1($themedir). '" title="'. l('v%s of this theme is available', htmlchars($version)). '">'. $theme_info['name']. '</a>';
+
+	}
+
+	if(count($tmp) > 0)
+	{
+		if(count($tmp) > 1)
+		{
+			// Let's make this purty!
+			$last = $tmp[count($tmp) - 1];
+			unset($tmp[count($tmp) - 1]);
+
+			$updates = implode(', ', $tmp). ' '. l('and'). ' '. $last;
+		}
+		else
+		{
+			$updates = $tmp[0];
+		}
+
+		$notifications[] = array(
+												 'attr_class' => 'alert-notification',
+												 'message' => l('The following themes have updates available: %s.', $updates),
+											 );
+	}
+
+	return $notifications;
+}
+
+/*
+	Function: admin_important_notifications
+
+	A function called upon by the admin_important_notifications filter. This
+	function will return any important notifications, such as a system update.
+
+	Parameters:
+		array $notifications - An array containing notifications.
+
+	Returns:
+		array - Returns an array containing any notifications.
+*/
+function admin_important_notifications($notifications)
+{
+	// Is there a system update available?
+	$latest_version = settings()->get('system_latest_version', 'string', settings()->get('version', 'string'));
+
+	if($latest_version !== false && compare_versions($latest_version, settings()->get('version', 'string'), '>'))
+	{
+		// Yes, there is!
+		$notifications[] = array(
+												 'attr_class' => 'alert-message',
+												 'message' => '<p>'. l('There is an update available for SnowCMS. Please <a href="%s">update to v%s now</a>.', baseurl. '/index.php?action=admin&amp;sa=update', $latest_version). '</p>',
+											 );
+	}
+
+	return $notifications;
 }
 ?>

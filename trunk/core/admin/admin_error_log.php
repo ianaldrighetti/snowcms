@@ -22,7 +22,7 @@ if(!defined('INSNOW'))
 	die('Nice try...');
 }
 
-// Title: Control Panel - Error Log
+// Title: Error Log
 
 if(!function_exists('admin_error_log'))
 {

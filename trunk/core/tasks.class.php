@@ -53,7 +53,7 @@ class Tasks
 	*/
 	public function __construct()
 	{
-		if(settings()->get('enable_tasks', 'bool'))
+		if(settings()->get('enable_tasks', 'bool', true))
 		{
 			// Want to do this? Less work for me! ;)
 			$handled = false;
@@ -117,7 +117,7 @@ class Tasks
 				}
 
 				// Register an action for running tasks :)
-				api()->add_event('action=tasks', array($this, 'run'));
+				api()->add_event('action=tasks', array($this, 'run'), null);
 
 				// Register the save method to be called before shutdown ;)
 				api()->add_hook('snow_exit', array($this, 'save'));
@@ -144,8 +144,8 @@ class Tasks
 			string $file - The file to include before calling on $func,
 										 if any.
 			string $location - The location of the specified file, if any,
-												 such as plugin_dir (and plugindir will be
-												 prepended when it is ran) or core_dir, etc.
+												 such as plugindir (and plugindir will be
+												 prepended when it is ran) or coredir, etc.
 			bool $enabled - Whether or not the task is enabled.
 
 		Returns:
@@ -386,20 +386,20 @@ class Tasks
 						// It is, not recommended, though.
 						$include_file = realpath($task['file']);
 					}
-					elseif($task['location'] == 'core_dir' || empty($task['location']))
+					elseif($task['location'] == 'coredir' || empty($task['location']))
 					{
 						// Prepend core_dir to it.
 						$include_file = realpath(coredir. '/'. $task['file']);
 					}
-					elseif($task['location'] == 'base_dir')
+					elseif($task['location'] == 'basedir')
 					{
 						$include_file = realpath(basedir. '/'. $task['file']);
 					}
-					elseif($task['location'] == 'plugin_dir')
+					elseif($task['location'] == 'plugindir')
 					{
 						$include_file = realpath(plugindir. '/'. $task['file']);
 					}
-					elseif($task['location'] == 'theme_dir')
+					elseif($task['location'] == 'themedir')
 					{
 						$include_file = realpath(plugindir. '/'. $task['file']);
 					}

@@ -22,7 +22,7 @@ if(!defined('INSNOW'))
 	die('Nice try...');
 }
 
-// Title: Control Panel - Members - Add
+// Title: Add Member
 
 if(!function_exists('admin_members_add'))
 {

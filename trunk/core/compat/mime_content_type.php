@@ -22,6 +22,8 @@ if(!defined('INSNOW'))
 	die('Nice try...');
 }
 
+// Title: MIME Content-Type
+
 if(!function_exists('mime_content_type'))
 {
 	/*

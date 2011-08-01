@@ -49,7 +49,7 @@ function init_func()
 	);
 
 	// Enable multibyte strings (which we set to use UTF-8).
-	if(settings()->get('enable_utf8', 'bool') && function_exists('mb_internal_encoding'))
+	if(settings()->get('enable_utf8', 'bool', false) && function_exists('mb_internal_encoding'))
 	{
 		// Set the internal encoding to UTF-8.
 		mb_internal_encoding('UTF-8');
@@ -197,9 +197,13 @@ if(!function_exists('create_pagination'))
 		// We can't have a page less then one,
 		// or greater then total_pages ;)
 		if($start < 1)
+		{
 			$start = 1;
+		}
 		elseif($start > $total_pages)
+		{
 			$start = $total_pages;
+		}
 
 		// So start... Make an array holding all our stuffs.
 		$index = array();

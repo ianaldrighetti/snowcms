@@ -22,7 +22,7 @@ if(!defined('INSNOW'))
 	die('Nice try...');
 }
 
-// Title: Control Panel - Members - Manage
+// Title: Manage Members
 
 if(!function_exists('admin_members_manage'))
 {
