@@ -122,8 +122,8 @@ function init_core()
 	api()->add_event('action=register2', 'register_process', l('Register'), coredir. '/register.php');
 	api()->add_event('action=resend', 'resend_view', l('Resend Activation Email'), coredir. '/resend.php');
 	api()->add_event('action=resource', 'api_handle_resource', null);
-	api()->add_event('action=reminder', 'reminder_view', l('Password Reset'), coredir. '/reminder.php');
-	api()->add_event('action=reminder2', 'reminder_view2', l('Password Reset'), coredir. '/reminder.php');
+	api()->add_event('action=forgotpw', 'forgotpw_view', l('Request a Password Reset'), coredir. '/forgotpw.php');
+	api()->add_event('action=forgotpw2', 'forgotpw_view2', l('Reset Password'), coredir. '/forgotpw.php');
 	api()->add_event('action=tasks', 'tasks_run', null, coredir. '/tasks.class.php');
 	api()->add_event('action=popup', 'core_popup', l('Viewing Popup'));
 

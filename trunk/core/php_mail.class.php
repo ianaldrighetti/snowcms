@@ -241,7 +241,7 @@ class PHP_Mail
 		if($this->options['is_html'])
 		{
 			// It's a message with multiple parts! (HTML and alternative!)
-			$boundary = substr(str_shuffle('abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_'), 0, 40);
+			$boundary = '----=_'. substr(str_shuffle('abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_'), 0, 40);
 			$this->options['headers']['CONTENT-TYPE'] = 'multipart/alternative; boundary="'. $boundary. '"';
 
 			// No alternative message? That isn't a good idea!
@@ -251,7 +251,7 @@ class PHP_Mail
 
 				if($alt_message == $message)
 				{
-					$alt_message = strip_tags($alt_message);
+					$alt_message = strip_tags(str_ireplace(array('<br />', '<br/>', '<br>'), "\r\n", $alt_message));
 				}
 			}
 		}
@@ -264,7 +264,7 @@ class PHP_Mail
 		}
 
 		// Implode! Implode! :0
-		$headers = wordwrap(api()->apply_filters('php_mail_headers', implode("\r\n", $headers)), 70);
+		$headers = wordwrap(api()->apply_filters('php_mail_headers', implode("\r\n", $headers)), 70, "\r\n  ");
 
 		// Messages end with a \n not \r\n... Weird.
 		$message = wordwrap(str_replace("\r\n", "\n", $message), 70);
@@ -287,9 +287,9 @@ class PHP_Mail
 			}
 
 			// Put it all together now!
-			$body = "--{$boundary}\r\nContent-Type: text/plain; charset={$this->options['charset']}\r\n\r\n{$alt_message}\r\n\r\n";
-			$body .= "\r\n--{$boundary}\r\nContent-Type: text/html; charset={$this->options['charset']}\r\n\r\n{$message}\r\n\r\n";
-			$body .= "--{$boundary}--\r\n.\r\n";
+			$body = "--{$boundary}\r\nContent-Type: text/plain; charset={$this->options['charset']}\r\n\r\n{$alt_message}\r\n";
+			$body .= "\r\n--{$boundary}\r\nContent-Type: text/html; charset={$this->options['charset']}\r\n\r\n{$message}\r\n";
+			$body .= "\r\n--{$boundary}--\r\n.\r\n";
 
 			$message = api()->apply_filters('php_mail_multipart_body', $body);
 		}

@@ -104,13 +104,13 @@ if(!function_exists('login_generate_form'))
 		$form->add_input(array(
 											 'name' => 'member_name',
 											 'type' => 'string',
-											 'label' => l('Username:'),
+											 'label' => l('Username or email address'),
 											 'callback' => create_function('$name, &$value, &$error', '
 																			 if(empty($value))
 																			 {
 																				 api()->run_hooks(\'login_process_empty_username\');
 
-																				 $error = l(\'Please enter a username.\');
+																				 $error = l(\'Please enter a username or email address.\');
 																				 return false;
 																			 }
 
@@ -121,7 +121,7 @@ if(!function_exists('login_generate_form'))
 		$form->add_input(array(
 											 'name' => 'member_pass',
 											 'type' => 'password',
-										 	 'label' => l('Password:'),
+										 	 'label' => l('Password'),
 											 'callback' => create_function('$name, &$value, &$error', '
 																			 if(empty($value) && empty($_POST[\'secured_password\']))
 																			 {
@@ -139,7 +139,6 @@ if(!function_exists('login_generate_form'))
 											 'type' => 'select',
 											 'label' => l('Stay logged in for'),
 											 'options' => array(
-																			// !!! TODO: 0 => l('This session'),
 																			3600 => l('An hour'),
 																			86400 => l('A day'),
 																			604800 => l('A week'),
@@ -236,9 +235,9 @@ if(!function_exists('login_process'))
 		// So you got the stuff, but is it the right stuff? Let's see!
 		$result = db()->query('
 			SELECT
-				member_id, member_pass, member_hash, member_activated
+				member_id, member_name, member_pass, member_hash, member_activated
 			FROM {db->prefix}members
-			WHERE '. (db()->case_sensitive ? 'LOWER(member_name) = LOWER({string:member_name})' : 'member_name = {string:member_name}'). '
+			WHERE '. (db()->case_sensitive ? 'LOWER(member_name) = LOWER({string:member_name})' : 'member_name = {string:member_name}'). ' OR '. (db()->case_sensitive ? 'LOWER(member_email) = LOWER({string:member_name})' : 'member_email = {string:member_name}'). '
 			LIMIT 1',
 			array(
 				'member_name' => $login['member_name'],
@@ -256,27 +255,11 @@ if(!function_exists('login_process'))
 		// Now let's check that password!
 		$row = $result->fetch_assoc();
 
-		// Your account not yet activated? No logging in then!
-		if($row['member_activated'] != 1)
-		{
-			// So, yeah!
-			if($row['member_activated'] == 11)
-			{
-				$errors[] = l('Your account has been disabled until you verify your new email address.');
-			}
-			else
-			{
-				$errors[] = l('Your account has not yet been activated.'. (settings()->get('registration_type', 'int') == 2 ? ' An administrator should approve your account shortly.' : (settings()->get('registration_type', 'int') == 3 ? ' Check your email for further instructions.' : '')));
-			}
-
-			return false;
-		}
-
 		// No success as of yet.
 		$login_success = false;
 
 		// Maybe it is just plain text, pssssh!
-		if(sha1($func['strtolower']($login['member_name']). $login['member_pass']) == $row['member_pass'])
+		if(sha1($func['strtolower']($row['member_name']). $login['member_pass']) == $row['member_pass'])
 		{
 			$login_success = true;
 		}
@@ -292,6 +275,22 @@ if(!function_exists('login_process'))
 			api()->run_hooks('login_process_failed', array($login));
 
 			$errors[] = l('Invalid username or password supplied.');
+
+			return false;
+		}
+
+		// Your account not yet activated? No logging in then, either.
+		if($row['member_activated'] != 1)
+		{
+			// So, yeah!
+			if($row['member_activated'] == 11)
+			{
+				$errors[] = l('Your account has been disabled until you verify your new email address.');
+			}
+			else
+			{
+				$errors[] = l('Your account must be activated before you can log in.'. (settings()->get('registration_type', 'int') == 2 ? '<br />An administrator should approve your account shortly.' : (settings()->get('registration_type', 'int') == 3 ? '<br />Please check your email for further instructions or <a href="%s">request a new activation email</a>.' : '')), baseurl. '/index.php?action=resend');
+			}
 
 			return false;
 		}

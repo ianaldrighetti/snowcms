@@ -224,7 +224,8 @@ if(!class_exists('Member'))
 								'member_id' => $this->id,
 							), 'member_update_last_info');
 
-						// Time to load their other data from the {db->prefix}member_data table :)
+						// Time to load their other data from the
+						// {db->prefix}member_data table :)
 						$this->data = array();
 						$result = db()->query('
 							SELECT
@@ -241,6 +242,27 @@ if(!class_exists('Member'))
 							{
 								$this->data[$row['variable']] = $row['value'];
 							}
+						}
+
+						// Let's see if someone made a password reset request... Because
+						// if someone did and you are logged in, then we should
+						// stop such an attempt :)
+						if(isset($this->data['pwreset_requested']) && $this->data['pwreset_requested'] == 1)
+						{
+							// Well, nice try, but let's remove that stuff.
+							$members = api()->load_class('Members');
+
+							// We won't delete the pwreset_requested_time value so we can
+							// prevent anyone from repeatedly requesting password resets
+							// for the same account.
+							$members->update($this->id(), array(
+																							'data' => array(
+																													'pwreset_requested' => false,
+																													'pwreset_requested_ip' => false,
+																													'pwreset_requested_user_agent' => false,
+																													'reset_key' => false,
+																												),
+																						));
 						}
 
 						// Time to load up their permissions based on groups.

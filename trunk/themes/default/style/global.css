@@ -1,3 +1,19 @@
+.float-left { float: left; }
+.float-right { float: right; }
+.break { clear: both; }
+
+.left { text-align: left !important; }
+.center { text-align: center !important; }
+.right { text-align: right !important; }
+
+.smaller { font-size: 75%; }
+
+input[type="submit"]
+{
+	font-family: "Segoe UI", Helvetica, Tahoma, sans-serif;
+	padding: 3px 5px;
+}
+
 .error-message, .alert-message, .message-box
 {
 	margin: 10px auto 10px auto;
@@ -31,3 +47,64 @@
 }
 
 fieldset { border: none; }
+
+/* Forms */
+.form table .label
+{
+	font-weight: bold;
+}
+
+.form table .subtext
+{
+	font-size: 75%;
+}
+
+.form .buttons
+{
+	text-align: right;
+}
+
+/* Log In/Resend/Activation/Password Reset Form */
+#login_form, #resend_form, #activate_form, #forgotpw_form
+{
+	width: 260px;
+	margin: 15px auto auto auto;
+}
+
+#login_form input[type="text"], #login_form input[type="password"],
+#resend_form input[type="text"], #activate_form input[type="text"],
+#forgotpw_form input[type="text"]
+{
+	width: 254px;
+	font-size: 1.1em;
+	padding: 3px;
+	border: 1px solid #ABADB3;
+	background: #FBFBFB;
+}
+
+#login_form_below
+{
+	margin-top: 15px;
+}
+
+/* Registration */
+#registration_form .error-message
+{
+	font-size: 90%;
+}
+
+#registration_form table
+{
+	width: 70%;
+	margin: auto;
+}
+
+#registration_form .td-left
+{
+
+}
+
+#registration_form .td-right
+{
+	text-align: center;
+}

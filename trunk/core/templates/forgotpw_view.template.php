@@ -23,20 +23,21 @@ if(!defined('INSNOW'))
 }
 
 echo '
-			<h1>', l('Activate Your Account'), '</h1>
-			<p>', l('If you haven&#039;t received your activation email you can <a href="%s">request a new one</a>.', baseurl. '/index.php?action=resend'), '</p>';
+			<h1>', l('Request a Password Reset'), '</h1>
+			<p>', l('You can begin the password reset process by entering your username or email address below (in case you are wondering, we cannot retrieve your current password due to the way passwords are stored).'), '</p>';
 
-api()->run_hooks('display_resend_form', array(&$handled));
+api()->run_hooks('display_forgotpw_form', array(&$handled));
 
+// Did no one display the log in form?
 if(empty($handled))
 {
 	// Any errors?
-	if(count(api()->apply_filters('activate_form_errors', array())) > 0 || count(api()->apply_filters('activate_form_messages', array())) > 0)
+	if(count(api()->context['form']->errors('forgotpw_form')) > 0 || count(api()->apply_filters('forgotpw_form_messages', array())) > 0)
 	{
 		echo '
-				<div class="', count(api()->apply_filters('activate_form_errors', array())) > 0 ? 'error-message' : 'message-box', '">';
+				<div class="', count(api()->context['form']->errors('forgotpw_form')) > 0 ? 'error-message' : 'message-box', '">';
 
-		$messages = count(api()->apply_filters('activate_form_errors', array())) > 0 ? api()->apply_filters('activate_form_errors', array()) : api()->apply_filters('activate_form_messages', array());
+		$messages = count(api()->context['form']->errors('forgotpw_form')) > 0 ? api()->context['form']->errors('forgotpw_form') : api()->apply_filters('forgotpw_form_messages', array());
 		foreach($messages as $message)
 		{
 			echo '
@@ -47,14 +48,18 @@ if(empty($handled))
 				</div>';
 	}
 
+	// Nope, so it is up to us to do it then.
+	echo '
+			', api()->context['form']->open('forgotpw_form'), '
+				<p class="label"><label for="member_name">', l('Username or email address'), '</label></p>
+				<p class="input">', api()->context['form']->input('member_name')->generate(), '</p>';
+
+	// Maybe you want to put something here?
+	api()->run_hooks('forgotpw_form_between');
 
 	echo '
-			<form action="', baseurl, '/index.php?action=activate" method="post" id="activate_form" class="form">
-				<p class="label"><label for="member_name">', l('Username or email address:'), '</label></p>
-				<p class="input"><input type="text" name="member_name" id="member_name" value="', htmlchars(!empty($_REQUEST['member_name']) ? $_REQUEST['member_name'] : ''), '" /></p>
-				<p class="label"><label for="member_acode">', l('Activation code:'), '</label></p>
-				<p class="input"><input type="text" name="code" id="member_acode" value="', htmlchars(!empty($_REQUEST['code']) ? $_REQUEST['code'] : ''), '" /></p>
-				<p class="buttons"><input type="submit" name="activate_form" value="', l('Activate account'), '" /></p>
-			</form>';
+				<p class="buttons"><input type="submit" name="forgotpw_form" id="forgotpw_form_submit" value="', l('Request reset'), '" /></p>
+
+			', api()->context['form']->close('forgotpw_form');
 }
 ?>
