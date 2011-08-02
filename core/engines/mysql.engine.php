@@ -230,6 +230,13 @@ class MySQL extends Database
 				// Holds onto any undefined variables, you never know ;)
 				$undefined = array();
 
+				// Let's figure out which variables are defined.
+				$defined = array();
+				foreach($db_vars as $var_name => $value)
+				{
+					$defined[] = $var_name;
+				}
+
 				// No need to parse the same variables multiple times, is there?
 				$matches[0] = array_unique($matches[0]);
 
@@ -242,9 +249,10 @@ class MySQL extends Database
 					$variable_name = trim($variable_name);
 
 					// Has it been defined or not?
-					if(!isset($db_vars[$variable_name]))
+					if(!in_array($variable_name, $defined))
 					{
 						$undefined[] = $variable_name;
+
 						continue;
 					}
 

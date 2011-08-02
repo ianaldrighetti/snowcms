@@ -242,6 +242,8 @@ if(!function_exists('profile_edit_generate_form'))
 			return;
 		}
 
+		$GLOBALS['editing_member_id'] = $member_info['id'];
+
 		$form = api()->load_class('Form');
 
 		$form->add('member_edit_'. $member_info['id'], array(
@@ -251,78 +253,87 @@ if(!function_exists('profile_edit_generate_form'))
 																								'id' => 'member_edit',
 																							));
 
-		$form->add_field('member_edit_'. $member_info['id'], 'display_name', array(
-																																			'type' => 'string',
-																																			'label' => l('Display name:'),
-																																			'subtext' => l('This does not change the name you log in with, simply the name that is displayed in your profile.'),
-																																			'length' => array(
-																																										'min' => settings()->get('members_min_name_length', 'int', 3),
-																																										'max' => settings()->get('members_max_name_length', 'int', 80),
-																																									),
-																																			'function' => create_function('$value, $form_name, &$error', '
-																																											$members = api()->load_class(\'Members\');
+		$form->current('member_edit_'. $member_info['id']);
 
-																																											// Is the name in use? Not by this member, though...
-																																											if(!$members->name_allowed($value, $_POST[\'member_id\']))
-																																											{
-																																												$error = l(\'That display name is in use by another member or not allowed.\');
-																																												return false;
-																																											}
+		$form->add_input(array(
+											 'name' => 'display_name',
+											 'type' => 'string',
+											 'label' => l('Display name:'),
+											 'subtext' => l('This does not change the name you log in with, simply the name that is displayed in your profile.'),
+											 'length' => array(
+																		 'min' => settings()->get('members_min_name_length', 'int', 3),
+																		 'max' => settings()->get('members_max_name_length', 'int', 80),
+																	 ),
+											 'callback' => create_function('$name, $value, &$error', '
+																			 $members = api()->load_class(\'Members\');
 
-																																											return true;'),
-																																			'value' => !empty($_POST['display_name']) ? $_POST['display_name'] : $member_info['name'],
-																																		));
+																			 // Is the name in use? Not by this member, though...
+																			 if(!$members->name_allowed($value, $GLOBALS[\'editing_member_id\']))
+																			 {
+																				 $error = l(\'That display name is in use by another member or not allowed.\');
 
-		$form->add_field('member_edit_'. $member_info['id'], 'member_email', array(
-																																			'type' => 'string',
-																																			'label' => l('Email address:'),
-																																			'function' => create_function('$value, $form_name, &$error', '
-																																											$members = api()->load_class(\'Members\');
+																				 return false;
+																			 }
 
-																																											// Make sure the email address isn\'t in use or banned or anything.
-																																											if(!$members->email_allowed($value, $_POST[\'member_id\']))
-																																											{
-																																												$error = l(\'That email address is in use by another member or not allowed.\');
-																																												return false;
-																																											}
+																			 return true;'),
+											 'default_value' => $member_info['name'],
+										 ));
 
-																																											return true;'),
-																																			'value' => !empty($_POST['member_email']) ? $_POST['member_email'] : $member_info['email'],
-																																		));
+		$form->add_input(array(
+											 'name' => 'member_email',
+											 'type' => 'string',
+											 'label' => l('Email address:'),
+											 'callback' => create_function('$name, $value, &$error', '
+																			 $members = api()->load_class(\'Members\');
 
-		$form->add_field('member_edit_'. $member_info['id'], 'member_pass', array(
-																																					'type' => 'password',
-																																					'label' => l('Password:'),
-																																					'subtext' => l('Leave blank if you don\'t want to change your password.'),
-																																					'function' => create_function('$value, $form_name, &$error', '
-																																													if(!empty($value) && (empty($_POST[\'verify_pass\']) || $_POST[\'verify_pass\'] != $value))
-																																													{
-																																														$error = l(\'The supplied passwords don\\\'t match.\');
-																																														return false;
-																																													}
-																																													elseif(!empty($value) && !empty($_POST[\'verify_pass\']))
-																																													{
-																																														$members = api()->load_class(\'Members\');
+																			 // Make sure the email address isn\'t in use or banned or anything.
+																			 if(!$members->email_allowed($value, $GLOBALS[\'editing_member_id\']))
+																			 {
+																				 $error = l(\'That email address is in use by another member or not allowed.\');
 
-																																														if(!$members->password_allowed($_POST[\'display_name\'], $value))
-																																														{
-																																															$error = l(\'The supplied password is not allowed.\');
-																																															return false;
-																																														}
-																																													}
+																				 return false;
+																			 }
 
-																																													return true;'),
-																																					'value' => '',
-																																				));
+																			 return true;'),
+											 'default_value' => $member_info['email'],
+										 ));
+
+		$form->add_input(array(
+											 'name' => 'member_pass',
+											 'type' => 'password',
+											 'label' => l('Password:'),
+											 'subtext' => l('Leave blank if you don\'t want to change your password.'),
+											 'function' => create_function('$name, $value, &$error', '
+																			 if(!empty($value) && (empty($_POST[\'verify_pass\']) || $_POST[\'verify_pass\'] != $value))
+																			 {
+																				 $error = l(\'The supplied passwords don\\\'t match.\');
+
+																				 return false;
+																			 }
+																			 elseif(!empty($value) && !empty($_POST[\'verify_pass\']))
+																			 {
+																				 $members = api()->load_class(\'Members\');
+
+																				 if(!$members->password_allowed($_POST[\'display_name\'], $value))
+																				 {
+																					 $error = l(\'The supplied password is not allowed.\');
+
+																					 return false;
+																				 }
+																			 }
+
+																			 return true;'),
+											 'default_value' => '',
+										 ));
 
 		// We will need you to verify that ;)
-		$form->add_field('member_edit_'. $member_info['id'], 'verify_pass', array(
-																																					'type' => 'password',
-																																					'label' => l('Verify password:'),
-																																					'subtext' => l('Just to make sure, re-enter the password.'),
-																																					'value' => '',
-																																					'save' => false,
-																																				));
+		$form->add_input(array(
+											 'name' => 'verify_pass',
+											 'type' => 'password',
+											 'label' => l('Verify password:'),
+											 'subtext' => l('Just to make sure, re-enter the password.'),
+											 'default_value' => '',
+										 ));
 
 		// How about which groups they are in, whether they are activated or not? etc.
 		if(member()->can('manage_members'))
@@ -359,32 +370,26 @@ if(!function_exists('profile_edit_generate_form'))
 		}
 
 		// Just make sure it is you changing your stuffs!
-		$form->add_field('member_edit_'. $member_info['id'], 'verify_password', array(
-																																							'type' => 'password',
-																																							'label' => l('Enter your password:'),
-																																							'subtext' => l('For security purposes, please enter your current password.'),
-																																							'function' => create_function('$value, $form_name, &$error', '
-																																															$members = api()->load_class(\'Members\');
+		$form->add_input(array(
+											 'name' => 'verify_password',
+											 'type' => 'password',
+											 'label' => l('Enter your password:'),
+											 'subtext' => l('For security purposes, please enter your current password.'),
+											 'callback' => create_function('$value, $form_name, &$error', '
+																			 $members = api()->load_class(\'Members\');
 
-																																															// Make sure their password is right!
-																																															if($members->authenticate(member()->name(), $value))
-																																															{
-																																																return true;
-																																															}
-																																															else
-																																															{
-																																																// Uh oh, wrong!
-																																																$error = l(\'The password you entered did not match your current password.\');
-																																																return false;
-																																															}'),
-																																							'save' => false,
-																																						));
-
-		// Lastly, a hidden field containing the members id. Pointless? I guess, but still :P
-		$form->add_field('member_edit_'. $member_info['id'], 'member_id', array(
-																																				'type' => 'hidden',
-																																				'value' => $member_info['id'],
-																																			));
+																			 // Make sure their password is right!
+																			 if($members->authenticate(member()->name(), $value))
+																			 {
+																				 return true;
+																			 }
+																			 else
+																			 {
+																				 // Uh oh, wrong!
+																				 $error = l(\'The password you entered did not match your current password.\');
+																				 return false;
+																			 }'),
+										));
 	}
 }
 

@@ -70,20 +70,24 @@ if(!function_exists('resend_view'))
 																'callback' => 'resend_process',
 															));
 
-		$form->add_field('resend_form', 'member_name', array(
-																										 'type' => 'string',
-																										 'label' => l('Username:'),
-																										 'subtext' => l('The name you used to register your account.'),
-																										 'function' => create_function('&$value, $form_name, &$error', '
-																																		 if(empty($value))
-																																		 {
-																																			 $error = l(\'Please enter your username.\');
-																																			 return false;
-																																		 }
+		$form->current('resend_form');
 
-																																		 return true;'),
-																										 'value' => !empty($_REQUEST['member_name']) ? $_REQUEST['member_name'] : '',
-																									 ));
+		$form->add_input(array(
+											 'name' => 'member_name',
+											 'type' => 'string',
+											 'label' => l('Username'),
+											 'subtext' => l('The name you used to register your account.'),
+											 'callback' => create_function('$name, &$value, &$error', '
+																			 if(empty($value))
+																			 {
+																				 $error = l(\'Please enter a username or email address.\');
+
+																				 return false;
+																			 }
+
+																			 return true;'),
+											 'default_value' => !empty($_REQUEST['member_name']) ? $_REQUEST['member_name'] : '',
+										 ));
 
 		// So, you submitting it?
 		if(!empty($_POST['resend_form']))
@@ -91,11 +95,11 @@ if(!function_exists('resend_view'))
 			$form->process('resend_form');
 		}
 
-		theme()->set_title(l('Resend Activation Email'));
+		theme()->set_title(l('Request a New Activation Email'));
 
 		api()->context['form'] = $form;
 
-		theme()->render('resend_form');
+		theme()->render('resend_view');
 	}
 }
 
@@ -125,7 +129,7 @@ if(!function_exists('resend_process'))
 
 		if(empty($member_id))
 		{
-			$errors[] = l('The name you entered does not exist.');
+			$errors[] = l('There is no account with that username or email address.');
 			return false;
 		}
 
@@ -134,9 +138,16 @@ if(!function_exists('resend_process'))
 		$member_info = $members->get($member_id);
 
 		// Is the account already activated? No go!
-		if($member_info['is_activated'] == 1)
+		if($member_info['is_activated'] != 0)
 		{
-			$errors[] = l('The account is already activated. If this is your account, you can proceed to <a href="%s">login</a>.', baseurl. '/index.php?action=login');
+			$errors[] = l('That account is already activated and you can <a href="%s">log in</a> if it is your account.', baseurl. '/index.php?action=login');
+
+			return false;
+		}
+		elseif(isset($member_info['data']['activation_last_resent']) && ($member_info['data']['activation_last_resent'] + 900) > time_utc())
+		{
+			$errors[] = l('You can only request a new activation email every 15 minutes. Please try again in %u minutes.', ceil((900 - (time_utc() - $member_info['data']['activation_last_resent'])) / 60));
+
 			return false;
 		}
 
@@ -144,8 +155,10 @@ if(!function_exists('resend_process'))
 		$member_acode = sha1($members->rand_str(mt_rand(30, 40)));
 
 		$members->update($member_id, array(
-																	 'member_activated' => 0,
 																	 'member_acode' => $member_acode,
+																	 'data' => array(
+																							 'activation_last_resent' => time_utc(),
+																						 ),
 																 ));
 
 		// Resend it! Woo!
@@ -156,8 +169,10 @@ if(!function_exists('resend_process'))
 
 		register_send_email($member_id);
 
-		api()->add_filter('resend_message', create_function('$value', '
-																				 return l(\'Your activation email has been resent successfully.\');'));
+		api()->add_filter('resend_form_messages', create_function('$value', '
+																								$value[] = l(\'A new activation email has been sent. The email should be received shortly.\');
+
+																								return $value;'));
 
 		return true;
 	}

@@ -387,9 +387,14 @@ class Members
 	{
 		global $func;
 
+		if(empty($member_id))
+		{
+			$member_id = 0;
+		}
+
 		// You know what to do, set it to a bool if you handle it ;)
 		$handled = null;
-		api()->run_hooks('members_name_allowed', array(&$handled, &$member_name));
+		api()->run_hooks('members_name_allowed', array(&$handled, &$member_name, &$member_id));
 
 		if($handled === null)
 		{
@@ -715,22 +720,23 @@ class Members
 
 		Parameters:
 			int $member_id - The member ID to update.
-			array $options - An array containing the information you want to update.
+			array $options - An array containing the information you want to
+											 update.
 
 		Returns:
-			bool - Returns TRUE if the member was successfully updated, FALSE if not.
+			bool - Returns true if the member was successfully updated, false if
+						 not (such as if the member does not exist).
 
 		Note:
 			For the $options parameter, these are acceptable indices to use:
 
-				member_name - Their login name, however, if this is changed, their current password
-											MUST be supplied, otherwise, the update will fail (Password must
-											not be hashed yet), their member name must be supplied if their password
-											is changed.
+				member_name - Their login name, however, if this is changed, their
+											current password MUST be supplied, otherwise, the
+											update will fail (password must not be hashed yet),
+											their member name must be supplied if their password
+											is changed as well.
 
 				member_pass - The users new password.
-
-				member_hash - A salt that the authentication cookie is hashed with.
 
 				display_name - The members display name.
 
@@ -740,20 +746,24 @@ class Members
 
 				member_ip - The IP of the member.
 
-				member_activated - The current status of the member. 0 means unactivated, 1 means
-													 activated and 11 means that the member changed their email and
-													 that the administrator has set the option to require the member
-													 to verify their new email address before it is changed.
+				member_activated - The current status of the member. 0 means
+													 unactivated, 1 means activated and 11 means that
+													 the member changed their email and that the
+													 administrator has set the option to require the
+													 member to verify their new email address before
+													 it is changed.
 
-				member_acode - An activation code for activating or reactivating their account.
+				member_acode - An activation code for activating or reactivating
+											 their account.
 
-				data - An array formatted as so: variable => value, simple, no? If you want to delete
-							 a data variable for the specified member, set the value to false.
+				data - An array formatted as so: variable => value, simple, no? If
+							 you want to delete a data variable for the specified member,
+							 set the value to false.
 
-				admin_override - Set this to true if it is the administrator modifying the account, in
-												 which case an activation code is generated (but it can be supplied) and
-												 the members activation state changes to 11, and they are required to set
-												 a new password.
+				admin_override - Set this to true if it is the administrator
+												 modifying the account, in which case a password
+												 request is set up and an email sent asking the
+												 user to set a new password.
 	*/
 	public function update($member_id, $options)
 	{
@@ -765,10 +775,16 @@ class Members
 		}
 
 		$handled = null;
-		api()->run_hooks('members_update', array(&$handled, $member_id, $options));
+		api()->run_hooks('members_update', array(&$handled, &$member_id, &$options));
 
 		if($handled === null)
 		{
+			// Make sure it is an integer.
+			if((string)$member_id != (string)(int)$member_id)
+			{
+				return false;
+			}
+
 			// Can't update a profile that doesn't exist, can we?
 			$result = db()->query('
 				SELECT
@@ -876,17 +892,19 @@ class Members
 				}
 				elseif(!empty($options['admin_override']))
 				{
+					// !!! TODO: Do it right!
 					$data['member_acode'] = empty($data['member_acode']) ? sha1($this->rand_str(mt_rand(30, 40))) : $data['member_acode'];
 					$data['member_activated'] = 11;
 				}
 
 				// Can't be a bool, the database wants an integer! Easy fix, though!
-				if(is_bool($data['member_activated']))
+				if(in_array('member_activated', array_keys($data)) && is_bool($data['member_activated']))
 				{
 					$data['member_activated'] = !empty($data['member_activated']) ? 1 : 0;
 				}
 
-				// Our data array could be empty, simply because they are updating member_data table information!
+				// Our data array could be empty, simply because they are updating
+				// member_data table information!
 				if(!empty($data))
 				{
 					$db_vars = array(
@@ -910,18 +928,23 @@ class Members
 					$handled = $result->success();
 				}
 
+				// Changing member data? But only if the other options were
+				// successfully updated or if no other options were updated.
 				if(!empty($member_data) && count($member_data) > 0 && ($handled === null || $handled))
 				{
 					$data = array();
 					$delete = array();
 					foreach($member_data as $variable => $value)
 					{
+						// If the value isn't false we will update it.
 						if($value !== false)
 						{
-							$data[] = array($member_id, $variable, $value);
+							// Be sure to typecast the value to a string.
+							$data[] = array($member_id, $variable, typecast()->to('string', $value));
 						}
 						else
 						{
+							// Otherwise, we delete it.
 							$delete[] = $variable;
 						}
 					}
@@ -1042,20 +1065,23 @@ class Members
 	/*
 		Method: name_to_id
 
-		Converts a username to an ID.
+		Converts a username or email address to a member ID.
 
 		Parameters:
-			mixed $name - The username to convert, this can also be an array
-										of usernames as well.
+			mixed $name - The username or email address to translate into a member
+										ID, this can also be an array of usernames/emails as
+										well.
 
 		Returns:
-			mixed - Returns an integer if one username is supplied, an associative
-							array containing the IDs (LOWER(name) => ID). The value of the
-							name will be false (for arrays or single lookups) if the name
-							was not found.
+			mixed - Returns an integer if one username or email address is
+							supplied, an associative rray containing the IDs
+							(LOWER(name/email) => ID). The value of the name/email will be
+							false (for arrays or single lookups) if the name/email was not
+							found.
 
 		Note:
-			Please note that this looks up usernames, not display names!
+			Please note that this looks up usernames and email addresses, not
+			display names!
 	*/
 	public function name_to_id($name)
 	{
@@ -1063,7 +1089,7 @@ class Members
 
 		// You might want to do this if you have your own member setup ;)
 		$handled = null;
-		api()->run_hooks('member_name_to_id', array(&$handled, $name));
+		api()->run_hooks('member_name_to_id', array(&$handled, &$name));
 
 		if($handled === null)
 		{
@@ -1089,9 +1115,9 @@ class Members
 			// Simple in reality...
 			$result = db()->query('
 				SELECT
-					LOWER(member_name) AS name, member_id AS id
+					LOWER(member_name) AS name, LOWER(member_email) AS email, member_id AS id
 				FROM {db->prefix}members
-				WHERE '. (db()->case_sensitive ? 'LOWER(member_name)' : 'member_name'). ' IN({string_array:names})',
+				WHERE ('. (db()->case_sensitive ? 'LOWER(member_name)' : 'member_name'). ' IN({string_array:names})) OR ('. (db()->case_sensitive ? 'LOWER(member_email)' : 'member_email'). ' IN({string_array:names}))',
 				array(
 					'names' => $name,
 				), 'member_name_to_id_query');
@@ -1104,7 +1130,7 @@ class Members
 					return false;
 				}
 
-				list(, $member_id) = $result->fetch_row();
+				list(,, $member_id) = $result->fetch_row();
 
 				return $member_id;
 			}
@@ -1116,12 +1142,22 @@ class Members
 				// For now, we will assume none were found.
 				foreach($names as $key => $name)
 				{
-					$names[$key] = false;
+					$names[$name] = false;
 				}
 
 				while($row = $result->fetch_assoc())
 				{
-					$names[$row['name']] = $row['id'];
+					// They could have supplied a name and email address which are
+					// from the same member, so:
+					if(isset($names[$row['email']]))
+					{
+						$names[$row['email']] = $row['id'];
+					}
+
+					if(isset($names[$row['name']]))
+					{
+						$names[$row['name']] = $row['id'];
+					}
 				}
 
 				return $names;

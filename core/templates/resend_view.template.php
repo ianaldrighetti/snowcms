@@ -22,17 +22,37 @@ if(!defined('INSNOW'))
 	die('Nice try...');
 }
 
-		echo '
-			<h1>', l('Resend your activation email'), '</h1>
-			<p>', l('If for some reason you didn\'t receive your activation email, you can request to have it resent by entering your username below.'), '</p>';
+echo '
+			<h1>', l('Request a New Activation Email'), '</h1>
+			<p>', l('In case you did not receive your activation email you can request a new one by entering your username or email address below. Please be sure to wait a few minutes before requesting another and also check your spam folder.'), '</p>';
 
-		if(strlen(api()->apply_filters('resend_message', '')) > 0)
+// Want to do this, for some odd reason?
+api()->run_hooks('resend_form_display', array(&$handled));
+
+if(empty($handled))
+{
+	// Any errors?
+	if(count(api()->context['form']->errors('resend_form')) > 0 || count(api()->apply_filters('resend_form_messages', array())) > 0)
+	{
+		echo '
+				<div class="', count(api()->context['form']->errors('resend_form')) > 0 ? 'error-message' : 'message-box', '">';
+
+		$messages = count(api()->context['form']->errors('resend_form')) > 0 ? api()->context['form']->errors('resend_form') : api()->apply_filters('resend_form_messages', array());
+		foreach($messages as $message)
 		{
 			echo '
-			<div id="', api()->apply_filters('resend_message_id', 'resend_success'), '">
-				', api()->apply_filters('resend_message', ''), '
-			</div>';
+					<p>', $message, '</p>';
 		}
 
-		api()->context['form']->render('resend_form');
+		echo '
+				</div>';
+	}
+
+	echo '
+			', api()->context['form']->open('resend_form'), '
+				<p class="label"><label for="member_name">', l('Username or email address'), '</label></p>
+				<p class="input">', api()->context['form']->input('member_name')->generate(), '</p>
+				<p class="buttons right"><input type="submit" name="resend_form" id="resend_form_submit" value="', l('Resend activation'), '" /></p>
+			', api()->context['form']->close('resend_form');
+}
 ?>

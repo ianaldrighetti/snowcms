@@ -615,17 +615,17 @@ class SMTP
 		if($this->is_html)
 		{
 			// It's a message with multiple parts! (HTML and alternative!)
-			$boundary = substr(str_shuffle('abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_'), 0, 40);
+			$boundary = '----=_'. substr(str_shuffle('abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_'), 0, 40);
 			$this->headers['CONTENT-TYPE'] = 'multipart/alternative; boundary="'. $boundary. '"';
 
-			// No alternative message? That isn't good practice!
+			// No alternative message? That isn't a good thing to do!
 			if(empty($alt_message))
 			{
 				$alt_message = api()->apply_filters('smtp_alt_message_create', $message);
 
 				if($alt_message == $message)
 				{
-					$alt_message = strip_tags($alt_message);
+					$alt_message = strip_tags(str_ireplace(array('<br />', '<br/>', '<br>'), "\r\n", $alt_message));
 				}
 			}
 		}
@@ -638,7 +638,7 @@ class SMTP
 		}
 
 		// Write them headers! Word wrap them too!
-		fwrite($this->con, wordwrap(api()->apply_filters('smtp_headers', implode("\r\n", $headers)), 70). "\r\n\r\n");
+		fwrite($this->con, wordwrap(api()->apply_filters('smtp_headers', implode("\r\n", $headers)), 70, "\r\n  "). "\r\n\r\n");
 
 		// New lines are ended with \n not \r\n in the message. ;)
 		$message = str_replace("\r\n", "\n", $message);
@@ -669,9 +669,9 @@ class SMTP
 			}
 
 			// Put the whole message together.
-			$body = "--{$boundary}\r\nContent-Type: text/plain; charset={$this->charset}\r\n\r\n{$alt_message}\r\n\r\n";
-			$body .= "\r\n--{$boundary}\r\nContent-Type: text/html; charset={$this->charset}\r\n\r\n{$message}\r\n\r\n";
-			$body .= "--{$boundary}--\r\n.\r\n";
+			$body = "--{$boundary}\r\nContent-Type: text/plain; charset={$this->charset}\r\n\r\n{$alt_message}\r\n";
+			$body .= "\r\n--{$boundary}\r\nContent-Type: text/html; charset={$this->charset}\r\n\r\n{$message}\r\n";
+			$body .= "\r\n--{$boundary}--\r\n.\r\n";
 
 			// Take that server!
 			fwrite($this->con, api()->apply_filters('smtp_multipart_body', $body));
@@ -684,11 +684,13 @@ class SMTP
 		{
 			// Woo! Close that connection, and we are done!
 			$this->close(true);
+
 			return true;
 		}
 		else
 		{
 			$this->errors[] = l('The server "%s" did not accept the email message.', htmlchars($this->host));
+
 			return false;
 		}
 	}
