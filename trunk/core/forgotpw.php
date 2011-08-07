@@ -189,7 +189,42 @@ if(!function_exists('forgotpw_view2'))
 	*/
 	function forgotpw_view2()
 	{
-		api()->run_hook('forgotpw_view2');
+		api()->run_hooks('forgotpw_view2');
+
+		// Before we check if they are logged in, or if they have a valid code,
+		// let's see if they are trying to revoke the password reset.
+		if(!empty($_GET['block']))
+		{
+			// In order to block it you must provide valid information.
+			$members = api()->load_class('Members');
+			$members->load(isset($_GET['id']) ? $_GET['id'] : 0);
+			$member_info = $members->get(isset($_GET['id']) ? $_GET['id'] : 0);
+
+			if(!empty($_REQUEST['code']) && !empty($member_info) && isset($member_info['data']['pwreset_requested_time']) && ($member_info['data']['pwreset_requested_time'] + 86400) > time_utc() && $member_info['data']['pwreset_requested'] == 1 && $member_info['data']['reset_key'] == $_REQUEST['code'])
+			{
+				$members->update($member_info['id'], array(
+																							 'data' => array(
+																													 'pwreset_requested' => 0,
+																												 ),
+																						 ));
+
+				theme()->set_title(l('Reset Request Revoked'));
+
+				api()->context['request_revoked'] = true;
+
+				theme()->render('forgotpw_view2');
+				exit;
+			}
+
+			// Looks like something went wrong. Oh well.
+			theme()->set_title(l('An Error Occurred'));
+
+			api()->context['error_title'] = l('Revoke Password Reset Error');
+			api()->context['error_message'] = l('Sorry, but the password reset request could not be revoked because invalid verification information was supplied.');
+
+			theme()->render('error');
+			exit;
+		}
 
 		if(member()->is_logged())
 		{
@@ -205,64 +240,97 @@ if(!function_exists('forgotpw_view2'))
 			$members->load($_REQUEST['id']);
 			$member_info = $members->get($_REQUEST['id']);
 
-			if(!empty($member_info))
+			// Well, seems alright... Now to see if the code has expired, that is, if a password request was made!
+			if(!empty($member_info) && isset($member_info['data']['pwreset_requested_time']) && ($member_info['data']['pwreset_requested_time'] + 86400) > time_utc() && $member_info['data']['pwreset_requested'] == 1)
 			{
-				// Well, seems alright... Now to see if the code has expired, that is, if a password request was made!
-				if(isset($member_info['data']['reminder_requested_time']) && ($member_info['data']['reminder_requested_time'] + 86400) > time_utc() && $member_info['data']['reminder_requested'] == 1)
+				$GLOBALS['member_name'] = $member_info['username'];
+
+				// Make the form to display the form to enter your new password :)
+				$form = api()->load_class('Form');
+
+				$form->add('reset_password_form', array(
+																						'action' => baseurl. '/index.php?action=forgotpw2',
+																						'method' => 'post',
+																						'callback' => 'forgotpw_process2',
+																						'submit' => l('Reset password'),
+																					));
+
+				$form->current('reset_password_form');
+
+				$form->add_input(array(
+													 'name' => 'new_password',
+													 'type' => 'password',
+													 'label' => l('New password'),
+													 'callback' => create_function('$name, $value, &$error', '
+																					 $members = api()->load_class(\'Members\');
+
+																					 if($value != $_POST[\'verify_password\'])
+																					 {
+																						 $error = l(\'The passwords you supplied did not match.\');
+
+																						 return false;
+																					 }
+																					 elseif($members->password_allowed($GLOBALS[\'member_name\'], $value))
+																					 {
+																						 return true;
+																					 }
+																					 else
+																					 {
+																						 $security = settings()->get(\'password_security\', \'int\');
+
+																						 if($security == 1)
+																						 {
+																							 $error = l(\'The password must be at least 4 characters long.\');
+																						 }
+																						 elseif($security == 2)
+																						 {
+																							 $error = l(\'The password must be at least 6 characters long and cannot contain your username.\');
+																						 }
+																						 elseif($security == 3)
+																						 {
+																							 $error = l(\'The password must be at least 8 characters long, cannot contain your username and contain at least 1 number.\');
+																						 }
+																						 else
+																						 {
+																							 api()->run_hooks(\'password_error_message\', array(&$security, &$error));
+																						 }
+
+																						 return false;
+																					 }'),
+												 ));
+
+				$form->add_input(array(
+													 'name' => 'verify_password',
+													 'type' => 'password',
+													 'label' => l('New password, again'),
+													 'subtext' => l('Type your password again, just for verification.'),
+												 ));
+
+				$form->add_input(array(
+													 'name' => 'id',
+													 'type' => 'hidden',
+													 'default_value' => $_REQUEST['id'],
+												 ));
+
+				$form->add_input(array(
+													 'name' => 'code',
+													 'type' => 'hidden',
+													 'default_value' => $_REQUEST['code'],
+												 ));
+
+				// Process the form?
+				if(!empty($_POST['reset_password_form']))
 				{
-					// Make the form to display the form to enter your new password :)
-					$form = api()->load_class('Form');
-
-					$form->add('reset_password_form', array(
-																							'action' => baseurl. '/index.php?action=forgotpw2',
-																							'method' => 'post',
-																							'callback' => 'reminder_process2',
-																							'submit' => l('Reset password'),
-																						));
-
-					$form->add_field('reset_password_form', 'new_password', array(
-																																		'type' => 'password',
-																																		'label' => l('Your new password:'),
-																																		'function' => create_function('&$value, $form_name, &$error', '
-																																							if($value != $_POST[\'verify_password\'])
-																																							{
-																																								$error = l(\'The passwords you supplied did not match.\');
-																																								return false;
-																																							}
-
-																																							return true;'),
-																																	));
-
-					$form->add_field('reset_password_form', 'verify_password', array(
-																																			 'type' => 'password',
-																																			 'label' => l('Verify your password:'),
-																																			 'subtext' => l('Type your password again, just for verification.'),
-																																			 'save' => false,
-																																		 ));
-
-					$form->add_field('reset_password_form', 'id', array(
-																													'type' => 'hidden',
-																													'value' => $_REQUEST['id'],
-																												));
-
-					$form->add_field('reset_password_form', 'code', array(
-																														'type' => 'hidden',
-																														'value' => $_REQUEST['code'],
-																													));
-
-					// Process the form?
-					if(!empty($_POST['reset_password_form']))
-					{
-						$form->process('reset_password_form');
-					}
-
-					theme()->set_title(l('Reset Password'));
-
-					api()->context['form'] = $form;
-
-					theme()->render('forgotpw_view2');
-					exit;
+					$form->process('reset_password_form');
 				}
+
+				theme()->set_title(l('Reset Password'));
+
+				api()->context['form'] = $form;
+
+				theme()->render('forgotpw_view2');
+
+				exit;
 			}
 		}
 
@@ -270,7 +338,7 @@ if(!function_exists('forgotpw_view2'))
 		theme()->set_title(l('An Error Occurred'));
 
 		api()->context['error_title'] = l('An Error Occurred');
-		api()->context['error_message'] = l('Sorry, but your password change request could not be completed as the information you supplied was incorrect or the password request has expired.');
+		api()->context['error_message'] = l('Sorry, but your password change request could not be completed as the information supplied was incorrect or reset request has expired.');
 
 		theme()->render('error');
 	}
@@ -295,7 +363,7 @@ if(!function_exists('forgotpw_process2'))
 	*/
 	function forgotpw_process2($reset, &$errors = array())
 	{
-		api()->run_hook('forgotpw_process2');
+		api()->run_hooks('forgotpw_process2');
 
 		$members = api()->load_class('Members');
 
@@ -304,10 +372,18 @@ if(!function_exists('forgotpw_process2'))
 
 		$member_info = $members->get($reset['id']);
 
+		// Let's just double-check, shall we? ;-)
+		if(!isset($member_info['data']['pwreset_requested_time']) || ($member_info['data']['pwreset_requested_time'] + 86400) < time_utc() || $member_info['data']['pwreset_requested'] != 1)
+		{
+			$errors[] = l('No password reset request has been made for this account.');
+
+			return false;
+		}
 		// Check to make sure their password is allowed.
-		if(!$members->password_allowed($member_info['username'], $reset['new_password']))
+		elseif(!$members->password_allowed($member_info['username'], $reset['new_password']))
 		{
 			$errors[] = l('Sorry, but the password you supplied is invalid.');
+
 			return false;
 		}
 
@@ -315,13 +391,15 @@ if(!function_exists('forgotpw_process2'))
 		$members->update($reset['id'], array(
 																		 'member_name' => $member_info['username'],
 																		 'member_pass' => $reset['new_password'],
-																		 'member_hash' => $members->rand_str(16),
 																		 'data' => array(
-																								 'reminder_requested' => 0,
+																								 'pwreset_requested' => 0,
 																							 ),
 																	 ));
 
-		api()->run_hook('password_reset', array($member_info));
+		api()->run_hooks('password_reset', array($member_info));
+
+		// We updated your password. But let's show a message, shall we?
+		$_SESSION['show_pwreset_message'] = true;
 
 		// Alright, redirecting you to the login screen :)
 		redirect(baseurl. '/index.php?action=login&member_name='. urlencode($member_info['username']));

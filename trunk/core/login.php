@@ -52,6 +52,18 @@ if(!function_exists('login_view'))
 			redirect(baseurl. '/index.php');
 		}
 
+		// Did your password just get reset? Then we shall show you a message.
+		if(!empty($_SESSION['show_pwreset_message']))
+		{
+			api()->add_filter('login_form_messages', create_function('$value', '
+																								 $value[] = l(\'You may now log in with your new password.\');
+
+																								 // No need to show this again.
+																								 $_SESSION[\'show_pw_reset_message\'] = false;
+
+																								 return $value;'));
+		}
+
 		theme()->set_title(l('Log In'));
 
 		// Generate that lovely login form.
@@ -137,7 +149,7 @@ if(!function_exists('login_generate_form'))
 		$form->add_input(array(
 											 'name' => 'session_length',
 											 'type' => 'select',
-											 'label' => l('Stay logged in for'),
+											 'label' => l('Session length'),
 											 'options' => array(
 																			3600 => l('An hour'),
 																			86400 => l('A day'),

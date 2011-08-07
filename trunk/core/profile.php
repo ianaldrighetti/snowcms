@@ -243,6 +243,7 @@ if(!function_exists('profile_edit_generate_form'))
 		}
 
 		$GLOBALS['editing_member_id'] = $member_info['id'];
+		$GLOBALS['member_info'] = $member_info;
 
 		$form = api()->load_class('Form');
 
@@ -310,19 +311,38 @@ if(!function_exists('profile_edit_generate_form'))
 
 																				 return false;
 																			 }
-																			 elseif(!empty($value) && !empty($_POST[\'verify_pass\']))
+																			 else
 																			 {
 																				 $members = api()->load_class(\'Members\');
 
-																				 if(!$members->password_allowed($_POST[\'display_name\'], $value))
+																				 if($members->password_allowed($GLOBALS[\'member_info\'][\'username\'], $value))
 																				 {
-																					 $error = l(\'The supplied password is not allowed.\');
+																					 return true;
+																				 }
+																				 else
+																				 {
+																					 $security = settings()->get(\'password_security\', \'int\');
+
+																					 if($security == 1)
+																					 {
+																						 $error = l(\'The password must be at least 3 characters long.\');
+																					 }
+																					 elseif($security == 2)
+																					 {
+																						 $error = l(\'The password must be at least 4 characters long and cannot contain your username.\');
+																					 }
+																					 elseif($security == 3)
+																					 {
+																						 $error = l(\'The password must be at least 5 characters long, cannot contain your username and contain at least 1 number.\');
+																					 }
+																					 else
+																					 {
+																						 api()->run_hooks(\'password_error_message\', array(&$security, &$error));
+																					 }
 
 																					 return false;
 																				 }
-																			 }
-
-																			 return true;'),
+																			 }'),
 											 'default_value' => '',
 										 ));
 

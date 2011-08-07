@@ -58,9 +58,9 @@ if(empty($handled))
 	// Nope, so it is up to us to do it then.
 	echo '
 			', api()->context['form']->open('login_form'), '
-				<p class="label"><label for="member_name">', l('Username or email address'), '</label></p>
+				<p class="label"><label for="member_name">', api()->context['form']->input('member_name')->label(), '</label></p>
 				<p class="input">', api()->context['form']->input('member_name')->generate(), '</p>
-				<p class="label"><label for="member_pass">', l('Password'), '</label></p>
+				<p class="label"><label for="member_pass">', api()->context['form']->input('member_pass')->label(), '</label></p>
 				<p class="input">', api()->context['form']->input('member_pass')->generate(), '</p>';
 
 	// Maybe you want to put something here?
@@ -69,7 +69,7 @@ if(empty($handled))
 	echo '
 				<div id="login_form_below">
 					<div class="float-left">
-						<p><label>', l('Session length'), ' ', api()->context['form']->input('session_length')->generate(), '</label></p>
+						<p><label>', api()->context['form']->input('session_length')->label(), ' ', api()->context['form']->input('session_length')->generate(), '</label></p>
 					</div>
 					<div class="float-right">
 						<p class="buttons"><input type="submit" name="login_form" id="login_form_submit" value="', l('Log In'), '" /></p>
@@ -78,6 +78,7 @@ if(empty($handled))
 					</div>
 					<p class="right smaller"><a href="', baseurl, '/index.php?action=forgotpw" title="', l('If you forgot your password you can request a new one'), '">', l('Forgot your password?'), '</a></p>
 				</div>
+				', api()->context['form']->input('redir_to')->generate(), '
 			', api()->context['form']->close('login_form');
 }
 ?>

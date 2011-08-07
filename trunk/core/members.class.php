@@ -93,7 +93,7 @@ class Members
 		// set the handled parameter to a bool, otherwise, if it is null, this method
 		// will just do it itself!!! :P
 		$handled = null;
-		api()->run_hooks('load_members', array(&$handled, $members));
+		api()->run_hooks('load_members', array(&$handled, &$members));
 
 		if($handled === null && count($members) > 0)
 		{
@@ -106,7 +106,7 @@ class Members
 				}
 			}
 
-			if(count($members))
+			if(count($members) > 0)
 			{
 				$result = db()->query('
 					SELECT
@@ -201,7 +201,7 @@ class Members
 			// You want to do the loading? Set the member_data variable to something other
 			// than -1, otherwise, this method will get the data itself. Set member_data to
 			// null if that member has not been loaded.
-			api()->run_hooks('members_get', array(&$member_data, $members));
+			api()->run_hooks('members_get', array(&$member_data, &$members));
 
 			if($member_data == -1 && isset($this->loaded[$members]))
 			{
@@ -213,7 +213,7 @@ class Members
 			}
 
 			// Wanna touch it?
-			api()->run_hooks('post_members_get', array(&$member_data, $members));
+			api()->run_hooks('post_members_get', array(&$member_data, &$members));
 
 			return $member_data === null ? false : $member_data;
 		}

@@ -65,15 +65,15 @@ fieldset { border: none; }
 }
 
 /* Log In/Resend/Activation/Password Reset Form */
-#login_form, #resend_form, #activate_form, #forgotpw_form
+#login_form, #resend_form, #activate_form, #forgotpw_form, #reset_password_form
 {
-	width: 260px;
-	margin: 15px auto auto auto;
+	width: 260px !important;
+	margin: 15px auto auto auto !important;
 }
 
 #login_form input[type="text"], #login_form input[type="password"],
 #resend_form input[type="text"], #activate_form input[type="text"],
-#forgotpw_form input[type="text"]
+#forgotpw_form input[type="text"], #reset_password_form input[type="password"]
 {
 	width: 254px;
 	font-size: 1.1em;
