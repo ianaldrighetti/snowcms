@@ -226,11 +226,11 @@ if(!function_exists('register_generate_form'))
 																				 }
 																				 elseif($security == 2)
 																				 {
-																					 $error = l(\'The password must be at least 4 characters long and cannot contain your username.\');
+																					 $error = l(\'The password must be at least 6 characters long and cannot contain your username.\');
 																				 }
 																				 elseif($security == 3)
 																				 {
-																					 $error = l(\'The password must be at least 5 characters long, cannot contain your username and contain at least 1 number.\');
+																					 $error = l(\'The password must be at least 8 characters long, cannot contain your username and contain at least 1 number.\');
 																				 }
 																				 else
 																				 {

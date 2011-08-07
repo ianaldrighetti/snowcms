@@ -561,15 +561,21 @@ if(!function_exists('admin_access_denied'))
 			// right to access whatever it is you are wanting to block them from :P
 			if(empty($message))
 			{
-				$message = l('Sorry, but you are not allowed to access the page you have requested.');
+				$message = l('Sorry, but you do not have sufficient permissions to access the page requested.');
 			}
+
+			// We need a couple things.
+			theme()->add_link(array('rel' => 'stylesheet', 'type' => 'text/css', 'href' => theme()->url(). '/style/login.css'));
+			api()->add_filter('admin_theme_container_id', create_function('$element_id', '
+																											return \'login-box\';'));
 
 			theme()->set_title($title);
 
 			api()->context['error_title'] = $title;
 			api()->context['error_message'] = $message;
+			api()->context['cp_access_denied'] = true;
 
-			theme()->render('error');
+			theme()->render('admin_access_denied');
 		}
 
 		// Either way, we won't continue executing.

@@ -51,7 +51,7 @@ else
 			</div>
 		</div>
 <?php
-if(!admin_prompt_required())
+if(!admin_prompt_required() && empty(api()->context['cp_access_denied']))
 {
 	// Any important notifications?
 	$important_notifications = api()->apply_filters('admin_important_notifications', array());
@@ -75,10 +75,10 @@ if(!admin_prompt_required())
 }
 ?>
 		<div id="link-tree">
-			<p><?php echo admin_link_tree(admin_prompt_required()); ?></p>
+			<p><?php echo empty(api()->context['cp_access_denied']) ? admin_link_tree(admin_prompt_required()) : '<a href="'. baseurl. '/">'. settings()->get('site_name', 'string'). '</a> &raquo; '. api()->context['error_title']; ?></p>
 <?php
 // Don't show the notifications area unless they are logged in.
-if(!admin_prompt_required())
+if(!admin_prompt_required() && empty(api()->context['cp_access_denied']))
 {
 ?>
 			<div id="notifications">
@@ -93,7 +93,7 @@ if(!admin_prompt_required())
 		<div id="<?php echo api()->apply_filters('admin_theme_container_id', 'content-container'); ?>">
 <?php
 // Did you want to display the sidebar?
-if(!admin_prompt_required() && admin_show_sidebar())
+if(!admin_prompt_required() && admin_show_sidebar() && empty(api()->context['cp_access_denied']))
 {
 	echo '
 			<div id="side-bar">';

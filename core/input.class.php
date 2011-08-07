@@ -1139,9 +1139,10 @@ class Input
 			return false;
 		}
 
-		// The label is very important, so we need that to be okay.
-		if(!$this->label($label))
-		{
+		// The label is very important, so we need that to be okay, well, unless
+		// it is a hidden field. In which case we will make an exception.
+		if(!$this->label($label) && strtolower($type) != 'hidden')
+		{echo 'die';
 			$this->revert($prev_options);
 			$this->errors[] = l('The label of the field was left empty.');
 

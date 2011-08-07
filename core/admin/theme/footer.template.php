@@ -22,7 +22,7 @@ if(!defined('INSNOW'))
   die('Nice try...');
 }
 
-if(!admin_prompt_required() && admin_show_sidebar())
+if(!admin_prompt_required() && admin_show_sidebar() && empty(api()->context['cp_access_denied']))
 {
 	echo '
 			</div>
@@ -38,7 +38,7 @@ if(!admin_prompt_required() && admin_show_sidebar())
 				<p><?php echo l('Page created in %s seconds with %u queries.', round(microtime(true) - starttime, 3), db()->num_queries); ?></p>
 			</div>
 <?php
-if(!admin_prompt_required())
+if(!admin_prompt_required() && empty(api()->context['cp_access_denied']))
 {
 ?>
 			<div id="jump-to">

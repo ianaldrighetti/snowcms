@@ -320,6 +320,7 @@ class Form
 													 'name' => $name. '_token',
 													 'label' => l('Token'),
 													 'type' => 'hidden',
+													 'id' => $name. '_token',
 													 'request_type' => $this->forms[$name]['method'],
 													 'callback' => create_function('$name, $value, &$error', '
 
@@ -746,7 +747,7 @@ class Form
 		api()->run_hooks('before_form_close', array($form_name));
 
 		// We may need to include the CSRF token as well.
-		return ($this->input_exists($form_name. '_token', $form_name) ? $this->generate($form_name. '_token', $form_name). "\r\n" : ''). '</form>';
+		return ($this->input_exists($form_name. '_token', $form_name) ? $this->generate($form_name. '_token', $form_name. '_token'). "\r\n" : ''). '</fieldset></form>';
 	}
 
 	/*
