@@ -579,8 +579,8 @@ function setup_finalize($member_name, $member_pass, $member_email, &$error_msg)
 	// Let's create your account now, shall we?
 	mysql_query('
 		INSERT INTO `'. TBLPREFIX. 'members`
-		(`member_name`, `member_pass`, `member_hash`, `member_email`, `display_name`, `member_groups`, `member_registered`, `member_activated`)
-		VALUES(\''. mysql_real_escape_string(htmlspecialchars($member_name, ENT_QUOTES)). '\', \''. mysql_real_escape_string(sha1(strtolower($member_name). $member_pass)). '\', \''. mysql_real_escape_string(rand_str(16)). '\', \''. mysql_real_escape_string(htmlspecialchars($member_email, ENT_QUOTES)). '\', \''. mysql_real_escape_string(htmlspecialchars($member_name, ENT_QUOTES)). '\', \'administrator\', \''. time(). '\', 1)');
+		(`member_name`, `member_pass`, `member_email`, `display_name`, `member_groups`, `member_registered`, `member_activated`)
+		VALUES(\''. mysql_real_escape_string(htmlspecialchars($member_name, ENT_QUOTES)). '\', \''. mysql_real_escape_string(sha1(strtolower($member_name). $member_pass)). '\', \''. mysql_real_escape_string(htmlspecialchars($member_email, ENT_QUOTES)). '\', \''. mysql_real_escape_string(htmlspecialchars($member_name, ENT_QUOTES)). '\', \'administrator\', \''. time(). '\', 1)');
 
 	return true;
 }

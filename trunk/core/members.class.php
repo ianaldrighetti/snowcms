@@ -128,7 +128,6 @@ class Members
 												'name' => $row['display_name'],
 												'username' => $row['member_name'],
 												'password' => $row['member_pass'],
-												'hash' => $row['member_hash'],
 												'email' => $row['member_email'],
 												'groups' => explode(',', $row['member_groups']),
 												'member_groups' => explode(',', $row['member_groups']),
@@ -269,16 +268,6 @@ class Members
 				return false;
 			}
 
-			// How about a hash? (This hash will likely get changed eventually, but :P)
-			if(!empty($options['member_hash']) && (strlen($options['member_hash']) == 0 || strlen($options['member_hash']) > 16))
-			{
-				return false;
-			}
-			elseif(empty($options['member_hash']))
-			{
-				$options['member_hash'] = $this->rand_str(16);
-			}
-
 			// Have you set a display name? Gotta check that!
 			if(!empty($options['display_name']) && !$this->name_allowed($options['display_name']))
 			{
@@ -326,16 +315,14 @@ class Members
 			// Alright! Now insert that member!!!
 			$result = db()->insert('insert', '{db->prefix}members',
 									array(
-										'member_name' => 'string', 'member_pass' => 'string', 'member_hash' => 'string',
-										'display_name' => 'string', 'member_email' => 'string', 'member_groups' => 'string',
-										'member_registered' => 'int', 'member_ip' => 'string', 'member_activated' => 'int',
-										'member_acode' => 'string',
+										'member_name' => 'string', 'member_pass' => 'string', 'display_name' => 'string',
+										'member_email' => 'string', 'member_groups' => 'string', 'member_registered' => 'int',
+										'member_ip' => 'string', 'member_activated' => 'int', 'member_acode' => 'string',
 									),
 									array(
-										htmlchars($member_name), sha1($func['strtolower'](htmlchars($member_name)). $member_pass), $options['member_hash'],
-										htmlchars($options['display_name']), htmlchars($member_email), implode(',', $options['member_groups']),
-										$options['member_registered'], $options['member_ip'], $options['member_activated'],
-										$options['member_acode'],
+										htmlchars($member_name), sha1($func['strtolower'](htmlchars($member_name)). $member_pass), htmlchars($options['display_name']),
+										htmlchars($member_email), implode(',', $options['member_groups']), $options['member_registered'],
+										$options['member_ip'], $options['member_activated'], $options['member_acode'],
 									), array(), 'members_add_query');
 
 			$handled = $result->success() ? $result->insert_id() : false;
@@ -627,7 +614,7 @@ class Members
 			// Alright, let's query that database!
 			$result = db()->query('
 				SELECT
-					member_pass, member_hash
+					member_pass
 				FROM {db->prefix}members
 				WHERE member_name = {string:member_name}
 				LIMIT 1',
@@ -809,7 +796,6 @@ class Members
 			$allowed_columns = array(
 				'member_name' => 'string-80',
 				'member_pass' => 'string-40',
-				'member_hash' => 'string-16',
 				'display_name' => 'string-255',
 				'member_email' => 'string-255',
 				'member_groups' => 'string-255',
