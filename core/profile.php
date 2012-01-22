@@ -446,7 +446,6 @@ if(!function_exists('profile_edit_handle'))
 			{
 				$update_info['member_name'] = $member_info['username'];
 				$update_info['member_pass'] = $data['member_pass'];
-				$update_info['member_hash'] = $members->rand_str(16);
 				$redir_login = member()->id() == $member_info['id'];
 			}
 

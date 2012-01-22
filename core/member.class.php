@@ -47,12 +47,6 @@ if(!class_exists('Member'))
 		// Contains the members hashed password
 		private $passwrd;
 
-		// Variable: hash
-		// A set of random characters (up to 16 characters) that the members
-		// authentication cookie is salted with. Only changes whenever the
-		// member changes their current password.
-		private $hash;
-
 		// Variable: display_name
 		// Contains the members display name
 		private $display_name;
@@ -187,7 +181,7 @@ if(!class_exists('Member'))
 					// Alright, let's see if what you have is right :P
 					$result = db()->query('
 						SELECT
-							member_id AS id, member_name AS name, member_pass AS pass, member_hash AS hash, display_name,
+							member_id AS id, member_name AS name, member_pass AS pass, display_name,
 							member_email AS email, member_groups AS groups, member_registered AS registered
 						FROM {db->prefix}members
 						WHERE member_id = {int:member_id} AND member_activated = 1
@@ -205,7 +199,6 @@ if(!class_exists('Member'))
 						$this->id = $member['id'];
 						$this->name = $member['name'];
 						$this->passwrd = $member['pass'];
-						$this->hash = $member['hash'];
 						$this->display_name = $member['display_name'];
 						$this->email = $member['email'];
 						$this->registered = $member['registered'];
@@ -326,7 +319,6 @@ if(!class_exists('Member'))
 				$this->id = isset($member['id']) ? $member['id'] : $this->id;
 				$this->name = isset($member['name']) ? $member['name'] : $this->name;
 				$this->passwrd = isset($member['pass']) ? $member['pass'] : $this->passwrd;
-				$this->hash = isset($member['hash']) ? $member['hash'] : $this->hash;
 				$this->display_name = isset($member['display_name']) ? $member['display_name'] : $this->display_name;
 				$this->email = isset($member['email']) ? $member['email'] : $this->email;
 				$this->registered = isset($member['registered']) ? $member['registered'] : $this->registered;
@@ -385,21 +377,6 @@ if(!class_exists('Member'))
 		public function passwrd()
 		{
 			return $this->passwrd;
-		}
-
-		/*
-			Method: hash
-
-			Parameters:
-				none
-
-			Returns:
-				string - A set of random characters that the members authentication
-								cookie is salted with.
-		*/
-		public function hash()
-		{
-			return $this->hash;
 		}
 
 		/*

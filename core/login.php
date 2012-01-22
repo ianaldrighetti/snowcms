@@ -247,7 +247,7 @@ if(!function_exists('login_process'))
 		// So you got the stuff, but is it the right stuff? Let's see!
 		$result = db()->query('
 			SELECT
-				member_id, member_name, member_pass, member_hash, member_activated
+				member_id, member_name, member_pass, member_activated
 			FROM {db->prefix}members
 			WHERE '. (db()->case_sensitive ? 'LOWER(member_name) = LOWER({string:member_name})' : 'member_name = {string:member_name}'). ' OR '. (db()->case_sensitive ? 'LOWER(member_email) = LOWER({string:member_name})' : 'member_email = {string:member_name}'). '
 			LIMIT 1',
