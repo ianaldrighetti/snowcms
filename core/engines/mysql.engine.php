@@ -208,7 +208,7 @@ class MySQL extends Database
 		if(empty($file) || empty($line))
 		{
 			$backtrace = debug_backtrace();
-			$file = realpath($backtrace[0]['file']);
+			$file = $backtrace[0]['file'];
 			$line = (int)$backtrace[0]['line'];
 		}
 

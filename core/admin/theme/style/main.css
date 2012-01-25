@@ -94,6 +94,11 @@ body
 	top: 3px;
 }
 
+#side-content h3
+{
+	margin: 5px 0;
+}
+
 /* End #main-content section. Begin #footer-container section. */
 #footer-container
 {
@@ -191,10 +196,12 @@ body
 /* Section tabs */
 .section-tabs
 {
+	position: relative;
+	top: -5px;
 	background: #F2F2F2;
 	border: 1px solid #DEDEDE;
-	border-radius: 5px;
-	z-index: 2;
+	border-width: 0 1px 1px 1px;
+	border-radius: 0 0 5px 5px;
 }
 
 .section-tabs ul
@@ -213,10 +220,11 @@ body
 .section-tabs li a
 {
 	display: block;
-	padding: 10px;
-	color: #333333;
+	padding: 5px 10px;
+	color: #000000;
 	text-decoration: none;
 	border-right: 1px solid #DEDEDE;
+	font-size: 85%;
 }
 
 .section-tabs li a:hover, .section-tabs .selected
@@ -228,7 +236,7 @@ body
 
 .section-tabs li .first
 {
-	border-radius: 5px 0 0 5px;
+	border-radius: 0 0 0 5px;
 }
 
 /* Form formatting */

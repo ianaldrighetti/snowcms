@@ -23,6 +23,16 @@ if(!defined('INSNOW'))
 }
 
 echo '
+	<div class="section-tabs">
+		<ul>
+			<li><a href="', baseurl('index.php?action=admin&amp;sa=members_add'), '" title="', l('Add a new member'), '" class="first">', l('Add Member'), '</a></li>
+			<li><a href="', baseurl('index.php?action=admin&amp;sa=members_manage'), '" title="', l('Manage existing members'), '">', l('Manage Members'), '</a></li>
+			<li><a href="', baseurl('index.php?action=admin&amp;sa=members_settings'), '" title="', l('Manage member registration and account settings'), '">', l('Member Settings'), '</a></li>
+			<li><a href="', baseurl('index.php?action=admin&amp;sa=members_permissions'), '" title="', l('Manage member group permissions'), '" class="selected">', l('Manage Permissions'), '</a></li>
+		</ul>
+		<div class="break">
+		</div>
+	</div>
 	<h3><img src="', theme()->url(), '/style/images/members_permissions-small.png" alt="" /> ', l('Manage Permissions'), '</h3>
 	<p>', l('Each member group can have their own unique permissions assigned to them, which then users of the group inherit.'), '</p>
 

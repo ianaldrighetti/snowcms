@@ -292,7 +292,7 @@ if(!function_exists('admin_prompt_required'))
 		their account password. Useful for AJAX kind of things, ;).
 
 		Parameters:
-			none
+			bool $force_check
 
 		Returns:
 			bool - Returns true if the user needs to supply their password
@@ -301,18 +301,29 @@ if(!function_exists('admin_prompt_required'))
 		Note:
 			This function is overloadable.
 	*/
-	function admin_prompt_required()
+	function admin_prompt_required($force_check = false)
 	{
-		// Check to see if your last check has now timed out, quite simple
-		// really! But if you for some strange reason have it disabled,
-		// nevermind!
-		if(!settings()->get('disable_admin_security', 'bool', false) && (empty($_SESSION['admin_password_prompted']) || ((int)$_SESSION['admin_password_prompted'] + (settings()->get('admin_login_timeout', 'int', 15) * 60)) < time_utc()))
-		{
-			return true;
-		}
+		static $cache = null;
 
-		// Your good, for now!
-		return false;
+		if($cache === null || $force_check === true)
+		{
+			// Check to see if your last check has now timed out, quite simple
+			// really! But if you for some strange reason have it disabled,
+			// nevermind!
+			if(!settings()->get('disable_admin_security', 'bool', false) && (empty($_SESSION['admin_password_prompted']) || ((int)$_SESSION['admin_password_prompted'] + (settings()->get('admin_login_timeout', 'int', 15) * 60)) < time_utc()))
+			{
+				$cache = true;
+				return true;
+			}
+
+			// Your good, for now!
+			$cache = false;
+			return false;
+		}
+		else
+		{
+			return $cache;
+		}
 	}
 }
 

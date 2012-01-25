@@ -468,7 +468,19 @@ if(!function_exists('admin_themes_update'))
 			// So, how did that go?
 			if($update_version === false || compare_versions($theme_info['version'], $update_version, '>=') || $theme_info['update_url'] === false)
 			{
-				// No update needed!
+				// No update needed! But this may be a system error, as outdated
+				// information may be indicating to the administrator that there is
+				// an update, when there isn't.
+				$theme_updates = settings()->get('theme_updates', 'array', array());
+				if(!empty($theme_updates[basename($theme_info['directory'])]))
+				{
+					// Looks like the system does think there is an update available,
+					// so maybe we should fix that...
+					unset($theme_updates[basename($theme_info['directory'])]);
+
+					settings()->set('theme_updates', $theme_updates);
+				}
+
 				theme()->set_title(l('No Update Available'));
 
 				api()->context['error_title'] = '<img src="'. theme()->url(). '/style/images/manage_themes-small.png" alt="" /> '. l('No Update Available');
@@ -497,7 +509,7 @@ if(!function_exists('admin_themes_update'))
 				{
 					// But we need to remove the update notification, after we check
 					// for any more updates, that is.
-					$response = admin_themes_update_check($theme_info['directory']);
+					$response = admin_themes_check_updates($theme_info['directory']);
 
 					$theme_updates = settings()->get('theme_updates', 'array', array());
 
@@ -617,7 +629,7 @@ if(!function_exists('admin_themes_check_updates'))
 				$post_data = array('requesttype' => 'updatecheck', 'version' => $theme_info['version']);
 
 				// Want to add some sort of update key or something?
-				if($func['strlen'](api()->apply_filters(sha1($theme_info['directory']). '_updatekey'), '') > 0)
+				if($func['strlen'](api()->apply_filters(sha1($theme_info['directory']). '_updatekey', '') > 0))
 				{
 					$post_data['updatekey'] = api()->apply_filters(sha1($theme_info['directory']). '_updatekey', '');
 				}

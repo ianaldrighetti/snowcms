@@ -115,24 +115,6 @@ class Theme
 
 		// Our first meta tag!
 		$this->add_meta(array('http-equiv' => 'Content-Type', 'content' => 'text/html; charset=utf-8'));
-
-		// Load up the default templates.
-		$files = scandir(coredir. '/templates/');
-
-		// There better be stuff in there!
-		if(count($files) > 0)
-		{
-			foreach($files as $filename)
-			{
-				if($filename == '.' || $filename == '..' || substr($filename, -13, 13) != '.template.php')
-				{
-					continue;
-				}
-
-				// Seems like it is a valid template file. Add it, then.
-				$this->add_template(substr($filename, 0, strlen($filename) - 13), realpath(coredir. '/templates/'. $filename));
-			}
-		}
 	}
 
 	/*
@@ -255,7 +237,7 @@ class Theme
 	public function set_themedir($themedir)
 	{
 		// Can't have a non-existent location for a theme!
-		if(is_dir($themedir) && file_exists($themedir. '/header.template.php') && file_exists($themedir. '/footer.template.php'))
+		if(is_file($themedir. '/header.template.php') && is_file($themedir. '/footer.template.php'))
 		{
 			// Seems like this'll work.
 			$this->themedir = realpath($themedir);
@@ -348,7 +330,7 @@ class Theme
 	public function add_link($link)
 	{
 		// Is href not set, link not an array, that link already exist?!?
-		if(count($link) == 0 || empty($link['href']) || !is_array($link) || $this->link_exists($link['href']) || count($link) > 15)
+		if(count($link) == 0 || empty($link['href']) || !is_array($link) || count($link) > 15)
 		{
 			return false;
 		}
@@ -561,7 +543,7 @@ class Theme
 	public function add_js_file($script)
 	{
 		// We require you give us at least the source (src) of the script.
-		if(empty($script) || !is_array($script) || empty($script['src']) || $this->js_file_exists($script['src']))
+		if(empty($script) || !is_array($script) || empty($script['src']))
 		{
 			return false;
 		}
@@ -692,7 +674,7 @@ class Theme
 	{
 		// No information given? Or no essential information given? Then sorry,
 		// can't add it!
-		if(empty($meta) || !is_array($meta) || count($meta) == 0 || ((isset($meta['name']) || isset($meta['http-equiv'])) && $this->meta_exists(isset($meta['name']) ? $meta['name'] : $meta['http-equiv'])))
+		if(empty($meta) || !is_array($meta) || count($meta) == 0 || ((isset($meta['name']) || isset($meta['http-equiv']))))
 		{
 			return false;
 		}
@@ -801,79 +783,11 @@ class Theme
 	}
 
 	/*
-		Method: add_template
-
-		Adds a template to the templates that the Theme system recognizes as
-		valid themes which can be loaded via <Theme::render>.
-
-		Parameters:
-			string $name - The name of the template, which will be used when
-										 calling <Theme::render>.
-			string $filename - The name of the file to be associated with the
-												 template being added.
-
-		Returns:
-			bool - Returns true if the template was added, false on failure, such
-						 as if the template already exists, or if the file does not
-						 exist.
-
-		Note:
-			Templates can be mass added by leaving the filename parameter blank,
-			and then passing an array in the following format in the name
-			parameter:
-				array(
-					array(
-						'name' => 'template_1',
-						'filename' => 'location of template_1',
-					),
-					array(
-						'name' => ...,
-						'filename' => ...,
-					),
-				)
-
-			Please note that in this case, this method will return the number of
-			templates which were added.
-	*/
-	public function add_template($name, $filename = null)
-	{
-		// First, let's see if this is a bulk amount of templates that are going
-		// to be added.
-		if(is_array($name))
-		{
-			$total = 0;
-			foreach($name as $item)
-			{
-				// Make sure a couple things are set.
-				if(isset($item['name']) && isset($item['filename']) && $this->add_template($item['name'], $item['filename']))
-				{
-					// That was a success.
-					$total++;
-				}
-			}
-
-			// We will return how many templates were added successfully.
-			return $total;
-		}
-
-		// Now, does this template already exist (among other things)?
-		if(empty($name) || $this->template_exists($name) || !file_exists($filename) || !is_file($filename) || !is_readable($filename))
-		{
-			// Nope.
-			return false;
-		}
-
-		// Add the template. Easy enough, right?
-		$this->templates[strtolower($name)] = $filename;
-
-		return true;
-	}
-
-	/*
 		Method: template_exists
 
-		Checks to see if there is a template with the specified name already
-		registered.
+		Checks to see if there is a template with the specified name defined,
+		whether it be a file within the default templates directory or defined
+		(or overridden) by a plugin.
 
 		Parameters:
 			string $name - The name of the template to check for.
@@ -884,64 +798,54 @@ class Theme
 	*/
 	public function template_exists($name)
 	{
-		// Simply enough :-)
-		return isset($this->templates[strtolower($name)]);
+		// Simple enough, really.
+		return $this->return_template($name) !== false;
 	}
 
-	/*
-		Method: remove_template
-
-		Removes the specified template from the recognized templates.
-
-		Parameters:
-			string $name - The name of the template to remove.
-
-		Returns:
-			bool - Returns true if the template was removed successfully, false if
-						 the template was not registered in the first place.
-	*/
-	public function remove_template($name)
-	{
-		// So can we remove it?
-		if(!$this->template_exists($name))
-		{
-			// Hard to remove something that doesn't exist... I could be wrong,
-			// though.
-			return false;
-		}
-
-		// Remove it!
-		unset($this->templates[strtolower($name)]);
-
-		return true;
-	}
 
 	/*
 		Method: return_template
 
-		Returns all the currently recognized templates, or the location of the
-		specified template.
+		Returns the location of the template based on the specified name.
 
 		Parameters:
 			string $name - The name of the template you wish to obtain the
-										 location of, if any.
+										 location of.
 
 		Returns:
-			mixed - Returns an array if the name parameter is left empty, but a
-							string if the template name is registered which will contain
-							the location of the template, but false if the template name
-							is not registered.
+			mixed - Returns a string containing the path to the specified template
+							but if there is no template by that name, false will be
+							returned.
 	*/
-	public function return_template($name = null)
+	public function return_template($name)
 	{
-		if($name === null)
+		// Before we check if there is a default template, we will see if a
+		// plugin may have defined a location to a current template (or maybe
+		// even a template that is plugin-specific).
+		$template_location = null;
+
+		api()->run_hooks('template_location', array(&$name, &$template_location));
+
+		// Did we get anything?
+		if($template_location === null || !file_exists($template_location))
 		{
-			// Return everything we got!
-			return $this->templates;
+			// We will go ahead and check if there is one in the default template
+			// directory, then.
+			// We will check, but only after we make sure the name is safe...
+			$name = basename($name);
+
+			if(file_exists(coredir. '/templates/'. $name. '.template.php'))
+			{
+				// Good, there is a default template we can use.
+				$template_location = coredir. '/templates/'. $name. '.template.php';
+			}
+			else
+			{
+				$template_location = null;
+			}
 		}
 
-		// Return the templates location, if there is one.
-		return $this->template_exists($name) ? $this->templates[$name] : false;
+		return $template_location !== null ? realpath($template_location) : false;
 	}
 
 	/*
@@ -962,32 +866,12 @@ class Theme
 			The template name is simply the name of the file in the
 			coredir/templates directory, without the .template.php part.
 
-			Also, plugins may add their own templates as well, by calling on the
-			<Theme::add_template> method. These templates can be added one by one
-			or specify multiple via an array.
-
-			Plugins may override built-in templates (the ones in the
-			aforementioned templates directory) by hooking into template_location
-			which will supply the templates name as the first parameter, and the
-			templates currently set location. These parameters will be passed by
-			reference, so simply set the new desired location for the template.
-
-			Templates may also be overridden by having them removed via the
-			<Theme::remove_template> method, and then adding them with
-			<Theme::add_template>.
+			Also, plugins may add their own templates as well, by hooking into
+			the template_location hook and override or define a new template
+			location.
 	*/
 	public function render($template)
 	{
-		// Which template you loading? We don't care if it exists, yet.
-		api()->add_hook('template_location', array(&$template, &$template_location));
-
-		// Make sure the template location exists.
-		if(empty($template_location) || !file_exists($template_location) || !is_file($template_location) || !is_readable($template_location))
-		{
-			// Alright, we will try the more conventional method.
-			$template_location = $this->return_template($template);
-		}
-
 		// Make sure the required theme files exist.
 		if(!file_exists($this->themedir. '/header.template.php'))
 		{
@@ -1005,7 +889,12 @@ class Theme
 
 		api()->run_hooks('pre_theme_content');
 
-		if(!file_exists($template_location))
+		// We can go ahead and determine the location of the template now, any
+		// plugin can hook into template_location to override or add any
+		// template they please!
+		$template_location = $this->return_template($template);
+
+		if($template_location === false)
 		{
 			echo '
 			<h1>', l('Theme Error'), '</h1>

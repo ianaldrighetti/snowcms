@@ -44,6 +44,10 @@ class XML
 	// successfully parsed by <XML::parse>.
 	private $data;
 
+	// Variable: data_count
+	// Maintains the current size of the data array.
+	private $data_count;
+
 	// Variable: index
 	// An array containing an index of the parsed XML data from the last XML
 	// file successfully parsed by <XML::parse>.
@@ -61,6 +65,7 @@ class XML
 		$this->parser = xml_parser_create();
 		$this->options = array();
 		$this->data = null;
+		$this->data_count = 0;
 		$this->index = null;
 	}
 
@@ -152,6 +157,7 @@ class XML
 	{
 		// Clear a couple of things.
 		$this->data = null;
+		$this->data_count = 0;
 		$this->index = null;
 
 		// Call on the parser to, of course, parse the data.
@@ -204,6 +210,7 @@ class XML
 
 			// Save the data and the index.
 			$this->data = $data;
+			$this->data_count = count($data);
 			$this->index = $index;
 
 			return $data;
@@ -349,14 +356,13 @@ class XML
 		}
 
 		// Let's get going!
-		$data_items = count($this->data);
-		for($i = 0; $i < $data_items; $i++)
+		for($i = 0; $i < $this->data_count; $i++)
 		{
 			// Keep going until we find the parent tag.
 			if($this->data[$i]['tag'] == $parent_tag)
 			{
 				// Another for loop. Yippe!
-				for($j = $i + 1; $j < $data_items; $j++)
+				for($j = $i + 1; $j < $this->data_count; $j++)
 				{
 					// Did we find the tag you are looking for?
 					if($this->data[$j]['tag'] == $tag && $this->data[$j]['level'] == $this->data[$i]['level'] + 1)

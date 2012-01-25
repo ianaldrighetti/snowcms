@@ -40,8 +40,7 @@ class API
 	private $filters;
 
 	// Variable: count
-	// Keeps track of how many times, if any, an action or tag has been
-	// called.
+	// Keeps track of how many hooks and filters are registered.
 	private $count;
 
 	// Variable: events
@@ -153,6 +152,7 @@ class API
 		if(!isset($this->hooks[$action_name]))
 		{
 			$this->hooks[$action_name] = array();
+			$this->count['actions'][$action_name] = 0;
 		}
 
 		// Add the hook, and its now ready to go!
@@ -161,6 +161,7 @@ class API
 																		 'importance' => max(intval($importance), 1),
 																		 'accepted_args' => empty($accepted_args) ? null : max(intval($accepted_args), 0),
 																	 );
+		$this->count['actions'][$action_name]++;
 
 		return true;
 	}
@@ -182,7 +183,7 @@ class API
 	public function remove_hook($action_name, $callback)
 	{
 		// We can't delete a hook from an action that has no hooks, can we?
-		if(empty($action_name) || !is_callable($callback) || !isset($this->hooks[$action_name]) || count($this->hooks[$action_name]) == 0)
+		if(empty($action_name) || !isset($this->count['actions'][$action_name]) || $this->count['actions'][$action_name] == 0)
 		{
 			return false;
 		}
@@ -195,7 +196,7 @@ class API
 				// sequential, otherwise, when the action is ran and the hooks
 				// sorted, things would get all screwed up, which we don't want! ;)
 				$array = array();
-				$array_size = count($this->hooks[$action_name]);
+				$array_size = $this->count['actions'][$action_name];
 				for($i = 0; $i < $array_size; $i++)
 				{
 					// Do the keys match? Then skip!
@@ -210,6 +211,7 @@ class API
 
 				// Now save our change, before exiting.
 				$this->hooks[$action_name] = $array;
+				$this->count['actions'][$action_name]--;
 
 				return true;
 			}
@@ -238,23 +240,26 @@ class API
 	*/
 	public function run_hooks($action_name, $args = null)
 	{
-		// Increment the counter, for this action, even if no hooks are ran.
-		$this->count['actions'][$action_name] = isset($this->count['actions'][$action_name]) ? $this->count['actions'][$action_name] + 1 : 1;
-
 		// No hooks to run?
-		if(!isset($this->hooks[$action_name]) || count($this->hooks[$action_name]) == 0)
+		if(!isset($this->count['actions'][$action_name]) || $this->count['actions'][$action_name] == 0)
 		{
 			return;
 		}
 
 		// Sort the hooks by importance, if there is more than 1!
-		if(count($this->hooks[$action_name]) > 1)
+		if($this->count['actions'][$action_name] > 1)
 		{
 			$this->sort($this->hooks[$action_name]);
 		}
 
-		// Not an array? I'll make it one!
-		if(!is_array($args))
+		// No arguments at all?
+		if($args === null)
+		{
+			$args = array();
+		}
+		// If there is only one parameter we will make it an array anyways so
+		// we can use the PHP function call_user_func_array.
+		elseif(!is_array($args))
 		{
 			$args = array($args);
 		}
@@ -287,21 +292,28 @@ class API
 	/*
 		Method: hook_exists
 
-		Checks to see if the hook is registered on the specified action.
+		Checks to see if the (or there are) hook(s) is registered for the
+		specified action.
 
 		Parameters:
 			string $action_name - The action to search for the hook.
-			callback $callback - The callback to find.
+			callback $callback - The callback to find (optional).
 
 		Returns:
-			bool - Returns true if the hook is registered to the specified
-						 action, false if the hook was not found.
+			bool - If callback is set it returns true if the hook is registered to
+						 the specified action, false if the hook was not found.
+						 Otherwise the method will return true if there are hooks
+						 registered for the specified action and false if not.
 	*/
-	public function hook_exists($action_name, $callback)
+	public function hook_exists($action_name, $callback = null)
 	{
-		if(empty($action_name) || !isset($this->hooks[$action_name]) || count($this->hooks[$action_name]) == 0)
+		if(empty($action_name) || !isset($this->count['actions'][$action_name]) || $this->count['actions'][$action_name] == 0)
 		{
 			return false;
+		}
+		elseif($callback === null)
+		{
+			return true;
 		}
 
 		foreach($this->hooks[$action_name] as $hook)
@@ -382,6 +394,7 @@ class API
 		if(!isset($this->filters[$tag_name]))
 		{
 			$this->filters[$tag_name] = array();
+			$this->count['tags'][$tag_name] = 0;
 		}
 
 		// Add it, and we're done.
@@ -389,6 +402,7 @@ class API
 																		'callback' => $callback,
 																		'importance' => max(intval($importance), 1),
 																	);
+		$this->count['tags'][$tag_name]++;
 
 		return true;
 	}
@@ -408,7 +422,7 @@ class API
 	*/
 	public function remove_filter($tag_name, $callback)
 	{
-		if(empty($tag_name) || !isset($this->filters[$tag_name]) || count($this->filters[$tag_name]) == 0)
+		if(empty($tag_name) || !isset($this->count['tags'][$tag_name]) || $this->count['tags'][$tag_name] == 0)
 		{
 			return false;
 		}
@@ -420,7 +434,7 @@ class API
 				// If we found it, we need to make a new array, and exclude the one
 				// to be removed, otherwise we will have sorting issues ;)
 				$array = array();
-				$array_size = count($this->filters[$tag_name]);
+				$array_size = $this->count['tags'][$tag_name];
 				for($i = 0; $i < $array_size; $i++)
 				{
 					if($key == $i)
@@ -433,6 +447,8 @@ class API
 				}
 
 				$this->filters[$tag_name] = $array;
+				$this->count['tags'][$tag_name]--;
+
 				return true;
 			}
 		}
@@ -455,17 +471,14 @@ class API
 	*/
 	public function apply_filters($tag_name, $value)
 	{
-		// Increment the counter for this filter, that's one more, after all ;)
-		$this->count['tags'][$tag_name] = isset($this->count['tags'][$tag_name]) ? $this->count['tags'][$tag_name] + 1 : 1;
-
 		// No filters? Just return the value.
-		if(!isset($this->filters[$tag_name]) || count($this->filters[$tag_name]) == 0)
+		if(!isset($this->count['tags'][$tag_name]) || $this->count['tags'][$tag_name] == 0)
 		{
 			return $value;
 		}
 
 		// Sort the filters, just maybe.
-		if(count($this->filters[$tag_name]) > 1)
+		if($this->count['tags'][$tag_name] > 1)
 		{
 			$this->sort($this->filters[$tag_name]);
 		}
@@ -501,7 +514,7 @@ class API
 	*/
 	public function filter_exists($tag_name, $callback)
 	{
-		if(empty($tag_name) || !isset($this->filters[$tag_name]) || count($this->filters[$tag_name]) == 0)
+		if(empty($tag_name) || !isset($this->count['tags'][$tag_name]) || $this->count['tags'][$tag_name] == 0)
 		{
 			return false;
 		}
@@ -580,7 +593,7 @@ class API
 	{
 		// Is the callback not callable? Does the file not exist? Does the
 		// event already exist?
-		if(empty($query_string) || (empty($filename) && !is_callable($callback)) || !isset($identifier) || ($identifier !== null && !is_string($identifier) && !is_callable($identifier)) || (!empty($filename) && !file_exists($filename)) || $this->event_exists($query_string) || !($query = $this->parse_query($query_string)))
+		if(empty($query_string) || (empty($filename) && !is_callable($callback)) || ($identifier !== null && !is_string($identifier) && !is_callable($identifier)) || (!empty($filename) && !file_exists($filename)) || $this->event_exists($query_string) || !($query = $this->parse_query($query_string)))
 		{
 			return false;
 		}
@@ -1291,12 +1304,13 @@ class API
 	*/
 	public function add_class($class, $filename)
 	{
-		if($this->class_exists($class) || !file_exists($filename) || !is_file($filename))
+		if($this->class_exists($class) || !is_file($filename))
 		{
 			return false;
 		}
 
 		$this->classes[strtolower($class)] = $filename;
+
 		return true;
 	}
 
@@ -1321,6 +1335,7 @@ class API
 		}
 
 		unset($this->classes[strtolower($class)]);
+
 		return true;
 	}
 
@@ -1367,7 +1382,7 @@ class API
 	public function load_class($class_name, $params = array(), $filename = null, $new = false)
 	{
 		// Don't want a new object? Does it already exist? Great! You can have this one :)
-		if(empty($new) && isset($this->objects[strtolower($class_name)]))
+		if($new === false && isset($this->objects[strtolower($class_name)]))
 		{
 			return $this->objects[strtolower($class_name)];
 		}
@@ -1389,7 +1404,7 @@ class API
 			}
 
 			// Does the file not exist..?!
-			if(!file_exists($filename))
+			if(!is_file($filename))
 			{
 				return false;
 			}
@@ -1409,17 +1424,18 @@ class API
 		$obj = new $class_name();
 
 		// Any parameters?
-		if(count($params) > 0 && is_callable(array($obj, '__construct')))
+		$param_count = count($params);
+		if($param_count > 0 && is_callable(array($obj, '__construct')))
 		{
 			call_user_func_array(array($obj, '__construct'), $params);
 		}
-		elseif(count($params) > 0)
+		elseif($param_count > 0)
 		{
 			return false;
 		}
 
 		// Not your own "private" object? Then we shall store it!
-		if(empty($new))
+		if($new === false)
 		{
 			$this->objects[strtolower($class_name)] = $obj;
 		}
@@ -1703,13 +1719,12 @@ class API
 */
 function load_api()
 {
-	global $loading_plugins;
-
 	ob_start();
 
 	// Register a shutdown function, which calls on a function to see if the
 	// error was fatal, if it was, and caused by a plugin, it will be
 	// disabled :)
+	$GLOBALS['loading_plugins'] = true;
 	register_shutdown_function('api_catch_fatal');
 
 	// Instantiate the API class.
@@ -1787,6 +1802,11 @@ function load_api()
 		}
 	}
 
+	// We have finished loading all plugins, so we're all good. No need to
+	// monitor for any fatal errors that a plugin may cause that would require
+	// recovery.
+	$GLOBALS['loading_plugins'] = false;
+
 	// Simple hook, something you can hook onto if you want to do something
 	// right before SnowCMS stops executing.
 	register_shutdown_function(create_function('', '
@@ -1812,7 +1832,7 @@ function api_catch_fatal()
 {
 	// Make sure this isn't being called after the page has loaded without
 	// any issue.
-	if(stripos(ob_get_contents(), '<html') !== false)
+	if(empty($GLOBALS['loading_plugins']) || stripos(ob_get_contents(), '<html') !== false)
 	{
 		return;
 	}
