@@ -27,14 +27,14 @@ if(!defined('INSNOW'))
 // Don't have JSON enabled?
 if(!function_exists('json_encode'))
 {
-	require_once(coredir. '/compat/json.php');
+	require(coredir. '/compat/json.php');
 }
 
 // Windows doesn't seem to have mime_content_type, at least on certain
 // setups, it is somewhat important :P
 if(!function_exists('mime_content_type'))
 {
-	require_once(coredir. '/compat/mime_content_type.php');
+	require(coredir. '/compat/mime_content_type.php');
 }
 
 // Windows also doesn't have fnmatch if you're using a PHP version lower

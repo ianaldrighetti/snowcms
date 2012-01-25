@@ -60,7 +60,7 @@ if(!function_exists('admin_update'))
 		}
 
 		// Get the information.
-		$latest_version = settings()->get('system_latest_version', 'string', settings()->get('version', 'string'));
+		$latest_version = settings()->get('system_latest_version', null, settings()->get('version', 'string'));
 		$latest_info = settings()->get('system_latest_info', 'array', array('up-to-date' => null));
 
 		// Was there an update?

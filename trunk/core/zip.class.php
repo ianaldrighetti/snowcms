@@ -303,7 +303,7 @@ class Zip implements Extractor
 					}
 
 					// Get the files data out (The compressed size, because, well, you know!)...
-					$data = fread($this->fp, $file['compressed_size']);
+					$data = $file['compressed_size'] > 0 ? fread($this->fp, $file['compressed_size']) : '';
 
 					// The compressed and not compressed size different? Inflate it!
 					if($file['compressed_size'] != $file['uncompressed_size'])

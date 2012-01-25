@@ -136,6 +136,7 @@ CREATE INDEX '{db->prefix}plugins_is_activated' ON '{db->prefix}plugins' ('is_ac
 CREATE TABLE '{db->prefix}settings'
 (
 	'variable' VARCHAR(255) NOT NULL,
+	'type' VARCHAR(30) NOT NULL DEFAULT 'string',
 	'value' TEXT NULL,
 	PRIMARY KEY ('variable')
 );

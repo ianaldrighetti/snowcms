@@ -501,7 +501,7 @@ class Component
 			$post_data = array('requesttype' => 'verifyversion', 'version' => $version);
 
 			// Want to add some sort of update key or something?
-			if($func['strlen'](api()->apply_filters(sha1($component_info['directory']). '_updatekey'), '') > 0)
+			if($func['strlen'](api()->apply_filters(sha1($component_info['directory']). '_updatekey', '') > 0))
 			{
 				$post_data['updatekey'] = api()->apply_filters(sha1($component_info['directory']). '_updatekey', '');
 			}
@@ -535,7 +535,7 @@ class Component
 		$post_data = array('requesttype' => 'download', 'version' => $version);
 
 		// Want to add some sort of update key or something?
-		if($func['strlen'](api()->apply_filters(sha1($component_info['directory']). '_updatekey'), '') > 0)
+		if($func['strlen'](api()->apply_filters(sha1($component_info['directory']). '_updatekey', '') > 0))
 		{
 			$post_data['updatekey'] = api()->apply_filters(sha1($component_info['directory']). '_updatekey', '');
 		}
@@ -652,7 +652,12 @@ class Component
 		// Did we get a response?
 		if(!empty($response))
 		{
-			@list($status, $reason) = explode("\r\n", $response, 2);
+			// We will want to check to make sure there is a reason specified.
+			$list = explode("\r\n", $response, 2);
+
+			// We don't want any undefined errors :-).
+			$status = isset($list[0]) ? $list[0] : '';
+			$reason = isset($list[1]) ? $list[1] : false;
 
 			// Just to make sure.
 			$status = strtolower(trim($status));

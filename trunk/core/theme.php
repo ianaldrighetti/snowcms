@@ -74,7 +74,7 @@ if(!defined('INSNOW'))
 function theme_load($path)
 {
 	// Doesn't exist? Then we can't load it!
-	if(!file_exists($path) || !is_dir($path) || !file_exists($path. '/header.template.php') || !file_exists($path. '/footer.template.php') || !file_exists($path. '/theme.xml'))
+	if(!is_dir($path) || !is_file($path. '/header.template.php') || !is_file($path. '/footer.template.php') || !is_file($path. '/theme.xml'))
 	{
 		return false;
 	}
@@ -456,5 +456,26 @@ function theme_menu($menu = 'main')
 function theme_foot()
 {
 	echo api()->apply_filters('theme_foot', l('Page created in %s seconds with %u queries.', round(microtime(true) - starttime, 3), db()->num_queries)). (settings()->get('show_version', 'bool', true) ? ' | '. l('Powered by <a href="http://www.snowcms.com/" target="_blank" title="SnowCMS">SnowCMS</a> v%s', settings()->get('version', 'string')) : '');
+}
+
+/*
+	Function: baseurl
+
+	Returns the properly formatted URL for the specified location.
+
+	Parameters:
+		string $uri - The URI to append to the base URL of the site. This
+									parameter is optional.
+
+	Returns:
+		string - The properly formatted URL for the specified location.
+
+	Note:
+		There is a filter called baseurl which is passed "baseurl. '/'. $uri"
+		which can be used to modify the URL -- of course.
+*/
+function baseurl($uri = null)
+{
+	return api()->apply_filters('baseurl', baseurl. '/'. ($uri !== null && is_string($uri) ? $uri : ''));
 }
 ?>

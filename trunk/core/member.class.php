@@ -153,27 +153,31 @@ if(!class_exists('Member'))
 					SELECT
 						member_id, token_id, token_assigned, token_expires, token_data
 					FROM {db->prefix}auth_tokens
-					WHERE member_id = {int:member_id} AND token_id = {string:auth_token} AND token_expires > {int:cur_time}
+					WHERE member_id = {int:member_id} AND token_id = {string:auth_token}
 					LIMIT 1',
 					array(
 						'member_id' => $member_id,
 						'auth_token' => $auth_token,
-						'cur_time' => time_utc(),
 					));
 
 				// Did we find that this token is valid?
 				if($result->num_rows() > 0)
 				{
-					// Yes, it is.
-					$auth_token_valid = true;
-
 					$row = $result->fetch_assoc();
 
-					// Make the data an array.
-					$row['token_data'] = @unserialize($row['token_data']);
+					// Just about done... We just want to make sure that the token is
+					// not expired...
+					if($row['token_expires'] > time_utc())
+					{
+						// Yes, it is.
+						$auth_token_valid = true;
 
-					// Maybe you want to check a couple extra things?
-					api()->run_hooks('member_auth_validate', array($row, &$auth_token_valid));
+						// Make the data an array.
+						$row['token_data'] = @unserialize($row['token_data']);
+
+						// Maybe you want to check a couple extra things?
+						api()->run_hooks('member_auth_validate', array($row, &$auth_token_valid));
+					}
 				}
 
 				if(!empty($auth_token_valid))

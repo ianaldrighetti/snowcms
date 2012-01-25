@@ -44,13 +44,13 @@ function load_database()
 	if(file_exists(coredir. '/engines/'. strtolower(dbtype). '.engine.php') && file_exists(coredir. '/engines/'. strtolower(dbtype). '_result.engine.php'))
 	{
 		// Awesome, they're there! So we can get going now :)
-		require_once(coredir. '/database_result.class.php');
-		require_once(coredir. '/engines/'. strtolower(dbtype). '_result.engine.php');
-		require_once(coredir. '/database.class.php');
-		require_once(coredir. '/engines/'. strtolower(dbtype). '.engine.php');
+		require(coredir. '/database_result.class.php');
+		require(coredir. '/engines/'. strtolower(dbtype). '_result.engine.php');
+		require(coredir. '/database.class.php');
+		require(coredir. '/engines/'. strtolower(dbtype). '.engine.php');
 
 		// Well, you should have specified the name of your class and result class, did you?
-		if(!empty($db_class) && !empty($db_result_class) && class_exists($db_class) && class_exists($db_result_class))
+		if(isset($db_class) && isset($db_result_class) && class_exists($db_class) && class_exists($db_result_class))
 		{
 			$GLOBALS['db'] = new $db_class($db_result_class);
 

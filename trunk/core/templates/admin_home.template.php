@@ -40,7 +40,9 @@ if(count(api()->context['current_news']) > 0)
 else
 {
 	echo '
-			<p class="center">', l('No news to display. This could be caused by not being able to contact the update server.'), '</p>';
+		<div class="error-message">
+			<p>', l('No news to display. This could be caused by not being able to contact the update server.'), '</p>
+		</div>';
 }
 
 echo '

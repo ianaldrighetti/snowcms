@@ -76,12 +76,12 @@ if(!defined('INSNOW'))
 function plugin_load($plugin_id, $is_path = true)
 {
 	// Is it a path? Make sure it exists...
-	if(empty($plugin_id) || (!empty($is_path) && (!file_exists($plugin_id) || !is_dir($plugin_id) || !file_exists($plugin_id. '/plugin.php') || !file_exists($plugin_id. '/plugin.xml'))))
+	if(empty($plugin_id) || (!empty($is_path) && (!is_dir($plugin_id) || !is_file($plugin_id. '/plugin.php') || !is_file($plugin_id. '/plugin.xml'))))
 	{
 		return false;
 	}
 	// A guid? That's fine, but we need the path.
-	elseif(empty($is_path))
+	elseif($is_path === false)
 	{
 		// Get all the plugins, and attempt to interpret the guid into an actual
 		// path ;)
@@ -134,7 +134,7 @@ function plugin_load($plugin_id, $is_path = true)
 */
 function plugin_get_info($filename)
 {
-	if(!file_exists($filename) || !is_file($filename))
+	if(!is_file($filename))
 	{
 		return false;
 	}

@@ -83,7 +83,7 @@ function init_core()
 																																														),
 																																														array(
 																																															\'query_string\' => \'type=\'. htmlchars($_GET[\'type\']),
-																																															\'identifier\' => $GLOBALS[\'settings_identifiers\'][$_GET[\'type\']],
+																																															\'identifier\' => isset($GLOBALS[\'settings_identifiers\']) ? $GLOBALS[\'settings_identifiers\'][$_GET[\'type\']] : false,
 																																														),
 																																													);'), coredir. '/admin/admin_members_settings.php');
 	api()->add_event('action=admin&sa=plugins_add', 'admin_plugins_add', l('Add a New Plugin'), coredir. '/admin/admin_plugins_add.php');
@@ -105,8 +105,8 @@ function init_core()
 	api()->add_event('action=admin&sa=themes', 'admin_themes', create_function('$value', '
 																															 return array(
 																																				array(
-																																					\'query_string\' => \'sa=themes&amp;section=\'. ($_GET[\'section\'] == \'install\' ? \'install\' : \'manage\'),
-																																					\'identifier\' => ($_GET[\'section\'] == \'install\' ? l(\'Install Themes\') : l(\'Manage Themes\')),
+																																					\'query_string\' => \'sa=themes&amp;section=\'. (isset($_GET[\'section\']) && $_GET[\'section\'] == \'install\' ? \'install\' : \'manage\'),
+																																					\'identifier\' => (isset($_GET[\'section\']) && $_GET[\'section\'] == \'install\' ? l(\'Install Themes\') : l(\'Manage Themes\')),
 																																				),
 																																			);'), coredir. '/admin/admin_themes.php');
 	api()->add_event('action=admin&sa=themes&install=*', 'admin_themes_install', l('Installing Theme'), coredir. '/admin/admin_themes.php');
