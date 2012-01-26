@@ -690,9 +690,10 @@ function admin_link_tree($displaying_login = false)
 
 	// Yeah, I know, we have to go through this AGAIN.
 	$links = array();
+	$link_count = count($linktree);
 	foreach($linktree as $link)
 	{
-		$links[] = (!$link['is_last'] ? '<a href="'. $link['href']. '">' : ''). $link['text']. (!$link['is_last'] ? '</a>' : '');
+		$links[] = (!$link['is_last'] || $link_count == 1 ? '<a href="'. $link['href']. '">' : ''). $link['text']. (!$link['is_last'] ? '</a>' : '');
 	}
 
 	return implode(' &raquo; ', $links);
