@@ -126,6 +126,7 @@ function init_core()
 	api()->add_event('action=forgotpw2', 'forgotpw_view2', l('Reset Password'), coredir. '/forgotpw.php');
 	api()->add_event('action=tasks', 'tasks_run', null, coredir. '/tasks.class.php');
 	api()->add_event('action=popup', 'core_popup', l('Viewing Popup'));
+	api()->add_event('action=verify', 'verify_email', l('Verify Email Address'), coredir. '/verify.php');
 
 	// Stop output buffering which was started in the <load_api> function.
 	ob_end_clean();

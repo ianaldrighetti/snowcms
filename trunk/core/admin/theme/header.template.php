@@ -51,7 +51,7 @@ else
 			</div>
 		</div>
 <?php
-if(!admin_prompt_required() && empty(api()->context['cp_access_denied']))
+if(!admin_prompt_required(true) && empty(api()->context['cp_access_denied']))
 {
 	// Any important notifications?
 	$important_notifications = api()->apply_filters('admin_important_notifications', array());

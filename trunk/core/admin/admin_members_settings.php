@@ -64,9 +64,9 @@ if(!function_exists('admin_members_settings'))
 																																									 l('If you want to prevent members (and possibly guests) from using certain names and email addresses, you may add them to the lists below.'),
 																																								 ),
 																																 'other' => array(
-																																						  l('Password &amp; Username Settings'),
+																																						  l('Username, Email &amp; Password Settings'),
 																																						  l('Manage security related settings'),
-																																						  l('Password requirements and username length requirements can be changed here.'),
+																																						  l('Password and username length requirements can be changed here, along with how email address changes should be handled.'),
 																																					  ),
 																															 ));
 
@@ -230,7 +230,7 @@ if(!function_exists('admin_members_settings_generate_form'))
 																		 ),
 													'callback' => create_function('$name, $value, &$error', '
 
-																					if((int)$value > (int)$_POST[\'members_max_name_length\'])
+																					if(isset($_POST[\'members_max_name_length\']) && (int)$value > (int)$_POST[\'members_max_name_length\'])
 																					{
 																						$error = l(\'Minimum username length can\\\'t be larger than the maximum username length.\');
 																						return false;
@@ -252,7 +252,7 @@ if(!function_exists('admin_members_settings_generate_form'))
 																		 ),
 													'callback' => create_function('$name, $value, &$error', '
 
-																					if((int)$value < (int)$_POST[\'members_min_name_length\'])
+																					if(isset($_POST[\'members_min_name_length\']) && (int)$value < (int)$_POST[\'members_min_name_length\'])
 																					{
 																						return false;
 																					}
@@ -260,6 +260,14 @@ if(!function_exists('admin_members_settings_generate_form'))
 																					return true;'),
 													'default_value' => settings()->get('members_max_name_length', 'int', 80),
 												));
+
+			$form->add_input(array(
+												 'name' => 'require_email_verification',
+												 'type' => 'checkbox',
+												 'label' => l('Require email verification'),
+												 'subtext' => l('If enabled, this option requires that a user verify their new email address before the email address can be used.'),
+												 'default_value' => settings()->get('require_email_verification', 'bool', false),
+											 ));
 		}
 
 		// You may need to do this yourself.

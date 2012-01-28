@@ -265,7 +265,7 @@ class Tokens
 		// Is it the current session? Just mark them for deletion.
 		if(empty($session_id) || $session_id == (member()->is_logged() ? 'member_id-'. member()->id() : 'ip'. member()->ip()))
 		{
-			if(count($this->tokens))
+			if(count($this->tokens) > 0)
 			{
 				foreach($this->tokens as $token_name => $form)
 				{

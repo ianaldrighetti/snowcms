@@ -79,6 +79,15 @@ if(empty($handled))
 					<p class="right smaller"><a href="', baseurl, '/index.php?action=forgotpw" title="', l('If you forgot your password you can request a new one'), '">', l('Forgot your password?'), '</a></p>
 				</div>
 				', api()->context['form']->input('redir_to')->generate(), '
-			', api()->context['form']->close('login_form');
+			', api()->context['form']->close('login_form'), '
+				<script type="text/javascript">
+					s.onload(function()
+						{
+							if(s.id(\'member_name\') && s.id(\'member_pass\'))
+							{
+								s.id(s.id(\'member_name\').value.length > 0 ? \'member_pass\' : \'member_name\').focus();
+							}
+						});
+				</script>';
 }
 ?>
