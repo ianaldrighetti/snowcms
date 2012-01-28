@@ -756,6 +756,7 @@ class Members
 	{
 		global $func;
 
+		// No options? No go!
 		if(count($options) == 0)
 		{
 			return false;

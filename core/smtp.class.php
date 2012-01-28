@@ -133,17 +133,23 @@ class SMTP
 		// Did it work?
 		if(!empty($this->con))
 		{
-			// Turn stream blocking on (stalls reading from the server until we get something).
+			// Turn stream blocking on (stalls reading from the server until we
+			// get something).
 			stream_set_blocking($this->con, 1);
 			stream_set_timeout($this->con, $timeout, 0);
 
 			// Clear the buffer, we don't need anything the server spewed out.
 			$this->get_response();
 
-			// Did you want TLS? Let's attempt to start it.
-			if(!empty($is_tls))
+			// Did you want TLS? Let's attempt to start it. Well, if the host
+			// already specifies ssl:// then we don't need to do it again.
+			if(!empty($is_tls) && strtolower(substr($host, 0, 6)) != 'ssl://')
 			{
 				$this->is_tls = $this->start_tls();
+			}
+			elseif(strtolower(substr($host, 0, 6)) != 'ssl://')
+			{
+				$this->is_tls = true;
 			}
 
 			// Save the other information.
@@ -214,9 +220,15 @@ class SMTP
 	*/
 	private function start_tls()
 	{
+		static $started = false;
+
 		if(empty($this->con) || !function_exists('stream_socket_enable_crypto'))
 		{
 			return false;
+		}
+		elseif($started === true)
+		{
+			return true;
 		}
 
 		// Let's ask nicely, now.
@@ -227,7 +239,9 @@ class SMTP
 		// If the server accepted our request, it would have returned 220.
 		if($reply_code = 220)
 		{
-			return stream_socket_enable_crypto($this->con, true, STREAM_CRYPTO_METHOD_TLS_CLIENT);
+			$started = stream_socket_enable_crypto($this->con, true, STREAM_CRYPTO_METHOD_TLS_CLIENT);
+
+			return $started;
 		}
 		else
 		{

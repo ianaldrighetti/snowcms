@@ -442,7 +442,7 @@ if(!function_exists('register_send_welcome_email'))
 		}
 
 		// Now time to send those emails!
-		if(count($members_info))
+		if(count($members_info) > 0)
 		{
 			// Now dispatch them emails!
 			foreach($members_info as $member_info)
