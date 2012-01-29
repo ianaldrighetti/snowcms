@@ -139,23 +139,10 @@ if(!function_exists('forgotpw_process'))
 			return false;
 		}
 
-		// Alrighty then, we need to generate a reminder key ;)
-		$reset_key = sha1(time_utc(). $members->rand_str(mt_rand(32, 64)). (microtime(true) / mt_rand(4, 16)));
-
-		$members->update($member_id, array(
-																	 'data' => array(
-																							 'pwreset_requested' => 1,
-																							 'pwreset_requested_time' => time_utc(),
-																							 'pwreset_requested_ip' => member()->ip(),
-																							 'pwreset_requested_user_agent' => htmlchars($_SERVER['HTTP_USER_AGENT']),
-																							 'reset_key' => $reset_key,
-																						 ),
-																 ));
-
-		// Email time! :) and that's pretty much it!
-		$mail = api()->load_class('Mail');
-		$mail->set_html(true);
-		$mail->send($member_info['email'], l('Password Reset Instructions for %s', settings()->get('site_name', 'string')), l("Hello, %s.<br /><br />You are receiving this email because someone has requested a password reset for your account on <a href=\"%s\">%s</a>. If you did not make this request to reset your password, <a href=\"%s\">log in</a> to your account or click the link below:<br /><a href=\"%s\">%s</a><br /><br />If you did request to have your password reset you can finish the process by clicking on the following link:<br /><a href=\"%s\">%s</a><br /><br />This password reset request will only remain valid for the next 24 hours.<br /><br />Regards,<br />%s<br /><a href=\"%s\">%s</a>", $member_info['username'], baseurl, settings()->get('site_name', 'string'), baseurl. '/index.php?action=login&amp;member_name='. urlencode($member_info['username']), baseurl. '/index.php?action=forgotpw2&amp;id='. $member_info['id']. '&amp;code='. $reset_key. '&amp;block=true', baseurl. '/index.php?action=forgotpw2&amp;id='. $member_info['id']. '&amp;code='. $reset_key. '&amp;block=true', baseurl. '/index.php?action=forgotpw2&amp;id='. $member_info['id']. '&amp;code='. $reset_key, baseurl. '/index.php?action=forgotpw2&amp;id='. $member_info['id']. '&amp;code='. $reset_key, settings()->get('site_name', 'string'), baseurl, baseurl));
+		// For flexibility, we threw the following code into a function (since
+		// another component of the system also needs to send a different, but
+		// similar, message to the user).
+		forgotpw_invoke($member_info);
 
 		api()->add_filter('forgotpw_form_messages', create_function('$value', '
 																								$value[] = l(\'An email containing instructions on how to reset your password have been sent.<br />This request will only be valid for the next 24 hours.\');
@@ -167,6 +154,76 @@ if(!function_exists('forgotpw_process'))
 		api()->run_hooks('post_reminder_process', array($member_info));
 
 		return true;
+	}
+}
+
+if(!function_exists('forgotpw_invoke'))
+{
+	/*
+		Function: forgotpw_invoke
+
+		This function sets up the reset key, sets up the proper information on
+		the users account and then sends the user the appropriate email message
+		to tell them how to complete their password reset.
+
+		Parameters:
+			mixed $member_info - An array containing the members information
+													 (which is retrieved from <Members::get>) or an
+													 integer which is the members ID.
+			bool $admin_override - Set this to true if the reset request was
+														 caused by an administrator modifying the users
+														 log in name but not specifying a password for
+														 the account (which means the password becomes
+														 invalid because the password is salted with
+														 the user name, and if that name changes the log
+														 in system will say the password they enter is
+														 invalid even if it isn't). Defaults to false.
+
+		Returns:
+			bool - Returns true on success, false on failure.
+	*/
+	function forgotpw_invoke($member_info, $admin_override = false)
+	{
+		// Is it an array containing the members information, or an ID?
+		if(!is_array($member_info))
+		{
+			$members = api()->load_class('Members');
+			$members->load((int)$member_info);
+
+			$member_info = $members->get((int)$member_info);
+		}
+
+		// Make sure we have at least have the information we will need.
+		if(!isset($member_info['id']) || !isset($member_info['username']) || !isset($member_info['email']))
+		{
+			return false;
+		}
+
+		// Alrighty then, we need to generate a reminder key ;)
+		$reset_key = sha1(time_utc(). $members->rand_str(mt_rand(32, 64)). (microtime(true) / mt_rand(4, 16)));
+
+		$members->update($member_info['id'], array(
+																					 'data' => array(
+																											 'pwreset_requested' => 1,
+																											 'pwreset_requested_time' => time_utc(),
+																											 'pwreset_requested_ip' => member()->ip(),
+																											 'pwreset_requested_user_agent' => htmlchars($_SERVER['HTTP_USER_AGENT']),
+																											 'reset_key' => $reset_key,
+																										 ),
+																				 ));
+
+		// Email time! :) and that's pretty much it!
+		$mail = api()->load_class('Mail');
+		$mail->set_html(true);
+
+		if(empty($admin_override))
+		{
+			return $mail->send($member_info['email'], l('Password Reset Instructions for %s', settings()->get('site_name', 'string')), l("Hello, %s.<br /><br />You are receiving this email because someone has requested a password reset for your account on <a href=\"%s\">%s</a>. If you did not make this request to reset your password, <a href=\"%s\">log in</a> to your account or click the link below:<br /><a href=\"%s\">%s</a><br /><br />If you did request to have your password reset you can finish the process by clicking on the following link:<br /><a href=\"%s\">%s</a><br /><br />This password reset request will only remain valid for the next 24 hours.<br /><br />Regards,<br />%s<br /><a href=\"%s\">%s</a>", $member_info['username'], baseurl, settings()->get('site_name', 'string'), baseurl. '/index.php?action=login&amp;member_name='. urlencode($member_info['username']), baseurl. '/index.php?action=forgotpw2&amp;id='. $member_info['id']. '&amp;code='. $reset_key. '&amp;block=true', baseurl. '/index.php?action=forgotpw2&amp;id='. $member_info['id']. '&amp;code='. $reset_key. '&amp;block=true', baseurl. '/index.php?action=forgotpw2&amp;id='. $member_info['id']. '&amp;code='. $reset_key, baseurl. '/index.php?action=forgotpw2&amp;id='. $member_info['id']. '&amp;code='. $reset_key, settings()->get('site_name', 'string'), baseurl, baseurl));
+		}
+		else
+		{
+			return $mail->send($member_info['email'], l('Password Reset Instructions for %s', settings()->get('site_name', 'string')), l("Hello, %s.<br /><br />You are receiving this email because an administrator changed your accounts log in name on <a href=\"%s\">%s</a>, which requires that you create a new password. Just click the link below to set your new password:<br /><a href=\"%s\">%s</a><br /><br />This password reset request will only remain valid for the next 24 hours, but you can always start a password reset convenient for you.<br /><br />Regards,<br />%s<br /><a href=\"%s\">%s</a>", $member_info['username'], baseurl, settings()->get('site_name', 'string'), baseurl. '/index.php?action=forgotpw2&amp;id='. $member_info['id']. '&amp;code='. $reset_key, baseurl. '/index.php?action=forgotpw2&amp;id='. $member_info['id']. '&amp;code='. $reset_key, settings()->get('site_name', 'string'), baseurl, baseurl));
+		}
 	}
 }
 
@@ -241,7 +298,7 @@ if(!function_exists('forgotpw_view2'))
 			$member_info = $members->get($_REQUEST['id']);
 
 			// Well, seems alright... Now to see if the code has expired, that is, if a password request was made!
-			if(!empty($member_info) && isset($member_info['data']['pwreset_requested_time']) && ($member_info['data']['pwreset_requested_time'] + 86400) > time_utc() && $member_info['data']['pwreset_requested'] == 1)
+			if(!empty($member_info) && isset($member_info['data']['pwreset_requested_time']) && ($member_info['data']['pwreset_requested_time'] + 86400) > time_utc() && $member_info['data']['pwreset_requested'] == 1 && !empty($member_info['data']['reset_key']) && $member_info['data']['reset_key'] == $_REQUEST['code'])
 			{
 				$GLOBALS['member_name'] = $member_info['username'];
 
@@ -376,6 +433,12 @@ if(!function_exists('forgotpw_process2'))
 		if(!isset($member_info['data']['pwreset_requested_time']) || ($member_info['data']['pwreset_requested_time'] + 86400) < time_utc() || $member_info['data']['pwreset_requested'] != 1)
 		{
 			$errors[] = l('No password reset request has been made for this account.');
+
+			return false;
+		}
+		elseif(empty($member_info['data']['reset_key']) || strlen($member_info['data']['reset_key']) < 1 || $member_info['data']['reset_key'] != $reset['code'])
+		{
+			$errors[] = l('Invalid reset verification code specified.');
 
 			return false;
 		}

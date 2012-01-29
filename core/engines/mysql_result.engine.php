@@ -26,59 +26,94 @@ class MySQL_Result extends Database_Result
 {
 	public function data_seek($row_num = 0)
 	{
-		// Got something to do?
+		static $run_hooks = false;
+
 		$return = null;
-		$current = $this->current;
-		api()->run_hooks('database_data_seek', array($this->result, $row_num, &$return, &$current));
-		$this->current = $current;
+		if($run_hooks)
+		{
+			$current = $this->current;
+			api()->run_hooks('database_data_seek', array($this->result, $row_num, &$return, &$current));
+			$this->current = $current;
+			$run_hooks = $return !== null;
+		}
 
 		return $return === null ? mysql_data_seek($this->result, $row_num) : $return;
 	}
 
 	public function fetch_array()
 	{
+		static $run_hooks = false;
+
 		$return = null;
-		$current = $this->current;
-		api()->run_hooks('database_fetch_array', array($this->result, &$return, &$current));
-		$this->current = $current;
+		if($run_hooks)
+		{
+			$current = $this->current;
+			api()->run_hooks('database_fetch_array', array($this->result, &$return, &$current));
+			$this->current = $current;
+			$run_hooks = $return !== null;
+		}
 
 		return $return === null ? mysql_fetch_array($this->result) : $return;
 	}
 
 	public function fetch_assoc()
 	{
+		static $run_hooks = true;
+
 		$return = null;
-		$current = $this->current;
-		api()->run_hooks('database_fetch_assoc', array($this->result, &$return, &$current));
-		$this->current = $current;
+		if($run_hooks)
+		{
+			$current = $this->current;
+			api()->run_hooks('database_fetch_assoc', array($this->result, &$return, &$current));
+			$this->current = $current;
+			$run_hooks = $return !== null;
+		}
 
 		return $return === null ? mysql_fetch_assoc($this->result) : $return;
 	}
 
 	public function fetch_object()
 	{
+		static $run_hooks = true;
+
 		$return = null;
-		$current = $this->current;
-		api()->run_hooks('database_fetch_object', array($this->result, &$return, &$current));
-		$this->current = $current;
+		if($run_hooks)
+		{
+			$current = $this->current;
+			api()->run_hooks('database_fetch_object', array($this->result, &$return, &$current));
+			$this->current = $current;
+			$run_hooks = $return !== null;
+		}
 
 		return $return === null ? mysql_fetch_object($this->result) : $return;
 	}
 
 	public function fetch_row()
 	{
+		static $run_hooks = true;
+
 		$return = null;
-		$current = $this->current;
-		api()->run_hooks('database_fetch_row', array($this->result, &$return, &$current));
-		$this->current = $current;
+		if($run_hooks)
+		{
+			$current = $this->current;
+			api()->run_hooks('database_fetch_row', array($this->result, &$return, &$current));
+			$this->current = $current;
+			$run_hooks = $return !== null;
+		}
 
 		return $return === null ? mysql_fetch_row($this->result) : $return;
 	}
 
 	public function field_name($field_offset)
 	{
+		static $run_hooks = true;
+
 		$return = null;
-		api()->run_hooks('database_field_name', array($this->result, $field_offset, &$return));
+		if($run_hooks)
+		{
+			api()->run_hooks('database_field_name', array($this->result, $field_offset, &$return));
+			$run_hooks = $return !== null;
+		}
 
 		return $return === null ? mysql_field_name($this->result, $field_offset) : $return;
 	}
@@ -93,16 +128,28 @@ class MySQL_Result extends Database_Result
 
 	public function num_fields()
 	{
+		static $run_hooks = true;
+
 		$return = null;
-		api()->run_hooks('database_num_fields', array($this->result, &$return));
+		if($run_hooks)
+		{
+			api()->run_hooks('database_num_fields', array($this->result, &$return));
+			$run_hooks = $return !== null;
+		}
 
 		return $return === null ? mysql_num_fields($this->result) : $return;
 	}
 
 	public function num_rows()
 	{
+		static $run_hooks = true;
+
 		$return = null;
-		api()->run_hooks('database_num_rows', array($this->result, &$return));
+		if($run_hooks)
+		{
+			api()->run_hooks('database_num_rows', array($this->result, &$return));
+			$run_hooks = $return !== null;
+		}
 
 		return $return === null ? mysql_num_rows($this->result) : $return;
 	}

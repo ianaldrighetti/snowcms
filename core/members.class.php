@@ -25,16 +25,17 @@ if(!defined('INSNOW'))
 /*
 	Class: Members
 
-	This is a class which allows the system and plugins to load various information
-	about either an individual or multiple accounts. Anything relating to the obtaining
-	or modification of member information should be done via the Members class as the
-	current site may not be using SnowCMS's built in member database (You know, like
-	someone is using a bridge ;))
+	This is a class which allows the system and plugins to load various
+	information about either an individual or multiple accounts. Anything
+	relating to the obtaining or modification of member information should be
+	done via the Members class as the current site may not be using SnowCMS's
+	built in member database (You know, like someone is using a bridge ;))
 */
 class Members
 {
 	// Variable: loaded
-	// An array containing members which have already been loaded once (they don't need to be twice ;))
+	// An array containing members which have already been loaded once (they
+	// don't need to be twice ;))
 	private $loaded;
 
 	/*
@@ -51,16 +52,17 @@ class Members
 	/*
 		Method: load
 
-		This method loads the specified members into an array, which can be retrieved
-		via <Members::get>
+		This method loads the specified members into an array, which can be
+		retrieved via <Members::get>
 
 		Parameters:
-			mixed $members - Either an array or single interger containing the member ID(s)
-											 of which members you want to load the information of.
+			mixed $members - Either an array or single interger containing the
+											 member ID(s) of which members you want to load the
+											 information of.
 
 		Returns:
-			bool - Returns TRUE if the information was successfully loaded, FALSE on failure.
-
+			bool - Returns true if the information was successfully loaded, false
+						 on failure.
 	*/
 	public function load($members)
 	{
@@ -89,15 +91,16 @@ class Members
 			}
 		}
 
-		// Alright, so do you want to do this yourself? ;) If you do do this yourself,
-		// set the handled parameter to a bool, otherwise, if it is null, this method
-		// will just do it itself!!! :P
+		// Alright, so do you want to do this yourself? ;) If you do do this
+		// yourself, set the handled parameter to a bool, otherwise, if it is
+		// null, this method will just do it itself!!! :P
 		$handled = null;
 		api()->run_hooks('load_members', array(&$handled, &$members));
 
 		if($handled === null && count($members) > 0)
 		{
-			// Make sure this member isn't already loaded, otherwise it is a waste of resources.
+			// Make sure this member isn't already loaded, otherwise it is a waste
+			// of resources.
 			foreach($members as $member_id)
 			{
 				if(isset($this->loaded[$member_id]))
@@ -177,21 +180,26 @@ class Members
 	/*
 		Method: get
 
-		After the member(s) information has been loaded via <Members::get> the data
-		can be retrieved through this method.
+		After the member(s) information has been loaded via <Members::get> the
+		data can be retrieved through this method.
 
 		Parameters:
-			mixed $members - Either an array or integer containing the member you want to get
-											 the loaded information of.
+			mixed $members - Either an array of integers or an integer containing
+											 the member you want to get the loaded information of.
 
 		Returns:
-			array - If you set the members parameter as an array, you will retrieve an array
-							containing nested arrays, the index of the subarrays being the members id.
-							If a single integer is supplied, then a single array will be returned.
-							However, if the member id supplied has not yet been loaded, the value will be false.
+			array - If you set the members parameter as an array, you will
+							retrieve an array containing nested arrays, the index of the
+							subarrays being the members id. If a single integer is
+							supplied, then a single array will be returned. However, if
+							the member id supplied has not yet been loaded, the value will
+							be false.
 	*/
 	public function get($members)
 	{
+		// If they aren't requesting multiple members we will handle the return
+		// differently -- after all, we will simply do a foreach and call on
+		// this method with a single ID to load up multiple members information.
 		if(!is_array($members))
 		{
 			$members = (int)$members;
@@ -237,22 +245,24 @@ class Members
 
 		Parameters:
 			string $member_name - The login name of the member you want to create.
-			string $member_pass - The unhashed password the member uses to login with.
+			string $member_pass - The unhashed password the member uses to login
+														with.
 			string $member_email - The email of the member.
-			array $options - An optional array containing extra information (such as their
-											 hash, display name, ip, data (member_data table), if none of
-											 these are supplied, the system automatically creates this info.)
+			array $options - An optional array containing extra information (such
+											 as their hash, display name, ip, data (member_data
+											 table), if none of these are supplied, the system
+											 automatically creates this info.)
 
 		Returns:
-			int - Returns an integer if the member was successfully created (which is the new
-						new members ID) or FALSE on failure.
+			int - Returns an integer if the member was successfully created (which
+						is the new new members ID) or true on failure.
 	*/
 	public function add($member_name, $member_pass, $member_email, $options = array())
 	{
 		global $func;
 
 		// Allows a plugin to handle the creation of members themselves ;)
-		// Set the handled parameter to an integer or FALSE, otherwise the
+		// Set the handled parameter to an integer or false, otherwise the
 		// system will handle the creation of the member.
 		$handled = null;
 		api()->run_hooks('members_add', array(&$handled, $member_name, $member_pass, $member_email, $options));
@@ -261,8 +271,8 @@ class Members
 		{
 			$member_name = trim($member_name);
 
-			// Now make sure that the member name and email are allowed, we don't want them to be
-			// in use already, as that would be pretty bad :P
+			// Now make sure that the member name and email are allowed, we don't
+			// want them to be in use already, as that would be pretty bad :P
 			if(!$this->name_allowed($member_name) || !$this->email_allowed($member_email) || !$this->password_allowed($member_name, $member_pass))
 			{
 				return false;
@@ -279,8 +289,9 @@ class Members
 				$options['display_name'] = $member_name;
 			}
 
-			// No member groups assigned? Member it is! (If the member is not an administrator, they
-			// must have at least the member group assigned to them)
+			// No member groups assigned? Member it is! (If the member is not an
+			// administrator, they must have at least the member group assigned to
+			// them)
 			if(isset($options['member_groups']) && is_array($options['member_groups']) && !in_array('administrator', $options['member_groups']) && !in_array('member', $options['member_groups']))
 			{
 				return false;
@@ -290,7 +301,8 @@ class Members
 				$options['member_groups'] = array('member');
 			}
 
-			// Registration time can be manually set, must be greater than 0 though :P
+			// Registration time can be manually set, must be greater than 0
+			// though :P
 			if(isset($options['member_registered']) && $options['member_registered'] <= 0)
 			{
 				return false;
@@ -309,7 +321,8 @@ class Members
 			// Is the member activated?
 			$options['member_activated'] = !empty($options['member_activated']) ? 1 : 0;
 
-			// If the member is not activated, then we will generate an activation code...
+			// If the member is not activated, then we will generate an activation
+			// code...
 			$options['member_acode'] = empty($options['member_activated']) && empty($options['member_acode']) ? sha1($this->rand_str(mt_rand(30, 40))) : (!empty($options['member_acode']) ? $options['member_acode'] : '');
 
 			// Alright! Now insert that member!!!
@@ -353,7 +366,7 @@ class Members
 			}
 		}
 
-		return (string)(int)$handled == (string)$handled ? (int)$handled : false;
+		return (string)$handled == (string)(int)$handled ? (int)$handled : false;
 	}
 
 	/*
@@ -363,12 +376,12 @@ class Members
 
 		Parameters:
 			string $member_name - The member name to check.
-			int $member_id - If there is a certain member which you want to exclude
-											 from your search, give it here ;) Default is 0, which
-											 is to search all members.
+			int $member_id - If there is a certain member which you want to
+											 exclude from your search, give it here ;) Default is
+											 0, which is to search all members.
 
 		Returns:
-			bool - Returns TRUE if the name is allowed, FALSE if not.
+			bool - Returns true if the name is allowed, false if not.
 	*/
 	public function name_allowed($member_name, $member_id = 0)
 	{
@@ -437,22 +450,23 @@ class Members
 			}
 		}
 
-		// Are we still going? Then return the handled value, unless it wasn't modified,
-		// in which case, that means we handled it and we didn't find the name!
+		// Are we still going? Then return the handled value, unless it wasn't
+		// modified, in which case, that means we handled it and we didn't find
+		// the name!
 		return $handled === null ? true : !empty($handled);
 	}
 
 	/*
 		Method: email_allowed
 
-		Checks to see if the specified email is allowed (either the whole address itself,
-		or the domain) and not already taken.
+		Checks to see if the specified email is allowed (either the whole
+		address itself, or the domain) and not already taken.
 
 		Parameters:
 			string $member_email - The email to check.
-			int $member_id - If there is a certain member which you want to exclude
-											 from your search, give it here ;) Default is 0, which
-											 is to search all members.
+			int $member_id - If there is a certain member which you want to
+											 exclude from your search, give it here ;) Default is
+											 0, which is to search all members.
 
 		Returns:
 			bool - Returns true if the email address is allowed, false if not.
@@ -526,12 +540,12 @@ class Members
 		Checks to see if the supplied password is allowed.
 
 		Parameters:
-			string $member_name - The login name of the member you are
-														checking the password of.
+			string $member_name - The login name of the member you are checking
+														the password of.
 			string $member_pass - The password to check.
 
 		Returns:
-			bool - Returns TRUE if the password is allowed, FALSE if not.
+			bool - Returns true if the password is allowed, false if not.
 
 		Note:
 			The supplied password parameter should NOT be hashed, it should
@@ -572,25 +586,30 @@ class Members
 	/*
 		Method: authenticate
 
-		This method takes a login name and a password, and checks to see if the supplied
-		credentials would actually allow the user to login... This could be use for various
-		things, oh, say, someone commenting under a username, but they don't actually want
-		to login to post under their account (you know, like they are in a hurry/in a public
-		place), hint hint ;) or actually verifying the login of a member...
+		This method takes a login name and a password, and checks to see if the
+		supplied credentials would actually allow the user to login... This
+		could be use for various things, oh, say, someone commenting under a
+		username, but they don't actually want to login to post under their
+		account (you know, like they are in a hurry/in a public place), hint
+		hint ;) or actually verifying the login of a member...
 
 		Parameters:
-			string $member_name - The name of the member to check the credentials of.
+			string $member_name - The name of the member to check the credentials
+														of.
 			string $member_pass - The password to attempt to login with.
-			string $pass_hash - This can be either false, which means that the supplied password
-													is not hashed at all (in which case, this method hashes it), it can
-													also be true, which means that the password was hashed in this format:
-													SHA1(LOWER(members name) + members password)
-													or a string that was used to salt the supplied hashed password. That
-													means that the members password hashed in this format:
-													SHA1(SHA1(LOWER(members name) + members password) + password hash).
+			string $pass_hash - This can be either false, which means that the
+													supplied password is not hashed at all (in which
+													case, this method hashes it), it can also be true,
+													which means that the password was hashed in this
+													format: SHA1(LOWER(members name) + members
+													password) or a string that was used to salt the
+													supplied hashed password. That means that the
+													members password hashed in this format:
+													SHA1(SHA1(LOWER(members name) + members password)
+													+ password hash).
 
 		Returns:
-			bool - Returns TRUE if the credentials were correct, FALSE on failure.
+			bool - Returns true if the credentials were correct, false on failure.
 	*/
 	public function authenticate($member_name, $member_pass, $pass_hash = false)
 	{
@@ -625,7 +644,8 @@ class Members
 			// Did we get anything?
 			if($result->num_rows() > 0)
 			{
-				// Sure, we may have gotten a result, but that doesn't mean their password is right :P
+				// Sure, we may have gotten a result, but that doesn't mean their
+				// password is right :P
 				$row = $result->fetch_assoc();
 
 				// So let's check
@@ -663,12 +683,14 @@ class Members
 										1 and 100 is used.
 
 		Returns:
-			string - Returns the randomly (pseudo-random, of course, because we all know,
-							 computers can't really make true random stuff ;)) generated string.
+			string - Returns the randomly (pseudo-random, of course, because we
+							 all know, computers can't really make true random stuff ;))
+							 generated string.
 	*/
 	public function rand_str($length = 0)
 	{
-		// If for some very strange, unknown reason you want to do a random string, be my guest!
+		// If for some very strange, unknown reason you want to do a random
+		// string, be my guest!
 		$handled = null;
 		$str = '';
 		api()->run_hooks('members_rand_str', array(&$handled, &$length, &$str));
@@ -868,20 +890,27 @@ class Members
 					$data['member_groups'] = $member_groups;
 				}
 
-				// Now we need to hash the password, maybe!
+				// Now we need to hash the password, maybe! They're user name must
+				// be supplied, because we salt their password with their user name.
 				if(!empty($options['member_name']) && !empty($options['member_pass']))
 				{
 					$data['member_pass'] = sha1($func['strtolower']($options['member_name']). $options['member_pass']);
 				}
+				// If they didn't supply a user name but they did supply a password
+				// then we can't continue... Sorry!
 				elseif(empty($options['admin_override']) && ((!empty($options['member_name']) && empty($options['member_pass'])) || (empty($options['member_name']) && !empty($options['member_pass']))))
 				{
 					return false;
 				}
-				elseif(!empty($options['admin_override']))
+				// However, if admin_override has been invoked then we will simply
+				// ignore the fact that their user name was not supplied. In order
+				// to get passed that hurdle we must then start the password reset
+				// process on the account.
+				elseif(!empty($options['admin_override']) && !empty($options['member_name']))
 				{
-					// !!! TODO: Do it right!
-					$data['member_acode'] = empty($data['member_acode']) ? sha1($this->rand_str(mt_rand(30, 40))) : $data['member_acode'];
-					$data['member_activated'] = 11;
+					// Yup, invoke that password reset... Once we make sure the update
+					// actually takes effect.
+					$invoke_pwreset = true;
 				}
 
 				// Can't be a bool, the database wants an integer! Easy fix, though!
@@ -913,6 +942,15 @@ class Members
 						$db_vars, 'members_update_query');
 
 					$handled = $result->success();
+
+					// We may need to invoke the password reset process on this
+					// account.
+					if($handled && !empty($invoke_pwreset))
+					{
+						require_once(coredir. '/forgotpw.php');
+
+						forgotpw_invoke($member_id, true);
+					}
 				}
 
 				// Changing member data? But only if the other options were
