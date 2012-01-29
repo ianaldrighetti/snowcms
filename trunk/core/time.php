@@ -101,7 +101,7 @@ if(!function_exists('timeformat'))
 		$timestamp = api()->apply_filters('timeformat_timestamp', $timestamp);
 
 		// Do you want that fancy Today at or Yesterday at stuff? : )
-		if(!empty($today_yesterday))
+		if(!empty($today_yesterday) && $timestamp + 172800 >= time_utc())
 		{
 			// We need to get the current time.
 			$cur_time = api()->apply_filters('timeformat_timestamp', time_utc());
