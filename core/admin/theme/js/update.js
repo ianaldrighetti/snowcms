@@ -238,7 +238,6 @@ function update_downloaded(data)
 
 		s.id('update-box').appendChild(p);
 
-		// Maybe you would like to try again?
 		var cancelUpdate = document.createElement('button');
 		cancelUpdate.innerHTML = l['cancel_update'];
 		cancelUpdate.onclick = function()
@@ -283,9 +282,161 @@ function update_cancel_finished(data)
 */
 function verify_download_start()
 {
-	alert('Not yet implemented!!! Cancelling update process.');
+	percentage('overall', 33);
+	showStepProgress(false);
+	empty_update_box();
+	flash_problem(false);
+	set_message('overall', l['verifying']);
 
-	s.ajaxCallback(baseurl + '/update.php?action=cancel', update_cancel_finished, 'update_key=' + s.encode(update_key));
+	s.ajaxCallback(baseurl + '/update.php?action=verify', download_verified, 'update_key=' + s.encode(update_key));
+}
+
+/*
+	Function: download_verified
+*/
+function download_verified(data)
+{
+	var response = s.json(data);
+
+	// If the update package was verified, then we can go ahead and move on to
+	// the next step.
+	if(response['verified'])
+	{
+		extract_update_start();
+	}
+	else
+	{
+		empty_update_box();
+		flash_problem(true);
+
+		var h3 = document.createElement('h3');
+		h3.innerHTML = l['verify_error_header'];
+
+		s.id('update-box').appendChild(h3);
+		s.id('update-box').style.display = 'block';
+
+		var p = document.createElement('p');
+		p.innerHTML = l['verify_error_' + response['error_code']];
+
+		s.id('update-box').appendChild(p);
+
+		// Just give up, perhaps?
+		var cancelUpdate = document.createElement('button');
+		cancelUpdate.innerHTML = l['cancel_update'];
+		cancelUpdate.onclick = function()
+			{
+				// We will need to send a message to the update system to cancel
+				// everything.
+				set_message(l['cancelling']);
+				percentage('overall', 0);
+				flash_problem(false);
+
+				s.ajaxCallback(baseurl + '/update.php?action=cancel', update_cancel_finished, 'update_key=' + s.encode(update_key));
+			};
+
+		// If we got an error code of 1, that means the checksum couldn't be
+		// downloaded, so you can try to do it over again.
+		if(response['error_code'] == 1)
+		{
+			var downloadAgain = document.createElement('button');
+			downloadAgain.innerHTML = l['verify_again'];
+			downloadAgain.onclick = function()
+				{
+					// Just restart the process.
+					verify_download_start();
+				};
+		}
+		// Otherwise there is a problem with the file we downloaded earlier.
+		else
+		{
+			var downloadAgain = document.createElement('button');
+			downloadAgain.innerHTML = l['download_again'];
+			downloadAgain.onclick = function()
+				{
+					// Just restart the process.
+					download_update_start();
+				};
+		}
+
+		p = document.createElement('p');
+		p.appendChild(cancelUpdate);
+		p.appendChild(downloadAgain);
+		p.style.textAlign = 'right';
+
+		s.id('update-box').appendChild(p);
+	}
+}
+
+/*
+	Function: extract_update_start
+*/
+function extract_update_start()
+{
+	percentage('overall', 50);
+	showStepProgress(false);
+	empty_update_box();
+	flash_problem(false);
+	set_message('overall', l['extracting']);
+
+	s.ajaxCallback(baseurl + '/update.php?action=extract', update_extracted, 'update_key=' + s.encode(update_key));
+}
+
+/*
+	Function: update_extracted
+*/
+function update_extracted(data)
+{
+	var response = s.json(data);
+
+	if(response['extracted'])
+	{
+		copy_files_start();
+	}
+	else
+	{
+		empty_update_box();
+		flash_problem(true);
+
+		var h3 = document.createElement('h3');
+		h3.innerHTML = l['extract_error_header'];
+
+		s.id('update-box').appendChild(h3);
+		s.id('update-box').style.display = 'block';
+
+		var p = document.createElement('p');
+		p.innerHTML = l['extract_error_' + response['error_code']];
+
+		s.id('update-box').appendChild(p);
+
+		// Just give up, perhaps?
+		var cancelUpdate = document.createElement('button');
+		cancelUpdate.innerHTML = l['cancel_update'];
+		cancelUpdate.onclick = function()
+			{
+				// We will need to send a message to the update system to cancel
+				// everything.
+				set_message(l['cancelling']);
+				percentage('overall', 0);
+				flash_problem(false);
+
+				s.ajaxCallback(baseurl + '/update.php?action=cancel', update_cancel_finished, 'update_key=' + s.encode(update_key));
+			};
+
+		var extractAgain = document.createElement('button');
+		extractAgain.innerHTML = l['extract_again'];
+		extractAgain.onclick = function()
+			{
+				// Just restart the process.
+				extract_update_start();
+			};
+
+		p = document.createElement('p');
+		p.appendChild(cancelUpdate);
+		p.appendChild(extractAgain);
+		p.style.textAlign = 'right';
+
+		s.id('update-box').appendChild(p);
+	}
 }
 
 s.onload(function()

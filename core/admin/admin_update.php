@@ -216,8 +216,20 @@ if(!function_exists('admin_update_apply'))
 																 'download_error_header' => l('Download Failed'),
 																 'download_error_message' => l('The update file could not be downloaded from the SnowCMS update service. Please make sure that your system has either fsockopen or cURL enabled, and make sure that the SnowCMS website is up. You can always try again later.'),
 																 'cancelling' => l('Please wait... Cancelling.'),
-																 'download_again' => l('Try Again &raquo;'),
+																 'download_again' => l('Download Again &raquo;'),
 																 'cancel_update' => l('Cancel Update'),
+																 'verifying' => l('Verifying Update Integrity'),
+																 'verify_error_header' => l('Update Integrity Issue'),
+																 'verify_error_1' => l('The checksum could not be downloaded from the SnowCMS update service.'),
+																 'verify_error_2' => l('The update package downloaded from the SnowCMS update service appears to be corrupt.'),
+																 'verify_error_3' => l('The update package is in an unknown format and cannot be extracted.'),
+																 'verify_again' => l('Verify Again &raquo;'),
+																 'extracting' => l('Extracting File Information from Package'),
+																 'extract_error_header' => l('Extraction Issue'),
+																 'extract_error_1' => l('The system does not have write permission to the base, <em>/core/</em>, or <em>/themes/</em> directory. Please make sure that the permissions allow the PHP process to have write access and try again.'),
+																 'extract_error_2' => l('A temporary index file for extraction information could not be created, please make sure that the base directory is writable.'),
+																 'extract_error_3' => l('An error occurred which prevented the system from reading the update package&#039;s file information.'),
+																 'extract_again' => l('Try Again &raquo;'),
 															 ));
 
 			api()->context['version'] = $version;
