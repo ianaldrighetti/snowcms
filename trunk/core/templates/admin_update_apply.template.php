@@ -52,7 +52,7 @@ if(!defined('INSNOW'))
 
 /*			// Man, that Update class is awesome, isn't it?!
 
-Plugin/Theme Compat Check | Downloading update | Verifying Update | Extracting Update | Copying Files | Applying Update | Completed
+Plugin/Theme Compat Check | Downloading update | Verifying Update | Extracting File Information | Copying Files | Applying Update | Completed
 
 			$update = api()->load_class('Update');
 
