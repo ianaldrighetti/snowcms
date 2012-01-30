@@ -1,6 +1,6 @@
 a { text-decoration: none; color: #3465A7; }
 a:hover { text-decoration: underline; }
-input, textarea, option, select { font: 13px Verdana, Tahoma, Arial, sans-serif; }
+input, textarea, option, select, button { font: 13px Verdana, Tahoma, Arial, sans-serif; }
 fieldset, img { border: 0; }
 
 body

@@ -66,6 +66,7 @@ if(!function_exists('admin_prepend'))
 		theme()->add_js_file(array('src' => theme()->url(). '/js/notifications.js'));
 		theme()->add_js_var('notificationTitle', l('Notificiations'));
 		theme()->add_js_var('base_url', baseurl);
+		theme()->add_js_var('baseurl', baseurl);
 		theme()->add_js_var('session_id', member()->session_id());
 		theme()->add_link(array('rel' => 'stylesheet', 'type' => 'text/css', 'href' => theme()->url(). '/style/main.css'));
 

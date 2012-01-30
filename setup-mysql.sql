@@ -138,7 +138,7 @@ CREATE TABLE `{db->prefix}plugins`
 CREATE TABLE `{db->prefix}settings`
 (
 	`variable` VARCHAR(255) NOT NULL,
-	`type` VARCHAR(30) NOT NULL 'string',
+	`type` VARCHAR(30) NOT NULL DEFAULT 'string',
 	`value` TEXT NOT NULL,
 	PRIMARY KEY (`variable`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;

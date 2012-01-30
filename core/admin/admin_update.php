@@ -80,6 +80,41 @@ if(!function_exists('admin_update'))
 			$latest_info['message'] = l('There is no update available for your version of SnowCMS.');
 		}
 
+		// Do they want to start the update process? That's great! But why don't
+		// we make sure that there is a need to do so.
+		if(isset($_GET['start']) && $latest_version !== false && compare_versions($latest_version, settings()->get('version', 'string'), '>'))
+		{
+			verify_request('get');
+
+			// During the update process the entire site will be, technically,
+			// taken offline. This means that the the session of the user updating
+			// the SnowCMS system could time out, which would be bad. So in order
+			// to get passed that hurdle we will assign an update key, and anyone
+			// with that key can apply the update.
+			// We will generate the key using the rand_str method within the
+			// Members class.
+			$members = api()->load_class('Members');
+
+			$update_key = $members->rand_str(mt_rand(64, 128));
+
+			// We will need to save this key to a safe, but accessible, location.
+			$fp = fopen(basedir. '/update-key.php', 'w');
+
+			if(!empty($fp))
+			{
+				// No one should be able to see this.
+				fwrite($fp, '<?php die; ?>'. $update_key);
+				fclose($fp);
+
+				// Now redirect!
+				redirect(baseurl. '/index.php?action=admin&sa=update&apply='. urlencode($update_key));
+			}
+			else
+			{
+				api()->context['start_update_failure'] = true;
+			}
+		}
+
 		admin_current_area('system_update');
 
 		theme()->set_title(l('Update'));
@@ -111,7 +146,7 @@ if(!function_exists('admin_update_apply'))
 	*/
 	function admin_update_apply()
 	{
-		$version = $_GET['apply'];
+		$apply_key = $_GET['apply'];
 
 		api()->run_hooks('admin_update_system');
 
@@ -120,25 +155,37 @@ if(!function_exists('admin_update_apply'))
 			admin_access_denied();
 		}
 
-		$version = basename($version);
-
 		admin_current_area('system_update');
 
-		// Verify your session id.
-		verify_request('get');
+		// Why don't we see if the update keys match.
+		$update_key = false;
+		if(file_exists(basedir. '/update-key.php'))
+		{
+			$fp = fopen(basedir. '/update-key.php', 'r');
 
-		// !!! TODO: Make sure $version is a number.
+			// Seek passed all the junk (the security junk, that is ;-)).
+			fseek($fp, 13);
 
-		// Do we not need to apply an update?
-		if(compare_versions(settings()->get('version', 'string', null), $version) > -1)
+			// Then read what is left of the file, which is our update key.
+			$update_key = fread($fp, filesize(basedir. '/update-key.php') - 13);
+
+			fclose($fp);
+		}
+
+		// Let's make sure that they started the update process in the first
+		// place.
+		if($update_key === false || strlen($apply_key) == 0 || $apply_key != $update_key)
 		{
 			theme()->set_title(l('An error has occurred'));
 
-			theme()->header();
+			api()->context['error_title'] = '<img src="'. theme()->url(). '/style/images/update-small.png" alt="" /> '. l('Invalid Update Key');
+			api()->context['error_message'] = l('Sorry, but your update key was invalid. <a href="%s">Back to system update</a>.', baseurl. '/index.php?action=admin&amp;sa=update');
 
-			echo '
-	<h1><img src="', theme()->url(), '/update-small.png" alt="" /> ', l('No update required'), '</h1>
-	<p>', l('No update needs to be applied at this time. <a href="%s">Back to system update</a>.', baseurl. '/index.php?action=admin&amp;sa=update'), '</p>';
+			theme()->render('error');
+		}
+		elseif(($version = admin_latest_version()) !== false && compare_versions(settings()->get('version', 'string', null), $version, '>'))
+		{
+			theme()->set_title(l('An error has occurred'));
 
 			api()->context['error_title'] = '<img src="'. theme()->url(). '/style/images/update-small.png" alt="" /> '. l('No update required');
 			api()->context['error_message'] = l('No update needs to be applied at this time. <a href="%s">Back to system update</a>.', baseurl. '/index.php?action=admin&amp;sa=update');
@@ -148,6 +195,30 @@ if(!function_exists('admin_update_apply'))
 		else
 		{
 			theme()->set_title(l('Applying Update'));
+
+			// We have a few resources we will require while the update process
+			// chugs along.
+			theme()->add_link(array('rel' => 'stylesheet', 'type' => 'text/css', 'href' => theme()->url(). '/style/update.css'));
+			theme()->add_js_file(array('src' => theme()->url(). '/js/update.js'));
+			theme()->add_js_var('update_key', $update_key);
+			theme()->add_js_var('l', array(
+																 'compatibility' => l('Checking Plugin and Theme Compatibility'),
+																 'compat_error_header' => l('Compatibility Issues Found'),
+																 'compat_error_message' => l('There are some plugins or themes which may cause compatibility issues when the system has been updated to v%s. If there are any updates available for the components it is recommended you install those updates first then come back and try installing the system update again. Otherwise, you can simply ignore these warnings and continue anyways.', $version),
+																 'compat_plugin_header' => l('Incompatible Plugins'),
+																 'compat_theme_header' => l('Incompatible Theme'),
+																 'available' => l('available'),
+																 'no_update_available' => l('No update available'),
+																 'check_compat_again' => l('Recheck Compatibility'),
+																 'compat_ignore_warnings' => l('Continue with Update &raquo;'),
+																 'compat_ignore_confirm' => l('Are you sure you want to continue with the update even though some plugins or themes may not be compatible?'. "\r\n". 'Proceed at your own risk.'),
+																 'downloading' => l('Downloading Update'),
+																 'download_error_header' => l('Download Failed'),
+																 'download_error_message' => l('The update file could not be downloaded from the SnowCMS update service. Please make sure that your system has either fsockopen or cURL enabled, and make sure that the SnowCMS website is up. You can always try again later.'),
+																 'cancelling' => l('Please wait... Cancelling.'),
+																 'download_again' => l('Try Again &raquo;'),
+																 'cancel_update' => l('Cancel Update'),
+															 ));
 
 			api()->context['version'] = $version;
 
@@ -177,13 +248,13 @@ function admin_update_check($force_check = false)
 {
 	if(!empty($force_check) || (settings()->get('system_last_update_check', 'int', 0) + settings()->get('system_update_interval', 'int', 3600)) < time_utc())
 	{
-		$http = api()->load_class('HTTP');
-
 		// Let's get the latest version of SnowCMS.
-		$latest_version = $http->request(api()->apply_filters('admin_update_version_url', 'http://download.snowcms.com/updates/latest-version.php'), array('version' => settings()->get('version', 'string')));
+		$latest_version = admin_latest_version();
 
 		if(!empty($latest_version))
 		{
+			$http = api()->load_class('HTTP');
+
 			// Now the information about the current version you are running.
 			$latest_info = $http->request(api()->apply_filters('admin_update_version_url', 'http://download.snowcms.com/updates/latest-version.php'), array('version' => settings()->get('version', 'string'), 'news' => 'true'));
 
@@ -212,5 +283,27 @@ function admin_update_check($force_check = false)
 
 		settings()->set('system_latest_version', $latest_version);
 	}
+}
+
+/*
+	Function: admin_latest_version
+
+	Fetches the latest version of SnowCMS available, for this system to update
+	to, that is.
+
+	Parameters:
+		none
+
+	Returns:
+		string - Returns the latest version of SnowCMS available, or false if
+						 download.snowcms.com could not be accessed.
+*/
+function admin_latest_version()
+{
+	// I love you, HTTP class!
+	$http = api()->load_class('HTTP');
+
+	// Just make the request, and return the data we fetched.
+	return $http->request(api()->apply_filters('admin_update_version_url', 'http://download.snowcms.com/updates/latest-version.php'), array('version' => settings()->get('version', 'string')));
 }
 ?>

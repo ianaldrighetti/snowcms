@@ -23,12 +23,37 @@ if(!defined('INSNOW'))
 }
 
 			echo '
-	<h1><img src="', theme()->url(), '/style/images/update-small.png" alt="" /> ', l('Applying Update v%s', api()->context['version']), '</h1>
-	<p>', l('Please wait while SnowCMS applies the system update.'), '</p>
+	<h3><img src="', theme()->url(), '/style/images/update-small.png" alt="" /> ', l('Applying Update v%s', api()->context['version']), '</h3>
+	<p>', l('Please wait while SnowCMS applies the system update. The website will be put into maintenance mode until the update process has completed.'), '</p>
+	<p>', l('<strong>Warning:</strong> Do <em>not</em> close this window until the update process has completed, otherwise the update may not be properly applied resulting in possible damage to your website.'), '</p>
 
-	<h3>Downloading the update</h3>';
+	<h3>', l('Update Progress'), '</h3>
 
-			// Man, that Update class is awesome, isn't it?!
+	<div class="update-progress-bar-box" style="margin-top: 10px;">
+		<div class="update-progress-bar-fill" id="update-overall" style="width: 0%;">
+		</div>
+		<div class="update-progress-message">
+			<p id="update-overall-message">', l('Loading...'), '</p>
+		</div>
+		<div id="overall-underlay" class="update-progress-underlay" style="visibility: hidden;">
+		</div>
+	</div>
+	<div class="update-progress-bar-box" style="margin-top: 15px; visibility: hidden;">
+		<div class="update-progress-bar-fill" id="update-step" style="width: 0%;">
+		</div>
+		<div class="update-progress-message">
+			<p id="update-step-message">0%</p>
+		</div>
+		<div class="update-progress-underlay" style="visibility: hidden;">
+		</div>
+	</div>
+	<div id="update-box" style="display: none;">
+	</div>';
+
+/*			// Man, that Update class is awesome, isn't it?!
+
+Plugin/Theme Compat Check | Downloading update | Verifying Update | Extracting Update | Copying Files | Applying Update | Completed
+
 			$update = api()->load_class('Update');
 
 			// We will download the gzip package, if the system will allow it.
@@ -123,5 +148,5 @@ if(!defined('INSNOW'))
 		<p class="green">', l('You have been successfully updated to v%s. <a href="%s">Go to the control panel</a>.', settings()->get('version', 'string'), baseurl. '/index.php?action=admin'), '</p>';
 					}
 				}
-			}
+			}*/
 ?>

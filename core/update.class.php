@@ -26,7 +26,8 @@ if(!defined('INSNOW'))
 	Class: Update
 
 	The Update class facilitates the means for you guessed it, updating files,
-	such as updating the SnowCMS system in its entirety, or a plugin.
+	such as updating the SnowCMS system in its entirety, or a plugin (though
+	the <Component> class is more apt to doing that).
 */
 class Update
 {
@@ -54,7 +55,7 @@ class Update
 	*/
 	public function set_filename($filename)
 	{
-		if(!file_exists($filename) || !is_file($filename))
+		if(!is_file($filename))
 		{
 			return false;
 		}

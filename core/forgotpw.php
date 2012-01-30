@@ -321,7 +321,7 @@ if(!function_exists('forgotpw_view2'))
 													 'callback' => create_function('$name, $value, &$error', '
 																					 $members = api()->load_class(\'Members\');
 
-																					 if($value != $_POST[\'verify_password\'])
+																					 if(!isset($_POST[\'verify_password\']) || $value != $_POST[\'verify_password\'])
 																					 {
 																						 $error = l(\'The passwords you supplied did not match.\');
 
