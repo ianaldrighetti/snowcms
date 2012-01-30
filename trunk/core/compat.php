@@ -511,9 +511,13 @@ function is_compatible($versions, $version = null)
 {
 	// Was a version supplied? If not, we will use the current version of
 	// SnowCMS.
-	if(empty($version))
+	if(empty($version) && function_exists('settings'))
 	{
 		$version = settings()->get('version', 'string');
+	}
+	elseif(empty($version))
+	{
+		return null;
 	}
 
 	// Did you really give us a string?

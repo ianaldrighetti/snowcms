@@ -629,7 +629,7 @@ if(!function_exists('admin_themes_check_updates'))
 				$post_data = array('requesttype' => 'updatecheck', 'version' => $theme_info['version']);
 
 				// Want to add some sort of update key or something?
-				if($func['strlen'](api()->apply_filters(sha1($theme_info['directory']). '_updatekey', '') > 0))
+				if($func['strlen'](api()->apply_filters(sha1($theme_info['directory']). '_updatekey', '')) > 0)
 				{
 					$post_data['updatekey'] = api()->apply_filters(sha1($theme_info['directory']). '_updatekey', '');
 				}

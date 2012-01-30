@@ -17,6 +17,13 @@
 //                       File version: SnowCMS 2.0                        //
 ////////////////////////////////////////////////////////////////////////////
 
+// We may want to throw the site into maintenance mode... If the
+// update-to.php file exists, that means an update is going on!
+if(file_exists('update-to.php'))
+{
+	die('<!DOCTYPE html><html><head><title>Maintenance Mode</title></head><body><h1>Maintenance Mode Enabled</h1><p>Sorry about the inconvience, but this site is currently in maintenance mode &ndash; the administrator is probably updating the system. We&#039;ll be back shortly!</p><p>If you are an administrator and are still receiving this message after the update is complete, delete the <em>update-to.php</em> file in the base directory.</p></body></html>');
+}
+
 define('STARTTIME', microtime(true), true);
 
 // Magic quotes, what a joke!!!
@@ -66,6 +73,8 @@ require(coredir. '/errors.php');
 // Even though plugins can't overload this function, they can hook into it.
 set_error_handler('errors_handler');
 
+require(coredir. '/compat.php');
+
 // Now that our database is loaded up, let's get the API started, very important you know?
 require(coredir. '/api.class.php');
 
@@ -87,7 +96,6 @@ require(coredir. '/func.php');
 // Initialize the $func array.
 init_func();
 
-require(coredir. '/compat.php');
 require(coredir. '/clean_request.php');
 
 // We need to filter out some baaaad stuff, like any register_globals issues and other security things.

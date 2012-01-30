@@ -146,7 +146,7 @@ class Typecast
 	*/
 	public function type_exists($name)
 	{
-		return !empty($name) && isset($this->types[strtolower($name)]);
+		return !empty($name) && is_string($name) && isset($this->types[strtolower($name)]);
 	}
 
 	/*

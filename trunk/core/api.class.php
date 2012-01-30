@@ -1465,6 +1465,7 @@ class API
 
 		// Simply add the guid ;)
 		$this->plugins[] = strtolower($guid);
+
 		return true;
 	}
 
@@ -1492,6 +1493,7 @@ class API
 			if($name == strtolower($guid))
 			{
 				unset($this->plugins[$key]);
+
 				return true;
 			}
 		}
@@ -1520,6 +1522,24 @@ class API
 		}
 
 		return in_array(strtolower($guid), $this->plugins);
+	}
+
+	/*
+		Method: return_plugins
+
+		Returns an array of the plugin GUID's which are currently enabled and
+		have been loaded.
+
+		Parameters:
+			none
+
+		Returns:
+			array - Returns an array containing the GUID's of all the enabled
+							plugins.
+	*/
+	public function return_plugins()
+	{
+		return $this->plugins;
 	}
 
 	/*
@@ -1788,7 +1808,7 @@ function load_api()
 				// Well well, load the plugin!
 				require_once($plugin);
 
-				$plugin_info = plugin_load(plugindir. '/'. $directory);
+				$plugin_info = plugin_load(dirname($plugin));
 
 				// The plugin is now enabled :-)
 				api()->add_plugin($plugin_info['guid']);

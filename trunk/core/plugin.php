@@ -213,7 +213,8 @@ function plugin_get_info($filename)
 	Finds and returns an array containing plugins in the plugin directory.
 
 	Parameters:
-		none
+		bool $force_reload - Whether to forcibly reload the currently installed
+												 plugins by rescanning the plugin directory.
 
 	Returns:
 		array - Returns an array containing all the current plugin paths, false
@@ -223,12 +224,19 @@ function plugin_get_info($filename)
 		In order for a plugin to be detected, the plugins directory must contain
 		a plugin.xml and plugin.php file.
 */
-function plugin_list()
+function plugin_list($force_reload = false)
 {
+	static $list_cache = null;
+
 	// Does the plugin directory not exist for some strange reason?
 	if(!defined('plugindir') || !file_exists(plugindir) || !is_dir(plugindir))
 	{
 		return false;
+	}
+	// No point on loading this over and over again if we don't need to.
+	elseif(empty($force_reload) && $list_cache !== null)
+	{
+		return $list_cache;
 	}
 
 	// Scan the plugins directory.
@@ -251,6 +259,9 @@ function plugin_list()
 			$list[] = realpath(plugindir. '/'. $file);
 		}
 	}
+
+	// Store that in our 'cache.'
+	$list_cache = $list;
 
 	// Return the list, whether or not there are any.
 	return $list;

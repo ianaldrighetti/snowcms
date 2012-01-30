@@ -610,7 +610,7 @@ if(!function_exists('admin_plugins_check_updates'))
 				$post_data = array('requesttype' => 'updatecheck', 'version' => $plugin_info['version']);
 
 				// Want to add some sort of update key or something?
-				if($func['strlen'](api()->apply_filters(sha1($plugin_info['directory']). '_updatekey', '') > 0))
+				if($func['strlen'](api()->apply_filters(sha1($plugin_info['directory']). '_updatekey', '')) > 0)
 				{
 					$post_data['updatekey'] = api()->apply_filters(sha1($plugin_info['directory']). '_updatekey', '');
 				}
@@ -630,8 +630,8 @@ if(!function_exists('admin_plugins_check_updates'))
 				// Is this version actually newer? Save it!
 				if(compare_versions($request, $plugin_info['version'], '>') && !isset($plugin_updates[basename($plugin_info['directory'])]))
 				{
-					// The GUID will be the index and the value will be the version
-					// available.
+					// The directory name will be the index and the value will be the
+					// version available.
 					$plugin_updates[basename($plugin_info['directory'])] = $request;
 				}
 			}
