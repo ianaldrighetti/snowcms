@@ -25,7 +25,7 @@ function percentage(which, value)
 
 function showStepProgress(enabled)
 {
-	s.id('update-step').style.visibility = enabled ? 'visible' : 'hidden';
+	s.id('update-step-container').style.visibility = enabled ? 'visible' : 'hidden';
 }
 
 function set_message(which, value)
@@ -190,6 +190,10 @@ function compat_checked(data)
 		p.style.textAlign = 'right';
 
 		s.id('update-box').appendChild(p);
+	}
+	else
+	{
+		download_update_start();
 	}
 }
 
@@ -437,6 +441,120 @@ function update_extracted(data)
 
 		s.id('update-box').appendChild(p);
 	}
+}
+
+/*
+	Function: copy_files_start
+*/
+function copy_files_start()
+{
+	percentage('overall', 67);
+	showStepProgress(true);
+	empty_update_box();
+	flash_problem(false);
+	set_message('overall', l['copying']);
+
+	s.ajaxCallback(baseurl + '/update.php?action=copy', copy_file_done, 'update_key=' + s.encode(update_key) + '&start=0');
+}
+
+/*
+	Function: copy_file_done
+*/
+function copy_file_done(data)
+{
+	var response = s.json(data);
+
+	if(response['finished'])
+	{
+		percentage('step', 100);
+		set_message('step', '100%');
+
+		apply_update_start();
+	}
+	else
+	{
+		percentage('overall', 67 + Math.ceil(16 * (response['percent_finished'] / 100)));
+		percentage('step', response['percent_finished']);
+		set_message('step', response['percent_finished'].toString() + '%');
+
+		s.ajaxCallback(baseurl + '/update.php?action=copy&t=' + (new Date).getTime(), copy_file_done, 'update_key=' + s.encode(update_key) + '&start=' + response['offset']);
+	}
+}
+
+/*
+	Function: apply_update_start
+*/
+function apply_update_start()
+{
+	percentage('overall', 83);
+	showStepProgress(false);
+	empty_update_box();
+	flash_problem(false);
+	set_message('overall', l['applying']);
+
+	s.ajaxCallback(baseurl + '/update.php?action=apply', applying_update, 'update_key=' + s.encode(update_key));
+}
+
+/*
+	Function: applying_update
+*/
+function applying_update(data)
+{
+	var response = s.json(data);
+
+	if(response['finished'])
+	{
+		update_completed();
+	}
+	else
+	{
+		if(response['percent_finished'] != false)
+		{
+			showStepProgress(true);
+			percentage('overall', 83 + Math.ceil(17 * (response['percent_finished'] / 100)));
+			percentage('step', response['percent_finished']);
+			set_message('step', response['percent_finished'].toString() + '%');
+		}
+
+		s.ajaxCallback(baseurl + '/update.php?action=apply', applying_update, 'update_key=' + s.encode(update_key) + '&state=' + s.encode(response['state']));
+	}
+}
+
+/*
+	Function: update_completed
+*/
+function update_completed()
+{
+	percentage('overall', 100);
+	showStepProgress(false);
+	empty_update_box();
+	flash_problem(false);
+	set_message('overall', l['completed']);
+
+	var h3 = document.createElement('h3');
+	h3.innerHTML = l['completed_header'];
+
+	s.id('update-box').appendChild(h3);
+	s.id('update-box').style.display = 'block';
+
+	var p = document.createElement('p');
+	p.innerHTML = l['completed_message'];
+
+	s.id('update-box').appendChild(p);
+
+	// Time to go back!
+	var back = document.createElement('button');
+	back.innerHTML = l['completed_button'];
+	back.onclick = function()
+		{
+			location.href = baseurl + '/index.php?action=admin&sa=update';
+		};
+
+	p = document.createElement('p');
+	p.appendChild(back);
+	p.style.textAlign = 'right';
+
+	s.id('update-box').appendChild(p);
 }
 
 s.onload(function()

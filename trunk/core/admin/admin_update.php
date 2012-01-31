@@ -224,12 +224,18 @@ if(!function_exists('admin_update_apply'))
 																 'verify_error_2' => l('The update package downloaded from the SnowCMS update service appears to be corrupt.'),
 																 'verify_error_3' => l('The update package is in an unknown format and cannot be extracted.'),
 																 'verify_again' => l('Verify Again &raquo;'),
-																 'extracting' => l('Extracting File Information from Package'),
+																 'extracting' => l('Extracting File Information'),
 																 'extract_error_header' => l('Extraction Issue'),
 																 'extract_error_1' => l('The system does not have write permission to the base, <em>/core/</em>, or <em>/themes/</em> directory. Please make sure that the permissions allow the PHP process to have write access and try again.'),
 																 'extract_error_2' => l('A temporary index file for extraction information could not be created, please make sure that the base directory is writable.'),
 																 'extract_error_3' => l('An error occurred which prevented the system from reading the update package&#039;s file information.'),
 																 'extract_again' => l('Try Again &raquo;'),
+																 'copying' => l('Copying Files'),
+																 'applying' => l('Applying Update'),
+																 'completed' => l('Update Completed'),
+																 'completed_header' => l('Update Completed'),
+																 'completed_message' => l('The system has been successfully updated to v%s.', $version),
+																 'completed_button' => l('Back to Update Center &raquo;'),
 															 ));
 
 			api()->context['version'] = $version;

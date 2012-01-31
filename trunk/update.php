@@ -142,6 +142,8 @@ function update_func()
 							 'cancel' => 'update_cancel',
 							 'verify' => 'update_verify',
 							 'extract' => 'update_extract',
+							 'copy' => 'update_copy',
+							 'apply' => 'update_apply',
 						 );
 
 	if(empty($_GET['action']) || !isset($actions[$_GET['action']]))
@@ -396,12 +398,13 @@ function update_download()
 	the current process.
 
 	Parameters:
-		none
+		bool $silent - Whether the function should display true and exit after
+									 this function is called.
 
 	Returns:
 		void - Nothing is returned by this function.
 */
-function update_cancel()
+function update_cancel($silent = false)
 {
 	// We definitely need to delete the update-key.php and update-to.php
 	// files. But first we should see if there is any downloaded file that
@@ -424,9 +427,13 @@ function update_cancel()
 	// Now for those other two.
 	@unlink(basedir. '/update-key.php');
 	@unlink(basedir. '/update-to.php');
+	@unlink(basedir. '/package-info.dat');
 
-	echo json_encode(true);
-	exit;
+	if(empty($silent))
+	{
+		echo json_encode(true);
+		exit;
+	}
 }
 
 /*
@@ -557,14 +564,225 @@ function update_extract()
 	}
 
 	// Looks like we're good to go!
-	// !!! TODO:
+	// We will want to move through this all as quickly as possible, so we
+	// will make a little (not exactly) index.
+	fwrite($fp, pack('V', count($files)));
 
-	// Delete the update package, we don't need it anymore.
-	@unlink(basedir. '/'. $filename);
+	// The start position won't be 0, not exactly. The first 4 bytes contains
+	// an unsigned integer telling us how many files there are, then there are
+	// {n} 32-bit unsigned integers.
+	$position = (count($files) * 4) + 4;
+	foreach($files as $file)
+	{
+		// Save the current position within the file.
+		fwrite($fp, pack('V', $position));
+
+		// The next file will start after this:
+		// (as a note, there will be a prepended character [f or d] to indicate
+		// whether the name is a file or directory, and before that there is a
+		// 16-bit unsigned integer which tells us how long the name is)
+		$position += strlen($file['name']) + 3;
+	}
+
+	// Now for the information itself.
+	foreach($files as $file)
+	{
+		fwrite($fp, pack('v', strlen($file['name'])). ($file['is_dir'] ? 'd' : 'f'). $file['name']);
+	}
+
+	// Unlock the file, close it, and then we're done with this step.
+	flock($fp, LOCK_UN);
+	fclose($fp);
 
 	$response['extracted'] = true;
 
 	echo json_encode($response);
 	exit;
+}
+
+/*
+	Function: update_copy
+
+	Actually extracts the files from the package to their new "homes." This
+	function may be called repeatedly in order to prevent any sort of timing
+	out of the PHP process.
+
+	Parameters:
+		none
+
+	Returns:
+		void - Nothing is returned by this function.
+*/
+function update_copy()
+{
+	$response = array(
+								'finished' => false,
+								'percent_finished' => 0,
+								'offset' => 0,
+								'value' => '',
+							);
+
+	// So, where are we starting?
+	$offset = isset($_POST['start']) && (int)$_POST['start'] > 0 ? (int)$_POST['start'] : 0;
+
+	// We will need the Extraction class.
+	$extraction = api()->load_class('Extraction');
+
+	$version = update_version_to();
+	$package_name = $version. '.tar'. (function_exists('gzdeflate') ? '.gz' : '');
+
+	// Then, before we can get going, we will need to open the file containing
+	// the files within the package.
+	$fp = fopen(basedir. '/package-info.dat', 'rb');
+	flock($fp, LOCK_SH);
+
+	$tmp = unpack('Vcount', fread($fp, 4));
+	$file_count = $tmp['count'];
+
+	// Let's make sure that we haven't finished everything, though.
+	if($offset >= $file_count)
+	{
+		// We're done!
+		$response['finished'] = true;
+		$response['percent_finished'] = 100;
+		$response['offset'] = $file_count - 1;
+
+		echo json_encode($response);
+		exit;
+	}
+
+	// How many do we have left?
+	$left = $file_count - $offset;
+	for($i = 0; $i < ($left > 5 ? 5 : $left); $i++)
+	{
+		// Move to the right place.
+		fseek($fp, 4 + (($offset + $i) * 4));
+
+		// Now read the 4 bytes which will tell us where we need to move next.
+		$tmp = unpack('Vposition', fread($fp, 4));
+
+		fseek($fp, $tmp['position']);
+
+		// The first two bytes will tell us how long the file name is (not
+		// including the single character we prepended to that).
+		$tmp = unpack('vlength', fread($fp, 2));
+		$length = $tmp['length'];
+
+		// So, a directory or file?
+		$is_dir = fread($fp, 1) == 'd';
+
+		// Now for the files name.
+		$filename = fread($fp, $length);
+
+		// We can't extract an entire directory from the package, so we will
+		// just create the directory, if need be.
+		if($is_dir)
+		{
+			if(!is_dir(basedir. '/'. $filename))
+			{
+				@mkdir(basedir. '/'. $filename, 0775, true);
+			}
+		}
+		// But we can extract the file itself.
+		else
+		{
+			$extraction->read(basedir. '/'. $package_name, $filename, basedir. '/'. $filename);
+		}
+	}
+
+	// Increment the offset accordingly.
+	$offset += $left > 5 ? 5 : $left;
+
+	// How far did we get?
+	$response['percent_finished'] = round((($offset + 1) / (double)$file_count) * 100, 2);
+	$response['offset'] = $offset;
+
+	// I guess we should make one last check to make sure we haven't finished
+	// yet. No need to have them make a request just to verify that.
+	if($offset >= $file_count)
+	{
+		$response['finished'] = true;
+		$response['percent_finished'] = 100;
+		$response['offset'] = $file_count - 1;
+	}
+
+	echo json_encode($response);
+	exit;
+}
+
+/*
+	Function: update_apply
+
+	This function will execute any PHP files which need to be ran in order to
+	complete the update process. Once the proper files have been executed (if
+	any), then the cleanup will begin by removing files only required during
+	the update process. Also, the system will check for updates again -- just
+	in case.
+
+	Parameters:
+		none
+
+	Returns:
+		void - Nothing is returned by this function.
+*/
+function update_apply()
+{
+	// Is there any state data?
+	$GLOBALS['state'] = isset($_REQUEST['state']) ? $_REQUEST['state'] : null;
+
+	// The files we will run (well, the file) should mark the following as
+	// true if it is done.
+	$GLOBALS['finished'] = false;
+
+	// If you want, you can give a status as well.
+	$GLOBALS['percent_finished'] = false;
+
+	// The system-update.php file in the core directory will be what we want
+	// to execute, if it exists.
+	if(is_file(coredir. '/system-update.php'))
+	{
+		require(coredir. '/system-update.php');
+
+		// You done?
+		if(!empty($GLOBALS['finished']))
+		{
+			// Then we should remove this.
+			@unlink(coredir. '/system-update.php');
+		}
+	}
+	else
+	{
+		// Well, there is no file which can say we're done, so we will do that
+		// ourselves.
+		$GLOBALS['finished'] = true;
+	}
+
+	// Do we need to finish up?
+	if(!empty($GLOBALS['finished']))
+	{
+		// The update_cancel function accomplishes what we want to do.
+		update_cancel(true);
+
+		// Now, check for updates!!!
+		require_once(coredir. '/admin/admin_update.php');
+
+		admin_update_check(true);
+	}
+
+	echo json_encode(array(
+										 'finished' => $GLOBALS['finished'],
+										 'percent_finished' => $GLOBALS['percent_finished'],
+										 'state' => $GLOBALS['state'],
+									 ));
+	exit;
+
+}
+
+/*
+	Function: time_utc
+*/
+function time_utc()
+{
+	return time() - date('Z');
 }
 ?>

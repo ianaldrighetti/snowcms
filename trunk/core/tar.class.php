@@ -242,7 +242,7 @@ class Tar implements Extractor
 
 			// Now to see if the file is a valid tarball. But while there isn't a
 			// for sure way to tell if it is a tarball, we can give it a try.
-			if(filesize($filename) < 512)
+			if(filesize($filename) < 512 && !$this->is_gzipped())
 			{
 				// The headers in a tarball (for each file/directory) are 512 bytes,
 				// so if the file isn't at least 512 bytes then it can't be valid.
