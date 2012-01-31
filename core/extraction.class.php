@@ -397,9 +397,8 @@ class Extraction
 		the contents of the file or saves the contents to the desired location.
 
 		Parameters:
-			string $filename - The name of the compressed file.
-			string $file - The name of the file in the compressed file to
-										 read.
+			string $filename - The name of the compressed file to extract from.
+			string $file - The name of the file within the compressed file.
 			string $destination - The location where $file should be saved to, if
 														left blank the contents will be returned.
 

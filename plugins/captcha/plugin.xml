@@ -9,5 +9,5 @@
 	<name>CAPTCHA</name>
 	<description>CAPTCHA is a plugin which allows you to integrate CAPTCHA (Completely Automated Public Turing Test in order to Tell Computers and Humans Apart) images into SnowCMS. This plugin will add a CAPTCHA image to the registration form by default.</description>
 	<version>1.0</version>
-	<compatible-with>1.*</compatible-with>
+	<compatible-with>2.*</compatible-with>
 </plugin-info>
