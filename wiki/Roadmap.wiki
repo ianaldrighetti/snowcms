@@ -1,7 +1,7 @@
-#summary The roadmap for SnowCMS.
+#summary The road map for the SnowCMS 2.x line.
 #labels Featured,Phase-Requirements
 
-= Roadmap for SnowCMS v2.0 =
+= Road Map for SnowCMS v2.0 =
 
 === 2.0 alpha ===
 
@@ -43,7 +43,7 @@ Resolve issue #69 and issue #71.
 
 === 2.0 beta 2 ===
 
-Not much in this release except for SQLite support, other than bug fixes and what not, of course.
+This may no longer be required, unless a significant amount of bugs are found in 2.0 beta.
 
 === 2.0 RC ===
 
@@ -53,4 +53,8 @@ Just a few bugs left to squash, almost there! But just to be sure...
 
 Once all known bugs and issues are fixed, we can finally call SnowCMS 2.0 complete... Next stop? SnowCMS 2.1!
 
-_*This roadmap could change in the future, currently it is highly unlikely for the alpha releases to be changed at all (though some could be added), but expect more than one beta and at least one release candidate, all of which will mainly be bug fixes.*_
+_*This road map could change in the future, currently it is highly unlikely for the alpha releases to be changed at all (though some could be added), but expect more than one beta and at least one release candidate, all of which will mainly be bug fixes.*_
+
+= Road Map for SnowCMS v2.1 =
+
+This road map is still in planning, however the goal of the 2.1 release is to improve the database abstraction layer to be much more flexible and allow as many different database types as possible without having to alter the queries using so many string manipulation functions.
