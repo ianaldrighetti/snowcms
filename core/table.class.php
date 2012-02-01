@@ -638,6 +638,8 @@ class Table
 			call_user_func($table['callback'], $_POST[$tbl_name. '_option'], isset($_POST['selected']) ? $_POST['selected'] : array());
 		}
 
+		api()->run_hooks($tbl_name. '_post_submit');
+
 		// Are there any options? If there are, we will need to make a form!!!
 		$is_options = is_array($table['options']) && count($table['options']) > 0;
 

@@ -56,13 +56,50 @@ if(!function_exists('admin_plugins_manage'))
 		$table = api()->load_class('Table');
 
 		// Activating, deactivating or deleting a plugin..?
-		if(!empty($_GET['activate']) || !empty($_GET['deactivate']) || !empty($_GET['delete']))
+		if(!empty($_REQUEST['activate']) || !empty($_GET['deactivate']) || !empty($_GET['delete']))
 		{
 			// Gotta make sure it's you ;-)
-			verify_request('get');
+			verify_request('request');
+
+			// We may need to make a little modification if we're activating
+			// multiple plugins.
+			$plugindirs = array();
+			if(!empty($_REQUEST['activate']) && strpos($_REQUEST['activate'], ',') !== false)
+			{
+				foreach(explode(',', $_REQUEST['activate']) as $dirname)
+				{
+					$plugindirs[] = plugindir. '/'. $dirname;
+				}
+			}
+			else
+			{
+				$plugindirs = array(plugindir. '/'. (!empty($_REQUEST['activate']) ? $_REQUEST['activate'] : (!empty($_GET['deactivate']) ? $_GET['deactivate'] : $_GET['delete'])));
+			}
 
 			// Just use the function used in the table.
-			admin_plugins_manage_table_handle(!empty($_GET['activate']) ? 'activate' : (!empty($_GET['deactivate']) ? 'deactivate' : 'delete'), array(plugindir. '/'. (!empty($_GET['activate']) ? $_GET['activate'] : (!empty($_GET['deactivate']) ? $_GET['deactivate'] : $_GET['delete']))));
+			admin_plugins_manage_table_handle(!empty($_REQUEST['activate']) ? 'activate' : (!empty($_GET['deactivate']) ? 'deactivate' : 'delete'), $plugindirs, !empty($_GET['ignore']));
+		}
+
+		// Do we have a list of plugins which are incompatible? Then we will
+		// need to show a message asking if they still want to continue anyways.
+		if(!empty($_GET['compat']))
+		{
+			api()->context['compat'] = array();
+
+			foreach(explode(',', $_GET['compat']) as $plugindir)
+			{
+				// We will want to make sure that this plugin is within the plugin
+				// directory. No messin' around, ya hear!
+				$plugindir = realpath(plugindir. '/'. $plugindir);
+
+				if(substr($plugindir, 0, strlen(plugindir)) == realpath(plugindir) && ($plugin_info = plugin_load($plugindir)) !== false && $plugin_info['is_compatible'] === false)
+				{
+					api()->context['compat'][] = array(
+																				 'dirname' => basename($plugindir),
+																				 'name' => $plugin_info['name'],
+																			 );
+				}
+			}
 		}
 
 		admin_current_area('plugins_manage');
@@ -275,8 +312,9 @@ if(!function_exists('admin_plugins_manage_table_handle'))
 
 		Parameters:
 			string $action - The action selected.
-			array $selected - An array containing the selected plugin
-												guid's.
+			array $selected - An array containing the selected plugin guid's.
+			bool $ignore_compat - Whether to ignore compatibility issues when
+														activating a plugin. Defaults to false.
 
 		Returns:
 			void - Nothing is returned by this function.
@@ -284,9 +322,10 @@ if(!function_exists('admin_plugins_manage_table_handle'))
 		Note:
 			This function is overloadable.
 	*/
-	function admin_plugins_manage_table_handle($action, $selected)
+	function admin_plugins_manage_table_handle($action, $selected, $ignore_compat = false)
 	{
-		// Make sure the supplied plugins are legit... Along with that, load their information.
+		// Make sure the supplied plugins are legit... Along with that, load
+		// their information.
 		$plugins = array();
 
 		if(count($selected) > 0)
@@ -318,17 +357,30 @@ if(!function_exists('admin_plugins_manage_table_handle'))
 		{
 			// Activating a plugin, are we? Alright, I can handle that.
 			$rows = array();
+			$compat_issues = array();
 			foreach($plugins as $plugindir => $plugin_info)
 			{
-				$rows[] = array($plugindir, 1);
+				// Let's see, is this compatible?
+				if($plugin_info['is_compatible'] === true || $plugin_info['is_compatible'] === null || $ignore_compat === true)
+				{
+					$rows[] = array($plugindir, 1);
+				}
+				else
+				{
+					$compat_issues[] = urlencode($plugindir);
+				}
 			}
 
-			db()->insert('replace', '{db->prefix}plugins',
-				array(
-					'directory' => 'string-255', 'is_activated' => 'int',
-				),
-				$rows,
-				array('directory'), 'admin_plugins_manage_activate_query');
+			// Let's be sure there are even any plugins to enable.
+			if(count($rows) > 0)
+			{
+				db()->insert('replace', '{db->prefix}plugins',
+					array(
+						'directory' => 'string-255', 'is_activated' => 'int',
+					),
+					$rows,
+					array('directory'), 'admin_plugins_manage_activate_query');
+			}
 		}
 		elseif($action == 'deactivate')
 		{
@@ -359,7 +411,7 @@ if(!function_exists('admin_plugins_manage_table_handle'))
 		}
 
 		// Redirect!
-		redirect(baseurl. '/index.php?action=admin&sa=plugins_manage', 301);
+		redirect(baseurl. '/index.php?action=admin&sa=plugins_manage'. (isset($compat_issues) && count($compat_issues) > 0 ? '&compat='. implode(',', $compat_issues) : ''), 301);
 	}
 }
 
