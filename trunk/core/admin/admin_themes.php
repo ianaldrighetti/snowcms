@@ -148,6 +148,7 @@ if(!function_exists('admin_themes'))
 				$theme = array(
 									 'anchor' => 't'. sha1(basename($theme_info['directory'])),
 									 'name' => $theme_info['name'],
+									 'is_compatible' => $theme_info['is_compatible'] === true || $theme_info['is_compatible'] === null,
 									 'description' => $theme_info['description'],
 									 'author' => (!empty($theme_info['website']) ? '<a href="'. $theme_info['website']. '" target="_blank">' : ''). $theme_info['author']. (!empty($theme_info['website']) ? '</a>' : ''),
 									 'version' => $theme_info['version'],

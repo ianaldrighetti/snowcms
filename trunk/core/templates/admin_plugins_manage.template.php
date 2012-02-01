@@ -22,7 +22,7 @@ if(!defined('INSNOW'))
 	die('Nice try...');
 }
 
-		echo '
+echo '
 	<div class="section-tabs">
 		<ul>
 			<li><a href="', baseurl('index.php?action=admin&amp;sa=plugins_add'), '" title="', l('Add a new plugin'), '" class="first">', l('Add Plugin'), '</a></li>
@@ -34,5 +34,34 @@ if(!defined('INSNOW'))
 	</div>
 	<h3><img src="', theme()->url(), '/style/images/plugins_manage-small.png" alt="" /> ', l('Manage Plugins'), '</h3>';
 
-		api()->context['table']->show('manage_plugins_table');
+// Do we need to show a message that the plugins they are trying to activate
+// say they aren't compatible with this version of SnowCMS?
+if(isset(api()->context['compat']) && count(api()->context['compat']) > 0)
+{
+	echo '
+	<div class="error-message left" style="padding: 5px 10px !important; font-size: 13px;">
+		<p>', l('The following plugins you are trying to activate are not compatible with SnowCMS. Would you still like to activate them anyways? Please note that activating such plugins may cause instability issues.'), '</p>
+		<ul>';
+
+	$dirnames = array();
+	foreach(api()->context['compat'] as $plugin_info)
+	{
+		echo '
+			<li>', $plugin_info['name'], '</li>';
+
+		$dirnames[] = $plugin_info['dirname'];
+	}
+
+	echo '
+		</ul>
+		<form action="', baseurl('index.php?action=admin&amp;sa=plugins_manage&amp;ignore=true'), '" method="post">
+			<p class="right"><input type="submit" value="', l('Activate &raquo;'), '" /></p>
+			<input type="hidden" name="activate" value="', htmlchars(implode(',', $dirnames)), '" />
+			<input type="hidden" name="sid" value="', member()->session_id(), '" />
+			<input type="hidden" name="ignore" value="true" />
+		</form>
+	</div>';
+}
+
+api()->context['table']->show('manage_plugins_table');
 ?>
