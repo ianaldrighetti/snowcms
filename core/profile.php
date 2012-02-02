@@ -417,7 +417,7 @@ if(!function_exists('profile_edit_generate_form'))
 													'subtext' => l('Select any additional groups the member should be in, ignored if the member is an administrator.'),
 													'options' => $groups,
 													'rows' => 4,
-													'default_value' => $member_info['groups'],
+													'default_value' => array_values($member_info['groups']),
 												));
 
 			// Should the account be activated? ;)
@@ -565,7 +565,7 @@ if(!function_exists('profile_edit_handle'))
 				{
 					// Otherwise we will want to make sure they are always assigned to
 					// the default group of 'member.'
-					$update_info['member_groups'] = array_merge(array('member'), $data['member_groups']);
+					$update_info['member_groups'] = array_merge(array('member'), is_array($data['member_groups']) ? $data['member_groups'] : array());
 				}
 
 				// Changing their activation status?

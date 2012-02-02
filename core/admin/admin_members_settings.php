@@ -299,6 +299,12 @@ if(!function_exists('admin_members_settings_handle'))
 		// Update them, easy!
 		foreach($data as $variable => $value)
 		{
+			// Ignore this if it is a CSRF token.
+			if(substr($variable, -6, 6) == '_token')
+			{
+				continue;
+			}
+
 			// Save it.
 			settings()->set($variable, $value);
 		}

@@ -453,6 +453,12 @@ if(!function_exists('admin_settings_handle'))
 		// Loop through all the settings and save them!
 		foreach($form->inputs($_GET['type']. '_settings_form') as $input)
 		{
+			// Ignore this if it is a CSRF token.
+			if(substr($input->name(), -6, 6) == '_token' && $input->type() == 'hidden')
+			{
+				continue;
+			}
+
 			$variable = $input->name();
 			$value = $data[$variable];
 

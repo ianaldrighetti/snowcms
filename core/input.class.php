@@ -1142,7 +1142,7 @@ class Input
 		// The label is very important, so we need that to be okay, well, unless
 		// it is a hidden field. In which case we will make an exception.
 		if(!$this->label($label) && strtolower($type) != 'hidden')
-		{echo 'die';
+		{
 			$this->revert($prev_options);
 			$this->errors[] = l('The label of the field was left empty.');
 
@@ -1271,11 +1271,14 @@ class Input
 					$this->default_value = array($this->default_value);
 				}
 
+				// Just get the keys of the array.
+				$options = array_keys($this->options);
+
 				// Go through all the options, and make sure they are available.
 				foreach($this->default_value as $index => $value)
 				{
 					// Just a simple check.
-					if(!in_array($value, $this->options))
+					if(!in_array($value, $options))
 					{
 						// Wasn't found, so remove it.
 						unset($this->default_value[$index]);
@@ -1286,7 +1289,7 @@ class Input
 				// array now.
 				if(count($this->default_value) == 0)
 				{
-					$this->default_value = 0;
+					$this->default_value = array();
 				}
 			}
 		}
@@ -1401,7 +1404,7 @@ class Input
 		// I just wanted to make life a bit easier with what I did above... But
 		// seeing as checkboxes are a bit more complicated, they will need to be
 		// dealt with differently.
-		if((!isset($value) || $this->disabled || $this->readonly) && $this->type != 'checkbox' && $this->type != 'checkbox-multi')
+		if((!isset($value) || $this->disabled || $this->readonly) && $this->type != 'checkbox' && $this->type != 'checkbox-multi' && $this->type != 'select-multi')
 		{
 			// Default value it is, then!
 			$value = $this->default_value;
@@ -1484,7 +1487,7 @@ class Input
 				{
 					// Let's make sure that the option they choose is one that
 					// actually exists.
-					if(in_array($option_id, $options))
+					if(in_array($option_id, $options, true))
 					{
 						// Everything seems fine here.
 						$selected[] = $option_id;
