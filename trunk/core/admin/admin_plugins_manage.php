@@ -468,7 +468,7 @@ if(!function_exists('admin_plugins_update'))
 			$update_version = admin_plugins_check_updates($plugin_info['directory']);
 
 			// So, how did that go?
-			if($update_version === false || compare_versions($plugin_info['version'], $update_version, '>=') || $theme_info['update_url'] === false)
+			if($update_version === false || compare_versions($plugin_info['version'], $update_version, '>='))
 			{
 				// No update needed!
 				theme()->set_title(l('No Update Available'));
@@ -555,7 +555,7 @@ if(!function_exists('admin_plugins_update'))
 							WHERE directory = {string:directory}
 							LIMIT 1',
 							array(
-								'directory' => basename($theme_info['directory']),
+								'directory' => basename($plugin_info['directory']),
 							));
 					}
 				}

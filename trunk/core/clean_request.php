@@ -152,11 +152,11 @@ function redirect($location = null, $status = 307)
 	// What type of redirect? Temporary, or permanent?
 	if((int)$status == 307 || strtolower($status) == 'temporary')
 	{
-		// We may need to make a minor modification. Firefox likes to show an
-		// annoying 'This web page is being redirect to another location' blah
-		// blah blah if there is POST data involved. This can be fixed pretty
-		// easily.
-		if(count($_POST) > 0 && stripos($_SERVER['HTTP_USER_AGENT'], 'Firefox') !== false)
+		// We may need to make a minor modification. Some browsers like to show
+		// an annoying 'This web page is being redirect to another location'
+		// blah  blah blah if there is POST data involved. This can be fixed
+		// pretty  easily.
+		if(count($_POST) > 0)
 		{
 			header('HTTP/1.1 303 See Other');
 		}

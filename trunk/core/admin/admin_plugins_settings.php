@@ -141,6 +141,12 @@ if(!function_exists('admin_plugins_settings_handle'))
 		// Loop through all the settings and save them!
 		foreach($data as $variable => $value)
 		{
+			// Ignore this if it is a CSRF token.
+			if(substr($variable, -6, 6) == '_token')
+			{
+				continue;
+			}
+
 			// Set it :)
 			settings()->set($variable, $value);
 		}

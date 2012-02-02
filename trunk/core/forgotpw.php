@@ -184,10 +184,11 @@ if(!function_exists('forgotpw_invoke'))
 	*/
 	function forgotpw_invoke($member_info, $admin_override = false)
 	{
+		$members = api()->load_class('Members');
+
 		// Is it an array containing the members information, or an ID?
 		if(!is_array($member_info))
 		{
-			$members = api()->load_class('Members');
 			$members->load((int)$member_info);
 
 			$member_info = $members->get((int)$member_info);
