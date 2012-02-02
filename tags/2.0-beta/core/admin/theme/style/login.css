@@ -1,0 +1,42 @@
+/* Begin #login-box section. */
+#login-box
+{
+	width: 580px;
+	margin: 15px auto 15px auto;
+	padding: 10px;
+	border: 1px solid #DEDEDE;
+	border-radius: 8px;
+}
+
+#login-box h1
+{
+	display: inline;
+	font: 22px normal Verdana, Tahoma, Arial, sans-serif;
+}
+
+#login-form
+{
+	width: 300px;
+	margin: auto;
+}
+
+#login-form .label
+{
+	margin-bottom: 2px;
+}
+
+#login-form label
+{
+}
+
+#login-form .input
+{
+	margin-top: 0;
+}
+
+#login-form input[type="text"], #login-form input[type="password"]
+{
+	width: 300px;
+	padding: 3px;
+	font-size: 15px;
+}
