@@ -1,0 +1,429 @@
+a { text-decoration: none; color: #3465A7; }
+a:hover { text-decoration: underline; }
+input, textarea, option, optgroup, select, button { font: 13px Verdana, Tahoma, Arial, sans-serif; }
+fieldset, img { border: 0; }
+
+body
+{
+	margin-top: 0;
+	font: 13px Verdana, Tahoma, Arial, sans-serif;
+}
+
+/* Start #container section. */
+#container
+{
+	width: 900px;
+	margin: auto;
+}
+
+/* End #container section. Begin #header-container section. */
+
+#header-container
+{
+	padding: 5px;
+	background: #3465A7;
+	border-radius: 0 0 10px 10px;
+}
+
+#header-container h1
+{
+	float: left;
+	display: inline-block;
+	margin: 17px auto auto 10px;
+	font: 28px normal Verdana, Tahoma, Arial, serif;
+	color: white;
+}
+
+#header-container h1 a
+{
+	text-decoration: none;
+	color: white;
+}
+
+#header-container h1 a:hover
+{
+	color: #DDDDDD;
+}
+
+#member-box
+{
+	float: right;
+	min-width: 130px;
+	margin: 10px 10px 10px 0;
+	padding: 5px 5px 0 5px;
+	background: #729FCF;
+	color: white;
+}
+
+#member-box p
+{
+	margin: 0 auto 5px auto;
+}
+
+#member-box a
+{
+	color: #DDDDDD;
+	text-decoration: none;
+}
+
+#member-box a:hover
+{
+	text-decoration: underline;
+}
+
+/* End #header-container section. Begin #link-tree section. */
+#link-tree
+{
+	margin: 5px auto 5px auto;
+	background: #F2F2F2;
+	border: 1px solid #DEDEDE;
+	border-radius: 8px;
+}
+
+#link-tree p
+{
+	margin: 0;
+	padding: 5px 9px;
+	font-size: 12px;
+}
+
+/* End #link-tree section. Begin #main-content section. */
+#main-content h3 img, #side-content h3 img
+{
+	position: relative;
+	top: 3px;
+}
+
+#side-content h3
+{
+	margin: 5px 0;
+}
+
+/* End #main-content section. Begin #footer-container section. */
+#footer-container
+{
+	margin-top: 5px;
+	padding: 5px 5px 0 5px;
+	border-top: 1px solid #DEDEDE;
+}
+
+#footer-container p
+{
+	margin: 2px auto 0 auto;
+	font-size: 75%;
+	color: #363636;
+}
+
+#footer-text
+{
+	float: left;
+}
+
+#jump-to
+{
+	float: right;
+}
+
+#jump-to input, #jump-to select
+{
+	padding: 3px;
+}
+
+/* End #footer-container section. Begin Misc. crap. */
+.break
+{
+	clear: both;
+}
+
+.float-left { float: left; }
+.float-right { float: right; }
+
+.left { text-align: left !important; }
+.center { text-align: center !important; }
+.right { text-align: right !important; }
+
+.bold { font-weight: bold !important; }
+.italic { font-style: italic !important; }
+.normal { font-weight: normal !important; }
+
+.large { font-size: 110% !important; }
+.small { font-size: 85% !important; }
+
+.red { color: red !important; }
+.green { color: green !important; }
+
+.no-margin { margin: 0 !important; }
+
+.error-message, .alert-message, .message-box
+{
+	margin: 10px auto 10px auto;
+	padding: 5px 5px 0 5px;
+	border-radius: 5px;
+	text-align: center;
+}
+
+.error-notification, .alert-notification, .notification-message
+{
+	margin: 5px 5px;
+	padding: 5px;
+	border-radius: 5px;
+	/*text-align: center;*/
+}
+
+.alert-message, .alert-notification
+{
+	background: #FFEC8B !important;
+	border: 1px solid #F0A804 !important;
+}
+
+.error-message, .error-notification
+{
+	background: #FFC1C1 !important;
+	border: 1px solid #EE0000 !important;
+}
+
+.message-box, .notification-message
+{
+	background: #98FB98;
+	border: 1px solid #004F00;
+}
+
+.error-message p, .alert-message p, .message-box p
+{
+	margin: 0 auto 5px auto;
+}
+
+/* Section tabs */
+.section-tabs
+{
+	position: relative;
+	top: -5px;
+	background: #F2F2F2;
+	border: 1px solid #DEDEDE;
+	border-width: 0 1px 1px 1px;
+	border-radius: 0 0 5px 5px;
+}
+
+.section-tabs ul
+{
+	margin: 0;
+	padding: 0;
+	list-style: none;
+}
+
+.section-tabs li
+{
+	float: left;
+	display: inline;
+}
+
+.section-tabs li a
+{
+	display: block;
+	padding: 5px 10px;
+	color: #000000;
+	text-decoration: none;
+	border-right: 1px solid #DEDEDE;
+	font-size: 85%;
+}
+
+.section-tabs li a:hover, .section-tabs .selected
+{
+	background: white;
+	color: black;
+	z-index: 1;
+}
+
+.section-tabs li .first
+{
+	border-radius: 0 0 0 5px;
+}
+
+/* Form formatting */
+.form table
+{
+	margin: auto;
+	text-align: center;
+}
+
+.form table .td-left
+{
+	width: 50%;
+	text-align: left !important;
+}
+
+.form table .td-right
+{
+	width: 50%;
+	text-align: center;
+}
+
+.form table .label
+{
+	font-weight: bold;
+	font-size: 95%;
+}
+
+.form table .subtext
+{
+	font-size: 85%;
+}
+
+.form table .buttons
+{
+	text-align: center;
+}
+
+/* Theme List section. */
+.theme_list
+{
+}
+
+.theme_list a img
+{
+	display: block;
+	width: 210px;
+	height: 130px;
+	padding: 5px;
+	text-align: center;
+	border: 1px solid #FFFFFF;
+	color: #000000;
+}
+
+.theme_list a:hover img
+{
+	border-radius: 5px;
+	border: 1px solid #C9C9C9;
+	background: #EDEDED;
+}
+
+.theme_list td
+{
+	padding: 3px;
+}
+
+#content .theme_list .button
+{
+	display: inline;
+	border: 1px solid #FFFFFF;
+	background: transparent;
+	margin-top: 10px;
+	margin-left: 5px;
+}
+
+#content .theme_list .important
+{
+	border-radius: 5px;
+	border: 1px solid #CD0000;
+	background: #FFC1C1;
+}
+
+#content .theme_list .important:hover
+{
+	border-color: #CD0000;
+	background: #FF6A6A;
+}
+
+/* System Settings */
+#admin_settings_form table
+{
+	width: 90%;
+}
+
+/* Table Formatting */
+.table table
+{
+	width: 100% !important;
+	margin: 5px auto 5px auto;
+}
+
+.table .header
+{
+	text-align: right !important;
+}
+
+.table th
+{
+	text-align: left !important;
+}
+
+.table .columns
+{
+	background: #3465A7;
+	color: #FFFFFF;
+}
+
+.table .columns a
+{
+	color: #FFFFFF;
+	text-decoration: none;
+}
+
+.table .columns a:hover
+{
+	text-decoration: underline;
+}
+
+.table .tr_0
+{
+	background: #E6E8FA;
+}
+
+.table .tr_1
+{
+	background: #F5F5F5;
+}
+
+.table .options
+{
+	text-align: right !important;
+}
+
+.table .filters
+{
+	text-align: right !important;
+}
+
+.pagination
+{
+	font-size: 80%;
+}
+
+.table-filters
+{
+	font-size: 80%;
+}
+
+/* Plugin Management */
+.plugin-name
+{
+	display: block;
+	margin-bottom: 5px;
+	font-weight: bold;
+}
+
+.plugin-link-list
+{
+	font-size: 12px;
+}
+
+.plugin-description
+{
+	display: block;
+	margin-bottom: 10px;
+}
+
+.plugin-info
+{
+	font-size: 11px;
+}
+
+/* Notifications */
+#notification-box
+{
+}
+
+.notification-message
+{
+	margin: 10px;
+}
