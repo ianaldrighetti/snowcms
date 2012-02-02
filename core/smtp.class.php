@@ -623,7 +623,7 @@ class SMTP
 		}
 
 		// Set the X-Mailer! :)
-		$this->headers['X-MAILER'] = 'PHP/'. phpversion(). ' using SnowCMS';
+		$this->headers['X-MAILER'] = 'PHP/'. (settings()->get('show_version', 'bool', false) ? phpversion(). ' using SnowCMS' : 'SnowCMS');
 
 		// We just might need to change the Content-Type again, maybe.
 		if($this->is_html)

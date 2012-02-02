@@ -143,7 +143,7 @@ CREATE TABLE `{db->prefix}settings`
 	PRIMARY KEY (`variable`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 
-INSERT INTO `{db->prefix}settings` (`variable`, `value`) VALUES('show_version', 1),('version', '2.0-beta'),('password_security', 1),('disallowed_names', ''),('disallowed_emails', ''),('default_event', '');
+INSERT INTO `{db->prefix}settings` (`variable`, `value`) VALUES('show_version', 1),('version', '2.0-beta2'),('password_security', 1),('disallowed_names', ''),('disallowed_emails', ''),('default_event', '');
 INSERT INTO `{db->prefix}settings` (`variable`, `value`) VALUES('enable_tasks', 1),('site_name', 'SnowCMS'),('site_email', ''),('theme', 'default'),('max_tasks', 2);
 INSERT INTO `{db->prefix}settings` (`variable`, `value`) VALUES('registration_type', 1),('enable_utf8', 1),('members_min_name_length', 3),('members_max_name_length', 80),('errors_log', 1);
 INSERT INTO `{db->prefix}settings` (`variable`, `value`) VALUES('mail_handler', 'mail'),('smtp_host', 'localhost'),('smtp_port', 25),('smtp_is_tls', 0),('smtp_timeout', 5),('smtp_user', ''),('smtp_pass', '');

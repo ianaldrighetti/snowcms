@@ -90,6 +90,7 @@ require(coredir. '/settings.class.php');
 
 // Load up the settings with the Settings class.
 settings();
+init_time();
 
 require(coredir. '/func.php');
 

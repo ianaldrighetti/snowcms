@@ -231,4 +231,28 @@ function time_diff($timestamp, $from = null)
 		return $return;
 	}
 }
+
+/*
+	Function: init_time
+
+	Sets the default time zone according to the default timezone option set by
+	the administrator.
+
+	Parameters:
+		none
+
+	Returns:
+		void - Nothing is returned by this function.
+*/
+function init_time()
+{
+	if(function_exists('date_default_timezone_set'))
+	{
+		date_default_timezone_set(settings()->get('default_timezone', 'string', 'UTC'));
+	}
+	else
+	{
+		@ini_set('date.timezone', settings()->get('default_timezone', 'string', 'UTC'));
+	}
+}
 ?>
