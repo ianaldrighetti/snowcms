@@ -181,6 +181,44 @@ function init_core()
 
 		admin_prepend();
 	}
+
+	api()->add_menu_item('main', array(
+																 'href' => baseurl(),
+																 'content' => l('Home'),
+															 ));
+
+	if(member()->is_guest())
+	{
+		api()->add_menu_item('main', array(
+																	 'href' => baseurl('index.php?action=register'),
+																	 'content' => l('Register'),
+																 ));
+
+		api()->add_menu_item('main', array(
+																	 'href' => baseurl('index.php?action=login'),
+																	 'content' => l('Log In'),
+																 ));
+	}
+	else
+	{
+		api()->add_menu_item('main', array(
+																	 'href' => baseurl('index.php?action=profile'),
+																	 'content' => l('My Profile'),
+																 ));
+
+		if(member()->can('access_admin_cp'))
+		{
+			api()->add_menu_item('main', array(
+																		 'href' => baseurl('index.php?action=admin'),
+																		 'content' => l('Control Panel'),
+																	 ));
+		}
+
+		api()->add_menu_item('main', array(
+																	 'href' => baseurl('index.php?action=logout&amp;sc='. member()->session_id()),
+																	 'content' => l('Log Out'),
+																 ));
+	}
 }
 
 if(!function_exists('core_popup'))
