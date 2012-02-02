@@ -98,7 +98,7 @@ class PHP_Mail
 	*/
 	public function set_from($from)
 	{
-		$this->add_header('FROM', $from);
+		return $this->add_header('FROM', $from);
 	}
 
 	/*
@@ -235,7 +235,7 @@ class PHP_Mail
 		}
 
 		// Set the X-Mailer, just 'cause we are cool like that!
-		$this->options['headers']['X-MAILER'] = 'PHP/'. version(). ' using SnowCMS';
+		$this->options['headers']['X-MAILER'] = 'PHP/'. (settings()->get('show_version', 'bool', false) ? phpversion(). ' using SnowCMS' : 'SnowCMS');
 
 		// Gotta change the Content-Type?
 		if($this->options['is_html'])

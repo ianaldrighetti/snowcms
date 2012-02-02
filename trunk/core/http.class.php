@@ -77,6 +77,11 @@ class HTTP
 	// The user agent to set the User-Agent HTTP header to.
 	private $user_agent;
 
+	// Variable: info
+	// An array containing the information from the last request made by the
+	// HTTP class (HTTP status code, effective URL and content type).
+	private $info;
+
 	/*
 		Constructor: __construct
 
@@ -98,6 +103,7 @@ class HTTP
 		$this->set_port(empty($port) || (string)$port != (string)(int)$port ? 80 : $port);
 		$this->set_timeout(5);
 		$this->set_user_agent(empty($user_agent) || !is_string($user_agent) ? 'SnowCMS ' .(settings()->get('show_version', 'bool', false) ? 'v'. settings()->get('version', 'string') : ''). '/PHP'. (settings()->get('show_version', 'bool', false) ? 'v'. PHP_VERSION : '') : $user_agent);
+		$this->info = false;
 	}
 
 	/*
@@ -482,6 +488,9 @@ class HTTP
 			as methods of remote requesting. cURL is preferred over fsockopen
 			(as fsockopen tends to be much slower than cURL!), so even if
 			fsockopen would work, cURL is still used.
+
+			Failure is defined as a URL redirecting more than allowed or receiving
+			an HTTP status code of greater than or equal to 400.
 	*/
 	public function request($url, $post_data = array(), $resume_from = 0, $filename = null)
 	{
@@ -505,7 +514,7 @@ class HTTP
 		$request_callbacks = array(
 			array(
 				'test' => create_function('', '
-										return function_exists(\'curl_exec\');'),
+										return !function_exists(\'curl_exec\');'),
 				'callback' => 'http_curl_request',
 			),
 			array(
@@ -556,12 +565,116 @@ class HTTP
 				'port' => ($func['substr']($func['strtolower']($url), 0, 8) == 'https://' && $this->port == 80 && $this->ssl_supported() ? 443 : $this->port),
 				'timeout' => $this->timeout,
 				'user_agent' => $this->user_agent,
+				'http' => $this,
 			));
 		}
 		else
 		{
 			return false;
 		}
+	}
+
+	/*
+		Method: set_info
+
+		This method is only to be used by the registered request callbacks, and
+		should be called upon immediately upon completing a request issued by
+		the HTTP class. This method is to be supplied an array containing
+		information about the completed request. See the note for more
+		information.
+
+		Parameters:
+			int $info - An array containing the information about the completed
+									request.
+
+		Returns:
+			void - Nothing is returned by this method.
+
+		Note:
+			The array should contain the following information:
+
+				int status_code - The HTTP status code received from the server the
+													request was made to.
+
+				string effective_url - The last effective URL of the request, such
+															 as if the Location: header is supplied, the
+															 function should make the request again to the
+															 URL specified in Location: if the allow
+															 redirect options permit.
+
+				string content_type - The contents of the Content-Type: header.
+	*/
+	public function set_info($info)
+	{
+		// Make sure the right options have been set.
+		$indexes = array_keys($info);
+		if(!in_array('status_code', $indexes) || !in_array('effective_url', $indexes) || !in_array('content_type', $indexes))
+		{
+			return;
+		}
+
+		$this->info = array(
+										'status_code' => (int)$info['status_code'],
+										'effective_url' => $info['effective_url'],
+										'content_type' => $info['content_type'],
+									);
+	}
+
+	/*
+		Method: status_code
+
+		Returns the HTTP status code received from the last request.
+
+		Parameters:
+			none
+
+		Returns:
+			mixed - Returns an integer containing the HTTP status code if one was
+							retrieved, and false if no previous request was made.
+	*/
+	public function status_code()
+	{
+		return is_array($this->info) ? $this->info['status_code'] : false;
+	}
+
+	/*
+		Method: effective_url
+
+		Returns the effective URL (the actual URL the request ended up
+		retrieving) from the last request.
+
+		Parameters:
+			none
+
+		Returns:
+			mixed - Returns a string containing the last effective URL, and false
+							if no previous request was made.
+	*/
+	public function effective_url()
+	{
+		return is_array($this->info) ? $this->info['effective_url'] : false;
+	}
+
+	/*
+		Method: content_type
+
+		Returns the content type received from the last request.
+
+		Parameters:
+			none
+
+		Returns:
+			mixed - Returns a string containing the content type retrieved from
+							the last request, and false if no previous request was made.
+
+		Note:
+			Please note that the value returned could also contain a charset, such
+			as: text/html; charset=utf-8. Also, this value may be null in the case
+			that the URL retrieved did not specify a Content-Type header.
+	*/
+	public function content_type()
+	{
+		return is_array($this->info) ? $this->info['content_type'] : false;
 	}
 }
 
@@ -649,6 +762,24 @@ if(!function_exists('http_curl_request'))
 		// Execute the cURL session...
 		$data = curl_exec($ch);
 
+		// Get our information!
+		$info = curl_getinfo($ch);
+
+		// We will want to give the HTTP class its information.
+		$request['http']->set_info(array(
+																 'status_code' => $info['http_code'],
+																 'effective_url' => $info['url'],
+																 'content_type' => $info['content_type'],
+															));
+
+		// Now that we gave the HTTP instance the information, we should check
+		// to make sure the request was successful.
+		if($info['status_code'] >= 400)
+		{
+			// Anything over 400 is not a good sign!
+			return false;
+		}
+
 		// Get the error number... Just incase...
 		$curl_errno = curl_errno($ch);
 		curl_close($ch);
@@ -719,8 +850,18 @@ if(!function_exists('http_fsockopen_request'))
 		{
 			return false;
 		}
-		elseif($num_redirects > $request['max_redirects'])
+		elseif(!empty($request['allow_redirect']) && $num_redirects > $request['max_redirects'])
 		{
+			// We can't keep being redirected, as we have a set option that tells
+			// us how many times will will continue to follow. So we will still
+			// set the request information, but the developer can use this
+			// information to see that they were being redirected too often.
+			$request['http']->set_info(array(
+																	 'status_code' => isset($request['status_code']) ? $request['status_code'] : 301,
+																	 'effective_url' => $request['url'],
+																	 'content_type' => null,
+																));
+
 			return false;
 		}
 
@@ -728,6 +869,12 @@ if(!function_exists('http_fsockopen_request'))
 		$parsed = parse_url($request['url']);
 
 		$fp = fsockopen(($parsed['scheme'] == 'https' ? 'ssl://' : ''). $parsed['host'], $request['port'], $errno, $errstr, $request['timeout']);
+
+		// Let's set a timeout, maybe.
+		if($request['timeout'] > 0)
+		{
+			stream_set_timeout($fp, $request['timeout']);
+		}
 
 		// Couldn't connect...?
 		if(empty($fp))
@@ -800,13 +947,51 @@ if(!function_exists('http_fsockopen_request'))
 			$data .= fgets($fp, 4096);
 		}
 
+		$info = stream_get_meta_data($fp);
 		fclose($fp);
+
+		// Make sure it didn't time out.
+		if(!empty($info['timed_out']))
+		{
+			$request['http']->set_info(array(
+																	 'status_code' => null,
+																	 'effective_url' => $request['url'],
+																	 'content_type' => null,
+																));
+
+			return false;
+		}
 
 		// Get the headers and data separated.
 		list($full_raw_headers, $data) = explode("\r\n\r\n", $data, 2);
 
 		// Get the status.
 		list($http_status, $raw_headers) = explode("\r\n", $full_raw_headers, 2);
+
+		// Let's get the status code all alone.
+		if(strpos($http_status, ' ') !== false)
+		{
+			$parts = explode(' ', $http_status);
+
+			// The status code will be the second part.
+			$status_code = (int)$parts[1];
+		}
+		else
+		{
+			$status_code = false;
+		}
+
+		// Make sure we didn't get any error.
+		if($status_code === false || $status_code >= 400)
+		{
+			$request['http']->set_info(array(
+																	 'status_code' => $status_code,
+																	 'effective_url' => $request['url'],
+																	 'content_type' => null,
+																));
+
+			return false;
+		}
 
 		// Now read the headers into an easy to read array... :D
 		$headers = array();
@@ -827,9 +1012,24 @@ if(!function_exists('http_fsockopen_request'))
 		}
 
 		// So do we need to redirect, perhaps?
-		if($func['strpos']($http_status, '302') !== false || $func['strpos']($http_status, '301') !== false || $func['strpos']($http_status, '307') !== false)
+		if(in_array($status_code, array(301, 302, 303, 307), true))
 		{
-			return !empty($headers['location']) ? http_fsockopen_request(array_merge($request, array('url' => $headers['location'], 'fp' => null)), $num_redirects + 1) : false;
+			// Yeah, but are we allowed to do so?
+			if(!empty($request['allow_redirect']))
+			{
+				return !empty($headers['location']) ? http_fsockopen_request(array_merge($request, array('url' => $headers['location'], 'status_code' => $status_code)), $num_redirects + 1) : false;
+			}
+			else
+			{
+				// No, we aren't. So that's no good.
+				$request['http']->set_info(array(
+																		 'status_code' => $status_code,
+																		 'effective_url' => $request['url'],
+																		 'content_type' => !empty($headers['content-type']) ? $headers['content-type'] : null,
+																	));
+
+				return false;
+			}
 		}
 
 		// Okay, well, if the transfer-encoding header is not set, then we can
@@ -850,6 +1050,14 @@ if(!function_exists('http_fsockopen_request'))
 		}
 
 		$data = $request['include_header'] ? implode("\r\n\r\n", array($full_raw_headers, $data)) : $data;
+
+		// Everything seems to have been okay, so we can set our information in
+		// the HTTP class now.
+		$request['http']->set_info(array(
+																 'status_code' => $status_code,
+																 'effective_url' => $request['url'],
+																 'content_type' => !empty($headers['content-type']) ? $headers['content-type'] : null,
+															));
 
 		// Did you want this written to a file?
 		if(!empty($request['fp']))
