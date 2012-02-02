@@ -29,12 +29,12 @@ p {
 	font-size: 1em;
 }
 
-ul {
-	margin: 10px 0 10px 40px;
+a {
+	text-decoration: none;
 }
 
-ul li {
-	font-size: .9em;
+a:hover {
+	text-decoration: underline;
 }
 
 #header {
@@ -61,12 +61,20 @@ ul li {
 #content {
 	/*min-width: 655px;*/
 	width: 650px;
-	padding: 2% 1% 1% 7%;
+	padding: 20px 10px 10px 7%;
 	float: left;
 }
 
 #content img {
 	max-width: 97%;
+}
+
+#content ul {
+	margin: 10px 0 10px 40px;
+}
+
+#content ul li {
+	font-size: .9em;
 }
 
 #sidebar-container {
@@ -80,8 +88,13 @@ ul li {
 	border-top: 0;
 }
 
-#sidebar * {
-	padding: 2% 1% 1% 1%;
+#sidebar ul#navigation {
+	padding: 25px 0 0 30px;
+	list-style: circle;
+}
+
+#sidebar ul#navigation li {
+	padding: 3px 0;
 }
 
 #footer {
