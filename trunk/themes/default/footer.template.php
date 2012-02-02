@@ -25,7 +25,9 @@ if(!defined('INSNOW'))
 		</div>
 		<div id="sidebar-container">
 			<div id="sidebar">
-				<?php theme_menu(); ?>
+				<ul>
+					<?php theme_menu(); ?>
+				</ul>
 			</div>
 			<p id="footer">
 				<?php theme_foot(); ?>
