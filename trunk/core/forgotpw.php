@@ -47,14 +47,14 @@ if(!function_exists('forgotpw_view'))
 
 		if(member()->is_logged())
 		{
-			redirect(baseurl. '/index.php');
+			redirect(baseurl());
 		}
 
 		// We just need a form for you to enter your username ;)
 		$form = api()->load_class('Form');
 
 		$form->add('forgotpw_form', array(
-																	'action' => baseurl. '/index.php?action=forgotpw',
+																	'action' => baseurl('index.php?action=forgotpw'),
 																	'method' => 'post',
 																	'callback' => 'forgotpw_process',
 																	'submit' => l('Reset password'),
@@ -219,11 +219,11 @@ if(!function_exists('forgotpw_invoke'))
 
 		if(empty($admin_override))
 		{
-			return $mail->send($member_info['email'], l('Password Reset Instructions for %s', settings()->get('site_name', 'string')), l("Hello, %s.<br /><br />You are receiving this email because someone has requested a password reset for your account on <a href=\"%s\">%s</a>. If you did not make this request to reset your password, <a href=\"%s\">log in</a> to your account or click the link below:<br /><a href=\"%s\">%s</a><br /><br />If you did request to have your password reset you can finish the process by clicking on the following link:<br /><a href=\"%s\">%s</a><br /><br />This password reset request will only remain valid for the next 24 hours.<br /><br />Regards,<br />%s<br /><a href=\"%s\">%s</a>", $member_info['username'], baseurl, settings()->get('site_name', 'string'), baseurl. '/index.php?action=login&amp;member_name='. urlencode($member_info['username']), baseurl. '/index.php?action=forgotpw2&amp;id='. $member_info['id']. '&amp;code='. $reset_key. '&amp;block=true', baseurl. '/index.php?action=forgotpw2&amp;id='. $member_info['id']. '&amp;code='. $reset_key. '&amp;block=true', baseurl. '/index.php?action=forgotpw2&amp;id='. $member_info['id']. '&amp;code='. $reset_key, baseurl. '/index.php?action=forgotpw2&amp;id='. $member_info['id']. '&amp;code='. $reset_key, settings()->get('site_name', 'string'), baseurl, baseurl));
+			return $mail->send($member_info['email'], l('Password Reset Instructions for %s', settings()->get('site_name', 'string')), l("Hello, %s.<br /><br />You are receiving this email because someone has requested a password reset for your account on <a href=\"%s\">%s</a>. If you did not make this request to reset your password, <a href=\"%s\">log in</a> to your account or click the link below:<br /><a href=\"%s\">%s</a><br /><br />If you did request to have your password reset you can finish the process by clicking on the following link:<br /><a href=\"%s\">%s</a><br /><br />This password reset request will only remain valid for the next 24 hours.<br /><br />Regards,<br />%s<br /><a href=\"%s\">%s</a>", $member_info['username'], baseurl(), settings()->get('site_name', 'string'), baseurl('index.php?action=login&amp;member_name='. urlencode($member_info['username'])), baseurl('index.php?action=forgotpw2&amp;id='. $member_info['id']. '&amp;code='. $reset_key. '&amp;block=true'), baseurl('index.php?action=forgotpw2&amp;id='. $member_info['id']. '&amp;code='. $reset_key. '&amp;block=true'), baseurl('index.php?action=forgotpw2&amp;id='. $member_info['id']. '&amp;code='. $reset_key), baseurl('index.php?action=forgotpw2&amp;id='. $member_info['id']. '&amp;code='. $reset_key), settings()->get('site_name', 'string'), baseurl(), baseurl()));
 		}
 		else
 		{
-			return $mail->send($member_info['email'], l('Password Reset Instructions for %s', settings()->get('site_name', 'string')), l("Hello, %s.<br /><br />You are receiving this email because an administrator changed your accounts log in name on <a href=\"%s\">%s</a>, which requires that you create a new password. Just click the link below to set your new password:<br /><a href=\"%s\">%s</a><br /><br />This password reset request will only remain valid for the next 24 hours, but you can always start a password reset convenient for you.<br /><br />Regards,<br />%s<br /><a href=\"%s\">%s</a>", $member_info['username'], baseurl, settings()->get('site_name', 'string'), baseurl. '/index.php?action=forgotpw2&amp;id='. $member_info['id']. '&amp;code='. $reset_key, baseurl. '/index.php?action=forgotpw2&amp;id='. $member_info['id']. '&amp;code='. $reset_key, settings()->get('site_name', 'string'), baseurl, baseurl));
+			return $mail->send($member_info['email'], l('Password Reset Instructions for %s', settings()->get('site_name', 'string')), l("Hello, %s.<br /><br />You are receiving this email because an administrator changed your accounts log in name on <a href=\"%s\">%s</a>, which requires that you create a new password. Just click the link below to set your new password:<br /><a href=\"%s\">%s</a><br /><br />This password reset request will only remain valid for the next 24 hours, but you can always start a password reset convenient for you.<br /><br />Regards,<br />%s<br /><a href=\"%s\">%s</a>", $member_info['username'], baseurl(), settings()->get('site_name', 'string'), baseurl('index.php?action=forgotpw2&amp;id='. $member_info['id']. '&amp;code='. $reset_key), baseurl('index.php?action=forgotpw2&amp;id='. $member_info['id']. '&amp;code='. $reset_key), settings()->get('site_name', 'string'), baseurl(), baseurl()));
 		}
 	}
 }
@@ -286,7 +286,7 @@ if(!function_exists('forgotpw_view2'))
 
 		if(member()->is_logged())
 		{
-			redirect(baseurl. '/index.php');
+			redirect(baseurl());
 		}
 
 		// Do you have the data required?
@@ -307,7 +307,7 @@ if(!function_exists('forgotpw_view2'))
 				$form = api()->load_class('Form');
 
 				$form->add('reset_password_form', array(
-																						'action' => baseurl. '/index.php?action=forgotpw2',
+																						'action' => baseurl('index.php?action=forgotpw2'),
 																						'method' => 'post',
 																						'callback' => 'forgotpw_process2',
 																						'submit' => l('Reset password'),
@@ -466,7 +466,7 @@ if(!function_exists('forgotpw_process2'))
 		$_SESSION['show_pwreset_message'] = true;
 
 		// Alright, redirecting you to the login screen :)
-		redirect(baseurl. '/index.php?action=login&member_name='. urlencode($member_info['username']));
+		redirect(baseurl('index.php?action=login&member_name='. urlencode($member_info['username'])));
 	}
 }
 ?>

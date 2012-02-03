@@ -146,7 +146,7 @@ function redirect($location = null, $status = 307)
 
 	if(empty($location))
 	{
-		$location = baseurl;
+		$location = function_exists('baseurl') ? baseurl() : baseurl;
 	}
 
 	// What type of redirect? Temporary, or permanent?

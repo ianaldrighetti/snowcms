@@ -991,8 +991,8 @@ function theme()
 		theme()->add_js_file(array('src' => themeurl. '/default/js/snowobj.js'));
 
 		// Along with  JavaScript variables containing the base URL and theme URL.
-		theme()->add_js_var('base_url', baseurl);
-		theme()->add_js_var('baseurl', baseurl);
+		theme()->add_js_var('base_url', baseurl());
+		theme()->add_js_var('baseurl', baseurl());
 		theme()->add_js_var('theme_url', themeurl);
 		theme()->add_js_var('session_id', member()->session_id());
 

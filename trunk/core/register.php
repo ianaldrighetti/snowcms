@@ -47,7 +47,7 @@ if(!function_exists('register_view'))
 		// Are you logged in? You don't need to register an account because you obviously have one!
 		if(member()->is_logged())
 		{
-			redirect(baseurl. '/index.php');
+			redirect(baseurl());
 		}
 
 		// Is registration enabled?
@@ -97,7 +97,7 @@ if(!function_exists('register_process'))
 		// Already logged in? You don't need another account! ;)
 		if(member()->is_logged())
 		{
-			redirect(baseurl. '/index.php');
+			redirect(baseurl());
 		}
 
 		// Registration disabled? We will let register_view() handle that.
@@ -165,7 +165,7 @@ if(!function_exists('register_generate_form'))
 		$form = api()->load_class('Form');
 		$form->add('registration_form', array(
 																			'callback' => 'register_member',
-																			'action' => api()->apply_filters('register_action_url', baseurl. '/index.php?action=register2'),
+																			'action' => api()->apply_filters('register_action_url', baseurl('index.php?action=register2')),
 																			'submit' => l('Register account'),
 																		));
 
@@ -387,7 +387,7 @@ if(!function_exists('register_send_email'))
 		{
 			$mail->set_html(true);
 
-			$handled = $mail->send($member_info['email'], api()->apply_filters('register_member_email_subject', l('Activation Instructions for %s', settings()->get('site_name', 'string'))), api()->apply_filters('register_member_email_body', l("Hello there %s, this email comes from %s.<br /><br />You are receiving this email because someone is attempting to register an account on our website with your email address. If you did not register for this account please disregard this email, no further actions are required and no account will be activated.<br /><br />If you did register for this account, please activate your account by clicking on the link below:<br /><a href=\"%s\">%s</a><br /><br />Thank you for registering! Hope to see you around!", $member_info['name'], baseurl, baseurl. '/index.php?action=activate&id='. $member_info['id']. '&code='.$member_info['acode'], baseurl. '/index.php?action=activate&id='. $member_info['id']. '&code='. $member_info['acode'])), api()->apply_filters('register_member_alt_email', ''), api()->apply_filters('register_member_email_options', array()));
+			$handled = $mail->send($member_info['email'], api()->apply_filters('register_member_email_subject', l('Activation Instructions for %s', settings()->get('site_name', 'string'))), api()->apply_filters('register_member_email_body', l("Hello there %s, this email comes from %s.<br /><br />You are receiving this email because someone is attempting to register an account on our website with your email address. If you did not register for this account please disregard this email, no further actions are required and no account will be activated.<br /><br />If you did register for this account, please activate your account by clicking on the link below:<br /><a href=\"%s\">%s</a><br /><br />Thank you for registering! Hope to see you around!", $member_info['name'], baseurl(), baseurl('index.php?action=activate&id='. $member_info['id']. '&code='.$member_info['acode']), baseurl('index.php?action=activate&id='. $member_info['id']. '&code='. $member_info['acode']))), api()->apply_filters('register_member_alt_email', ''), api()->apply_filters('register_member_email_options', array()));
 		}
 
 		return !empty($handled);
@@ -447,7 +447,7 @@ if(!function_exists('register_send_welcome_email'))
 			// Now dispatch them emails!
 			foreach($members_info as $member_info)
 			{
-				$mail->send($member_info['email'], api()->apply_filters('register_welcome_member_email_subject', l('Welcome to %s', settings()->get('site_name', 'string'))), api()->apply_filters('register_welcome_member_email_body', l("Hello there %s, this email comes from %s.<br /><br />You are receiving this email because your account on %s is now activated, and you can now log in to your account. If you never registered an account on %s, please disregard this email.<br /><br />If you did, however, you can now log in to your account at %s/index.php?action=login&member_name=%s<br /><br />Thank you for registering! Hope to see you around!", $member_info['name'], baseurl, settings()->get('site_name', 'string'), settings()->get('site_name', 'string'), baseurl, urlencode($member_info['username']))), api()->apply_filters('register_welcome_member_alt_email', ''), api()->apply_filters('register_welcome_member_email_options', array()));
+				$mail->send($member_info['email'], api()->apply_filters('register_welcome_member_email_subject', l('Welcome to %s', settings()->get('site_name', 'string'))), api()->apply_filters('register_welcome_member_email_body', l("Hello there %s, this email comes from %s.<br /><br />You are receiving this email because your account on %s is now activated, and you can now log in to your account. If you never registered an account on %s, please disregard this email.<br /><br />If you did, however, you can now log in to your account at %s/index.php?action=login&member_name=%s<br /><br />Thank you for registering! Hope to see you around!", $member_info['name'], baseurl(), settings()->get('site_name', 'string'), settings()->get('site_name', 'string'), baseurl(), urlencode($member_info['username']))), api()->apply_filters('register_welcome_member_alt_email', ''), api()->apply_filters('register_welcome_member_email_options', array()));
 			}
 
 			return true;

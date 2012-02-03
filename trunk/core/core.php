@@ -251,7 +251,10 @@ if(!function_exists('core_popup'))
 		}
 
 		// Collect the popup information.
-		$popup = api()->apply_filters('popup_'. $_GET['id'], array('title' => '', 'content'));
+		$popup = api()->apply_filters('popup_'. $_GET['id'], array(
+																													 'title' => false,
+																													 'content' => false,
+																												 ));
 
 		// We need title and content for the popup.
 		if(empty($popup['title']) || empty($popup['content']))

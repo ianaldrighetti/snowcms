@@ -1852,8 +1852,65 @@ function api_catch_fatal()
 {
 	// Make sure this isn't being called after the page has loaded without
 	// any issue.
-	if(empty($GLOBALS['loading_plugins']) || stripos(ob_get_contents(), '<html') !== false)
+	if(empty($GLOBALS['loading_plugins']))
 	{
+		// Well, while we are no longer loading plugins, why don't we see if
+		// an error occurred, because maybe we should handle it.
+		if(stripos(ob_get_contents(), '<html') === false)
+		{
+			// If the server has PHP 5.2.0 then we can use error_get_last.
+			if(!function_exists('error_get_last'))
+			{
+				$last_error = error_get_last();
+
+				// We are only worried about fatal errors.
+				if($last_error['type'] == E_ERROR)
+				{
+					api_show_fatal($last_error['message'], $last_error['file'], $last_error['line']);
+				}
+			}
+			else
+			{
+				$content = trim(strip_tags(ob_get_contents()));
+
+				// There should be a 'fatal error' or 'parse error'
+				if(stripos($content, 'fatal error') !== false || stripos($content, 'parse error') !== false)
+				{
+					// We will want to get some bits of information.
+					// Such as the line the error occurred on.
+					$line = (int)substr($content, strrpos($content, 'line') + 5);
+
+					$content = substr($content, 0, strrpos($content, ' on line'));
+
+					// Now we will work backwards until we find ' in '
+					$pos = strlen($content) - 1;
+					while($pos >= 0)
+					{
+						if(substr($content, $pos, 4) == ' in ')
+						{
+							break;
+						}
+
+						$pos--;
+					}
+
+					$file = substr($content, $pos + 4);
+
+					// Now we can get the error message itself.
+					$message = substr($content, 0, $pos);
+					$message = substr($message, strpos($message, ':') + 2);
+
+					// We want to make sure that the file even exists, since the way
+					// we obtained the error message may not have been completely
+					// accurate.
+					if(file_exists($file) && $line > 0)
+					{
+						api_show_fatal($message, $file, $line);
+					}
+				}
+			}
+		}
+
 		return;
 	}
 
@@ -2056,6 +2113,160 @@ if(!function_exists('api_handle_resource'))
 			exit;
 		}
 	}
+}
+
+/*
+	Function: api_show_fatal
+
+	Parameters:
+		string $message
+		string $filename
+		string $line
+
+	Returns:
+		void - Nothing is returned by this function.
+*/
+function api_show_fatal($message, $filename, $line)
+{
+	ob_clean();
+
+	// If this isn't an administrator, we don't want to show the whole file
+	// path -- just in case (whatever case that may be).
+	if(!function_exists('member') || !member()->is_a('administrator'))
+	{
+		$filename = realpath($filename);
+
+		// Remove the irrelevant parts.
+		$filename = substr($filename, strlen(realpath(dirname(dirname(__FILE__)))) + 1);
+	}
+
+	// It looks like it is time to show the error!
+	echo '<!DOCTYPE html>
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+	<meta name="robots" content="noindex" />
+	<title>Server Error: A Fatal Error Occurred</title>
+	<style type="text/css">
+		body
+		{
+			font: 13px Verdana, Tahoma, Arial, sans-serif;
+		}
+
+		h1
+		{
+			font-family: Georgia;
+			font-weight: normal;
+			color: red;
+		}
+
+		hr
+		{
+			height: 1px;
+			background: #CCC;
+			border: none;
+		}
+
+		#code-box
+		{
+			background: #FFFFAA;
+		}
+
+		#code-box p
+		{
+			display: block;
+			margin: 0;
+			padding: 0;
+		}
+
+		.highlighted-line
+		{
+			background: #FF7F50;
+		}
+
+		.line-no
+		{
+			float: left;
+			display: block;
+			font-weight: bold;
+			border-right: 1px solid #000000;
+			padding: 0 3px;
+			margin-right: 3px;
+		}
+
+		.break { clear: both; }
+	</style>
+</head>
+<body>
+	<h1>Server Error: A Fatal Error Occurred</h1>
+	<hr />
+	<p>An unexpected fatal error has occurred which has prevented the page from loading properly. If you are not a server administrator, please attempt to contact one in order to have this issue resolved.</p>
+	<p>Please be sure to provide the following information when contacting the administrator.</p>
+	<hr />
+	<p><strong>Error:</strong> ', $message, ' in <strong>', htmlspecialchars($filename), '</strong> on line <strong>', (int)$line, '</strong></p>';
+
+	// If they are an administrator, we can go ahead and show them the content
+	// of the file, but just the relevant lines (the line itself and a few
+	// others surrounding it.
+	if(function_exists('member') && member()->is_a('administrator'))
+	{
+		// We will want to open the file.
+		$fp = fopen($filename, 'rb');
+
+		// Let's find the proper lines.
+		$cur_line = 1;
+		$lines = array();
+		while(!feof($fp))
+		{
+			// Do we want this line?
+			if(abs(($cur_line < $line ? $cur_line + 1 : $cur_line)- $line) <= 10)
+			{
+				$lines[$cur_line] = fgets($fp);
+			}
+			elseif($cur_line > $line)
+			{
+				// We are over the lines we wanted to get, so no point on continuing
+				// to go through the file.
+				break;
+			}
+			else
+			{
+				// Not the line we want, but go ahead and keep going...
+				fgets($fp);
+			}
+
+			$cur_line++;
+		}
+
+		fclose($fp);
+
+		// Alright, let's display the lines, highlighting the one which is
+		// causing the problem.
+		echo '
+	<div id="code-box">';
+
+		foreach($lines as $cur_line => $line_text)
+		{
+			// We will want to replace a few things.
+			$line_text = strtr(htmlspecialchars($line_text, ENT_QUOTES, 'UTF-8'), array(
+																																							"\r\n" => '',
+																																							"\r" => '',
+																																							"\n" => '',
+																																							"\t" => '&nbsp;',
+																																						));
+
+			echo '
+		<p', $cur_line == $line ? ' class="highlighted-line"' : '', '><span class="line-no">', $cur_line, '</span> ', $line_text, '</p>
+		<div class="break">
+		</div>';
+		}
+
+		echo '
+	</div>';
+	}
+
+	echo '
+</body>
+</html>';
 }
 
 /*

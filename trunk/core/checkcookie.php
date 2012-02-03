@@ -81,7 +81,7 @@ if(!function_exists('checkcookie_verify'))
 			// It shouldn't have any slashes in it.
 			if(strpos($redir_to, '/') === false)
 			{
-				redirect(baseurl. '/index.php?'. $redir_to);
+				redirect(baseurl('index.php?'. $redir_to));
 			}
 		}
 
