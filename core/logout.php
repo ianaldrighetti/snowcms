@@ -45,7 +45,7 @@ if(!function_exists('logout_process'))
 		// Not even logged in? Then you can't log out!
 		if(member()->is_guest())
 		{
-			redirect(baseurl. '/index.php');
+			redirect(baseurl());
 		}
 
 		// Check that session identifier, make sure it is yours.
@@ -82,7 +82,7 @@ if(!function_exists('logout_process'))
 		api()->run_hooks('logout_success');
 
 		// Let's go home...
-		redirect(baseurl. '/index.php');
+		redirect(baseurl());
 	}
 }
 ?>

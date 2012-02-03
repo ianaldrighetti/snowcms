@@ -49,7 +49,7 @@ if(!function_exists('login_view'))
 		// Are you already logged in? If you are, you don't need this!
 		if(member()->is_logged())
 		{
-			redirect(baseurl. '/index.php');
+			redirect(baseurl());
 		}
 
 		// Did your password just get reset? Then we shall show you a message.
@@ -104,7 +104,7 @@ if(!function_exists('login_generate_form'))
 		$form = api()->load_class('Form');
 		$form->add('login_form', array(
 															 'callback' => 'login_process',
-															 'action' => api()->apply_filters('login_action_url', baseurl. '/index.php?action=login2'),
+															 'action' => api()->apply_filters('login_action_url', baseurl('index.php?action=login2')),
 															 'method' => 'post',
 															 'submit' => l('Log In'),
 														 ));
@@ -194,7 +194,7 @@ if(!function_exists('login_view2'))
 		// Are you logged in? You Silly Pants you!
 		if(member()->is_logged())
 		{
-			redirect(baseurl. '/index.php');
+			redirect(baseurl());
 		}
 
 		// Generate the login form :)
@@ -215,7 +215,7 @@ if(!function_exists('login_view2'))
 		}
 
 		// Redirect to check that login cookie! :)
-		redirect(baseurl. '/index.php?action=checkcookie&id='. $member_id. (!empty($_POST['redir_to']) ? '&redir_to='. urlencode($_POST['redir_to']) : ''));
+		redirect(baseurl('index.php?action=checkcookie&id='. $member_id. (!empty($_POST['redir_to']) ? '&redir_to='. urlencode($_POST['redir_to']) : '')));
 	}
 }
 
@@ -301,7 +301,7 @@ if(!function_exists('login_process'))
 			}
 			else
 			{
-				$errors[] = l('Your account must be activated before you can log in.'. (settings()->get('registration_type', 'int') == 2 ? '<br />An administrator should approve your account shortly.' : (settings()->get('registration_type', 'int') == 3 ? '<br />Please check your email for further instructions or <a href="%s">request a new activation email</a>.' : '')), baseurl. '/index.php?action=resend');
+				$errors[] = l('Your account must be activated before you can log in.'. (settings()->get('registration_type', 'int') == 2 ? '<br />An administrator should approve your account shortly.' : (settings()->get('registration_type', 'int') == 3 ? '<br />Please check your email for further instructions or <a href="%s">request a new activation email</a>.' : '')), baseurl('index.php?action=resend'));
 			}
 
 			return false;

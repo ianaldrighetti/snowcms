@@ -46,7 +46,7 @@ if(!function_exists('resend_view'))
 
 		if(member()->is_logged())
 		{
-			redirect(baseurl. '/index.php');
+			redirect(baseurl());
 		}
 		elseif(settings()->get('registration_type', 'int', 1) != 3)
 		{
@@ -64,7 +64,7 @@ if(!function_exists('resend_view'))
 		$form = api()->load_class('Form');
 
 		$form->add('resend_form', array(
-																'action' => baseurl. '/index.php?action=resend',
+																'action' => baseurl('index.php?action=resend'),
 																'method' => 'post',
 																'submit' => l('Resend activation'),
 																'callback' => 'resend_process',
@@ -140,7 +140,7 @@ if(!function_exists('resend_process'))
 		// Is the account already activated? No go!
 		if($member_info['is_activated'] != 0)
 		{
-			$errors[] = l('That account is already activated and you can <a href="%s">log in</a> if it is your account.', baseurl. '/index.php?action=login');
+			$errors[] = l('That account is already activated and you can <a href="%s">log in</a> if it is your account.', baseurl('index.php?action=login'));
 
 			return false;
 		}

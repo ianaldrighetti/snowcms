@@ -592,7 +592,7 @@ if(!function_exists('profile_edit_handle'))
 			$members->update($member_info['id'], $update_info);
 
 			// We updated everything... So let's go back!
-			redirect(baseurl. '/index.php?action=profile'. (member()->id() == $member_info['id'] ? '' : '&id='. $member_info['id']). '&edit&message='. (!empty($verification_required) ? 2 : 1));
+			redirect(baseurl('index.php?action=profile'. (member()->id() == $member_info['id'] ? '' : '&id='. $member_info['id']). '&edit&message='. (!empty($verification_required) ? 2 : 1)));
 		}
 		else
 		{

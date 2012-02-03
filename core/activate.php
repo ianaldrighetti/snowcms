@@ -89,7 +89,7 @@ if(!function_exists('activate_view'))
 				if($member_info['is_activated'] == 1)
 				{
 					api()->add_filter('activate_form_errors', create_function('$value', '
-																											$value[] = l(\'That account is already activated. If this is your account you can <a href="%s">log in</a>.\', baseurl. \'/index.php?action=login\');
+																											$value[] = l(\'That account is already activated. If this is your account you can <a href="%s">log in</a>.\', baseurl(\'index.php?action=login\'));
 
 																											return $value;'));
 					api()->run_hooks('activate_member_already_activated', array($member_info));
@@ -116,7 +116,7 @@ if(!function_exists('activate_view'))
 																						));
 
 					api()->add_filter('activate_form_messages', create_function('$value', '
-																												$value[] = l(\'Your account has been successfully activated. You may now <a href="%s">log in</a>.\', baseurl. \'/index.php?action=login\');
+																												$value[] = l(\'Your account has been successfully activated. You may now <a href="%s">log in</a>.\', baseurl(\'index.php?action=login\'));
 
 																												return $value;'));
 					api()->run_hooks('activate_member_success', array($member_info));

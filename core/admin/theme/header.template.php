@@ -96,7 +96,8 @@ if(!admin_prompt_required() && empty(api()->context['cp_access_denied']))
 if(!admin_prompt_required() && admin_show_sidebar() && empty(api()->context['cp_access_denied']))
 {
 	echo '
-			<div id="side-bar">';
+			<div id="side-bar">
+				<p style="margin: 5px auto;"><a href="', baseurl('index.php?action=admin'), '" title="', l('Control Panel'), '">', l('Control Panel'), '</a></p>';
 
 	foreach($GLOBALS['icons'] as $group_label => $items)
 	{
