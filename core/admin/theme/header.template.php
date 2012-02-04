@@ -95,25 +95,62 @@ if(!admin_prompt_required() && empty(api()->context['cp_access_denied']))
 // Did you want to display the sidebar?
 if(!admin_prompt_required() && admin_show_sidebar() && empty(api()->context['cp_access_denied']))
 {
+	$groups_state = member()->data('admin_groups_state', 'array', array());
+
 	echo '
 			<div id="side-bar">
-				<p style="margin: 5px auto;"><a href="', baseurl('index.php?action=admin'), '" title="', l('Control Panel'), '">', l('Control Panel'), '</a></p>';
+				<p class="cp-link"><a href="', baseurl('index.php?action=admin'), '" title="', l('Control Panel'), '">', l('Control Panel'), '</a></p>';
 
+	$group_id = 0;
 	foreach($GLOBALS['icons'] as $group_label => $items)
 	{
 		echo '
-				<p class="sidebar-header">', $group_label, '</p>
-				<ul>';
+				<p class="sidebar-header" onclick="expandGroup(', $group_id, ');">', $group_label, '</p>
+				<ul id="group_', $group_id, '" style="display: ', !empty($groups_state[$group_id]) ? 'block' : 'none', ';">';
 
 		// Now for each link.
 		foreach($items as $item)
 		{
 			echo '
-					<li><a href="', $item['href'], '" title="', $item['title'], '">', $item['label'], '</a></li>';
+					<li', !empty($item['children']) && count($item['children']) > 0 ? ' onmouseover="s.id(\''. $item['id']. '_dropdown\').style.display = \'block\';" onmouseout="s.id(\''. $item['id']. '_dropdown\').style.display = \'none\';"' : '', '><a href="', $item['href'], '" title="', !empty($item['title']) ? $item['title'] : '', '">', $item['label'], '</a>';
+
+			// Does this section have children?
+			if(!empty($item['children']) && count($item['children']) > 0)
+			{
+				echo '
+						<ul id="', $item['id'], '_dropdown" style="display: none;">';
+
+				$total = count($item['children']);
+				$current = 0;
+				foreach($item['children'] as $child)
+				{
+					$classes = array();
+					if($current == 0)
+					{
+						$classes[] = 'is-first';
+					}
+					elseif($current + 1 == $total)
+					{
+						$classes[] = 'is-last';
+					}
+
+					echo '
+							<li><a href="', $child['href'], '" title="', !empty($child['title']) ? $child['title'] : '', '"', count($classes) > 0 ? ' class="'. implode(' ', $classes). '"' : '', '>', $child['label'], '</a></li>';
+
+					$current++;
+				}
+
+				echo '
+						</ul>';
+			}
+
+			echo '</li>';
 		}
 
 		echo '
 				</ul>';
+
+		$group_id++;
 	}
 
 	echo '

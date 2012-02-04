@@ -231,3 +231,27 @@ function removeWindow(window_id)
 		return false;
 	}
 }
+
+function expandGroup(group_id)
+{
+	if(s.id('group_' + group_id.toString()))
+	{
+		var element = s.id('group_' + group_id.toString());
+
+		if(element.style.display == 'none')
+		{
+			element.style.display = 'block';
+		}
+		else
+		{
+			element.style.display = 'none';
+		}
+
+		s.ajaxCallback(baseurl + '/index.php?action=admin&sa=ajax', expandGroupDone, 'request=set&group_id=' + s.encode(group_id) + '&state=' + (element.style.display == 'none' ? 0 : 1) + '&sid=' + s.encode(session_id));
+	}
+}
+
+function expandGroupDone(response)
+{
+	// Nothing... (on purpose).
+}

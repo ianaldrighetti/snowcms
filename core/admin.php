@@ -293,7 +293,7 @@ if(!function_exists('admin_prepend'))
 					// link tree.
 					$icon_map['data'][$info['id']] = array(
 																						 'href' => $info['href'],
-																						 'title' => $info['title'],
+																						 'title' => !empty($info['title']) ? $info['title'] : '',
 																						 'label' => !empty($info['tree_label']) ? $info['tree_label'] : $info['label'],
 																					 );
 					$icon_map['index'][$info['id']] = array($header);
@@ -314,7 +314,7 @@ if(!function_exists('admin_prepend'))
 
 							$icon_map['data'][$child['id']] = array(
 																									'href' => $child['href'],
-																									'title' => $child['title'],
+																									'title' => !empty($child['title']) ? $child['title'] : '',
 																									'label' => !empty($child['tree_label']) ? $child['tree_label'] : $child['label'],
 																								);
 							$icon_map['index'][$child['id']] = array($header, $info['id']);
@@ -358,6 +358,25 @@ if(!function_exists('admin_prepend'))
 					echo json_encode(array('error' => l('Your session has timed out'), 'admin_prompt_required' => true));
 					exit;
 				}
+			}
+
+			if(isset($_POST['request']) && $_POST['request'] == 'set' && !empty($_POST['sid']) && $_POST['sid'] == member()->session_id() && in_array('group_id', array_keys($_POST)) && (int)$_POST['group_id'] >= 0)
+			{
+				$groups_state = member()->data('admin_groups_state', 'array', array());
+
+				$groups_state[(int)$_POST['group_id']] = !empty($_POST['state']) ? 1 : 0;
+
+				// We require the Members class to update their data.
+				$members = api()->load_class('Members');
+
+				$members->update(member()->id(), array(
+																					 'data' => array(
+																											 'admin_groups_state' => serialize($groups_state),
+																										 ),
+																				 ));
+
+				echo json_encode(true);
+				exit;
 			}
 		}
 		else
