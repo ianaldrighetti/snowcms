@@ -55,6 +55,7 @@ if(is_array($GLOBALS['icons']) && count($GLOBALS['icons']) > 0)
 	foreach($GLOBALS['icons'] as $label => $icon)
 	{
 		echo '
+			<a name="', htmlchars(str_replace(' ', '', strtolower($label))), '"></a>
 			<h3>', $label, '</h3>
 			<table class="icon-table">
 				<tr>';

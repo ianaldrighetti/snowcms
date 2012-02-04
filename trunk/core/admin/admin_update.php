@@ -156,6 +156,7 @@ if(!function_exists('admin_update_apply'))
 		}
 
 		admin_current_area('system_update');
+		admin_link_tree_add(l('Installing Update'));
 
 		// Why don't we see if the update keys match.
 		$update_key = false;

@@ -125,7 +125,7 @@ if(!function_exists('admin_settings'))
 			}
 		}
 
-		admin_current_area('system_settings');
+		admin_current_area($form_type. '_system_settings');
 
 		theme()->set_title(htmlchars_decode($form_types[$form_type][0]));
 

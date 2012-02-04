@@ -45,7 +45,7 @@ if(!function_exists('admin_prepend'))
 	*/
 	function admin_prepend()
 	{
-		global $icons;
+		global $icons, $icon_map;
 
 		// Clear everything...
 		theme()->clear();
@@ -64,7 +64,7 @@ if(!function_exists('admin_prepend'))
 		theme()->add_js_file(array('src' => themeurl. '/default/js/snowobj.js'));
 		theme()->add_js_file(array('src' => theme()->url(). '/js/main.js'));
 		theme()->add_js_file(array('src' => theme()->url(). '/js/notifications.js'));
-		theme()->add_js_var('notificationTitle', l('Notificiations'));
+		theme()->add_js_var('notificationTitle', l('Notifications'));
 		theme()->add_js_var('base_url', baseurl);
 		theme()->add_js_var('baseurl', baseurl);
 		theme()->add_js_var('session_id', member()->session_id());
@@ -85,6 +85,43 @@ if(!function_exists('admin_prepend'))
 														'src' => theme()->url(). '/style/images/settings.png',
 														'label' => l('Settings'),
 														'show' => member()->can('manage_system_settings'),
+														'children' => array(
+																						array(
+																							'id' => 'basic_system_settings',
+																							'href' => baseurl('index.php?action=admin&amp;sa=settings&amp;type=basic'),
+																							'title' => l('Change your website name, subtitle, description and keywords'),
+																							'label' => l('Basic Settings'),
+																							'show' => true,
+																						),
+																						array(
+																							'id' => 'date_system_settings',
+																							'href' => baseurl('index.php?action=admin&amp;sa=settings&amp;type=date'),
+																							'title' => l('Manage date and time format settings'),
+																							'label' => l('Date &amp; Time Settings'),
+																							'show' => true,
+																						),
+																						array(
+																							'id' => 'mail_system_settings',
+																							'href' => baseurl('index.php?action=admin&amp;sa=settings&amp;type=email'),
+																							'title' => l('Manage email settings, such as the email address to send emails with'),
+																							'label' => l('Email Settings'),
+																							'show' => true,
+																						),
+																						array(
+																							'id' => 'security_system_settings',
+																							'href' => baseurl('index.php?action=admin&amp;sa=settings&amp;type=security'),
+																							'title' => l('Manage security related settings'),
+																							'label' => l('Security Settings'),
+																							'show' => true,
+																						),
+																						array(
+																							'id' => 'other_system_settings',
+																							'href' => baseurl('index.php?action=admin&amp;sa=settings&amp;type=other'),
+																							'title' => l('Manage miscellaneous settings'),
+																							'label' => l('Other Settings'),
+																							'show' => true,
+																						),
+																					),
 													),
 													array(
 														'id' => 'manage_themes',
@@ -93,6 +130,22 @@ if(!function_exists('admin_prepend'))
 														'src' => theme()->url(). '/style/images/manage_themes.png',
 														'label' => l('Themes'),
 														'show' => member()->can('manage_themes'),
+														'children' => array(
+																						array(
+																							'id' => 'manage_manage_themes',
+																							'href' => baseurl('index.php?action=admin&amp;sa=themes&amp;section=manage'),
+																							'title' => l('Manage currently installed themes'),
+																							'label' => l('Manage Themes'),
+																							'show' => true,
+																						),
+																						array(
+																							'id' => 'install_manage_themes',
+																							'href' => baseurl('index.php?action=admin&amp;sa=themes&amp;section=install'),
+																							'title' => l('Install a new theme from a file or from the Internet'),
+																							'label' => l('Install Themes'),
+																							'show' => true,
+																						),
+																					),
 													),
 													array(
 														'id' => 'system_update',
@@ -100,6 +153,7 @@ if(!function_exists('admin_prepend'))
 														'title' => l('Check for updates'),
 														'src' => theme()->url(). '/style/images/update.png',
 														'label' => l('Update'),
+														'tree_label' => l('Check for Updates'),
 														'show' => member()->can('update_system'),
 													),
 													array(
@@ -108,6 +162,7 @@ if(!function_exists('admin_prepend'))
 														'title' => l('About SnowCMS and system information'),
 														'src' => theme()->url(). '/style/images/about.png',
 														'label' => l('About'),
+														'tree_label' => l('About SnowCMS'),
 														'show' => true,
 													),
 													array(
@@ -116,6 +171,7 @@ if(!function_exists('admin_prepend'))
 														'title' => l('View the error log'),
 														'src' => theme()->url(). '/style/images/error_log.png',
 														'label' => l('Errors'),
+														'tree_label' => l('Error Log'),
 														'show' => member()->can('view_error_log') && settings()->get('errors_log', 'bool'),
 													),
 												),
@@ -126,6 +182,7 @@ if(!function_exists('admin_prepend'))
 														'title' => l('Add a new member'),
 														'src' => theme()->url(). '/style/images/members_add.png',
 														'label' => l('Add'),
+														'tree_label' => l('Add a New Member'),
 														'show' => member()->can('add_new_member'),
 													),
 													array(
@@ -134,6 +191,7 @@ if(!function_exists('admin_prepend'))
 														'title' => l('Manage existing members'),
 														'src' => theme()->url(). '/style/images/members_manage.png',
 														'label' => l('Manage'),
+														'tree_label' => l('Manage Members'),
 														'show' => member()->can('manage_members'),
 													),
 													array(
@@ -143,6 +201,29 @@ if(!function_exists('admin_prepend'))
 														'src' => theme()->url(). '/style/images/members_settings.png',
 														'label' => l('Settings'),
 														'show' => member()->can('manage_member_settings'),
+														'children' => array(
+																						array(
+																							'id' => 'register_members_settings',
+																							'href' => baseurl('index.php?action=admin&amp;members_settings&amp;type=register'),
+																							'title' => l('Manage registration settings'),
+																							'label' => l('Registration Settings'),
+																							'show' => true,
+																						),
+																						array(
+																							'id' => 'disallowed_members_settings',
+																							'href' => baseurl('index.php?action=admin&amp;members_settings&amp;type=disallowed'),
+																							'title' => l('Manage usernames and email addresses which are not allowed to be used'),
+																							'label' => l('Disallowed Names &amp; Emails'),
+																							'show' => true,
+																						),
+																						array(
+																							'id' => 'other_members_settings',
+																							'href' => baseurl('index.php?action=admin&amp;members_settings&amp;type=other'),
+																							'title' => l('Change the length requirements for usernames and passwords, along with how email address changes should be handled'),
+																							'label' => l('Username, Email &amp; Password Settings'),
+																							'show' => true,
+																						),
+																					),
 													),
 													array(
 														'id' => 'members_permissions',
@@ -150,6 +231,7 @@ if(!function_exists('admin_prepend'))
 														'title' => l('Set member group permissions'),
 														'src' => theme()->url(). '/style/images/members_permissions.png',
 														'label' => l('Permissions'),
+														'tree_label' => l('Manage Permissions'),
 														'show' => member()->can('manage_permissions'),
 													),
 												),
@@ -160,6 +242,7 @@ if(!function_exists('admin_prepend'))
 														'title' => l('Add a new plugin'),
 														'src' => theme()->url(). '/style/images/plugins_add.png',
 														'label' => l('Add'),
+														'tree_label' => l('Add a New Plugin'),
 														'show' => member()->can('add_plugins'),
 													),
 													array(
@@ -168,6 +251,7 @@ if(!function_exists('admin_prepend'))
 														'title' => l('Manage plugins'),
 														'src' => theme()->url(). '/style/images/plugins_manage.png',
 														'label' => l('Manage'),
+														'tree_label' => l('Manage Plugins'),
 														'show' => member()->can('manage_plugins'),
 													),
 													array(
@@ -176,6 +260,7 @@ if(!function_exists('admin_prepend'))
 														'title' => l('Manage plugin settings'),
 														'src' => theme()->url(). '/style/images/plugins_settings.png',
 														'label' => l('Settings'),
+														'tree_label' => l('Plugin Settings'),
 														'show' => member()->can('manage_plugin_settings'),
 													),
 												),
@@ -186,13 +271,54 @@ if(!function_exists('admin_prepend'))
 
 			// Remove any that don't need showing, though.
 			$tmp = array();
+
+			// We will also generate a mapping for the ID's of the links, which
+			// will be used to generate the link tree.
+			$icon_map = array(
+										'data' => array(),
+										'index' => array(),
+									);
 			foreach($icons as $header => $icon)
 			{
 				foreach($icon as $key => $info)
 				{
-					if(empty($info['show']))
+					if(empty($info['show']) || empty($info['id']) || empty($info['href']) || empty($info['label']))
 					{
 						unset($icon[$key]);
+
+						continue;
+					}
+
+					// Add this location to the index, this way we can generate the
+					// link tree.
+					$icon_map['data'][$info['id']] = array(
+																						 'href' => $info['href'],
+																						 'title' => $info['title'],
+																						 'label' => !empty($info['tree_label']) ? $info['tree_label'] : $info['label'],
+																					 );
+					$icon_map['index'][$info['id']] = array($header);
+
+					// Does this have any children?
+					if(isset($info['children']) && count($info['children']) > 0)
+					{
+						foreach($info['children'] as $c_key => $child)
+						{
+							// Make sure this one should be displayed.
+							if(empty($child['show']) || empty($child['id']) || empty($child['href']) || empty($child['label']))
+							{
+								// Nope!
+								unset($info['children'][$c_key]);
+
+								continue;
+							}
+
+							$icon_map['data'][$child['id']] = array(
+																									'href' => $child['href'],
+																									'title' => $child['title'],
+																									'label' => !empty($child['tree_label']) ? $child['tree_label'] : $child['label'],
+																								);
+							$icon_map['index'][$child['id']] = array($header, $info['id']);
+						}
 					}
 				}
 
@@ -646,58 +772,73 @@ function admin_link_tree($displaying_login = false)
 	// If the log in form is being displayed, show a different link tree.
 	if(!empty($displaying_login))
 	{
-		return '<a href="'. baseurl. '/index.php?action=admin">'. l('Control Panel'). '</a> &raquo; '. l('Log In');
+		return '<a href="'. baseurl('index.php?action=admin'). '">'. l('Control Panel'). '</a> &raquo; '. l('Log In');
 	}
 
-	$linktree = array();
-	$query_strings = array();
-	$current = 0;
-	foreach(api()->return_linktree() as $link)
+	// We will always at least show the Control Panel link.
+	$links[] = '<a href="'. baseurl('index.php?action=admin'). '">'. l('Control Panel'). '</a>';
+
+	// We want to make sure we know where we're at.
+	$area_id = admin_current_area();
+	if(isset($GLOBALS['icon_map']['index'][$area_id]))
 	{
-		// Is the identifier a callback?
-		if(is_callable($link['identifier']))
-		{
-			// Then we shall go ahead and call it.
-			$link['identifier'] = call_user_func($link['identifier'], $link['value']);
-		}
+		// Let's get the list of ID's that this location is within.
+		$index = $GLOBALS['icon_map']['index'][$area_id];
 
-		if(!is_array($link['identifier']))
-		{
-			$link['identifier'] = array(
-															array(
-																'query_string' => $link['query_string'],
-																'identifier' => $link['identifier'],
-															),
-														);
-		}
+		// Also go ahead and add the current ID to the list as well ;-).
+		$index[] = $area_id;
 
-		foreach($link['identifier'] as $_link)
+		$length = count($index);
+		for($i = 0; $i < $length; $i++)
 		{
-			$query_strings[] = $_link['query_string'];
-			$linktree[$current++] = array(
-																'href' => baseurl. '/index.php?'. implode('&amp;', $query_strings),
-																'text' => $_link['identifier'],
-																'is_last' => true,
-															);
+			$item = $index[$i];
 
-			// Mark the previous as not last any more. If there is a previous,
-			// that is.
-			if($current - 2 >= 0)
+			// The very first item is just a category title.
+			if($i == 0)
 			{
-				$linktree[$current - 2]['is_last'] = false;
+				$links[] = '<a href="'. baseurl('index.php?action=admin#'. urlencode(strtolower(str_replace(' ', '', $item)))). '" title="'. htmlchars($item). '">'. htmlchars($item). '</a>';
+			}
+			elseif(isset($GLOBALS['icon_map']['data'][$item]))
+			{
+				$item = $GLOBALS['icon_map']['data'][$item];
+
+				$links[] = ($i + 1 != $length || admin_link_tree_add() !== null ? '<a href="'. $item['href']. '" title="'. $item['title']. '">' : ''). $item['label']. ($i + 1 != $length || admin_link_tree_add() !== null ? '</a>' : '');
 			}
 		}
-	}
 
-	// Yeah, I know, we have to go through this AGAIN.
-	$links = array();
-	$link_count = count($linktree);
-	foreach($linktree as $link)
-	{
-		$links[] = (!$link['is_last'] || $link_count == 1 ? '<a href="'. $link['href']. '">' : ''). $link['text']. (!$link['is_last'] ? '</a>' : '');
+		if(admin_link_tree_add() !== null)
+		{
+			$links[] = admin_link_tree_add();
+		}
 	}
 
 	return implode(' &raquo; ', $links);
+}
+
+/*
+	Function: admin_link_tree_add
+
+	Allows the addition of one more item to be appended to the link tree
+	displayed within the control panel.
+
+	Parameters:
+		string $label
+
+	Returns:
+		void - Nothing is returned by this function.
+*/
+function admin_link_tree_add($label = null)
+{
+	static $label_value = null;
+
+	if(!empty($label))
+	{
+		$label_value = $label;
+	}
+	else
+	{
+		return $label_value;
+	}
 }
 
 /*

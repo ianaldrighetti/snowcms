@@ -46,6 +46,23 @@ if(!admin_prompt_required() && empty(api()->context['cp_access_denied']))
 					<select name="jump_to_select" onchange="this.form.go.click();">
 						<option><?php echo l('Control Panel'); ?></option>
 <?php
+		// There can be up to two levels of navigation specified in the icons
+		// array, but we only show the first level in this drop down... So we
+		// need to figure out whether the currently specified area is at the
+		// first level or not.
+		$area_id = admin_current_area();
+
+		if(isset($GLOBALS['icon_map']['index'][$area_id]))
+		{
+			$index = $GLOBALS['icon_map']['index'][$area_id];
+
+			// If there is just one item, then we're at the first level.
+			if(count($index) > 1)
+			{
+				$area_id = array_pop($index);
+			}
+		}
+
     // Display the drop down for quick navigation.
     foreach($GLOBALS['icons'] as $icon_group => $icon)
     {
@@ -55,7 +72,7 @@ if(!admin_prompt_required() && empty(api()->context['cp_access_denied']))
       foreach($icon as $i)
       {
         echo '
-          <option value="', urlencode(htmlspecialchars_decode($i['href'])), '"', (!empty($i['id']) && admin_current_area() == $i['id'] ? ' selected="selected"' : ''), '>', $i['label'], '</option>';
+          <option value="', urlencode(htmlspecialchars_decode($i['href'])), '"', (!empty($i['id']) && $area_id == $i['id'] ? ' selected="selected"' : ''), '>', $i['label'], '</option>';
       }
 
       echo '
