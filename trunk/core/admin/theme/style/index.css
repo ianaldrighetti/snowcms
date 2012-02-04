@@ -39,26 +39,49 @@
 /* End #content-container section. Begin #side-bar section. */
 #side-bar
 {
+	font-size: 90%;
 	float: left;
-	width: 140px;
+	width: 165px;
 	margin: 0;
-	padding: 0 10px 10px 10px;
+	padding: 0 0 3px 0;
 	background: #F2F2F2;
 	border: 1px solid #DEDEDE;
 	border-radius: 8px;
-	overflow: hidden;
+}
+
+#side-bar .cp-link
+{
+	margin: 0;
+}
+
+#side-bar .cp-link a
+{
+	display: block;
+	color: black;
+	margin: 5px 5px;
+	font-size: 105%;
+	font-weight: bold;
+	z-index: 0;
+	cursor: pointer;
+}
+
+#side-bar .cp-link a:hover
+{
+	text-decoration: none;
 }
 
 #side-bar .sidebar-header
 {
-	margin: 5px auto;
+	margin: 5px 5px;
 	font-size: 105%;
 	font-weight: bold;
+	z-index: 0;
+	cursor: pointer;
 }
 
 #side-bar ul
 {
-	margin: 0 auto auto 5px;
+	margin: 0 auto auto auto;
 	padding: 0;
 	list-style: none;
 	font-size: 90%;
@@ -66,7 +89,57 @@
 
 #side-bar ul li
 {
-	margin-top: 1px;
+	position: relative;
+}
+
+#side-bar ul li a
+{
+	padding: 5px 10px;
+	display: block;
+}
+
+#side-bar ul li a:hover
+{
+	background: #E8E8E8;
+	text-decoration: none;
+}
+
+#side-bar ul li ul
+{
+	position: absolute;
+	top: 0px;
+	left: 120px;
+	z-index: 1;
+}
+
+#side-bar ul li ul
+{
+	font-size: 105%;
+	background: #F2F2F2;
+	border: 1px solid #DEDEDE;
+	border-radius: 8px;
+}
+
+#side-bar ul li ul a
+{
+	display: block;
+	width: 170px;
+	padding: 5px 8px;
+}
+
+#side-bar ul li ul a:hover
+{
+	color: #003F87;
+}
+
+#side-bar ul .is-first
+{
+	border-radius: 8px 8px 0 0;
+}
+
+#side-bar ul .is-last
+{
+	border-radius: 0 0 8px 8px;
 }
 
 /* End #sideb-bar section. Begin #side-content section. */
