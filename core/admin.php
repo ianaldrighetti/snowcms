@@ -204,21 +204,21 @@ if(!function_exists('admin_prepend'))
 														'children' => array(
 																						array(
 																							'id' => 'register_members_settings',
-																							'href' => baseurl('index.php?action=admin&amp;members_settings&amp;type=register'),
+																							'href' => baseurl('index.php?action=admin&amp;sa=members_settings&amp;type=register'),
 																							'title' => l('Manage registration settings'),
 																							'label' => l('Registration Settings'),
 																							'show' => true,
 																						),
 																						array(
 																							'id' => 'disallowed_members_settings',
-																							'href' => baseurl('index.php?action=admin&amp;members_settings&amp;type=disallowed'),
+																							'href' => baseurl('index.php?action=admin&amp;sa=members_settings&amp;type=disallowed'),
 																							'title' => l('Manage usernames and email addresses which are not allowed to be used'),
 																							'label' => l('Disallowed Names &amp; Emails'),
 																							'show' => true,
 																						),
 																						array(
 																							'id' => 'other_members_settings',
-																							'href' => baseurl('index.php?action=admin&amp;members_settings&amp;type=other'),
+																							'href' => baseurl('index.php?action=admin&amp;sa=members_settings&amp;type=other'),
 																							'title' => l('Change the length requirements for usernames and passwords, along with how email address changes should be handled'),
 																							'label' => l('Username, Email &amp; Password Settings'),
 																							'show' => true,
