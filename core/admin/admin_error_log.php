@@ -313,6 +313,7 @@ if(!function_exists('admin_error_log_view'))
 			api()->run_hooks('admin_error_log_view_id', array($error_id, &$error, &$error_const));
 
 			theme()->set_title(l('Viewing Error #%s', $error_id));
+			admin_link_tree_add(l('Viewing Error #%s', $error_id));
 
 			api()->context['error_id'] = $error_id;
 			api()->context['error'] = array(

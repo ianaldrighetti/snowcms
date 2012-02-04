@@ -204,7 +204,7 @@ if(!function_exists('admin_themes'))
 			api()->context['table_width'] = count(api()->context['theme_list']) == 1 ? '33%' : (count(api()->context['theme_list']) == 2 ? '66%' : '100%');
 		}
 
-		admin_current_area('manage_themes');
+		admin_current_area($theme_section. '_manage_themes');
 
 		theme()->set_title(l('Manage Themes'));
 

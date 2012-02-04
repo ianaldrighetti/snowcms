@@ -65,7 +65,7 @@ if(!function_exists('admin_members_settings'))
 																																								 ),
 																																 'other' => array(
 																																						  l('Username, Email &amp; Password Settings'),
-																																						  l('Manage security related settings'),
+																																						  l('Change the length requirements for usernames and passwords, along with how email address changes should be handled'),
 																																						  l('Password and username length requirements can be changed here, along with how email address changes should be handled.'),
 																																					  ),
 																															 ));
@@ -115,7 +115,7 @@ if(!function_exists('admin_members_settings'))
 			}
 		}
 
-		admin_current_area('members_settings');
+		admin_current_area($form_type. '_members_settings');
 
 		theme()->set_title(htmlchars_decode($form_types[$form_type][0]));
 

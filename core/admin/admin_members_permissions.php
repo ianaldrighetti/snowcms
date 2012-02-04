@@ -165,6 +165,7 @@ if(!function_exists('admin_members_manage_group_permissions'))
 		}
 
 		admin_current_area('members_permissions');
+		admin_link_tree_add(l('Managing Group'));
 
 		// Check to see if the specified group even exists!
 		if(!api()->return_group($group_id) && strtolower($group_id) != 'guest')
@@ -211,6 +212,8 @@ if(!function_exists('admin_members_manage_group_permissions'))
 			api()->context['group_id'] = $group_id;
 			api()->context['group_name'] = $group_id != 'guest' ? htmlchars(api()->return_group($group_id)) : l('Guest');
 			api()->context['form'] = $form;
+
+			admin_link_tree_add(l('Editing &quot;%s&quot; Permissions', api()->context['group_name']));
 
 			theme()->render('admin_members_manage_group_permissions');
 		}
