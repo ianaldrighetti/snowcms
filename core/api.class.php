@@ -1862,19 +1862,13 @@ function api_catch_fatal()
 			if(function_exists('error_get_last'))
 			{
 				$last_error = error_get_last();
-
-				// We are only worried about fatal errors.
-				if(in_array($last_error['type'], array(E_ERROR, E_PARSE, E_COMPILE_ERROR), true))
-				{
-					api_show_fatal($last_error['message'], $last_error['file'], $last_error['line']);
-				}
 			}
 			else
 			{
 				$content = trim(strip_tags(ob_get_contents()));
 
 				// There should be a 'fatal error' or 'parse error'
-				if(stripos($content, 'fatal error') !== false || stripos($content, 'parse error') !== false)
+				if(($is_fatal = stripos($content, 'fatal error')) !== false || stripos($content, 'parse error') !== false)
 				{
 					// We will want to get some bits of information.
 					// Such as the line the error occurred on.
@@ -1900,14 +1894,35 @@ function api_catch_fatal()
 					$message = substr($content, 0, $pos);
 					$message = substr($message, strpos($message, ':') + 2);
 
-					// We want to make sure that the file even exists, since the way
-					// we obtained the error message may not have been completely
-					// accurate.
-					if(file_exists($file) && $line > 0)
-					{
-						api_show_fatal($message, $file, $line);
-					}
+					// Store the information into an array, just like the
+					// error_get_last function.
+					$last_error = array(
+													'type' => $is_fatal ? E_ERROR : E_PARSE,
+													'message' => $message,
+													'file' => $file,
+													'line' => $line,
+												);
 				}
+			}
+
+			// Before we continue, let's just make sure the file that supposedly
+			// threw the error exists (well, it kind of has to, but this check is
+			// just to make sure the error message was parsed correctly if the
+			// error_get_last function isn't present on this system).
+			if(file_exists($last_error['file']) && $last_error['line'] > 0 && in_array($last_error['type'], array(E_ERROR, E_PARSE, E_COMPILE_ERROR), true))
+			{
+				// We really ought to log this error.
+				if(!function_exists('errors_handler'))
+				{
+					// Which can be done through our handy-dandy errors_handler
+					// function!
+					require_once(coredir. '/errors.php');
+				}
+
+				errors_handler($last_error['type'], $last_error['message'], $last_error['file'], $last_error['line']);
+
+				// Now show that error message! Hopefully someone will fix it.
+				api_show_fatal($last_error['message'], $last_error['file'], $last_error['line']);
 			}
 		}
 
