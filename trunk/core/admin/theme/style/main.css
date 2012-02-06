@@ -417,6 +417,34 @@ body
 	font-size: 11px;
 }
 
+#error_log_view
+{
+	margin-top: 10px;
+}
+
+#error_log_view th
+{
+	background: #3465A7;
+	color: #FFFFFF;
+	padding: 4px;
+	text-align: left !important;
+}
+
+#error_log_view td
+{
+	padding: 5px;
+}
+
+#error_log_view .tr_1
+{
+	background: #E6E8FA;
+}
+
+#error_log_view .tr_2
+{
+	background: #F5F5F5;
+}
+
 /* Notifications */
 #notification-box
 {
