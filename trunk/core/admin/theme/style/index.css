@@ -26,7 +26,7 @@
 #content-container
 {
 	margin: 10px auto 10px auto;
-	padding: 5px;
+	padding: 0;
 	border: 1px solid #DEDEDE;
 	border-radius: 8px;
 }
@@ -39,52 +39,23 @@
 /* End #content-container section. Begin #side-bar section. */
 #side-bar
 {
+	position: relative;
 	font-size: 90%;
 	float: left;
-	width: 165px;
+	width: 170px;
 	margin: 0;
 	padding: 0 0 3px 0;
 	background: #F2F2F2;
 	border: 1px solid #DEDEDE;
-	border-radius: 8px;
-}
-
-#side-bar .cp-link
-{
-	margin: 0;
-}
-
-#side-bar .cp-link a
-{
-	display: block;
-	color: black;
-	margin: 5px 5px;
-	font-size: 105%;
-	font-weight: bold;
-	z-index: 0;
-	cursor: pointer;
-}
-
-#side-bar .cp-link a:hover
-{
-	text-decoration: none;
-}
-
-#side-bar .sidebar-header
-{
-	margin: 5px 5px;
-	font-size: 105%;
-	font-weight: bold;
-	z-index: 0;
-	cursor: pointer;
+	border-width: 0 1px 1px 0;
+	border-radius: 7px 0 8px 0;
 }
 
 #side-bar ul
 {
-	margin: 0 auto auto auto;
+	margin: 0;
 	padding: 0;
 	list-style: none;
-	font-size: 90%;
 }
 
 #side-bar ul li
@@ -94,52 +65,107 @@
 
 #side-bar ul li a
 {
-	padding: 5px 10px;
 	display: block;
+	padding: 5px;
+	font-size: 105%;
+	font-weight: bold;
+	color: black;
 }
 
 #side-bar ul li a:hover
 {
-	background: #E8E8E8;
 	text-decoration: none;
 }
 
-#side-bar ul li ul
-{
-	position: absolute;
-	top: 0px;
-	left: 120px;
-	z-index: 1;
-}
-
-#side-bar ul li ul
-{
-	font-size: 105%;
-	background: #F2F2F2;
-	border: 1px solid #DEDEDE;
-	border-radius: 8px;
-}
-
-#side-bar ul li ul a
+/* Second Level Navigation - State: Expanded */
+#side-bar ul ul.expanded
 {
 	display: block;
-	width: 170px;
-	padding: 5px 8px;
 }
 
-#side-bar ul li ul a:hover
+#side-bar ul ul.expanded li a
 {
+	padding: 4px 8px;
+	font-size: 90%;
+	font-weight: normal;
 	color: #003F87;
 }
 
-#side-bar ul .is-first
+#side-bar ul ul.expanded li
 {
-	border-radius: 8px 8px 0 0;
+	border: 1px solid #F2F2F2;
+	border-width: 1px 0;
 }
 
-#side-bar ul .is-last
+#side-bar ul ul li:hover
 {
-	border-radius: 0 0 8px 8px;
+	background: white;
+	border-color: #DEDEDE;
+}
+
+#side-bar ul ul.expanded li ul
+{
+	display: none;
+	width: 170px;
+	position: absolute;
+	top: -1px;
+	left: 160px;
+	background: #F2F2F2;
+	border: 1px solid #DEDEDE;
+	z-index: 1;
+}
+
+#side-bar ul ul.expanded li:hover ul
+{
+	display: block;
+}
+
+#side-bar ul ul.expanded li li
+{
+	border: none;
+}
+
+/* Second Level Navigation - State: Collapsed */
+#side-bar ul ul.collapsed
+{
+	display: none;
+	width: 170px;
+	position: absolute;
+	top: -1px;
+	left: 160px;
+	background: #F2F2F2;
+	border: 1px solid #DEDEDE;
+	z-index: 2;
+}
+
+#side-bar ul li:hover ul.collapsed
+{
+	display: block;
+}
+
+#side-bar ul li:hover ul.collapsed a
+{
+	padding: 4px 8px;
+	font-size: 90%;
+	font-weight: normal;
+	color: #003F87;
+}
+
+#side-bar ul li:hover ul.collapsed li ul
+{
+	display: none;
+	width: 170px;
+	position: absolute;
+	top: -1px;
+	left: 160px;
+	background: #F2F2F2;
+	border: 1px solid #D2D2D2;
+	z-index: 3;
+}
+
+#side-bar ul li:hover ul.collapsed li:hover ul
+{
+	display: block;
 }
 
 /* End #sideb-bar section. Begin #side-content section. */
@@ -152,18 +178,19 @@
 
 #snowcms-news
 {
-	margin: 5px 5px 0 0;
+	margin: 0 5px 0 0;
 	border: 1px solid #DEDEDE;
-	border-radius: 8px;
+	border-width: 0 1px 1px 1px;
+	border-radius: 0 0 8px 8px;
 }
 
 #snowcms-news h3
 {
 	margin: 0;
 	padding: 5px;
-	font-size: 110%;
+	font-size: 90%;
 	background: #F2F2F2;
-	border-radius: 6px 6px 0 0;
+	border-bottom: 1px solid #DEDEDE;
 }
 
 #snowcms-news #news-content

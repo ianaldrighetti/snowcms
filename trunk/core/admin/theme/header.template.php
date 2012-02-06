@@ -99,61 +99,56 @@ if(!admin_prompt_required() && admin_show_sidebar() && empty(api()->context['cp_
 
 	echo '
 			<div id="side-bar">
-				<p class="cp-link"><a href="', baseurl('index.php?action=admin'), '" title="', l('Control Panel'), '">', l('Control Panel'), '</a></p>';
+				<ul>
+					<li><a href="', baseurl('index.php?action=admin'), '" title="', l('Control Panel'), '">', l('Control Panel'), '</a></li>';
 
-	$group_id = 0;
+	// The icons array is set within the admin_prepend function in admin.php,
+	// it contains all the locations (well, for the most part) within the
+	// control panel.
 	foreach($GLOBALS['icons'] as $group_label => $items)
 	{
-		echo '
-				<p class="sidebar-header" onclick="expandGroup(', $group_id, ');">', $group_label, '</p>
-				<ul id="group_', $group_id, '" style="display: ', !empty($groups_state[$group_id]) ? 'block' : 'none', ';">';
+		// We will go ahead and use this as the group ID.
+		$group_id = sha1(strtolower($group_label));
 
-		// Now for each link.
+		echo '
+					<li><a href="javascript:void(0);" onclick="menuStateChanged(\'', $group_id, '\');">', $group_label, '</a>
+						<ul id="group_', $group_id, '" class="', isset($groups_state[$group_id]) && $groups_state[$group_id] == 1 ? 'expanded' : 'collapsed', '">';
+
+		// Now we will need to generate all the locations within this group.
 		foreach($items as $item)
 		{
 			echo '
-					<li', !empty($item['children']) && count($item['children']) > 0 ? ' onmouseover="s.id(\''. $item['id']. '_dropdown\').style.display = \'block\';" onmouseout="s.id(\''. $item['id']. '_dropdown\').style.display = \'none\';"' : '', '><a href="', $item['href'], '" title="', !empty($item['title']) ? $item['title'] : '', '">', $item['label'], '</a>';
+							<li><a href="', $item['href'], '" title="', isset($item['title']) ? $item['title'] : '', '">', $item['label'], '</a>';
 
-			// Does this section have children?
+			// This location could have children, which we will certainly want to
+			// display before closing the current list item tag.
 			if(!empty($item['children']) && count($item['children']) > 0)
 			{
+				// This is the last one, I promise!
 				echo '
-						<ul id="', $item['id'], '_dropdown" style="display: none;">';
+								<ul>';
 
-				$total = count($item['children']);
-				$current = 0;
 				foreach($item['children'] as $child)
 				{
-					$classes = array();
-					if($current == 0)
-					{
-						$classes[] = 'is-first';
-					}
-					elseif($current + 1 == $total)
-					{
-						$classes[] = 'is-last';
-					}
-
 					echo '
-							<li><a href="', $child['href'], '" title="', !empty($child['title']) ? $child['title'] : '', '"', count($classes) > 0 ? ' class="'. implode(' ', $classes). '"' : '', '>', $child['label'], '</a></li>';
-
-					$current++;
+									<li><a href="', $child['href'], '" title="', isset($child['title']) ? $child['title'] : '', '">', $child['label'], '</a></li>';
 				}
 
 				echo '
-						</ul>';
+								</ul>';
 			}
 
-			echo '</li>';
+			echo '
+							</li>';
 		}
 
 		echo '
-				</ul>';
-
-		$group_id++;
+						</ul>
+					</li>';
 	}
 
 	echo '
+				</ul>
 			</div>
 			<div id="side-content">';
 }

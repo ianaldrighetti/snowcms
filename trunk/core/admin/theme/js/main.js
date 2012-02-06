@@ -79,7 +79,7 @@ function createOverlay(opacity, color, zIndex)
 	div.style.right = '0';
 	div.style.bottom = '0';
 	div.style.left = '0';
-	div.style.background = (color ? color : '#000000');
+	div.style.background = (color ? color : '#ffffff');
 	div.id = 'overlay_' + element_id;
 
 	if(zIndex)
@@ -232,22 +232,16 @@ function removeWindow(window_id)
 	}
 }
 
-function expandGroup(group_id)
+function menuStateChanged(group_id)
 {
 	if(s.id('group_' + group_id.toString()))
 	{
 		var element = s.id('group_' + group_id.toString());
 
-		if(element.style.display == 'none')
-		{
-			element.style.display = 'block';
-		}
-		else
-		{
-			element.style.display = 'none';
-		}
+		// If it is expanded, collapse it, and vice versa.
+		element.className = element.className == 'expanded' ? 'collapsed' : 'expanded';
 
-		s.ajaxCallback(baseurl + '/index.php?action=admin&sa=ajax', expandGroupDone, 'request=set&group_id=' + s.encode(group_id) + '&state=' + (element.style.display == 'none' ? 0 : 1) + '&sid=' + s.encode(session_id));
+		s.ajaxCallback(baseurl + '/index.php?action=admin&sa=ajax', expandGroupDone, 'request=set&group_id=' + s.encode(group_id) + '&state=' + (element.className == 'collapsed' ? 0 : 1) + '&sid=' + s.encode(session_id));
 	}
 }
 

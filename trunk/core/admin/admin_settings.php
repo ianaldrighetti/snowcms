@@ -831,7 +831,7 @@ if(!function_exists('admin_settings_generate_form'))
 			$form->add_input(array(
 												 'name' => 'enable_utf8',
 												 'type' => 'checkbox',
-												 'label' => l('Enable UTF8 support'),
+												 'label' => l('Enable UTF-8 support'),
 												 'subtext' => l('If enabled (and if the Multibyte PHP extension is enabled), UTF8 capable functions will be used to handle data. Please note that this can, in cases, slow your site down.'),
 												 'disabled' => !function_exists('mb_internal_encoding'),
 												 'default_value' => settings()->get('enable_utf8', 'int'),
