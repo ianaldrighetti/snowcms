@@ -4,7 +4,7 @@ var notificationOverlayId;
 function openNotificationWindow()
 {
 	// Let's create our overlay first.
-	notificationOverlayId = createOverlay(70, false, 1);
+	notificationOverlayId = createOverlay(30, false, 1);
 	overlays[notificationOverlayId].onclick = closeNotificationWindow;
 
 	// Now our window.

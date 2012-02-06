@@ -360,11 +360,11 @@ if(!function_exists('admin_prepend'))
 				}
 			}
 
-			if(isset($_POST['request']) && $_POST['request'] == 'set' && !empty($_POST['sid']) && $_POST['sid'] == member()->session_id() && in_array('group_id', array_keys($_POST)) && (int)$_POST['group_id'] >= 0)
+			if(isset($_POST['request']) && $_POST['request'] == 'set' && !empty($_POST['sid']) && $_POST['sid'] == member()->session_id() && in_array('group_id', array_keys($_POST)) && strlen($_POST['group_id']) == 40)
 			{
 				$groups_state = member()->data('admin_groups_state', 'array', array());
 
-				$groups_state[(int)$_POST['group_id']] = !empty($_POST['state']) ? 1 : 0;
+				$groups_state[$_POST['group_id']] = !empty($_POST['state']) ? 1 : 0;
 
 				// We require the Members class to update their data.
 				$members = api()->load_class('Members');
