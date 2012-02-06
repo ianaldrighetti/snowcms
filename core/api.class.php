@@ -1856,15 +1856,15 @@ function api_catch_fatal()
 	{
 		// Well, while we are no longer loading plugins, why don't we see if
 		// an error occurred, because maybe we should handle it.
-		if(stripos(ob_get_contents(), '<html') === false)
+		if(($html_tag_found = stripos(ob_get_contents(), '<html')) === false || ($html_tag_found && stripos(ob_get_contents(), '</html') === false) || (function_exists('error_get_last') && error_get_last() !== null))
 		{
 			// If the server has PHP 5.2.0 then we can use error_get_last.
-			if(!function_exists('error_get_last'))
+			if(function_exists('error_get_last'))
 			{
 				$last_error = error_get_last();
 
 				// We are only worried about fatal errors.
-				if($last_error['type'] == E_ERROR)
+				if(in_array($last_error['type'], array(E_ERROR, E_PARSE, E_COMPILE_ERROR), true))
 				{
 					api_show_fatal($last_error['message'], $last_error['file'], $last_error['line']);
 				}

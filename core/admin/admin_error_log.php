@@ -51,6 +51,14 @@ if(!function_exists('admin_error_log'))
 			admin_access_denied();
 		}
 
+		// Maybe they're deleting an error?
+		if(!empty($_GET['delete']))
+		{
+			verify_request('get');
+
+			admin_error_log_table_handle('delete', array((int)$_GET['delete']));
+		}
+
 		// Generate the table which we will use to display the errors.
 		admin_error_log_generate_table();
 
@@ -325,8 +333,67 @@ if(!function_exists('admin_error_log_view'))
 																	'line' => $error['error_line'],
 																	'url' => '<a href="'. htmlchars($error['error_url']). '">'. htmlchars($error['error_url']). '</a>',
 																	'message' => $error['error_message'],
+																	'options' => array(
+																							 ),
 																);
 			api()->context['error_const'] = $error_const;
+
+			// Let's see if there is a previous error we can have them navigate
+			// to.
+			$request = db()->query('
+				SELECT
+					error_id
+				FROM {db->prefix}error_log
+				WHERE error_id < {int:error_id}
+				ORDER BY error_id DESC
+				LIMIT 1',
+				array(
+					'error_id' => $error_id,
+				));
+
+			// Anything?
+			if($request->num_rows() > 0)
+			{
+				list($prev_error_id) = $request->fetch_row();
+
+				// Yup, so add it to the options.
+				api()->context['error']['options'][] = array(
+																								 'title' => l('Go to the previous error message'),
+																								 'label' => l('&laquo; Previous'),
+																								 'href' => baseurl('index.php?action=admin&amp;sa=error_log&amp;id='. $prev_error_id),
+																							 );
+			}
+
+			// Next comes the option to delete the error.
+			api()->context['error']['options'][] = array(
+																							 'title' => l('Delete this error message'),
+																							 'confirm' => l('Are you sure you want to delete this error message?'),
+																							 'label' => l('Delete'),
+																							 'href' => baseurl('index.php?action=admin&amp;sa=error_log&amp;delete='. $error_id. '&amp;sid='. member()->session_id()),
+																						 );
+
+			// Now for a the next error.
+			$request = db()->query('
+				SELECT
+					error_id
+				FROM {db->prefix}error_log
+				WHERE error_id > {int:error_id}
+				ORDER BY error_id ASC
+				LIMIT 1',
+				array(
+					'error_id' => $error_id,
+				));
+
+			if($request->num_rows() > 0)
+			{
+				list($next_error_id) = $request->fetch_row();
+
+				api()->context['error']['options'][] = array(
+																								 'title' => l('Go to the next error message'),
+																								 'label' => l('Next &raquo;'),
+																								 'href' => baseurl('index.php?action=admin&amp;sa=error_log&amp;id='. $next_error_id),
+																							 );
+			}
 
 			$members = api()->load_class('Members');
 			$members->load($error['member_id']);
