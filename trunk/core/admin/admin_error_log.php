@@ -144,17 +144,25 @@ if(!function_exists('admin_error_log_generate_table'))
 																										'function' => create_function('$row', '
 																																		$error_type = $row[\'error_type\'];
 
-																																		if($error_type == 8)
+																																		if($error_type == E_ERROR || $error_type == E_PARSE || $error_type == E_USER_ERROR)
 																																		{
-																																			return l(\'<abbr title="Undefined variable">Undefined</abbr>\');
+																																			return \'<span class="red bold">\'. l(\'Fatal\'). \'</span>\';
 																																		}
-																																		elseif($error_type == 2)
+																																		elseif($error_type == E_WARNING || $error_type == E_USER_WARNING)
 																																		{
-																																			return l(\'General\');
+																																			return \'<abbr title="\'. l(\'Run-time warning (non-fatal)\'). \'">\'. l(\'Warning\'). \'</abbr>\';
+																																		}
+																																		elseif($error_type == E_NOTICE || $error_type == E_USER_NOTICE)
+																																		{
+																																			return l(\'<abbr title="Undefined variable">Notice</abbr>\');
 																																		}
 																																		elseif($error_type == \'database\')
 																																		{
 																																			return l(\'Database\');
+																																		}
+																																		elseif($error_type == E_DEPRECATED || $error_type == E_USER_DEPRECATED)
+																																		{
+																																			return l(\'Deprecated\');
 																																		}
 																																		else
 																																		{
