@@ -50,7 +50,7 @@ if(!function_exists('activate_view'))
 		// Are you logged in? Then why would you need to activate another account?
 		if(member()->is_logged())
 		{
-			redirect(baseurl. '/index.php');
+			redirect(baseurl());
 		}
 		// What is the registration type? Is it actually email?
 		elseif(settings()->get('registration_type', 'int', 0) != 3)
@@ -96,7 +96,9 @@ if(!function_exists('activate_view'))
 
 					$_REQUEST['name'] = $member_info['username'];
 				}
-				// Do the codes not match?
+				// Do the codes not match? Also make sure that this account wasn't
+				// supposed to be activated by an administrator (in which case the
+				// activation code is admin_approval).
 				elseif($member_info['acode'] != $_REQUEST['code'] || strlen($member_info['acode']) == 0 || $member_info['acode'] == 'admin_approval')
 				{
 					api()->add_filter('activate_form_errors', create_function('$value', '

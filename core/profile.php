@@ -522,6 +522,11 @@ if(!function_exists('profile_edit_handle'))
 						// Looks like it didn't work! D:
 						$errors[] = l('An error occurred while trying to send the email verification message. Please contact an administrator if this issue continues.');
 
+						// We should log this error, otherwise administrators may never
+						// find out there is a problem, seeing as they don't have to
+						// verify their email address changes!
+						trigger_error(l('An error occurred while trying to send the user their email verification message. This could indicate that the SMTP settings are incorrect or the server does not have the mail() function enabled.'), E_USER_WARNING);
+
 						return false;
 					}
 

@@ -167,7 +167,16 @@ if(!function_exists('resend_process'))
 			require_once(coredir. '/register.php');
 		}
 
-		register_send_email($member_id);
+		if(!register_send_email($member_id))
+		{
+			// We should tell the administrator that the message couldn't be sent.
+			trigger_error(l('An error occurred while trying to resend the user their activation email. This could indicate that the SMTP settings are incorrect or the server does not have the mail() function enabled.'), E_USER_WARNING);
+
+			// Then tell the user! D:
+			$errors[] = l('An error occurred while trying to resend your activation email. Please contact the administrator if this issue continues.');
+
+			return false;
+		}
 
 		api()->add_filter('resend_form_messages', create_function('$value', '
 																								$value[] = l(\'A new activation email has been sent. The email should be received shortly.\');

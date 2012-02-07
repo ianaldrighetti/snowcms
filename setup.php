@@ -149,7 +149,7 @@ function setup_requirement_fail()
 			<p>Checking if directory is writable... ', (is_writable(dirname(__FILE__)) ? '<span class="green bold">Writable</span>' : '<span class="red bold">Not Writable</span>'), '</p>
 			<p>Checking for at least PHP version 5... ', (version_compare(phpversion(), '5.0.0', '>=') ? '<span class="green bold">OK</span>' : '<span class="red bold">FAIL</span>'), ' (running v', phpversion(), ')</p>
 			<p>Checking for <a href="http://www.php.net/manual/en/book.xml.php" target="_blank">XML Parser</a> extension... ', (function_exists('xml_parser_create') ? '<span class="green bold">Enabled</span>' : '<span class="red bold">Not Enabled</span>'), '</p>
-			<p>Checking for at MySQL extension... ', (function_exists('mysql_connect') ? '<span class="green bold">Enabled</span>' : '<span class="red bold">Not Enabled</span>'), '</p>
+			<p>Checking for MySQL extension... ', (function_exists('mysql_connect') ? '<span class="green bold">Enabled</span>' : '<span class="red bold">Not Enabled</span>'), '</p>
 			<br />
 			<p>Once these issues are resolved, simply refresh this page to check again.</p>';
 

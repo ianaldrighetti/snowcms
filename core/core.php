@@ -116,8 +116,8 @@ function init_core()
 			api()->add_event('action=admin&sa=themes', 'admin_themes', create_function('$value', '
 																																	 return array(
 																																						array(
-																																							\'query_string\' => \'sa=themes&amp;section=\'. (isset($_GET[\'section\']) && $_GET[\'section\'] == \'install\' ? \'install\' : \'manage\'),
-																																							\'identifier\' => (isset($_GET[\'section\']) && $_GET[\'section\'] == \'install\' ? l(\'Install Themes\') : l(\'Manage Themes\')),
+																																							\'query_string\' => \'sa=themes&amp;section=\'. (isset($_GET[\'section\']) ? ($_GET[\'section\'] == \'install\' ? \'install\' : ($_GET[\'section\'] == \'widgets\' ? \'widgets\' : \'manage\')) : \'manage\'),
+																																							\'identifier\' => (isset($_GET[\'section\']) && ($_GET[\'section\'] == \'install\' || $_GET[\'section\'] == \'widgets\') ? ($_GET[\'section\'] == \'install\' ? l(\'Install Themes\') : l(\'Manage Widgets\')) : l(\'Manage Themes\')),
 																																						),
 																																					);'), coredir. '/admin/admin_themes.php');
 			api()->add_event('action=admin&sa=themes&install=*', 'admin_themes_install', l('Installing Theme'), coredir. '/admin/admin_themes.php');

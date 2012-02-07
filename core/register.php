@@ -338,7 +338,17 @@ if(!function_exists('register_member'))
 		// Was it a success? Do we need to send an activation email?
 		if($member_id > 0 && settings()->get('registration_type', 'int', 1) == 3)
 		{
-			register_send_email($member_id);
+			if(!register_send_email($member_id))
+			{
+				// If the message didn't get sent, then we should alert the
+				// administrator of the problem.
+				trigger_error(l('An error occurred while trying to send the user their activation email. This could indicate that the SMTP settings are incorrect or the server does not have the mail() function enabled.'), E_USER_WARNING);
+			}
+		}
+		elseif($member_id > 0)
+		{
+			// Otherwise we will just send a welcome email.
+			register_send_welcome_email($member_id);
 		}
 
 		// Now return the member id.
@@ -447,7 +457,10 @@ if(!function_exists('register_send_welcome_email'))
 			// Now dispatch them emails!
 			foreach($members_info as $member_info)
 			{
-				$mail->send($member_info['email'], api()->apply_filters('register_welcome_member_email_subject', l('Welcome to %s', settings()->get('site_name', 'string'))), api()->apply_filters('register_welcome_member_email_body', l("Hello there %s, this email comes from %s.<br /><br />You are receiving this email because your account on %s is now activated, and you can now log in to your account. If you never registered an account on %s, please disregard this email.<br /><br />If you did, however, you can now log in to your account at %s/index.php?action=login&member_name=%s<br /><br />Thank you for registering! Hope to see you around!", $member_info['name'], baseurl(), settings()->get('site_name', 'string'), settings()->get('site_name', 'string'), baseurl(), urlencode($member_info['username']))), api()->apply_filters('register_welcome_member_alt_email', ''), api()->apply_filters('register_welcome_member_email_options', array()));
+				if(!$mail->send($member_info['email'], api()->apply_filters('register_welcome_member_email_subject', l('Welcome to %s', settings()->get('site_name', 'string'))), api()->apply_filters('register_welcome_member_email_body', l("Hello there %s, this email comes from %s.<br /><br />You are receiving this email because your account on %s is now activated, and you can now log in to your account. If you never registered an account on %s, please disregard this email.<br /><br />If you did, however, you can now log in to your account at %s/index.php?action=login&member_name=%s<br /><br />Thank you for registering! Hope to see you around!", $member_info['name'], baseurl(), settings()->get('site_name', 'string'), settings()->get('site_name', 'string'), baseurl(), urlencode($member_info['username']))), api()->apply_filters('register_welcome_member_alt_email', ''), api()->apply_filters('register_welcome_member_email_options', array())))
+				{
+					trigger_error(l('An error occurred while trying to send the user welcome email. This could indicate that the SMTP settings are incorrect or the server does not have the mail() function enabled.'), E_USER_WARNING);
+				}
 			}
 
 			return true;
