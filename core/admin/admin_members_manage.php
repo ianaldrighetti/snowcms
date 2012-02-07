@@ -87,6 +87,31 @@ if(!function_exists('admin_members_manage_generate_table'))
 	{
 		$table = api()->load_class('Table');
 
+		// There are a couple options we will only want to show when certain
+		// filters are applied.
+		$action_options = array(
+												'activate' => 'Activate',
+												'deactivate' => 'Deactivate',
+												'delete' => 'Delete',
+											);
+
+		if(isset($_GET['filter']))
+		{
+			// Such as if they are viewing the pending activation members, we will
+			// allow them to resend the activation emails.
+			if($_GET['filter'] == 'unactivated')
+			{
+				$action_options['resend'] = l('Resend Activation');
+			}
+
+			// But we don't need to show the deactivate option if they are viewing
+			// already unactivated accounts.
+			if($_GET['filter'] == 'unactivated' || $_GET['filter'] == 'awaiting')
+			{
+				unset($action_options['deactivate']);
+			}
+		}
+
 		$table->add('admin_members_manage_table', array(
 																								'db_query' => '
 																																SELECT
@@ -98,20 +123,23 @@ if(!function_exists('admin_members_manage_generate_table'))
 																								'sort' => array('member_id', 'desc'),
 																								'base_url' => baseurl. '/index.php?action=admin&sa=members_manage',
 																								'cellpadding' => '4px',
-																								'options' => array(
-																															 'activate' => 'Activate',
-																															 'deactivate' => 'Deactivate',
-																															 'delete' => 'Delete',
-																														 ),
+																								'options' => $action_options,
 																								'filters' => array(
 																															 'activated' => array(
 																																								'label' => l('Activated'),
+																																								'title' => l('View only activated members'),
 																																								'where' => 'member_activated = 1',
 																																							),
 																															 'unactivated' => array(
 																																									'label' => l('Pending Activation'),
-																																									'where' => 'member_activated = 0',
+																																									'title' => l('View only unactivated members who have yet to activate their account via email'),
+																																									'where' => 'member_activated = 0 AND member_acode != \'admin_approval\'',
 																																								),
+																															 'awaiting' => array(
+																																							 'label' => l('Awaiting Approval'),
+																																							 'title' => l('View only unactivated members awaiting administrative approval'),
+																																							 'where' => 'member_activated = 0 AND (member_acode = \'admin_approval\' OR member_acode = \'\')',
+																																						 ),
 																														 ),
 																							));
 
@@ -249,6 +277,50 @@ if(!function_exists('admin_members_manage_table_handle'))
 					array(
 						'selected' => $selected,
 					), 'admin_members_deactivate_query');
+			}
+		}
+		// Resending the users their activation emails? Good idea!
+		elseif($action == 'resend')
+		{
+			// We will need to load up all the information about these accounts,
+			// as we want to make sure they aren't activated yet (or are pending
+			// email activation)
+			$members = api()->load_class('Members');
+			$members->load($selected);
+
+			// An error might prevent these messages from being sent, and we will
+			// only want to log that error once.
+			$email_failed = false;
+
+			foreach($members->get($selected) as $member_info)
+			{
+				// So, does it meet the criteria?
+				if(!$member_info['is_activated'] && $member_info['acode'] != 'admin_approval' && strlen($member_info['acode']) > 0)
+				{
+					// The register_send_email function in register.php will do
+					// exactly what we want. But we just may need to fetch it.
+					if(!function_exists('register_send_email'))
+					{
+						require(coredir. '/register.php');
+					}
+
+					// We need to regenerate their activation code...
+					$members->update($member_info['id'], array(
+																								 'member_acode' => sha1($members->rand_str(mt_rand(30, 40))),
+																							 ));
+
+					if(!register_send_email($member_info['id']))
+					{
+						// Looks like it didn't get sent, woops!
+						$email_failed = true;
+					}
+				}
+			}
+
+			// Did something go wrong?
+			if($email_failed)
+			{
+				trigger_error(l('An error occurred while trying to send users their activation email. This could indicate that the SMTP settings are incorrect or the server does not have the mail() function enabled.'), E_USER_WARNING);
 			}
 		}
 		elseif($action == 'delete')

@@ -758,7 +758,7 @@ class Table
 
 				foreach($table['filters'] as $filter_id => $filter_options)
 				{
-					$filters[] = ($filter != $filter_id ? '<a href="'. $table['base_url']. '&amp;filter='. urlencode($filter_id). '">' : ''). $filter_options['label']. ' ('. format_number($filter_options['count']). ')'. ($filter != $filter_id ? '</a>' : '');
+					$filters[] = ($filter != $filter_id ? '<a href="'. $table['base_url']. '&amp;filter='. urlencode($filter_id). '"'. (isset($filter_options['title']) ? ' title="'. htmlchars($filter_options['title']). '"' : ''). '>' : ''). htmlchars($filter_options['label']). ' ('. format_number($filter_options['count']). ')'. ($filter != $filter_id ? '</a>' : '');
 				}
 			}
 
