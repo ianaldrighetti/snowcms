@@ -48,11 +48,14 @@ if(!function_exists('checkcookie_verify'))
 		$cookie = isset($_COOKIE[api()->apply_filters('login_cookie_name', cookiename)]) ? $_COOKIE[api()->apply_filters('login_cookie_name', cookiename)] : '';
 		list($member_id) = explode('|', $cookie);
 
+		// If the cookie is empty, there is no ID for us to check against or the
+		// ID in the URL and in the cookie don't match, then something went
+		// wrong...
 		if(api()->apply_filters('checkcookie_check', empty($cookie) || empty($_GET['id']) || $_GET['id'] != $member_id))
 		{
 			// The cookie didn't save :(
 			api()->add_filter('login_message', create_function('$value', '
-				return l(\'It appears your login cookie couldn\\\'t be saved. Please be sure you have cookies enabled in your browser settings and try again.\');'));
+				return l(\'It appears your log in cookie couldn\\\'t be saved. Please be sure you have cookies enabled in your browser settings and try again.\');'));
 
 			api()->run_hooks('checkcookie_failed');
 
@@ -86,7 +89,7 @@ if(!function_exists('checkcookie_verify'))
 		}
 
 		// Guess not.
-		redirect(baseurl. '/index.php');
+		redirect(baseurl());
 	}
 }
 ?>

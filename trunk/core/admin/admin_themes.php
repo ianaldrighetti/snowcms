@@ -60,6 +60,10 @@ if(!function_exists('admin_themes'))
 																																										l('Install Themes'),
 																																										l('Install a new theme from a file or from the Internet'),
 																																									),
+																																		 'widgets' => array(
+																																										l('Manage Widgets'),
+																																										l('Manage widgets'),
+																																									),
 																																	 ));
 
 		// Which section are you accessing?
