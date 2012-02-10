@@ -1,0 +1,53 @@
+.permission-table
+{
+	margin: 0 0 10px 0;
+	background: #F2F2F2;
+	border: 1px solid #DEDEDE;
+	border-radius: 8px;
+}
+
+.permission-header
+{
+	margin: 0;
+	padding: 4px 8px;
+	font-weight: bold;
+	background: #DEDEDE;
+	border-radius: 7px 7px 0 0;
+}
+
+.permission-header .permission-subtext
+{
+	font-weight: normal !important;
+	font-size: 80%;
+}
+
+.permission-table .float-left
+{
+	width: 80%;
+	margin: 0;
+	padding: 10px;
+}
+
+.permission-table .float-right
+{
+	margin: 0;
+	padding: 10px;
+}
+
+.permission-table .float-right p
+{
+	margin: 0;
+}
+
+.permission-label
+{
+	font-weight: bold;
+	font-size: 90%;
+	margin: 0;
+}
+
+.permission-label-subtext
+{
+	font-size: 80%;
+	margin: 0;
+}
