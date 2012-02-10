@@ -59,6 +59,7 @@ if(!function_exists('admin_members_manage_permissions'))
 
 		$group_list = array();
 		$count = 0;
+		$group_ids = array();
 		foreach(api()->context['groups'] as $group_id => $group_name)
 		{
 			$group = array(
@@ -93,31 +94,8 @@ if(!function_exists('admin_members_manage_permissions'))
 				$group['members'] = format_number($group['members']);
 			}
 
-			// Now how about the total number of permissions assigned, and to each
-			// section (denied, disallowed or allowed). If this isn't the
-			// administrator group, which can do everything!
-			if($group_id != 'administrator')
-			{
-				$result = db()->query('
-										SELECT
-											status, COUNT(*) AS assigned
-										FROM {db->prefix}permissions
-										WHERE group_id = {string:group_id}
-										GROUP BY status',
-										array(
-											'group_id' => $group_id,
-										));
-
-				// Save the totals.
-				while($row = $result->fetch_assoc())
-				{
-					if($row['status'] <= 1 && $row['status'] >= -1)
-					{
-						$group['assigned'][$row['status'] == -1 ? 'deny' : ($row['status'] == 0 ? 'disallow' : 'allow')] = $row['assigned'];
-					}
-				}
-			}
-			else
+			// The administrator group can do everything! Because they're awesome!
+			if($group_id == 'administrator')
 			{
 				$group['assigned'] = array(
 															 'deny' => '&ndash;',
@@ -127,8 +105,32 @@ if(!function_exists('admin_members_manage_permissions'))
 			}
 
 			// Add this group to the list.
-			$group_list[] = $group;
+			$group_list[$group_id] = $group;
+			$group_ids[] = $group_id;
 		}
+
+		// We want to get the count of permissions denied, disallowed and
+		// denied.
+		$result = db()->query('
+								SELECT
+									group_id, status, COUNT(*) AS assigned
+								FROM {db->prefix}permissions
+								GROUP BY status, group_id',
+								array(
+									'group_id' => $group_ids,
+								));
+
+		while($row = $result->fetch_assoc())
+		{
+			// Let's just make sure...
+			if($row['group_id'] == 'administrator')
+			{
+				continue;
+			}
+
+			$group_list[$row['group_id']]['assigned'][$row['status'] == -1 ? 'deny' : ($row['status'] == 0 ? 'disallow' : 'allow')] = $row['assigned'];
+		}
+
 
 		// The template will be needing this.
 		api()->context['group_list'] = $group_list;
@@ -209,9 +211,18 @@ if(!function_exists('admin_members_manage_group_permissions'))
 
 			theme()->set_title(l('Managing %s Permissions', htmlchars(api()->return_group($group_id))));
 
+			// Some CSS, please!
+			theme()->add_link(array('rel' => 'stylesheet', 'type' => 'text/css', 'href' => theme()->url(). '/style/permissions.css'));
+
 			api()->context['group_id'] = $group_id;
 			api()->context['group_name'] = $group_id != 'guest' ? htmlchars(api()->return_group($group_id)) : l('Guest');
 			api()->context['form'] = $form;
+
+			// Do we need to set a message?
+			if(!empty($_GET['message']))
+			{
+				api()->context['message'] = l('Permissions updated successfully.');
+			}
 
 			admin_link_tree_add(l('Editing &quot;%s&quot; Permissions', api()->context['group_name']));
 
@@ -251,81 +262,106 @@ if(!function_exists('admin_members_permissions_generate_form'))
 
 		$form->current($form_name);
 
-		// Now is your time to add your permission!
+		// Let's define all the default permissions available.
 		$permissions = array(
-										 array(
-											 'permission' => 'manage_system_settings', // The permission in the table.
-											 'label' => l('Manage system settings:'), // The label of the field
-											 'subtext' => '', // Subtext too, if you want.
-										 ),
-										 array(
-											 'permission' => 'manage_themes',
-											 'label' => l('Manage themes:'),
-											 'subtext' => l('Allow the group to select the site theme, download and upload themes to the site.'),
-										 ),
-										 array(
-											 'permission' => 'update_system',
-											 'label' => l('Update system:'),
-											 'subtext' => l('Whether or not they can update SnowCMS.'),
-										 ),
-										 array(
-											 'permission' => 'view_error_log',
-											 'label' => l('View error log:'),
-										 ),
-										 array(
-											 'permission' => 'add_new_member',
-											 'label' => l('Add a new member:'),
-											 'subtext' => l('Allow them to add a new member through the control panel (keep in mind they would be able to make accounts administrators!).'),
-										 ),
-										 array(
-											 'permission' => 'manage_members',
-											 'label' => l('Manage members:'),
-											 'subtext' => l('Allow them to manage members, which would allow them to also make accounts administrators.'),
-										 ),
-										 array(
-											 'permission' => 'search_members',
-											 'label' => l('Search for members:'),
-											 'subtext' => l('Through the control panel.'),
-										 ),
-										 array(
-											 'permission' => 'manage_member_settings',
-											 'label' => l('Manage member settings:'),
-										 ),
-										 array(
-											 'permission' => 'manage_permissions',
-											 'label' => l('Manage permissions:'),
-											 'subtext' => l('Not a very good idea.'),
-										 ),
-										 array(
-											 'permission' => 'add_plugins',
-											 'label' => l('Add a new plugin:'),
-										 ),
-										 array(
-											 'permission' => 'manage_plugins',
-											 'label' => l('Manage plugins:'),
-											 'subtext' => l('Which includes activating, deactivating and updating of plugins.'),
-										 ),
-										 array(
-											 'permission' => 'manage_plugin_settings',
-											 'label' => l('Manage plugin settings:'),
-											 'subtext' => l('Allow the group to manage miscellaneous plugin settings (Not recommended, as plugins can add various settings).'),
-										 ),
-										 array(
-											 'permission' => 'view_other_profiles',
-											 'label' => l('View other profiles:'),
-											 'subtext' => l('Should they be allowed to view other members profiles? (Not recommended for guests)'),
-										 ),
-										 array(
-											 'permission' => 'edit_other_profiles',
-											 'label' => l('Edit other profiles:'),
-											 'subtext' => l(''),
-										 ),
+										 'system' => array(
+																	 'label' => l('System'),
+																	 'subtext' => l('Permissions relating to the core functionality in SnowCMS.'),
+																	 'permissions' => array(
+																											array(
+																												'id' => 'manage_system_settings',
+																												'label' => l('Manage system settings'),
+																												'subtext' => l('Allows them to modify such settings as website name, date & time, and other various settings.'),
+																											),
+																											array(
+																												'id' => 'update_system',
+																												'label' => l('Apply updates'),
+																												'subtext' => l('Enables them to apply any available system updates.'),
+																											),
+																											array(
+																												'id' => 'view_error_log',
+																												'label' => l('View error log'),
+																											),
+																										),
+																 ),
+										 'members' => array(
+																		'label' => l('Members'),
+																		'subtext' => l('Member management and other profile permissions'),
+																		'permissions' => array(
+																											 array(
+																												 'id' => 'add_new_member',
+																												 'label' => l('Add new members'),
+																												 'subtext' => l('Allows them to create new members (keep in mind they would be able to create administrative accounts).'),
+																											 ),
+																											 array(
+																												 'id' => 'manage_members',
+																												 'label' => l('Manage members'),
+																												 'subtext' => l('Managing members includes creating, activating and modifying accounts, along with making accounts administrators.'),
+																											 ),
+																											 array(
+																												 'id' => 'manage_member_settings',
+																												 'label' => l('Manage member settings'),
+																												 'subtext' => l('Includes settings such as registration type, disallowed usernames and emails, and password requirements.'),
+																											 ),
+																											 array(
+																												 'id' => 'manage_permissions',
+																												 'label' => l('Manage permissions'),
+																												 'subtext' => l('Allows users of the group to do what you\'re doing right now.'),
+																											 ),
+																											 array(
+																												 'id' => 'view_other_profiles',
+																												 'label' => l('View other\'s profiles'),
+																												 'subtext' => l('Allows them to view the profiles of other users.'),
+																											 ),
+																										 ),
+																	),
+										 'themes' => array(
+																	 'label' => l('Themes'),
+																	 'subtext' => l('Theme management permissions'),
+																	 'permissions' => array(
+																											array(
+																												'id' => 'select_theme',
+																												'label' => l('Select theme'),
+																												'subtext' => l('Allows them to select the current theme and install any theme updates.'),
+																											),
+																											array(
+																												'id' => 'manage_widgets',
+																												'label' => l('Manage widgets'),
+																											),
+																											array(
+																												'id' => 'manage_themes',
+																												'label' => l('Manage Themes'),
+																												'subtext' => l('This permission includes installing, updating and selecting themes, along with widget management.'),
+																											),
+																										),
+																 ),
+										 'plugins' => array(
+																		'label' => l('Plugins'),
+																		'subtext' => l('Plugin management permissions'),
+																		'permissions' => array(
+																											 array(
+																												 'id' => 'add_plugins',
+																												 'label' => l('Add new plugin'),
+																												 'subtext' => l('Allows them to upload and install a new plugin.'),
+																											 ),
+																											 array(
+																												 'id' => 'manage_plugins',
+																												 'label' => l('Manage plugins'),
+																												 'subtext' => l('Plugin management includes adding, updating, activating and deactivating plugins.'),
+																											 ),
+																											 array(
+																												 'id' => 'manage_plugin_settings',
+																												 'label' => l('Manage plugin settings'),
+																												 'subtext' => l('These settings are any settings that activated plugins may add to the plugin settings page.'),
+																											 ),
+																										 ),
+																	),
 									 );
 
-		// So yeah, add your permissions!
+		// If you have any permissions you want to add, now is your chance!
 		$permissions = api()->apply_filters('member_group_permissions', $permissions);
 
-		if(is_array($permissions) && count($permissions))
+		if(is_array($permissions))
 		{
 			// Time to load up the permissions in the database, or elsewhere.
 			$loaded = null;
@@ -351,28 +387,33 @@ if(!function_exists('admin_members_permissions_generate_form'))
 				}
 			}
 
-			foreach($permissions as $permission)
+			foreach($permissions as $group_id => $group)
 			{
-				if(empty($permission['permission']))
+				foreach($group['permissions'] as $permission)
 				{
-					// We really kinda need the permissions identifier.
-					continue;
-				}
+					if(empty($permission['id']))
+					{
+						// We really kinda need the permissions identifier.
+						continue;
+					}
 
-				$form->add_input(array(
-													 'name' => $permission['permission'],
-													 'type' => 'select',
-													 'label' => isset($permission['label']) ? $permission['label'] : '',
-													 'subtext' => isset($permission['subtext']) ? $permission['subtext'] : '',
-													 'options' => array(
-																					-1 => l('Deny'),
-																					0 => l('Disallow'),
-																					1 => l('Allow'),
-																				),
-													 'default_value' => isset($loaded[$permission['permission']]) ? $loaded[$permission['permission']] : 0,
-												 ));
+					$form->add_input(array(
+														 'name' => $permission['id'],
+														 'type' => 'select',
+														 'label' => isset($permission['label']) ? $permission['label'] : '',
+														 'subtext' => isset($permission['subtext']) ? $permission['subtext'] : '',
+														 'options' => array(
+																						-1 => l('Deny'),
+																						0 => l('Disallow'),
+																						1 => l('Allow'),
+																					),
+														 'default_value' => isset($loaded[$permission['id']]) ? $loaded[$permission['id']] : 0,
+													 ));
+				}
 			}
 		}
+
+		api()->context['permissions'] = $permissions;
 	}
 }
 
@@ -403,14 +444,19 @@ if(!function_exists('admin_members_permissions_handle'))
 		// Sorry guests, there are certain permissions you just cannot have!!!
 		if($group_id == 'guest')
 		{
-			// You can add more DENIED permissions via the guest_denied_permissions hook ;)
-			// (Sorry, but I will not allow plugins to remove denied permissions, at least built in functionality)
-			$denied = array_merge(array('manage_system_settings', 'manage_themes', 'update_system', 'view_error_log', 'add_new_member', 'manage_members', 'search_members', 'manage_member_settings', 'manage_permissions', 'add_plugins', 'manage_plugins', 'manage_plugin_settings', 'edit_other_profiles'), api()->apply_filters('denied_guest_permissions', array()));
+			// You can add any permissions that are ALLOWED via the
+			// allowed_guest_permissions hook -- otherwise if the permission is
+			// not in the list it will be denied.
+			$allowed = array_merge(array('view_other_profiles'), api()->apply_filters('allowed_guest_permissions', array()));
 
-			foreach($denied as $deny)
+			foreach($data as $permission => $value)
 			{
-				// Deny it by giving it a -1.
-				$data[$deny] = -1;
+				// Is this permission in the allowed list?
+				if(!in_array($permission, $allowed))
+				{
+					// No, it's not, so deny it.
+					$data[$permission] = -1;
+				}
 			}
 		}
 
@@ -435,14 +481,8 @@ if(!function_exists('admin_members_permissions_handle'))
 			$rows,
 			array('group_id', 'permission'), 'permissions_handle_query');
 
-		// This will force the form to use the data we just inserted into the
-		// permissions table.
-		$form->clear_data();
-
-		api()->add_hook(strtolower($group_id). '_permissions_messages', create_function('&$value', '
-																																			$value[] = l(\'%s permissions have been updated successfully.\', ($_GET[\'grp\'] == \'guest\' ? l(\'Guest\') : htmlchars(api()->return_group($_GET[\'grp\']))));'));
-
-		return true;
+		// We saved the changes, let's be sure to show it.
+		redirect(baseurl('index.php?action=admin&sa=members_permissions&grp='. urlencode($_GET['grp']). '&message=1'));
 	}
 }
 ?>

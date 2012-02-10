@@ -45,7 +45,7 @@ if(!function_exists('admin_members_add'))
 		api()->run_hooks('admin_members_add');
 
 		// Trying to access something you can't? Not if I can help it!
-		if(!member()->can('add_new_member'))
+		if(!member()->can('add_new_member') && !member()->can('manage_members'))
 		{
 			admin_access_denied();
 		}
