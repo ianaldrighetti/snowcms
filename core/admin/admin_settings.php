@@ -59,7 +59,7 @@ if(!function_exists('admin_settings'))
 																																							l('Basic settings include changing the name of your website, along with a website description keywords, and more.'),
 																																						),
 																															   'date' => array(
-																																						 l('Date &amp; Time Settings'),
+																																						 l('Date & Time Settings'),
 																																						 l('Manage date and time settings'),
 																																						 l('The format of how a date or time is displayed can be modified here.'),
 																																					 ),
@@ -89,21 +89,17 @@ if(!function_exists('admin_settings'))
 		// This will come in handy.
 		api()->context['section_menu'] = array();
 		$GLOBALS['settings_identifiers'] = array();
-		$is_first = true;
 		foreach($form_types as $type_id => $type_info)
 		{
 			$GLOBALS['settings_identifiers'][$type_id] = $type_info[0];
 
 			api()->context['section_menu'][] = array(
-																					 'href' => baseurl. '/index.php?action=admin&amp;sa=settings&amp;type='. $type_id,
+																					 'id' => $type_id,
+																					 'href' => baseurl('index.php?action=admin&amp;sa=settings&amp;type='. $type_id),
 																					 'title' => $type_info[1],
-																					 'is_first' => $is_first,
-																					 'is_selected' => $form_type == $type_id,
-																					 'text' => $type_info[0],
+																					 'content' => $type_info[0],
+																					 'show' => true,
 																				 );
-
-			// Nothing else will be first.
-			$is_first = false;
 		}
 
 		admin_settings_generate_form($form_type);

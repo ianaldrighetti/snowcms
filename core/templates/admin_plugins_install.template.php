@@ -22,6 +22,8 @@ if(!defined('INSNOW'))
 	die('Nice try...');
 }
 
+admin_section_menu('plugins');
+
 echo '
 		<h3><img src="', theme()->url(), '/style/images/plugins_add-small.png" alt="" /> ', l('Installing Plugin'), '</h3>
 		<p>', l('Please wait while the plugin is being installed.'), '</p>
