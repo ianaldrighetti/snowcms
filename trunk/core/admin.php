@@ -426,6 +426,9 @@ if(!function_exists('admin_prepend'))
 
 		theme()->add_js_var('notifications', $GLOBALS['notifications']);
 
+		// The section menus will come in handy.
+		require(coredir. '/admin/admin_section_menus.php');
+
 		// You can make changes to the theme and what not now :)
 		api()->run_hooks('admin_prepend_authenticated', array('ajax' => substr($_SERVER['QUERY_STRING'], 0, 20) == 'action=admin&sa=ajax'));
 	}

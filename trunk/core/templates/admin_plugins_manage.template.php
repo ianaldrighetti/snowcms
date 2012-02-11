@@ -22,16 +22,9 @@ if(!defined('INSNOW'))
 	die('Nice try...');
 }
 
+admin_section_menu('plugins', 'plugins_manage');
+
 echo '
-	<div class="section-tabs">
-		<ul>
-			<li><a href="', baseurl('index.php?action=admin&amp;sa=plugins_add'), '" title="', l('Add a new plugin'), '" class="first">', l('Add Plugin'), '</a></li>
-			<li><a href="', baseurl('index.php?action=admin&amp;sa=plugins_manage'), '" title="', l('Manage plugins'), '" class="selected">', l('Manage Plugins'), '</a></li>
-			<li><a href="', baseurl('index.php?action=admin&amp;sa=plugins_settings'), '" title="', l('Manage plugin settings'), '">', l('Plugin Settings'), '</a></li>
-		</ul>
-		<div class="break">
-		</div>
-	</div>
 	<h3><img src="', theme()->url(), '/style/images/plugins_manage-small.png" alt="" /> ', l('Manage Plugins'), '</h3>';
 
 // Do we need to show a message that the plugins they are trying to activate

@@ -22,6 +22,8 @@ if(!defined('INSNOW'))
 	die('Nice try...');
 }
 
+admin_section_menu('plugins');
+
 echo '
 		<h3><img src="', theme()->url(), '/style/images/plugins_manage-small.png" alt="" /> ', l('Updating Plugin &quot;%s&quot;', api()->context['plugin_name']), '</h3>
 		<p>', l('Please wait while the plugin is being updated from v%s to v%s.', api()->context['plugin_version'], api()->context['update_version']), '</p>

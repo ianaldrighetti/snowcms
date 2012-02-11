@@ -203,6 +203,16 @@ body
 	border-radius: 0 0 5px 5px;
 }
 
+.section-tabs-no-radius
+{
+	border-radius: 0 !important;
+}
+
+.section-tabs-second-level
+{
+	font-size: 90%;
+}
+
 .section-tabs ul
 {
 	margin: 0;
