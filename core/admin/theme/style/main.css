@@ -97,7 +97,7 @@ body
 
 #side-content h3
 {
-	margin: 5px 0;
+	margin: 10px 0;
 }
 
 /* End #main-content section. Begin #footer-container section. */
@@ -210,7 +210,9 @@ body
 
 .section-tabs-second-level
 {
+	margin: 0 10px;
 	font-size: 90%;
+	background: #FAFAFA;
 }
 
 .section-tabs ul

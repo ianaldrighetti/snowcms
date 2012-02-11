@@ -134,12 +134,12 @@ init_core();
 if(!empty($_SERVER['QUERY_STRING']))
 {
 	// One is, but is it registered? Let's see!
-	$event = api()->return_event($_SERVER['QUERY_STRING'], true);
+	$event = api()->return_event($_SERVER['QUERY_STRING']);
 }
 else
 {
 	// We shall use the default event!
-	$event = api()->return_event($settings->get('default_event', 'string', ''), true);
+	$event = api()->return_event($settings->get('default_event', 'string', ''));
 }
 
 // So did we get an event, or not? If not, that's bad news!!!
