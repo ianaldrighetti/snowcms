@@ -477,7 +477,7 @@ class Component
 			}
 			elseif($type == 'theme' && !function_exists('admin_themes_check_updates'))
 			{
-				require(coredir. '/admin/admin_themes.php');
+				require(coredir. '/admin/admin_themes_manage.php');
 			}
 
 			// I guess we will.

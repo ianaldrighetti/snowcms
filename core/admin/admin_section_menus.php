@@ -107,6 +107,32 @@ function admin_section_menu($section_id, $current_id = null, $second_level = fal
 		// admin_settings.php file.
 		$menu = isset(api()->context['section_menu']) ? api()->context['section_menu'] : array();
 	}
+	elseif($section_id == 'themes')
+	{
+		$menu = array(
+							array(
+								'id' => 'manage',
+								'href' => baseurl('index.php?action=admin&amp;sa=themes&amp;section=manage'),
+								'title' => l('Manage currently installed themes'),
+								'content' => l('Manage Themes'),
+								'show' => member()->can('select_theme') || member()->can('manage_themes'),
+							),
+							array(
+								'id' => 'install',
+								'href' => baseurl('index.php?action=admin&amp;sa=themes&amp;section=install'),
+								'title' => l('Install a new theme from a file or from the Internet'),
+								'content' => l('Install Theme'),
+								'show' => member()->can('manage_themes'),
+							),
+							array(
+								'id' => 'widgets',
+								'href' => baseurl('index.php?action=admin&amp;sa=themes&amp;section=widgets'),
+								'title' => l('Select and manage widgets displayed within the current theme'),
+								'content' => l('Manage Widgets'),
+								'show' => member()->can('manage_widgets') || member()->can('manage_themes'),
+							),
+						);
+	}
 
 	// Maybe a plugin would like to modify the menu.
 	api()->run_hooks('admin_section_menu', array($section_id, $current_id, &$menu));

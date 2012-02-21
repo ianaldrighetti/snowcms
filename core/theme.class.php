@@ -898,7 +898,9 @@ class Theme
 		{
 			echo '
 			<h1>', l('Theme Error'), '</h1>
-			<p>', l('Sorry, but the specified theme &ndash; &quot;%s&quot; &ndash; could not be loaded, as it is not registered with the Theme system.', htmlchars($template)), '</p>';
+			<div class="error-message">
+				<p>', l('Sorry, but the specified theme &ndash; &quot;%s&quot; &ndash; could not be loaded, as it is not registered with the Theme system.', htmlchars($template)), '</p>
+			</div>';
 		}
 		else
 		{

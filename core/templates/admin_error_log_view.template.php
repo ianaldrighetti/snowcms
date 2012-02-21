@@ -76,5 +76,5 @@ echo '
 		</tr>
 	</table>
 
-	<p class="right"><a href="', baseurl, '/index.php?action=admin&amp;sa=error_log">', l('Back to error log'), ' &raquo;</a></p>';
+	<p class="right"><a href="', baseurl('index.php?action=admin&amp;sa=error_log'), '">', l('Back to error log'), ' &raquo;</a></p>';
 ?>
