@@ -339,7 +339,7 @@ if(!function_exists('admin_error_log_view'))
 																	'generated_by' => l('Guest (IP: %s)', $error['member_ip']),
 																	'file' => $error['error_file'],
 																	'line' => $error['error_line'],
-																	'url' => '<a href="'. htmlchars($error['error_url']). '">'. htmlchars($error['error_url']). '</a>',
+																	'url' => '<a href="'. htmlchars($error['error_url']). '">'. str_replace("\r\n", '<br />', htmlchars(wordwrap($error['error_url'], 85, "\r\n", true))). '</a>',
 																	'message' => $error['error_message'],
 																	'options' => array(
 																							 ),

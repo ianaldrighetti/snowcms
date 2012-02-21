@@ -193,7 +193,7 @@ if(!function_exists('admin_prepend'))
 													 'href' => baseurl('index.php?action=admin&amp;sa=themes&amp;section=install'),
 													 'title' => l('Install a new theme from a file or from the Internet'),
 													 'src' => theme()->url(). '/style/images/manage_themes.png',
-													 'label' => l('Install Themes'),
+													 'label' => l('Install Theme'),
 													 'show' => member()->can('manage_themes'),
 												 ),
 												 array(

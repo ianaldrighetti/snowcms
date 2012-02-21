@@ -266,7 +266,7 @@ function update_check_compat()
 			// like plugins are).
 			if(!empty($warnings['theme']['current_version']))
 			{
-				require_once(coredir. '/admin/admin_themes.php');
+				require_once(coredir. '/admin/admin_themes_manage.php');
 
 				// This function will do all the work for us!
 				$update_version = admin_themes_check_updates($theme_info['directory']);

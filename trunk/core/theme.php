@@ -248,7 +248,7 @@ function theme_package_valid($filename)
 	$file_list = $extraction->files($filename);
 
 	// Make sure there was anything in there.
-	if(count($file_list) > 0)
+	if($file_list !== false && count($file_list) > 0)
 	{
 		// Make sure the files we require exist.
 		$found = 0;

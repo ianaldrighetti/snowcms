@@ -75,9 +75,11 @@ function init_core()
 			api()->add_event('action=admin&sa=plugins_manage&update=*', 'admin_plugins_update', coredir. '/admin/admin_plugins_manage.php');
 			api()->add_event('action=admin&sa=plugins_settings', 'admin_plugins_settings', coredir. '/admin/admin_plugins_settings.php');
 			api()->add_event('action=admin&sa=settings', 'admin_settings', coredir. '/admin/admin_settings.php');
-			api()->add_event('action=admin&sa=themes', 'admin_themes', coredir. '/admin/admin_themes.php');
-			api()->add_event('action=admin&sa=themes&install=*', 'admin_themes_install', coredir. '/admin/admin_themes.php');
-			api()->add_event('action=admin&sa=themes&update=*', 'admin_themes_update', coredir. '/admin/admin_themes.php');
+			api()->add_event('action=admin&sa=themes&section=manage', 'admin_themes_manage', coredir. '/admin/admin_themes_manage.php');
+			api()->add_event('action=admin&sa=themes&section=install', 'admin_themes_install', coredir. '/admin/admin_themes_install.php');
+			api()->add_event('action=admin&sa=themes&section=widgets', 'admin_themes_widgets', coredir. '/admin/admin_themes_widgets.php');
+			api()->add_event('action=admin&sa=themes&install=*', 'admin_themes_perform_install', coredir. '/admin/admin_themes_install.php');
+			api()->add_event('action=admin&sa=themes&update=*', 'admin_themes_update', coredir. '/admin/admin_themes_manage.php');
 			api()->add_event('action=admin&sa=update', 'admin_update', coredir. '/admin/admin_update.php');
 
 			// Yup, we will want to call on the admin_prepend function.
