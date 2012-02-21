@@ -40,6 +40,7 @@ echo '
 	<p>', l('There are a few places where SnowCMS used the work of others, and this section is dedicated to their credit!'), '</p>
 	<ul>
 		<li>', l('Control Panel icons are from the <a href="http://kde-look.org/content/show.php/Oxygen+Icons?content=74184" title="Oxygen Icon set" target="_blank">Oxygen Icon set</a>.'), '</li>
+		<li><a href="http://jquery.org/">', l('jQuery'), '</a></li>
 	</ul>
 
 	<h3><img src="', theme()->url(), '/style/images/about-small.png" alt="" /> ', l('System Information'), '</h3>

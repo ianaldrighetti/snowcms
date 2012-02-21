@@ -59,6 +59,10 @@ class Input
 	// The name of the input field.
 	private $name;
 
+	// Variable: parent
+	// The name of the form which contains this input.
+	private $parent;
+
 	// Variable: label
 	// A label, or nice name, for this input field, used for notifying users
 	// of any errors with their data they have entered.
@@ -193,11 +197,18 @@ class Input
 		Note:
 			If you would rather use a method which can return whether or not your
 			settings did not contain any errors, please use <Input::set>.
+
+			If this input is a child of a form, then the <Input::parent> method
+			should be passed the name of the parent form. While this is not
+			required for the Input to work, it is required for the Input to work
+			properly if the Input is of type select-multi, checkbox-multi and
+			checkbox.
 	*/
 	public function __construct($name = null, $label = null, $subtext = null, $type = null, $request_type = null, $length = null, $truncate = false, $options = array(), $callback = null, $default_value = null, $disabled = false, $readonly = false, $rows = null, $columns = null, $required = true)
 	{
 		// Set everything to blanks and what not.
 		$this->name = null;
+		$this->parent = null;
 		$this->label = null;
 		$this->subtext = null;
 		$this->type = null;
@@ -270,6 +281,55 @@ class Input
 		{
 			// We shall return the current name, then.
 			return $this->name;
+		}
+	}
+
+	/*
+		Method: parent
+
+		Sets or returns the parent form of this input. This option is not
+		required, but highly recommended -- at least for Input types of
+		select-multi, checkbox-multi and checkbox.
+
+		Parameters:
+			string $parent - The name of the parent form that contains this input.
+
+		Returns:
+			mixed - Returns the current parent form if $parent is left empty, but
+							true if the parent form was set successfully.
+
+		Note:
+			In case you're wondering what the purpose of specifying the Input's
+			parent form name under certain circumstances, this is why: when an
+			input with a type of select-multi (just for example) is submitted and
+			no options are selected, the input class thinks that the user is
+			viewing the input for the first time and then uses the default value
+			for the input, instead of nothing (which is what the user selected --
+			well, didn't, but you get the point). With the name of the form
+			supplied, the instance of Input will then be able to determine if the
+			form was actually submitted or not, and if the form was submitted and
+			it detects no value for the input it will leave the value empty,
+			otherwise it will go for the default value.
+	*/
+	public function parent($parent = null)
+	{
+		if($parent !== null)
+		{
+			// Please, no empty name!
+			if(strlen($parent) > 0)
+			{
+				$this->parent = $parent;
+
+				return true;
+			}
+			else
+			{
+				return false;
+			}
+		}
+		else
+		{
+			return $this->parent;
 		}
 	}
 
@@ -1401,17 +1461,17 @@ class Input
 		// will be used.
 		$value = $this->request_type == 'post' ? (isset($_POST[$this->name]) ? $_POST[$this->name] : null) : ($this->request_type == 'get' ? (isset($_GET[$this->name]) ? $_GET[$this->name] : null) : (isset($_REQUEST[$this->name]) ? $_REQUEST[$this->name] : null));
 
-		// I just wanted to make life a bit easier with what I did above... But
-		// seeing as checkboxes are a bit more complicated, they will need to be
-		// dealt with differently.
-		if((!isset($value) || $this->disabled || $this->readonly) && $this->type != 'checkbox' && $this->type != 'checkbox-multi' && $this->type != 'select-multi')
+		// We have quite a few scenarios to handle, such as using the default
+		// value under only certain circumstances... Such as if the input is
+		// disabled or readonly.
+		if($this->disabled || $this->readonly)
 		{
-			// Default value it is, then!
+			// We will definitely stick with the default value, then.
 			$value = $this->default_value;
 		}
-		// This could have been done together up above, but it would have been
-		// somewhat long, and confusing to look at.
-		elseif($this->type == 'checkbox' && ($this->disabled || $this->readonly || count($this->request_type == 'post' ? $_POST : ($this->request_type == 'get' ? $_GET : $_REQUEST)) == 0))
+		// We may also need to use the default value if the form hasn't been
+		// submitted at all.
+		elseif(((!is_array($value) && !isset($value)) || (is_array($value) && count($value) == 0)) && ($this->parent === null || ($this->request_type == 'post' ? !isset($_POST[$this->parent]) : ($this->request_type == 'get' ? !isset($_GET[$this->parent]) : !isset($_REQUEST[$this->parent])))))
 		{
 			$value = $this->default_value;
 		}
@@ -1926,7 +1986,7 @@ class Input
 		}
 
 		// Use the default value if we need too.
-		if($value === null)
+		if(((!is_array($value) && $value === null) || (is_array($value) && count($value) == 0)) && ($this->parent === null || ($this->request_type == 'post' ? !isset($_POST[$this->parent]) : ($this->request_type == 'get' ? !isset($_GET[$this->parent]) : !isset($_REQUEST[$this->parent])))))
 		{
 			$value = $this->default_value;
 		}

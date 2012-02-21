@@ -64,6 +64,8 @@ if(!function_exists('admin_prepend'))
 		theme()->add_js_file(array('src' => themeurl. '/default/js/snowobj.js'));
 		theme()->add_js_file(array('src' => theme()->url(). '/js/main.js'));
 		theme()->add_js_file(array('src' => theme()->url(). '/js/notifications.js'));
+		theme()->add_js_file(array('src' => theme()->url(). '/js/jquery.min.js'));
+		theme()->add_js_file(array('src' => theme()->url(). '/js/jquery-ui.min.js'));
 		theme()->add_js_var('notificationTitle', l('Notifications'));
 		theme()->add_js_var('base_url', baseurl);
 		theme()->add_js_var('baseurl', baseurl);
