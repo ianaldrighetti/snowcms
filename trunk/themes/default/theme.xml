@@ -10,4 +10,7 @@
 	<version>1.0</version>
 	<update-url>themes.snowcms.com/snowcms/default</update-url>
 	<compatible-with>2.0.*</compatible-with>
+	<widgets>
+		<widget id="right-sidebar" />
+	</widgets>
 </theme-info>

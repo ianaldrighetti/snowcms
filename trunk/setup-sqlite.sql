@@ -189,17 +189,6 @@ CREATE INDEX '{db->prefix}tasks_last_ran' ON '{db->prefix}tasks' ('last_ran');
 CREATE INDEX '{db->prefix}tasks_queued' ON '{db->prefix}tasks' ('queued');
 CREATE INDEX '{db->prefix}tasks_enabled' ON '{db->prefix}tasks' ('enabled');
 
-CREATE TABLE '{db->prefix}tokens'
-(
-	'session_id' VARCHAR(150) NOT NULL,
-	'token_name' VARCHAR(100) NOT NULL,
-	'token' VARCHAR(255) NOT NULL,
-	'token_registered' INT NOT NULL DEFAULT '0',
-	PRIMARY KEY ('session_id', 'token_name')
-);
-
-CREATE INDEX '{db->prefix}tokens_token_registered' ON '{db->prefix}tokens' ('token_registered');
-
 CREATE TABLE '{db->prefix}uploads'
 (
 	'area_name' VARCHAR(255) NOT NULL,

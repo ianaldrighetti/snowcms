@@ -199,7 +199,7 @@ if(!function_exists('admin_prepend'))
 													 'show' => member()->can('manage_themes'),
 												 ),
 												 array(
-													'id' => 'wiget_manage_themes',
+													'id' => 'widgets_manage_themes',
 													'href' => baseurl('index.php?action=admin&amp;sa=themes&amp;section=widgets'),
 													'title' => l('Manage widgets'),
 													'src' => theme()->url(). '/style/images/manage_themes.png',

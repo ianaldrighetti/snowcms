@@ -350,8 +350,36 @@ class XML
 			}
 			else
 			{
-				// Got it!
-				return $this->data[$this->index[$tag][$offset]];
+				// Well, if this tag is 'open', it contains children, which we also
+				// want to include in the return value.
+				if(isset($this->data[$this->index[$tag][$offset]]['type']) && $this->data[$this->index[$tag][$offset]]['type'] == 'open')
+				{
+					// We will start collecting the elements within this tag,
+					// including the opening tag.
+					$elements = array($this->data[$this->index[$tag][$offset]]);
+					$index = $this->index[$tag][$offset] + 1;
+					while($index < $this->data_count)
+					{
+						// Keep adding those elements...
+						$elements[] = $this->data[$index];
+
+						// But we will need to quite eventually.
+						if($this->data[$index]['tag'] == $this->data[$this->index[$tag][$offset]]['tag'] && $this->data[$index]['level'] == $this->data[$this->index[$tag][$offset]]['level'] && isset($this->data[$index]['type']) && $this->data[$index]['type'] == 'close')
+						{
+							// And it appears that the time has come to stop.
+							break;
+						}
+
+						$index++;
+					}
+
+					return $elements;
+				}
+				else
+				{
+					// But otherwise, just return the one item.
+					return $this->data[$this->index[$tag][$offset]];
+				}
 			}
 		}
 
@@ -370,8 +398,34 @@ class XML
 						// Gotta make sure we are at the right offset.
 						if($offset == 0)
 						{
-							// Yup, we found it!
-							return $this->data[$j];
+							// Yup, we found it! But hold on, we may need to collect some
+							// other elements, if this tag is 'open' -- which means it
+							// likely contains child elements that are going to be of use.
+							if(isset($this->data[$j]['type']) && $this->data[$j]['type'] == 'open')
+							{
+								$elements = array($this->data[$j]);
+								$k = $j + 1;
+								while($k < $this->data_count)
+								{
+									$elements[] = $this->data[$k];
+
+									if($this->data[$k]['tag'] == $this->data[$j]['tag'] && $this->data[$k]['level'] == $this->data[$j]['level'] && isset($this->data[$k]['type']) && $this->data[$k]['type'] == 'close')
+									{
+										// We found the end of the original tag we wanted, so we
+										// can go ahead and get out now.
+										break;
+									}
+
+									$k++;
+								}
+
+								return $elements;
+							}
+							else
+							{
+								// But otherwise, we just return the single element.
+								return $this->data[$j];
+							}
 						}
 						else
 						{

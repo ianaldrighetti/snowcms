@@ -174,19 +174,6 @@ INSERT INTO `{db->prefix}tasks` (`task_name`, `file`, `location`, `func`) VALUES
 INSERT INTO `{db->prefix}tasks` (`task_name`, `file`, `location`, `func`) VALUES('system_update_check', 'admin/admin_update.php', 'coredir', 'admin_update_check');
 
 ##
-# Holds registered tokens...
-##
-CREATE TABLE `{db->prefix}tokens`
-(
-	`session_id` VARCHAR(150) NOT NULL,
-	`token_name` VARCHAR(100) NOT NULL,
-	`token` VARCHAR(255) NOT NULL,
-	`token_registered` INT(10) UNSIGNED NOT NULL DEFAULT '0',
-	PRIMARY KEY (`session_id`,`token_name`),
-	KEY (`token_registered`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8;
-
-##
 # Holds uploaded files, well, the files information that is.
 ##
 CREATE TABLE `{db->prefix}uploads`
