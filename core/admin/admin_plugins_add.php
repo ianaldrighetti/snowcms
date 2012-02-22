@@ -59,6 +59,26 @@ if(!function_exists('admin_plugins_add'))
 			$form->process('add_plugins_form');
 		}
 
+		// We may need to do a bit of cleanup in the plugin directory. There may
+		// be some temporary files that don't need to be there anymore.
+		if(empty($_SESSION['plugindir_cleaned']) || ((int)$_SESSION['plugindir_cleaned'] + 86400) < time_utc())
+		{
+			foreach(scandir(plugindir) as $filename)
+			{
+				// We don't want to delete any directories, files not ending with
+				// .tmp, or a file that is newer than a few hours.
+				if(is_dir(plugindir. '/'. $filename) || substr($filename, -4, 4) != '.tmp' || (filemtime(plugindir. '/'. $filename) + 10800) > time_utc())
+				{
+					continue;
+				}
+
+				@unlink(plugindir. '/'. $filename);
+			}
+
+			// Thanks for your help, but we won't have you do it again for awhile!
+			$_SESSION['plugindir_cleaned'] = time_utc();
+		}
+
 		admin_current_area('plugins_add');
 
 		theme()->set_title(l('Add Plugin'));

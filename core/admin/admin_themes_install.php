@@ -64,6 +64,28 @@ if(!function_exists('admin_themes_install'))
 			$form->process('install_theme_form');
 		}
 
+		// Do we need to clean up the theme directory? There could be some
+		// temporary files that we don't need. But we will only do this if the
+		// user hasn't assisted us within the last 24 hours.
+		if(empty($_SESSION['themedir_cleaned']) || ((int)$_SESSION['themedir_cleaned'] + 86400) < time_utc())
+		{
+			foreach(scandir(themedir) as $filename)
+			{
+				// We will ignore anything that is a directory, any file not
+				// ending with .tmp, or a file that isn't over a few hours old.
+				if(is_dir(themedir. '/'. $filename) || substr($filename, -4, 4) != '.tmp' || (filemtime(themedir. '/'. $filename) + 10800) > time_utc())
+				{
+					continue;
+				}
+
+				// We will delete it, then.
+				@unlink(themedir. '/'. $filename);
+			}
+
+			// Thanks for helping out ;-)
+			$_SESSION['themedir_cleaned'] = time_utc();
+		}
+
 		// Get ready to display the form to allow upload or the entry of a URL.
 		admin_current_area('install_manage_themes');
 

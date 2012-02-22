@@ -69,6 +69,14 @@ if(!defined('INSNOW'))
 													 were specified in compatible_with, it will
 													 contain null.
 
+			array widgets - This is an array which will contain sub-arrays which
+											will contain an id index and a label index. The id
+											index indicates the identifier of the widgets location
+											used within the theme to load widgets designated to be
+											displayed there. The label contains a string which is
+											used to, well, label that location. This array may be
+											empty.
+
 		* (asterisk) Indicates this index will never be null.
 */
 function theme_load($path)
@@ -135,6 +143,7 @@ function theme_get_info($filename)
 									'update_url' => htmlchars($xml->get_value($xml->value('update-url', 'theme-info'))),
 									'compatible_with' => htmlchars($xml->get_value($xml->value('compatible-with', 'theme-info'))),
 									'is_compatible' => null,
+									'widgets' => array(),
 								);
 
 	// No need to fetch the data again.
@@ -166,6 +175,30 @@ function theme_get_info($filename)
 	if(!is_url((strtolower(substr($theme_info['update_url'], 0, 7)) != 'http://' && strtolower(substr($theme_info['update_url'], 0, 8)) != 'https://' ? 'http://' : ''). $theme_info['update_url']))
 	{
 		$theme_info['update_url'] = null;
+	}
+
+	// Does this theme support any widgets?
+	$widget_data = $xml->value('widgets', 'theme-info');
+	if(is_array($widget_data) && count($widget_data) > 0)
+	{
+		$widgets = array();
+		foreach($widget_data as $widget)
+		{
+			// Make sure that the widget location has an ID and label. Though we
+			// may be able to set the label if it is a common one.
+			if(!isset($widget['attributes']['id']) || strlen($widget['attributes']['id']) == 0 || (!in_array($widget['attributes']['id'], array('left-sidebar', 'right-sidebar', 'footer')) && strlen($widget['value']) == 0))
+			{
+				// Yeah, we'll pass!
+				continue;
+			}
+
+			$widgets[] = array(
+										 'id' => $widget['attributes']['id'],
+										 'label' => l(strlen($widget['value']) == 0 ? ($widget['attributes']['id'] == 'left-sidebar' ? 'Left Sidebar' : ($widgets['attributes']['id'] == 'right-sidebar' ? 'Right Sidebar' : 'Footer')) : $widget['value']),
+									 );
+		}
+
+		$theme_info['widgets'] = $widgets;
 	}
 
 	// Add the path, just incase :P
