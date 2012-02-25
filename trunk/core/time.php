@@ -34,15 +34,10 @@ if(!defined('INSNOW'))
 
 	Returns:
 		int - Returns the current timestamp in UTC.
-
-	Note:
-		Use this function instead of the <http://www.php.net/time> function
-		otherwise when using <timeformat>, the actual time will not be properly
-		displayed.
 */
 function time_utc()
 {
-	return time() - date('Z');
+	return time();
 }
 
 if(!function_exists('timeformat'))
@@ -79,7 +74,7 @@ if(!function_exists('timeformat'))
 		api()->run_hooks('timeformat', array(&$return, &$timestamp, &$format, &$today_yesterday));
 
 		// Did the hooks do anything?
-		if(!empty($return))
+		if($return !== null)
 		{
 			return $return;
 		}

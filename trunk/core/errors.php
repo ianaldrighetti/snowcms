@@ -83,7 +83,7 @@ function errors_handler($error_type, $error_message, $error_file = null, $error_
 				'error_file' => 'string', 'error_line' => 'int', 'error_url' => 'string',
 			),
 			array(
-				time_utc(), $member_id, $member_name,
+				function_exists('time_utc') ? time_utc() : time(), $member_id, $member_name,
 				$member_ip, $error_type, strip_tags($error_message),
 				$error_file, $error_line, 'http://'. $_SERVER['HTTP_HOST']. $_SERVER['REQUEST_URI'],
 			), array(), 'errors_handler_query');

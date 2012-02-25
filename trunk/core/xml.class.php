@@ -465,7 +465,7 @@ class XML
 	public function get_value($item)
 	{
 		// Seems pointless, but hey, makes life easier!
-		return isset($item['value']) ? $item['value'] : false;
+		return is_array($item) && isset($item['value']) ? $item['value'] : false;
 	}
 }
 ?>

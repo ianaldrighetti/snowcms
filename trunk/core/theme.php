@@ -192,10 +192,10 @@ function theme_get_info($filename)
 				continue;
 			}
 
-			$widgets[] = array(
-										 'id' => $widget['attributes']['id'],
-										 'label' => l(strlen($widget['value']) == 0 ? ($widget['attributes']['id'] == 'left-sidebar' ? 'Left Sidebar' : ($widgets['attributes']['id'] == 'right-sidebar' ? 'Right Sidebar' : 'Footer')) : $widget['value']),
-									 );
+			$widgets[$widget['attributes']['id']] = array(
+																							  'id' => $widget['attributes']['id'],
+																							  'label' => l(htmlchars(strlen($widget['value']) == 0 ? ($widget['attributes']['id'] == 'left-sidebar' ? 'Left Sidebar' : ($widget['attributes']['id'] == 'right-sidebar' ? 'Right Sidebar' : 'Footer')) : $widget['value'])),
+																						  );
 		}
 
 		$theme_info['widgets'] = $widgets;

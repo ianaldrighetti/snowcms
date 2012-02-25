@@ -66,6 +66,10 @@ class API
 	// Currently enabled plugins are held in this array.
 	private $plugins;
 
+	// Variable: widgets
+	// An array containing registered widgets.
+	private $widgets;
+
 	// Variable: resources
 	// A resource is something such as an image, style sheet, or anything,
 	// really.
@@ -107,6 +111,7 @@ class API
 		$this->classes = array();
 		$this->objects = array();
 		$this->plugins = array();
+		$this->widgets = array();
 		$this->resources = array();
 		$this->context = array();
 	}
@@ -1497,6 +1502,95 @@ class API
 	}
 
 	/*
+		Method: add_widget
+
+		Adds a new widget, which is a class which extends the abstract class
+		<Widget>.
+
+		Parameters:
+			string $class_name - The name of the class which extends the Widget
+													 class.
+
+		Returns:
+			bool - Returns true if the widget was added successfully, false if
+						 not, which likely means that the specified class does not
+						 extend the Widget class.
+	*/
+	public function add_widget($class_name)
+	{
+		// If this widget exists, we won't add it again.
+		if($this->widget_exists($class_name) || !is_subclass_of($class_name, 'Widget'))
+		{
+			return false;
+		}
+
+		// Just add it... Not much else to do.
+		$this->widgets[strtolower($class_name)] = $class_name;
+
+		return true;
+	}
+
+	/*
+		Method: widget_exists
+
+		Determines whether the specified widget class has already been
+		registered.
+
+		Parameters:
+			string $class_name - The name of the class which extends the <Widget>
+													 class.
+
+		Returns:
+			bool - Returns true if the widget has been registered, false if not.
+	*/
+	public function widget_exists($class_name)
+	{
+		return !class_exists($class_name) || isset($this->widgets[strtolower($class_name)]);
+	}
+
+	/*
+		Method: remove_widget
+
+		Removes the specified widget.
+
+		Parameters:
+			string $class_name - The name of the widget class to remove.
+
+		Returns:
+			bool - Returns true on success, false on failure.
+	*/
+	public function remove_widget($class_name)
+	{
+		// We can't remove what isn't there.
+		if(!$this->widget_exists($class_name))
+		{
+			return false;
+		}
+
+		// Remove it from the list of registered widgets.
+		unset($this->widgets[strtolower($class_name)]);
+
+		return true;
+	}
+
+	/*
+		Method: return_widgets
+
+		Returns an array containing all of the registered widget handlers.
+
+		Parameters:
+			none
+
+		Returns:
+			array - Returns an array containing all of the registered widget
+							handlers.
+	*/
+	public function return_widgets()
+	{
+		return $this->widgets;
+	}
+
+	/*
 		Method: add_resource
 
 		Adds a resource which will then become accessible to those browsing
@@ -1704,9 +1798,13 @@ function load_api()
 	// Instantiate the API class.
 	$GLOBALS['api'] = new API();
 
+	// Plugins may register some widget handlers, which implement the Widget
+	// abstract class... We definitely need to include that now.
+	require(coredir. '/widget.class.php');
+
 	// Load up plugin_load and plugin_list (we don't really use it here, but
 	// hey it's for other people too!)
-	require_once(coredir. '/plugin.php');
+	require(coredir. '/plugin.php');
 
 	// Find all activated plugins, that way we can load them up.
 	$result = db()->query('
@@ -1873,6 +1971,7 @@ function api_catch_fatal()
 					require_once(coredir. '/errors.php');
 				}
 
+				$GLOBALS['api_force_log'] = true;
 				errors_handler($last_error['type'], $last_error['message'], $last_error['file'], $last_error['line']);
 
 				// Now show that error message! Hopefully someone will fix it.
@@ -1938,7 +2037,7 @@ function api_catch_fatal()
 				if(file_exists($cur_path. '/plugin.xml'))
 				{
 					// Did we find the plugins base directory?
-					if(plugin_load($cur_path) !== false)
+					if(($plugin_info = plugin_load($cur_path)) !== false)
 					{
 						// We do, so disable that dern thing!
 						db()->query('
@@ -1957,8 +2056,9 @@ function api_catch_fatal()
 							require_once(coredir. '/errors.php');
 						}
 
-						// Well, now log the error.
-						errors_handler($last_error['type'], $last_error['message'], $last_error['file'], $last_error['line']);
+						// Well, now log the error. We need to force it to, though.
+						$GLOBALS['api_force_log'] = true;
+						errors_handler($last_error['type'], $last_error['message']. "\r\n\r\nThis error was caused by the plugin &quot;". $plugin_info['name']. "&quot; and has been automatically disabled by the system.", $last_error['file'], $last_error['line']);
 
 						// Redirect, maybe.
 						if(!isset($_SESSION['last_error_fix']) || ((int)$_SESSION['last_error_fix'] + 10) < time())
