@@ -250,7 +250,7 @@ if(!function_exists('admin_settings_generate_form'))
 												 'name' => 'default_timezone',
 												 'type' => 'select',
 												 'label' => l('Default timezone:'),
-												 'subtext' => l('This setting will change the timezone used when displaying any date and/or times on the website.'),
+												 'subtext' => l('This setting will change the timezone used when displaying any date and/or times on the website.'). '<br /><br />'. l('<strong>UTC time:</strong> %s', timeformat(time() - date('Z'), 'datetime', false)). '<br />'. l('<strong>Set timezone time:</strong> %s', timeformat(null, 'datetime', false)),
 												 'options' => array(
 																				'Africa/Abidjan' => 'Abidjan (Africa)',
 																				'Africa/Accra' => 'Accra (Africa)',

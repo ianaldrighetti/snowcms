@@ -1,0 +1,12 @@
+<?xml version="1.0"?>
+<plugin-info xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://plugins.snowcms.com/xml plugin-info.xsd">
+	<author>
+		<name>SnowCMS Dev Team</name>
+		<website>http://www.snowcms.com/</website>
+		<email>dev@snowcms.com</email>
+	</author>
+	<guid>plugins.snowcms.com/snowcms/widgets</guid>
+	<name>Widgets</name>
+	<description>This is a dummy plugin which creates dummy widgets for testing the new widget feature within SnowCMS.</description>
+	<version>1.0</version>
+</plugin-info>

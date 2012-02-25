@@ -198,6 +198,8 @@ if(!function_exists('admin_error_log_table_handle'))
 			db()->query('
 				TRUNCATE {db->prefix}error_log',
 				array(), 'admin_error_log_truncate_query');
+
+			redirect(baseurl('index.php?action=admin&sa=error_log'));
 		}
 		elseif($action == 'delete' && is_array($selected) && count($selected) > 0)
 		{
@@ -208,6 +210,8 @@ if(!function_exists('admin_error_log_table_handle'))
 				array(
 					'selected' => $selected,
 				), 'admin_error_log_delete_query');
+
+			redirect(baseurl('index.php?action=admin&sa=error_log'));
 		}
 		elseif($action == 'export')
 		{
@@ -340,7 +344,7 @@ if(!function_exists('admin_error_log_view'))
 																	'file' => $error['error_file'],
 																	'line' => $error['error_line'],
 																	'url' => '<a href="'. htmlchars($error['error_url']). '">'. str_replace("\r\n", '<br />', htmlchars(wordwrap($error['error_url'], 85, "\r\n", true))). '</a>',
-																	'message' => $error['error_message'],
+																	'message' => str_replace("\r\n", '<br />', $error['error_message']),
 																	'options' => array(
 																							 ),
 																);

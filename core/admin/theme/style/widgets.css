@@ -1,0 +1,133 @@
+.widget-area
+{
+	border: 1px solid #DEDEDE;
+	background: #F2F2F2;
+	border-radius: 8px 8px 0 0;
+}
+
+.available-list
+{
+	float: left;
+	width: 460px;
+}
+
+.sidebar-list
+{
+	float: right;
+	width: 230px;
+}
+
+.widget-area h3
+{
+	margin: 0 !important;
+	padding: 5px 8px;
+	font-size: 90%;
+	background: #DEDEDE;
+	border-radius: 8px 8px 0 0;
+}
+
+.widget-list
+{
+}
+
+.widget-info
+{
+	width: 220px;
+	padding: 5px;
+	font-size: 80%;
+}
+
+.widget-label
+{
+	background: #DEDEDE;
+	margin-bottom: 3px;
+	padding: 5px;
+	font-weight: bold;
+	font-size: 110%;
+	border-radius: 5px;
+	overflow: hidden;
+	cursor: pointer;
+}
+
+.widget-info p
+{
+	margin: 0 !important;
+}
+
+.move-selected-widget
+{
+	display: none;
+	background: white;
+	cursor: pointer;
+	margin: 3px;
+}
+
+.move-selected-widget p
+{
+	margin: 0 !important;
+	text-align: center;
+	padding: 4px;
+	font-size: 80%;
+}
+
+.widget-container
+{
+	margin: 5px;
+	border: 1px solid #DEDEDE;
+	background: #DEDEDE;
+	border-radius: 5px;
+}
+
+.widget-no-radius
+{
+	border-radius: 5px 5px 0 0 !important;
+}
+
+.widget-radius
+{
+	border-radius: 5px !important;
+}
+
+.widget-container .widget-name
+{
+	float: left;
+	width: 180px;
+	overflow: hidden;
+	margin: 0 !important;
+	font-size: 88%;
+	font-weight: bold;
+	padding: 5px;
+	cursor: pointer;
+}
+
+.widget-container .widget-expand
+{
+	float: right;
+	margin: 0 !important;
+	padding: 4px 6px 4px 0;
+}
+
+.widget-expand img
+{
+	cursor: pointer;
+}
+
+.widget-options
+{
+	display: none;
+	padding: 3px;
+	background: white;
+}
+
+.widget-options .buttons
+{
+	margin: 0 !important;
+	padding-top: 3px;
+	text-align: right;
+}
+
+.widget-options .buttons input
+{
+	padding: 2px 3px;
+	font-size: 88%;
+}

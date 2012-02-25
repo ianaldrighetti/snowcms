@@ -41,15 +41,27 @@ if(!function_exists('mime_content_type'))
 // than 5.3.0.
 if(!function_exists('fnmatch'))
 {
-	function fnmatch($pattern, $string)
-	{
-		return preg_match("#^".strtr(preg_quote($pattern, '#'), array('\*' => '.*', '\?' => '.', '\[' => '[', '\]' => ']'))."$#i", $string);
-	}
+	/*
+		Function: fnmatch
 
+		See <www.php.net/fnmatch>.
+
+		Parameters:
+			string $pattern
+			string $string
+			int $flags
+
+		Returns:
+			bool
+	*/
+	function fnmatch($pattern, $string, $flags = 0)
+	{
+		return preg_match('~^'. strtr(preg_quote($pattern, '~'), array('\*' => '.*', '\?' => '.', '\[' => '[', '\]' => ']')). '$~i', $string);
+	}
 }
 
-// The following are a bit simpler ;-) or just plain don't exist on
-// any version of PHP...
+// The following are a bit simpler ;-). These also include some functions
+// that just plain don't exist in PHP...
 
 /*
 	Function: array_insert
@@ -63,36 +75,49 @@ if(!function_exists('fnmatch'))
 		string $key
 
 	Returns:
-		array - Returns the new array with item inserted at the specified
-						position.
+		mixed - Returns the new array with the item inserted at the specified
+						position, or false on failure (such as if the specified key
+						is already in use).
 
 	Note:
+		This insert operation will place the item before the item that is
+		currently at the specified position.
+
 		If you are inserting the item into an associative array, you must
-		specify the $key parameter, which is the key of the inserted item!
+		specify the $key parameter, which will be used as the key when inserting
+		$item into the specified array.
 */
-function array_insert($array, $item, $index, $key = null)
+function array_insert($array, $item, $position, $key = null)
 {
-	$index = (int)$index;
+	$position = (int)$position;
 	$length = count($array);
 
-	// Is it an associative array?
+	// Was any key name specified? If not, then we will assume that the array
+	// is a simple (flat) array.
 	if($key === null)
 	{
-		// Maybe we can just plop it at the end..?
-		if($index >= $length)
+		// If the position you want to place it at is at the end -- or passed it
+		// -- we can just add the item to the end of the array.
+		if($position >= $length)
 		{
 			$array[] = $item;
 		}
+		// Otherwise we will need to do a bit more work.
 		else
 		{
+			// We will need a new array to place the items in.
 			$new_array = array();
 
 			for($i = 0; $i < $length; $i++)
 			{
-				// The right index to insert item at?
-				if($i == $index)
+				// If this is the position at which you want to place the item at,
+				// we will put it in there before moving on.
+				if($i == $position)
+				{
 					$new_array[] = $item;
+				}
 
+				// All the rest just keep getting added to the end.
 				$new_array[] = $array[$i];
 			}
 
@@ -101,25 +126,33 @@ function array_insert($array, $item, $index, $key = null)
 	}
 	else
 	{
-		// Can't have two of the same indexes, sorry!
+		// If this item already exists, we won't do it.
 		if(isset($array[$key]))
 		{
 			return false;
 		}
-		elseif($index >= $length)
+		// But if the position you want to insert the item at is at the end of
+		// the array, or passed it, just add it which will have the same effect.
+		elseif($position >= $length)
 		{
 			$array[$key] = $item;
 		}
 		else
 		{
-			// Interesting... :P
+			// Instead of a for loop, we will have to use a for each and keep
+			// track of the current position ourselves.
 			$new_array = array();
 			$current = 0;
 
 			foreach($array as $akey => $avalue)
 			{
-				if($current == $index)
+				// Is this it?
+				if($current++ == $position)
+				{
+					// Go ahead and add it before we place the item that is currently
+					// in this position.
 					$new_array[$key] = $item;
+				}
 
 				$new_array[$akey] = $avalue;
 			}
@@ -130,6 +163,64 @@ function array_insert($array, $item, $index, $key = null)
 
 	return $array;
 }
+
+/*
+	Function: array_ainsert
+
+	This function is somewhat similar to the <array_insert> function, however
+	the item is inserted after the specified key within the supplied array. If
+	the specified key does not exist within the array, the item is added to
+	the end of the array.
+
+	Parameters:
+		array $array - The array to insert the item into.
+		mixed $after - The key after which to insert the item, this can any type
+									 that can be an index within an array.
+		mixed $key - The key to associate with the item being inserted after
+								 $after.
+		mixed $item - The item to insert after $after.
+
+	Returns:
+		array - Returns an array containing the array with $item in the desired
+						position.
+*/
+function array_ainsert($array, $after, $key, $item)
+{
+	// We can't insert an item into an array if the array isn't, well, an
+	// array. Also, we can't insert $item after $after if $key is the same as
+	// $after.
+	if(!is_array($array) || $after == $key)
+	{
+		return false;
+	}
+	// If there is nothing in the array, then there isn't much to do.
+	elseif(count($array) == 0)
+	{
+		return array($key => $item);
+	}
+	// The last easy scenario: The index that $item is to be inserted after
+	// doesn't even exist.
+	elseif(!array_key_exists($after, $array))
+	{
+		$array[$key] = $item;
+	}
+
+	// We will need a temporary array, of course.
+	$new_array = array();
+	foreach($array as $_key => $_value)
+	{
+		$new_array[$_key] = $_value;
+
+		// Is this the key we want to insert $item after?
+		if($_key == $after)
+		{
+			$new_array[$key] = $item;
+		}
+	}
+
+	return $new_array;
+}
+
 
 // Some constants that aren't defined until PHP 5.3.0.
 if(!defined('E_DEPRECATED'))
