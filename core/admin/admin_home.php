@@ -63,6 +63,11 @@ if(!function_exists('admin_home'))
 			// This is a place for the HTTP class!
 			$http = api()->load_class('HTTP');
 
+			// We don't want to keep trying for too long -- this way the page load
+			// when news is being fetched won't slow the user down too much if
+			// SnowCMS is down.
+			$http->set_timeout(2);
+
 			// Make an HTTP request for it.
 			$fetched_news = $http->request(api()->apply_filters('admin_news_location', 'http://update.snowcms.com/news.txt'));
 

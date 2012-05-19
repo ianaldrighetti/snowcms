@@ -22,11 +22,26 @@ if(!defined('INSNOW'))
 	die('Nice try...');
 }
 
-require(dirname(__FILE__). '/textbox.widget.php');
-require(dirname(__FILE__). '/menu.widget.php');
-require(dirname(__FILE__). '/user_info.widget.php');
+class Menu_Widget extends Widget
+{
+	public function __construct()
+	{
+		parent::__construct('Menu', 'A simple menu widget for a list of static links.');
+	}
 
-api()->add_widget('Textbox_Widget');
-api()->add_widget('Menu_Widget');
-api()->add_widget('User_Info_Widget');
+	public function form($options)
+	{
+
+	}
+
+	public function save($options, &$errors = array())
+	{
+
+	}
+
+	public function display($display_options, $options)
+	{
+
+	}
+}
 ?>

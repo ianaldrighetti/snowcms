@@ -514,7 +514,7 @@ class HTTP
 		$request_callbacks = array(
 			array(
 				'test' => create_function('', '
-										return !function_exists(\'curl_exec\');'),
+										return function_exists(\'curl_exec\');'),
 				'callback' => 'http_curl_request',
 			),
 			array(
@@ -603,12 +603,14 @@ class HTTP
 															 redirect options permit.
 
 				string content_type - The contents of the Content-Type: header.
+
+				bool timed_out - A bool which indicates whether the request timed
+												 out.
 	*/
 	public function set_info($info)
 	{
 		// Make sure the right options have been set.
-		$indexes = array_keys($info);
-		if(!in_array('status_code', $indexes) || !in_array('effective_url', $indexes) || !in_array('content_type', $indexes))
+		if(!array_key_exists('status_code', $info) || !array_key_exists('effective_url', $info) || !array_key_exists('content_type', $info) || !array_key_exists('timed_out', $info))
 		{
 			return;
 		}
@@ -617,6 +619,7 @@ class HTTP
 										'status_code' => (int)$info['status_code'],
 										'effective_url' => $info['effective_url'],
 										'content_type' => $info['content_type'],
+										'timed_out' => !empty($info['timed_out']),
 									);
 	}
 
@@ -675,6 +678,25 @@ class HTTP
 	public function content_type()
 	{
 		return is_array($this->info) ? $this->info['content_type'] : false;
+	}
+
+	/*
+		Method: timed_out
+
+		Returns whether the last request resulted in a timeout, whether it be
+		because the remote server is down, or the functions timed out.
+
+		Parameters:
+			none
+
+		Returns:
+			mixed - Returns a bool indicating whether the last request timed out,
+							however if no previous request was made, then null is
+							returned.
+	*/
+	public function timed_out()
+	{
+		return is_array($this->info) ? $this->info['timed_out'] : null;
 	}
 }
 
@@ -770,11 +792,14 @@ if(!function_exists('http_curl_request'))
 																 'status_code' => $info['http_code'],
 																 'effective_url' => $info['url'],
 																 'content_type' => $info['content_type'],
+																 'timed_out' => $info['total_time'] >= $request['timeout'],
 															));
 
 		// Now that we gave the HTTP instance the information, we should check
-		// to make sure the request was successful.
-		if($info['status_code'] >= 400)
+		// to make sure the request was successful. This could mean that we got
+		// a file not found or other server error, or maybe the request timed
+		// out according to the timeout option we were supplied.
+		if($info['http_code'] >= 400 || $info['total_time'] >= $request['timeout'])
 		{
 			// Anything over 400 is not a good sign!
 			return false;
@@ -860,6 +885,7 @@ if(!function_exists('http_fsockopen_request'))
 																	 'status_code' => isset($request['status_code']) ? $request['status_code'] : 301,
 																	 'effective_url' => $request['url'],
 																	 'content_type' => null,
+																	 'timed_out' => false,
 																));
 
 			return false;
@@ -870,16 +896,23 @@ if(!function_exists('http_fsockopen_request'))
 
 		$fp = fsockopen(($parsed['scheme'] == 'https' ? 'ssl://' : ''). $parsed['host'], $request['port'], $errno, $errstr, $request['timeout']);
 
+		// Couldn't connect...?
+		if(empty($fp))
+		{
+			$request['http']->set_info(array(
+																	 'status_code' => null,
+																	 'effective_url' => $request['url'],
+																	 'content_type' => null,
+																	 'timed_out' => true,
+																));
+
+			return false;
+		}
+
 		// Let's set a timeout, maybe.
 		if($request['timeout'] > 0)
 		{
 			stream_set_timeout($fp, $request['timeout']);
-		}
-
-		// Couldn't connect...?
-		if(empty($fp))
-		{
-			return false;
 		}
 
 		// Make our request path, used in our request, of course!
@@ -957,6 +990,7 @@ if(!function_exists('http_fsockopen_request'))
 																	 'status_code' => null,
 																	 'effective_url' => $request['url'],
 																	 'content_type' => null,
+																	 'timed_out' => true,
 																));
 
 			return false;
@@ -988,6 +1022,7 @@ if(!function_exists('http_fsockopen_request'))
 																	 'status_code' => $status_code,
 																	 'effective_url' => $request['url'],
 																	 'content_type' => null,
+																	 'timed_out' => false,
 																));
 
 			return false;
@@ -1026,6 +1061,7 @@ if(!function_exists('http_fsockopen_request'))
 																		 'status_code' => $status_code,
 																		 'effective_url' => $request['url'],
 																		 'content_type' => !empty($headers['content-type']) ? $headers['content-type'] : null,
+																		 'timed_out' => false,
 																	));
 
 				return false;
@@ -1057,6 +1093,7 @@ if(!function_exists('http_fsockopen_request'))
 																 'status_code' => $status_code,
 																 'effective_url' => $request['url'],
 																 'content_type' => !empty($headers['content-type']) ? $headers['content-type'] : null,
+																 'timed_out' => false,
 															));
 
 		// Did you want this written to a file?

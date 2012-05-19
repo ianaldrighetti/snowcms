@@ -89,7 +89,7 @@ if(!function_exists('admin_themes_widgets'))
 
 					if(!array_key_exists('widget_id', $_POST) || empty($allocated_widgets[$_POST['widget_id']]))
 					{
-						$response['error'] = l('The specified widget does not exist. %s', $_POST['widget_id']);
+						$response['error'] = l('The specified widget does not exist.');
 					}
 					else
 					{
@@ -109,8 +109,117 @@ if(!function_exists('admin_themes_widgets'))
 						$response['widgetId'] = $_POST['widget_id'];
 					}
 				}
+				// Moving an existing widget, I see.
+				elseif(!empty($_POST['move']) && $_POST['move'] == 'true')
+				{
+					// We will need to make sure that the widget they are attempting
+					// to move actually exists.
+					$allocated_widgets = settings()->get('allocated_widgets', 'array', array());
+
+					if(!array_key_exists('widget_id', $_POST) || !array_key_exists($_POST['widget_id'], $allocated_widgets))
+					{
+						$response['error'] = empty($_POST['widget_id']) ? l('No widget specified.') : l('The specified widget does not exist.');
+					}
+					// Make sure that the area exists.
+					elseif(empty($_POST['area_id']) || !isset($theme_info['widgets'][$_POST['area_id']]))
+					{
+						$response['error'] = empty($_POST['area_id']) ? l('No area specified.') : l('The area %s is not supported by the current theme.', htmlchars($_POST['area_id']));
+					}
+					elseif(!array_key_exists('after', $_POST) || ($_POST['after'] != 'top' && !array_key_exists($_POST['after'], $allocated_widgets)))
+					{
+						$response['error'] = !array_key_exists('after', $_POST) ? l('No moving location specified.') : l('The widget cannot be moved after a widget that doesn\'t exist.');
+					}
+					else
+					{
+						$widget_id = (int)$_POST['widget_id'];
+
+						// Will we actually be moving the widget, or will it end up in
+						// the same place it was before?
+						if($allocated_widgets[$widget_id]['area'] == $_POST['area_id'] && $_POST['after'] == $_POST['widget_id'])
+						{
+							$response['moved'] = false;
+						}
+						else
+						{
+							// We need to get the widget's current options and such.
+							$widget_info = $widgets[$allocated_widgets[$widget_id]['area']][$widget_id];
+
+							// We will need to place the widget in it's new area... If it
+							// changed.
+							if($allocated_widgets[$widget_id]['area'] != $_POST['area_id'])
+							{
+								// Well, before we set the new area, we need to remove it
+								// from it's previous area.
+								unset($widgets[$allocated_widgets[$widget_id]['area']][$widget_id]);
+
+								// Okay, now we can safely change the area.
+								$allocated_widgets[$widget_id]['area'] = $_POST['area_id'];
+
+								// Set it.
+								settings()->set('allocated_widgets', $allocated_widgets);
+
+								// Then save it.
+								settings()->save();
+							}
+
+							// Does this widget area have anything in it, at all?
+							if(!isset($widgets[$_POST['area_id']]))
+							{
+								$widgets[$_POST['area_id']] = array();
+							}
+
+							// If the area has no widgets, regardless of the 'after'
+							// location, the widget will be the only one there.
+							if(count($widgets[$_POST['area_id']]) == 0)
+							{
+								$widgets[$_POST['area_id']][$widget_id] = $widget_info;
+							}
+							// Straight to the top!
+							elseif(!array_key_exists('after', $_POST) || $_POST['after'] == 'top')
+							{
+								$tmp_widgets = array($widget_info['id'] => $widget_info);
+
+								// Move all the current widgets in this area after the new
+								// widget just added.
+								foreach($widgets[$_POST['area_id']] as $tmp_id => $tmp)
+								{
+									$tmp_widgets[$tmp_id] = $tmp;
+								}
+
+								$widgets[$_POST['area_id']] = $tmp_widgets;
+							}
+							else
+							{
+								// Remove the widget, possibly.
+								unset($widgets[$_POST['area_id']][$widget_id]);
+
+								// We will insert the widget after the specified index.
+								$widgets[$_POST['area_id']] = array_ainsert($widgets[$_POST['area_id']], $_POST['after'], $widget_info['id'], $widget_info);
+							}
+
+							// Save the updated widget information.
+							settings()->set('widgets', $widgets);
+							settings()->save();
+
+							// We will need to provide them with the widgets information so
+							// that it can add the widget without requiring a page reload.
+							$response['widget_info'] = array(
+																					 'id' => $widget_info['id'],
+																					 'name' => api()->context['widgets'][$widget_info['class']]['name'],
+																					 'description' => api()->context['widgets'][$widget_info['class']]['description'],
+																					 'title' => !empty($widget_info['options']['title']) ? (strpos($widget_info['options']['title'], '<') !== false || strpos($widget_info['options']['title'], '>') !== false ? htmlchars($widget_info['options']['title']) : $widget_info['options']['title']) : api()->context['widgets'][$widget_info['class']]['name'],
+																					 'form' => admin_themes_widgets_widget_form($widget_info, api()->context['widgets']),
+																				 );
+
+							// We will want to tell them where to place the item.
+							$response['after'] = ($_POST['after'] == 'top') ? $_POST['area_id']. '_top' : $_POST['after'];
+							$response['widget_area'] = $_POST['area_id'];
+							$response['moved'] = true;
+						}
+					}
+				}
 				// So, are we adding the widget?
-				elseif(empty($_POST['move']) || $_POST['move'] == 'false')
+				elseif(!empty($_POST['move']) && $_POST['move'] == 'false')
 				{
 					// Nope, we're adding it, for the first time.
 					// Make sure the widget they want to add is even supported.
@@ -170,9 +279,9 @@ if(!function_exists('admin_themes_widgets'))
 							$widgets[$_POST['area_id']][$widget_info['id']] = $widget_info;
 						}
 						// Do they want the widget to go at the top?
-						elseif(empty($_POST['after']) || $_POST['after'] == 'top')
+						elseif(!array_key_exists('after', $_POST) || $_POST['after'] == 'top')
 						{
-							$tmp_widgets[$widget_info['id']] = $widget_info;
+							$tmp_widgets = array($widget_info['id'] => $widget_info);
 
 							// Move all the current widgets in this area after the new
 							// widget just added.
@@ -210,7 +319,7 @@ if(!function_exists('admin_themes_widgets'))
 				}
 				else
 				{
-					die('not implemented');
+					$response['error'] = l('Unknown action.');
 				}
 
 				// Send the response in JSON-form.
@@ -307,7 +416,7 @@ if(!function_exists('admin_themes_widgets'))
 		theme()->add_js_file(array('src' => theme()->url(). '/js/widgets.js?'.time()));
 		theme()->add_js_var('themeurl', theme()->url());
 		theme()->add_js_var('widgets_pleaseWait', l('Please wait...'));
-		theme()->add_js_var('widgets_moveHere', '&laquo; '. l('Move Widget Here'). ' &raquo;');
+		theme()->add_js_var('widgets_moveHere', '&laquo; '. l('Add Widget Here'). ' &raquo;');
 		theme()->add_js_var('widget_expand', l('Expand this widget'));
 		theme()->add_js_var('widget_collapse', l('Collapse this widget'));
 		theme()->add_js_var('widget_moveThis', l('Move this widget'));

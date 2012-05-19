@@ -93,7 +93,24 @@ Widgets.prototype.Expand = function(img, widgetId)
 // Function: StartMove
 Widgets.prototype.StartMove = function(element, widgetId)
 {
-	alert('not implemented');
+	// Moving something else? We can only do one at a time!
+	if(this.moving != null)
+	{
+		if(typeof this.moving == 'string')
+		{
+			this.StopPlace();
+		}
+		else
+		{
+			this.StopMove();
+		}
+	}
+
+	$('.move-selected-widget').css('display', 'block');
+	$('p', '.move-selected-widget').html(widgets_moveHere);
+
+	// We're moving an existing widget.
+	this.moving = widgetId;
 };
 
 // Function: StartPlace
@@ -169,26 +186,69 @@ Widgets.prototype.MoveHere = function(element, areaId, after)
 				},
 		});
 	}
+	else
+	{
+		$.ajax({
+			'type': 'POST',
+			'cache': false,
+			'data': 'request_type=ajax&move=true&widget_id=' + this.moving + '&area_id=' + encodeURIComponent(areaId) + '&after=' + encodeURIComponent(after) + '&sid=' + session_id,
+			'url': baseurl + '/index.php?action=admin&sa=themes&section=widgets',
+			'dataType': 'JSON',
+			'success': function(result, status, xhr)
+				{
+					if(result['error'])
+					{
+						Widgets.StopMove();
+
+						alert(result['error']);
+					}
+					// Did the user actually move it, or was it in the same place
+					// in the end?
+					else if(result['moved'])
+					{
+						Widgets.StopMove();
+
+						// This will be added back...
+						$('#moveHere_' + result['widget_info']['id']).remove();
+						$('#widget_id-' + result['widget_info']['id']).remove();
+
+						$('#moveHere_' + result['after']).after('<div class="widget-container" id="widget_id-' + result['widget_info']['id'] + '">' +
+																											'<p class="widget-name" title="' + widget_moveThis + '" onclick="Widgets.StartMove(this, ' + result['widget_info']['id'] + ');">' + result['widget_info']['title'] + '</p>' +
+																											'<p class="widget-expand"><img src="' + themeurl + '/style/images/collapse-arrow.png" alt="" title="' + widget_collapse + '" onclick="Widgets.Expand(this, ' + result['widget_info']['id'] + ');" onmouseover="this.src = \'' + themeurl + '/style/images/collapse-double-arrow.png\';" onmouseout="this.src = \'' + themeurl + '/style/images/collapse-arrow.png\';" /></p>' +
+																											'<div class="break">' +
+																											'</div>' +
+																											'<div id="options_' + result['widget_info']['id'] + '" class="widget-options" style="display: block;">' +
+																											result['widget_info']['form'] +
+																											'</div>' +
+																										'</div>' +
+																										'<div id="moveHere_' + result['widget_info']['id'] + '" class="move-selected-widget" onclick="Widgets.MoveHere(this, \'' + result['widget_area'] + '\', ' + result['widget_info']['id'] + ');">' +
+																											'<p>' + widgets_moveHere + '</p>' +
+																										'</div>');
+					}
+					else
+					{
+						Widgets.StopMove();
+					}
+				},
+		});
+	}
 };
 
 // Function: StopPlace
 Widgets.prototype.StopPlace = function()
 {
-	if(this.moving != null && typeof this.moving == 'string')
+	if(this.moving != null)
 	{
 		$('.move-selected-widget').css('display', 'none');
 		this.moving = null;
-	}
-	else
-	{
-		alert('not implemented');
 	}
 };
 
 // Function: StopMove
 Widgets.prototype.StopMove = function()
 {
-	alert('not yet implemented');
+	// They do the same thing >.>
+	Widgets.StopPlace();
 };
 
 var Widgets = new Widgets();

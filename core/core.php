@@ -64,7 +64,7 @@ function init_core()
 			api()->add_event('action=admin&sa=update&apply=*', 'admin_update_apply', coredir. '/admin/admin_update.php');
 			api()->add_event('action=admin&sa=error_log', 'admin_error_log', coredir. '/admin/admin_error_log.php');
 			api()->add_event('action=admin&sa=error_log&id=*', 'admin_error_log_view', coredir. '/admin/admin_error_log.php');
-			api()->add_event('action=admin&sa=members_add', 'admin_members_add', l('Add a New Member'), coredir. '/admin/admin_members_add.php');
+			api()->add_event('action=admin&sa=members_add', 'admin_members_add', coredir. '/admin/admin_members_add.php');
 			api()->add_event('action=admin&sa=members_manage', 'admin_members_manage', coredir. '/admin/admin_members_manage.php');
 			api()->add_event('action=admin&sa=members_permissions', 'admin_members_manage_permissions', coredir. '/admin/admin_members_permissions.php');
 			api()->add_event('action=admin&sa=members_permissions&grp=*', 'admin_members_manage_group_permissions', coredir. '/admin/admin_members_permissions.php');
