@@ -203,6 +203,8 @@ function array_ainsert($array, $after, $key, $item)
 	elseif(!array_key_exists($after, $array))
 	{
 		$array[$key] = $item;
+
+		return $array;
 	}
 
 	// We will need a temporary array, of course.

@@ -402,7 +402,14 @@ if(!function_exists('admin_prepend'))
 
 		// Load some default notifications and what not.
 		api()->add_filter('admin_notifications', 'admin_load_notifications');
-		api()->add_filter('admin_important_notifications', 'admin_important_notifications');
+
+		// The important notifications is an alert that there is a system
+		// update available. But if the user cannot update the system, there is
+		// no point in telling them.
+		if(member()->can('update_system'))
+		{
+			api()->add_filter('admin_important_notifications', 'admin_important_notifications');
+		}
 
 		// Do we have any notifications?
 		$admin_notifications = api()->apply_filters('admin_notifications', array());
@@ -910,83 +917,93 @@ function admin_show_sidebar($show = null)
 */
 function admin_load_notifications($notifications)
 {
-	// So, do we have any notifications we need to add?
-	$plugin_updates = settings()->get('plugin_updates', 'array', array());
-
-	$tmp = array();
-	foreach($plugin_updates as $plugindir => $version)
+	// We only need to notify them of available plugin updates if they can
+	// update them, of course!
+	if(member()->can('manage_plugins'))
 	{
-		$plugin_info = plugin_load(plugindir. '/'. basename($plugindir));
+		// So, do we have any notifications we need to add?
+		$plugin_updates = settings()->get('plugin_updates', 'array', array());
 
-		// Make sure the plugin even exists.
-		if($plugin_info === false)
+		$tmp = array();
+		foreach($plugin_updates as $plugindir => $version)
 		{
-			continue;
+			$plugin_info = plugin_load(plugindir. '/'. basename($plugindir));
+
+			// Make sure the plugin even exists.
+			if($plugin_info === false)
+			{
+				continue;
+			}
+
+			$tmp[] = '<a href="'. baseurl('index.php?action=admin&amp;sa=plugins_manage'. (!isset($_GET['go']) ? '&amp;go=1' : ''). '#p'. sha1($plugindir)). '" title="'. l('v%s of this plugin is available', htmlchars($version)). '">'. $plugin_info['name']. '</a>';
 		}
 
-		$tmp[] = '<a href="'. baseurl. '/index.php?action=admin&amp;sa=plugins_manage'. (!isset($_GET['go']) ? '&amp;go=1' : ''). '#p'. sha1($plugindir). '" title="'. l('v%s of this plugin is available', htmlchars($version)). '">'. $plugin_info['name']. '</a>';
+		// So, were there any plugin updates?
+		if(count($tmp) > 0)
+		{
+			// Yup, there is!
+			if(count($tmp) > 1)
+			{
+				// Let's make this purty!
+				$last = $tmp[count($tmp) - 1];
+				unset($tmp[count($tmp) - 1]);
+
+				$updates = implode(', ', $tmp). ' '. l('and'). ' '. $last;
+			}
+			else
+			{
+				$updates = $tmp[0];
+			}
+
+			$notifications[] = array(
+													 'attr_class' => 'alert-notification',
+													 'message' => l('The following plugins have updates available: %s.', $updates),
+												 );
+		}
 	}
 
-	// So, were there any plugin updates?
-	if(count($tmp) > 0)
+	// The user can update themes if they are allowed to select the current
+	// theme or manage themes.
+	if(member()->can('manage_themes') || member()->can('select_theme'))
 	{
-		// Yup, there is!
-		if(count($tmp) > 1)
+		// Now, what about themes?
+		$theme_updates = settings()->get('theme_updates', 'array', array());
+
+		$tmp = array();
+		foreach($theme_updates as $themedir => $version)
 		{
-			// Let's make this purty!
-			$last = $tmp[count($tmp) - 1];
-			unset($tmp[count($tmp) - 1]);
+			$theme_info = theme_load(themedir. '/'. basename($themedir));
 
-			$updates = implode(', ', $tmp). ' '. l('and'). ' '. $last;
-		}
-		else
-		{
-			$updates = $tmp[0];
-		}
+			// Make sure the theme exists.
+			if($theme_info === false)
+			{
+				continue;
+			}
 
-		$notifications[] = array(
-												 'attr_class' => 'alert-notification',
-												 'message' => l('The following plugins have updates available: %s.', $updates),
-											 );
-	}
+			$tmp[] = '<a href="'. baseurl('index.php?action=admin&amp;sa=themes'. (!isset($_GET['go']) ? '&amp;go=1' : ''). '#t'. sha1($themedir)). '" title="'. l('v%s of this theme is available', htmlchars($version)). '">'. $theme_info['name']. '</a>';
 
-	// Now, what about themes?
-	$theme_updates = settings()->get('theme_updates', 'array', array());
-
-	$tmp = array();
-	foreach($theme_updates as $themedir => $version)
-	{
-		$theme_info = theme_load(themedir. '/'. basename($themedir));
-
-		// Make sure the theme exists.
-		if($theme_info === false)
-		{
-			continue;
 		}
 
-		$tmp[] = '<a href="'. baseurl. '/index.php?action=admin&amp;sa=themes'. (!isset($_GET['go']) ? '&amp;go=1' : ''). '#t'. sha1($themedir). '" title="'. l('v%s of this theme is available', htmlchars($version)). '">'. $theme_info['name']. '</a>';
-
-	}
-
-	if(count($tmp) > 0)
-	{
-		if(count($tmp) > 1)
+		if(count($tmp) > 0)
 		{
-			// Let's make this purty!
-			$last = $tmp[count($tmp) - 1];
-			unset($tmp[count($tmp) - 1]);
+			if(count($tmp) > 1)
+			{
+				// Let's make this purty!
+				$last = $tmp[count($tmp) - 1];
+				unset($tmp[count($tmp) - 1]);
 
-			$updates = implode(', ', $tmp). ' '. l('and'). ' '. $last;
-		}
-		else
-		{
-			$updates = $tmp[0];
-		}
+				$updates = implode(', ', $tmp). ' '. l('and'). ' '. $last;
+			}
+			else
+			{
+				$updates = $tmp[0];
+			}
 
-		$notifications[] = array(
-												 'attr_class' => 'alert-notification',
-												 'message' => l('The following themes have updates available: %s.', $updates),
-											 );
+			$notifications[] = array(
+													 'attr_class' => 'alert-notification',
+													 'message' => l('The following themes have updates available: %s.', $updates),
+												 );
+		}
 	}
 
 	return $notifications;
@@ -1014,7 +1031,7 @@ function admin_important_notifications($notifications)
 		// Yes, there is!
 		$notifications[] = array(
 												 'attr_class' => 'alert-message',
-												 'message' => '<p>'. l('There is an update available for SnowCMS. Please <a href="%s">update to v%s now</a>.', baseurl. '/index.php?action=admin&amp;sa=update', $latest_version). '</p>',
+												 'message' => '<p>'. l('There is an update available for SnowCMS. Please <a href="%s">update to v%s now</a>.', baseurl('index.php?action=admin&amp;sa=update'), $latest_version). '</p>',
 											 );
 	}
 

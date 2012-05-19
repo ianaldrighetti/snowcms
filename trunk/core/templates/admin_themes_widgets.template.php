@@ -26,7 +26,7 @@ admin_section_menu('themes', 'widgets');
 
 echo '
 	<h3><img src="', theme()->url(), '/style/images/manage_themes-small.png" alt="" /> ', l('Manage Widgets'), '</h3>
-	<p>Widgets allow plugins to add additional functionality in a theme, such as displaying some sort of dynamic or static content. So long as the current theme supports widgets, simply drag and drop the installed widgets to their desired location.</p>';
+	<p>Widgets allow plugins to add additional functionality in a theme, such as displaying some sort of dynamic or static content. If the theme supports widgets, just select the widgets you wish to add and choose where they should be displayed, along with changing any configuration options for the widget.</p>';
 
 // Does the current theme support widgets?
 if(api()->context['widget_support'])
@@ -34,7 +34,7 @@ if(api()->context['widget_support'])
 	// We need to list all the widgets that are available for use.
 	echo '
 	<div class="widget-area available-list">
-		<h3>', l('Installed Widgets'), '</h3>
+		<h3>', l('Available Widgets'), '</h3>
 		<div class="widget-list">';
 
 	foreach(api()->context['widgets'] as $widget_class => $widget)
@@ -49,6 +49,8 @@ if(api()->context['widget_support'])
 	}
 
 	echo '
+			<div class="break">
+			</div>
 		</div>
 	</div>';
 
@@ -60,7 +62,7 @@ if(api()->context['widget_support'])
 		<h3>', $area_info['label'], '</h3>
 		<div class="widget-list" id="', $widget_area, '">
 			<div id="moveHere_', $widget_area, '_top" class="move-selected-widget" onclick="Widgets.MoveHere(this, \'', $widget_area, '\', \'top\');">
-				<p>&laquo; ', l('Move Widget Here'), ' &raquo;</p>
+				<p>&laquo; ', l('Add Widget Here'), ' &raquo;</p>
 			</div>';
 
 		foreach($area_info['widgets'] as $widget)
@@ -76,7 +78,7 @@ if(api()->context['widget_support'])
 				</div>
 			</div>
 			<div id="moveHere_', $widget['id'], '" class="move-selected-widget" onclick="Widgets.MoveHere(this, \'', $widget_area, '\', ', $widget['id'], ');">
-				<p>&laquo; ', l('Move Widget Here'), ' &raquo;</p>
+				<p>&laquo; ', l('Add Widget Here'), ' &raquo;</p>
 			</div>';
 		}
 
