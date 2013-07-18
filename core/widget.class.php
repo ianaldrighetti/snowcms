@@ -132,6 +132,9 @@ abstract class Widget
 		the HTML form tag, as this is done automatically.
 
 		Parameters:
+			int $widget_id - This is the ID assigned to the widget, no other
+											 enabled widget (including widgets of different types)
+											 will have the same ID.
 			array $options - An array containing the currently set options for the
 											 widget.
 
@@ -148,7 +151,7 @@ abstract class Widget
 			identify each individual widget -- even if it is of the same widget
 			type.
 	*/
-	abstract public function form($options);
+	abstract public function form($widget_id, $options);
 
 	/*
 		Method: save
@@ -159,6 +162,7 @@ abstract class Widget
 		database.
 
 		Parameters:
+			int $widget_id - A unique number identifying the widget.
 			array $options - An array containing the options specified by the
 											 user.
 			array &$errors - An array containing an errors regarding the users
@@ -172,7 +176,7 @@ abstract class Widget
 		Note:
 			This is an abstract method and must be implemented.
 	*/
-	abstract public function save($options, &$errors = array());
+	abstract public function save($widget_id, $options, &$errors = array());
 
 	/*
 		Method: default_options
@@ -201,13 +205,15 @@ abstract class Widget
 	}
 
 	/*
-		Method: display
+		Method: render
 
-		This method will generate and display the contents of the widget
-		according to the options specified by the theme and also the currently
-		set options for the widget.
+		This method will generate and the contents of the widget according to
+		the options specified by the theme and also the currently set options
+		for the widget.
 
 		Parameters:
+			int $widget_id - A unique number identifying the widget being
+											 displayed.
 			array $display_options - An array containing display options for the
 															 widget, which are specified by the theme
 															 itself. See the notes for more information.
@@ -215,8 +221,8 @@ abstract class Widget
 											 by the user within the control panel for this widget.
 
 		Returns:
-			void - Nothing is to be returned by this method, as the widget is
-						 expected to echo any necessary content.
+			string - The render method is expected to return the string containing
+							 the generated output for the widget.
 
 		Note:
 			This is an abstract method and must be implemented.
@@ -250,6 +256,6 @@ abstract class Widget
 			Each of these indexes will always be set, though they may contain an
 			empty string.
 	*/
-	abstract function display($display_options, $options);
+	abstract function render($widget_id, $display_options, $options);
 }
 ?>

@@ -317,6 +317,28 @@ if(!function_exists('admin_themes_widgets'))
 						$response['widget_area'] = $_POST['area_id'];
 					}
 				}
+				// Maybe options for the widget are being saved?
+				elseif(!empty($_POST['save']) && $_POST['save'] == 'true')
+				{
+					// Which widget are we talking about?
+					$widget_id = isset($_POST['widget_id']) ? (int)$_POST['widget_id'] : -1;
+
+					// Check to see whether this widget exists. That information will
+					// be found in the allocated widgets array.
+					$allocated_widgets = settings()->get('allocated_widgets', 'array', array());
+
+					// So... does it?
+					if(array_key_exists($widget_id, $allocated_widgets))
+					{
+						$response['success'] = true;
+					}
+					else
+					{
+						$response['error'] = l('That widget does not exist.');
+					}
+
+					$response['widget_id'] = $widget_id;
+				}
 				else
 				{
 					$response['error'] = l('Unknown action.');
@@ -453,9 +475,9 @@ if(!function_exists('admin_themes_widgets_widget_form'))
 		}
 
 		// Generate the options form, with the proper options form and buttons.
-		return '<form action="'. baseurl('index.php?action=admin&amp;sa=themes&amp;section=widgets&amp;widget='. urlencode($widget_info['class']). '&amp;id='. (int)$widget_info['id']). '" method="post" onsubmit="return Widgets.Save(this, \''. urlencode($widget_info['class']). '\', '. (int)$widget_info['id']. ');">'.
-						 $widgets[$widget_info['class']]['object']->form($widget_info['options']).
-					 '<p class="buttons"><input type="submit" name="save_widget" value="'. l('Save'). '" /> <input type="button" value="'. l('Delete'). '" onclick="Widgets.Delete(this, '. $widget_info['id']. ');" /></p>
+		return '<form id="widget_form-'. $widget_info['id']. '" action="'. baseurl('index.php?action=admin&amp;sa=themes&amp;section=widgets&amp;widget='. urlencode($widget_info['class']). '&amp;id='. (int)$widget_info['id']). '" method="post" onsubmit="return Widgets.Save(this, \''. urlencode($widget_info['class']). '\', '. (int)$widget_info['id']. ');">'.
+						 $widgets[$widget_info['class']]['object']->form($widget_info['id'], $widget_info['options']).
+					 '<p class="buttons"><input type="submit" name="save_widget" id="widget_save-'. $widget_info['id']. '" value="'. l('Save'). '" /> <input type="button" value="'. l('Delete'). '" onclick="Widgets.Delete(this, '. $widget_info['id']. ');" /></p>
 					 </form>';
 	}
 }

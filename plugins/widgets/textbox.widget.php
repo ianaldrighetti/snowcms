@@ -29,17 +29,17 @@ class Textbox_Widget extends Widget
 		parent::__construct('Text Box', 'A simple text box widget for entering static content.');
 	}
 
-	public function form($options)
+	public function form($widget_id, $options)
+	{
+		return '<p><input type="text" name="title" value="'. htmlchars($options['title']). '" /></p><p><textarea name="text" style="width: 95%; height: 50px;">'. (!empty($options['text']) ? htmlchars($options['text']) : ''). '</textarea></p>';
+	}
+
+	public function save($widget_id, $options, &$errors = array())
 	{
 
 	}
 
-	public function save($options, &$errors = array())
-	{
-
-	}
-
-	public function display($display_options, $options)
+	public function render($widget_id, $display_options, $options)
 	{
 
 	}

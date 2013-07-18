@@ -29,17 +29,17 @@ class Menu_Widget extends Widget
 		parent::__construct('Menu', 'A simple menu widget for a list of static links.');
 	}
 
-	public function form($options)
+	public function form($widget_id, $options)
 	{
 
 	}
 
-	public function save($options, &$errors = array())
+	public function save($widget_id, $options, &$errors = array())
 	{
 
 	}
 
-	public function display($display_options, $options)
+	public function render($widget_id, $display_options, $options)
 	{
 
 	}
