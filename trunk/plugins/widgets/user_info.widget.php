@@ -29,17 +29,17 @@ class User_Info_Widget extends Widget
 		parent::__construct('User Info', 'This widget will display useful links to the current user depending upon whether they are logged in or a guest.');
 	}
 
-	public function form($options)
+	public function form($widget_id, $options)
 	{
 
 	}
 
-	public function save($options, &$errors = array())
+	public function save($widget_id, $options, &$errors = array())
 	{
 
 	}
 
-	public function display($display_options, $options)
+	public function render($widget_id, $display_options, $options)
 	{
 
 	}

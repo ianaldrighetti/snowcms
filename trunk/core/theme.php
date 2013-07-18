@@ -492,6 +492,100 @@ function theme_foot()
 }
 
 /*
+	Function: theme_get_widgets
+
+	Returns an array of strings containing widgets to display.
+
+	Parameters:
+		string $area_id - The name of the area to fetch widgets from. These
+											values are assigned by the theme creators themselves
+											in the theme manifest (theme.xml).
+		array $display_options - An array containing customized display options
+														 for the widget, such as HTML to be output
+														 before/after the widget. See notes for more
+														 information.
+
+	Returns:
+		array - Returns an array containing the widgets that have been setup.
+
+	Note:
+		$display_options may contain any of the following, if not set they will
+		use the default values:
+
+			string before - A string specifying any content that the theme wants
+											the widget to display before any of the widgets own
+											content. Default: <li>
+
+			string after - A string specifying any content that the theme wants
+										 the widget to display after any of the widgets own
+										 content. Default: </li>
+
+			string before_title - A string specifying any content that the theme
+														wants the widget to display before the title
+														of the widget.
+														Default: <div class="widget-title">
+
+			string after_title - A string specifying any content that the theme
+													 wants the widget to display after the title of
+													 the widget. Default: </div>
+
+			string before_content - A string specifying any content that the
+															theme wants the widget to display before any
+															main content of the widget.
+															Default: <div class="widget-content">
+
+			string after_content - A string specifying any content that the
+														 theme wants the widget to display after any
+														 main content of the widget. Default: </div>
+*/
+function theme_get_widgets($area_id, $display_options = null)
+{
+	static $widgets = null;
+
+	// Have we loaded them yet? (We only need to do this once, because they
+	// aren't [or shouldn't] change when this function is being called because
+	// it's meant for themes -- after all processing)
+	if($widgets === null)
+	{
+		// Setup widgets are stored as an array inside the settings table.
+		$widgets = settings()->get('widgets', 'array', array());
+	}
+
+	// We will store rendered widgets here. Even if there were none in the
+	// specified area, we will just return an empty
+	$display_widgets = array();
+
+	// First, does the area exist?
+	if(!empty($widgets[$area_id]))
+	{
+		$display_widgets = array();
+
+		// Iterate through each widget so that we can generate the output.
+		foreach($widgets[$area_id] as $widget_info)
+		{
+			// !!! TODO: We really shouldn't need to make an instance of the
+			// 					 widget to have it generate the output.
+			$widget = new $widget_info['class']();
+
+			// Now render the widget with all the necessary options.
+			$display_widgets[] = $widget->render($widget_info['id'], array(
+																																 'before' => isset($display_options['before']) ? $display_options['before'] : '<li>',
+																																 'after' => isset($display_options['after']) ? $display_options['after'] : '</li>',
+																																 'before_title' => isset($display_options['before_title']) ? $display_options['before_title'] : '<div class="widget-title">',
+																																 'after_title' => isset($display_options['after_title']) ? $display_options['after_title'] : '</div>',
+																																 'before_content' => isset($display_options['before_content']) ? $display_options['before_content'] : '<div class="widget-content">',
+																																 'after_content' => isset($display_options['after_content']) ? $display_options['after_content'] : '</div>',
+																															), $widget_info['options']);
+
+
+		}
+	}
+
+	// Return what we got.
+	return $display_widgets;
+}
+
+/*
 	Function: baseurl
 
 	Returns the properly formatted URL for the specified location.

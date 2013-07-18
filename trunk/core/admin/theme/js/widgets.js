@@ -20,7 +20,57 @@ Widgets.prototype.AddArea = function(areaId, currentWidgets)
 // Function: Save
 Widgets.prototype.Save = function(element, widgetClass, widgetId)
 {
+	$('#widget_save-' + widgetId).attr('disabled', 'disabled');
+
+	$.ajax({
+		'type': 'POST',
+		'cache': false,
+		'data': 'request_type=ajax&save=true&widget_id=' + encodeURIComponent(widgetId) + '&' + (Widgets.CollectOptions(element).join('&')) + '&sid=' + session_id,
+		'url': baseurl + '/index.php?action=admin&sa=themes&section=widgets',
+		'dataType': 'JSON',
+		'success': function(result, status, xhr)
+			{
+				if(result['error'])
+				{
+					alert(result['error']);
+				}
+				else
+				{
+					alert('!!! Save occurred ???');
+				}
+
+				if(result['widget_id'] >= 0)
+				{
+					$('#widget_save-' + result['widget_id']).attr('disabled', false);
+				}
+			},
+		});
+
 	return false;
+};
+
+Widgets.prototype.CollectOptions = function(element)
+{
+	var children = $(element).children();
+	var options = [];
+
+	for(var index = 0; index < $(element).children().length; index++)
+	{
+		if($(children[index]).children().length > 0)
+		{
+			var childOptions = Widgets.CollectOptions(children[index]);
+			for(var j in childOptions)
+			{
+				options.push(childOptions[j]);
+			}
+		}
+		else if(typeof $(children[index]).attr('name') != 'undefined')
+		{
+			options.push(encodeURIComponent($(children[index]).attr('name')) + '=' + encodeURIComponent($(children[index]).val()));
+		}
+	}
+
+	return options;
 };
 
 // Function: Delete
