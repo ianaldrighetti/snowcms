@@ -24,6 +24,44 @@ if(!defined('INSNOW'))
 
 // Title: Manage Widgets
 
+/*
+	Variable: allocated_widgets
+
+	Note: This variable is a Settings variable.
+
+				The allocated_widgets variable is a key/value pair array that
+				contains the following information:
+
+					int id - The unique ID of the widget assigned when created.
+
+					string class - The name of the class that implements <Widget>.
+
+					string area - The name of the area the widget belongs, acceptable
+												values are determined by the current theme.
+
+				The key of the entry in the array is also the widget's unique ID.
+				This is to allow a quick check to see if the widget being dealt with
+				exists.
+
+	Variable: widgets
+
+	Note: This variable is a Settings variable.
+
+				The widgets variable contains the actual widget's information used
+				to generate it. It is a key/value pair as well:
+
+					int id - The unique ID of the widget, same as that assigned in the
+									 allocated_widgets array.
+
+					string class - The name of the class that implements <Widget>.
+
+					array options - A key/value pair containing the set options for
+													the widget.
+
+				The key of the entry is the widget's unique ID as well. The array is
+				sorted in order based on what the user has set.
+*/
+
 if(!function_exists('admin_themes_widgets'))
 {
 	/*
@@ -330,7 +368,48 @@ if(!function_exists('admin_themes_widgets'))
 					// So... does it?
 					if(array_key_exists($widget_id, $allocated_widgets))
 					{
-						$response['success'] = true;
+						// It does exist, so we need to gather the options passed.
+						$widget_options = array();
+
+						// We need to remove a few entries, though.
+						$remove_keys = array('request_type', 'save', 'widget_id', 'save_widget', 'sid');
+						foreach($_POST as $key => $value)
+						{
+							// If the key is in the array of keys we want removed, pass
+							// it.
+							if(in_array($key, $remove_keys))
+							{
+								continue;
+							}
+
+							// Otherwise transfer it.
+							$widget_options[$key] = $value;
+						}
+
+						// Now the widget needs to tell us whether the options have any
+						// issues. The errors parameter may be modified, if necessary.
+						$errors = array();
+						$widget_options = api()->context['widgets'][$allocated_widgets[$widget_id]['class']]['object']->save($widget_id, $widget_options, $errors);
+
+						// Did anything go wrong?
+						if($widget_options === false)
+						{
+							// Yeah, something bad with the options.
+							$response['error'] = (count($errors) == 1 ? l('An error occurred while attempting to save the widget&#039;s settings:') : l('Errors occurred while attempting to save the widget&#039;s settings')). "\r\n". implode("\r\n", $errors);
+						}
+						else
+						{
+							// It went well, so set the new options in the widget's option
+							// array.
+							$widgets[$allocated_widgets[$widget_id]['area']][$widget_id]['options'] = $widget_options;
+
+							// We need to save the changes to the database, of course.
+							settings()->set('widgets', $widgets);
+							settings()->save();
+
+							// Tell the user it all went well.
+							$response['success'] = true;
+						}
 					}
 					else
 					{
@@ -402,7 +481,7 @@ if(!function_exists('admin_themes_widgets'))
 				{
 					foreach($widgets as $widget_info)
 					{
-						if(!isset(api()->context['widgets'][$widget_info['class']]))
+						if(!isset($widget_info['class']) || !isset(api()->context['widgets'][$widget_info['class']]))
 						{
 							// In which case we will just skip it -- we won't delete it
 							// though, because you never know, it could come back!

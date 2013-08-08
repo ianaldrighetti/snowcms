@@ -89,12 +89,33 @@ a:hover {
 }
 
 #sidebar ul#navigation {
-	padding: 25px 0 0 30px;
+	padding: 0px 0 0 25px;
 	list-style: circle;
 }
 
 #sidebar ul#navigation li {
 	padding: 3px 0;
+}
+
+#sidebar ul#right-widgets
+{
+	padding: 10px 0;
+	list-style: none;
+}
+
+#sidebar ul .widget-title
+{
+	display: block;
+	padding: 5px 3px;
+	border: 1px solid #CCCCCC;
+	background: #F0F0F0;
+	border-width: 1px 0;
+}
+
+#sidebar ul .widget-content
+{
+	display: block;
+	padding: 5px;
 }
 
 #footer {

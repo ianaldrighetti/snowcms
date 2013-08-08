@@ -36,12 +36,15 @@ class Textbox_Widget extends Widget
 
 	public function save($widget_id, $options, &$errors = array())
 	{
-
+		return array(
+							'title' => $options['title'],
+							'text' => $options['text'],
+						);
 	}
 
 	public function render($widget_id, $display_options, $options)
 	{
-
+		return $display_options['before']. (!empty($options['title']) ? $display_options['before_title']. $options['title']. $display_options['after_title'] : ''). $display_options['before_content']. $options['text']. $display_options['after_content']. $display_options['after'];
 	}
 }
 ?>

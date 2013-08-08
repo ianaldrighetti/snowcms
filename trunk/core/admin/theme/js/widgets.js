@@ -34,10 +34,6 @@ Widgets.prototype.Save = function(element, widgetClass, widgetId)
 				{
 					alert(result['error']);
 				}
-				else
-				{
-					alert('!!! Save occurred ???');
-				}
 
 				if(result['widget_id'] >= 0)
 				{
@@ -56,17 +52,17 @@ Widgets.prototype.CollectOptions = function(element)
 
 	for(var index = 0; index < $(element).children().length; index++)
 	{
-		if($(children[index]).children().length > 0)
+		if(typeof $(children[index]).attr('name') != 'undefined')
+		{
+			options.push(encodeURIComponent($(children[index]).attr('name')) + '=' + encodeURIComponent($(children[index]).val()));
+		}
+		else if($(children[index]).children().length > 0)
 		{
 			var childOptions = Widgets.CollectOptions(children[index]);
 			for(var j in childOptions)
 			{
 				options.push(childOptions[j]);
 			}
-		}
-		else if(typeof $(children[index]).attr('name') != 'undefined')
-		{
-			options.push(encodeURIComponent($(children[index]).attr('name')) + '=' + encodeURIComponent($(children[index]).val()));
 		}
 	}
 

@@ -140,6 +140,8 @@ function init_core()
 		admin_prepend();
 	}
 
+	api()->add_menu_category('main', 'Main Menu');
+
 	// Let's add a few default links to allow some basic navigation throughout
 	// the website.
 	api()->add_menu_item('main', array(
