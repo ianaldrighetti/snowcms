@@ -54,6 +54,9 @@ class API
 	// Variable: menu
 	private $menu;
 
+	// Variable: menu_info
+	private $menu_info;
+
 	// Variable: classes
 	// Holds registered classes, which are not located within the core
 	// directory.
@@ -1029,6 +1032,8 @@ class API
 	*/
 	public function add_menu_item($category, $options)
 	{
+		global $func;
+
 		// No category? No options..? No href or name? No content?
 		if(empty($category) || !is_array($options) || count($options) == 0 || (!isset($options['href']) && !isset($options['name'])) || empty($options['content']))
 		{
@@ -1057,6 +1062,12 @@ class API
 		if(!isset($this->menu[$category]))
 		{
 			$this->menu[$category] = array();
+		}
+
+		// We may need to create this as well.
+		if(!isset($this->menu_category[$category]))
+		{
+			$this->menu_category[$category] = $func['ucwords'](str_replace(array('-', '_'), ' ', $category));
 		}
 
 		// Are you going to make my life easy..? :)
@@ -1243,8 +1254,66 @@ class API
 		}
 		else
 		{
-			return isset($this->menu[$category]) ? $this->menu[$category] : false;
+			return isset($this->menu[$category]) && count($this->menu[$category]) > 0 ? $this->menu[$category] : false;
 		}
+	}
+
+	/*
+		Method: add_menu_category
+
+		Creates a new menu category to add links to.
+
+		Parameters:
+			string $category_id - The ID of the category (like main-menu, etc).
+			string $category_name - The friendly name of the category.
+
+		Returns:
+			void - Nothing is returned by this method.
+	*/
+	public function add_menu_category($category_id, $category_name = null)
+	{
+		global $func;
+
+		// If it doesn't exist in the menu array (which contains the actual
+		// links), create it.
+		if(!isset($this->menu[$category_id]))
+		{
+			$this->menu[$category_id] = array();
+		}
+
+		// Add/set the information. Because I forgot to do this when I first
+		// implemented the menu API, instead of putting it in the menu array
+		// and formatting it differently like an intelligent person with any
+		// forethought, I will just make a different one... ;-).
+		$this->menu_category[$category_id] = isset($category_name) ? $category_name : $func['ucwords'](str_replace(array('-', '_'), ' ', $category_name));
+	}
+
+	/*
+		Method: remove_menu_category
+
+		Removes the entire category of links.
+
+		Parameters:
+			string $category_id - The ID of the category to remove.
+
+		Returns:
+			bool - Returns true if the category was removed, false if not.
+	*/
+
+	/*
+		Method: return_menu_categories
+
+		Returns an array containing all menu categories available.
+
+		Parameters:
+			none
+
+		Returns:
+			array - Returns an array containing all categories, along with names.
+	*/
+	public function return_menu_categories()
+	{
+		return $this->menu_category;
 	}
 
 	/*
