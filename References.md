@@ -1,0 +1,1 @@
+To see information about the classes and functions of SnowCMS, [check out the docs](http://snowcms.googlecode.com/svn/docs/index.html).
